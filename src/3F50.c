@@ -75,7 +75,9 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 unk0[0x4];
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 unk6[0x18 - 0x6];
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u8 unkA[0x18 - 0xA];
     /* 0x18 */ f32 unk18;
     /* 0x1C */ u8 unk1C[0x24 - 0x1C];
     /* 0x24 */ u8 unk24[4];
@@ -204,7 +206,7 @@ void func_800251CC(u8 arg0, Actor *arg1);
 void func_800271B4(f32 arg0, Vec2f *arg1);
 void func_8002A338(s32 arg0);
 void func_8002A6B8(s32 arg0);
-void func_8002A7C8(s32 arg0, s32 arg1, s32 arg2);
+void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
 void func_80032D20(s32 arg0);
 s32 func_80007FD8(s32 arg0, u16 arg1, Actor *arg2);
 void func_80015F44(s32 arg0, Actor *arg1);
@@ -692,7 +694,74 @@ void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006168.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_8000665C.s")
+void func_8001A6E4(Actor *arg0);
+
+void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p) {
+    s32 anim;
+    s32 next;
+    s32 speed;
+    s32 mode;
+    s32 flag;
+    f32 d;
+    f32 pad;
+    f32 spd;
+    f32 cur;
+    f32 newspd;
+
+    cur = sqrtf(a->vx * a->vx + a->vz * a->vz);
+    if (sx != 0.0f || sz != 0.0f) {
+        spd = sqrtf(sx * sx + sz * sz) * 0.025;
+        if (spd > 2.0) {
+            sx = sx * 2.0 / spd;
+            sz = sz * 2.0 / spd;
+            spd = 2.0f;
+        }
+        d = func_800270D0(sx, sz) - a->rot;
+        if (d > 3.141592653589793) {
+            d -= 6.283185307179586;
+        } else if (d < -3.141592653589793) {
+            d += 6.283185307179586;
+        }
+        a->rot = a->rot + d * 0.4;
+        if (a->rot > 3.141592653589793) {
+            a->rot -= 6.283185307179586;
+        } else if (a->rot < -3.141592653589793) {
+            a->rot += 6.283185307179586;
+        }
+        D_8007A918.x = 0.0f;
+        D_8007A918.z = newspd = cur + (spd - cur) * 0.2;
+        func_800271B4(a->rot, &D_8007A918);
+        a->vx = D_8007A918.x;
+        a->vz = D_8007A918.z;
+        anim = 2;
+        next = 2;
+        mode = 0;
+        speed = spd * 14.0f + 3.0f;
+        flag = 0;
+        if (newspd < 1.0 && spd < 1.0) {
+            p->unk0 = 1;
+        }
+    } else {
+        anim = 0xF;
+        next = D_8007A910;
+        mode = 3;
+        p->unk0 = 4;
+        p->unk4 = 8;
+        a->unkC = 0.0f;
+        a->unk14 = 0.0f;
+        a->vx *= 0.9;
+        a->vz *= 0.9;
+        speed = 1;
+        flag = 1;
+        func_8001A6E4(a);
+    }
+    if (anim != a->unk52 && anim != a->unk5A) {
+        func_800201A0(a, anim, speed, next, speed, flag);
+        a->unk54 = mode;
+    } else {
+        a->unk58 = speed;
+    }
+}
 
 void func_800069E0(Actor *arg0, s32 arg1, Vec2f *arg2) {
     func_80007A38(arg0);
@@ -767,7 +836,100 @@ s32 func_80006D24(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006F80.s")
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 radius;
+} Unk8007C2A8;
+
+extern s32 D_8007C02C;
+extern Actor *D_8007C030[];
+extern s32 D_8007C2A4;
+extern Unk8007C2A8 *D_8007C2A8[];
+
+void func_80006F80(f32 *arg0, f32 *arg1, Actor *arg2) {
+    f32 size;
+    f32 x;
+    f32 z;
+    s32 hit;
+    s32 n;
+    Actor **list;
+    Actor *a;
+    Unk8007C2A8 **list2;
+    Unk8007C2A8 *o;
+    f32 dx;
+    f32 dz;
+    f32 r;
+    f32 dist;
+    f32 k;
+
+    hit = 0;
+    size = arg2->unk28 * arg2->scale;
+    x = *arg0 + arg2->x;
+    z = *arg1 + arg2->z;
+    n = D_8007C02C;
+    if (n != 0) {
+        for (list = D_8007C030; !hit && n != 0; n--) {
+            a = *list++;
+            dx = x - a->x;
+            dz = z - a->z;
+            r = a->unk28 * a->scale + size;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = a->x + dx - arg2->x;
+                    *arg1 = a->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+    n = D_8007ABA8;
+    if (n != 0) {
+        for (list = D_8007ABB0; !hit && n != 0; n--) {
+            a = *list++;
+            dx = x - a->x;
+            dz = z - a->z;
+            r = a->unk28 * a->scale + size;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = a->x + dx - arg2->x;
+                    *arg1 = a->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+    n = D_8007C2A4;
+    if (n != 0) {
+        for (list2 = D_8007C2A8; !hit && n != 0; n--) {
+            o = *list2++;
+            dx = x - o->x;
+            dz = z - o->z;
+            r = size + 2.0 * o->radius;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = o->x + dx - arg2->x;
+                    *arg1 = o->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007320.s")
 
@@ -864,6 +1026,9 @@ void func_800079B4(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A38.s")
 
+extern u16 D_8007C050[];
+extern u16 D_8008BE5A;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A8C.s")
 
 void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2) {
@@ -947,6 +1112,12 @@ s32 func_80008540(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
+extern s16 D_8008C15A;
+extern u16 D_8008C15C;
+extern u16 D_80092C86;
+
+s32 func_800168F0(s32 arg0, u16 arg1);
+s32 func_800167B0(u16 count, u8 *seq);
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800085D8.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80008840.s")
