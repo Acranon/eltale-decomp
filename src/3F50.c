@@ -89,7 +89,9 @@ typedef struct {
 
 /* D_8007B908: monsters, size 0x130 */
 typedef struct {
-    /* 0x00 */ u8 unk0[0x2C];
+    /* 0x00 */ u8 unk0[0xA];
+    /* 0x0A */ u16 unkA;
+    /* 0x0C */ u8 unkC[0x2C - 0xC];
     /* 0x2C */ Actor actor;
     /* 0x98 */ u8 unk98[0x130 - 0x98];
 } Monster;
@@ -209,6 +211,8 @@ void func_8002A338(s32 arg0);
 void func_8002A6B8(s32 arg0);
 void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
 void func_80032D20(s32 arg0);
+s32 func_80007E04(s32 arg0, Actor *arg1);
+u16 func_80007EAC(PlayerState *arg0);
 void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
 void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p);
 void func_80007320(PlayerState *arg0, Actor *arg1);
@@ -227,6 +231,8 @@ f32 sqrtf(f32 x);
 
 extern s32 D_8004DCA0;
 extern s32 D_8004DCF8;
+extern u16 D_80092C86;
+extern u16 D_80092C86;
 extern u16 D_8007A90C;
 extern u16 D_8007A90C;
 extern u16 D_8007A90C;
@@ -611,6 +617,13 @@ void func_8000525C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     }
 }
 
+extern s32 D_80085E4C;
+void func_8000CA88(Actor *arg0);
+void func_8001AE24(Actor *arg0, s32 arg1, u16 arg2);
+void func_8001BE2C(f32 x, f32 y, f32 z);
+void func_8002373C(Actor *arg0, s32 arg1, s32 arg2, s32 arg3);
+
+u16 func_8000C528(s32 target, u16 dmg, s32 elem, u16 flags, Actor *arg4);
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800052E0.s")
 
 void func_8000571C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
