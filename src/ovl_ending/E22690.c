@@ -37,9 +37,17 @@ typedef struct {
     f32 unk40;
     f32 unk44;
     f32 unk48;
-    s16 unk4C;
+    u16 unk4C;
     s16 unk4E;
 } UnkStruct_8022BB38;
+
+typedef struct {
+    s32 unk0;
+    s32 unk4;
+    char unk8[8];
+    s32 unk10;
+    s32 unk14;
+} UnkArg_8020CE70;
 
 typedef struct {
     char unk0[0x22];
@@ -241,11 +249,66 @@ s32 func_8020CCD8_ovl_ending(void) {
     return count;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CD88_ovl_ending.s")
+s16 func_8020CD88_ovl_ending(void) {
+    UnkStruct_8022BB38* ptr = D_8022BB38;
+    s32 i = 0;
+
+    while (i < 150) {
+        if ((ptr->unk0 & 0x80000000) == 0) {
+            return i;
+        }
+        i++;
+        ptr++;
+    }
+    return -1;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CE70_ovl_ending.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CFD4_ovl_ending.s")
+s32 func_8020CFD4_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
+    UnkStruct_8022BB38* temp_v1;
+    s32 v;
+    s16 x;
+    s16 y;
+    s32 flag;
+
+    temp_v1 = &D_8022BB38[arg0];
+    if (!(temp_v1->unk0 & 0x80000000)) {
+        return 0xFF;
+    }
+    v = arg1 & 0x400;
+    flag = v;
+    temp_v1->unk4C++;
+    if (flag) {
+        x = temp_v1->unk8;
+        temp_v1->unk40 += (f32) x / (f32) temp_v1->unk38;
+        v = x - (s32) temp_v1->unk40;
+        if ((v <= 0) || (temp_v1->unk4C >= temp_v1->unk38)) {
+            v = 0;
+        }
+        arg2->unk0 = temp_v1->unk2E - v;
+        arg2->unk10 = v;
+    }
+    if (!flag) {
+        y = temp_v1->unkA;
+        temp_v1->unk44 += (f32) y / (f32) temp_v1->unk38;
+        v = y - (s32) temp_v1->unk44;
+        if ((v <= 0) || (temp_v1->unk4C >= temp_v1->unk38)) {
+            v = 0;
+        }
+        arg2->unk4 = temp_v1->unk30 - v;
+        arg2->unk14 = v;
+    }
+    if (temp_v1->unk4C >= temp_v1->unk38) {
+        temp_v1->unk4C = 0;
+        temp_v1->unk2E = 0;
+        temp_v1->unk30 = 0;
+        temp_v1->unk40 = 0.0f;
+        temp_v1->unk44 = 0.0f;
+        return 0xFF;
+    }
+    return 0;
+}
 
 void func_8020D130_ovl_ending(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
@@ -255,9 +318,69 @@ void func_8020D130_ovl_ending(s32 arg0) {
     temp_v0->unk30 = temp_v0->unk6 + temp_v0->unkA;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D16C_ovl_ending.s")
+s32 func_8020D16C_ovl_ending(s32 arg0, s32 arg1) {
+    UnkStruct_8022BB38* temp_v0;
+    f32 step;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D270_ovl_ending.s")
+    temp_v0 = &D_8022BB38[arg0];
+    if (!(temp_v0->unk0 & 0x80000000)) {
+        return 0;
+    }
+    temp_v0->unk32++;
+    step = 255.0f / temp_v0->unk38;
+    temp_v0->unk48 += step;
+    if ((temp_v0->unk48 >= 255.0f) || (temp_v0->unk32 >= temp_v0->unk38)) {
+        temp_v0->unk48 = 255.0f;
+    }
+    if (arg1 == 0) {
+        temp_v0->unk4E = temp_v0->unk48;
+    } else {
+        temp_v0->unk4E = 255.0f - temp_v0->unk48;
+    }
+    if (temp_v0->unk32 >= temp_v0->unk38) {
+        temp_v0->unk32 = 0;
+        temp_v0->unk48 = 0.0f;
+        if (arg1 == 0) {
+            temp_v0->unk4E = 0xFF;
+        } else {
+            temp_v0->unk4E = 0;
+        }
+        return 0xFF;
+    }
+    return 0;
+}
+
+s32 func_8020D270_ovl_ending(s32 arg0, s32 arg1) {
+    UnkStruct_8022BB38* temp_v0;
+    f32 step;
+
+    temp_v0 = &D_8022BB38[arg0];
+    if (!(temp_v0->unk0 & 0x80000000)) {
+        return 0;
+    }
+    temp_v0->unk32++;
+    step = 255.0f / temp_v0->unk38;
+    temp_v0->unk48 += step;
+    if ((temp_v0->unk48 >= 255.0f) || (temp_v0->unk32 >= temp_v0->unk38)) {
+        temp_v0->unk48 = 255.0f;
+    }
+    if (arg1 == 0) {
+        temp_v0->unk4E = temp_v0->unk48;
+    } else {
+        temp_v0->unk4E = 255.0f - temp_v0->unk48;
+    }
+    if (temp_v0->unk32 >= temp_v0->unk38) {
+        temp_v0->unk32 = 0;
+        temp_v0->unk48 = 0.0f;
+        if (arg1 == 0) {
+            temp_v0->unk4E = 0xFF;
+        } else {
+            temp_v0->unk4E = 0;
+        }
+        return 0xFF;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D374_ovl_ending.s")
 
