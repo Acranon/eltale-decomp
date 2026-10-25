@@ -118,7 +118,76 @@ void func_80015DB4(s32);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014E04.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80015494.s")
+void func_80015B88(Camera15150* arg0);
+void func_80015B94(Camera15150* arg0, Unk15150Target* arg1);
+void func_80015494(Camera15150* arg0) {
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 dist;
+    Unk15150Target* target;
+
+    target = arg0->target;
+    func_80015B88(arg0);
+    func_80015B94(arg0, target);
+    dx = arg0->eyeX - arg0->atX;
+    dy = arg0->eyeY - arg0->atY;
+    dz = arg0->eyeZ - arg0->atZ;
+    dist = sqrtf(dx * dx + dz * dz);
+    if (dy != 0.0f || dist != 0.0f) {
+        arg0->unk24 = func_800270D0(dy, dist);
+    }
+    if (dx != 0.0f || dz != 0.0f) {
+        arg0->unk28 = func_800270D0(dx, dz);
+    }
+    if (arg0->unk60 != 0.0f || arg0->unk64 != 0.0f) {
+        if (arg0->unk24 < arg0->unk60) {
+            arg0->unk24 = arg0->unk60;
+            dx = dist / cosf(arg0->unk60);
+            arg0->atY = arg0->eyeY - sinf(arg0->unk60) * dx;
+        } else if (arg0->unk64 < arg0->unk24) {
+            arg0->unk24 = arg0->unk64;
+            dx = dist / cosf(arg0->unk64);
+            arg0->atY = arg0->eyeY - sinf(arg0->unk64) * dx;
+        }
+    }
+    if (arg0->unk68 < arg0->unk6C) {
+        if (arg0->unk28 < arg0->unk68) {
+            arg0->unk28 = arg0->unk68;
+            D_80085C10.x = 0.0f;
+            D_80085C10.y = -dist;
+            func_800271B4(arg0->unk28, &D_80085C10);
+            arg0->atX = arg0->eyeX + D_80085C10.x;
+            arg0->atZ = arg0->eyeZ + D_80085C10.y;
+        } else if (arg0->unk6C < arg0->unk28) {
+            arg0->unk28 = arg0->unk6C;
+            D_80085C10.x = 0.0f;
+            D_80085C10.y = -dist;
+            func_800271B4(arg0->unk28, &D_80085C10);
+            arg0->atX = arg0->eyeX + D_80085C10.x;
+            arg0->atZ = arg0->eyeZ + D_80085C10.y;
+        }
+    } else if (arg0->unk6C < arg0->unk68) {
+        if (arg0->unk28 < 0.0) {
+            if (arg0->unk6C < arg0->unk28) {
+                arg0->unk28 = arg0->unk6C;
+                D_80085C10.x = 0.0f;
+                D_80085C10.y = -dist;
+                func_800271B4(arg0->unk28, &D_80085C10);
+                arg0->atX = arg0->eyeX + D_80085C10.x;
+                arg0->atZ = arg0->eyeZ + D_80085C10.y;
+            }
+        } else if (arg0->unk28 < arg0->unk68) {
+            arg0->unk28 = arg0->unk68;
+            D_80085C10.x = 0.0f;
+            D_80085C10.y = -dist;
+            func_800271B4(arg0->unk28, &D_80085C10);
+            arg0->atX = arg0->eyeX + D_80085C10.x;
+            arg0->atZ = arg0->eyeZ + D_80085C10.y;
+        }
+    }
+    arg0->unk2C = arg0->unk28;
+}
 
 void func_80015810(Camera15150* arg0) {
     f32 dx = arg0->eyeX - arg0->atX;
