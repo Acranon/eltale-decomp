@@ -769,7 +769,100 @@ s32 func_80006D24(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006F80.s")
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 radius;
+} Unk8007C2A8;
+
+extern s32 D_8007C02C;
+extern Actor *D_8007C030[];
+extern s32 D_8007C2A4;
+extern Unk8007C2A8 *D_8007C2A8[];
+
+void func_80006F80(f32 *arg0, f32 *arg1, Actor *arg2) {
+    f32 size;
+    f32 x;
+    f32 z;
+    s32 hit;
+    s32 n;
+    Actor **list;
+    Actor *a;
+    Unk8007C2A8 **list2;
+    Unk8007C2A8 *o;
+    f32 dx;
+    f32 dz;
+    f32 r;
+    f32 dist;
+    f32 k;
+
+    hit = 0;
+    size = arg2->unk28 * arg2->scale;
+    x = *arg0 + arg2->x;
+    z = *arg1 + arg2->z;
+    n = D_8007C02C;
+    if (n != 0) {
+        for (list = D_8007C030; !hit && n != 0; n--) {
+            a = *list++;
+            dx = x - a->x;
+            dz = z - a->z;
+            r = a->unk28 * a->scale + size;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = a->x + dx - arg2->x;
+                    *arg1 = a->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+    n = D_8007ABA8;
+    if (n != 0) {
+        for (list = D_8007ABB0; !hit && n != 0; n--) {
+            a = *list++;
+            dx = x - a->x;
+            dz = z - a->z;
+            r = a->unk28 * a->scale + size;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = a->x + dx - arg2->x;
+                    *arg1 = a->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+    n = D_8007C2A4;
+    if (n != 0) {
+        for (list2 = D_8007C2A8; !hit && n != 0; n--) {
+            o = *list2++;
+            dx = x - o->x;
+            dz = z - o->z;
+            r = size + 2.0 * o->radius;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = o->x + dx - arg2->x;
+                    *arg1 = o->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007320.s")
 
