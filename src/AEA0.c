@@ -2,12 +2,21 @@
 
 typedef struct {
     /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[0xE];
+    /* 0x02 */ s16 unk2;
+    /* 0x04 */ u8 pad4[2];
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u8 pad8[4];
+    /* 0x0C */ u16 unkC;
+    /* 0x0E */ u16 unkE;
     /* 0x10 */ s32 unk10;
     /* 0x14 */ s32 unk14;
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
-} EnemyDef;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ u8 pad24[6];
+    /* 0x2A */ u16 unk2A;
+    /* 0x2C */ u8 pad2C[0xC];
+} EnemyDef; /* size 0x38 */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x86];
@@ -34,9 +43,11 @@ typedef struct {
     /* 0x4C */ f32 unk4C;
     /* 0x50 */ s16 unk50;
     /* 0x52 */ s16 unk52;
-    /* 0x54 */ u8 pad54[4];
+    /* 0x54 */ s16 unk54;
+    /* 0x56 */ u8 pad56[2];
     /* 0x58 */ u16 unk58;
-    /* 0x5A */ u8 pad5A[6];
+    /* 0x5A */ u8 pad5A[4];
+    /* 0x5E */ u16 unk5E;
     /* 0x60 */ u16 unk60;
     /* 0x62 */ u16 unk62;
     /* 0x64 */ EnemyDef *unk64;
@@ -44,25 +55,31 @@ typedef struct {
 } Obj; /* size 0x6C */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ u16 unkC;
-} Unk28;
-
-typedef struct {
     /* 0x000 */ u16 type;
     /* 0x002 */ s16 unk2;
     /* 0x004 */ u16 unk4;
     /* 0x006 */ u16 unk6;
     /* 0x008 */ u16 flags;
-    /* 0x00A */ u8 padA[0x1E];
-    /* 0x028 */ Unk28 *unk28;
+    /* 0x00A */ u16 unkA;
+    /* 0x00C */ u16 unkC;
+    /* 0x00E */ u8 padE[2];
+    /* 0x010 */ f32 unk10;
+    /* 0x014 */ u8 pad14[8];
+    /* 0x01C */ struct Unk8000BA20 *unk1C;
+    /* 0x020 */ f32 unk20;
+    /* 0x024 */ f32 unk24;
+    /* 0x028 */ EnemyDef *unk28;
     /* 0x02C */ Obj obj;
     /* 0x098 */ u16 unk98;
     /* 0x09A */ u8 pad9A[0x82];
     /* 0x11C */ u16 unk11C;
-    /* 0x11E */ u8 pad11E[4];
+    /* 0x11E */ u16 unk11E;
+    /* 0x120 */ u16 unk120;
     /* 0x122 */ u16 unk122;
-    /* 0x124 */ u8 pad124[0xC];
+    /* 0x124 */ u16 unk124;
+    /* 0x126 */ u8 pad126[2];
+    /* 0x128 */ f32 unk128;
+    /* 0x12C */ f32 unk12C;
 } Enemy; /* size 0x130 */
 
 typedef struct {
@@ -76,7 +93,7 @@ typedef struct {
     /* 0x00 */ u32 start;
     /* 0x04 */ u32 end;
     /* 0x08 */ u8 **unk8;
-    /* 0x0C */ u8 padC[4];
+    /* 0x0C */ EnemyDef *unkC;
     /* 0x10 */ s32 unk10;
 } Unk800561A0; /* size 0x14 */
 
@@ -114,25 +131,50 @@ typedef struct {
     /* 0x18 */ f32 x;
     /* 0x1C */ f32 y;
     /* 0x20 */ f32 z;
+    /* 0x24 */ u8 pad24[0x18];
+    /* 0x3C */ f32 unk3C;
 } Unk8007AA08;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ f32 unk18;
+} Unk8007AA84;
+
+f32 sqrtf(f32);
+extern Unk8007AA84 *D_8007AA84;
 
 typedef struct {
     /* 0x00 */ u8 pad0[10];
 } Unk800C18D8;
 
-typedef struct {
+typedef struct Unk8000BA20 {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
     /* 0x04 */ u16 unk4;
     /* 0x06 */ u8 pad6[2];
     /* 0x08 */ s16 unk8;
     /* 0x0A */ s16 unkA;
+    /* 0x0C */ u8 padC[4];
+    /* 0x10 */ f32 unk10;
 } Unk8000BA20;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
     /* 0x0E */ s16 unkE;
 } Unk8000AA74;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} CollResult;
+
+void func_800107F0(f32, f32, f32, s32, CollResult *);
+extern CollResult D_8007C080;
 
 void func_8000A5E4(void);
 Unk8000BA20 *func_8000B7A4(Enemy *, Obj *);
@@ -303,7 +345,61 @@ void func_8000AA74(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000AC84.s")
+void func_8000AC84(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
+    Unk8000BA20 *v;
+    f32 dx;
+    f32 dz;
+    f32 d;
+
+    func_8000BB90(obj, D_8007AA08.x, D_8007AA08.z);
+    if (D_8008BE52 & 0x100) {
+        D_8007C070.x = 0.0f;
+        D_8007C070.y = 0.4f;
+        func_800271B4(obj->angle, &D_8007C070);
+    } else {
+        func_8000BFE0(obj, &D_8007C070);
+    }
+    func_8000BCA4(1, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+    e->unk2--;
+    if (e->unk2 == 0) {
+        e->unk4--;
+        if (e->unk1C != NULL) {
+            dx = D_8007AA08.x - obj->x;
+            dz = D_8007AA08.z - obj->z;
+            d = sqrtf(dx * dx + dz * dz) - D_8007AA84->unk18 * D_8007AA08.unk3C;
+            if (d < e->unk1C->unk10 * obj->unk24) {
+                func_8000BA20(e, obj, e->unk1C);
+                return;
+            }
+            if (e->unk4 == 0 || (e->flags & 2)) {
+                func_8000BA20(e, obj, e->unk1C);
+                return;
+            }
+            if (D_8008BE52 & 0x100) {
+                e->unk2 = arg2->unkE;
+            } else {
+                e->unk2 = arg2->unkE / 10;
+            }
+        } else {
+            v = func_8000B7A4(e, obj);
+            if (v != NULL) {
+                func_8000BA20(e, obj, v);
+                return;
+            }
+            if (e->unk4 == 0 || (e->flags & 2)) {
+                e->type = 0;
+                func_800201A0(obj, 0, 1, 0, 1, 1);
+                func_8001FC14(obj);
+                return;
+            }
+            if (D_8008BE52 & 0x100) {
+                e->unk2 = arg2->unkE;
+            } else {
+                e->unk2 = arg2->unkE / 10;
+            }
+        }
+    }
+}
 
 void func_8000AF14(Obj *obj, EnemyAI *ai, s32 arg2) {
     func_8000BFE0(obj, &D_8007C070);
