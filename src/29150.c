@@ -24,13 +24,9 @@ typedef struct {
 
 extern ALHeap D_8008F070;
 extern u8 D_80332DB0[];
-extern void* D_8008F080;
-extern void* D_8008F084;
-extern void* D_8008F088;
-extern void* D_8008F08C;
-extern void* D_8008F090;
-extern void* D_8008F094;
-extern void* D_8008F098;
+extern Acmd* D_8008F080[2];
+extern void* D_8008F088[2];
+extern s16* D_8008F090[3];
 extern OSMesgQueue D_8008F0A0;
 extern OSMesgQueue D_8008F0B8;
 extern OSMesg D_8008F0D0;
@@ -95,13 +91,13 @@ ALDMAproc func_80028908(AMDMAState** state);
 
 void func_800285C4(void) {
     alHeapInit(&D_8008F070, D_80332DB0, 0x68000);
-    D_8008F080 = alHeapAlloc(&D_8008F070, 1, 0x8000);
-    D_8008F084 = alHeapAlloc(&D_8008F070, 1, 0x8000);
-    D_8008F088 = alHeapAlloc(&D_8008F070, 1, 0x40);
-    D_8008F08C = alHeapAlloc(&D_8008F070, 1, 0x40);
-    D_8008F090 = alHeapAlloc(&D_8008F070, 1, 0x8000);
-    D_8008F094 = alHeapAlloc(&D_8008F070, 1, 0x8000);
-    D_8008F098 = alHeapAlloc(&D_8008F070, 1, 0x8000);
+    D_8008F080[0] = alHeapAlloc(&D_8008F070, 1, 0x8000);
+    D_8008F080[1] = alHeapAlloc(&D_8008F070, 1, 0x8000);
+    D_8008F088[0] = alHeapAlloc(&D_8008F070, 1, 0x40);
+    D_8008F088[1] = alHeapAlloc(&D_8008F070, 1, 0x40);
+    D_8008F090[0] = alHeapAlloc(&D_8008F070, 1, 0x8000);
+    D_8008F090[1] = alHeapAlloc(&D_8008F070, 1, 0x8000);
+    D_8008F090[2] = alHeapAlloc(&D_8008F070, 1, 0x8000);
     osCreateMesgQueue(&D_8008F0A0, &D_8008F0D0, 1);
     osCreateMesgQueue(&D_8008F0B8, &D_8008F0D4, 1);
     D_8008F4C8.initialized = 0;
