@@ -75,7 +75,9 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 unk0[0x4];
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 unk6[0x18 - 0x6];
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u8 unkA[0x18 - 0xA];
     /* 0x18 */ f32 unk18;
     /* 0x1C */ u8 unk1C[0x24 - 0x1C];
     /* 0x24 */ u8 unk24[4];
@@ -204,7 +206,7 @@ void func_800251CC(u8 arg0, Actor *arg1);
 void func_800271B4(f32 arg0, Vec2f *arg1);
 void func_8002A338(s32 arg0);
 void func_8002A6B8(s32 arg0);
-void func_8002A7C8(s32 arg0, s32 arg1, s32 arg2);
+void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
 void func_80032D20(s32 arg0);
 s32 func_80007FD8(s32 arg0, u16 arg1, Actor *arg2);
 void func_80015F44(s32 arg0, Actor *arg1);
@@ -864,6 +866,9 @@ void func_800079B4(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A38.s")
 
+extern u16 D_8007C050[];
+extern u16 D_8008BE5A;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A8C.s")
 
 void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2) {
@@ -947,6 +952,12 @@ s32 func_80008540(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
+extern s16 D_8008C15A;
+extern u16 D_8008C15C;
+extern u16 D_80092C86;
+
+s32 func_800168F0(s32 arg0, u16 arg1);
+s32 func_800167B0(u16 count, u8 *seq);
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800085D8.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80008840.s")
