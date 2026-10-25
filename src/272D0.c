@@ -30,7 +30,36 @@ void func_800266D0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/272D0/func_80026774.s")
+void func_80026774(Struct_80026774* arg0) {
+    if (D_8008CA50 & 8) {
+        gSPDisplayList(D_8007A184++, D_8004F550);
+    }
+    if (D_8008CA50 & 1) {
+        gDPPipeSync(D_8007A184++);
+        gSPMatrix(D_8007A184++, D_2000040, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+        guMtxIdent(&arg0->unkC0[D_8007A180]);
+        gSPMatrix(D_8007A184++, &D_2000000[D_8007A180 + 3], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        D_8007A180++;
+        gDPSetEnvColor(D_8007A184++, D_8008CE5C->r, D_8008CE5C->g, D_8008CE5C->b, D_8008CE5C->a);
+        if (D_8008CE5C->a == 0xFF) {
+            gDPSetRenderMode(D_8007A184++, 0x0F0A4000, 0);
+        } else {
+            gDPSetRenderMode(D_8007A184++, 0x00504340, 0);
+        }
+        gSPDisplayList(D_8007A184++, D_8004F510);
+        if (D_8008CE58) {
+            if (D_8008CA50 & 4) {
+                D_8008CE5C--;
+            } else {
+                D_8008CE5C++;
+            }
+            D_8008CE58--;
+            if (!D_8008CE58 & !(D_8008CA50 & 2)) {
+                D_8008CA50 &= ~1;
+            }
+        }
+    }
+}
 
 void func_800269B8(s32 arg0, u16 arg1, Color_RGBA8* arg2) {
     D_8008CE58 = arg0;
