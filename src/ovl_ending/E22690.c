@@ -138,7 +138,25 @@ void func_8020C0D0_ovl_ending(void) {
     D_8022BB28 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020C15C_ovl_ending.s")
+s32 func_8020C15C_ovl_ending(void) {
+    s32 idx;
+    s32 ret;
+
+    idx = (D_8020F698_ovl_ending + 1) & 1;
+    D_80238658 = D_8007A184;
+    D_8007A184 = D_8022EA18[idx];
+    gSPDisplayList(D_8007A184++, D_8020F6C0_ovl_ending);
+    // D_8020F698 is a function static in the original: IDO does not keep its address
+    // in a register. Until D2 moves the data into C, write it through the neighbouring
+    // symbol so this extern's address is not CSE'd either.
+    (&D_8020F694_ovl_ending)[1] = idx;
+    ret = func_8020C254_ovl_ending();
+    idx = D_8020F698_ovl_ending;
+    gSPEndDisplayList(D_8007A184++);
+    D_8007A184 = D_80238658;
+    gSPDisplayList(D_8007A184++, D_8022EA18[idx]);
+    return ret;
+}
 
 s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
 void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
