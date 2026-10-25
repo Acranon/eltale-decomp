@@ -47,6 +47,40 @@ s32 func_80024904(u8*);
 void func_80024A54(s32, s32, s32, s32, s32);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
 
+typedef struct {
+    /* 0x00 */ char unk0[0x18];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+} Struct_8007AA08;
+
+extern Gfx* D_8007A184;
+extern Struct_8007AA08 D_8007AA08;
+extern s16 D_8008C042;
+extern s32 D_8008C044;
+extern s32 D_8008C048;
+extern s32 D_8008C04C;
+extern u16 D_8008C050;
+extern s32 D_8008C054;
+extern s32 D_8008C138;
+extern u16 D_8008C14C[2];
+extern s16 D_8008C15A;
+extern s16 D_8008C15C;
+extern s16 D_8008C15E;
+extern s16 D_8008C162;
+extern s32 D_8008C168;
+extern s32 D_8008C16C;
+extern s32 D_8008C170;
+extern s32 D_8008C174;
+extern s32 D_8008C178;
+extern Gfx D_803AA448[];
+extern Gfx D_803AA4C0[];
+extern Gfx D_803AA538[];
+
+s32 func_80027FFC(f32, f32, f32, s32*, s32*);
+s16 sins(u16);
+void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
+
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80020AE0.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80020B78.s")
