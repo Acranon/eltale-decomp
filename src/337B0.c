@@ -85,6 +85,7 @@ extern s8 D_80092C82;
 void func_80032BF8(s32 arg0, u8 arg1);
 void func_80034C9C(s32, s32, s32, s32, s32);
 void func_80035350(s32, s32, u8 *);
+void func_8003521C(void);
 
 void func_80032BB0(s32 arg0) {
     s32 i;

@@ -15,6 +15,9 @@ extern u8 D_80260490_ovl_intro[];
 extern u8 D_80264740_ovl_intro[];
 extern u16 D_80264E98_ovl_intro[];
 extern u16 D_802615A8_ovl_intro[];
+extern u16 D_80260288_ovl_intro[];
+extern u8 D_8025D500_ovl_intro[];
+extern u16 D_80092C86;
 
 void func_8020F5B4_ovl_intro(void);
 void func_8020F878_ovl_intro(void);
@@ -143,6 +146,25 @@ void func_80210D38_ovl_intro(void) {
     gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 10 + 99) << 2, 260 << 2, (i * 10 + 101) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC9350/func_802111A4_ovl_intro.s")
+s32 func_802111A4_ovl_intro(void) {
+    s32 ret = 0;
+    s32 i;
+
+    gSPDisplayList(D_8007A184++, D_80212270_ovl_intro);
+    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    GFX_WORDS(0xFCFFFFFF, 0xFFFCF279);
+    GFX_WORDS(0xB900031D, 0x0F0A4000);
+    gDPLoadTLUT_pal16(D_8007A184++, 0, D_80260288_ovl_intro);
+    for (i = 0; i < 11; i++) {
+        gDPLoadTextureTile_4b(D_8007A184++, D_8025D500_ovl_intro, G_IM_FMT_CI, 208, 0, 0, i * 10, 199, i * 10 + 9, 0, 0, 0, 0, 0, 0, 0);
+        gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 10 + 64) << 2, 260 << 2, (i * 10 + 74) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
+    }
+    gDPLoadTextureTile_4b(D_8007A184++, D_8025D500_ovl_intro, G_IM_FMT_CI, 208, 0, 0, i * 10, 199, i * 10 + 1, 0, 0, 0, 0, 0, 0, 0);
+    gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 10 + 64) << 2, 260 << 2, (i * 10 + 66) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
+    if (D_80092C86 & 0x9000) {
+        ret = 1;
+    }
+    return ret;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC9350/func_80211634_ovl_intro.s")
