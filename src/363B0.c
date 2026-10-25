@@ -44,7 +44,57 @@ s32 func_8003DEA0();
 s32 func_800360F8();
 s32 func_8003E080();
 
-#pragma GLOBAL_ASM("asm/nonmatchings/363B0/func_800357B0.s")
+s32 func_800357B0(void) {
+    s32 pad[2];
+    s32 ret = 0;
+    s32 count;
+    s32 i;
+
+    D_80092C88 = 0;
+    for (i = 0; i < 4; i++) {
+        D_80092E48[i].unk12 = -0x80;
+    }
+    for (i = 0; i < 4; i++) {
+        D_80092EB8[i].button = 0;
+        D_80092EB8[i].stick_x = 0;
+        D_80092EB8[i].stick_y = 0;
+    }
+    osCreateMesgQueue(&D_80092C90, &D_80092EB0, 1);
+    osSetEventMesg(OS_EVENT_SI, &D_80092C90, &D_80092EB0);
+    func_8003D910(&D_80092C90, &D_80092E98, D_80092EA0);
+    osContSetCh(4);
+    D_80092C80 = -1;
+    count = 0;
+    for (i = 0; i != 4; i++) {
+        if (D_80092E98 & (1 << i)) {
+            if (D_80092EA0[i].errno & 4) {
+                D_80092E48[i].unk12 = -1;
+            } else if (D_80092EA0[i].type & 2) {
+                D_80092E48[i].unk12 = -2;
+            } else {
+                D_80092E48[i].unk12 = 0;
+                count++;
+                if (D_80092C80 == -1) {
+                    D_80092C80 = i;
+                }
+                if (D_80092EA0[i].status & 1) {
+                    D_80092E48[i].unk0 |= 0x8000;
+                } else {
+                    D_80092E48[i].unk0 = 0;
+                    if (i == D_80092C80) {
+                        ret = 1;
+                    }
+                }
+            }
+        } else {
+            D_80092E48[i].unk12 = -3;
+        }
+    }
+    if (count == 0) {
+        return -1;
+    }
+    return ret;
+}
 
 void func_80035970(s32 cont) {
     OSContPad *pad;

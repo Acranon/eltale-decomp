@@ -95,7 +95,40 @@ void func_80032BB0(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80032BF8.s")
+void func_80032BF8(s32 arg0, u8 arg1) {
+    s32 i;
+    s32 j;
+
+    if (arg1 == 0) {
+        D_80090470[arg0].unk6 = 0;
+        D_80090470[arg0].unkA = 0;
+        D_80090470[arg0].unk0 = 0;
+        D_80090470[arg0].unk4 = D_80090470[arg0].unk6;
+        D_80090470[arg0].unk8 = D_80090470[arg0].unkA;
+    }
+    D_80090470[arg0].unkC = 1;
+    D_80090470[arg0].unkE = 0;
+    D_80090470[arg0].unkF = 0;
+    D_80090470[arg0].unk10 = 0;
+    D_80090470[arg0].unk12 = 0;
+    D_80090470[arg0].unk14 = 0xFF;
+    D_80090470[arg0].unk15 = 0;
+    D_80090470[arg0].unk16 = 0;
+    for (i = 0; i < 32; i++) {
+        D_80090470[arg0].unk17[i] = 0xFF;
+    }
+    for (i = 0; i < 0x4B0; i++) {
+        D_80090470[arg0].unk9C[i] = 0xFF;
+        D_80090470[arg0].unk54C[i] = 0xFF;
+    }
+    D_80090470[arg0].unk38 = 0;
+    D_80090470[arg0].unk3A = 0;
+    for (i = 0; i < 24; i++) {
+        for (j = 0; j < 4; j++) {
+            D_80090470[arg0].unk3C[j][i] = 0xFF;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80032D20.s")
 
