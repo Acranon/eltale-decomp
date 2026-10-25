@@ -175,7 +175,106 @@ void func_8002AC1C(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002C598.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002D7CC.s")
+extern s8 D_80060D64[];
+extern u8 D_8007A9F4;
+extern u8 D_8007A9F5;
+extern u8 D_8007A9F6;
+extern u8 D_8007A9F7;
+extern s32 D_8007A9E0;
+extern u8 D_8007AA04;
+extern u32 D_80055D7C[];
+extern s32 D_8008FB38;
+extern s32 D_8008FB44;
+extern s8 D_80092C81;
+extern u16 D_80092C84;
+void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
+void func_8002DECC(s32 id, s32 x, s32 y, s32 w, s32 h);
+void func_8002E42C(s32 arg0, s32 arg1);
+void func_8002EED8(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
+
+void func_8002D7CC(s32 x) {
+    s32 p;
+    s32 v;
+    f32 f;
+
+    func_8002DECC(0, x + 0x28, 0x1E, 0xF0, 0x9F);
+    func_8002DECC(0x37, x + 0x2B, 0xBE, 0xF0, 3);
+    func_8002DECC(0x37, x + 0x119, 0x24, 2, 0x9A);
+    func_8002DECC(0x37, x + 0x27, 0x1D, 0xF2, 1);
+    func_8002DECC(0x37, x + 0x27, 0xBD, 0xF2, 1);
+    func_8002DECC(0x37, x + 0x27, 0x1E, 1, 0x9F);
+    func_8002DECC(0x37, x + 0x118, 0x1E, 1, 0x9F);
+    func_8002DECC(0x38, x + 0x29, 0x1F, 0xED, 1);
+    func_8002DECC(0x38, x + 0x29, 0x20, 1, 0x9B);
+    func_8002DECC(0x39, x + 0x29, 0xBB, 0xEE, 1);
+    func_8002DECC(0x39, x + 0x116, 0x1F, 1, 0x9C);
+    func_8002DECC(5, x + 0x45, 0x1C, 7, 7);
+    func_8002DECC(5, x + 0xF3, 0x1C, 7, 7);
+    p = D_8008FB44;
+    p = (p >> 2) & 0xF;
+    p = D_80060D64[p];
+    func_8002DECC(6, x + p + 0x36, 0x1A, 0xE, 0xB);
+    func_8002DECC(7, x - p + 0xFB, 0x1A, 0xE, 0xB);
+    func_8002DECC(0x2D, x + 0x75, 0x19, 0x56, 0xD);
+    func_8002DECC(0x32, x + 0xA5, 0x35, 0x35, 6);
+    func_8002DECC(0x32, x + 0x31, 0x78, 0x35, 6);
+    func_8002DECC(0x32, x + 0xD9, 0x78, 0x35, 6);
+    func_8002DECC(0x32, x + 0xA5, 0xAE, 0x35, 6);
+    func_8002DECC(0x14, x + 0x86, 0x34, 8, 0xA);
+    func_8002DECC(0x14, x + 0x47, 0x6B, 8, 0xA);
+    func_8002DECC(0x14, x + 0xF0, 0x6B, 8, 0xA);
+    func_8002DECC(0x14, x + 0x86, 0xAD, 8, 0xA);
+    func_8002DECC(0x2E, x + 0x9A, 0x3D, 0xC, 0xC);
+    func_8002DECC(0x2F, x + 0x67, 0x6F, 0xC, 0xC);
+    func_8002DECC(0x30, x + 0xCC, 0x6F, 0xC, 0xC);
+    func_8002DECC(0x31, x + 0x9A, 0xA1, 0xC, 0xC);
+    func_8002DECC(0x15, x + 0xA7, 0x92, 8, 0xA);
+    func_8002EED8(2, x + 0x8D, 0x34, 50, 0xA);
+    func_8002EED8(2, x + 0x4E, 0x6B, 50, 0xA);
+    func_8002EED8(2, x + 0xF7, 0x6B, 50, 0xA);
+    func_8002EED8(2, x + 0x8D, 0xAD, 50, 0xA);
+    p = D_8007A9F4;
+    func_8002EED8(2, x + 0x78, 0x34, p, 0xA);
+    p = D_8007A9F5;
+    func_8002EED8(2, x + 0x39, 0x6B, p, 0xA);
+    p = D_8007A9F7;
+    func_8002EED8(2, x + 0xE2, 0x6B, p, 0xA);
+    p = D_8007A9F6;
+    func_8002EED8(2, x + 0x78, 0xAD, p, 0xA);
+    f = (u32)D_8007A9F4;
+    f /= 50.0f;
+    f *= 50.0f;
+    func_8002DECC(0x33, x + 0xA6, 0x36, f, 3);
+    f = (u32)D_8007A9F5;
+    f /= 50.0f;
+    f *= 50.0f;
+    func_8002DECC(0x33, x + 0x32, 0x79, f, 3);
+    f = (u32)D_8007A9F7;
+    f /= 50.0f;
+    f *= 50.0f;
+    func_8002DECC(0x33, x + 0xDA, 0x79, f, 3);
+    f = (u32)D_8007A9F6;
+    f /= 50.0f;
+    f *= 50.0f;
+    func_8002DECC(0x33, x + 0xA6, 0xAF, f, 3);
+    v = D_8007A9E0 * 100 / D_80055D7C[D_8007AA04];
+    if (v > 100) {
+        v = 100;
+    }
+    func_8002EED8(3, x + 0x91, 0x92, v, 0xA);
+    func_8002E42C(v, x);
+    if (!(D_8008FB3E & 0x2000)) {
+        if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
+            D_8008FB3E |= 0x2000;
+            D_8008FB38 = 31;
+            func_8002A7C8(0, 0, 0xFF);
+        } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
+            D_8008FB3E |= 0x3000;
+            D_8008FB38 = 31;
+            func_8002A7C8(0, 0, 0xFF);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002DECC.s")
 
