@@ -118,7 +118,60 @@ void func_800134D0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/140D0/func_80013500.s")
+void func_80013500(void) {
+    Unk8004DF1C* entry;
+    Unk140D0Group* group;
+    Unk140D0Def* def;
+    Unk80085290* p;
+    u32 i;
+    s32 id;
+    s32 mode;
+
+    for (id = D_800842BC, entry = D_8004DF1C, i = 0; i < 19; i++, entry++) {
+        if (id == entry->id) {
+            break;
+        }
+    }
+    if (i != 19) {
+        group = &entry->groups[D_800842C0];
+        D_80085950 = group->count;
+        i = D_80085950;
+        def = group->defs;
+        p = D_80085290;
+        while (i != 0) {
+            p->x = def->x;
+            p->z = def->z;
+            p->rx = 0.0f;
+            p->rz = 0.0f;
+            p->ry = def->ry;
+            func_800107F0(p->x, 0.0f, p->z, 0xA00, &D_80085968);
+            p->y = D_80085968.unk4;
+            p->unk2C = D_80085968.unkC;
+            p->unk30 = D_80085968.unk10;
+            p->unk34 = D_80085968.unk14;
+            p->unk1C = def->unk14;
+            p->unk18 = def->unk18;
+            p->unk20 = def->unk1C;
+            p->unk44 = def->unkC;
+            p->unk4C = def->unk10;
+            p->scale = 0.07f;
+            p->unk62 = def->unk20;
+            p->unk50 = def->unk21;
+            p->unk60 = 0;
+            if (func_80013B20(p->unk62)) {
+                mode = 3;
+            } else {
+                mode = 0;
+            }
+            func_800201A0(p, mode, 1, mode, 1, 1);
+            i--;
+            p++;
+            def++;
+        }
+    } else {
+        D_80085950 = 0;
+    }
+}
 
 void func_800136B8(s32 arg0) {
     s32 n;
