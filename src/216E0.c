@@ -79,7 +79,7 @@ extern u16 D_8008C050;
 extern s32 D_8008C054;
 extern s32 D_8008C138;
 extern u16 D_8008C14C[2];
-extern s16 D_8008C15A;
+extern u16 D_8008C15A;
 extern u16 D_8008C15C;
 extern s16 D_8008C15E;
 extern u16 D_8008C162;
@@ -237,6 +237,14 @@ void func_80021920(Unk2000000* buf) {
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80021C04.s")
+
+typedef struct {
+    /* 0x000 */ char unk0[0x122];
+    /* 0x122 */ u16 unk122;
+} Struct_80022658;
+
+extern u8 D_8039EC90[];
+extern Struct_80024A54 D_803A8718;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80022658.s")
 
