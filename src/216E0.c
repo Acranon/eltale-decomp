@@ -544,7 +544,86 @@ extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
 void func_8002A7C8(s32, s32, s32);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80022970.s")
+void func_80022970(Unk2000000* buf, Struct_80022970* pl) {
+    u16 alpha;
+    s32 yoff;
+    s32 t;
+    f32* pos;
+    f32 x;
+    u8* col;
+    f32 y;
+
+    D_8008C174 = 0x81;
+    D_8008C178 = 0x48;
+    yoff = 0;
+    if (D_8008C160) {
+        if (D_8008C042 & 1) {
+            alpha = D_8008C160 * 255 / 8;
+        } else {
+            t = D_8008C160 * D_8008C160;
+            yoff = t * 20 / 64;
+            alpha = 255 - t * 255 / 64;
+        }
+        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
+        gDPSetCombine(D_8007A184++, 0xFF9BFF, 0xFF34FE7F);
+        gDPSetEnvColor(D_8007A184++, 0, 0, 0, alpha);
+    }
+    gDPPipeSync(D_8007A184++);
+    gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
+    func_80024EB0(&D_803A8718, 0, yoff, 0x40, 0x14, 0, 0, 0x400, 0x400);
+    func_80024EB0(&D_803A8718, 0, yoff + 0x14, 0x40, 0x14, 0, 0x14, 0x400, 0x400);
+    func_80024EB0(&D_803A8718, 0, yoff + 0x28, 0x40, 0x14, 0, 0x28, 0x400, 0x400);
+    func_80024EB0(&D_803A8718, 0, yoff + 0x3C, 0x40, 0x14, 0, 0x3C, 0x400, 0x400);
+    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    gDPLoadTLUT_pal256(D_8007A184++, D_8039ADB0);
+    func_80024974(5, 0x1C, yoff + 0x24, D_8007A9F4);
+    func_80024974(5, 0xA, yoff + 0x34, D_8007A9F5);
+    func_80024974(5, 0x1C, yoff + 0x43, D_8007A9F6);
+    func_80024974(5, 0x2E, yoff + 0x34, D_8007A9F7);
+    if (D_8008C160 && (D_8008C042 & 1)) {
+        col = D_8004F2CC[D_8008C13C];
+        pos = (f32*)D_8004F324 + D_8008C13C * 2;
+        x = pos[0] + D_8008C174;
+        y = pos[1] + D_8008C178;
+        guTranslate(&buf->unkC0[D_8007A180], x, y, 0.0f);
+        gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        gDPPipeSync(D_8007A184++);
+        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], D_8008C160 * 255 / 8);
+        gSPDisplayList(D_8007A184++, D_803AA2F8);
+    }
+    if (D_8008C160 == 0) {
+        if (D_80092C86 & 0xF) {
+            if (D_80092C86 & 8) {
+                D_8008C13C = 0;
+            } else if (D_80092C86 & 2) {
+                D_8008C13C = 1;
+            } else if (D_80092C86 & 4) {
+                D_8008C13C = 2;
+            } else {
+                D_8008C13C = 3;
+            }
+            if (pl->unk14->unk24[D_8008C13C] < 50) {
+                pl->unk14->unk24[D_8008C13C]++;
+                if (pl->unk14->unk24[D_8008C13C] == 50) {
+                    pl->unk8 |= D_8004F344[D_8008C13C];
+                    if ((pl->unk8 & 0xF000) == 0xF000) {
+                        pl->unk8 |= 0x10000;
+                    }
+                }
+                func_8002A7C8(0, 4, 0xFF);
+                D_8008C138 = 30;
+                D_8008C160 = 8;
+                D_8008C042 |= 1;
+            }
+        }
+    } else {
+        D_8008C160--;
+        if ((D_8008C042 & 1) && D_8008C160 == 0) {
+            D_8004DCA0 &= ~8;
+            D_8008C042 ^= 1;
+        }
+    }
+}
 
 extern u16 D_8008C040;
 
