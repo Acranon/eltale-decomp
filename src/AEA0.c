@@ -334,7 +334,25 @@ void func_8000A2A0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A310.s")
+void func_8000A310(void) {
+    s32 n;
+    Enemy *e;
+    Obj *obj;
+
+    n = D_8007B900;
+    if (n != 0) {
+        for (e = D_8007B908; n != 0; e++) {
+            obj = &e->obj;
+            if (e->obj.unk50 != -1) {
+                D_8004DD20[e->type](obj, e, D_8007C048[obj->unk50]);
+                n--;
+            }
+        }
+    }
+    if (D_8008BE52 & 0x100) {
+        func_8000CC78();
+    }
+}
 
 void func_8000A3E4(s32 arg0) {
     Enemy *e;
