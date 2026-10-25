@@ -120,7 +120,31 @@ void func_800134D0(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/140D0/func_80013500.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/140D0/func_800136B8.s")
+void func_800136B8(s32 arg0) {
+    s32 n;
+    Unk80085290* p;
+    u16 t;
+
+    n = D_80085950;
+    p = D_80085290;
+    while (n != 0) {
+        if (p->unk60 & 0x8000) {
+            t = p->unk60 & ~0x8000;
+            t--;
+            if (!t) {
+                p->unk60 = 0;
+                func_800201A0(p, 3, 1, 3, 1, 1);
+            } else {
+                p->unk60 = t | 0x8000;
+            }
+        }
+        func_80020428(0, p, &D_8010FDC4[p->unk52], arg0);
+        func_8002099C(p->unk58, p, &D_8010FDC4[p->unk52]);
+        func_800131F0(p->x, p->y, p->z, p->unk2C, p->unk30, p->unk34, 6.0f);
+        n--;
+        p++;
+    }
+}
 
 Unk80085290* func_80013808(Unk80013808Arg* arg0) {
     s32 n = D_80085950;
