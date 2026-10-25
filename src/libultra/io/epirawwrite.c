@@ -1,3 +1,27 @@
-#include "common.h"
+#undef BUILD_VERSION
+#define BUILD_VERSION VERSION_I
+#include "PR/os_version.h"
+#include "libultra/sdk_names.h"
+#include "PRinternal/piint.h"
+#include "PR/ultraerror.h"
+#define osEPiRawWriteIo func_80048F30
 
-#pragma GLOBAL_ASM("asm/nonmatchings/libultra/io/epirawwrite/func_80048F30.s")
+// TODO: this comes from a header
+#ident "$Revision: 1.17 $"
+
+s32 __osEPiRawWriteIo(OSPiHandle* pihandle, u32 devAddr, u32 data) {
+    register u32 stat;
+    register u32 domain;
+
+#ifdef _DEBUG
+    if (devAddr & 0x3) {
+        __osError(ERR_OSPIRAWWRITEIO, 1, devAddr);
+        return -1;
+    }
+#endif
+
+    EPI_SYNC(pihandle, stat, domain);
+    IO_WRITE(pihandle->baseAddress | devAddr, data);
+
+    return 0;
+}
