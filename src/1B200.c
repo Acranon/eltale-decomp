@@ -717,7 +717,77 @@ void func_8001C038(void) {
     } while (i != 0);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001C060.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ f32 y;
+    /* 0x08 */ u8 pad8[4];
+    /* 0x0C */ Unk1B200Vec3 normal;
+    /* 0x18 */ u16 flags;
+} Coll1B200;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ f32 unk1C;
+} Unk8007AA08_1B200;
+extern Coll1B200 D_80087E10;
+extern Unk8007AA08_1B200 D_8007AA08;
+extern u16 D_8004F024[];
+void func_800107F0(f32, f32, f32, s32, Coll1B200*);
+s32 func_8001C060(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
+    s32 i;
+    Unk800877A8* p;
+    Unk1B200Vec3* pt;
+    Unk1B200Vec3* n;
+    s32 j;
+    f32 angle;
+    f32 dy;
+
+    p = D_800877A8;
+    for (i = 0; i != 3; i++, p++) {
+        if (p->unk0 == 0) {
+            break;
+        }
+    }
+    p->unk6 = arg0;
+    p->unk0 = 1;
+    p->unk2 = 0;
+    p->unk4 = D_8004F024[arg0];
+    p->unk8 = arg1;
+    p->unkC = arg2;
+    p->unk10 = arg3;
+    pt = p->pts; n = p->norms; j = 16;
+    angle = 0.0f;
+    do {
+        D_80087E00.x = 0.0f;
+        D_80087E00.y = arg4;
+        func_800271B4(angle, &D_80087E00);
+        pt->x = D_80087E00.x + arg1;
+        pt->z = D_80087E00.y + arg3;
+        func_800107F0(pt->x, D_8007AA08.unk1C, pt->z, 0xA00, &D_80087E10);
+        if (D_80087E10.flags & 0x8000) {
+            pt->y = arg2;
+            n->x = 0.0f;
+            n->y = 1.0f;
+            n->z = 0.0f;
+        } else {
+            dy = D_80087E10.y - arg2;
+            if (dy < -40.0 || dy > 40.0) {
+                pt->y = arg2;
+                n->x = 0.0f;
+                n->y = 1.0f;
+                n->z = 0.0f;
+            } else {
+                pt->y = D_80087E10.y;
+                n->x = D_80087E10.normal.x;
+                n->y = D_80087E10.normal.y;
+                n->z = D_80087E10.normal.z;
+            }
+        }
+        angle += 0.39269908169872414;
+        pt++;
+        n++;
+    } while (--j != 0);
+    return i;
+}
 
 void func_8001C298(s32 arg0, f32 arg1, f32 arg2, f32 arg3) {
     Unk800877A8* p = &D_800877A8[arg0];

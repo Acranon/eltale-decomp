@@ -241,6 +241,103 @@ void func_80016760(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800168F0.s")
 
+typedef struct {
+    /* 0x00 */ u8 pad0[2];
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u8 pad4[0xC];
+    /* 0x10 */ u16 unk10;
+    /* 0x12 */ u16 unk12;
+    /* 0x14 */ u16 unk14;
+    /* 0x16 */ u16 unk16;
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 pad1A[2];
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ u8 pad20[8];
+    /* 0x28 */ u16 unk28;
+    /* 0x2A */ u16 unk2A;
+    /* 0x2C */ u8 pad2C[2];
+    /* 0x2E */ u16 unk2E;
+    /* 0x30 */ u8 pad30[2];
+    /* 0x32 */ u8 unk32[12];
+} Unk80017F48Cfg;
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u8 pad2[6];
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u8 padA[2];
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ u8 pad18[0x10];
+    /* 0x28 */ f32 vx;
+    /* 0x2C */ f32 vy;
+    /* 0x30 */ f32 vz;
+} Unk80017F48Sub;
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u16 unkA;
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ f32 vx;
+    /* 0x1C */ f32 vy;
+    /* 0x20 */ f32 vz;
+    /* 0x24 */ Actor17360* unk24;
+    /* 0x28 */ Actor17360* target;
+    /* 0x2C */ Unk80017F48Cfg* cfg;
+    /* 0x30 */ s16* unk30;
+    /* 0x34 */ Unk80017F48Sub* unk34;
+    /* 0x38 */ u8 pad38[4];
+} Unk80017F48;
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+} Coll17360;
+extern Coll17360 D_800863C8;
+void func_800107F0(f32, f32, f32, s32, Coll17360*);
+void func_80015D78(s32);
+void func_80019FC8();
+typedef struct {
+    /* 0x00 */ u8 pad0[0x22];
+    /* 0x22 */ u16 unk22;
+} Unk80086358Cfg;
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u16 unkC;
+    /* 0x0E */ u8 padE[2];
+    /* 0x10 */ Unk80086358Cfg* unk10;
+    /* 0x14 */ s32 unk14;
+} Unk80086358_b; // size = 0x18
+extern void (*D_8004ECC4[])(Unk80017F48*);
+extern Actor17360* (*D_8004ECD0[])(Unk80017F48*, s32);
+extern void (*D_8004ECDC[])(Unk80017F48*, Actor17360*);
+extern void (*D_8004ED04[])(u8, Actor17360*);
+extern s32 D_80085F94;
+extern s32 D_8007A1C8;
+extern u8 D_800EB7C0[];
+void func_800169B8(s32, u32, s32, u16);
+void func_8001A2C4(s32, Actor17360*);
+s32 func_8001A3EC();
+s32 func_8001A4AC();
+void func_8001A56C();
+void func_8000CA88(Actor17360*);
+void func_8000847C(void);
+void func_80012B34(s32, s32, s32, u8*);
+void func_80019D2C();
+void func_80019BFC();
+typedef struct {
+    /* 0x00 */ f32 v[5];
+} Unk8004ED68;
+extern Unk8004ED68 D_8004ED68;
+extern Unk8004ED68 D_8004ED7C;
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800169B8.s")
 
 void func_80016DE0(Unk80016DE0* arg0, Actor17360* arg1) {
@@ -372,97 +469,6 @@ void func_80017590(Unk17360Cam* arg0, Actor17360* arg1) {
     arg0->z = arg1->z + D_800863B8.y * arg1->scale;
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[2];
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u8 pad4[0xC];
-    /* 0x10 */ u16 unk10;
-    /* 0x12 */ u16 unk12;
-    /* 0x14 */ u16 unk14;
-    /* 0x16 */ u16 unk16;
-    /* 0x18 */ u16 unk18;
-    /* 0x1A */ u8 pad1A[2];
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ u8 pad20[8];
-    /* 0x28 */ u16 unk28;
-    /* 0x2A */ u16 unk2A;
-    /* 0x2C */ u8 pad2C[2];
-    /* 0x2E */ u16 unk2E;
-    /* 0x30 */ u8 pad30[2];
-    /* 0x32 */ u8 unk32[12];
-} Unk80017F48Cfg;
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[6];
-    /* 0x08 */ u16 unk8;
-    /* 0x0A */ u8 padA[2];
-    /* 0x0C */ f32 x;
-    /* 0x10 */ f32 y;
-    /* 0x14 */ f32 z;
-    /* 0x18 */ u8 pad18[0x10];
-    /* 0x28 */ f32 vx;
-    /* 0x2C */ f32 vy;
-    /* 0x30 */ f32 vz;
-} Unk80017F48Sub;
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u16 unk8;
-    /* 0x0A */ u16 unkA;
-    /* 0x0C */ f32 x;
-    /* 0x10 */ f32 y;
-    /* 0x14 */ f32 z;
-    /* 0x18 */ f32 vx;
-    /* 0x1C */ f32 vy;
-    /* 0x20 */ f32 vz;
-    /* 0x24 */ Actor17360* unk24;
-    /* 0x28 */ Actor17360* target;
-    /* 0x2C */ Unk80017F48Cfg* cfg;
-    /* 0x30 */ s16* unk30;
-    /* 0x34 */ Unk80017F48Sub* unk34;
-    /* 0x38 */ u8 pad38[4];
-} Unk80017F48;
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-} Coll17360;
-extern Coll17360 D_800863C8;
-void func_800107F0(f32, f32, f32, s32, Coll17360*);
-void func_80015D78(s32);
-void func_80019FC8();
-typedef struct {
-    /* 0x00 */ u8 pad0[0x22];
-    /* 0x22 */ u16 unk22;
-} Unk80086358Cfg;
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ u8 padE[2];
-    /* 0x10 */ Unk80086358Cfg* unk10;
-    /* 0x14 */ s32 unk14;
-} Unk80086358_b; // size = 0x18
-extern void (*D_8004ECC4[])(Unk80017F48*);
-extern Actor17360* (*D_8004ECD0[])(Unk80017F48*, s32);
-extern void (*D_8004ECDC[])(Unk80017F48*, Actor17360*);
-extern void (*D_8004ED04[])(u8, Actor17360*);
-extern s32 D_80085F94;
-extern s32 D_8007A1C8;
-extern u8 D_800EB7C0[];
-void func_800169B8(s32, s32, u16, u16);
-void func_8001A2C4(s32, Actor17360*);
-s32 func_8001A3EC();
-s32 func_8001A4AC();
-void func_8001A56C();
-void func_8000CA88(Actor17360*);
-void func_8000847C(void);
-void func_80012B34(s32, s32, s32, u8*);
-void func_80019D2C();
-void func_80019BFC();
 void func_80017630(void) {
     Unk80086358_b* r;
     s32 i;
@@ -584,11 +590,6 @@ s32 func_80017AB0(void) {
     return i;
 }
 
-typedef struct {
-    /* 0x00 */ f32 v[5];
-} Unk8004ED68;
-extern Unk8004ED68 D_8004ED68;
-extern Unk8004ED68 D_8004ED7C;
 void func_80017AEC(Unk80017F48* arg0) {
     u16 flags;
     f32 dx;
