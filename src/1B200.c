@@ -90,22 +90,38 @@ extern Unk800865DC D_800865DC[];
 extern Unk800866D8 D_800866D8[];
 typedef struct {
     /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[0x26];
+    /* 0x02 */ u8 pad2[2];
+    /* 0x04 */ f32 x;
+    /* 0x08 */ f32 y;
+    /* 0x0C */ f32 z;
+    /* 0x10 */ f32 vx;
+    /* 0x14 */ f32 vy;
+    /* 0x18 */ f32 vz;
+    /* 0x1C */ f32 x0;
+    /* 0x20 */ f32 y0;
+    /* 0x24 */ f32 z0;
 } Unk80087298; // size = 0x28
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+} Unk1B200Vec3;
 
 typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u16 unk2;
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 pad6[2];
+    /* 0x06 */ u16 unk6;
     /* 0x08 */ f32 unk8;
     /* 0x0C */ f32 unkC;
     /* 0x10 */ f32 unk10;
-    /* 0x14 */ u8 pad14[0x180];
+    /* 0x14 */ Unk1B200Vec3 pts[16];
+    /* 0xD4 */ Unk1B200Vec3 norms[16];
 } Unk800877A8; // size = 0x194
 
 typedef struct {
-    /* 0x00 */ s16 unk0;
+    /* 0x00 */ u16 unk0;
     /* 0x02 */ s16 unk2;
 } Unk80087798; // size = 0x4
 
@@ -207,6 +223,18 @@ void func_80027430(MtxF*, f32, f32, f32);
 f32 func_800270D0(f32, f32);
 u32 func_80026E90(u32);
 s32 func_800281F0(s32, u8*, u16);
+extern s32 D_8007A180;
+void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
+void func_800278C8(MtxF*, f32, f32, f32);
+void func_80027CB4(MtxF*, f32, f32, f32);
+f32 sqrtf(f32);
+typedef struct {
+    /* 0x00 */ Mtx unk0[3];
+    /* 0xC0 */ Mtx unkC0[1];
+} Unk2000000_1B200;
+extern Unk2000000_1B200 D_2000000;
+extern Gfx D_800EB880[];
+extern Gfx D_800EB8E8[];
 
 void func_8001A6B4(void);
 void func_8001A8F4(void);
@@ -589,9 +617,94 @@ void func_8001BB18(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001BB48.s")
+void func_8001BB48(void* arg0) {
+    s32 n;
+    Unk80087298* p;
+    s32 first;
+    u32 alpha;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 dist;
+    MtxF mtx;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001BE2C.s")
+    first = 0;
+    p = D_80087298;
+    n = 32;
+    do {
+        if (p->unk0 != 0) {
+            p->x += p->vx;
+            p->y += p->vy;
+            p->z += p->vz;
+            if (D_8007A180 < 0x1E6) {
+                if (first == 0) {
+                    gSPDisplayList(D_8007A184++, D_800EB880);
+                    first++;
+                }
+                if (p->unk0 & 1) {
+                    alpha = 250;
+                } else {
+                    alpha = 150;
+                }
+                if (p->unk0 < 8) {
+                    alpha = (p->unk0 * alpha) >> 3;
+                }
+                func_800278C8(&mtx, p->vx, p->vy, p->vz);
+                dx = p->x - p->x0;
+                dy = p->y - p->y0;
+                dz = p->z - p->z0;
+                dist = sqrtf(dx * dx + dy * dy + dz * dz);
+                func_80027CB4(&mtx, 0.35f, dist * 0.1, 0.35f);
+                mtx.mf[3][0] = p->x;
+                mtx.mf[3][1] = p->y;
+                mtx.mf[3][2] = p->z;
+                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[D_8007A180]);
+                gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                gDPSetEnvColor(D_8007A184++, 255, 255, 255, alpha);
+                gSPDisplayList(D_8007A184++, D_800EB8E8);
+            }
+            p->unk0--;
+            p->vx *= 0.6;
+            p->vy *= 0.6;
+            p->vz *= 0.6;
+        }
+        n--;
+        p++;
+    } while (n != 0);
+}
+
+void func_8001BE2C(f32 x, f32 y, f32 z) {
+    s32 n;
+    Unk80087298* p;
+    s32 count;
+    f32 a;
+    f32 b;
+    f32 r;
+    MtxF mtx;
+
+    p = D_80087298;
+    n = 31;
+    count = 16;
+    do {
+        while (n != 0 && p->unk0 != 0) {
+            n--;
+            p++;
+        }
+        p->unk0 = func_80026E90(8) + 10;
+        p->x = x;
+        p->x0 = x;
+        p->y = y;
+        p->y0 = y;
+        p->z0 = z;
+        p->z = z;
+        a = func_80026E90(20) * 3.141592653589793 / 10.0;
+        b = func_80026E90(20) * 3.141592653589793 / 10.0;
+        r = (f32)func_80026E90(10) / 3.0 + 3.0;
+        func_80027430(&mtx, a, b, 0.0f);
+        guMtxXFMF(mtx.mf, 0.0f, 0.0f, r, &p->vx, &p->vy, &p->vz);
+        count--;
+    } while (count != 0 && n != 0);
+}
 
 void func_8001C038(void) {
     s32 i = 4;
@@ -676,10 +789,6 @@ typedef struct {
     /* 0x04 */ Anim1B200* unk4;
 } AnimSet1B200;
 extern s32 D_8008BFF0;
-extern s32 D_8007A180;
-void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
-void func_800278C8(MtxF*, f32, f32, f32);
-void func_80027CB4(MtxF*, f32, f32, f32);
 void func_80020568(MtxF*, Vec3f_1B200, s32, s32, s32, s32, AnimSet1B200*, Anim1B200*, s32);
 s32 func_8001CBD0(Unk80086798b* arg0, s32 arg1) {
     u32 i;
