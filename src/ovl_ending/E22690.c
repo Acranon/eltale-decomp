@@ -710,7 +710,7 @@ void func_8020D970_ovl_ending(s32 arg0) {
     D_8022BB38[arg0].unk34 = 0;
 }
 
-s32 func_8020CE70_ovl_ending();
+s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D98C_ovl_ending.s")
 
