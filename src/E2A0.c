@@ -163,6 +163,20 @@ typedef struct {
 
 extern Unk8005E518 D_8005E51C[];
 extern Unk8005E518 D_8005E5A0[];
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x20];
+    /* 0x20 */ Unk8005E518 *unk20;
+} Unk8007C284;
+
+extern Unk8007C284 *D_8007C284;
+extern Vec3f D_80083638[];
+extern f32 D_80085F50;
+f32 sqrtf(f32);
+f32 func_800270D0(f32, f32);
+void func_80027220(f32 (*)[4], f32, f32, f32, f32, f32, f32, f32);
+void guMtxF2L(f32 (*)[4], Mtx *);
+void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
 extern u16 D_8004DE62[];
 extern u8 **D_8005E5AC[];
 extern u16 D_8004DE84[];
@@ -261,7 +275,57 @@ void func_8000F5DC(void) {
     } while (i != 0);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000F740.s")
+void func_8000F740(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
+    Unk8000FA9C *s;
+    f32 dx;
+    f32 dz;
+    f32 a;
+    f32 mf[4][4];
+    s32 first;
+    Unk8005E518 *e;
+    Gfx *dl1;
+    Gfx *dl2;
+    Vec3f *c;
+
+    first = 0;
+    e = D_8007C284->unk20;
+    dl1 = e[type].a;
+    dl2 = e[type].b;
+    for (; count != 0; count--) {
+        s = *list++;
+        if (type == s->timer) {
+            dx = s->x - D_80085E48.x;
+            dz = s->z - D_80085E48.z;
+            if (sqrtf(dx * dx + dz * dz) < 1500.0f) {
+                a = func_800270D0(dx, dz) - D_80085E48.angle + 3.141592653589793;
+                if (a < -3.141592653589793) {
+                    a += 6.283185307179586;
+                } else if (a > 3.141592653589793) {
+                    a -= 6.283185307179586;
+                }
+                if (a < 0.0f) {
+                    a = -a;
+                }
+                a = a * 57.29577951308232;
+                if (a < D_80085F50) {
+                    if (first == 0) {
+                        gSPDisplayList(D_8007A184++, dl1);
+                        first++;
+                        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+                    }
+                    func_80027220(mf, 0.0f, D_80085E48.angle, 0.0f, s->scale, s->x, s->y, s->z);
+                    guMtxF2L(mf, &arg0->mtx[D_8007A180]);
+                    gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
+                    D_8007A180++;
+                    gSPDisplayList(D_8007A184++, dl2);
+                    c = &D_80083638[(s32)s->angle];
+                    func_800131F0(s->x, s->y, s->z, c->x, c->y, c->z, 8.0f);
+                    D_8007C2A0++;
+                }
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000FA9C.s")
 

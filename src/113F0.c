@@ -103,6 +103,7 @@ s32 func_80010A4C(f32, f32, u16, u16, CollResult *);
 s32 func_80010BC8(f32, f32, f32, u16, CollMesh *, CollResult *);
 s32 func_80010F34(f32, f32, f32, f32, f32, f32);
 s32 func_80011034(f32 *, f32 *, f32, f32, f32, f32, f32);
+f32 sqrtf(f32);
 s32 func_8001164C(f32, f32, CollWalls *, CollResult *);
 s32 func_800118E4(f32);
 s32 func_80011978(Unk24 *);

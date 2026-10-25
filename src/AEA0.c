@@ -13,9 +13,13 @@ typedef struct {
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
-    /* 0x24 */ u8 pad24[6];
+    /* 0x24 */ u16 unk24;
+    /* 0x26 */ u8 pad26[4];
     /* 0x2A */ u16 unk2A;
-    /* 0x2C */ u8 pad2C[0xC];
+    /* 0x2C */ u16 unk2C;
+    /* 0x2E */ u8 pad2E[2];
+    /* 0x30 */ struct Unk8000BA20 *unk30;
+    /* 0x34 */ u8 pad34[4];
 } EnemyDef; /* size 0x38 */
 
 typedef struct {
@@ -156,7 +160,8 @@ typedef struct Unk8000BA20 {
     /* 0x0A */ s16 unkA;
     /* 0x0C */ u8 padC[4];
     /* 0x10 */ f32 unk10;
-} Unk8000BA20;
+    /* 0x14 */ u8 pad14[4];
+} Unk8000BA20; /* size 0x18 */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
