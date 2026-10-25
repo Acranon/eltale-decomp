@@ -28,6 +28,8 @@
 
 /* io/contpfs.c data (J inode cache) */
 #define __osPfsInodeCacheBank D_8006EB44
+#define __osPfsInodeCacheChannel D_8006EB40
+#define __osPfsInodeCache D_80095800
 
 /* controller */
 #define __osContPifRam D_800956F0
@@ -57,6 +59,7 @@
 #define __osSiRawWriteIo __osSpRawWriteIo
 
 #define bzero _bzero
+#define bcmp func_8004B6D0
 
 /* gu/sintable.h */
 #define sintable D_8006DEF0
