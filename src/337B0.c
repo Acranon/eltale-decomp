@@ -28,7 +28,15 @@ typedef struct {
     /* 0x06 */ s16 unk6;
 } Unk800616A8;
 
+typedef struct {
+    /* 0x0 */ u8 v[8];
+} Unk8Bytes;
+
 extern Gfx *D_8007A184;
+extern Unk8Bytes D_800616B8;
+extern Unk8Bytes D_800616C0;
+extern Unk8Bytes D_800616C8;
+extern u16 D_80061850[];
 extern Unk800616A8 D_800616A8;
 extern Unk80090470 D_80090470[4];
 extern u8 D_80092C60;

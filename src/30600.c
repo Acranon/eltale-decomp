@@ -89,7 +89,9 @@ extern Gfx *D_8007A184;
 extern u16 D_8008FB3E;
 extern u16 D_8008FB70;
 extern s8 D_8008FB72;
-extern s8 D_8008FB73;
+extern u8 D_8008FB73;
+extern s16 D_8006C90C[][4];
+extern u8 *D_8006C8F8[];
 extern s32 D_8008FB74;
 extern u8 D_8008FB78;
 extern s8 D_8008FB79;
@@ -118,6 +120,8 @@ void func_80032558(void);
 void func_800327BC(s32);
 void func_800329B0(s32);
 void func_8002DECC(s32, s32, s32, s32, s32);
+void func_80035350(s32, s32, u8 *);
+void func_800324F4(void);
 s8 func_80035D58(s32, u8);
 u8 func_80035E24(s32, u8);
 s32 func_80035F0C(s32, s32, s32, s32, void *);
@@ -184,7 +188,28 @@ void func_8002FA6C(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/30600/func_8002FBE0.s")
+void func_8002FBE0(void) {
+    u8 unused[4];
+    s16 *r = D_8006C90C[D_8008FB73];
+    s16 x = r[0];
+    s16 y = r[1];
+    s16 w = r[2];
+    s16 h = r[3];
+
+    func_8002DECC(0, x, y, w, h);
+    func_8002DECC(0x37, x + 3, y + h, w, 3);
+    func_8002DECC(0x37, x + w + 1, y + 6, 2, h - 5);
+    func_8002DECC(0x37, x - 1, y - 1, w + 2, 1);
+    func_8002DECC(0x37, x - 1, y + h, w + 2, 1);
+    func_8002DECC(0x37, x - 1, y, 1, h);
+    func_8002DECC(0x37, x + w, y, 1, h);
+    func_8002DECC(0x38, x + 1, y + 1, w - 3, 1);
+    func_8002DECC(0x38, x + 1, y + 2, 1, h - 4);
+    func_8002DECC(0x39, x + 1, y + h - 2, w - 2, 1);
+    func_8002DECC(0x39, x + w - 2, y + 1, 1, h - 3);
+    func_80035350(x + 6, y + 6, D_8006C8F8[D_8008FB73]);
+    func_800324F4();
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/30600/func_8002FDB8.s")
 
