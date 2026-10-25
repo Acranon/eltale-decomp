@@ -295,7 +295,7 @@ typedef struct {
 void func_800169B8(Obj *, s32, s32, s32);
 s32 func_8000C3FC(Obj *obj);
 u16 func_8000C48C(Enemy *arg0);
-s32 func_80007FD8(s32, s32, Obj *);
+s32 func_80007FD8(u16, s32, Obj *);
 void func_8001BE2C(f32, f32, f32);
 void func_8001AE24(Obj *, s32, s32);
 void func_8002373C(Obj *, u16, u16, s16);
@@ -640,7 +640,94 @@ void func_8000B030(Obj *obj, EnemyAI *ai, s32 arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B0D8.s")
+void func_8000B0D8(Obj *obj, Enemy *e, AnimDef *anims) {
+    u16 n;
+    f32 dx;
+    f32 dz;
+    f32 d;
+    s32 atk;
+    Unk8000BA20 *a;
+    u16 attr;
+
+    switch (e->unk6) {
+        case 0:
+            attr = e->unk1C->unk2;
+            if (attr & 2) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C074, obj, (EnemyAI *)e);
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                e->unk6++;
+                e->unk2 = e->unk1C->unk6;
+            }
+            break;
+        case 1:
+            attr = e->unk1C->unk2;
+            if (attr & 0xA) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            }
+            if (!(D_8007AA08.unk78 & 2) && !(e->flags & 8)) {
+                dx = D_8007AA08.x - obj->x;
+                dz = D_8007AA08.z - obj->z;
+                d = sqrtf(dx * dx + dz * dz) - D_8007AA08.unk3C * D_8007AA08.unk14->unk18;
+                if (d < e->unk1C->unk14 * obj->unk24) {
+                    if (func_8000C3FC(obj) != 0) {
+                        n = func_8000C48C(e);
+                        atk = 0x8004;
+                        if (e->flags & 0x20) {
+                            atk = 0xC004;
+                        }
+                        n = func_80007FD8(n, atk, obj);
+                        D_8007C070.x = 0.0f;
+                        D_8007C070.y = 2.0f * (obj->unk64->unk18 * obj->unk24);
+                        func_800271B4(obj->angle, &D_8007C070);
+                        func_8001BE2C(obj->x + D_8007C070.x, obj->y + obj->unk64->unk1C * obj->unk24 * 0.7f, obj->z + D_8007C070.y);
+                        if (e->unk98 & 2) {
+                            n = ((n + 3) >> 2) + 1;
+                            e->unkA += n;
+                            if (obj->unk64->unk6 < e->unkA) {
+                                e->unkA = obj->unk64->unk6;
+                            }
+                            func_8001AE24(obj, 1, n);
+                            func_8002373C(obj, 2, 1, 30);
+                        }
+                    } else {
+                        func_8000847C();
+                        D_8007AA08.unk14->unk2C++;
+                    }
+                    e->flags |= 8;
+                }
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                a = e->unk1C;
+                e->unk6++;
+                if (a->unkA == -1) {
+                    e->unk2 = anims[a->unk8].unk2 - a->unk4;
+                } else {
+                    e->unk2 = anims[a->unkC].unk2;
+                    func_800201A0(obj, a->unkC, 1, 0, 1, 1);
+                    func_8000BFE0(obj, &D_8007C070);
+                }
+                if (e->unk2 <= 0) {
+                    e->unk2 = 1;
+                }
+                func_8001FC14(obj);
+            }
+            break;
+        case 2:
+            func_8000BFE0(obj, &D_8007C070);
+            func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            e->unk2--;
+            if (e->unk2 == 0) {
+                e->type = 0;
+                obj->unk60 &= 0xFFFE;
+            }
+            break;
+    }
+}
 
 void func_8000B508(Obj *obj, Enemy *e, AnimDef *anims) {
     Unk8000BA20 *a;
