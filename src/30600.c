@@ -98,7 +98,7 @@ extern s8 D_8008FB79;
 extern s8 D_8008FB7A;
 extern s8 D_8008FB7B;
 extern u8 D_8008FB7C;
-extern Unk8008FB80 D_8008FB80[];
+extern Unk8008FB80 D_8008FB80[17];
 extern u8 D_8008FB81[];
 extern Unk80090228 D_80090228;
 extern u8 D_80090248[];

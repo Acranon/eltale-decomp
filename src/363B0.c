@@ -40,6 +40,9 @@ s32 func_8003D6B0();
 s32 func_8003D0F0();
 s32 func_8003ED60();
 s32 func_8003EDC0();
+s32 func_8003DEA0();
+s32 func_800360F8();
+s32 func_8003E080();
 
 #pragma GLOBAL_ASM("asm/nonmatchings/363B0/func_800357B0.s")
 
