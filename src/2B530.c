@@ -19,7 +19,83 @@ void func_8002A954(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002A984.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002AC1C.s")
+extern s32 D_8008FB30;
+extern s32 D_8008FB34;
+extern s32 D_8008FB38;
+void func_8002AE58(s32);
+void func_8002B844(s32);
+void func_8002C598(s32);
+void func_8002D7CC(s32);
+
+void func_8002AC1C(void) {
+    s32 mode;
+    s32 dir = 0;
+    s32 d;
+    s32 a;
+    s32 b;
+
+    d = D_8008FB38 * D_8008FB38 * 0.3125;
+    if (D_8008FB3E & 0x1000) {
+        D_8008FB30 = 0x140 - d;
+        D_8008FB34 = -d;
+        a = D_8008FB30;
+        b = D_8008FB34;
+        if (D_8008FB38 == 0) {
+            dir = -1;
+        }
+    } else {
+        D_8008FB30 = d;
+        D_8008FB34 = d - 0x140;
+        a = D_8008FB34;
+        b = D_8008FB30;
+        if (D_8008FB38 == 0) {
+            dir = 1;
+        }
+    }
+    D_8008FB38--;
+    mode = D_8008FB3E & 3;
+    switch (mode) {
+        case 0:
+            func_8002AE58(a);
+            if (D_8008FB3E & 0x1000) {
+                func_8002B844(b);
+            } else {
+                func_8002C598(b);
+            }
+            break;
+        case 1:
+            func_8002C598(a);
+            if (D_8008FB3E & 0x1000) {
+                func_8002AE58(b);
+            } else {
+                func_8002D7CC(b);
+            }
+            break;
+        case 2:
+            func_8002D7CC(a);
+            if (D_8008FB3E & 0x1000) {
+                func_8002C598(b);
+            } else {
+                func_8002B844(b);
+            }
+            break;
+        case 3:
+            func_8002B844(a);
+            if (D_8008FB3E & 0x1000) {
+                func_8002D7CC(b);
+            } else {
+                func_8002AE58(b);
+            }
+            break;
+    }
+    if (dir != 0) {
+        D_8008FB3E &= ~0x2000;
+        D_8008FB3E &= ~0x1000;
+        mode += dir;
+        D_8008FB3E &= ~3;
+        D_8008FB3E |= mode & 3;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002AE58.s")
 
