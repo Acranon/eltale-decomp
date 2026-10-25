@@ -176,7 +176,68 @@ void func_80020AE0(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80020B78.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80021030.s")
+typedef struct {
+    /* 0x0 */ char unk0[4];
+    /* 0x4 */ u16 unk4;
+    /* 0x6 */ u16 unk6;
+    /* 0x8 */ u16 unk8;
+    /* 0xA */ u16 unkA;
+} Struct_80021030_64;
+
+typedef struct {
+    /* 0x00 */ char unk0[0x64];
+    /* 0x64 */ Struct_80021030_64* unk64;
+} Struct_80021030;
+
+extern u16 D_8008C152;
+extern u16 D_8008C154;
+extern u16 D_8008C156;
+extern u16 D_8008C158;
+extern Struct_80024A54 D_803A86F8;
+void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
+
+void func_80021030(Struct_80021030* arg0) {
+    Struct_80021030_64* st;
+    s32 w;
+    s32 d;
+
+    D_8008C174 = 0x1C;
+    D_8008C178 = 0x18;
+    if (D_8008C154 != 0) {
+        w = D_8008C152 * D_8008C152;
+        D_8008C174 -= w * 150 / 144;
+    }
+    st = arg0->unk64;
+    func_80024EB0(&D_803A86F8, 0, 1, 0x3E, 0x11, 0x20, 0x27, 0x400, 0x400);
+    func_80024EB0(&D_803A86F8, 0, 0x12, 0x3E, 0x12, 0x20, 0x38, 0x400, 0x400);
+    w = st->unk4 * 56 / st->unk6;
+    d = w - D_8008C156;
+    if (d >= 2 || d < -1) {
+        D_8008C156 += d >> 1;
+    } else {
+        D_8008C156 = w;
+    }
+    if (D_8008C156) {
+        func_80024EB0(&D_803A86F8, 3, 0xB, D_8008C156, 5, 0x5E, 0x27, 0x400, 0x400);
+    }
+    w = st->unk8 * 56 / st->unkA;
+    d = w - D_8008C158;
+    if (d >= 2 || d < -1) {
+        D_8008C158 += d >> 1;
+    } else {
+        D_8008C158 = w;
+    }
+    if (D_8008C158) {
+        func_80024EB0(&D_803A86F8, 3, 0x15, D_8008C158, 5, 0x5E, 0x2C, 0x400, 0x400);
+    }
+    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    func_80024974(3, 0xC, 0, st->unk4);
+    func_80024974(1, 0x36, 0, st->unk6);
+    func_80024974(3, 0xC, 0x1B, st->unk8);
+    func_80024974(1, 0x36, 0x1B, st->unkA);
+    func_80024D40(0x2F, 0, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
+    func_80024D40(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800213A8.s")
 
