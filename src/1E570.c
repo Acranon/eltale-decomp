@@ -49,7 +49,7 @@ extern Struct_80085E48 D_80085E48;
 extern s32 D_80087E30;
 extern Struct_80087E38 D_80087E38[0x100];
 
-void func_8001DCE8(s32, u8*, s32, s32, s32, s32);
+void func_8001DCE8(u8, u8*, s32, s32, u8, u8);
 void func_80027430(MtxF*, f32, f32, f32);
 void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
 void func_800278C8(MtxF*, f32, f32, f32);
@@ -138,4 +138,66 @@ void func_8001DA3C(Struct_8001DA3C* arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1E570/func_8001DCE8.s")
+extern u8 D_8004F0A0[];
+
+extern u8 D_8004F0A0[];
+
+void func_8001DCE8(u8 fmt, u8* timg, s32 width, s32 height, u8 cms, u8 cmt) {
+    u8 masks;
+    u8 maskt;
+
+    for (masks = 0; masks < 7U; masks++) {
+        if (D_8004F0A0[masks] >= width) {
+            break;
+        }
+    }
+    masks++;
+    for (maskt = 0; maskt < 7U; maskt++) {
+        if (D_8004F0A0[maskt] >= height) {
+            break;
+        }
+    }
+    maskt++;
+    switch (fmt) {
+        case 0:
+            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, 0, cms, cmt, masks,
+                                maskt, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            break;
+        case 1:
+            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_RGBA, G_IM_SIZ_32b, width, height, 0, cms, cmt, masks,
+                                maskt, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            break;
+        case 2:
+            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_I, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
+                                maskt, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            break;
+        case 3:
+            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_IA, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
+                                maskt, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            break;
+        case 4:
+            gDPLoadTextureBlock_4b(D_8007A184++, timg, G_IM_FMT_I, width, height, 0, cms, cmt, masks, maskt,
+                                   G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            break;
+        case 5:
+            gDPLoadTextureBlock_4b(D_8007A184++, timg, G_IM_FMT_IA, width, height, 0, cms, cmt, masks, maskt,
+                                   G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            break;
+        case 6:
+            gDPLoadTextureBlock_4b(D_8007A184++, timg, G_IM_FMT_CI, width, height, 0, cms, cmt, masks, maskt,
+                                   G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+            break;
+        case 7:
+            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_CI, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
+                                maskt, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+            break;
+    }
+}
