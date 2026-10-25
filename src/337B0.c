@@ -58,7 +58,26 @@ void func_80032BB0(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80034274.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80034380.s")
+void func_80034380(s32 idx) {
+    Unk80090470 *p;
+    s32 x;
+    s32 y;
+
+    gDPPipeSync(D_8007A184++);
+    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
+    p = &D_80090470[idx];
+    func_80034C9C(0, p->unk4, p->unk6, p->unk8, p->unkA);
+    func_80034C9C(3, p->unk8 + p->unk4, p->unk6 + 2, 2, p->unkA);
+    func_80034C9C(3, p->unk4 + 2, p->unkA + p->unk6, p->unk8, 2);
+    gDPPipeSync(D_8007A184++);
+    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
+    x = p->unk4;
+    y = p->unk6;
+    func_80034C9C(3, x, y, p->unk8, 1);
+    func_80034C9C(3, x, p->unkA + y - 1, p->unk8, 1);
+    func_80034C9C(3, x, y, 1, p->unkA);
+    func_80034C9C(3, p->unk8 + x - 1, y, 1, p->unkA);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_8003453C.s")
 
@@ -112,7 +131,19 @@ s32 func_80034C18(s32 arg0, s32 arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80034C9C.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_8003509C.s")
+void func_8003509C(s32 x, s32 y, s32 w, s32 h) {
+    gDPPipeSync(D_8007A184++);
+    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
+    func_80034C9C(0, x, y, w, h);
+    func_80034C9C(3, x + w, y + 2, 2, h);
+    func_80034C9C(3, x + 2, y + h, w, 2);
+    gDPPipeSync(D_8007A184++);
+    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
+    func_80034C9C(3, x, y, w, 1);
+    func_80034C9C(3, x, y + h - 1, w, 1);
+    func_80034C9C(3, x, y, 1, h);
+    func_80034C9C(3, x + w - 1, y, 1, h);
+}
 
 void func_8003521C(void) {
     D_80092C62 = 0;
