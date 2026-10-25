@@ -245,7 +245,46 @@ void func_80027834(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32* arg4, f32* arg
     *arg6 = -(arg0->mf[0][2] * arg1 + arg0->mf[1][2] * arg2 + arg0->mf[2][2] * arg3);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/27A90/func_800278C8.s")
+void func_800278C8(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
+    f32 sin1;
+    f32 sin2;
+    f32 sin3;
+    f32 cos1;
+    f32 cos2;
+    f32 cos3;
+    f32 d;
+    f32 e;
+
+    d = sqrtf(arg1 * arg1 + arg3 * arg3);
+    if (d != 0.0f) {
+        sin2 = arg1 / d;
+        cos2 = arg3 / d;
+    } else {
+        sin2 = 0.0f;
+        cos2 = (arg2 >= 0.0f) ? 1.0 : -1.0;
+    }
+    e = sqrtf(d * d + arg2 * arg2);
+    sin1 = d / e;
+    cos1 = arg2 / e;
+    sin3 = 0.0;
+    cos3 = 1.0;
+    arg0->mf[0][0] = (cos3 * cos2) + (sin3 * sin1 * sin2);
+    arg0->mf[0][1] = sin3 * cos1;
+    arg0->mf[0][2] = (-sin2 * cos3) + (sin3 * sin1 * cos2);
+    arg0->mf[0][3] = 0.0;
+    arg0->mf[1][0] = (-sin3 * cos2) + (cos3 * sin1 * sin2);
+    arg0->mf[1][1] = cos3 * cos1;
+    arg0->mf[1][2] = (-sin3 * -sin2) + (cos3 * sin1 * cos2);
+    arg0->mf[1][3] = 0.0;
+    arg0->mf[2][0] = cos1 * sin2;
+    arg0->mf[2][1] = -sin1;
+    arg0->mf[2][2] = cos1 * cos2;
+    arg0->mf[2][3] = 0.0;
+    arg0->mf[3][0] = 0.0;
+    arg0->mf[3][1] = 0.0;
+    arg0->mf[3][2] = 0.0;
+    arg0->mf[3][3] = 1.0;
+}
 
 void func_80027A8C(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
     func_800278C8(&D_8008CE60, arg1, arg2, arg3);
