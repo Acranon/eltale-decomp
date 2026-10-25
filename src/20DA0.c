@@ -95,7 +95,70 @@ void func_800201A0(Struct_800201A0* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/20DA0/func_80020214.s")
+typedef struct {
+    /* 0x00 */ Vec3f unk0;
+    /* 0x0C */ Vec3f unkC;
+    /* 0x18 */ Vec3f unk18;
+} Struct_80020568_xf;
+
+void func_80020214(Struct_800201A0* arg0, Struct_80020214_set* arg1, f32 scale) {
+    s32 i;
+    s16 count;
+    u16 cur;
+    s32 frame;
+    Struct_80020214_kf* kf;
+    f32 x;
+    f32 y;
+    Struct_80020568_xf pos;
+    Struct_80020A28* anim;
+    f32 z;
+
+    count = arg1->unk0;
+    cur = arg0->unk54;
+    anim = arg1->unk4;
+    i = 0;
+    while (i < count && anim->unk14 != 0) {
+        i++;
+        anim++;
+    }
+    frame = anim->unk6;
+    if (frame != 0) {
+        frame = cur % frame;
+    } else {
+        frame = 0;
+    }
+    func_80026A00(anim, (Vec3f*)&pos, frame);
+    if (arg0->unk60 & 0x200) {
+        kf = anim->unk0;
+        frame = anim->unk6;
+        while (kf->unk32 != frame) {
+            kf++;
+        }
+        x = kf->unk0;
+        y = kf->unk4;
+        z = kf->unk8;
+        arg0->unk44 = (pos.unk0.x + x) * scale - arg0->unk38;
+        arg0->unk48 = (pos.unk0.y + y) * scale - arg0->unk3C;
+        arg0->unk4C = (pos.unk0.z + z) * scale - arg0->unk40;
+        arg0->unk38 = pos.unk0.x * scale;
+        arg0->unk3C = pos.unk0.y * scale;
+        arg0->unk40 = pos.unk0.z * scale;
+    } else if (arg0->unk60 & 0x400) {
+        arg0->unk44 = 0.0f;
+        arg0->unk48 = 0.0f;
+        arg0->unk4C = 0.0f;
+        arg0->unk38 = pos.unk0.x * scale;
+        arg0->unk3C = pos.unk0.y * scale;
+        arg0->unk40 = pos.unk0.z * scale;
+    } else {
+        arg0->unk44 = pos.unk0.x * scale - arg0->unk38;
+        arg0->unk48 = pos.unk0.y * scale - arg0->unk3C;
+        arg0->unk4C = pos.unk0.z * scale - arg0->unk40;
+        arg0->unk38 = pos.unk0.x * scale;
+        arg0->unk3C = pos.unk0.y * scale;
+        arg0->unk40 = pos.unk0.z * scale;
+    }
+}
 
 void func_80020428(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s32 arg3) {
     s32 i;
@@ -119,12 +182,6 @@ void func_80020428(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s
         }
     }
 }
-
-typedef struct {
-    /* 0x00 */ Vec3f unk0;
-    /* 0x0C */ Vec3f unkC;
-    /* 0x18 */ Vec3f unk18;
-} Struct_80020568_xf;
 
 typedef struct {
     /* 0x00 */ Mtx unk0[3];
