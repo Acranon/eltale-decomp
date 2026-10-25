@@ -322,4 +322,20 @@ void func_80026400(s32 arg0, Struct_803AAAA0* arg1) {
     func_800169B8(arg0, arg1->unk4, 0, 4);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_80026430.s")
+extern Gfx* D_8007A184;
+extern Gfx D_803AA8A8[];
+
+void func_80026430(s32 x, s32 y, s32 w, s32 h) {
+    gDPPipeSync(D_8007A184++);
+    gDPSetCycleType(D_8007A184++, G_CYC_FILL);
+    gDPSetRenderMode(D_8007A184++, G_RM_NOOP, G_RM_NOOP2);
+    gDPSetFillColor(D_8007A184++, 0x00010001);
+    gDPFillRectangle(D_8007A184++, x, y, (x + w), y);
+    gDPFillRectangle(D_8007A184++, x, (y + h), (x + w), (y + h));
+    gDPFillRectangle(D_8007A184++, x, y, x, (y + h));
+    gDPFillRectangle(D_8007A184++, (x + w), y, (x + w), (y + h));
+    gDPFillRectangle(D_8007A184++, x + 3, (y + h) + 1, (x + w) + 2, (y + h) + 2);
+    gDPFillRectangle(D_8007A184++, (x + w) + 1, y + 3, (x + w) + 2, (y + h) + 1);
+    gSPDisplayList(D_8007A184++, D_803AA8A8);
+    gSPTextureRectangle(D_8007A184++, (x + 1) << 2, (y + 1) << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+}
