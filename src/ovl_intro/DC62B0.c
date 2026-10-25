@@ -121,7 +121,41 @@ s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020D0F4_ovl_intro.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020D1DC_ovl_intro.s")
+void func_8020D1DC_ovl_intro(void) {
+    s32 i;
+    IntroSprite *p = D_802684E0;
+
+    for (i = 0; i < 150; i++, p++) {
+        p->unk0.w = 0;
+        p->unk4 = 0;
+        p->unk6 = 0;
+        p->unkC = 0;
+        p->unkE = 0;
+        p->unk8 = 0;
+        p->unkA = 0;
+        p->unk10 = 0;
+        p->unk12 = 0;
+        p->unk14 = 0;
+        p->unk18 = 0;
+        p->unk48 = 0.0f;
+        p->unk4E = 0xFF;
+        p->unk32 = 0;
+        p->unk1C = 0.0f;
+        p->unk20 = 0.0f;
+        p->unk24 = 0;
+        p->unk2A = 0;
+        p->unk2C = 0;
+        p->unk26 = 0;
+        p->unk28 = 0;
+        p->unk2E = p->unk30 = 0;
+        p->unk34 = 0;
+        p->unk40 = 0.0f;
+        p->unk44 = 1.0f;
+        p->unk4C = 0;
+        p->unk38 = 0;
+        p->unk3C = 0;
+    }
+}
 
 void func_8020D300_ovl_intro(s32 idx) {
     IntroSprite *p = &D_802684E0[idx];
