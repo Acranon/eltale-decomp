@@ -81,7 +81,7 @@ extern s32 D_8008C138;
 extern u16 D_8008C14C[2];
 extern u16 D_8008C15A;
 extern u16 D_8008C15C;
-extern s16 D_8008C15E;
+extern u16 D_8008C15E;
 extern u16 D_8008C162;
 extern s32 D_8008C168;
 extern s32 D_8008C16C;
@@ -174,7 +174,137 @@ void func_80020AE0(void) {
     D_8008C042 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80020B78.s")
+typedef struct {
+    /* 0x00 */ Mtx unk0[3];
+    /* 0xC0 */ Mtx unkC0[1];
+} Unk2000000;
+
+typedef struct {
+    /* 0x000 */ char unk0[0x2C];
+    /* 0x02C */ char unk2C[0x7C - 0x2C];
+    /* 0x07C */ s16 unk7C;
+    /* 0x07E */ char unk7E[0x130 - 0x7E];
+} Struct_8007B908_216E0;
+
+typedef struct {
+    /* 0x00 */ char unk0[0x14];
+    /* 0x14 */ u16 unk14;
+} Struct_8007C288;
+
+extern Unk2000000 D_2000000;
+extern s32 D_8004DCA0;
+extern s32 D_8007A180;
+extern s32 D_8007A9C0;
+extern s32 D_8007A9C4;
+extern s32 D_8007A9C8;
+extern s32 D_8007A9CC;
+extern u16 D_8007AA0A;
+extern s32 D_8007AA10;
+extern s32 D_8007AA1C;
+extern u8 D_8007AA20[];
+extern u16 D_8007AA80;
+extern s32 D_8007B900;
+extern Struct_8007B908_216E0 D_8007B908[];
+extern Struct_8007C288* D_8007C288;
+extern u16 D_800842B8;
+extern s32 D_80085F90;
+extern u16 D_8008BE52;
+extern u16 D_8008C152;
+extern u16 D_8008C154;
+extern Gfx D_803A8788[];
+
+struct Struct_80021030;
+void func_80021030(struct Struct_80021030* arg0);
+void func_800213A8(Unk2000000* arg0, s32 arg1);
+void func_80021920(Unk2000000* buf);
+void func_80021C04(Unk2000000* arg0, void* arg1);
+void func_80022658(void* arg0);
+void func_80022970(Unk2000000* arg0, void* arg1);
+void func_800230A8(void);
+void func_800231C4(void);
+void func_800232A8(void);
+void func_8002338C(void);
+void func_80023470(u16 arg0);
+void func_800235D8(void);
+void func_80023930(void* arg0);
+void func_80023E14(void);
+void func_8002440C(void);
+
+void func_80020B78(Unk2000000* buf) {
+    s32 n;
+    Struct_8007B908_216E0* e;
+
+    gSPMatrix(D_8007A184++, &D_2000000.unk0[1], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+    guTranslate(&buf->unkC0[D_8007A180], -160.0f, -120.0f, 0.0f);
+    gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_NOPUSH | G_MTX_MUL | G_MTX_PROJECTION);
+    D_8008C04C = 0x140;
+    D_8008C054 = 0xF0;
+    gSPDisplayList(D_8007A184++, D_803A8788);
+    if ((D_8004DCA0 & 2) && D_8008C154 != 1) {
+        D_8008C154 = 1;
+    } else if (!(D_8004DCA0 & 2) && D_8008C154 == 1) {
+        D_8008C154 = 2;
+    }
+    if (!(D_8004DCA0 & 0xC00)) {
+        func_80021030((struct Struct_80021030*)D_8007AA20);
+        func_800213A8(buf, D_8007AA1C);
+        if (D_8008C154 == 1) {
+            if (++D_8008C152 >= 13) {
+                D_8008C152 = 12;
+            }
+        } else if (D_8008C154 == 2) {
+            if (--D_8008C152 == 0) {
+                D_8008C154 = 0;
+            }
+        }
+    }
+    if ((D_800842B8 & 0xD) && !(D_8008BE52 & 1) && !(D_8007C288->unk14 & 8) && !(D_8004DCA0 & 2)) {
+        func_80021920(buf);
+    }
+    if ((D_8008BE52 & 1) && D_8008C162) {
+        func_80023E14();
+        D_8008C162--;
+    }
+    D_8008C174 = D_8008C178 = 0;
+    if (D_8008BE52 & 1) {
+        func_8002440C();
+        if (!(D_8008BE52 & 2) && D_8007AA0A && !(D_8007AA80 & 1) && !(D_80085F90 & 1)) {
+            func_80023470(D_8007AA0A - 1);
+        }
+        if ((D_8007AA10 & 0x20) && !(D_8004DCA0 & 0x800)) {
+            func_800235D8();
+        }
+        func_80023930(D_8007AA20);
+        n = D_8007B900;
+        e = D_8007B908;
+        while (n != 0) {
+            if (e->unk7C != -1) {
+                func_80023930(e->unk2C);
+                n--;
+            }
+            e++;
+        }
+    } else if (!(D_8004DCA0 & 0x87) && !(D_8007AA80 & 1)) {
+        if (D_8007A9C0) {
+            func_800230A8();
+        } else if (D_8007A9C4 && !(D_8004DCA0 & 8)) {
+            func_800231C4();
+        } else if (D_8007A9C8) {
+            func_800232A8();
+        } else if (D_8007A9CC) {
+            func_8002338C();
+        }
+    }
+    if (D_8004DCA0 & 4) {
+        func_80021C04(buf, &D_8007AA08);
+    } else if (D_8004DCA0 & 8) {
+        func_80022970(buf, &D_8007AA08);
+    }
+    if (D_8008C15E) {
+        func_80022658(&D_8007AA08);
+        D_8008C15E--;
+    }
+}
 
 typedef struct {
     /* 0x0 */ char unk0[4];
@@ -184,7 +314,7 @@ typedef struct {
     /* 0xA */ u16 unkA;
 } Struct_80021030_64;
 
-typedef struct {
+typedef struct Struct_80021030 {
     /* 0x00 */ char unk0[0x64];
     /* 0x64 */ Struct_80021030_64* unk64;
 } Struct_80021030;
@@ -241,14 +371,6 @@ void func_80021030(Struct_80021030* arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800213A8.s")
 
-typedef struct {
-    /* 0x00 */ Mtx unk0[3];
-    /* 0xC0 */ Mtx unkC0[1];
-} Unk2000000;
-
-extern s32 D_8004DCA0;
-extern s32 D_8007A180;
-extern Unk2000000 D_2000000;
 extern f32 D_80085E74;
 extern f32 D_8008FB48;
 extern f32 D_8008FB4C;
@@ -391,7 +513,6 @@ typedef struct {
     /* 0x14 */ f32 unk14;
 } Struct_80023930_fx;
 
-extern s32 D_8004DCA0;
 extern Struct_803AA628 D_803AA628[];
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023930.s")
