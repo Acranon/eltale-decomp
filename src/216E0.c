@@ -44,7 +44,13 @@ s32 func_800168F0(u32, u16);
 s32 func_800281F0(s32, u8*, u16);
 void func_80024694(s32, s32, s32, u8*);
 s32 func_80024904(u8*);
-void func_80024A54(void*, s32, s32, s32, s32);
+typedef struct {
+    /* 0x00 */ void* img;
+    /* 0x04 */ u16 is4b;
+    /* 0x08 */ u32 width;
+} Struct_80024A54;
+
+void func_80024A54(Struct_80024A54*, s32, s32, s32, s32);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
 
 typedef struct {
@@ -97,7 +103,7 @@ typedef struct {
 extern u8 D_803A4118[];
 extern u8 D_803A8728[];
 extern u8* D_803A8778[];
-extern u8 D_803A8748[];
+extern Struct_80024A54 D_803A8748;
 
 void func_80024EB0(void*, s32, s32, s32, s32, s32, s32, s32, s32);
 
@@ -109,10 +115,11 @@ typedef struct {
 } Struct_8002373C_64;
 
 typedef struct {
-    /* 0x00 */ char unk0[0x12];
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ char unk2[0x12 - 0x2];
     /* 0x12 */ u8 unk12[0x10];
-    /* 0x22 */ u8 unk22[0x10];
-    /* 0x32 */ u8 unk32[0x12];
+    /* 0x22 */ s8 unk22[0x10];
+    /* 0x32 */ s8 unk32[0x12];
     /* 0x44 */ s32 unk44[4];
     /* 0x54 */ char unk54[0x94 - 0x54];
     /* 0x94 */ f32 unk94;
@@ -245,6 +252,25 @@ void func_8002373C(Struct_8002373C* arg0, u16 mask, u16 idx, s16 val) {
     }
 }
 
+typedef struct {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 unk2;
+    /* 0x4 */ u16 unk4;
+    /* 0x6 */ u16 unk6;
+} Struct_803AA628;
+
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ char unk2[0x8 - 0x2];
+    /* 0x08 */ u16 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+} Struct_80023930_fx;
+
+extern s32 D_8004DCA0;
+extern Struct_803AA628 D_803AA628[];
+
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023930.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023D28.s")
@@ -359,7 +385,7 @@ void func_80024694(s32 x, s32 y, s32 pal, u8* str) {
             col = (*str & 0xF) * 8;
             row = (*str & 0x70) >> 4;
             if (row != cur) {
-                func_80024A54(D_803A8748, 0, row * 9, 0xA0, 9);
+                func_80024A54(&D_803A8748, 0, row * 9, 0xA0, 9);
                 cur = row;
             }
             row *= 9;
@@ -406,7 +432,17 @@ void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3) {
 void func_80024A4C(void) {
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80024A54.s")
+void func_80024A54(Struct_80024A54* tex, s32 x, s32 y, s32 w, s32 h) {
+    if (tex->is4b == 0) {
+        gDPLoadTextureTile(D_8007A184++, tex->img, G_IM_FMT_CI, G_IM_SIZ_8b, tex->width, 0, x, y, x + w, y + h, 0,
+                           G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
+                           G_TX_NOLOD);
+    } else {
+        gDPLoadTextureTile_4b(D_8007A184++, tex->img, G_IM_FMT_CI, tex->width, 0, x, y, x + w - 1, y + h - 1, 0,
+                              G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK,
+                              G_TX_NOLOD, G_TX_NOLOD);
+    }
+}
 
 void func_80024D40(s32 x, s32 y, s32 x2, s32 y2, s32 s, s32 t, s32 dsdx, s32 dtdy) {
     x += D_8008C174;
