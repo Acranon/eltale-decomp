@@ -197,7 +197,39 @@ void func_80024A4C(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80024A54.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80024D40.s")
+void func_80024D40(s32 x, s32 y, s32 x2, s32 y2, s32 s, s32 t, s32 dsdx, s32 dtdy) {
+    x += D_8008C174;
+    x2 += x;
+    y += D_8008C178;
+    if (x2 < D_8008C044) {
+        return;
+    }
+    y2 += y;
+    if (y2 < D_8008C048) {
+        return;
+    }
+    if (D_8008C04C < x) {
+        return;
+    }
+    if (D_8008C054 < y) {
+        return;
+    }
+    if (D_8008C04C < x2) {
+        x2 = D_8008C04C;
+    }
+    if (D_8008C054 < y2) {
+        y2 = D_8008C054;
+    }
+    if (x < D_8008C044) {
+        s = s - x + D_8008C044;
+        x = D_8008C044;
+    }
+    if (y < D_8008C048) {
+        t = t - y + D_8008C048;
+        y = D_8008C048;
+    }
+    gSPTextureRectangle(D_8007A184++, x << 2, y << 2, x2 << 2, y2 << 2, 0, s << 5, t << 5, dsdx, dtdy);
+}
 
 void func_80024EB0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
     func_80024A54(arg0, arg5, arg6, arg3, arg4);
