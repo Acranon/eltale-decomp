@@ -85,6 +85,11 @@ typedef struct {
     /* 0x2A */ u16 unk2A;
     /* 0x2C */ u16 unk2C;
     /* 0x2E */ u16 unk2E;
+    /* 0x30 */ u8 unk30;
+    /* 0x31 */ u8 unk31;
+    /* 0x32 */ u8 unk32;
+    /* 0x33 */ u8 unk33;
+    /* 0x34 */ u8 unk34;
 } PlayerStateSub14;
 
 /* D_8007B908: monsters, size 0x130 */
@@ -196,7 +201,7 @@ void func_80006168(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
 void func_80007A38(Actor *arg0);
 void func_80008970(PlayerState *arg0);
 void func_8000A040(s32 arg0);
-void func_80013A50(u8 arg0);
+void func_80013A50(s32 arg0);
 void func_800169B8(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
 s32 func_80017AB0(void);
 void func_8001A6E4(Actor *arg0);
@@ -231,6 +236,8 @@ f32 sqrtf(f32 x);
 
 extern s32 D_8004DCA0;
 extern s32 D_8004DCF8;
+extern u16 D_800842E8;
+extern u16 D_800842E8;
 extern u16 D_80092C86;
 extern u16 D_80092C86;
 extern u16 D_8007A90C;
@@ -1290,4 +1297,134 @@ void func_80008970(PlayerState *arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80008A40.s")
+extern u32 D_80055D7C[];
+extern u16 D_80055F0C[];
+extern f32 D_8007A9A8;
+extern s32 D_8007A9BC;
+extern u8 D_8007A9BF;
+extern s16 D_8008C160;
+
+void func_8001D94C();
+void func_8001D94C(s32 arg0);
+void func_80008A40(PlayerState *p, Actor *a) {
+    u16 cost;
+    s32 count;
+    u8 *lv;
+
+    count = 0;
+    if (!(D_8008BE52 & 1)) {
+        if (D_800842E8 & 1) {
+            D_8007A8FC += D_8007A9A8;
+            if (D_8007A8FC > 800.0) {
+                D_8007A8FC -= 800.0;
+                p->unk14->unk2C++;
+            }
+        } else {
+            D_8007A900 += D_8007A9A8;
+            if (D_8007A900 > 1500.0) {
+                D_8007A900 -= 1500.0;
+                p->unk14->unk2C++;
+            }
+        }
+    }
+    if (a->unk64->unk6 < 500) {
+        if (p->unk14->unk28 >= D_80055F0C[p->unk14->unk30]) {
+            p->unk14->unk28 -= D_80055F0C[p->unk14->unk30];
+            a->unk64->unk6++;
+            a->unk64->unk4++;
+            if (p->unk14->unk30 < 0x36) {
+                p->unk14->unk30++;
+            }
+            func_8001D94C(0);
+            count++;
+        }
+    } else {
+        p->unk14->unk28 = 0;
+    }
+    if (a->unk64->unkA < 500) {
+        cost = D_80055F0C[p->unk14->unk31];
+        if (p->unk8 & 0x4000) {
+            cost *= 3;
+        } else {
+            cost *= 4;
+        }
+        if (p->unk14->unk2A >= cost) {
+            p->unk14->unk2A -= cost;
+            a->unk64->unkA++;
+            a->unk64->unk8++;
+            if (p->unk14->unk31 < 0x36) {
+                p->unk14->unk31++;
+            }
+            func_8001D94C(2);
+            count++;
+        }
+    } else {
+        p->unk14->unk2A = 0;
+    }
+    if (a->unk64->unkC < 0xFF) {
+        cost = D_80055F0C[p->unk14->unk32];
+        if (p->unk8 & 0x8000) {
+            cost = (f32)cost * 0.8;
+        }
+        if (p->unk14->unk2C >= cost) {
+            p->unk14->unk2C -= cost;
+            a->unk64->unkC++;
+            if (p->unk14->unk32 < 0x36) {
+                p->unk14->unk32++;
+            }
+            func_8001D94C(3);
+            count++;
+        }
+    } else {
+        p->unk14->unk2C = 0;
+    }
+    if (a->unk64->unkE < 0xFF) {
+        cost = D_80055F0C[p->unk14->unk33];
+        if (p->unk8 & 0x2000) {
+            cost = (f32)cost * 0.8;
+        }
+        if (p->unk14->unk2E >= cost) {
+            p->unk14->unk2E -= cost;
+            a->unk64->unkE++;
+            if (p->unk14->unk33 < 0x36) {
+                p->unk14->unk33++;
+            }
+            func_8001D94C(1);
+            count++;
+        }
+    } else {
+        p->unk14->unk2E = 0;
+    }
+    if (!(D_8004DCA0 & 8)) {
+        if (p->unk14->unk34 >= 0x62) {
+            a->unk64->unk10 = 0;
+        } else if (a->unk64->unk10 >= D_80055D7C[p->unk14->unk34]) {
+            a->unk64->unk10 -= D_80055D7C[p->unk14->unk34];
+            if (p->unk14->unk34 < 0x62) {
+                p->unk14->unk34++;
+            }
+            lv = p->unk14->unk24;
+            if (lv[0] != 0x32 || lv[1] != 0x32 || lv[2] != 0x32 || lv[3] != 0x32) {
+                D_8004DCA0 |= 8;
+                p->unk0 = 0;
+                D_8008C160 = 8;
+                func_8002A7C8(0, 1, 0xFF);
+            }
+        }
+    }
+    if (count != 0) {
+        func_8002A7C8(4, 0x35, 0xFF);
+    }
+    if (!(D_8004DCA0 & 0xA) && D_8007A9BC != 0xFF) {
+        func_80013A50(D_8007A9BC);
+        func_80032D20(1);
+        func_80025094(D_8007A9BF);
+        D_8007A9BC = 0xFF;
+        p->unk8 |= 2;
+        D_8004DCA0 |= 2;
+        func_8002A7C8(0, 0x3B, 0xFF);
+    }
+    if (!(D_8004DCA0 & 0xA)) {
+        a->unk60 &= 0xFFFE;
+    }
+}
