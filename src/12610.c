@@ -271,7 +271,46 @@ void func_80012800(s32 arg0, u16 *arg1, u16 *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80012854.s")
+void func_80012854(s32 arg0) {
+    u16 *src;
+    u16 *src2;
+    u16 *dst;
+    u32 i;
+    u16 r1;
+    u16 g1;
+    u16 b1;
+    u16 r2;
+    u16 g2;
+    u16 b2;
+
+    src = D_80084344;
+    src2 = D_80084350;
+    dst = D_80084348;
+    i = 0x100;
+    if (arg0 != 0) {
+        while (i--) {
+            r1 = (*src & 0xF800) >> 11;
+            g2 = *src;
+            g1 = (g2 & 0x7C0) >> 6;
+            b1 = (g2 & 0x3E) >> 1;
+            r2 = (*src2 & 0xF800) >> 11;
+            g2 = (*src2 & 0x7C0) >> 6;
+            b2 = (*src2 & 0x3E) >> 1;
+            src++;
+            src2++;
+            r1 = (r1 * (D_80084340 - arg0) + r2 * arg0) / D_80084340;
+            g1 = (g1 * (D_80084340 - arg0) + g2 * arg0) / D_80084340;
+            b1 = (b1 * (D_80084340 - arg0) + b2 * arg0) / D_80084340;
+            *dst++ = (r1 << 11) | (g1 << 6) | (b1 << 1);
+        }
+    } else {
+        while (i--) {
+            *dst = *src;
+            src++;
+            dst++;
+        }
+    }
+}
 
 void func_80012A60(void) {
     Unk80084998 *p = D_80084998;
