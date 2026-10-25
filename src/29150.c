@@ -518,7 +518,83 @@ void func_80029AD4(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80029D10.s")
+extern f32 D_8004F780[];
+extern u32 D_8008F768[5];
+
+void func_80029D10(void) {
+    s32 snd = D_800559D4[D_8008F764];
+    u32 vol;
+    s32 cmd;
+    s32 end;
+
+    end = 0xFFFF;
+    if (*D_8008F75C == 0xFFFF) {
+        func_80029588(snd);
+        return;
+    }
+    if (*D_8008F75C == 0xFFFD) {
+        D_8008F760 = D_8008F75C;
+        D_8008F75C++;
+    }
+    if (*D_8008F75C == 0xFFFE) {
+        D_8008F75C = D_8008F760;
+        D_8008F75C++;
+    }
+    D_800559E8[D_8008F764] = *D_8008F75C;
+    D_8008F75C++;
+    if (*D_8008F75C != 0xFFFF) {
+        alSndpSetSound(&D_8008F450, D_8008F4BC[snd]);
+        alSndpSetPitch(&D_8008F450, D_8004F780[*D_8008F75C]);
+    }
+    D_8008F75C++;
+    cmd = *D_8008F75C;
+    if (end != cmd) {
+        vol = cmd;
+        D_8008F768[D_8008F764] = cmd;
+        if (D_800559FC[D_8008F764] != 0) {
+            vol = D_800559FC[D_8008F764] * ((u32) cmd >> 8);
+        }
+        alSndpSetSound(&D_8008F450, D_8008F4BC[snd]);
+        alSndpSetVol(&D_8008F450, vol);
+    } else if (D_800559FC[D_8008F764] != 0) {
+        cmd = D_8008F768[D_8008F764] >> 8;
+        vol = D_800559FC[D_8008F764] * cmd;
+        alSndpSetSound(&D_8008F450, D_8008F4BC[snd]);
+        alSndpSetVol(&D_8008F450, vol);
+    }
+    D_8008F75C++;
+    if (*D_8008F75C != end && D_80055A10[D_8008F764] == 0x40) {
+        alSndpSetSound(&D_8008F450, D_8008F4BC[snd]);
+        alSndpSetPan(&D_8008F450, *D_8008F75C);
+    }
+    if (D_80055A10[D_8008F764] != 0x40) {
+        alSndpSetSound(&D_8008F450, D_8008F4BC[snd]);
+        alSndpSetPan(&D_8008F450, D_80055A10[D_8008F764]);
+    }
+    D_8008F75C++;
+    switch (D_8008F764) {
+        case 0:
+            D_8008F77C = D_8008F75C;
+            D_8008F790 = D_8008F760;
+            break;
+        case 1:
+            D_8008F780 = D_8008F75C;
+            D_8008F794 = D_8008F760;
+            break;
+        case 2:
+            D_8008F784 = D_8008F75C;
+            D_8008F798 = D_8008F760;
+            break;
+        case 3:
+            D_8008F788 = D_8008F75C;
+            D_8008F79C = D_8008F760;
+            break;
+        case 4:
+            D_8008F78C = D_8008F75C;
+            D_8008F7A0 = D_8008F760;
+            break;
+    }
+}
 
 void func_8002A118(void) {
     s32 vol;
