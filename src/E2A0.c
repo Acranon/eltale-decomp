@@ -195,9 +195,19 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u16 count;
-    /* 0x02 */ u8 pad2[0x16];
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ s16 w;
+    /* 0x06 */ s16 h;
+    /* 0x08 */ f32 originX;
+    /* 0x0C */ f32 originZ;
+    /* 0x10 */ f32 cellW;
+    /* 0x14 */ f32 cellD;
     /* 0x18 */ Unk8000FA9C *objs;
-    /* 0x1C */ u8 pad1C[0x10];
+    /* 0x1C */ u16 *cells;
+    /* 0x20 */ u16 *lists;
+    /* 0x24 */ u16 *unk24;
+    /* 0x28 */ u16 unk28;
+    /* 0x2A */ u8 pad2A[2];
 } Unk8007C28C; /* size 0x2C */
 
 typedef struct {
@@ -603,7 +613,35 @@ void func_8000FD54(void) {
     } while (i != 0);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000FDA8.s")
+void func_8000FDA8(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *arg4) {
+    Unk80083470 *prev;
+    Unk80083470 *cur;
+    s32 i;
+
+    cur = D_8007A17C ? D_80083470 : D_80083558;
+    prev = D_8007A17C ? D_80083558 : D_80083470;
+    if (D_8007C6AC < 8) {
+        cur += D_8007C6AC;
+        i = D_8007C6A8;
+        while (i != 0 && arg4 != prev->unk18) {
+            i--;
+            prev++;
+        }
+        if (i != 0) {
+            cur->unk0 = prev->unk0;
+            cur->unk14 = prev->unk14;
+        } else {
+            cur->unk0 = 1;
+            cur->unk14 = (f32)func_80026E90(8) * 3.141592653589793 / 4.0f;
+        }
+        cur->unk4 = arg0;
+        cur->unk8 = arg1;
+        cur->unkC = arg2;
+        cur->unk10 = arg3;
+        cur->unk18 = arg4;
+        D_8007C6AC++;
+    }
+}
 
 void func_8000FF18(MtxBuf *arg0) {
     Unk80083470 *p;
