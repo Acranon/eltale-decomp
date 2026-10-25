@@ -31,14 +31,14 @@ typedef struct {
     /* 0x2C */ s16 unk2C;
     /* 0x2E */ s16 unk2E;
     /* 0x30 */ s16 unk30;
-    /* 0x32 */ s16 unk32;
+    /* 0x32 */ u16 unk32;
     /* 0x34 */ s16 unk34;
     /* 0x38 */ s32 unk38;
     /* 0x3C */ s32 unk3C;
     /* 0x40 */ f32 unk40;
     /* 0x44 */ f32 unk44;
     /* 0x48 */ f32 unk48;
-    /* 0x4C */ s16 unk4C;
+    /* 0x4C */ u16 unk4C;
     /* 0x4E */ s16 unk4E;
 } IntroSprite; /* size = 0x50 */
 
@@ -52,6 +52,15 @@ typedef struct {
     /* 0x00 */ Unk28 *unk0;
     /* 0x04 */ u32 unk4;
 } Unk802170E8;
+
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+} IntroRect;
 
 extern Unk802170E8 D_802170E8_ovl_intro[];
 extern u32 D_802170F0_ovl_intro;
@@ -174,9 +183,67 @@ void func_8020D8AC_ovl_intro(s32 idx) {
     p->unk30 = p->unk6 + p->unkA;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020D8E8_ovl_intro.s")
+s32 func_8020D8E8_ovl_intro(s32 idx, s32 arg1) {
+    IntroSprite *p = &D_802684E0[idx];
+    f32 step;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020D9EC_ovl_intro.s")
+    if (!(p->unk0.w & 0x80000000)) {
+        return 0;
+    }
+    p->unk32++;
+    step = 255.0f / p->unk38;
+    p->unk48 += step;
+    if (p->unk48 >= 255.0f || p->unk32 >= p->unk38) {
+        p->unk48 = 255.0f;
+    }
+    if (arg1 == 0) {
+        p->unk4E = p->unk48;
+    } else {
+        p->unk4E = 255.0f - p->unk48;
+    }
+    if (p->unk32 >= p->unk38) {
+        p->unk32 = 0;
+        p->unk48 = 0.0f;
+        if (arg1 == 0) {
+            p->unk4E = 0xFF;
+        } else {
+            p->unk4E = 0;
+        }
+        return 0xFF;
+    }
+    return 0;
+}
+
+s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1) {
+    IntroSprite *p = &D_802684E0[idx];
+    f32 step;
+
+    if (!(p->unk0.w & 0x80000000)) {
+        return 0;
+    }
+    p->unk32++;
+    step = 255.0f / p->unk38;
+    p->unk48 += step;
+    if (p->unk48 >= 255.0f || p->unk32 >= p->unk38) {
+        p->unk48 = 255.0f;
+    }
+    if (arg1 == 0) {
+        p->unk4E = p->unk48;
+    } else {
+        p->unk4E = 255.0f - p->unk48;
+    }
+    if (p->unk32 >= p->unk38) {
+        p->unk32 = 0;
+        p->unk48 = 0.0f;
+        if (arg1 == 0) {
+            p->unk4E = 0xFF;
+        } else {
+            p->unk4E = 0;
+        }
+        return 0xFF;
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020DAF0_ovl_intro.s")
 
