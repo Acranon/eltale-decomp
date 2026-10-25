@@ -261,7 +261,18 @@ void func_80028FFC(u32 bankStart, u32 bankEnd, u32 seqFile, s32 arg3, u8* table)
     alSeqpSetBank((ALSeqPlayer*) &D_8008F7A8[1].player, bank);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80029198.s")
+void func_80029198(s32 slot, s32 seqNo) {
+    u8* offset;
+    s32 len;
+
+    offset = D_80055930->seqArray[seqNo].offset;
+    len = D_80055930->seqArray[seqNo].len;
+    if (len & 1) {
+        len++;
+    }
+    func_80028550((u32) offset, D_8008F7A8[slot].seqData, len);
+    D_8008F7A8[slot].seqNo = seqNo;
+}
 
 s32 func_80029224(s32 slot) {
     SeqSlot* s = &D_8008F7A8[slot];
