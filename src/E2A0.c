@@ -380,7 +380,19 @@ extern s32 D_80084980;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000D6A0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000DDBC.s")
+void func_8000DDBC(void) {
+    s32 i;
+    s32 tmp;
+    u16 *p;
+
+    D_8007C6AC = 0;
+    if (D_800842BC == 0x1D) {
+        i = 18; p = D_80124E00 + i; tmp = *p;
+        for (; i != 0; i--, p--) { *p = *(p - 1); }
+        *p = tmp;
+        D_800842A8++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000DE54.s")
 

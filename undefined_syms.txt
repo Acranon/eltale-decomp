@@ -7,3 +7,6 @@ osCicId = 0x80000310;
 osVersion = 0x80000314;
 osMemSize = 0x80000318;
 osAppNMIBuffer = 0x8000031C;
+
+/* Buffers past the end of bss that the code addresses directly. */
+D_80124E00 = 0x80124E00;
