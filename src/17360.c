@@ -662,11 +662,13 @@ typedef struct {
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
     /* 0x24 */ Actor17360* unk24;
-    /* 0x28 */ u8 pad28[4];
+    /* 0x28 */ Actor17360* unk28;
     /* 0x2C */ Unk17360CamCfg* cfg;
     /* 0x30 */ Unk80019BFCDef* def;
+    /* 0x34 */ u8 pad34[4];
+    /* 0x38 */ struct Unk80019BFCRet* unk38;
 } Unk80019BFC;
-typedef struct {
+typedef struct Unk80019BFCRet {
     /* 0x00 */ u8 pad0[0x28];
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 unk2C;
@@ -755,8 +757,6 @@ void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019D2C.s")
-
 typedef struct {
     /* 0x00 */ u8 pad0[0x20];
     /* 0x20 */ s16 unk20;
@@ -778,6 +778,82 @@ typedef struct {
 extern Unk800C363C* D_800C363C[];
 void func_8001B3FC(s32, s32, f32, f32, f32, f32);
 void func_8001B7E0(s32, f32, f32, f32, f32);
+typedef struct {
+    /* 0x00 */ u8 pad0[0x30];
+    /* 0x30 */ s16 unk30;
+    /* 0x32 */ u16 unk32;
+    /* 0x34 */ u16 unk34;
+    /* 0x36 */ u8 pad36[2];
+    /* 0x38 */ f32 unk38;
+    /* 0x3C */ f32 unk3C;
+    /* 0x40 */ u8 pad40[2];
+    /* 0x42 */ s8 unk42;
+    /* 0x43 */ u8 unk43;
+} Unk80019D2CDef;
+typedef struct {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u16 unkA;
+} Unk800C363C_b; // size = 0xC
+void func_80019D2C(Unk80019BFC* arg0, Actor17360* arg1) {
+    Unk17360CamCfg* cfg;
+    Unk800C18D8* tbl;
+    Unk800C363C_b* fx;
+    Unk80019D2CDef* def;
+    u16 flags;
+    f32 y;
+    f32 h;
+    s32 pad[2];
+
+    def = (Unk80019D2CDef*)arg0->def;
+    cfg = arg0->cfg;
+    if (def->unk30 >= 0) {
+        tbl = &D_800C18D8[def->unk30];
+        D_800863B8.x = def->unk38;
+        D_800863B8.y = def->unk3C;
+        D_800863B8.z = cfg->unk1C;
+        flags = def->unk34;
+        if (flags & 0x40) {
+            arg1 = arg0->unk24;
+        }
+        if (arg1->unk64->unk0 == 1) {
+            if (flags & 0x100) {
+                y = arg1->unk68->unk94;
+            } else {
+                y = arg1->y;
+            }
+        } else if (flags & 0x100) {
+            y = arg1->y + arg1->unk64->unk1C * 0.5 * arg1->scale;
+        } else {
+            y = arg1->y;
+        }
+        arg0->unk38 = func_80019820(def->unk32, flags, arg1->x, y, arg1->z, arg1->ry, tbl, &D_800863B8, arg1);
+        arg0->unk38->unk28 = arg0->unk18;
+        arg0->unk38->unk2C = arg0->unk1C;
+        arg0->unk38->unk30 = arg0->unk20;
+    } else {
+        arg0->unk38 = NULL;
+    }
+    fx = &((Unk800C363C_b**)D_800C363C)[arg0->unk0][arg0->unk2];
+    if (fx->unk8 != 0) {
+        h = 2.0 * arg1->unk64->unk18 * arg1->unk64->unk20;
+        y = arg1->y + arg1->unk64->unk1C * arg1->unk64->unk20;
+        switch (fx->unk8) {
+            case 1:
+                func_8001B3FC(fx->unkA, 30, arg1->x, y, arg1->z, h * 1.2);
+                break;
+            case 2:
+                func_8001B7E0(fx->unkA, arg1->x, y, arg1->z, h * 0.2);
+                break;
+        }
+    }
+    if (def->unk42 >= 0) {
+        func_8002A7C8(def->unk43, def->unk42, 0xFF);
+    } else if (arg0->unk24 != arg0->unk28) {
+        func_8002A7C8(0, 0x18, 0xFF);
+    }
+}
+
 void func_80019FC8(Unk80019BFC* arg0, Actor17360* arg1) {
     Unk80019BFCRet* ret;
     Unk17360CamCfg* cfg;
