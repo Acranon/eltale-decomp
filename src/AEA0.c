@@ -424,7 +424,31 @@ void func_8000A65C(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A6D0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A95C.s")
+void func_8000A95C(void) {
+    u32 i;
+    s32 swapped;
+    u16 tmp;
+    u16 keys[6];
+
+    for (i = 0; i < D_8007B900; i++) {
+        D_8007C050[i] = i;
+        keys[i] = D_8007B908[i].unk28->unkC;
+    }
+    do {
+        swapped = 0;
+        for (i = 0; i < D_8007B900 - 1; i++) {
+            if (keys[i] < keys[i + 1]) {
+                tmp = keys[i];
+                keys[i] = keys[i + 1];
+                keys[i + 1] = tmp;
+                swapped++;
+                tmp = D_8007C050[i];
+                D_8007C050[i] = D_8007C050[i + 1];
+                D_8007C050[i + 1] = tmp;
+            }
+        }
+    } while (swapped);
+}
 
 void func_8000AA28(void) {
     D_8007B908[D_8007C050[D_8008BE58]].flags |= 1;
