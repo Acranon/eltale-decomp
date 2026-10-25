@@ -167,8 +167,8 @@ typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u16 unk2;
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ s16 unk8;
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8;
     /* 0x0A */ u8 padA[2];
     /* 0x0C */ f32 unkC;
     /* 0x10 */ f32 unk10;
@@ -198,6 +198,11 @@ typedef struct {
 
 extern Unk8004EE20 D_8004EFA4;
 extern Unk8004EE20 D_8004EFE4;
+extern Gfx D_800EB6D0[];
+extern u16 D_80087DF8;
+extern u16 D_800863F4;
+void func_8001CBD0(Unk80086798b*, void*);
+void func_8001CDF4(Unk80086798b*);
 void func_80027430(MtxF*, f32, f32, f32);
 f32 func_800270D0(f32, f32);
 u32 func_80026E90(u32);
