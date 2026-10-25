@@ -77,7 +77,7 @@ extern s32 D_8008C048;
 extern s32 D_8008C04C;
 extern u16 D_8008C050;
 extern s32 D_8008C054;
-extern s32 D_8008C138;
+extern u32 D_8008C138;
 extern u16 D_8008C14C[2];
 extern u16 D_8008C15A;
 extern u16 D_8008C15C;
@@ -371,7 +371,65 @@ void func_80021030(Struct_80021030* arg0) {
     func_80024D40(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800213A8.s")
+extern s32 D_8004F2F4[];
+extern Gfx D_803AA3C8[];
+extern u8 D_8004F2CC[][4];
+extern Gfx D_803AA2F8[];
+extern u32 D_8008C13C;
+extern u16 D_8008C180;
+
+void func_800213A8(Unk2000000* buf, s32 arg1) {
+    s32 x;
+    f32 fx;
+    f32 fy;
+    s32 i;
+    u8* p;
+    u8* col;
+    u16 *angle = &D_8008C180;
+
+    D_8008C174 = 0x1C;
+    D_8008C178 = 0xC6;
+    if (D_8008C154 != 0) {
+        i = D_8008C152 * D_8008C152;
+        D_8008C174 -= i * 200 / 144;
+    }
+    func_80024EB0(&D_803A86F8, 0, 0, 0xC, 0xC, 0x20, 0x10, 0x400, 0x400);
+    func_80024EB0(&D_803A86F8, 0x16, 0, 0xC, 0xC, 0x2C, 0x10, 0x400, 0x400);
+    func_80024EB0(&D_803A86F8, 0x2C, 0, 0xC, 0xC, 0x38, 0x10, 0x400, 0x400);
+    func_80024EB0(&D_803A86F8, 0x42, 0, 0xC, 0xC, 0x44, 0x10, 0x400, 0x400);
+    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    x = 6;
+    for (i = 0, p = (u8*)arg1; i < 4; i++) {
+        func_80024974(1, x, 6, p[0x24]);
+        p++;
+        x += 0x16;
+    }
+    for (i = 0; i < 4; i++) {
+        if (((s32*)&D_8007AA08)[2] & D_8004F2F4[i]) {
+            col = &D_8004F2CC[0][i];
+            fx = i * 22.0f + 5.0 + (f32)D_8008C174;
+            fy = D_8008C178 + 5.0f;
+            guTranslate(&buf->unkC0[D_8007A180], fx, fy, 0.0f);
+            gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+            gDPPipeSync(D_8007A184++);
+            gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], (sins(*angle) >> 10) + 0x88);
+            gSPDisplayList(D_8007A184++, D_803AA3C8);
+        }
+    }
+    *angle += 0x444;
+    if (D_8008C138) {
+        col = D_8004F2CC[D_8008C13C];
+        fx = D_8008C13C * 22.0f + 5.0 + (f32)D_8008C174;
+            fy = D_8008C178 + 5.0f;
+            guTranslate(&buf->unkC0[D_8007A180], fx, fy, 0.0f);
+        gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        gDPPipeSync(D_8007A184++);
+        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], D_8008C138 * 255 / 30);
+        gSPDisplayList(D_8007A184++, D_803AA2F8);
+        D_8008C138--;
+    }
+}
+
 
 extern f32 D_80085E74;
 extern f32 D_8008FB48;
@@ -479,7 +537,7 @@ extern u8 D_8007A9F4;
 extern u8 D_8007A9F5;
 extern u8 D_8007A9F6;
 extern u8 D_8007A9F7;
-extern s32 D_8008C13C;
+extern u32 D_8008C13C;
 extern u16 D_8008C160;
 extern u16 D_80092C86;
 extern u8 D_8039ADB0[];
