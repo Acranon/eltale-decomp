@@ -237,7 +237,43 @@ void func_80016760(void) {
     D_80085F90 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800167B0.s")
+s32 func_800167B0(u16 n, u8* arg1) {
+    s32 grp;
+    u32 i;
+    Unk800C185C* rec;
+    u8 t;
+    u8 buf[4];
+    u32 k;
+
+    grp = arg1[0];
+    for (i = 0; i != n; i++) {
+        buf[i] = arg1[i];
+    }
+    if (n >= 3) {
+        if (buf[2] < buf[1]) {
+            t = buf[2];
+            buf[2] = buf[1];
+            buf[1] = t;
+        }
+    }
+    rec = D_800C185C[grp];
+    for (i = 15; i != 0; i--, rec++) {
+        if (n == rec->unk4) {
+            for (k = 0; k < rec->unk4; k++) {
+                if (buf[k] != rec->unk6[k]) {
+                    break;
+                }
+            }
+            if (k == rec->unk4) {
+                break;
+            }
+        }
+    }
+    if (i == 0) {
+        i = 15;
+    }
+    return (grp << 8) - i + 15;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800168F0.s")
 
