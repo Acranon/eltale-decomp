@@ -332,9 +332,105 @@ void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2) {
     p->unk28 = p->unk6;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020DDA0_ovl_intro.s")
+s32 func_8020DDA0_ovl_intro(s32 idx, s32 flags) {
+    IntroSprite *p = &D_802684E0[idx];
+    f32 step;
+    s32 t;
+    s32 d;
+    s32 dir;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020DF20_ovl_intro.s")
+    if (!(flags & 0x80000000)) {
+        return 0xFF;
+    }
+    p->unk24++;
+    step = ((f32) p->unk2A - (f32) p->unk26) / p->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    p->unk1C += step;
+    dir = 2;
+    t = p->unk1C;
+    d = t;
+    if (p->unk4 < p->unk2A) {
+        dir = 1;
+    } else {
+        dir = 2;
+        d = -t;
+    }
+    p->unk4 += d;
+    if (p->unk1C >= 1.0f) {
+        p->unk1C -= t;
+    }
+    if (p->unk24 >= p->unk38) {
+        p->unk4 = p->unk2A;
+    }
+    if (dir & 1) {
+        if (p->unk4 >= p->unk2A) {
+            p->unk4 = p->unk2A;
+        }
+    } else if (dir & 2) {
+        if (p->unk4 <= p->unk2A) {
+            p->unk4 = p->unk2A;
+        }
+    }
+    if (p->unk24 >= p->unk38) {
+        p->unk24 = 0;
+        p->unk1C = 0.0f;
+        p->unk20 = 0.0f;
+        return 0xFF;
+    }
+    return 0;
+}
+
+s32 func_8020DF20_ovl_intro(s32 idx, s32 flags) {
+    IntroSprite *p = &D_802684E0[idx];
+    f32 step;
+    s32 t;
+    s32 d;
+    s32 dir;
+
+    if (!(flags & 0x80000000)) {
+        return 0xFF;
+    }
+    p->unk24++;
+    step = ((f32) p->unk2C - (f32) p->unk28) / p->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    p->unk20 += step;
+    dir = 8;
+    t = p->unk20;
+    d = t;
+    if (p->unk6 < p->unk2C) {
+        dir = 4;
+    } else {
+        dir = 8;
+        d = -t;
+    }
+    p->unk6 += d;
+    if (p->unk20 >= 1.0f) {
+        p->unk20 -= t;
+    }
+    if (p->unk24 >= p->unk38) {
+        p->unk6 = p->unk2C;
+    }
+    if (dir & 4) {
+        if (p->unk6 >= p->unk2C) {
+            p->unk6 = p->unk2C;
+        }
+    } else if (dir & 8) {
+        if (p->unk6 <= p->unk2C) {
+            p->unk6 = p->unk2C;
+        }
+    }
+    if (p->unk24 >= p->unk38) {
+        p->unk24 = 0;
+        p->unk1C = 0.0f;
+        p->unk20 = 0.0f;
+        return 0xFF;
+    }
+    return 0;
+}
 
 s32 func_8020E0A0_ovl_intro(s32 idx) {
     IntroSprite *p = &D_802684E0[idx];
