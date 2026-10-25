@@ -66,7 +66,32 @@ void func_80035970(s32 cont) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/363B0/func_80035A24.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/363B0/func_80035CC8.s")
+u8 func_80035CC8(s32 arg0) {
+    s32 i;
+    s32 j;
+    s32 k = arg0;
+
+    i = -1;
+    do {
+        i++;
+        j = 0;
+        arg0 = 0;
+        for (; j < 16; j++) {
+            if (i + 0x1A == D_80092E48[k].unk2[j]) {
+                arg0 = -1;
+                break;
+            }
+        }
+        if (i >= 16 && arg0) {
+            arg0 = -1;
+            break;
+        }
+    } while (arg0 == 0);
+    if (arg0 == 0) {
+        arg0 = i + 0x1A;
+    }
+    return arg0;
+}
 
 u8 func_80035D58(s32 arg0, u8 arg1) {
     u8 unused[4];
