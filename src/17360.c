@@ -1142,7 +1142,45 @@ void func_800195E0(s32 arg0, Actor17360* arg1) {
     arg1->unk68->unk0 |= 0x800;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800195FC.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x2A];
+    /* 0x2A */ u16 unk2A;
+} Unk800195FCStats;
+typedef struct {
+    /* 0x000 */ u8 pad0[0x28];
+    /* 0x028 */ Unk800195FCStats* unk28;
+    /* 0x02C */ u8 pad2C[0x104];
+} Unk800195FCRec; // size = 0x130
+typedef struct {
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ u8 stats[1];
+} Unk8007A9D0;
+extern u16 D_8004ED90[];
+extern Unk8007A9D0 D_8007A9D0;
+u16 func_800195FC(Unk80018480Cfg* arg0, Actor17360* arg1) {
+    u16 lv;
+    u16* p;
+    f32 sum;
+    f32 step;
+    s32 i;
+
+    if (arg1->unk5E & 1) {
+        lv = ((Unk800195FCRec*)D_8007B908)[func_8000CAB8(arg1)].unk28->unk2A;
+    } else {
+        p = &D_8004ED90[arg0->unk6 * 2];
+        lv = D_8007A9D0.stats[arg0->unk6];
+        lv += D_8007A9D0.stats[*p++] >> 4;
+        lv += D_8007A9D0.stats[*p++] >> 3;
+        lv += D_8007A9D0.stats[*p] >> 3;
+    }
+    sum = arg0->unkC * 0.02;
+    step = sum * 0.2;
+    for (i = 0; i != lv; i++) {
+        sum += step;
+        step *= 1.03;
+    }
+    return (u32)sum;
+}
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
