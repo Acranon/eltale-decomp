@@ -385,7 +385,73 @@ s32 func_80017AB0(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017AEC.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017F48.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ u16 unk14;
+    /* 0x16 */ u8 pad16[2];
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 pad1A[0x10];
+    /* 0x2A */ u16 unk2A;
+} Unk80017F48Cfg;
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u8 pad2[6];
+    /* 0x08 */ u16 unk8;
+} Unk80017F48Sub;
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[4];
+    /* 0x0A */ u16 unkA;
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ f32 vx;
+    /* 0x1C */ f32 vy;
+    /* 0x20 */ f32 vz;
+    /* 0x24 */ u8 pad24[4];
+    /* 0x28 */ Actor17360* target;
+    /* 0x2C */ Unk80017F48Cfg* cfg;
+    /* 0x30 */ u8 pad30[4];
+    /* 0x34 */ Unk80017F48Sub* unk34;
+} Unk80017F48;
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+} Coll17360;
+extern Coll17360 D_800863C8;
+void func_800107F0(f32, f32, f32, s32, Coll17360*);
+void func_80015D78(s32);
+void func_80019FC8();
+void func_80017F48(Unk80017F48* arg0) {
+    if (!(arg0->unkA & 1)) {
+        if (arg0->cfg->unk2A & 1) {
+            arg0->vy -= 0.3;
+        }
+        arg0->y += arg0->vy;
+        if (arg0->cfg->unk14 == 1) {
+            func_800107F0(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
+            if (arg0->y < D_800863C8.y) {
+                arg0->y = D_800863C8.y;
+                arg0->unkA |= 1;
+                arg0->unk4 = 8;
+                arg0->vz = 0.0f;
+                arg0->vy = 0.0f;
+                arg0->vx = 0.0f;
+                if (arg0->unk34 != NULL) {
+                    arg0->unk34->unk0 = 15;
+                    arg0->unk34->unk8 &= ~1;
+                }
+                func_80015D78(1);
+                func_80019FC8(arg0, arg0->target);
+            }
+        }
+        if (arg0->cfg->unk18 == 0 && !(arg0->target->unk60 & 1)) {
+            arg0->x = arg0->target->x;
+            arg0->z = arg0->target->z;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001809C.s")
 
