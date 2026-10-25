@@ -1,9 +1,88 @@
 #include "common.h"
 
 typedef struct {
-    /* 0x00 */ u8 unk0[0xC8];
+    u8 b[0x20];
+} Bytes20;
+
+typedef struct {
+    u8 b[0x10];
+} Bytes10;
+
+typedef struct {
+    u8 b[0x97];
+} Bytes97;
+
+typedef struct {
+    u8 b[1];
+} Bytes1;
+
+typedef struct {
+    /* 0x00 */ Bytes20 unk0;
+    /* 0x20 */ Bytes10 unk20;
+    /* 0x30 */ Bytes97 unk30;
+    /* 0xC7 */ Bytes1 unkC7;
 } Unk80090228; /* size = 0xC8 */
 
+typedef struct {
+    s32 unk0[14];
+} Unk8007A9D0; /* size = 0x38 */
+
+typedef struct {
+    /* 0x00 */ Unk8007A9D0 unk0;
+    /* 0x38 */ u16 unk38;
+    /* 0x3A */ u16 unk3A;
+    /* 0x3C */ s32 unk3C;
+    /* 0x40 */ s32 unk40;
+    /* 0x44 */ s32 unk44;
+    /* 0x48 */ s32 unk48;
+    /* 0x4C */ s32 unk4C;
+    /* 0x50 */ s32 unk50;
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ s32 unk58;
+    /* 0x5C */ u16 unk5C;
+    /* 0x5E */ u16 unk5E;
+    /* 0x60 */ u16 unk60;
+    /* 0x62 */ s8 unk62;
+    /* 0x63 */ s8 unk63;
+    /* 0x64 */ u16 unk64;
+} Unk8008FBA8; /* size = 0x68 */
+
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ s8 unk2[16];
+    /* 0x12 */ s8 unk12;
+    /* 0x13 */ u8 unk13;
+} Unk80092E48; /* size = 0x14 */
+
+typedef struct {
+    s8 unk0;
+    s8 unk1;
+} Unk8008FB80;
+
+extern s32 D_8004DCA0;
+extern s8 D_80060CB0;
+extern s8 D_800616B0;
+extern u16 D_8007A9AC;
+extern u16 D_8007A9AE;
+extern u16 D_8007A9B0;
+extern Unk8007A9D0 D_8007A9D0;
+extern u8 D_8007C13C[];
+extern s32 D_800842BC;
+extern s32 D_800842C0;
+extern s32 D_800842D0;
+extern s32 D_800842D4;
+extern s32 D_800842D8;
+extern s32 D_800842DC;
+extern s32 D_800842E0;
+extern s32 D_800842E4;
+extern u16 D_80084990;
+extern u16 D_80084992;
+extern u8 D_80085988[];
+extern u8 D_80085A98[];
+extern u8 D_8008C9B8[];
+extern Unk8008FBA8 D_8008FBA8[];
+extern Unk8008FBA8 D_800902F0;
+extern Unk80092E48 D_80092E48[];
 extern Gfx D_80061770[];
 extern s16 D_8007A170;
 extern Gfx *D_8007A184;
@@ -17,9 +96,12 @@ extern s8 D_8008FB79;
 extern s8 D_8008FB7A;
 extern s8 D_8008FB7B;
 extern u8 D_8008FB7C;
-extern s8 D_8008FB80[];
+extern Unk8008FB80 D_8008FB80[];
 extern u8 D_8008FB81[];
 extern Unk80090228 D_80090228;
+extern u8 D_80090248[];
+extern u8 D_80090258[];
+extern u8 D_800902EF[];
 extern u8 D_80090370[];
 extern s8 D_80092C80;
 
@@ -33,8 +115,12 @@ void func_80031C9C(void);
 void func_80031E10(void);
 void func_80032134(void);
 void func_80032558(void);
+void func_800327BC(s32);
 void func_800329B0(s32);
+void func_8002DECC(s32, s32, s32, s32, s32);
+s8 func_80035D58(s32, u8);
 u8 func_80035E24(s32, u8);
+s32 func_80035F0C(s32, s32, s32, s32, void *);
 s32 func_80035EA8(s32, s32, s32, s32, u8 *);
 s32 func_80035F94(s32, s32);
 s32 func_8003609C(s32);
@@ -147,7 +233,7 @@ void func_80031B68(void) {
 }
 
 void func_80031C9C(void) {
-    s32 err = func_80035EA8(D_80092C80, D_8008FB80[D_8008FB7A * 2], 0x80, 0xE0, D_80090370);
+    s32 err = func_80035EA8(D_80092C80, D_8008FB80[D_8008FB7A].unk0, 0x80, 0xE0, D_80090370);
 
     D_80090228 = *(Unk80090228 *)D_80090370;
     if (err != 0) {
@@ -182,7 +268,7 @@ void func_80032134(void) {
     s32 err;
 
     func_8003D8EC("Repair Info %d %d\n", D_8008FB7A, D_8008FB74);
-    err = func_80035F94(D_8008FB80[D_8008FB7A * 2], D_8008FB74);
+    err = func_80035F94(D_8008FB80[D_8008FB7A].unk0, D_8008FB74);
     if (err != 0) {
         D_8008FB74 = err;
         switch (-func_8003609C(err)) {
@@ -219,7 +305,29 @@ void func_800324F4(void) {
     D_8008FB3E &= ~0x10;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/30600/func_80032558.s")
+void func_80032558(void) {
+    func_8002DECC(0, 0x3C, 0x22, 0xC8, 0xAB);
+    func_8002DECC(0x37, 0x3F, 0xCE, 0xC8, 3);
+    func_8002DECC(0x37, 0x105, 0x28, 2, 0xA9);
+    func_8002DECC(0x37, 0x3B, 0x21, 0xCA, 1);
+    func_8002DECC(0x37, 0x3B, 0xCD, 0xCA, 1);
+    func_8002DECC(0x37, 0x3B, 0x21, 1, 0xAD);
+    func_8002DECC(0x37, 0x104, 0x21, 1, 0xAD);
+    func_8002DECC(0x38, 0x3D, 0x23, 0xC5, 1);
+    func_8002DECC(0x38, 0x3D, 0x23, 1, 0xA8);
+    func_8002DECC(0x39, 0x3D, 0xCB, 0xC6, 1);
+    func_8002DECC(0x39, 0x102, 0x23, 1, 0xA9);
+    func_8002DECC(0x3F, 0x5A, 0x2E, 0x96, 2);
+    func_8002DECC(0x3F, 0x5A, 0x44, 0x96, 2);
+    func_8002DECC(0x3F, 0x5A, 0x7B, 0x96, 2);
+    func_8002DECC(0x3F, 0x5A, 0x91, 0x96, 2);
+    func_8002DECC(0x42, 0x5E, 0x67, 0x7C, 0xC);
+    func_8002DECC(0x42, 0x5E, 0xB5, 0x7C, 0xC);
+    func_8002DECC(0x46, 0x55, 0x58, 0x14, 0xE);
+    func_8002DECC(0x47, 0xA2, 0x58, 0x18, 0xE);
+    func_8002DECC(0x46, 0x55, 0xA6, 0x14, 0xE);
+    func_8002DECC(0x47, 0xA2, 0xA6, 0x18, 0xE);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/30600/func_800327BC.s")
 
