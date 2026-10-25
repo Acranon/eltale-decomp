@@ -113,7 +113,7 @@ typedef struct {
 } Vec3f;
 
 typedef struct {
-    /* 0x00 */ s16 unk0;
+    /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
@@ -153,12 +153,13 @@ typedef struct {
 
 typedef struct Unk8000BA20 {
     /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[2];
+    /* 0x02 */ u16 unk2;
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 pad6[2];
+    /* 0x06 */ u16 unk6;
     /* 0x08 */ s16 unk8;
     /* 0x0A */ s16 unkA;
-    /* 0x0C */ u8 padC[4];
+    /* 0x0C */ s16 unkC;
+    /* 0x0E */ u8 padE[2];
     /* 0x10 */ f32 unk10;
     /* 0x14 */ u8 pad14[4];
 } Unk8000BA20; /* size 0x18 */
@@ -216,7 +217,50 @@ extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
 extern u8 D_8004F760[];
 extern Unk800561A0 D_800561A0[];
 extern u32 D_800566C8[];
-extern Unk80056718 D_80056718;
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+} SpawnDef; /* size 0x10 */
+
+typedef struct {
+    /* 0x00 */ u16 time;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 flags;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+} SpawnScript; /* size 0x18 */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ u8 pad20[0x24];
+} Unk800C185C; /* size 0x44 */
+
+extern SpawnDef D_80056718[];
+extern Unk800C185C *D_800C185C[];
+extern Enemy *D_8007C068;
+extern Obj *D_8007C06C;
+extern f32 D_8007AA20;
+extern f32 D_8007AA24;
+extern f32 D_8007AA28;
+extern f32 D_8007B928;
+extern f32 D_8007B92C;
+void func_80015D78(s32);
+
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ s16 unk2;
+    /* 0x04 */ u8 pad4[8];
+} AnimDef; /* size 0xC */
+
+void func_800169B8(Obj *, s32, s32, s32);
 extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
 extern Unk8007AA08 D_8007AA08;
@@ -229,7 +273,7 @@ extern s32 D_8007C04C;
 extern u16 D_8007C050[];
 extern Unk800561A0 *D_8007C05C;
 extern Unk8007C060 D_8007C060;
-extern s32 D_8007C064;
+extern SpawnScript *D_8007C064;
 extern Vec3f D_8007C070;
 extern Unk8007C288 *D_8007C288;
 extern u16 D_800842E8;
@@ -441,7 +485,62 @@ void func_8000B030(Obj *obj, EnemyAI *ai, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B0D8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B508.s")
+void func_8000B508(Obj *obj, Enemy *e, AnimDef *anims) {
+    Unk8000BA20 *a;
+
+    switch (e->unk6) {
+        case 0:
+            if (e->unk1C->unk2 & 2) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                func_800169B8(obj, e->unk1C->unk0 & ~0x8000, 0, 0);
+                a = e->unk1C;
+                e->unk6++;
+                if (a->unkA == -1) {
+                    e->unk2 = anims[a->unk8].unk2 - a->unk4;
+                } else {
+                    e->unk6++;
+                    e->unk2 = a->unk6;
+                }
+                if (e->unk2 <= 0) {
+                    e->unk2 = 15;
+                }
+                func_8001FC14(obj);
+            }
+            break;
+        case 1:
+            if (e->unk1C->unk2 & 0xA) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                e->type = 0;
+                obj->unk60 &= 0xFFFE;
+                e->unk20 = e->unk24 = 0.0f;
+            }
+            break;
+        case 2:
+            if (e->unk1C->unk2 & 0xA) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                a = e->unk1C;
+                e->unk6--;
+                e->unk2 = anims[a->unkC].unk2;
+                func_800201A0(obj, a->unkC, 1, 0, 1, 1);
+            }
+            if (e->unk2 <= 0) {
+                e->unk2 = 15;
+            }
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B7A4.s")
 
