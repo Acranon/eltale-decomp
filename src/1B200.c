@@ -201,7 +201,7 @@ extern Unk8004EE20 D_8004EFE4;
 extern Gfx D_800EB6D0[];
 extern u16 D_80087DF8;
 extern u16 D_800863F4;
-s32 func_8001CBD0(Unk80086798b*, void*);
+s32 func_8001CBD0(Unk80086798b*, s32);
 s32 func_8001CDF4(Unk80086798b*);
 void func_80027430(MtxF*, f32, f32, f32);
 f32 func_800270D0(f32, f32);
@@ -630,11 +630,88 @@ void func_8001C7E8(void) {
     } while (i != 0);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001C818.s")
+Unk80086798b* func_8001C818(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 arg10, f32 arg11) {
+    s32 i;
+    Unk80086798b* p;
+
+    i = 31;
+    p = D_80086798;
+    while (i != 0 && p->unk0 != 0) {
+        i--;
+        p++;
+    }
+    p->unkC = arg5;
+    p->unk10 = arg6;
+    p->unk14 = arg7;
+    p->unk18 = arg8;
+    p->unk1C = arg9;
+    p->unk20 = arg10;
+    p->unk24 = arg11;
+    p->unk28 = 0.0f;
+    p->unk2C = 0.0f;
+    p->unk30 = 1.0f;
+    p->unk38 = D_800EB2B4[arg0];
+    p->unk4 = 0;
+    p->unk6 = arg3;
+    p->unk38.unk8 = D_800CADA8[arg1];
+    p->unk0 = p->unk2 = p->unk38.unk2;
+    p->unk8 = arg4;
+    p->unk34 = 0;
+    p->unk44 = D_800DA0F0[arg2];
+    return p;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001C948.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001CBD0.s")
+typedef struct {
+    f32 x, y, z;
+} Vec3f_1B200;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ s8 unk14;
+    /* 0x15 */ u8 pad15[0xB];
+} Anim1B200; // size = 0x20
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x04 */ Anim1B200* unk4;
+} AnimSet1B200;
+extern s32 D_8008BFF0;
+extern s32 D_8007A180;
+void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
+void func_800278C8(MtxF*, f32, f32, f32);
+void func_80027CB4(MtxF*, f32, f32, f32);
+void func_80020568(MtxF*, Vec3f_1B200, s32, s32, s32, s32, AnimSet1B200*, Anim1B200*, s32);
+s32 func_8001CBD0(Unk80086798b* arg0, s32 arg1) {
+    u32 i;
+    Anim1B200* anims;
+    s32 frame;
+    MtxF mtx;
+    Vec3f_1B200 scale;
+
+    D_8008BFF0 = 0;
+    if (arg0->unk8 & 4) {
+        func_800278C8(&mtx, arg0->unk28, arg0->unk2C, arg0->unk30);
+        mtx.mf[3][0] = arg0->unkC;
+        mtx.mf[3][1] = arg0->unk10;
+        mtx.mf[3][2] = arg0->unk14;
+        func_80027CB4(&mtx, arg0->unk1C * 0.01, arg0->unk20 * 0.01, arg0->unk24 * 0.01);
+    } else {
+        func_80027220(&mtx, 0.0f, arg0->unk18, 0.0f, 0.01f, arg0->unkC, arg0->unk10, arg0->unk14);
+        func_80027CB4(&mtx, arg0->unk1C, arg0->unk20, arg0->unk24);
+    }
+    scale.x = arg0->unk1C * 0.01;
+    scale.y = arg0->unk20 * 0.01;
+    scale.z = arg0->unk24 * 0.01;
+    anims = ((AnimSet1B200*)&arg0->unk38)->unk4;
+    frame = arg0->unk34;
+    if (D_8007A180 < 0x1E6) {
+        for (i = 0; i < ((AnimSet1B200*)&arg0->unk38)->unk0; i++) {
+            if (anims[i].unk14 == 0) {
+                func_80020568(&mtx, scale, 0, i, frame, 0, (AnimSet1B200*)&arg0->unk38, anims, arg1);
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001CDF4.s")
 
