@@ -445,7 +445,38 @@ void func_8000571C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80005850.s")
+void func_80005850(Actor *arg0, PlayerState *arg1, s32 arg2) {
+    f32 rot;
+    f32 d;
+
+    arg0->vz = 0.0f;
+    arg0->vx = 0.0f;
+    rot = arg0->rot;
+    arg0->x += arg1->unk12C;
+    arg0->z += arg1->unk130;
+    d = arg1->unk134 - rot;
+    if (d > 3.141592653589793) {
+        d -= 6.283185307179586;
+    } else if (d < -3.141592653589793) {
+        d += 6.283185307179586;
+    }
+    arg0->rot = rot + d * 0.3;
+    rot = arg0->rot;
+    if (arg0->rot > 3.141592653589793) {
+        arg0->rot -= 6.283185307179586;
+    } else if (arg0->rot < -3.141592653589793) {
+        arg0->rot += 6.283185307179586;
+    }
+    if (--arg1->unk4 == 0) {
+        arg1->unk0 = 0xA;
+        arg1->unk4 = 0x50;
+        func_800201A0(arg0, arg1->unk6, 1, D_8007A910, 1, 1);
+        func_80007A38(arg0);
+        func_80020214(arg0, arg0->unk52 * 0xC + arg2, arg0->scale);
+        arg0->rot = arg1->unk138;
+        func_8002A7C8(0x1A, 8, 0xFF);
+    }
+}
 
 void func_80005A18(Actor *arg0, PlayerState *arg1, s32 arg2) {
     func_800069E0(arg0, arg2, &D_8007A918);
@@ -512,10 +543,74 @@ void func_80005C00(Actor *arg0, PlayerState *arg1, CharData *arg2) {
 extern u16 D_8007A172;
 void func_8002A744(s32 arg0, s32 arg1, s32 arg2);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80005D18.s")
+void func_80005D18(Actor *arg0, PlayerState *arg1, CharData *arg2) {
+    f32 rot;
+    f32 d;
+
+    arg0->vz = 0.0f;
+    arg0->vx = 0.0f;
+    if (arg1->unk4 < 0x26) {
+        rot = arg0->rot;
+        d = arg1->unk134 - rot;
+        if (d < -3.141592653589793) {
+            d += 6.283185307179586;
+        } else if (d > 3.141592653589793) {
+            d -= 6.283185307179586;
+        }
+        arg0->rot = rot + d * 0.2;
+        rot = arg0->rot;
+        if (arg0->rot < -3.141592653589793) {
+            arg0->rot += 6.283185307179586;
+        } else if (arg0->rot > 3.141592653589793) {
+            arg0->rot -= 6.283185307179586;
+        }
+    }
+    if (--arg1->unk4 == 0) {
+        arg1->unk0 = 0;
+        arg0->unk60 &= 0xFFFD;
+        if (D_8007A172 != 4) {
+            func_8002A744(D_800842BC, D_800842C0, 0x1E);
+        }
+    }
+}
 
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80005E78.s")
+void func_80005E78(Actor *arg0, PlayerState *arg1, CharData *arg2) {
+    f32 rot;
+    f32 d;
+
+    rot = arg0->rot;
+    d = arg1->unk134 - rot;
+    if (d < -3.141592653589793) {
+        d += 6.283185307179586;
+    } else if (d > 3.141592653589793) {
+        d -= 6.283185307179586;
+    }
+    arg0->rot = rot + d * 0.2;
+    rot = arg0->rot;
+    if (arg0->rot < -3.141592653589793) {
+        arg0->rot += 6.283185307179586;
+    } else if (arg0->rot > 3.141592653589793) {
+        arg0->rot -= 6.283185307179586;
+    }
+    if (arg1->unk4 != 0) {
+        if (--arg1->unk4 == 0) {
+            func_80032D20(1);
+            D_8004DCA0 |= 2;
+        }
+    } else if (D_80090450 == 0) {
+        arg1->unk0 = 3;
+        if (arg1->unk8 & 0x200) {
+            arg1->unk4 = 2;
+        } else {
+            arg1->unk4 = 8;
+            func_800201A0(arg0, 0xE, 1, D_8007A910, 1, 1);
+        }
+        arg1->unk8 &= ~0x200;
+        D_8004DCA0 &= ~2;
+        D_8007A9C0 = 0;
+    }
+}
 
 extern s16 D_8007A90C;
 
