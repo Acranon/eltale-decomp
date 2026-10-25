@@ -62,7 +62,7 @@ typedef struct {
     /* 0x52 */ s16 unk52;
     /* 0x54 */ s16 unk54;
     /* 0x56 */ s16 unk56;
-    /* 0x58 */ s16 unk58;
+    /* 0x58 */ u16 unk58;
     /* 0x5A */ s16 unk5A;
     /* 0x5C */ s16 unk5C;
     /* 0x5E */ s16 unk5E;
@@ -75,7 +75,9 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 unk0[0x4];
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 unk6[0x18 - 0x6];
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u8 unkA[0x18 - 0xA];
     /* 0x18 */ f32 unk18;
     /* 0x1C */ u8 unk1C[0x24 - 0x1C];
     /* 0x24 */ u8 unk24[4];
@@ -87,7 +89,9 @@ typedef struct {
 
 /* D_8007B908: monsters, size 0x130 */
 typedef struct {
-    /* 0x00 */ u8 unk0[0x2C];
+    /* 0x00 */ u8 unk0[0xA];
+    /* 0x0A */ u16 unkA;
+    /* 0x0C */ u8 unkC[0x2C - 0xC];
     /* 0x2C */ Actor actor;
     /* 0x98 */ u8 unk98[0x130 - 0x98];
 } Monster;
@@ -195,6 +199,7 @@ void func_8000A040(s32 arg0);
 void func_80013A50(u8 arg0);
 void func_800169B8(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
 s32 func_80017AB0(void);
+void func_8001A6E4(Actor *arg0);
 void func_8001FC14(Actor *arg0);
 void func_800201A0(Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 void func_80020214(Actor *arg0, s32 arg1, f32 arg2);
@@ -204,8 +209,18 @@ void func_800251CC(u8 arg0, Actor *arg1);
 void func_800271B4(f32 arg0, Vec2f *arg1);
 void func_8002A338(s32 arg0);
 void func_8002A6B8(s32 arg0);
-void func_8002A7C8(s32 arg0, s32 arg1, s32 arg2);
+void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
 void func_80032D20(s32 arg0);
+s32 func_80007E04(s32 arg0, Actor *arg1);
+u16 func_80007EAC(PlayerState *arg0);
+void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
+void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p);
+void func_80007320(PlayerState *arg0, Actor *arg1);
+void func_80008A40(PlayerState *arg0, Actor *arg1);
+void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
+void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p);
+void func_80007320(PlayerState *arg0, Actor *arg1);
+void func_80008A40(PlayerState *arg0, Actor *arg1);
 s32 func_80007FD8(s32 arg0, u16 arg1, Actor *arg2);
 void func_80015F44(s32 arg0, Actor *arg1);
 u32 func_80026E90(s32 arg0);
@@ -216,6 +231,27 @@ f32 sqrtf(f32 x);
 
 extern s32 D_8004DCA0;
 extern s32 D_8004DCF8;
+extern u16 D_80092C86;
+extern u16 D_80092C86;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
 extern CharData *D_80055D40[];
 extern RomRange D_80055F98[];
 extern f32 D_8007A988;
@@ -359,7 +395,118 @@ extern f32 D_8007AB3C;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800047F8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800049F4.s")
+/* particle/effect spawn parameters */
+typedef struct {
+    /* 0x00 */ u8 unk0[0x18];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ u8 unk24[0x30 - 0x24];
+    /* 0x30 */ f32 unk30;
+    /* 0x34 */ f32 unk34;
+    /* 0x38 */ f32 unk38;
+} Unk8004EE20;
+
+extern Unk8004EE20 D_8004EE20;
+extern s32 D_8007A908;
+extern f32 D_80085E70;
+extern s32 D_8008C168;
+extern s32 D_8008C16C;
+extern s8 D_80092C81;
+extern s8 D_80092C82;
+void func_8001D9A8(Unk8004EE20 *arg0);
+void func_8001F164(void);
+
+void func_800049F4(Actor *a, PlayerState *p, CharData *cd) {
+    f32 x;
+    f32 z;
+
+    x = -(f32)D_80092C81;
+    z = -(f32)D_80092C82;
+    if (x > -8.0f && x < 8.0f) {
+        x = 0.0f;
+    }
+    if (z > -8.0f && z < 8.0f) {
+        z = 0.0f;
+    }
+    if (x != 0.0f || z != 0.0f) {
+        D_8007A918.x = x;
+        D_8007A918.z = z;
+        func_800271B4(D_80085E70, &D_8007A918);
+        x = D_8007A918.x;
+        z = D_8007A918.z;
+    }
+    func_80008A40(p, a);
+    if (D_8008C168 != 0) {
+        x = z = 0.0f;
+    } else if (D_8008C16C != 0) {
+        x = z = 0.0f;
+    } else if (D_8004DCA0 & 0x300F) {
+        x = z = 0.0f;
+    } else if (p->unk84 & 8) {
+        x = z = 0.0f;
+    }
+    if ((D_8008BE52 & 1) && (D_8008BE52 & 0x202)) {
+        z = 0.0f;
+        x = 0.0f;
+    } else if (D_8008BE54 != 0) {
+        z = 0.0f;
+        x = 0.0f;
+    }
+    if (p->unk8 & 1) {
+        if (D_8007A908 != 0) {
+            if (--D_8007A908 == 0) {
+                func_80032D20(0);
+            }
+        } else if (D_80090450 == 0) {
+            p->unk8 &= ~1;
+            D_8004DCA0 &= ~2;
+            func_8001F164();
+        }
+    } else if (p->unk8 & 2) {
+        if (D_80090450 == 0) {
+            p->unk8 &= ~2;
+            D_8004DCA0 &= ~2;
+        }
+    } else if (p->unk8 & 0x10) {
+        if (D_80090450 == 0) {
+            p->unk8 &= ~0x10;
+            D_8004DCA0 &= ~2;
+        }
+    }
+    switch (p->unk0) {
+        case 2:
+            func_8000665C(x, z, a, p);
+            break;
+        case 1:
+            func_80006168(x, z, a, p);
+            break;
+        default:
+            func_80006040(x, z, a, p);
+            break;
+    }
+    func_80006A58(0xA01, a, p);
+    if (p->unk0 == 2) {
+        D_8007A90C += a->unk58;
+        if (D_8007A90C >= 0x97) {
+            D_8007A90C = 0;
+            func_8002A7C8(0, 0x21, 0xFF);
+        }
+        if (p->unk4 != 0) {
+            if (!(p->unk4 & 3)) {
+                D_8004EE20.unk18 = a->x;
+                D_8004EE20.unk1C = a->y + 1.0f;
+                D_8004EE20.unk20 = a->z;
+                D_8004EE20.unk30 = 0.0f;
+                D_8004EE20.unk34 = 0.2f;
+                D_8004EE20.unk38 = 0.0f;
+                func_8001D9A8(&D_8004EE20);
+            }
+            p->unk4--;
+        }
+    }
+    func_80007320(p, a);
+}
 
 void func_80004DEC(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     arg0->vz = 0.0f;
@@ -470,6 +617,13 @@ void func_8000525C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     }
 }
 
+extern s32 D_80085E4C;
+void func_8000CA88(Actor *arg0);
+void func_8001AE24(Actor *arg0, s32 arg1, u16 arg2);
+void func_8001BE2C(f32 x, f32 y, f32 z);
+void func_8002373C(Actor *arg0, s32 arg1, s32 arg2, s32 arg3);
+
+u16 func_8000C528(s32 target, u16 dmg, s32 elem, u16 flags, Actor *arg4);
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800052E0.s")
 
 void func_8000571C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
@@ -666,7 +820,7 @@ void func_80005E78(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     }
 }
 
-extern s16 D_8007A90C;
+extern u16 D_8007A90C;
 
 void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
     f32 speed;
@@ -690,9 +844,77 @@ void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
     }
 }
 
+extern u16 D_8007A90C;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006168.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_8000665C.s")
+
+void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p) {
+    s32 anim;
+    s32 next;
+    s32 speed;
+    s32 mode;
+    s32 flag;
+    f32 d;
+    f32 pad;
+    f32 spd;
+    f32 cur;
+    f32 newspd;
+
+    cur = sqrtf(a->vx * a->vx + a->vz * a->vz);
+    if (sx != 0.0f || sz != 0.0f) {
+        spd = sqrtf(sx * sx + sz * sz) * 0.025;
+        if (spd > 2.0) {
+            sx = sx * 2.0 / spd;
+            sz = sz * 2.0 / spd;
+            spd = 2.0f;
+        }
+        d = func_800270D0(sx, sz) - a->rot;
+        if (d > 3.141592653589793) {
+            d -= 6.283185307179586;
+        } else if (d < -3.141592653589793) {
+            d += 6.283185307179586;
+        }
+        a->rot = a->rot + d * 0.4;
+        if (a->rot > 3.141592653589793) {
+            a->rot -= 6.283185307179586;
+        } else if (a->rot < -3.141592653589793) {
+            a->rot += 6.283185307179586;
+        }
+        D_8007A918.x = 0.0f;
+        D_8007A918.z = newspd = cur + (spd - cur) * 0.2;
+        func_800271B4(a->rot, &D_8007A918);
+        a->vx = D_8007A918.x;
+        a->vz = D_8007A918.z;
+        anim = 2;
+        next = 2;
+        mode = 0;
+        speed = spd * 14.0f + 3.0f;
+        flag = 0;
+        if (newspd < 1.0 && spd < 1.0) {
+            p->unk0 = 1;
+        }
+    } else {
+        anim = 0xF;
+        next = D_8007A910;
+        mode = 3;
+        p->unk0 = 4;
+        p->unk4 = 8;
+        a->unkC = 0.0f;
+        a->unk14 = 0.0f;
+        a->vx *= 0.9;
+        a->vz *= 0.9;
+        speed = 1;
+        flag = 1;
+        func_8001A6E4(a);
+    }
+    if (anim != a->unk52 && anim != a->unk5A) {
+        func_800201A0(a, anim, speed, next, speed, flag);
+        a->unk54 = mode;
+    } else {
+        a->unk58 = speed;
+    }
+}
 
 void func_800069E0(Actor *arg0, s32 arg1, Vec2f *arg2) {
     func_80007A38(arg0);
@@ -767,7 +989,100 @@ s32 func_80006D24(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006F80.s")
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 radius;
+} Unk8007C2A8;
+
+extern s32 D_8007C02C;
+extern Actor *D_8007C030[];
+extern s32 D_8007C2A4;
+extern Unk8007C2A8 *D_8007C2A8[];
+
+void func_80006F80(f32 *arg0, f32 *arg1, Actor *arg2) {
+    f32 size;
+    f32 x;
+    f32 z;
+    s32 hit;
+    s32 n;
+    Actor **list;
+    Actor *a;
+    Unk8007C2A8 **list2;
+    Unk8007C2A8 *o;
+    f32 dx;
+    f32 dz;
+    f32 r;
+    f32 dist;
+    f32 k;
+
+    hit = 0;
+    size = arg2->unk28 * arg2->scale;
+    x = *arg0 + arg2->x;
+    z = *arg1 + arg2->z;
+    n = D_8007C02C;
+    if (n != 0) {
+        for (list = D_8007C030; !hit && n != 0; n--) {
+            a = *list++;
+            dx = x - a->x;
+            dz = z - a->z;
+            r = a->unk28 * a->scale + size;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = a->x + dx - arg2->x;
+                    *arg1 = a->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+    n = D_8007ABA8;
+    if (n != 0) {
+        for (list = D_8007ABB0; !hit && n != 0; n--) {
+            a = *list++;
+            dx = x - a->x;
+            dz = z - a->z;
+            r = a->unk28 * a->scale + size;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = a->x + dx - arg2->x;
+                    *arg1 = a->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+    n = D_8007C2A4;
+    if (n != 0) {
+        for (list2 = D_8007C2A8; !hit && n != 0; n--) {
+            o = *list2++;
+            dx = x - o->x;
+            dz = z - o->z;
+            r = size + 2.0 * o->radius;
+            if (dx < r && -r < dx && dz < r && -r < dz) {
+                dist = sqrtf(dx * dx + dz * dz);
+                if (dist < r) {
+                    k = r / dist;
+                    hit = 1;
+                    dx *= k;
+                    dz *= k;
+                    *arg0 = o->x + dx - arg2->x;
+                    *arg1 = o->z + dz - arg2->z;
+                }
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007320.s")
 
@@ -864,6 +1179,9 @@ void func_800079B4(u8 arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A38.s")
 
+extern u16 D_8007C050[];
+extern u16 D_8008BE5A;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A8C.s")
 
 void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2) {
@@ -947,6 +1265,12 @@ s32 func_80008540(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
+extern s16 D_8008C15A;
+extern u16 D_8008C15C;
+extern u16 D_80092C86;
+
+s32 func_800168F0(s32 arg0, u16 arg1);
+s32 func_800167B0(u16 count, u8 *seq);
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800085D8.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80008840.s")

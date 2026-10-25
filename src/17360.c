@@ -128,13 +128,25 @@ typedef struct {
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
 } Unk17360Vec2;
 
 extern Unk17360Vec2 D_800863B8;
 typedef struct {
-    /* 0x00 */ u8 pad0[0x2A];
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ u8 unk24[6];
     /* 0x2A */ u16 unk2A;
 } Unk8007AA1C;
+
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 unk6[0x3E];
+} Unk800C185C; // size = 0x44
+
+extern Unk800C185C* D_800C185C[];
+extern u16 D_800C186E[];
 
 extern Unk8007AA1C* D_8007AA1C;
 extern s32 D_8007B900;
@@ -358,7 +370,18 @@ void func_80017590(Unk17360Cam* arg0, Actor17360* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017630.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017AB0.s")
+s32 func_80017AB0(void) {
+    s32 i;
+    Unk80085F98* p;
+
+    i = 16;
+    p = D_80085F98;
+    while (i != 0 && p->unk4 == 0) {
+        i--;
+        p++;
+    }
+    return i;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017AEC.s")
 
@@ -472,7 +495,26 @@ void func_80018D88(s32 arg0, Actor17360* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018DC0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018FB0.s")
+void func_80018FB0(Unk80018FB0* arg0) {
+    s32 i;
+    Unk8007B908_b* p;
+
+    if (arg0->unk24->unk5E & 1) {
+        arg0->unk28 = D_8007AA20;
+        return;
+    }
+    p = (Unk8007B908_b*)D_8007B908;
+    i = 6;
+    while (i != 0 && p->unk7C == -1) {
+        i--;
+        p++;
+    }
+    if (i != 0) {
+        arg0->unk28 = p->unk2C;
+        return;
+    }
+    arg0->unk28 = NULL;
+}
 
 void func_80019024(Unk80019024* arg0) {
     arg0->unk28 = arg0->unk24;
@@ -596,11 +638,121 @@ void func_800195E0(s32 arg0, Actor17360* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800195FC.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019820.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ s16 unk10;
+    /* 0x12 */ u16 unk12;
+    /* 0x14 */ u16 unk14;
+    /* 0x16 */ u8 pad16[2];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ u8 pad20[0x26];
+    /* 0x46 */ s8 unk46;
+    /* 0x47 */ u8 unk47;
+} Unk80019BFCDef;
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[6];
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ Actor17360* unk24;
+    /* 0x28 */ u8 pad28[4];
+    /* 0x2C */ Unk17360CamCfg* cfg;
+    /* 0x30 */ Unk80019BFCDef* def;
+} Unk80019BFC;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x28];
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 unk2C;
+    /* 0x30 */ f32 unk30;
+} Unk80019BFCRet;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ f32 unk10;
+} Unk80019BFCArg1;
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8;
+} Unk800C18D8; // size = 0xA
+extern Unk800C18D8 D_800C18D8[];
+Unk80019BFCRet* func_80019820(u16, u16, f32, f32, f32, f32, Unk800C18D8*, Unk17360Vec2*, Actor17360*);
+void func_8002A7C8(u8, s8, s32);
+
+
+Unk80019BFCRet* func_8001C818(u16, u16, u16, s32, u16, f32, f32, f32, f32, f32, f32, f32);
+Unk80019BFCRet* func_80019820(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, Unk800C18D8* arg6, Unk17360Vec2* arg7, Actor17360* arg8) {
+    f32 sx;
+    f32 sy;
+
+    switch (arg6->unk0) {
+        case 0:
+            sx = arg8->unk64->unk18 * arg8->scale * arg7->x;
+            break;
+        case 1:
+            sx = arg8->unk64->unk1C * arg8->scale * arg7->x;
+            break;
+        case 3:
+            sx = arg7->z * arg7->x;
+            break;
+        default:
+            do {} while (0);
+            sx = arg7->x;
+            break;
+    }
+    switch (arg6->unk2) {
+        case 0:
+            sy = arg8->unk64->unk18 * arg8->scale * arg7->y;
+            break;
+        case 1:
+            sy = arg8->unk64->unk1C * arg8->scale * arg7->y;
+            break;
+        case 3:
+            sy = arg7->z * arg7->y;
+            break;
+        default:
+            do {} while (0);
+            sy = arg7->y;
+            break;
+    }
+    return func_8001C818(arg6->unk8, arg6->unk4, arg6->unk6, arg0 & 0xFF, arg1, arg2, arg3, arg4, arg5, sx, sy, sx);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800199C0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019BFC.s")
+void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
+    Unk80019BFCRet* ret;
+    Unk17360CamCfg* cfg;
+    Unk80019BFCDef* def;
+    Unk800C18D8* tbl;
+    f32 angle;
+
+    def = arg0->def;
+    cfg = arg0->cfg;
+    tbl = &D_800C18D8[def->unk10];
+    D_800863B8.x = def->unk18;
+    D_800863B8.y = def->unk1C;
+    D_800863B8.z = cfg->unk1C;
+    if (def->unk14 & 0x10) {
+        angle = arg0->unk4 * 3.141592653589793 / 10.0;
+    } else {
+        angle = arg1->unk10;
+    }
+    ret = func_80019820(def->unk12, def->unk14, arg0->x, arg0->y, arg0->z, angle, tbl, &D_800863B8, arg0->unk24);
+    ret->unk28 = arg0->unk18;
+    ret->unk2C = arg0->unk1C;
+    ret->unk30 = arg0->unk20;
+    if (def->unk46 >= 0) {
+        func_8002A7C8(def->unk47, def->unk46, 0xFF);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019D2C.s")
 

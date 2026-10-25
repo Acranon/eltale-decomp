@@ -3,6 +3,8 @@
 typedef struct {
     /* 0x00 */ u8 pad0[2];
     /* 0x02 */ s16 unk2;
+    /* 0x04 */ u8 pad4[0xA];
+    /* 0x0E */ s16 unkE;
 } Unk10;
 
 typedef struct {
@@ -22,7 +24,8 @@ typedef struct {
     /* 0x0C */ u8 padC[4];
     /* 0x10 */ Unk10 *unk10;
     /* 0x14 */ u8 *name;
-    /* 0x18 */ u8 pad18[4];
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ f32 x;
     /* 0x20 */ f32 z;
     /* 0x24 */ f32 angle;
@@ -30,8 +33,8 @@ typedef struct {
 } NPCDef; /* size 0x2C */
 
 typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ s16 timer;
+    /* 0x00 */ u16 state;
+    /* 0x02 */ u16 timer;
     /* 0x04 */ f32 homeX;
     /* 0x08 */ f32 homeZ;
     /* 0x0C */ f32 homeAngle;
@@ -103,7 +106,9 @@ typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ u8 padC[0x18];
+    /* 0x0C */ u8 padC[4];
+    /* 0x10 */ f32 angle;
+    /* 0x14 */ u8 pad14[0x10];
     /* 0x24 */ f32 unk24;
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 rx;
@@ -140,6 +145,8 @@ typedef struct {
 } Unk8007C2A8;
 
 f32 sqrtf(f32);
+extern f32 D_8007AA20;
+extern f32 D_8007AA28;
 extern s32 D_8007C2A4;
 extern Unk8007C2A8 *D_8007C2A8[];
 
@@ -174,10 +181,20 @@ void func_80009764(s32);
 void func_800097F8(NPCDef *, s32);
 void func_80009A54(f32 *, f32 *, Unk80009988 *);
 void func_8000A1D0(s32, u8 *);
-void func_800107F0(f32, f32, f32, s32, CollOut *);
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} CollResult;
+
+void func_800107F0(f32, f32, f32, s32, void *);
 void func_800201A0(void *, s32, s32, s32, s32, s32);
 u32 func_80026E90(s32);
-void func_80028120(u32, void *, u32);
+void func_80028120();
 void func_80032D20(s32);
 void func_8020C0D0(void);
 
@@ -192,7 +209,22 @@ extern RomRange D_80056880[];
 extern u8 D_800568B8[];
 extern u16 D_8007A172;
 extern RomRange *D_8007AB70;
-extern s16 D_8007AB74;
+extern u16 D_8007AB74;
+extern f32 D_8007AB78[2];
+void func_800271B4(f32, f32 *);
+
+typedef struct {
+    /* 0x00 */ u16 state;
+    /* 0x02 */ u16 timer;
+    /* 0x04 */ f32 homeX;
+    /* 0x08 */ f32 homeZ;
+    /* 0x0C */ f32 homeAngle;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ NPCObj obj;
+    /* 0x70 */ u8 pad70[0x10];
+    /* 0x80 */ NPCDef *def;
+} NPC2; /* size 0x84 */
+void func_80009988(f32, f32, Unk80009988 *);
 extern CollOut D_8007AB88;
 extern s32 D_8007ABA4;
 extern NPC D_8007ABF0[];
@@ -256,7 +288,17 @@ void func_80009594(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009764.s")
+void func_80009764(s32 arg0) {
+    u32 start;
+    u32 end;
+
+    D_8007AB70 = &D_80056880[arg0];
+    func_80028120(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
+    func_80028120(D_A70350, D_802A0000, D_A77F10 - D_A70350);
+    start = D_8007AB70->start;
+    end = D_8007AB70->end;
+    func_80028120(start, D_8020E6F0, end - start);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800097F8.s")
 
@@ -276,7 +318,82 @@ void func_80009988(f32 dx, f32 dz, Unk80009988 *obj) {
     obj->nz = D_8007AB88.nz;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009A54.s")
+void func_80009A54(f32 *dx, f32 *dz, Unk80009988 *obj) {
+    f32 nx;
+    f32 nz;
+    f32 ddx;
+    f32 ddz;
+    f32 r;
+    f32 d;
+    s32 hit;
+    f32 radius;
+    s32 i;
+    NPCObj **list;
+    NPCObj *other;
+    Unk8007C2A8 **list2;
+    Unk8007C2A8 *other2;
+
+    nx = *dx + obj->x;
+    nz = *dz + obj->z;
+    radius = obj->unk28 * obj->unk24;
+    hit = 0;
+    ddx = nx - D_8007AA08.x;
+    ddz = nz - D_8007AA08.z;
+    r = D_8007AA08.unk40 * D_8007AA08.unk3C + radius;
+    if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+        d = sqrtf(ddx * ddx + ddz * ddz);
+        if (d < r) {
+            d = r / d;
+            hit = 1;
+            ddx *= d;
+            ddz *= d;
+            *dx = D_8007AA20 + ddx - obj->x;
+            *dz = D_8007AA28 + ddz - obj->z;
+        }
+    }
+    i = D_8007ABA8;
+    if (i != 0) {
+        for (list = D_8007ABB0; !hit && i != 0; i--) {
+            other = *list++;
+            if ((void *)other != (void *)obj) {
+                ddx = nx - other->x;
+                ddz = nz - other->z;
+                r = other->unk28 * other->unk24 + radius;
+                if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+                    d = sqrtf(ddx * ddx + ddz * ddz);
+                    if (d < r) {
+                        d = r / d;
+                        hit = 1;
+                        ddx *= d;
+                        ddz *= d;
+                        *dx = other->x + ddx - obj->x;
+                        *dz = other->z + ddz - obj->z;
+                    }
+                }
+            }
+        }
+    }
+    i = D_8007C2A4;
+    if (i != 0) {
+        for (list2 = D_8007C2A8; !hit && i != 0; i--) {
+            other2 = *list2++;
+            ddx = nx - other2->x;
+            ddz = nz - other2->z;
+            r = radius + other2->unk10 * 2.0;
+            if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+                d = sqrtf(ddx * ddx + ddz * ddz);
+                if (d < r) {
+                    d = r / d;
+                    hit = 1;
+                    ddx *= d;
+                    ddz *= d;
+                    *dx = other2->x + ddx - obj->x;
+                    *dz = other2->z + ddz - obj->z;
+                }
+            }
+        }
+    }
+}
 
 void func_80009DDC(s32 idx) {
     s32 pad;

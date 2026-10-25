@@ -135,7 +135,18 @@ void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
 void func_800277A4(Mtx *, f32, f32, f32, f32 *, f32 *, f32 *);
 extern f32 D_80084550[4][4];
 extern Mtx D_80085F10;
-void func_800130F8(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
+void func_800130F8();
+extern Lights3 D_80084600[];
+extern Lights3 D_800847C0[];
+extern s32 D_80084B60;
+extern s32 D_80084B64;
+extern s32 D_80084B68;
+extern s32 D_80084B6C;
+extern s32 D_80084B70;
+extern s32 D_80084B74;
+extern s32 D_8007A188;
+extern s32 D_8007A18C;
+extern s32 D_8007A190;
 
 void func_80011A10(Unk80011A10Arg *arg0) {
     D_80084318 = arg0->unk1E;
