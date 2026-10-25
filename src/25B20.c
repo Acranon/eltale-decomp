@@ -111,7 +111,16 @@ s32 func_8002504C(void) {
     return count;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_80025094.s")
+void func_80025094(u8 arg0) {
+    s32 i;
+
+    for (i = 0; i < 0x96; i++) {
+        if (D_8008C9B8[i] == 0xFF) {
+            break;
+        }
+    }
+    D_8008C9B8[i] = arg0;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_800250D8.s")
 
