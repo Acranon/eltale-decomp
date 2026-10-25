@@ -71,7 +71,7 @@ typedef struct {
 
 extern Gfx* D_8007A184;
 extern Struct_8007AA08 D_8007AA08;
-extern s16 D_8008C042;
+extern u16 D_8008C042;
 extern s32 D_8008C044;
 extern s32 D_8008C048;
 extern s32 D_8008C04C;
@@ -219,7 +219,8 @@ void func_800213A8(Unk2000000* arg0, s32 arg1);
 void func_80021920(Unk2000000* buf);
 void func_80021C04(Unk2000000* arg0, void* arg1);
 void func_80022658(void* arg0);
-void func_80022970(Unk2000000* arg0, void* arg1);
+struct Struct_80022970;
+void func_80022970(Unk2000000* arg0, struct Struct_80022970* arg1);
 void func_800230A8(void);
 void func_800231C4(void);
 void func_800232A8(void);
@@ -298,7 +299,7 @@ void func_80020B78(Unk2000000* buf) {
     if (D_8004DCA0 & 4) {
         func_80021C04(buf, &D_8007AA08);
     } else if (D_8004DCA0 & 8) {
-        func_80022970(buf, &D_8007AA08);
+        func_80022970(buf, (struct Struct_80022970*)&D_8007AA08);
     }
     if (D_8008C15E) {
         func_80022658(&D_8007AA08);
@@ -430,6 +431,37 @@ extern u8 D_8039EC90[];
 extern Struct_80024A54 D_803A8718;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80022658.s")
+
+typedef struct {
+    /* 0x00 */ char unk0[0x24];
+    /* 0x24 */ u8 unk24[4];
+} Struct_80022970_14;
+
+typedef struct Struct_80022970 {
+    /* 0x00 */ char unk0[0x8];
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ char unkC[0x14 - 0xC];
+    /* 0x14 */ Struct_80022970_14* unk14;
+} Struct_80022970;
+
+typedef struct {
+    /* 0x0 */ f32 x;
+    /* 0x4 */ f32 y;
+} Struct_8004F324;
+
+extern u8 D_8004F2CC[][4];
+extern Struct_8004F324 D_8004F324[];
+extern s32 D_8004F344[];
+extern u8 D_8007A9F4;
+extern u8 D_8007A9F5;
+extern u8 D_8007A9F6;
+extern u8 D_8007A9F7;
+extern s32 D_8008C13C;
+extern u16 D_8008C160;
+extern u16 D_80092C86;
+extern u8 D_8039ADB0[];
+extern Gfx D_803AA2F8[];
+void func_8002A7C8(s32, s32, s32);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80022970.s")
 
