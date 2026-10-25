@@ -44,7 +44,7 @@ s32 func_800168F0(u32, u16);
 s32 func_800281F0(s32, u8*, u16);
 void func_80024694(s32, s32, s32, u8*);
 s32 func_80024904(u8*);
-void func_80024A54(s32, s32, s32, s32, s32);
+void func_80024A54(void*, s32, s32, s32, s32);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
 
 typedef struct {
@@ -99,7 +99,7 @@ extern u8 D_803A8728[];
 extern u8* D_803A8778[];
 extern u8 D_803A8748[];
 
-void func_80024EB0(s32, s32, s32, s32, s32, s32, s32, s32, s32);
+void func_80024EB0(void*, s32, s32, s32, s32, s32, s32, s32, s32);
 
 void func_80020AE0(void) {
     D_8008C168 = 0;
@@ -154,7 +154,7 @@ void func_800235D8(void) {
     if (func_80027FFC(D_8007AA08.unk18, y, D_8007AA08.unk20, &sx, &sy) != 0) {
         gDPPipeSync(D_8007A184++);
         gDPLoadTLUT_pal256(D_8007A184++, D_803A4118);
-        func_80024EB0((s32) D_803A8728, sx - 0x17, sy - 0xF, 0x2E, 0xF, 0x51, 0x31, 0x400, 0x400);
+        func_80024EB0(D_803A8728, sx - 0x17, sy - 0xF, 0x2E, 0xF, 0x51, 0x31, 0x400, 0x400);
     }
 }
 
@@ -202,7 +202,37 @@ void func_8002433C(Struct_8002433C_arg* arg0) {
     p->unk1A = 0xE;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_8002440C.s")
+void func_8002440C(void) {
+    s32 i;
+    Struct_8008C058* p;
+    f32 x;
+    f32 y;
+    s32 sx;
+    s32 sy;
+    f32 z;
+
+    gDPPipeSync(D_8007A184++);
+    gDPLoadTLUT_pal256(D_8007A184++, D_803A4118);
+    p = D_8008C058;
+    i = 8;
+    do {
+        if (p->unk0 != 0) {
+            x = p->unk8;
+            y = p->unkC;
+            z = p->unk10;
+            if (p->unk4 != NULL) {
+                x += ((Vec3f_216E0*) p->unk4)->x;
+                y += ((Vec3f_216E0*) p->unk4)->y;
+                z += ((Vec3f_216E0*) p->unk4)->z;
+            }
+            func_80027FFC(x, y, z, &sx, &sy);
+            func_80024EB0(D_803A8728, sx - (p->unk18 >> 1), sy - p->unk1A, p->unk18, p->unk1A, p->unk14, p->unk16, 0x400, 0x400);
+            p->unk0--;
+        }
+        i--;
+        p++;
+    } while (i != 0);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800245D0.s")
 
@@ -226,7 +256,7 @@ void func_80024694(s32 x, s32 y, s32 pal, u8* str) {
             col = (*str & 0xF) * 8;
             row = (*str & 0x70) >> 4;
             if (row != cur) {
-                func_80024A54((s32) D_803A8748, 0, row * 9, 0xA0, 9);
+                func_80024A54(D_803A8748, 0, row * 9, 0xA0, 9);
                 cur = row;
             }
             row *= 9;
@@ -309,7 +339,7 @@ void func_80024D40(s32 x, s32 y, s32 x2, s32 y2, s32 s, s32 t, s32 dsdx, s32 dtd
     gSPTextureRectangle(D_8007A184++, x << 2, y << 2, x2 << 2, y2 << 2, 0, s << 5, t << 5, dsdx, dtdy);
 }
 
-void func_80024EB0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
+void func_80024EB0(void* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
     func_80024A54(arg0, arg5, arg6, arg3, arg4);
     func_80024D40(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }
