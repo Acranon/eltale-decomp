@@ -1233,7 +1233,63 @@ s32 func_8001CDF4(Unk80086798b* arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001D688.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001D6A8.s")
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+} Unk8007AB48;
+extern Unk8007AB48 D_8007AB48;
+extern f32 D_8007AA44;
+extern Gfx D_800EB9C8[];
+extern Gfx D_800EB990[];
+extern u8 D_8004F04C[][4];
+void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
+void func_8001D6A8(void* arg0) {
+    s32 first;
+    s32 i;
+    Unk80087798* p;
+    u32 alpha;
+    f32 x;
+    f32 y;
+    f32 z;
+    MtxF mtx;
+    Gfx* gfx;
+
+    first = 0;
+    for (i = 0, p = D_80087798; i < 4; i++, p++) {
+        if (p->unk0 != 0) {
+            if (D_8007A180 < 0x1E6) {
+                if (first == 0) {
+                    gSPDisplayList(D_8007A184++, D_800EB990);
+                    first++;
+                }
+                alpha = 200 - func_80026E90(32);
+                if (p->unk0 < 8) {
+                    alpha = (p->unk0 * alpha) >> 3;
+                } else if (p->unk0 >= 22) {
+                    alpha = ((25 - p->unk0) * alpha) >> 2;
+                }
+                x = D_8007AB48.x;
+                y = D_8007AA44 * 70.0 + D_8007AB48.y;
+                z = D_8007AB48.z;
+                func_800275DC(&mtx, x, y, z, D_80085E48.eyeX, D_80085E48.eyeY, D_80085E48.eyeZ);
+                func_80027CB4(&mtx, D_8007AA44, D_8007AA44, D_8007AA44);
+                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[D_8007A180]);
+                /* Keep the index update in the matrix command's scope for IDO scheduling. */
+                {
+                    Gfx* _g = D_8007A184++;
+                    _g->words.w0 = 0x01020040;
+                    _g->words.w1 = (u32)&D_2000000.unkC0[D_8007A180];
+                    D_8007A180++;
+                }
+                gDPSetEnvColor(D_8007A184++, D_8004F04C[i / 1][0], D_8004F04C[i / 1][1], D_8004F04C[i / 1][2], alpha);
+                gSPDisplayList(D_8007A184++, D_800EB9C8);
+            }
+            p->unk0--;
+        }
+    }
+}
+
 
 void func_8001D94C(s32 arg0) {
     D_80087798[arg0].unk0 = 25;
