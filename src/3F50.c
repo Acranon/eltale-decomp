@@ -3,6 +3,7 @@
 typedef struct {
     f32 x;
     f32 z;
+    f32 unk8;
 } Vec2f;
 
 typedef struct {
@@ -774,8 +775,8 @@ typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ s16 rot;
-    /* 0x0E */ u8 unkE[0x18 - 0xE];
+    /* 0x0C */ f32 rot; /* degrees */
+    /* 0x10 */ u8 unk10[0x18 - 0x10];
 } Unk8007C290; /* size 0x18 */
 
 extern f32 D_8007AA2C; /* .actor.unkC */
@@ -788,7 +789,59 @@ void func_8000F50C(s32 arg0, s32 arg1, u16 arg2, Unk8007C290 *arg3);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800073E8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007658.s")
+void func_80007658(PlayerState *arg0, Actor *arg1) {
+    s32 pad[2];
+    f32 rot;
+    u16 hi;
+    Unk8007C290 *pos;
+    s16 n;
+
+    pos = &D_8007C290[D_80084300.unk10];
+    func_8000F50C(0, 0, D_80084300.unkC, pos);
+    hi = D_80084300.unkC >> 8;
+    if ((hi & 0xF) == 3) {
+        arg0->unk6 = 0;
+        func_800201A0(arg1, 0x1A, 1, 1, 0xA, 1);
+        arg0->unk0 = 3;
+        arg0->unk4 = 0x4B;
+        arg1->unkC = 0.0f;
+        arg1->unk14 = 0.0f;
+        arg1->vx = 0.0f;
+        arg1->vz = 0.0f;
+        func_8002A7C8(0x1E, 9, 0xFF);
+    } else {
+        arg0->unk0 = 9;
+        arg0->unk4 = 8;
+        func_800201A0(arg1, 1, 0xA, 1, 0xA, 1);
+        if (D_80084300.unkC & 1) {
+            n = 0x15;
+            D_8007A918.x = -133.0f;
+            D_8007A918.z = -92.0f;
+            D_8007A918.unk8 = 4.0f;
+        } else {
+            n = 0x14;
+            D_8007A918.x = -119.0f;
+            D_8007A918.z = 125.0f;
+            D_8007A918.unk8 = 162.0f;
+        }
+        arg0->unk6 = n;
+        rot = pos->rot * 0.017453292519943295;
+        func_800271B4(-rot, &D_8007A918);
+        arg0->unk12C = (pos->x - D_8007A918.x * arg1->scale - arg1->x) / arg0->unk4;
+        arg0->unk130 = (pos->z + D_8007A918.z * arg1->scale - arg1->z) / arg0->unk4;
+        arg0->unk138 = rot;
+        rot = rot + D_8007A918.unk8 * 0.017453292519943295;
+        if (rot > 3.141592653589793) {
+            rot -= 6.283185307179586;
+        } else if (rot < -3.141592653589793) {
+            rot += 6.283185307179586;
+        }
+        arg0->unk134 = rot;
+        arg1->unkC = 0.0f;
+        arg1->unk14 = 0.0f;
+    }
+    arg1->unk60 |= 1;
+}
 
 void func_8000791C(PlayerState *arg0, Actor *arg1, s32 arg2) {
     func_800201A0(arg1, 0x1C, 1, 0x1D, 1, 1);
