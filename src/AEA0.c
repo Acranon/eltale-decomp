@@ -293,7 +293,7 @@ extern u8 **D_8007C048;
 extern s32 D_8007C04C;
 extern u16 D_8007C050[];
 extern Unk800561A0 *D_8007C05C;
-extern Unk8007C060 D_8007C060;
+extern u16 D_8007C060;
 extern SpawnScript *D_8007C064;
 extern Vec3f D_8007C070;
 extern Unk8007C288 *D_8007C288;
@@ -795,10 +795,10 @@ void func_8000CC30(void) {
 }
 
 void func_8000CC40(s32 arg0, s32 arg1) {
-    D_8007C060.unk0 = 0;
-    D_8007C060.unk4 = D_800566C8[arg0];
-    D_8007C060.unk8 = arg1;
-    D_8007C060.unkC = &D_8007B908[0].obj;
+    ((Unk8007C060 *)&D_8007C060)->unk0 = 0;
+    ((Unk8007C060 *)&D_8007C060)->unk4 = D_800566C8[arg0];
+    ((Unk8007C060 *)&D_8007C060)->unk8 = arg1;
+    ((Unk8007C060 *)&D_8007C060)->unkC = &D_8007B908[0].obj;
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000CC78.s")
