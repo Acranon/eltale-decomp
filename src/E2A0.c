@@ -110,7 +110,26 @@ extern Unk80083470 D_80083470[8];
 extern Unk80083470 D_80083558[8];
 extern Gfx *D_8007A184;
 extern u16 D_800842A8;
+typedef struct {
+    f32 x;
+    f32 y;
+    f32 z;
+} Vec3f;
+
 extern SpriteObj D_8004DE04;
+extern u8 *D_8004DE14;
+extern f32 D_8004DE1C;
+extern f32 D_8004DE20;
+extern f32 D_8004DE24;
+extern f32 D_8004DE2C;
+extern f32 D_8004DE30;
+extern f32 D_8004DE34;
+extern f32 D_8004DE3C;
+extern f32 D_8004DE5C;
+extern f32 D_8004DE60;
+extern f32 D_8004DE64;
+extern f32 D_8004DE6C;
+extern f32 D_8004DE70;
 extern SpriteObj D_8004DE44;
 extern u8 D_8005E9F8[];
 extern f32 D_80081FF0[2];

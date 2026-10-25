@@ -7,7 +7,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
+    /* 0x02 */ s16 unk2;
     /* 0x04 */ u16 unk4;
     /* 0x06 */ u16 unk6;
     /* 0x08 */ u16 unk8;
@@ -19,6 +19,7 @@ typedef struct {
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
+    /* 0x24 */ u8 unk24[0x38 - 0x24];
 } ActorStats;
 
 typedef struct {
@@ -62,7 +63,8 @@ typedef struct {
     /* 0x56 */ s16 unk56;
     /* 0x58 */ s16 unk58;
     /* 0x5A */ s16 unk5A;
-    /* 0x5C */ u8 unk5C[0x60 - 0x5C];
+    /* 0x5C */ s16 unk5C;
+    /* 0x5E */ s16 unk5E;
     /* 0x60 */ u16 unk60;
     /* 0x62 */ u16 unk62;
     /* 0x64 */ ActorStats *unk64;
@@ -72,7 +74,9 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 unk0[0x4];
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 unk6[0x24 - 0x6];
+    /* 0x06 */ u8 unk6[0x18 - 0x6];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ u8 unk1C[0x24 - 0x1C];
     /* 0x24 */ u8 unk24[4];
     /* 0x28 */ u16 unk28;
     /* 0x2A */ u16 unk2A;
@@ -246,11 +250,54 @@ extern s32 D_80090450;
 extern s32 D_80090454;
 extern Unk803AAAA2 D_803AAAA2[];
 
+extern u8 D_869620[];
+extern u8 D_86F6F0[];
+extern u8 D_80206000[];
+extern ActorStats D_80055D44;
+extern ActorStats D_8007A9D0;
+extern ActorSub68 D_8007AA8C;
+extern f32 D_8007A8F4;
+extern f32 D_8007A8F8;
+extern f32 D_8007A8FC;
+extern f32 D_8007A900;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003350.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003494.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003B20.s")
+
+typedef struct {
+    /* 0x0 */ u16 unk0;
+    /* 0x2 */ u16 unk2;
+    /* 0x4 */ f32 x;
+    /* 0x8 */ f32 y;
+    /* 0xC */ f32 rot;
+} Unk80056088; /* size 0x10 */
+
+extern Unk80056088 D_80056088[];
+extern Unk80056088 D_80056198[];
+extern s32 D_800842C4;
+extern s32 D_800842C8;
+
+void func_80003B20(void) {
+    s32 i;
+
+    D_8007AA08.unk14->unk18 = 50.0f;
+    D_800842C4 = D_800842BC;
+    D_800842C8 = D_800842C0;
+    D_80084300.unk8 = 0;
+    for (i = 0; i < 17; i++) {
+        if (D_800842BC == D_80056088[i].unk0 && D_800842C0 == D_80056088[i].unk2) {
+            D_8007A98C = D_80056088[i].x;
+            D_8007A990 = D_80056088[i].y;
+            D_8007A994 = D_80056088[i].rot;
+            D_80084300.unk8 = -1;
+            break;
+        }
+    }
+    D_800842BC = -1;
+    D_800842C0 = -1;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003BE0.s")
 
@@ -398,7 +445,38 @@ void func_8000571C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80005850.s")
+void func_80005850(Actor *arg0, PlayerState *arg1, s32 arg2) {
+    f32 rot;
+    f32 d;
+
+    arg0->vz = 0.0f;
+    arg0->vx = 0.0f;
+    rot = arg0->rot;
+    arg0->x += arg1->unk12C;
+    arg0->z += arg1->unk130;
+    d = arg1->unk134 - rot;
+    if (d > 3.141592653589793) {
+        d -= 6.283185307179586;
+    } else if (d < -3.141592653589793) {
+        d += 6.283185307179586;
+    }
+    arg0->rot = rot + d * 0.3;
+    rot = arg0->rot;
+    if (arg0->rot > 3.141592653589793) {
+        arg0->rot -= 6.283185307179586;
+    } else if (arg0->rot < -3.141592653589793) {
+        arg0->rot += 6.283185307179586;
+    }
+    if (--arg1->unk4 == 0) {
+        arg1->unk0 = 0xA;
+        arg1->unk4 = 0x50;
+        func_800201A0(arg0, arg1->unk6, 1, D_8007A910, 1, 1);
+        func_80007A38(arg0);
+        func_80020214(arg0, arg0->unk52 * 0xC + arg2, arg0->scale);
+        arg0->rot = arg1->unk138;
+        func_8002A7C8(0x1A, 8, 0xFF);
+    }
+}
 
 void func_80005A18(Actor *arg0, PlayerState *arg1, s32 arg2) {
     func_800069E0(arg0, arg2, &D_8007A918);
@@ -461,11 +539,102 @@ void func_80005C00(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80005D18.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80005E78.s")
+extern u16 D_8007A172;
+void func_8002A744(s32 arg0, s32 arg1, s32 arg2);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006040.s")
+void func_80005D18(Actor *arg0, PlayerState *arg1, CharData *arg2) {
+    f32 rot;
+    f32 d;
+
+    arg0->vz = 0.0f;
+    arg0->vx = 0.0f;
+    if (arg1->unk4 < 0x26) {
+        rot = arg0->rot;
+        d = arg1->unk134 - rot;
+        if (d < -3.141592653589793) {
+            d += 6.283185307179586;
+        } else if (d > 3.141592653589793) {
+            d -= 6.283185307179586;
+        }
+        arg0->rot = rot + d * 0.2;
+        rot = arg0->rot;
+        if (arg0->rot < -3.141592653589793) {
+            arg0->rot += 6.283185307179586;
+        } else if (arg0->rot > 3.141592653589793) {
+            arg0->rot -= 6.283185307179586;
+        }
+    }
+    if (--arg1->unk4 == 0) {
+        arg1->unk0 = 0;
+        arg0->unk60 &= 0xFFFD;
+        if (D_8007A172 != 4) {
+            func_8002A744(D_800842BC, D_800842C0, 0x1E);
+        }
+    }
+}
+
+
+void func_80005E78(Actor *arg0, PlayerState *arg1, CharData *arg2) {
+    f32 rot;
+    f32 d;
+
+    rot = arg0->rot;
+    d = arg1->unk134 - rot;
+    if (d < -3.141592653589793) {
+        d += 6.283185307179586;
+    } else if (d > 3.141592653589793) {
+        d -= 6.283185307179586;
+    }
+    arg0->rot = rot + d * 0.2;
+    rot = arg0->rot;
+    if (arg0->rot < -3.141592653589793) {
+        arg0->rot += 6.283185307179586;
+    } else if (arg0->rot > 3.141592653589793) {
+        arg0->rot -= 6.283185307179586;
+    }
+    if (arg1->unk4 != 0) {
+        if (--arg1->unk4 == 0) {
+            func_80032D20(1);
+            D_8004DCA0 |= 2;
+        }
+    } else if (D_80090450 == 0) {
+        arg1->unk0 = 3;
+        if (arg1->unk8 & 0x200) {
+            arg1->unk4 = 2;
+        } else {
+            arg1->unk4 = 8;
+            func_800201A0(arg0, 0xE, 1, D_8007A910, 1, 1);
+        }
+        arg1->unk8 &= ~0x200;
+        D_8004DCA0 &= ~2;
+        D_8007A9C0 = 0;
+    }
+}
+
+extern s16 D_8007A90C;
+
+void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
+    f32 speed;
+
+    arg2->vz = 0.0f;
+    arg2->vx = 0.0f;
+    if (arg0 != 0.0f || arg1 != 0.0f) {
+        speed = sqrtf(arg0 * arg0 + arg1 * arg1) * 0.025;
+        if (speed > 2.0) {
+            speed = 2.0f;
+        }
+        if (speed > 1.5) {
+            arg3->unk0 = 2;
+            arg3->unk4 = 0x1E;
+            D_8007A90C = 0;
+        } else {
+            arg3->unk0 = 1;
+        }
+    } else if (D_8007A910 != arg2->unk52 && D_8007A910 != arg2->unk5A) {
+        func_800201A0(arg2, D_8007A910, 1, D_8007A910, 1, 1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006168.s")
 
