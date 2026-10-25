@@ -107,7 +107,8 @@ typedef struct {
     /* 0x010 */ s32 unk10;
     /* 0x014 */ PlayerStateSub14 *unk14;
     /* 0x018 */ Actor actor;
-    /* 0x084 */ s32 unk84;
+    /* 0x084 */ u16 unk84;
+    /* 0x086 */ u16 unk86;
     /* 0x088 */ u8 unk88[0x108 - 0x88];
     /* 0x108 */ u16 unk108;
     /* 0x10A */ u16 unk10A;
@@ -703,7 +704,42 @@ void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007E04.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007EAC.s")
+extern s32 D_8004DCFC[];
+extern u8 D_8004F760[];
+void func_800269B8(s32 arg0, s32 arg1, void *arg2);
+
+u16 func_80007EAC(PlayerState *arg0) {
+    s32 n;
+    s32 i;
+    u16 val;
+    u16 quarter;
+    u16 sum;
+
+    n = 0;
+    val = arg0->unk108;
+    quarter = arg0->unk108 >> 2;
+    sum = arg0->unk108;
+    for (i = 0; i < 4; i++) {
+        if (quarter < arg0->unk14->unk24[i]) {
+            sum = sum - arg0->unk14->unk24[i] + quarter;
+            n++;
+        }
+    }
+    val = (val >> 1) + sum;
+    if (n != 0) {
+        val = (D_8004DCFC[n] * val) >> 6;
+    }
+    val = (val * arg0->unk10E) >> 4;
+    if (func_80026E90((arg0->unk8 & 0x10000) ? 4 : 0x20) == 0) {
+        val += val >> 1;
+        func_800269B8(4, 0, D_8004F760);
+        arg0->unk8 |= 0x400;
+    }
+    if (arg0->unk84 & 1) {
+        val >>= 1;
+    }
+    return val;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007FD8.s")
 
