@@ -263,7 +263,9 @@ typedef struct {
     /* 0x20 */ u8 pad20[0x24];
 } Unk800C185C; /* size 0x44 */
 
-extern SpawnDef D_80056718[];
+extern Unk80056718 D_80056718;
+extern u16 D_8005685A;
+extern u16 D_8005685C;
 extern Unk800C185C *D_800C185C[];
 extern Enemy *D_8007C068;
 extern Obj *D_8007C06C;
@@ -334,7 +336,25 @@ void func_8000A2A0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A310.s")
+void func_8000A310(void) {
+    s32 n;
+    Enemy *e;
+    Obj *obj;
+
+    n = D_8007B900;
+    if (n != 0) {
+        for (e = D_8007B908; n != 0; e++) {
+            obj = &e->obj;
+            if (e->obj.unk50 != -1) {
+                D_8004DD20[e->type](obj, e, D_8007C048[obj->unk50]);
+                n--;
+            }
+        }
+    }
+    if (D_8008BE52 & 0x100) {
+        func_8000CC78();
+    }
+}
 
 void func_8000A3E4(s32 arg0) {
     Enemy *e;
@@ -406,7 +426,31 @@ void func_8000A65C(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A6D0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A95C.s")
+void func_8000A95C(void) {
+    u32 i;
+    s32 swapped;
+    u16 tmp;
+    u16 keys[6];
+
+    for (i = 0; i < D_8007B900; i++) {
+        D_8007C050[i] = i;
+        keys[i] = D_8007B908[i].unk28->unkC;
+    }
+    do {
+        swapped = 0;
+        for (i = 0; i < D_8007B900 - 1; i++) {
+            if (keys[i] < keys[i + 1]) {
+                tmp = keys[i];
+                keys[i] = keys[i + 1];
+                keys[i + 1] = tmp;
+                swapped++;
+                tmp = D_8007C050[i];
+                D_8007C050[i] = D_8007C050[i + 1];
+                D_8007C050[i + 1] = tmp;
+            }
+        }
+    } while (swapped);
+}
 
 void func_8000AA28(void) {
     D_8007B908[D_8007C050[D_8008BE58]].flags |= 1;
@@ -835,7 +879,23 @@ s32 func_8000CAB8(Obj *arg0) {
     return i;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000CAE8.s")
+void func_8000CAE8(Obj *obj) {
+    f32 y;
+    Unk800C18D8 *t;
+
+    D_8007C070.x = D_80056718.unk148;
+    D_8007C070.y = D_80056718.unk14C;
+    t = &D_800C18D8[D_80056718.unk140];
+    D_8007C070.z = obj->unk28;
+    if (obj->unk64->unk0 == 1) {
+        y = obj->unk68->unk94;
+    } else {
+        y = obj->y + obj->unk64->unk1C * 0.5 * obj->unk24;
+    }
+    func_80019820(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &D_8007C070, obj);
+    func_8001B3FC(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
+                  obj->unk64->unk18 * obj->unk24 * 3.6);
+}
 
 void func_8000CC30(void) {
     D_8007C064 = 0;
