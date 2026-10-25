@@ -41,6 +41,28 @@ s32 func_80026E90(s32);
 extern f32 D_8008BFAC;
 extern s16 D_8008BFB0;
 
+typedef struct {
+    f32 x, y, z;
+} Vec3f;
+
+typedef struct {
+    /* 0x000 */ char unk0[0xA];
+    /* 0x00A */ u16 unkA;
+    /* 0x00C */ char unkC[0x7C - 0xC];
+    /* 0x07C */ s16 unk7C;
+    /* 0x07E */ char unk7E[0x130 - 0x7E];
+} Struct_8007B908;
+
+extern Struct_8007B908 D_8007B908[];
+extern u16 D_8007C050[];
+extern s16 D_8008BE54;
+extern u16 D_8008BE58;
+extern u16 D_8008BE5A;
+extern u16 D_8008BF96;
+
+void func_8001A1A4(Vec3f*);
+void func_8001C298(u16, f32, f32, f32);
+
 void func_8001EE00(void) {
     D_8008BE52 &= 0x8000;
     D_8008BFAC = 0.0f;

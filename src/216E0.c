@@ -28,10 +28,10 @@ typedef struct {
     /* 0x08 */ f32 unk8;
     /* 0x0C */ f32 unkC;
     /* 0x10 */ f32 unk10;
-    /* 0x14 */ s16 unk14;
-    /* 0x16 */ s16 unk16;
-    /* 0x18 */ s16 unk18;
-    /* 0x1A */ s16 unk1A;
+    /* 0x14 */ u16 unk14;
+    /* 0x16 */ u16 unk16;
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u16 unk1A;
 } Struct_8008C058;
 
 extern Struct_8008C058 D_8008C058[8];
@@ -42,7 +42,7 @@ extern u8 D_8004F498[];
 u32 func_800167B0(u16, s32);
 s32 func_800168F0(u32, u16);
 s32 func_800281F0(s32, u8*, u16);
-void func_80024694(s32, s32, u8, u8*);
+void func_80024694(s32, s32, s32, u8*);
 s32 func_80024904(u8*);
 void func_80024A54(s32, s32, s32, s32, s32);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
@@ -80,6 +80,17 @@ extern Gfx D_803AA538[];
 s32 func_80027FFC(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
+
+typedef struct {
+    f32 x, y, z;
+} Vec3f_216E0;
+
+extern u8 D_803A4118[];
+extern u8 D_803A8728[];
+extern u8* D_803A8778[];
+extern u8 D_803A8748[];
+
+void func_80024EB0(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
 void func_80020AE0(void) {
     D_8008C168 = 0;
@@ -173,7 +184,36 @@ void func_8002433C(Struct_8002433C_arg* arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800245D0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80024694.s")
+void func_80024694(s32 x, s32 y, s32 pal, u8* str) {
+    s32 cur = 8;
+    s32 col;
+    s32 row;
+
+    gDPPipeSync(D_8007A184++);
+    gDPLoadTLUT_pal16(D_8007A184++, 0, D_803A8778[pal]);
+    while (*str != 0xFF) {
+        if (*str == 0x80) {
+            func_80024D40(x - 2, y - 1, 8, 9, 0x78, row, 0x400, 0x400);
+            x += 1;
+        } else if (*str == 0x81) {
+            func_80024D40(x - 2, y - 1, 8, 9, 0x80, row, 0x400, 0x400);
+            x += 1;
+        } else if (*str == 0x82) {
+            x += 4;
+        } else {
+            col = (*str & 0xF) * 8;
+            row = (*str & 0x70) >> 4;
+            if (row != cur) {
+                func_80024A54((s32) D_803A8748, 0, row * 9, 0xA0, 9);
+                cur = row;
+            }
+            row *= 9;
+            func_80024D40(x, y, 8, 9, col, row, 0x400, 0x400);
+            x += 8;
+        }
+        str++;
+    }
+}
 
 s32 func_80024904(u8* str) {
     s32 w = 0;
