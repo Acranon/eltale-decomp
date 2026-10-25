@@ -48,7 +48,8 @@ typedef struct {
 typedef struct {
     /* 0x000 */ char unk0[0xA];
     /* 0x00A */ u16 unkA;
-    /* 0x00C */ char unkC[0x7C - 0xC];
+    /* 0x00C */ char unkC[0x2C - 0xC];
+    /* 0x02C */ char unk2C[0x7C - 0x2C];
     /* 0x07C */ s16 unk7C;
     /* 0x07E */ char unk7E[0x130 - 0x7E];
 } Struct_8007B908;
@@ -62,6 +63,44 @@ extern u16 D_8008BF96;
 
 void func_8001A1A4(Vec3f*);
 void func_8001C298(u16, f32, f32, f32);
+
+
+extern f32 D_8004F29C[];
+extern s32 D_8007B900;
+extern Struct_8007B908 D_8007B908[];
+extern void* D_8007C048;
+extern void* D_8007C04C;
+extern s32 D_8007C140;
+extern f32 D_8007C174;
+extern f32 D_8007C178;
+extern f32 D_8007C17C;
+extern f32 D_8007C184;
+extern s16 D_8008BE4C;
+extern s16 D_8008BE4E;
+extern s16 D_8008BE50;
+extern s16 D_8008BE54;
+extern s16 D_8008BE56;
+extern u16 D_8008BE58;
+extern u16 D_8008BE5A;
+extern f32 D_8008BE5C;
+extern f32 D_8008BE60;
+extern f32 D_8008BE6C;
+extern void* D_8008BF70[];
+extern s32 D_8008BF90;
+extern s16 D_8008BF94;
+extern void* D_8008BFA0;
+extern void* D_8008BFA4;
+extern s32 D_8008BFA8;
+extern u8 D_803ABA58[];
+extern u8 D_803AC3F8[];
+
+void func_800047F8(void);
+void func_8000A95C(void);
+void func_8000CC30(void);
+void func_8000D19C(s32, f32, f32, f32, Struct_8007B908*);
+s16 func_8001C060(s32, f32, f32, f32, f32);
+void func_8002430C(void);
+void func_8002A6B8(s8);
 
 void func_8001EE00(void) {
     D_8008BE52 &= 0x8000;
