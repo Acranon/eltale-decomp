@@ -169,7 +169,32 @@ void func_80034380(s32 idx) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_8003453C.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_800348B8.s")
+void func_800348B8(s32 idx) {
+    s32 x;
+    s32 y;
+    s32 i;
+    Unk8Bytes a = D_800616B8;
+    Unk8Bytes b = D_800616C0;
+    Unk8Bytes c = D_800616C8;
+
+    gDPPipeSync(D_8007A184++);
+    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
+    gDPPipeSync(D_8007A184++);
+    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gDPPipeSync(D_8007A184++);
+    gDPLoadTLUT_pal256(D_8007A184++, D_80061850);
+    D_80090470[idx].unkC++;
+    i = (D_80090470[idx].unkC >> 1) & 7;
+    x = D_80090470[idx].unk4 + D_80090470[idx].unk8 - 11;
+    y = D_80090470[idx].unk6 + D_80090470[idx].unkA - 3;
+    x -= c.v[i];
+    func_80034C9C(3, x, y, b.v[i], 1);
+    x = D_80090470[idx].unk4 + D_80090470[idx].unk8 - 12;
+    y = D_80090470[idx].unk6 + D_80090470[idx].unkA - 15;
+    x = a.v[i] + x;
+    y -= a.v[i];
+    func_80034C9C(2, x, y, 12, 12);
+}
 
 void func_80034B30(s32 arg0) {
     s32 max = 0;
