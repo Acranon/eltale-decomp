@@ -75,7 +75,47 @@ extern u16 D_800806B0[];
 extern u16 D_800808B0[][0x100];
 extern s32 D_80084330;
 extern s32 D_80084334;
-extern s16 D_80084338;
+extern u16 D_80084338;
+extern u16 D_80084992;
+extern u16 D_800842B8;
+extern u16 D_8008BE52;
+extern s32 D_8004DCA0;
+extern s32 D_8008C168;
+extern Unk8004DEF4 D_8004DED0[];
+typedef struct {
+    /* 0x00 */ s32 r;
+    /* 0x04 */ s32 g;
+    /* 0x08 */ s32 b;
+} Color3;
+
+typedef struct {
+    /* 0x00 */ s32 near;
+    /* 0x04 */ s32 far;
+} FogSet;
+
+typedef struct {
+    /* 0x00 */ s32 time;
+    /* 0x04 */ Color3 amb;
+    /* 0x10 */ struct {
+        Color3 l[3];
+    } lights;
+    /* 0x34 */ FogSet fog;
+} Keyframe; /* size 0x3C */
+
+typedef struct {
+    Color3 l[3];
+} LightSet3;
+
+extern LightSet3 D_80084B24;
+
+typedef struct {
+    /* 0x00 */ Keyframe *frames;
+    /* 0x04 */ s32 count;
+} KeyTrack;
+
+void func_80011EF4(s32, Unk80084994 *);
+void func_80012854(s32);
+void func_80012800(s32, u16 *, u16 *);
 extern s32 D_8008498C;
 extern Unk80084994 *D_80084994;
 extern u16 D_8007C280;
