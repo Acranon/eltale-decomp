@@ -345,4 +345,19 @@ void func_80027D40(MtxF* arg0, MtxF* arg1, MtxF* arg2) {
     arg2->mf[3][3] = 1.0f;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/27A90/func_80027FFC.s")
+s32 func_80027FFC(f32 arg0, f32 arg1, f32 arg2, s32* arg3, s32* arg4) {
+    s32 ret;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
+
+    guMtxXFMF(D_80085F10.mf, arg0, arg1, arg2, &x, &y, &z);
+    ret = z < -D_80085F54;
+    if (ret) {
+        w = z * D_80085F5C;
+        *arg3 = 160 - (s32) (((x * 160.0) / w) * 0.75);
+        *arg4 = (s32) ((120.0f * y) / w) + 120;
+    }
+    return z < -D_80085F54;
+}
