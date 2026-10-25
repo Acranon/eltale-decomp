@@ -82,6 +82,46 @@ extern IntroSprite D_802684E0[150];
 
 void func_8020D1DC_ovl_intro(void);
 
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ u8 pad2[0x12];
+} Unk80092E48; /* size = 0x14 */
+
+extern Gfx *D_8007A184;
+extern Gfx *D_80276F40;
+extern Gfx D_8026B3C0[2][0xBB8];
+extern Gfx D_80212270_ovl_intro[];
+extern s8 D_80092C80;
+extern u16 D_80092C86;
+extern OSMesgQueue D_80092C90;
+extern OSPfs D_80092CA8[4];
+extern Unk80092E48 D_80092E48[4];
+extern s8 D_8006CC74;
+extern u8 D_8006CC78;
+extern u8 D_8006CC7C;
+extern char D_80268480_ovl_intro[];
+extern s32 D_80212234_ovl_intro;
+extern u8 D_80212238_ovl_intro;
+extern u8 D_8021223C_ovl_intro;
+extern s32 D_80212240_ovl_intro;
+extern s32 D_80212254_ovl_intro;
+
+s32 func_80035A24(s32);
+s32 func_8003609C(s32);
+s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
+s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
+void func_8003D8EC(char *, ...);
+void func_80029A88(s32, s32, s32);
+void func_8002A6B8(s32);
+s32 func_8020C6A8_ovl_intro(void);
+void func_8020F170_ovl_intro(void);
+void func_8020F2DC_ovl_intro(void);
+void func_8020F448_ovl_intro(void);
+s32 func_80210140_ovl_intro(void);
+void func_80210D38_ovl_intro(void);
+s32 func_802111A4_ovl_intro(void);
+s32 func_80211634_ovl_intro(void);
+
 void func_8020C0D0_ovl_intro(void) {
     func_8020D1DC_ovl_intro();
     D_802684B0 = 10;
