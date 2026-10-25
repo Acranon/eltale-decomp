@@ -6,7 +6,7 @@ extern Gfx D_8020F6C0_ovl_ending[];
 extern Gfx D_8022EA18[2][2500];
 extern Gfx* D_80238658;
 
-void func_8020C254_ovl_ending(void);
+s32 func_8020C254_ovl_ending(void);
 
 typedef struct {
     s32 unk0;
@@ -50,10 +50,36 @@ typedef struct {
 } UnkArg_8020CE70;
 
 typedef struct {
-    char unk0[0x22];
+    u16 unk0;
+    s16 unk2;
+    s32 unk4;
+    s16 unk8;
+    s16 unkA;
+    s16 unkC;
+    s16 unkE;
+    s16 unk10;
+    s16 unk12;
+    s16 unk14;
+    s16 unk16;
+    s32 unk18;
+    s32 unk1C;
+    s16 unk20;
     s16 unk22;
-    char unk24[4];
+    u16 unk24;
+    char unk26[2];
 } UnkStruct_802107F0_inner;
+
+typedef struct {
+    u32 flags;
+    s16 x;
+    s16 y;
+    s32 duration;
+} UnkStep_8020F880;
+
+typedef struct {
+    UnkStep_8020F880* steps;
+    u32 count;
+} UnkAnim_8020F880;
 
 typedef struct {
     UnkStruct_802107F0_inner* unk0;
@@ -63,17 +89,19 @@ typedef struct {
 extern UnkStruct_8022BB38 D_8022BB38[];
 extern UnkStruct_802107F0 D_802107F0_ovl_ending[];
 extern u32 D_802107F8_ovl_ending;
-extern s32 D_8020F690_ovl_ending;
+extern UnkAnim_8020F880 D_8020F880_ovl_ending[];
+extern s32 D_8023865C;
+extern u32 D_8020F690_ovl_ending;
 extern s32 D_8020F694_ovl_ending;
 extern s32 D_8022BB10;
 extern s32 D_8022BB14;
 extern s32 D_8022BB18;
 extern s32 D_8022BB1C;
-extern s32 D_8022BB20;
+extern u32 D_8022BB20;
 extern s32 D_8022BB24;
 extern s32 D_8022BB28;
-extern s32 D_8022BB2C;
-extern s32 D_8022BB30;
+extern u32 D_8022BB2C;
+extern u32 D_8022BB30;
 extern s32 D_8022BB34;
 
 void func_8020CA60_ovl_ending(void);
@@ -95,6 +123,28 @@ void func_8020C0D0_ovl_ending(void) {
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020C15C_ovl_ending.s")
+
+s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
+void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
+void func_8020CB84_ovl_ending(s32 arg0);
+s32 func_8020CCD8_ovl_ending(void);
+s16 func_8020CD88_ovl_ending(void);
+void func_8020D130_ovl_ending(s32 arg0);
+void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2);
+void func_8020D970_ovl_ending(s32 arg0);
+void func_8020D98C_ovl_ending(s32 arg0);
+void func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
+
+s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
+void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
+void func_8020CB84_ovl_ending(s32 arg0);
+s32 func_8020CCD8_ovl_ending(void);
+s16 func_8020CD88_ovl_ending(void);
+void func_8020D130_ovl_ending(s32 arg0);
+void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2);
+void func_8020D970_ovl_ending(s32 arg0);
+void func_8020D98C_ovl_ending(s32 arg0);
+void func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020C254_ovl_ending.s")
 
@@ -382,7 +432,84 @@ s32 func_8020D270_ovl_ending(s32 arg0, s32 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D374_ovl_ending.s")
+s32 func_8020D374_ovl_ending(s32 arg0, s32 arg1) {
+    UnkStruct_8022BB38* temp_v1;
+    f32 step;
+    s32 dir;
+    s32 dx;
+    s32 dy;
+    s32 deltaX;
+    s32 deltaY;
+
+    temp_v1 = &D_8022BB38[arg0];
+    if (!(arg1 & 0x80000000)) {
+        return 0;
+    }
+    temp_v1->unk24++;
+    step = ((f32) temp_v1->unk2A - (f32) temp_v1->unk26) / (f32) temp_v1->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    dir = 2;
+    temp_v1->unk1C += step;
+    dx = temp_v1->unk1C;
+    step = ((f32) temp_v1->unk2C - (f32) temp_v1->unk28) / (f32) temp_v1->unk38;
+    deltaX = dx;
+    if (step < 0) {
+        step = -step;
+    }
+    temp_v1->unk20 += step;
+    dy = temp_v1->unk20;
+    deltaY = dy;
+    if (temp_v1->unk4 < temp_v1->unk2A) {
+        dir = 1;
+    } else {
+        deltaX = -dx;
+    }
+    if (temp_v1->unk6 < temp_v1->unk2C) {
+        dir |= 4;
+    } else {
+        deltaY = -dy;
+        dir |= 8;
+    }
+    temp_v1->unk4 += deltaX;
+    temp_v1->unk6 += deltaY;
+    if (temp_v1->unk1C >= 1.0f) {
+        temp_v1->unk1C -= dx;
+    }
+    if (temp_v1->unk20 >= 1.0f) {
+        temp_v1->unk20 -= dy;
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk4 = temp_v1->unk2A;
+        temp_v1->unk6 = temp_v1->unk2C;
+    }
+    if (dir & 1) {
+        if (temp_v1->unk4 >= temp_v1->unk2A) {
+            temp_v1->unk4 = temp_v1->unk2A;
+        }
+    } else if (dir & 2) {
+        if (temp_v1->unk4 <= temp_v1->unk2A) {
+            temp_v1->unk4 = temp_v1->unk2A;
+        }
+    }
+    if (dir & 4) {
+        if (temp_v1->unk6 >= temp_v1->unk2C) {
+            temp_v1->unk6 = temp_v1->unk2C;
+        }
+    } else if (dir & 8) {
+        if (temp_v1->unk6 <= temp_v1->unk2C) {
+            temp_v1->unk6 = temp_v1->unk2C;
+        }
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk24 = 0;
+        temp_v1->unk1C = 0.0f;
+        temp_v1->unk20 = 0.0f;
+        return 0xFF;
+    }
+    return 0;
+}
 
 void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2) {
     UnkStruct_8022BB38* temp_v0;
@@ -394,9 +521,109 @@ void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2) {
     temp_v0->unk28 = temp_v0->unk6;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D624_ovl_ending.s")
+s32 func_8020D624_ovl_ending(s32 arg0, s32 arg1) {
+    UnkStruct_8022BB38* temp_v1;
+    f32 step;
+    s32 dir;
+    s32 d;
+    s32 delta;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D7A4_ovl_ending.s")
+    if (!(arg1 & 0x80000000)) {
+        return 0xFF;
+    }
+    temp_v1 = &D_8022BB38[arg0];
+    temp_v1->unk24++;
+    step = ((f32) temp_v1->unk2A - (f32) temp_v1->unk26) / (f32) temp_v1->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    temp_v1->unk1C += step;
+    d = temp_v1->unk1C;
+    delta = d;
+    if (temp_v1->unk4 < temp_v1->unk2A) {
+        dir = 1;
+    } else {
+        dir = 2;
+        delta = -d;
+    }
+    temp_v1->unk4 += delta;
+    if (temp_v1->unk1C >= 1.0f) {
+        temp_v1->unk1C -= d;
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk4 = temp_v1->unk2A;
+    }
+    if (dir & 1) {
+        if (temp_v1->unk4 >= temp_v1->unk2A) {
+            temp_v1->unk4 = temp_v1->unk2A;
+        }
+    } else if (dir & 2) {
+        if (temp_v1->unk4 <= temp_v1->unk2A) {
+            temp_v1->unk4 = temp_v1->unk2A;
+        }
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk24 = 0;
+        temp_v1->unk1C = 0.0f;
+        temp_v1->unk20 = 0.0f;
+        return 0xFF;
+    }
+    if (!temp_v1) {
+    }
+    return 0;
+}
+
+s32 func_8020D7A4_ovl_ending(s32 arg0, s32 arg1) {
+    UnkStruct_8022BB38* temp_v1;
+    f32 step;
+    s32 dir;
+    s32 d;
+    s32 delta;
+
+    if (!(arg1 & 0x80000000)) {
+        return 0xFF;
+    }
+    temp_v1 = &D_8022BB38[arg0];
+    temp_v1->unk24++;
+    step = ((f32) temp_v1->unk2C - (f32) temp_v1->unk28) / (f32) temp_v1->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    temp_v1->unk20 += step;
+    d = temp_v1->unk20;
+    delta = d;
+    if (temp_v1->unk6 < temp_v1->unk2C) {
+        dir = 4;
+    } else {
+        dir = 8;
+        delta = -d;
+    }
+    temp_v1->unk6 += delta;
+    if (temp_v1->unk20 >= 1.0f) {
+        temp_v1->unk20 -= d;
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk6 = temp_v1->unk2C;
+    }
+    if (dir & 4) {
+        if (temp_v1->unk6 >= temp_v1->unk2C) {
+            temp_v1->unk6 = temp_v1->unk2C;
+        }
+    } else if (dir & 8) {
+        if (temp_v1->unk6 <= temp_v1->unk2C) {
+            temp_v1->unk6 = temp_v1->unk2C;
+        }
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk24 = 0;
+        temp_v1->unk1C = 0.0f;
+        temp_v1->unk20 = 0.0f;
+        return 0xFF;
+    }
+    if (!temp_v1) {
+    }
+    return 0;
+}
 
 s32 func_8020D924_ovl_ending(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
