@@ -167,29 +167,7 @@ void func_8020D130_ovl_ending(s32 arg0);
 void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2);
 void func_8020D970_ovl_ending(s32 arg0);
 void func_8020D98C_ovl_ending(s32 arg0);
-void func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
-
-s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
-void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
-void func_8020CB84_ovl_ending(s32 arg0);
-s32 func_8020CCD8_ovl_ending(void);
-s16 func_8020CD88_ovl_ending(void);
-void func_8020D130_ovl_ending(s32 arg0);
-void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2);
-void func_8020D970_ovl_ending(s32 arg0);
-void func_8020D98C_ovl_ending(s32 arg0);
-void func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
-
-s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
-void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
-void func_8020CB84_ovl_ending(s32 arg0);
-s32 func_8020CCD8_ovl_ending(void);
-s16 func_8020CD88_ovl_ending(void);
-void func_8020D130_ovl_ending(s32 arg0);
-void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2);
-void func_8020D970_ovl_ending(s32 arg0);
-void func_8020D98C_ovl_ending(s32 arg0);
-void func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
+s32 func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020C254_ovl_ending.s")
 
