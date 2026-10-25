@@ -212,7 +212,22 @@ s32 func_80010A4C(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/113F0/func_80010BC8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/113F0/func_80010F34.s")
+s32 func_80010F34(f32 px, f32 pz, f32 ax, f32 az, f32 bx, f32 bz) {
+    if ((az <= pz && pz < bz) || (bz <= pz && pz < az)) {
+        if (ax <= px && bx < px) {
+            return 1;
+        }
+        if (px <= ax && px < bx) {
+            return 0;
+        }
+        if (az != bz) {
+            if ((pz - az) * ((ax - bx) / (az - bz)) + ax < px) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/113F0/func_80011034.s")
 
