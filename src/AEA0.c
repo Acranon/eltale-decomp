@@ -699,7 +699,84 @@ void func_8000B508(Obj *obj, Enemy *e, AnimDef *anims) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B7A4.s")
+Unk8000BA20 *func_8000B7A4(Enemy *e, Obj *obj) {
+    f32 dist;
+    f32 r;
+    f32 range;
+    f32 d;
+    f32 d2;
+    s32 swapped;
+    s32 cont;
+    u32 i;
+    Unk8000BA20 *sel;
+    Unk8000BA20 *b;
+    Unk8000BA20 *list[5];
+    Unk8000BA20 *a;
+
+    e->flags &= ~0x10;
+    dist = sqrtf((D_8007AA08.x - obj->x) * (D_8007AA08.x - obj->x) + (D_8007AA08.z - obj->z) * (D_8007AA08.z - obj->z)) - D_8007AA84->unk18 * D_8007AA08.unk3C;
+    sel = e->unk28->unk30;
+    for (i = 0; i < e->unk28->unk2C; i++) {
+        list[i] = sel++;
+    }
+    swapped = 0;
+    do {
+        for (i = 0; i < e->unk28->unk2C - 1; i++) {
+            b = list[i];
+            a = list[i + 1];
+            if (b->unk10 > a->unk10) {
+                list[i] = a;
+                list[i + 1] = b;
+                swapped++;
+            }
+        }
+        cont = swapped != 0;
+        swapped = 0;
+    } while (cont);
+    for (i = 0; i < e->unk28->unk2C; i++) {
+        sel = list[i];
+        if (i < e->unk28->unk2C - 1) {
+            d = sel->unk10 * obj->unk24;
+            d2 = e->unk10 * e->unk128 + d;
+            if (dist < d) {
+                swapped = 1;
+                break;
+            }
+            if (dist < d2) {
+                b = list[i + 1];
+                d = b->unk10 * obj->unk24;
+                if (dist < d) {
+                    if (func_80026E90(2) == 0) {
+                        sel = b;
+                    }
+                    swapped = 1;
+                    if (sel != b) {
+                        e->flags |= 0x10;
+                    }
+                    break;
+                }
+            }
+        } else {
+            d = sel->unk10 * obj->unk24;
+            d2 = e->unk10 * e->unk128 + d;
+            if (dist < d2) {
+                if (d < dist) {
+                    e->flags |= 0x10;
+                }
+                swapped = 1;
+                break;
+            }
+        }
+    }
+    if (!swapped) {
+        sel = NULL;
+    }
+    if (e->unk28->unk24 & 4) {
+        sel = &e->unk28->unk30[func_80026E90(e->unk28->unk2C)];
+    }
+    e->unk1C = sel;
+    return sel;
+}
 
 void func_8000BA20(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
     s32 t = arg2->unk0 & 0x8000;
