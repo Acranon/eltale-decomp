@@ -13,7 +13,7 @@
 #include "guint.h"
 
 
-void func_80039230(float mf[4][4], LookAt *l, 
+void guLookAtReflectF(float mf[4][4], LookAt *l, 
 		      float xEye, float yEye, float zEye,
 		      float xAt,  float yAt,  float zAt,
 		      float xUp,  float yUp,  float zUp)
@@ -104,7 +104,7 @@ void guLookAtReflect (Mtx *m, LookAt *l, float xEye, float yEye, float zEye,
 {
 	float	mf[4][4];
 
-	func_80039230(mf, l, xEye, yEye, zEye, xAt, yAt, zAt,
+	guLookAtReflectF(mf, l, xEye, yEye, zEye, xAt, yAt, zAt,
 			 xUp, yUp, zUp);
 
 	guMtxF2L(mf, m);

@@ -20,9 +20,9 @@ extern OSDevMgr __osPiDevMgr;
 extern s32 __osPiRawStartDma(s32, u32, void*, u32);
 extern s32 __osEPiRawStartDma(OSPiHandle*, s32, u32, void*, u32);
 
-void func_8003719C(void);
+void createSpeedParam(void);
 
-void func_80037020(OSPri pri, OSMesgQueue* cmdQ, OSMesg* cmdBuf, s32 cmdMsgCnt) {
+void osCreatePiManager(OSPri pri, OSMesgQueue* cmdQ, OSMesg* cmdBuf, s32 cmdMsgCnt) {
     u32 savedMask;
     OSPri oldPri;
     OSPri myPri;
@@ -30,7 +30,7 @@ void func_80037020(OSPri pri, OSMesgQueue* cmdQ, OSMesg* cmdBuf, s32 cmdMsgCnt) 
     if (__osPiDevMgr.active) {
         return;
     }
-    func_8003719C();
+    createSpeedParam();
     osCreateMesgQueue(cmdQ, cmdBuf, cmdMsgCnt);
     osCreateMesgQueue(&D_800942A0, (OSMesg*)D_800942B8, 1);
 
@@ -64,7 +64,7 @@ void func_80037020(OSPri pri, OSMesgQueue* cmdQ, OSMesg* cmdBuf, s32 cmdMsgCnt) 
     }
 }
 
-void func_8003719C(void) {
+void createSpeedParam(void) {
     D_80093000.latency = IO_READ(PI_BSD_DOM1_LAT_REG);
     D_80093000.pulse = IO_READ(PI_BSD_DOM1_PWD_REG);
     D_80093000.pageSize = IO_READ(PI_BSD_DOM1_PGS_REG);

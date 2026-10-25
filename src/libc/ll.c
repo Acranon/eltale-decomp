@@ -14,7 +14,7 @@ unsigned long long __ll_lshift(unsigned long long a0, unsigned long long a1) {
     return a0 << a1;
 }
 
-long long func_80038310(unsigned long long a0, long long a1) {
+long long __ll_rem(unsigned long long a0, long long a1) {
     return a0 % a1;
 }
 

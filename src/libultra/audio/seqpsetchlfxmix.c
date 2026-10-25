@@ -20,7 +20,7 @@
 
 #include <libaudio.h>
 
-void func_8003C620(ALSeqPlayer *seqp, u8 chan, u8 fxmix)
+void alSeqpSetChlFXMix(ALSeqPlayer *seqp, u8 chan, u8 fxmix)
 {
     ALEvent       evt;
 

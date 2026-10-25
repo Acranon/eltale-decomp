@@ -36,7 +36,7 @@ extern u32 cnt_index, resampler_num, resampler_cnt, resampler_max, resampler_min
 /***********************************************************************
  * Resampler filter public interfaces
  ***********************************************************************/
-Acmd *func_80043A3C(void *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p) 
+Acmd *alResamplePull(void *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p) 
 {
     ALResampler *f = (ALResampler *)filter;
     Acmd        *ptr = p;

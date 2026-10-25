@@ -4,13 +4,13 @@
 #include "PRinternal/siint.h"
 
 #if BUILD_VERSION >= VERSION_J
-void func_80046D60(int channel, u8 cmd);
+void __osPfsRequestOneChannel(int channel, u8 cmd);
 #else
-void func_80046D60(int channel);
+void __osPfsRequestOneChannel(int channel);
 #endif
-void func_80046E24(int channel, OSContStatus* data);
+void __osPfsGetOneChannelData(int channel, OSContStatus* data);
 
-s32 func_80046C90(OSMesgQueue* queue, int channel) {
+s32 __osPfsGetStatus(OSMesgQueue* queue, int channel) {
     s32 ret = 0;
     OSMesg dummy;
     OSContStatus data;
@@ -18,9 +18,9 @@ s32 func_80046C90(OSMesgQueue* queue, int channel) {
 #if BUILD_VERSION >= VERSION_J
     __osPfsInodeCacheBank = 250;
 
-    func_80046D60(channel, CONT_CMD_REQUEST_STATUS);
+    __osPfsRequestOneChannel(channel, CONT_CMD_REQUEST_STATUS);
 #else
-    func_80046D60(channel);
+    __osPfsRequestOneChannel(channel);
 #endif
 
     ret = __osSiRawStartDma(OS_WRITE, &__osPfsPifRam);
@@ -29,7 +29,7 @@ s32 func_80046C90(OSMesgQueue* queue, int channel) {
     ret = __osSiRawStartDma(OS_READ, &__osPfsPifRam);
     osRecvMesg(queue, &dummy, OS_MESG_BLOCK);
 
-    func_80046E24(channel, &data);
+    __osPfsGetOneChannelData(channel, &data);
 
     if (((data.status & CONT_CARD_ON) != 0) && ((data.status & CONT_CARD_PULL) != 0)) {
         return PFS_ERR_NEW_PACK;
@@ -43,9 +43,9 @@ s32 func_80046C90(OSMesgQueue* queue, int channel) {
 }
 
 #if BUILD_VERSION >= VERSION_J
-void func_80046D60(int channel, u8 cmd) {
+void __osPfsRequestOneChannel(int channel, u8 cmd) {
 #else
-void func_80046D60(int channel) {
+void __osPfsRequestOneChannel(int channel) {
 #endif
     u8* ptr;
     __OSContRequesFormatShort requestformat;
@@ -80,7 +80,7 @@ void func_80046D60(int channel) {
     *ptr = CONT_CMD_END;
 }
 
-void func_80046E24(int channel, OSContStatus* data) {
+void __osPfsGetOneChannelData(int channel, OSContStatus* data) {
     u8* ptr = (u8*)&__osPfsPifRam;
     __OSContRequesFormatShort requestformat;
     int i;

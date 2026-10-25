@@ -3,6 +3,10 @@
 #include "PR/rcp.h"
 #include "PRinternal/piint.h"
 
+/* This libultra is 2.0I: the EPi raw I/O functions still have their pre-2.0J names. */
+#define __osEPiRawReadIo osEPiRawReadIo
+#define __osEPiRawWriteIo osEPiRawWriteIo
+
 void __osDevMgrMain(void* args) {
     OSIoMesg* mb;
     OSMesg em;

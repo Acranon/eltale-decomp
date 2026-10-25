@@ -66,7 +66,7 @@ void func_8002A4F0(void);
 void func_8002A930(void);
 void func_80035308(void);
 void func_800357B0(void);
-void func_80037B70(OSPri pri);
+void osCreateViManager(OSPri pri);
 void func_801009EC(OSMesgQueue *arg0, OSMesgQueue *arg1);
 
 extern u8 D_71920[];
@@ -138,7 +138,7 @@ extern u16 D_803B5000[];
 extern u16 D_803DA800[];
 
 void func_80000C70(void *arg0) {
-    func_80037B70(0xFE);
+    osCreateViManager(0xFE);
     osCreateMesgQueue(&D_8007A1A8, &D_8007A1C0, 1);
     func_800285C4();
     /* the ROM end symbols don't exist yet: ends are written start + size */

@@ -51,18 +51,18 @@ extern u32 load_num, load_cnt, load_max, load_min, save_num, save_cnt, save_max,
 }
 
 
-Acmd *func_8004A584(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p);
-Acmd *func_8004A3F8(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p);
-Acmd *func_8004A270(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p);
-Acmd *func_8004A1B8(ALLowPass *lp, s32 buff, s32 count, Acmd *p);
-f32  func_8004A110(ALDelay *d, s32 count);
+Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p);
+Acmd *_loadBuffer(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p);
+Acmd *_saveBuffer(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p);
+Acmd *_filterBuffer(ALLowPass *lp, s32 buff, s32 count, Acmd *p);
+f32  _doModFunc(ALDelay *d, s32 count);
 
 static s32 L_INC[] = { L0_INC, L1_INC, L2_INC };
 
 /***********************************************************************
  * Reverb filter public interfaces
  ***********************************************************************/
-Acmd *func_8004AA1C(void *filter, s16 *outp, s32 outCount, s32 sampleOffset,
+Acmd *alFxPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset,
                      Acmd *p) 
 {
     Acmd        *ptr = p;
@@ -94,7 +94,7 @@ Acmd *func_8004AA1C(void *filter, s16 *outp, s32 outCount, s32 sampleOffset,
     aMix(ptr++, 0, 0xda83, AL_AUX_L_OUT, input); /* .707L = L - .293L */
     aMix(ptr++, 0, 0x5a82, AL_AUX_R_OUT, input); /* mix the AuxL and AuxR into the AuxL */
     /* and write the mixed value to the delay line at r->input */
-    ptr = func_8004A270(r, r->input, input, outCount, ptr);
+    ptr = _saveBuffer(r, r->input, input, outCount, ptr);
 
     aClearBuffer(ptr++, output, outCount<<1); /* clear the AL_AUX_R_OUT */
 
@@ -106,27 +106,27 @@ Acmd *func_8004AA1C(void *filter, s16 *outp, s32 outCount, s32 sampleOffset,
 	if (in_ptr == prev_out_ptr) {
 	    SWAP(buff1, buff2);
 	} else {  /* load data at in_ptr into buff1 */
-	    ptr = func_8004A3F8(r, in_ptr, buff1, outCount, ptr);
+	    ptr = _loadBuffer(r, in_ptr, buff1, outCount, ptr);
 	}
-	ptr = func_8004A584(r, d, buff2, outCount, ptr);
+	ptr = _loadOutputBuffer(r, d, buff2, outCount, ptr);
 
 	if (d->ffcoef) {
 	    aMix(ptr++, 0, (u16)d->ffcoef, buff1, buff2);
 	    if (!d->rs && !d->lp) {
-		ptr = func_8004A270(r, out_ptr, buff2, outCount, ptr);
+		ptr = _saveBuffer(r, out_ptr, buff2, outCount, ptr);
 	    }
 	}
 	
 	if (d->fbcoef) {
 	    aMix(ptr++, 0, (u16)d->fbcoef, buff2, buff1);
-	    ptr = func_8004A270(r, in_ptr, buff1, outCount, ptr);
+	    ptr = _saveBuffer(r, in_ptr, buff1, outCount, ptr);
 	}
 
 	if (d->lp)
-	    ptr = func_8004A1B8(d->lp, buff2, outCount, ptr);
+	    ptr = _filterBuffer(d->lp, buff2, outCount, ptr);
 
 	if (!d->rs)
-	    ptr = func_8004A270(r, out_ptr, buff2, outCount, ptr);
+	    ptr = _saveBuffer(r, out_ptr, buff2, outCount, ptr);
 	
 	if (d->gain)
 	    aMix(ptr++, 0, (u16)d->gain, buff2, output);
@@ -169,7 +169,7 @@ s32 alFxParam(void *filter, s32 paramID, void *param)
  * verify the validity of the paramID or the param value. input and output 
  * values must be 8 byte aligned, so round down any param passed. 
  */
-s32 func_8004A7A8(void *filter, s32 paramID, void *param)
+s32 alFxParamHdl(void *filter, s32 paramID, void *param)
 {
     ALFx   *f = (ALFx *) filter;    
     s32    p = (paramID - 2) % 8; 
@@ -237,7 +237,7 @@ s32 func_8004A7A8(void *filter, s32 paramID, void *param)
     return 0;
 }
 
-Acmd *func_8004A584(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
+Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
 {
     Acmd        *ptr = p;
     s32         ratio, count, rbuff = AL_TEMP_2;
@@ -252,7 +252,7 @@ Acmd *func_8004A584(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
  */
     if (d->rs) {
         length = d->output - d->input;
-        delta = func_8004A110(d, incount); /* get the number of samples to modulate by */
+        delta = _doModFunc(d, incount); /* get the number of samples to modulate by */
         /*
          * find ratio of delta to delay length and quantize
          *  to same resolution as resampler
@@ -295,7 +295,7 @@ Acmd *func_8004A584(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
 #endif
         /* load the rbuff with samples, note that there will be ramalign worth of
          *  samples at the begining which you don't care about. */
-        ptr = func_8004A3F8(r, out_ptr - ramalign, rbuff, count + ramalign, ptr);
+        ptr = _loadBuffer(r, out_ptr - ramalign, rbuff, count + ramalign, ptr);
 
         /* convert fratio to 16 bit fraction for microcode use */ 
         ratio = (s32)(fratio * UNITY_PITCH);
@@ -307,7 +307,7 @@ Acmd *func_8004A584(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
         d->rsdelta += count - incount; /* add the number of samples to d->rsdelta */
     } else {
         out_ptr = &r->input[-d->output];
-        ptr = func_8004A3F8(r, out_ptr, buff, incount, ptr);
+        ptr = _loadBuffer(r, out_ptr, buff, incount, ptr);
     }
 
     return ptr;
@@ -319,7 +319,7 @@ Acmd *func_8004A584(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
  * Cause count bytes of data at curr_ptr (within the delay line) to be
  * loaded into buff. (Buff is a dmem buffer)
  */
-Acmd *func_8004A3F8(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
+Acmd *_loadBuffer(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
 {
     Acmd    *ptr = p;
     s32     after_end, before_end;
@@ -368,7 +368,7 @@ Acmd *func_8004A3F8(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
  * space. If the write goes past the end of r->base, it will wrap around
  * Cause count bytes of data at buff to be written to delay line, curr_ptr.
  */
-Acmd *func_8004A270(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
+Acmd *_saveBuffer(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
 {
     Acmd    *ptr = p;
     s32     after_end, before_end;
@@ -404,7 +404,7 @@ Acmd *func_8004A270(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
 
 }
 
-Acmd *func_8004A1B8(ALLowPass *lp, s32 buff, s32 count, Acmd *p)
+Acmd *_filterBuffer(ALLowPass *lp, s32 buff, s32 count, Acmd *p)
 {
     Acmd	*ptr = p;
 
@@ -426,7 +426,7 @@ Acmd *func_8004A1B8(ALLowPass *lp, s32 buff, s32 count, Acmd *p)
  * should go at it's full chorus. In otherwords, this function returns a number
  * of samples the output pointer should modulate backwards.
  */
-f32 func_8004A110(ALDelay *d, s32 count)
+f32 _doModFunc(ALDelay *d, s32 count)
 {
   f32 val;
 

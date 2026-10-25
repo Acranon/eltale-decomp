@@ -22,7 +22,7 @@
 #include <os_internal.h>
 #include <ultraerror.h>
 
-void func_8003CF20(ALSndPlayer *sndp, u8 mix) 
+void alSndpSetFXMix(ALSndPlayer *sndp, u8 mix) 
 {
     ALSndpEvent evt;
     ALSoundState  *sState = sndp->sndState;

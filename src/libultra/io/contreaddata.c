@@ -7,7 +7,7 @@
 #include "PRinternal/controller.h"
 #include "PRinternal/siint.h"
 
-void func_8003DDD0(void);
+void __osPackReadData(void);
 
 s32 osContStartReadData(OSMesgQueue* mq) {
     s32 ret = 0;
@@ -15,7 +15,7 @@ s32 osContStartReadData(OSMesgQueue* mq) {
     __osSiGetAccess();
 
     if (__osContLastCmd != CONT_CMD_READ_BUTTON) {
-        func_8003DDD0();
+        __osPackReadData();
         ret = __osSiRawStartDma(OS_WRITE, __osContPifRam.ramarray);
         osRecvMesg(mq, NULL, OS_MESG_BLOCK);
     }
@@ -27,7 +27,7 @@ s32 osContStartReadData(OSMesgQueue* mq) {
     return ret;
 }
 
-void func_8003DD44(OSContPad* data) {
+void osContGetReadData(OSContPad* data) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContReadFormat readformat;
     int i;
@@ -46,7 +46,7 @@ void func_8003DD44(OSContPad* data) {
     }
 }
 
-void func_8003DDD0(void) {
+void __osPackReadData(void) {
     u8* ptr = (u8*)__osContPifRam.ramarray;
     __OSContReadFormat readformat;
     int i;

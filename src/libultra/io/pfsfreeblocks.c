@@ -3,7 +3,7 @@
 #include "PR/os_internal.h"
 #include "PRinternal/controller.h"
 
-s32 func_8003E080(OSPfs* pfs, s32* bytes_not_used) {
+s32 osPfsFreeBlocks(OSPfs* pfs, s32* bytes_not_used) {
     int j;
     int pages = 0;
     __OSInode inode;

@@ -31,7 +31,7 @@ void guOrthoF(float mf[4][4], float l, float r, float b, float t, float n, float
 		mf[i][j] *= scale;
 }
 
-void func_80038F34(Mtx *m, float l, float r, float b, float t, float n, float f, float scale)
+void guOrtho(Mtx *m, float l, float r, float b, float t, float n, float f, float scale)
 {
 	Matrix	mf;
 

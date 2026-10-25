@@ -2,9 +2,9 @@
 #include "PRinternal/macros.h"
 #include "PR/os_internal.h"
 #include "PRinternal/controller.h"
-s32 func_8003E878(OSPfs *pfs, __OSInode *inode, u8 start_page, u8 bank, __OSInodeUnit *last_page);
+s32 __osPfsReleasePages(OSPfs *pfs, __OSInode *inode, u8 start_page, u8 bank, __OSInodeUnit *last_page);
 
-s32 func_8003E6A0(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8* ext_name) {
+s32 osPfsDeleteFile(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8* ext_name) {
     s32 file_no;
 #if BUILD_VERSION < VERSION_J
     int k;
@@ -43,9 +43,9 @@ s32 func_8003E6A0(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8
     for (bank = dir.start_page.inode_t.bank; bank < pfs->banks;) {
         ERRCK(__osPfsRWInode(pfs, &inode, PFS_READ, bank));
 #if BUILD_VERSION >= VERSION_J
-        ERRCK(func_8003E878(pfs, &inode, startpage, bank, &last_page));
+        ERRCK(__osPfsReleasePages(pfs, &inode, startpage, bank, &last_page));
 #else
-        ERRCK(func_8003E878(pfs, &inode, startpage, &sum, bank, &last_page, TRUE));
+        ERRCK(__osPfsReleasePages(pfs, &inode, startpage, &sum, bank, &last_page, TRUE));
 #endif
         ERRCK(__osPfsRWInode(pfs, &inode, PFS_WRITE, bank));
 
@@ -86,7 +86,7 @@ s32 func_8003E6A0(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8
 
 #if BUILD_VERSION >= VERSION_J
 
-s32 func_8003E878(OSPfs* pfs, __OSInode* inode, u8 start_page, u8 bank, __OSInodeUnit* last_page) {
+s32 __osPfsReleasePages(OSPfs* pfs, __OSInode* inode, u8 start_page, u8 bank, __OSInodeUnit* last_page) {
     __OSInodeUnit next_page;
     __OSInodeUnit old_page;
     s32 ret = 0;
@@ -106,7 +106,7 @@ s32 func_8003E878(OSPfs* pfs, __OSInode* inode, u8 start_page, u8 bank, __OSInod
 
 #else
 
-s32 func_8003E878(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank, __OSInodeUnit *last_page, int flag)
+s32 __osPfsReleasePages(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank, __OSInodeUnit *last_page, int flag)
 {
     __OSInodeUnit next_page;
     __OSInodeUnit old_page;

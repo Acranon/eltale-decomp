@@ -14,7 +14,7 @@ extern s32 osViClock;
  * @param frequency Target Playback frequency.
  * @return The actual playback frequency, or -1 if the supplied frequency cannot be used.
  */
-s32 func_80039C30(u32 frequency) {
+s32 osAiSetFrequency(u32 frequency) {
     register unsigned int dacRate;
     register unsigned char bitRate;
     register float f;

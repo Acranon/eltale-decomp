@@ -83,12 +83,12 @@
  * CRC-5 with the generating polynomial \f$ x^5 + x^4 + x^2 + 1 \f$, AKA 0x15 = 0b(1)1 0101.
  * It only works on the bits from 0x7FF = 11 11111111, i.e. 10 bits.
  *
- * Usually used as func_80048740(addr) | (addr << 5) to add the CRC to the end. The overall length of 10 + 5 bits
+ * Usually used as __osContAddressCrc(addr) | (addr << 5) to add the CRC to the end. The overall length of 10 + 5 bits
  * allows the address + CRC to fit into one s16.
  *
  * `addr` is the address of a block in the mempak, only valid up to 0x7FF.
  */
-u8 func_80048740(u16 addr) {
+u8 __osContAddressCrc(u16 addr) {
     u32 temp = 0;
     u32 i = (1 << ADDRESS_CRC_MESSAGE_LENGTH);
 
@@ -131,7 +131,7 @@ u8 func_80048740(u16 addr) {
  * CRC-8 with generating polynomial \f$ x^8 + x^7 + x^2 + 1 \f$, AKA 0x85 = 0b(1) 1000 0101.
  * Expects exactly 0x20 = 32 bytes of data.
  */
-u8 func_80048810(u8* data) {
+u8 __osContDataCrc(u8* data) {
     u32 temp = 0;
     u32 i;
     u32 j;
@@ -168,7 +168,7 @@ u8 func_80048810(u8* data) {
 
 #else
 
-u8 func_80048740(u16 addr) {
+u8 __osContAddressCrc(u16 addr) {
     u8 temp = 0;
     u8 temp2;
     int i;
@@ -185,7 +185,7 @@ u8 func_80048740(u16 addr) {
     return temp & 0x1f;
 }
 
-u8 func_80048810(u8 *data) {
+u8 __osContDataCrc(u8 *data) {
     u8 temp = 0;
     u8 temp2;
     int i;

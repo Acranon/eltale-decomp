@@ -43,10 +43,8 @@ extern ALBankFile* D_80055928;
 extern OSThread D_8008CEC0;
 extern SeqSlot D_8008F7A8[2];
 
-s32 func_80039C30(s32);
 void func_80028AAC(void*);
-void func_8003C04C(ALCSeq*, u8*);
-void func_8003C620(ALCSPlayer*, u8, u8);
+void alCSeqNew(ALCSeq*, u8*);
 
 extern ALBankFile* D_8005592C;
 extern ALSndpConfig D_8008F4A8;
@@ -74,8 +72,7 @@ extern s32 D_800559E4;
 extern s32 D_800559E8[5];
 extern s32 D_800559F8;
 
-void func_8003CC94(ALSndPlayer*, ALSndpConfig*);
-void func_8003CF20(ALSndPlayer*, s32);
+void alSndpNew(ALSndPlayer*, ALSndpConfig*);
 void func_80029588(s32 id);
 void func_80029880();
 
@@ -101,7 +98,7 @@ void func_800285C4(void) {
     osCreateMesgQueue(&D_8008F0A0, &D_8008F0D0, 1);
     osCreateMesgQueue(&D_8008F0B8, &D_8008F0D4, 1);
     D_8008F4C8.initialized = 0;
-    D_8008F428.outputRate = func_80039C30(0x5622);
+    D_8008F428.outputRate = osAiSetFrequency(0x5622);
     D_8008F428.maxVVoices = 0x10;
     D_8008F428.maxPVoices = 0x10;
     D_8008F428.maxUpdates = 0x40;
@@ -279,12 +276,12 @@ s32 func_80029224(s32 slot) {
     if (s->player.state != 0) {
         return 0;
     }
-    func_8003C04C(seq, s->seqData);
+    alCSeqNew(seq, s->seqData);
     player = &s->player;
     alCSPSetSeq(player, seq);
     alSeqpPlay((ALSeqPlayer*) player);
     for (i = 0; i < 16; i++) {
-        func_8003C620(player, i, 0x18);
+        alSeqpSetChlFXMix(player, i, 0x18);
     }
     return 1;
 }
@@ -307,7 +304,7 @@ void func_80029374(u32 start, u32 end, u8* table) {
     D_8008F4A8.maxSounds = 0x50;
     D_8008F4A8.maxEvents = 0x20;
     D_8008F4A8.heap = &D_8008F070;
-    func_8003CC94(&D_8008F450, &D_8008F4A8);
+    alSndpNew(&D_8008F450, &D_8008F4A8);
     alBnkfNew(D_8005592C, table);
     D_8008F4B8 = D_8005592C->bankArray[0];
     D_8008F4B4 = D_8008F4B8->instArray[0];
@@ -325,7 +322,7 @@ void func_80029520(s32 id) {
     alSndpSetSound(&D_8008F450, D_8008F4BC[id]);
     if (alSndpGetState(&D_8008F450) == 0) {
         alSndpPlay(&D_8008F450);
-        func_8003CF20(&D_8008F450, 0x10);
+        alSndpSetFXMix(&D_8008F450, 0x10);
     }
 }
 

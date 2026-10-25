@@ -21,7 +21,7 @@
 #include <libaudio.h>
 #include "synthInternals.h"
 
-Acmd *func_80042CE0(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) 
+Acmd *alMainBusPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) 
 {
     Acmd        *ptr = p;
     ALMainBus   *m = (ALMainBus *)filter;

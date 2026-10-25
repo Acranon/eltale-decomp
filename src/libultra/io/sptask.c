@@ -20,7 +20,7 @@
 extern OSTask D_80094340;
 #define tmp_task D_80094340
 
-OSTask* func_80037790(OSTask* intp) {
+OSTask* _VirtualToPhysicalTask(OSTask* intp) {
     OSTask* tp;
     tp = &tmp_task;
     bcopy(intp, tp, sizeof(OSTask));
@@ -35,7 +35,7 @@ OSTask* func_80037790(OSTask* intp) {
     return tp;
 }
 
-void func_800378AC(OSTask* intp) {
+void osSpTaskLoad(OSTask* intp) {
     OSTask* tp;
 
 #ifdef _DEBUG
@@ -57,7 +57,7 @@ void func_800378AC(OSTask* intp) {
     }
 #endif
 
-    tp = func_80037790(intp);
+    tp = _VirtualToPhysicalTask(intp);
 
     if (tp->t.flags & OS_TASK_YIELDED) {
         tp->t.ucode_data = tp->t.yield_data_ptr;

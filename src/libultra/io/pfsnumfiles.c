@@ -2,7 +2,7 @@
 #include "PR/os_internal.h"
 #include "PRinternal/controller.h"
 
-s32 osPfsNumFiles(OSPfs* pfs, s32* max_files, s32* files_used) {
+s32 func_8003EDC0(OSPfs* pfs, s32* max_files, s32* files_used) {
     int j;
     s32 ret;
     __OSDir dir;

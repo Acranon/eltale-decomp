@@ -29,20 +29,16 @@ extern u8 D_80061810[];
 extern Ext4 D_80061840;
 extern Ext4 D_80061844;
 
-s32 func_8003D910();
-s32 func_8003DD44();
-s32 func_8003E220();
-s32 func_8003E6A0();
-s32 func_8003E9E4();
-s32 func_8003E080();
+s32 osContInit();
+s32 osPfsFreeBlocks();
 s32 func_8003D554();
 s32 func_8003D6B0();
 s32 func_8003D0F0();
-s32 func_8003ED60();
+s32 osPfsRepairId();
 s32 func_8003EDC0();
-s32 func_8003DEA0();
+s32 osPfsFileState();
 s32 func_800360F8();
-s32 func_8003E080();
+s32 osPfsFreeBlocks();
 
 s32 func_800357B0(void) {
     s32 pad[2];
@@ -61,7 +57,7 @@ s32 func_800357B0(void) {
     }
     osCreateMesgQueue(&D_80092C90, &D_80092EB0, 1);
     osSetEventMesg(OS_EVENT_SI, &D_80092C90, &D_80092EB0);
-    func_8003D910(&D_80092C90, &D_80092E98, D_80092EA0);
+    osContInit(&D_80092C90, &D_80092E98, D_80092EA0);
     osContSetCh(4);
     D_80092C80 = -1;
     count = 0;
@@ -103,7 +99,7 @@ void func_80035970(s32 cont) {
     osContSetCh(4);
     osContStartReadData(&D_80092C90);
     if (osRecvMesg(&D_80092C90, NULL, 1) != -1) {
-        func_8003DD44(D_80092EB8);
+        osContGetReadData(D_80092EB8);
     }
     pad = &D_80092EB8[cont];
     button = pad->button;
@@ -146,7 +142,7 @@ s32 func_80035A24(s32 cont) {
         return err;
     }
     for (i = 0; i < 16; i++) {
-        err = func_8003DEA0(pfs, i, &st);
+        err = osPfsFileState(pfs, i, &st);
         if (err == 0) {
             if (st.game_code == 0x4E45544A && st.company_code == 0x3943) {
                 if (func_800360F8(D_80061810, st.game_name, 16) == 0) {
@@ -176,7 +172,7 @@ s32 func_80035A24(s32 cont) {
         if (cnt >= 16) {
             D_80092E48[cont].unk0 |= 0x2000;
         }
-        func_8003E080(pfs, &i);
+        osPfsFreeBlocks(pfs, &i);
         i = i / 256;
         D_80092E48[cont].unk13 = i;
         if (i < 2) {
@@ -222,7 +218,7 @@ u8 func_80035D58(s32 arg0, u8 arg1) {
     ext = D_80061840;
     file_no = -1;
     ext.b[0] = arg1;
-    ret = func_8003E220(&D_80092CA8[arg0], 0x3943, 0x4E45544A, D_80061810, &ext, 0x200, &file_no);
+    ret = osPfsAllocateFile(&D_80092CA8[arg0], 0x3943, 0x4E45544A, D_80061810, &ext, 0x200, &file_no);
     if (ret == 0) {
         ret = file_no;
         D_80092E48[arg0].unk2[ret] = arg1;
@@ -238,22 +234,22 @@ u8 func_80035E24(s32 arg0, u8 arg1) {
 
     ext = D_80061844;
     ext.b[0] = arg1;
-    return func_8003E6A0(&D_80092CA8[arg0], 0x3943, 0x4E45544A, D_80061810, &ext);
+    return osPfsDeleteFile(&D_80092CA8[arg0], 0x3943, 0x4E45544A, D_80061810, &ext);
 }
 
 void func_80035EA8(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
-    func_8003E9E4(&D_80092CA8[arg0], file_no, 0, offset, nbytes, buf);
+    osPfsReadWriteFile(&D_80092CA8[arg0], file_no, 0, offset, nbytes, buf);
 }
 
 s32 func_80035F0C(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
     s32 ret;
     s32 bytes;
 
-    ret = func_8003E080(&D_80092CA8[arg0], &bytes);
+    ret = osPfsFreeBlocks(&D_80092CA8[arg0], &bytes);
     if (ret != 0) {
         return ret;
     }
-    return func_8003E9E4(&D_80092CA8[arg0], file_no, 1, offset, nbytes, buf);
+    return osPfsReadWriteFile(&D_80092CA8[arg0], file_no, 1, offset, nbytes, buf);
 }
 
 s32 func_80035F94(s32 arg0, s32 arg1) {
@@ -265,7 +261,7 @@ s32 func_80035F94(s32 arg0, s32 arg1) {
             if (func_8003D6B0(&D_80092C90, &D_80092CA8[cont], cont) != 0) {
                 err = func_8003D0F0(&D_80092C90, &D_80092CA8[cont], cont);
                 if (err != 11 && err != 1 && err != 2) {
-                    err = func_8003ED60(&D_80092CA8[cont]);
+                    err = osPfsRepairId(&D_80092CA8[cont]);
                 }
             } else {
                 err = 4;

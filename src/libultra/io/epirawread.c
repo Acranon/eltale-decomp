@@ -33,7 +33,7 @@
 // TODO: this comes from a header
 #ident "$Revision: 1.17 $"
 
-s32 func_800490C0(OSPiHandle* pihandle, u32 devAddr, u32* data) {
+s32 __osEPiRawReadIo(OSPiHandle* pihandle, u32 devAddr, u32* data) {
     register u32 stat;
     register u32 domain;
 

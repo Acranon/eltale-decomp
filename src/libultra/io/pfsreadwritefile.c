@@ -7,7 +7,7 @@
     (((p).ipage >= pfs->inode_start_page) && ((p).inode_t.bank < pfs->banks) && ((p).inode_t.page >= 0x01) && \
      ((p).inode_t.page < 0x80))
 
-s32 func_8003E910(OSPfs* pfs, u8* bank, __OSInode* inode, __OSInodeUnit* page) {
+s32 __osPfsGetNextPage(OSPfs* pfs, u8* bank, __OSInode* inode, __OSInodeUnit* page) {
     s32 ret;
 
     if (page->inode_t.bank != *bank) {
@@ -75,7 +75,7 @@ s32 osPfsReadWriteFile(OSPfs* pfs, s32 file_no, u8 flag, int offset, int size_in
     cur_page = dir.start_page;
 
     while (cur_block >= PFS_ONE_PAGE) {
-        ERRCK(func_8003E910(pfs, &bank, &inode, &cur_page));
+        ERRCK(__osPfsGetNextPage(pfs, &bank, &inode, &cur_page));
         cur_block -= PFS_ONE_PAGE;
     }
 
@@ -84,7 +84,7 @@ s32 osPfsReadWriteFile(OSPfs* pfs, s32 file_no, u8 flag, int offset, int size_in
 
     while (siz_block > 0) {
         if (cur_block == PFS_ONE_PAGE) {
-            ERRCK(func_8003E910(pfs, &bank, &inode, &cur_page));
+            ERRCK(__osPfsGetNextPage(pfs, &bank, &inode, &cur_page));
             cur_block = 0;
         }
 

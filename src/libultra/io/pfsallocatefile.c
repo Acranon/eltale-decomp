@@ -3,13 +3,13 @@
 #include "PR/os_internal.h"
 #include "PRinternal/controller.h"
 #include "PR/rmon.h"
-s32 func_8003E554(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank, int *decleared, int *last_page);
+s32 __osPfsDeclearPage(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank, int *decleared, int *last_page);
 
 #define ROUND_UP_DIVIDE(numerator, denominator) (((numerator) + (denominator)-1) / (denominator))
 
 #if BUILD_VERSION >= VERSION_J
 
-s32 func_8003E220(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8* ext_name, int file_size_in_bytes,
+s32 osPfsAllocateFile(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8* ext_name, int file_size_in_bytes,
                       s32* file_no) {
     int start_page;
     int decleared;
@@ -61,7 +61,7 @@ s32 func_8003E220(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8
 
     for (bank = 0; bank < pfs->banks; bank++) {
         ERRCK(__osPfsRWInode(pfs, &inode, PFS_READ, bank));
-        ERRCK(func_8003E554(pfs, &inode, file_size_in_pages, &start_page, bank, &decleared, &last_page));
+        ERRCK(__osPfsDeclearPage(pfs, &inode, file_size_in_pages, &start_page, bank, &decleared, &last_page));
 
         if (start_page != -1) {
             if (firsttime == 0) {
@@ -103,7 +103,7 @@ s32 func_8003E220(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8
     return ret;
 }
 
-s32 func_8003E554(OSPfs* pfs, __OSInode* inode, int file_size_in_pages, int* first_page, u8 bank, int* decleared,
+s32 __osPfsDeclearPage(OSPfs* pfs, __OSInode* inode, int file_size_in_pages, int* first_page, u8 bank, int* decleared,
                        int* last_page) {
     int j;
     int spage;
@@ -153,7 +153,7 @@ s32 func_8003E554(OSPfs* pfs, __OSInode* inode, int file_size_in_pages, int* fir
 
 static s32 __osClearPage(OSPfs *pfs, int page_num, u8 *data, u8 bank);
 
-s32 func_8003E220(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8* ext_name, int file_size_in_bytes,
+s32 osPfsAllocateFile(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8* ext_name, int file_size_in_bytes,
                       s32* file_no) {
     int start_page;
     int decleared;
@@ -210,7 +210,7 @@ s32 func_8003E220(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8
 
         for (bank = 0; bank < pfs->banks; bank++) {
             ERRCK(__osPfsRWInode(pfs, &inode, PFS_READ, bank));
-            ERRCK(func_8003E554(pfs, &inode, file_size_in_pages, &start_page, bank, &decleared, &last_page));
+            ERRCK(__osPfsDeclearPage(pfs, &inode, file_size_in_pages, &start_page, bank, &decleared, &last_page));
 
             if (start_page != -1) {
                 if (firsttime == 0) {
@@ -262,7 +262,7 @@ s32 func_8003E220(OSPfs* pfs, u16 company_code, u32 game_code, u8* game_name, u8
     }
 }
 
-s32 func_8003E554(OSPfs* pfs, __OSInode* inode, int file_size_in_pages, int* first_page, u8 bank, int* decleared,
+s32 __osPfsDeclearPage(OSPfs* pfs, __OSInode* inode, int file_size_in_pages, int* first_page, u8 bank, int* decleared,
                        int* last_page) {
     int j;
     int spage;

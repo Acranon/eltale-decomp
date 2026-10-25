@@ -23,7 +23,7 @@
 // TODO: this comes from a header
 #ident "$Revision: 1.17 $"
 
-Acmd *func_800449F4(void *filter, s16 *outp, s32 outCount, s32 sampleOffset,
+Acmd *alSavePull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset,
                  Acmd *p) 
 {
     Acmd        *ptr = p;

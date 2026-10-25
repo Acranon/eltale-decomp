@@ -10,7 +10,7 @@
 #if BUILD_VERSION >= VERSION_J
 extern s32 __osPfsLastChannel; /* defined in data, D2 */
 
-s32 func_80046F40(OSMesgQueue* mq, int channel, u16 address, u8* buffer) {
+s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer) {
     s32 ret = 0;
     s32 i;
     u8* ptr;
@@ -79,7 +79,7 @@ s32 func_80046F40(OSMesgQueue* mq, int channel, u16 address, u8* buffer) {
 
 static void __osPackRamReadData(int channel, u16 address);
 
-s32 func_80046F40(OSMesgQueue* mq, int channel, u16 address, u8* buffer) {
+s32 __osContRamRead(OSMesgQueue* mq, int channel, u16 address, u8* buffer) {
     s32 ret = 0;
     int i;
     u8* ptr = (u8*)&__osPfsPifRam;

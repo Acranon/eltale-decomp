@@ -25,7 +25,7 @@ void func_80037CF0(void* arg);
 /* func_80037CF0 (viMgrMain) needs its static retrace (D_80095590) defined in
  * this file to match (IDO treats a local static differently from an extern),
  * so it waits for the data step. */
-void func_80037B70(OSPri pri) {
+void osCreateViManager(OSPri pri) {
     u32 savedMask;
     OSPri oldPri;
     OSPri myPri;

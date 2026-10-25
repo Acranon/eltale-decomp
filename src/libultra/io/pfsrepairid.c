@@ -5,7 +5,7 @@
 
 #if BUILD_VERSION >= VERSION_J
 
-s32 func_8003ED60(OSPfs* pfs) {
+s32 osPfsRepairId(OSPfs* pfs) {
     s32 ret = 0;
 
     if ((pfs->status & (PFS_INITIALIZED | PFS_ID_BROKEN))) {
@@ -23,7 +23,7 @@ s32 func_8003ED60(OSPfs* pfs) {
 
 #else
 
-s32 func_8003ED60(OSPfs *pfs) {
+s32 osPfsRepairId(OSPfs *pfs) {
     int k;
     u16 sum;
     u16 isum;

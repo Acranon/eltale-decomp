@@ -18,7 +18,7 @@ extern s32 D_8006E710; /* __osContinitialized */
 #define __osContinitialized D_8006E710
 
 /* I-era: a fixed 500 ms count (46.875 MHz), not OS_USEC_TO_CYCLES. */
-s32 func_8003D910(OSMesgQueue* mq, u8* bitpattern, OSContStatus* data) {
+s32 osContInit(OSMesgQueue* mq, u8* bitpattern, OSContStatus* data) {
     OSMesg dummy;
     s32 ret = 0;
     OSTime t;

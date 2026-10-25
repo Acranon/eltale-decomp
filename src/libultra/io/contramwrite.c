@@ -10,7 +10,7 @@ extern s32 __osPfsLastChannel;
 #define READFORMAT(ptr) ((__OSContRamReadFormat*)(ptr))
 
 #if BUILD_VERSION >= VERSION_J
-s32 func_800488B0(OSMesgQueue* mq, int channel, u16 address, u8* buffer, int force) {
+s32 __osContRamWrite(OSMesgQueue* mq, int channel, u16 address, u8* buffer, int force) {
     s32 ret = 0;
     s32 i;
     u8* ptr;
@@ -84,7 +84,7 @@ s32 func_800488B0(OSMesgQueue* mq, int channel, u16 address, u8* buffer, int for
 
 static void __osPackRamWriteData(int channel, u16 address, u8 *buffer);
 
-s32 func_800488B0(OSMesgQueue* mq, int channel, u16 address, u8* buffer, int force) {
+s32 __osContRamWrite(OSMesgQueue* mq, int channel, u16 address, u8* buffer, int force) {
     s32 ret = 0;
     s32 i;
     u8* ptr = (u8*)&__osPfsPifRam;

@@ -4,7 +4,6 @@
 #include "libultra/sdk_names.h"
 #include "PRinternal/piint.h"
 #include "PR/ultraerror.h"
-#define osEPiRawWriteIo func_80048F30
 
 // TODO: this comes from a header
 #ident "$Revision: 1.17 $"

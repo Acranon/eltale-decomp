@@ -22,7 +22,7 @@
 #include <ultraerror.h>
 #include "synthInternals.h"
 
-s32 func_800466A0(ALSynth *drvr, PVoice **pvoice, s16 priority);
+s32 _allocatePVoice(ALSynth *drvr, PVoice **pvoice, s16 priority);
 
 s32 alSynAllocVoice(ALSynth *drvr, ALVoice *voice, ALVoiceConfig *vc)
 {
@@ -49,7 +49,7 @@ s32 alSynAllocVoice(ALSynth *drvr, ALVoice *voice, ALVoiceConfig *vc)
     voice->state        = AL_STOPPED;        
     voice->pvoice       = 0;
 
-    stolen = func_800466A0(drvr, &pvoice, vc->priority);
+    stolen = _allocatePVoice(drvr, &pvoice, vc->priority);
         
     if (pvoice) {    /* if we were able to allocate a voice */
 
@@ -97,7 +97,7 @@ s32 alSynAllocVoice(ALSynth *drvr, ALVoice *voice, ALVoiceConfig *vc)
     return (pvoice != 0);    
 }
 
-s32 func_800466A0(ALSynth *drvr, PVoice **pvoice, s16 priority)
+s32 _allocatePVoice(ALSynth *drvr, PVoice **pvoice, s16 priority)
 {
     ALLink      *dl;
     PVoice      *pv;

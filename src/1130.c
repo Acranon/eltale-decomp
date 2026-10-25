@@ -61,7 +61,7 @@ void func_800008D0(NNSched *sc, NNScMsg *msg);
 void func_80000920(NNSched *sc);
 void func_80000AA0(NNSched *sc);
 void func_80000BD4(NNSched *sc, NNScTask *task);
-void func_800378AC(OSTask *task);
+void osSpTaskLoad(OSTask *task);
 
 extern u64 D_80078160[];
 extern u64 D_80079160[];
@@ -184,7 +184,7 @@ void func_80000920(NNSched *sc) {
         }
 
         sc->curAudioTask = task;
-        func_800378AC(&task->list);
+        osSpTaskLoad(&task->list);
         osSpTaskStartGo(&task->list);
         osRecvMesg(&sc->rspMQ, &msg, OS_MESG_BLOCK);
         sc->curAudioTask = (NNScTask *)0;
@@ -192,7 +192,7 @@ void func_80000920(NNSched *sc) {
         if (sc->graphicsTaskSuspended)
             osSendMesg(&sc->waitMQ, &msg, OS_MESG_BLOCK);
         if (yieldFlag == 1) {
-            func_800378AC(&gfxTask->list);
+            osSpTaskLoad(&gfxTask->list);
             osSpTaskStartGo(&gfxTask->list);
         } else if (yieldFlag == 2) {
             osSendMesg(&sc->rspMQ, &msg, OS_MESG_BLOCK);
@@ -215,7 +215,7 @@ void func_80000AA0(NNSched *sc) {
         }
 
         sc->curGraphicsTask = task;
-        func_800378AC(&task->list);
+        osSpTaskLoad(&task->list);
         osSpTaskStartGo(&task->list);
         osRecvMesg(&sc->rspMQ, &msg, OS_MESG_BLOCK);
         sc->curGraphicsTask = (NNScTask *)0;
