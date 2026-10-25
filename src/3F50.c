@@ -1206,7 +1206,13 @@ void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     func_80015F44(0x23, arg1);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007E04.s")
+s32 func_80007E04(s32 arg0, Actor *arg1) {
+    s16 chance;
+    Monster *m = &D_8007B908[arg0];
+
+    chance = (arg1->unk68->unk86 * 100) / (arg1->unk68->unk86 + ((m->actor.unk68->unk86 + 7) >> 3));
+    return func_80026E90(100) < chance;
+}
 
 extern s32 D_8004DCFC[];
 extern u8 D_8004F760[];
