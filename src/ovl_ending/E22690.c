@@ -33,7 +33,7 @@ typedef struct {
     s16 unk34;
     char unk36[2];
     s32 unk38;
-    s32 unk3C;
+    u32 unk3C;
     f32 unk40;
     f32 unk44;
     f32 unk48;
@@ -44,10 +44,24 @@ typedef struct {
 typedef struct {
     s32 unk0;
     s32 unk4;
-    char unk8[8];
+    s32 s;
+    s32 t;
     s32 unk10;
     s32 unk14;
+    s32 sw;
+    s32 th;
+    s32 dsdx;
+    s32 dtdy;
+    s32 sfrac;
+    s32 tfrac;
+    s32 env;
+    s32 prim;
 } UnkArg_8020CE70;
+
+typedef struct {
+    u32 key;
+    u16 idx;
+} UnkSortEntry_8020D98C;
 
 typedef struct {
     u16 unk0;
@@ -103,6 +117,8 @@ extern s32 D_8022BB28;
 extern u32 D_8022BB2C;
 extern u32 D_8022BB30;
 extern s32 D_8022BB34;
+extern Gfx D_8020F718_ovl_ending[];
+extern Gfx D_8020F748_ovl_ending[];
 
 void func_8020CA60_ovl_ending(void);
 
@@ -123,6 +139,17 @@ void func_8020C0D0_ovl_ending(void) {
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020C15C_ovl_ending.s")
+
+s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
+void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
+void func_8020CB84_ovl_ending(s32 arg0);
+s32 func_8020CCD8_ovl_ending(void);
+s16 func_8020CD88_ovl_ending(void);
+void func_8020D130_ovl_ending(s32 arg0);
+void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2);
+void func_8020D970_ovl_ending(s32 arg0);
+void func_8020D98C_ovl_ending(s32 arg0);
+void func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
 
 s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
 void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
@@ -639,6 +666,8 @@ s32 func_8020D924_ovl_ending(s32 arg0) {
 void func_8020D970_ovl_ending(s32 arg0) {
     D_8022BB38[arg0].unk34 = 0;
 }
+
+s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D98C_ovl_ending.s")
 
