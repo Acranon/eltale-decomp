@@ -887,4 +887,27 @@ void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_800104C0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_80010768.s")
+extern s32 D_8004DEC8;
+extern u16 D_80081AB0[];
+extern u16 D_80081C40;
+extern u16 D_80081C42;
+
+void func_80010768(void) {
+    s32 *cnt = &D_8004DEC8;
+    s32 v;
+    u16 *p;
+    u16 tmp;
+
+    v = *cnt;
+    if (v >= 0) {
+    lbl:;
+        tmp = D_80081AB0[0xC9];
+        *cnt = 0;
+        D_80081C42 = D_80081C40;
+        v = 200; p = D_80081AB0 + 199;
+        for (; v != 0; v--, p--) { p[1] = p[0]; }
+        D_80081AB0[0] = tmp;
+    } else {
+        v++; *cnt = v;
+    }
+}
