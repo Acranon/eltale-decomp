@@ -208,14 +208,14 @@ extern s32 D_8004EDEC[];
 s32 func_80007E04(s32, Actor17360*);
 s32 func_8000C3FC(Actor17360*, Actor17360*);
 s32 func_8000CAB8(Actor17360*);
-s32 func_8000C528(s32, s32, s32, s32, s32);
-void func_80007FD8(u16, s32, s32);
+s32 func_8000C528(s32, u16, s32, u16, s32);
+void func_80007FD8(u16, u16, s32);
 void func_80023D28(Actor17360*);
 u32 func_80026E90(u32);
 f32 sqrtf(f32);
 void func_800271B4(f32, Unk17360Vec2*);
 
-void func_80018480(s32, Actor17360*);
+void func_80018480();
 void func_80018CD8(s32, Actor17360*);
 s32 func_8001809C(Unk80018444*);
 void func_8002373C(Actor17360*, s32, u16, s32);
@@ -390,7 +390,9 @@ typedef struct {
     /* 0x14 */ u16 unk14;
     /* 0x16 */ u8 pad16[2];
     /* 0x18 */ u16 unk18;
-    /* 0x1A */ u8 pad1A[0x10];
+    /* 0x1A */ u8 pad1A[2];
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ u8 pad20[0xA];
     /* 0x2A */ u16 unk2A;
 } Unk80017F48Cfg;
 typedef struct {
@@ -466,7 +468,51 @@ s32 func_80018444(Unk80018444* arg0) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018480.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[2];
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u8 pad4[2];
+    /* 0x06 */ u8 unk6;
+} Unk80018480Cfg;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ Actor17360* unk24;
+    /* 0x28 */ u8 pad28[4];
+    /* 0x2C */ Unk80018480Cfg* cfg;
+} Unk80018480;
+extern s32 D_8007AA10;
+extern u8 D_8004F760[];
+u16 func_800195FC(Unk80018480Cfg*, Actor17360*);
+void func_800269B8(s32, s32, u8*);
+void func_80018480(Unk80018480* arg0, Actor17360* arg1) {
+    u16 dmg;
+    u16 flag;
+
+    flag = 0;
+    dmg = func_800195FC(arg0->cfg, arg0->unk24);
+    if (arg0->unk24->unk68->unk0 & 1) {
+        dmg >>= 1;
+    }
+    if (arg1->unk5E & 1) {
+        if (D_8007AA10 & 0x1000) {
+            if (func_80026E90((D_8007AA10 & 0x10000) ? 4 : 0x20) == 0) {
+                dmg += (dmg + 1) >> 1;
+                func_800269B8(4, 0, D_8004F760);
+                flag = 0x4000;
+            }
+        }
+        if (func_8000C528(func_8000CAB8(arg1), dmg, arg0->cfg->unk6, arg0->cfg->unk2 | flag, (s32)arg0->unk24) != 0) {
+            D_8007AA1C->unk2A++;
+        }
+    } else {
+        if (func_80026E90(0x20) == 0) {
+            dmg += (dmg + 1) >> 1;
+            func_800269B8(4, 0, D_8004F760);
+            flag = 0x4000;
+        }
+        func_80007FD8(dmg, arg0->cfg->unk2 | flag, (s32)arg0->unk24);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001860C.s")
 
@@ -555,7 +601,7 @@ void func_80018CD8(s32 arg0, Actor17360* arg1) {
 }
 
 void func_80018D88(s32 arg0, Actor17360* arg1) {
-    func_80018480(arg0, arg1);
+    func_80018480((void*)arg0, arg1);
     func_80018CD8(arg0, arg1);
 }
 
