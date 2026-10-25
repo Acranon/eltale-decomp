@@ -29,16 +29,17 @@ typedef struct {
     /* 0x0C */ f32 unkC;
     /* 0x10 */ f32 unk10;
     /* 0x14 */ f32 unk14;
-    /* 0x18 */ s32 unk18;
+    /* 0x18 */ struct Unk8000FA9C *unk18;
 } Unk80083470; /* size 0x1C */
 
-typedef struct {
+typedef struct Unk8000FA9C {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
     /* 0x0C */ f32 angle;
     /* 0x10 */ f32 scale;
     /* 0x14 */ s16 timer;
+    /* 0x16 */ u16 unk16;
 } Unk8000FA9C;
 
 typedef struct {
@@ -145,6 +146,28 @@ extern s32 D_80084B68;
 extern Unk80084994 *D_80084994;
 extern Unk80060C48 D_80060C48[];
 extern MtxBuf D_2000000;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ Gfx *dl;
+    /* 0x14 */ u8 pad14[0xC];
+} Unk8007C294; /* size 0x20 */
+
+extern Unk8007C294 *D_8007C294;
+extern s32 D_8007C2A0;
+
+typedef struct {
+    /* 0x00 */ Gfx *a;
+    /* 0x04 */ Gfx *b;
+} Unk8005E518;
+
+extern Unk8005E518 D_8005E51C[];
+extern Unk8005E518 D_8005E5A0[];
+extern u16 D_8004DE62[];
+extern u8 **D_8005E5AC[];
+extern u16 D_8004DE84[];
+extern u8 D_8004DE88[];
+extern f32 D_80085E74;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000D6A0.s")
 
@@ -260,9 +283,59 @@ void func_8000FD54(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000FDA8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000FF18.s")
+void func_8000FF18(MtxBuf *arg0) {
+    Unk80083470 *p;
+    u32 i;
+    Unk8000FA9C *s;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_80010104.s")
+    D_8007C6A8 = D_8007C6AC;
+    p = D_8007A17C ? D_80083470 : D_80083558;
+    i = D_8007C6A8;
+    while (i--) {
+        if (p->unk0 != 0) {
+            s = p->unk18;
+            p->unk14 -= 0.015707963267948967;
+            func_800273C0(&arg0->mtx[D_8007A180], 0.0f, p->unk10 * 0.017453292519943295, p->unk14, s->scale, s->x, s->y, s->z);
+            gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
+            D_8007A180++;
+            gSPDisplayList(D_8007A184++, D_8007C294[s->timer].dl);
+            D_8007C2A0++;
+        }
+        p++;
+    }
+}
+
+void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
+    s32 pad1;
+    s32 idx;
+    s32 pad;
+    u8 **tex;
+    Gfx *dl;
+    s32 first;
+    Unk8000FA9C *s;
+
+    idx = type - 0x11;
+    dl = D_8005E51C[type].a;
+    tex = D_8005E5AC[type];
+    first = 0;
+    for (; count != 0; count--) {
+        s = *list++;
+        if (type == (s->unk16 & 0xFF)) {
+            if (first == 0) {
+                gSPDisplayList(D_8007A184++, D_8005E5A0[idx].a);
+                first++;
+            }
+            gDPLoadTextureBlock(D_8007A184++, tex[(s->timer >> 1) & 7], G_IM_FMT_CI, G_IM_SIZ_8b, D_8004DE84[type - 0x11], 32, 0, 0, 0, 0, 0, 0, 0);
+            func_800273C0(&arg0->mtx[D_8007A180], 0.0f, D_80085E74, 0.0f, s->scale, s->x, s->y, s->z);
+            gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
+            D_8007A180++;
+            gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_8004DE88[s->timer & 3]);
+            gSPDisplayList(D_8007A184++, dl);
+            s->timer++;
+            D_8007C2A0++;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_800104C0.s")
 
