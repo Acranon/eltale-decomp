@@ -64,6 +64,10 @@ typedef struct {
 typedef struct {
     /* 0x00 */ Unk80084994Elem *unk0;
     /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
 } Unk80084994;
 
 extern Unk8004DEF4 D_8004DEF4[];
@@ -85,7 +89,12 @@ extern s32 D_80084B48[4][3];
 extern s32 D_80084B78[];
 
 void func_80012A60(void);
-void func_8001263C(Lights3 *arg0);
+void func_8001263C(void);
+void func_80027430(f32 (*)[4], f32, f32, f32);
+void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
+void func_800277A4(Mtx *, f32, f32, f32, f32 *, f32 *, f32 *);
+extern f32 D_80084550[4][4];
+extern Mtx D_80085F10;
 void func_800130F8(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
 
 void func_80011A10(Unk80011A10Arg *arg0) {
@@ -121,7 +130,7 @@ void func_800124E8(void) {
     Lights3 *l;
 
     l = D_8007A17C ? &D_800845C8 : &D_80084590;
-    func_8001263C(l);
+    func_8001263C();
     func_800130F8(l, D_80084B18, D_80084B48);
     D_8007A1A0 = D_80084B78[0];
     D_8007A1A2 = D_80084B78[1];
@@ -129,7 +138,34 @@ void func_800124E8(void) {
     gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/12610/func_8001263C.s")
+void func_8001263C(void) {
+    s32 pad;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 angle;
+
+    if (D_8007C280 & 1) {
+        angle = (f32)D_80084988 * 3.141592653589793 * 2 / (f32)D_8008498C - 3.141592653589793;
+        func_80027430(D_80084550, 0.0f, 0.0f, angle);
+        guMtxXFMF(D_80084550, 0.0f, 90.0f, 50.0f, &x, &y, &z);
+        D_80084B48[0][0] = x;
+        D_80084B48[0][1] = y;
+        D_80084B48[0][2] = z;
+    } else if (D_80084994->unk8 != 0) {
+        D_80084B48[0][0] = D_80084994->unkC;
+        D_80084B48[0][1] = D_80084994->unk10;
+        D_80084B48[0][2] = D_80084994->unk14;
+    } else {
+        D_80084B48[0][0] = -89;
+        D_80084B48[0][1] = 89;
+        D_80084B48[0][2] = 20;
+    }
+    func_800277A4(&D_80085F10, -89.0f, 89.0f, 20.0f, &x, &y, &z);
+    D_80084B48[1][0] = x;
+    D_80084B48[1][1] = y;
+    D_80084B48[1][2] = z;
+}
 
 void func_80012800(s32 arg0, u16 *arg1, u16 *arg2) {
     u16 *dst;
