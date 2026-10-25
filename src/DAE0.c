@@ -114,10 +114,10 @@ void func_80028120();
 void func_8000D19C(s32, f32, f32, f32, Unk8007C148 *);
 u8 func_8000D398(u32);
 void func_80020428(s32, Unk8007C174 *, void *, s32);
-void func_8002099C(u16, Unk8007C174 *, void *);
+void func_8002099C(s32, Unk8007C174 *, void *);
 void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
-void func_800201A0(Unk8007C174 *, s32, s32, s32, s32, s32);
-void func_800107F0(f32, f32, f32, s32, Unk8007C0B0 *);
+void func_800201A0(Unk8007C174 *, s32, s32, s32, s32, u16);
+void func_800107F0(f32, f32, f32, u16, Unk8007C0B0 *);
 
 extern u8 D_8004F770[];
 extern Gfx *D_8007A184;
@@ -190,7 +190,46 @@ s32 func_8000D100(void) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/DAE0/func_8000D19C.s")
+void func_8000D19C(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
+    Unk803AB820 *s2 = &D_803AB820[arg0];
+    Unk8007C174 *s1 = &arg4->unk2C;
+    s16 flags;
+
+    arg4->unk2C.unk50 = s2->unk2;
+    func_800201A0(s1, 0, 1, 0, 1, 1);
+    s1->unk24 = s2->unk20;
+    s1->unk28 = s2->unk18;
+    s1->unk64 = (u16 *)s2;
+    s1->unk68 = &arg4->unk98;
+    arg4->unk28 = s2;
+    arg4->unkA = s2->unk6;
+    arg4->unkC = s2->unk6;
+    arg4->unk0 = 0;
+    arg4->unk8 = 0;
+    arg4->unk10 = sqrtf((u32)s2->unkC) * 3.846 + 17.838;
+    arg4->unk98 = 0;
+    arg4->unk11C = arg4->unk28->unk2A;
+    arg4->unk11E = ((Unk803AB820 *)s1->unk64)->unkC;
+    arg4->unk120 = ((Unk803AB820 *)s1->unk64)->unkE;
+    arg4->unk128 = 1.0f;
+    func_800107F0(arg1, 0.0f, arg2, 0xA00, &D_8007C0B0);
+    s1->x = D_8007C0B0.x;
+    s1->y = D_8007C0B0.y;
+    s1->z = D_8007C0B0.z;
+    if (arg0 == 7) {
+        arg4->unk8 |= 4;
+        s1->y -= 30.0;
+    }
+    s1->unk10 = arg3;
+    s1->unk2C = D_8007C0B0.unkC;
+    s1->unk30 = D_8007C0B0.unk10;
+    s1->unk34 = D_8007C0B0.unk14;
+    s1->unk5E = 1;
+    s1->unk60 = 0;
+    if (s2 == &D_803AB9A8) {
+        s1->unk5E |= 4;
+    }
+}
 
 u8 func_8000D398(u32 arg0) {
     return D_8007C13C[arg0 >> 3] & D_8004F770[arg0 & 7];

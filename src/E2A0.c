@@ -95,7 +95,7 @@ typedef struct {
     /* 0x0C */ Mtx mtx[1];
 } MtxBuf;
 
-u32 func_80026E90(s32);
+u32 func_80026E90(u32);
 void func_80026A00(AnimInfo *, Unk80082020 *, s32);
 void func_800271B4(f32, f32 *);
 void func_8001D9A8(SpriteObj *);
@@ -242,7 +242,7 @@ typedef struct {
 void func_80028120();
 void func_8000F4A0(void);
 void func_8000FD54(void);
-void func_800107F0(f32, f32, f32, s32, CollResult *);
+void func_800107F0(f32, f32, f32, u16, CollResult *);
 extern Unk8007C284 D_80056BB0[];
 extern Unk80057540 D_80057540[];
 extern Unk8007C288 *D_8007C288;

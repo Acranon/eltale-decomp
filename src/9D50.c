@@ -152,7 +152,7 @@ extern Unk8007C2A8 *D_8007C2A8[];
 
 void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
 void func_80020428(s32, NPCObj *, AnimEntry *, s32);
-void func_8002099C(u16, NPCObj *, AnimEntry *);
+void func_8002099C(s32, NPCObj *, AnimEntry *);
 extern Gfx *D_8007A184;
 extern Unk8007AA08 D_8007AA08;
 extern s32 D_8007ABA8;
@@ -166,9 +166,9 @@ typedef struct {
 } Unk80090458;
 
 f32 func_800270D0(f32, f32);
-s32 func_80024FF0(s32);
-void func_80025094(s32);
-s32 func_8000D398(s32);
+s32 func_80024FF0(u8);
+void func_80025094(u8);
+u8 func_8000D398(u32);
 void func_8000A0F8(NPC *, s32);
 extern s32 D_8004DCA0;
 extern u8 D_8004DD10[];
@@ -191,9 +191,9 @@ typedef struct {
     /* 0x18 */ u16 flags;
 } CollResult;
 
-void func_800107F0(f32, f32, f32, s32, void *);
+void func_800107F0(f32, f32, f32, u16, void *);
 void func_800201A0(void *, s32, s32, s32, s32, u16);
-u32 func_80026E90(s32);
+u32 func_80026E90(u32);
 void func_80028120();
 void func_80032D20(s32);
 void func_8020C0D0(void);
