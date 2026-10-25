@@ -7,10 +7,19 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u16 area;
-    /* 0x02 */ u8 pad2[2];
+    /* 0x02 */ u16 unk2;
     /* 0x04 */ u8 unk4;
     /* 0x05 */ u8 flags;
-    /* 0x06 */ u8 pad6[0xA];
+    union {
+        /* 0x06 */ u16 unk6;
+        struct {
+            /* 0x06 */ u8 unk6_hi;
+            /* 0x07 */ u8 unk7;
+        } b;
+    } u6;
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u16 unkA;
+    /* 0x0C */ u8 padC[4];
     /* 0x10 */ Unk10 *unk10;
     /* 0x14 */ u8 *name;
     /* 0x18 */ u8 pad18[4];
@@ -26,7 +35,7 @@ typedef struct {
     /* 0x04 */ f32 homeX;
     /* 0x08 */ f32 homeZ;
     /* 0x0C */ f32 homeAngle;
-    /* 0x10 */ u8 pad10[4];
+    /* 0x10 */ f32 unk10;
     /* 0x14 */ f32 x;
     /* 0x18 */ f32 y;
     /* 0x1C */ f32 z;
@@ -62,7 +71,8 @@ typedef struct {
     /* 0x18 */ f32 unk18;
     /* 0x1C */ u8 pad1C[4];
     /* 0x20 */ f32 unk20;
-    /* 0x24 */ u8 pad24[8];
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 nx;
     /* 0x30 */ f32 ny;
     /* 0x34 */ f32 nz;
@@ -88,6 +98,77 @@ typedef struct {
     /* 0x00 */ u32 start;
     /* 0x04 */ u32 end;
 } RomRange;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ u8 padC[0x18];
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 rx;
+    /* 0x30 */ f32 ry;
+    /* 0x34 */ f32 rz;
+    /* 0x38 */ u8 pad38[0x1A];
+    /* 0x52 */ s16 unk52;
+    /* 0x54 */ u8 pad54[4];
+    /* 0x58 */ u16 unk58;
+} NPCObj;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+} AnimEntry; /* size 0xC */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u8 padC[0xC];
+    /* 0x18 */ f32 x;
+    /* 0x1C */ u8 pad1C[4];
+    /* 0x20 */ f32 z;
+    /* 0x24 */ u8 pad24[0x18];
+    /* 0x3C */ f32 unk3C;
+    /* 0x40 */ f32 unk40;
+} Unk8007AA08;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+} Unk8007C2A8;
+
+f32 sqrtf(f32);
+extern s32 D_8007C2A4;
+extern Unk8007C2A8 *D_8007C2A8[];
+
+void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
+void func_80020428(s32, NPCObj *, AnimEntry *, s32);
+void func_8002099C(u16, NPCObj *, AnimEntry *);
+extern Gfx *D_8007A184;
+extern Unk8007AA08 D_8007AA08;
+extern s32 D_8007ABA8;
+extern NPCObj *D_8007ABB0[];
+
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ u8 *unk8;
+    /* 0x0C */ u8 *unkC;
+} Unk80090458;
+
+f32 func_800270D0(f32, f32);
+s32 func_80024FF0(s32);
+void func_80025094(s32);
+s32 func_8000D398(s32);
+void func_8000A0F8(NPC *, s32);
+extern s32 D_8004DCA0;
+extern u8 D_8004DD10[];
+extern u8 D_8004DD18[];
+extern s32 D_8007A174;
+extern s32 D_80090454;
+extern Unk80090458 D_80090458;
 
 void func_80009764(s32);
 void func_800097F8(NPCDef *, s32);
@@ -142,7 +223,38 @@ void func_80009150(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800091E0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009594.s")
+void func_80009594(s32 arg0) {
+    NPC *npc;
+    s32 i;
+    NPCObj **list;
+    NPCObj *obj;
+    f32 dx;
+    f32 dz;
+    f32 dist;
+    s32 filter;
+    AnimEntry *anims;
+
+    D_8007ABA8 = 0;
+    i = D_8007ABA4;
+    npc = D_8007ABF0;
+    list = D_8007ABB0;
+    for (; i != 0; i--, npc++) {
+        dx = npc->x - D_8007AA08.x;
+        obj = (NPCObj *)&npc->x;
+        dz = npc->z - D_8007AA08.z;
+        dist = dx * dx + dz * dz;
+        if (dist < 90000.0f) {
+            filter = (dist < 20000.0f) ? G_TF_BILERP : G_TF_POINT;
+            gDPSetTextureFilter(D_8007A184++, filter);
+            anims = (AnimEntry *)npc->def->unk10;
+            func_80020428(0, obj, &anims[obj->unk52], arg0);
+            func_8002099C(obj->unk58, obj, &anims[obj->unk52]);
+            func_800131F0(obj->x, obj->y, obj->z, obj->rx, obj->ry, obj->rz, 5.0f);
+            *list++ = obj;
+            D_8007ABA8++;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009764.s")
 
@@ -166,7 +278,73 @@ void func_80009988(f32 dx, f32 dz, Unk80009988 *obj) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009A54.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009DDC.s")
+void func_80009DDC(s32 idx) {
+    s32 pad;
+    s32 found;
+    NPC *npc = &D_8007ABF0[idx];
+    f32 angle;
+    f32 dx;
+    f32 dz;
+    s32 msg;
+
+    npc->state = 2;
+    if (npc->def->flags & 2) {
+        npc->timer = 0;
+    } else {
+        npc->timer = 15;
+        dx = D_8007AA08.x - npc->x;
+        dz = D_8007AA08.z - npc->z;
+        angle = func_800270D0(dx, dz) - npc->angle;
+        if (angle < -3.141592653589793) {
+            angle += 6.283185307179586;
+        }
+        if (angle > 3.141592653589793) {
+            angle -= 6.283185307179586;
+        }
+        npc->unk10 = angle;
+        npc->timer = 15;
+        func_800201A0(&npc->x, 1, 1, 1, 1, 1);
+    }
+    switch (npc->def->unk2) {
+        case 2:
+            if (func_80024FF0(npc->def->u6.b.unk7) == 0) {
+                found = 0;
+                msg = npc->def->unk8;
+            } else {
+                found = 1;
+                msg = npc->def->unkA;
+            }
+            func_8000A0F8(npc, msg);
+            if (found == 0) {
+                func_80025094(npc->def->u6.b.unk7);
+                D_8007AA08.unk8 |= 0x40;
+            }
+            break;
+        case 5:
+            if (func_8000D398(npc->def->u6.unk6) == 0) {
+                msg = npc->def->unk8;
+            } else {
+                msg = npc->def->unkA;
+                if (npc->def->u6.unk6 == 7) {
+                    D_8004DCA0 |= 0x8080;
+                    D_8007A174 = 0x16;
+                }
+            }
+            func_8000A0F8(npc, msg);
+            break;
+        case 6:
+            func_8000A0F8(npc, npc->def->unk8);
+            D_80090458.unk0 = 2;
+            D_80090458.unk8 = D_8004DD10;
+            D_80090458.unkC = D_8004DD18;
+            D_80090454 = -1;
+            D_8004DCA0 |= 0x10;
+            break;
+        default:
+            func_8000A0F8(npc, npc->def->unk8);
+            break;
+    }
+}
 
 void func_8000A040(s32 idx) {
     NPC *npc = &D_8007ABF0[idx];
