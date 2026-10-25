@@ -884,7 +884,7 @@ void func_80006168(f32 sx, f32 sz, Actor *a, PlayerState *p) {
     s32 mode;
     s32 flag;
     f32 d;
-    f32 X;
+    f32 unused;
     f32 spd;
     f32 cur;
 
