@@ -141,6 +141,8 @@ extern s32 D_8007B900;
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
     /* 0x0E */ u16 unkE;
+    /* 0x10 */ u8 pad10[8];
+    /* 0x18 */ u16 unk18;
 } Unk8001A3ECCfg;
 
 typedef struct {
@@ -161,8 +163,11 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 pad0[0x6];
     /* 0x06 */ u16 unk6;
-    /* 0x08 */ u8 pad8[0xC];
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u8 padC[8];
     /* 0x14 */ Unk8007AA1C* unk14;
+    /* 0x18 */ u8 pad18[0xF8];
+    /* 0x110 */ u16 unk110;
 } Unk8007AA08;
 
 typedef struct {
@@ -185,6 +190,9 @@ extern Unk8007AA08 D_8007AA08;
 extern s32 D_8004DCA0;
 extern s32 D_8007A174;
 extern Unk8007C288* D_8007C288;
+extern u8 D_8004EDB0[];
+extern s32 D_8004EDBC[];
+extern s32 D_8004EDEC[];
 s32 func_80007E04(s32, Actor17360*);
 s32 func_8000C3FC(Actor17360*, Actor17360*);
 s32 func_8000CAB8(Actor17360*);
@@ -643,7 +651,14 @@ void func_8001A2EC(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001A340.s")
+void func_8001A340(s32 arg0) {
+    s32 i;
+
+    D_8007AA08.unk110 &= ~D_8004ED34[arg0];
+    for (i = 0; i < 6; i++) {
+        D_8007B908[i].unk124 &= ~D_8004ED34[arg0];
+    }
+}
 
 s32 func_8001A3EC(Unk8001A3EC* arg0, Actor17360* arg1) {
     s32 ret;
@@ -666,6 +681,28 @@ s32 func_8001A3EC(Unk8001A3EC* arg0, Actor17360* arg1) {
     return D_8004EDA4[ret];
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001A4AC.s")
+s32 func_8001A4AC(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
+    s32 ret;
+    s32 n;
+    Unk8001A3ECCfg* cfg;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001A56C.s")
+    if (arg0->unkA & 4) {
+        ret = 1;
+    } else if (cfg = arg0->unk2C, cfg->unk18 == 2) {
+        ret = 1;
+    } else if (arg1->unk5E & 1) {
+        ret = func_80026E90(64) < D_8004EDB0[arg2];
+    } else {
+        n = (D_8007AA08.unk8 & 0x8000) ? 28 : 32;
+        ret = func_80026E90(n) < D_8004EDB0[arg2];
+    }
+    return ret;
+}
+
+void func_8001A56C(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
+    if (arg1 != arg0->unk24) {
+        arg1->unk68->timers[arg2] = func_80026E90(D_8004EDBC[arg2]) + 2;
+    } else {
+        arg1->unk68->timers[arg2] = func_80026E90(D_8004EDEC[arg2]) + 3;
+    }
+}
