@@ -144,7 +144,30 @@ s32 func_8003403C(s32 idx) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80034274.s")
+void func_80034274(s32 arg0) {
+    s32 x;
+    s32 y;
+
+    gDPPipeSync(D_8007A184++);
+    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
+    if (D_80090470[arg0].unk17[0] != 0xFF) {
+        x = D_80090470[arg0].unk4;
+        y = D_80090470[arg0].unk6;
+        func_80034C9C(1, x + 27, y + 4, 40, 13);
+        x = D_80090470[arg0].unk4;
+        y = D_80090470[arg0].unk6;
+        func_80035350(x + 73, y + 4, D_80090470[arg0].unk17);
+        x = D_80090470[arg0].unk4;
+        y = D_80090470[arg0].unk6;
+        func_80035350(x + 10, y + 20, D_80090470[arg0].unk54C);
+    } else {
+        x = D_80090470[arg0].unk4;
+        x = x + 10;
+        y = D_80090470[arg0].unk6;
+        y = y + 12;
+        func_80035350(x, y, D_80090470[arg0].unk54C);
+    }
+}
 
 void func_80034380(s32 idx) {
     Unk80090470 *p;
