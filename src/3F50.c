@@ -1091,7 +1091,30 @@ void func_80006F80(f32 *arg0, f32 *arg1, Actor *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007320.s")
+void func_80007320(PlayerState *arg0, Actor *arg1) {
+    f32 dx;
+    f32 dz;
+    f32 k = 2.0f;
+
+    switch ((u16)(arg1->unk62 >> 6) & 7) {
+        case 0:
+            break;
+        case 1:
+            if (arg0->unk128 == 0) {
+                func_80007FD8(1, 4, arg1);
+            }
+            arg0->unk128--;
+            break;
+        case 2:
+            dx = arg1->unk2C * k;
+            arg1->x += dx;
+            dz = arg1->unk34 * k;
+            arg1->z += dz;
+            arg1->vx += dx;
+            arg1->vz += dz;
+            break;
+    }
+}
 
 typedef struct {
     /* 0x00 */ f32 x;
