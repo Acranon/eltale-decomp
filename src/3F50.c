@@ -197,6 +197,7 @@ void func_8000A040(s32 arg0);
 void func_80013A50(u8 arg0);
 void func_800169B8(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
 s32 func_80017AB0(void);
+void func_8001A6E4(Actor *arg0);
 void func_8001FC14(Actor *arg0);
 void func_800201A0(Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 void func_80020214(Actor *arg0, s32 arg1, f32 arg2);
@@ -692,9 +693,10 @@ void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
     }
 }
 
+extern s16 D_8007A90C;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006168.s")
 
-void func_8001A6E4(Actor *arg0);
 
 void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p) {
     s32 anim;
