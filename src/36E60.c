@@ -179,4 +179,54 @@ void func_80036544(Unk80092EDC *arg0, s32 frame) {
     D_80085E48.unk20 = D_80085E48.unk14 - D_80085E48.unk20;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/36E60/func_80036664.s")
+void func_80036664(void) {
+    Cue *cue;
+    Unk80092EE8 *slot;
+    s32 n;
+    s32 a;
+    u16 d;
+    s32 xr;
+    s32 t;
+
+    n = 31;
+    slot = D_80092EE8;
+    if (D_80092EE0 == D_80092EE4->frame) {
+        do {
+            while (n != 0 && slot->unk0 != 0) {
+                n--;
+                slot++;
+            }
+            D_80092EE4->tlut[0] = 0;
+            slot->unk0 = D_80092EE4->dur;
+            slot->unk4 = D_80092EE4;
+            D_80092EE4++;
+        } while (D_80092EE0 == D_80092EE4->frame);
+    }
+    slot = D_80092EE8;
+    gSPDisplayList(D_8007A184++, D_8006CC90);
+    for (n = 32; n != 0; slot++) {
+        n--;
+        d = slot->unk0;
+        if (slot->unk0) {
+            cue = slot->unk4;
+            if (d < 16) {
+                a = d * 16;
+            } else {
+                t = cue->dur - d;
+                if (t < 32) {
+                    a = t * 8;
+                } else {
+                    a = 0xFF;
+                }
+            }
+            gDPLoadTextureTile_4b(D_8007A184++, cue->img, G_IM_FMT_CI, (cue->w + 15) & ~15, cue->h, 0, 0, cue->w - 1, cue->h - 1, 0, 0, 0, 0, 0, 0, 0);
+            gDPLoadTLUT_pal16(D_8007A184++, 0, cue->tlut);
+            gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, a);
+            xr = (cue->x + cue->w) & ~1;
+            gSPTextureRectangle(D_8007A184++, cue->x << 2, cue->y << 2, xr << 2, (cue->y + cue->h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+            slot->unk0--;
+        }
+    }
+    D_80092EE0++;
+}
+
