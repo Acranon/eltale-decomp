@@ -401,8 +401,6 @@ void func_80001278(GfxFrame *arg0) {
     arg0->task.list.t.data_size = (D_8007A184 - sub->dl) * sizeof(Gfx);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80001944.s")
-
 extern s32 D_8007A180;
 extern s32 D_8007A1D0;
 extern s8 D_8008FAF0;
@@ -455,6 +453,82 @@ void func_80036260(void);
 void func_8003627C(void);
 void func_8003642C(void);
 void func_800364F4(void);
+
+typedef struct {
+    /* 0x0 */ u8 unk0[0x4];
+    /* 0x4 */ u16 unk4;
+    /* 0x6 */ u16 unk6;
+    /* 0x8 */ u16 unk8;
+    /* 0xA */ u16 unkA;
+} PlayerStateSub14;
+
+typedef struct {
+    /* 0x00 */ u8 unk0[0x14];
+    /* 0x14 */ PlayerStateSub14 *unk14;
+    /* 0x18 */ f32 x;
+    /* 0x1C */ f32 y;
+    /* 0x20 */ f32 z;
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 rot;
+    /* 0x2C */ u8 unk2C[0x78 - 0x2C];
+    /* 0x78 */ u16 unk78;
+} PlayerState;
+
+typedef struct {
+    s32 unk0;
+    s32 unk4;
+} Unk80084300;
+
+extern u64 D_8007A8A8;
+extern u64 D_8007A8B0;
+extern u64 D_8007A8B8;
+extern PlayerState D_8007AA08;
+extern u8 D_8007AA20[];
+extern s32 D_800842C0;
+extern u16 D_800842E8;
+extern Unk80084300 D_80084300;
+extern u16 D_8008BE52;
+extern s32 D_8008C170;
+extern s32 D_80090450;
+extern u16 D_80092C84;
+extern u16 D_80092C86;
+void func_80003494(void);
+void func_80003B20(void);
+void func_80003BE0(void);
+void func_800073E8(void);
+void func_80009150(void);
+void func_800091E0(void);
+void func_8000A2A0(void);
+void func_8000A310(void);
+void func_8000CEF0(void);
+void func_8000D6A0(void);
+void func_8000F5DC(void);
+s32 func_80011770(f32 arg0, f32 arg1, f32 arg2);
+void func_80011EA0(s32 arg0);
+void func_80013500(void);
+void func_80013BD0(void);
+void func_80014130(void);
+void func_80014550(void);
+void func_800163F4(void);
+void func_80016760(void);
+void func_80017630(void);
+void func_8001A600(void);
+void func_8001D970(void);
+void func_8001EE00(s32 *arg0);
+void func_8001EE94(void);
+void func_8001F36C(void);
+void func_8001F888(void);
+void func_800201A0(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+void func_80020AE0(void);
+void func_80029198(s32 arg0, s32 arg1);
+void func_80029224(s32 arg0);
+void func_8002A744(s32 arg0, s32 arg1, s32 arg2);
+void func_8002A7C8(s32 arg0, s32 arg1, s32 arg2);
+void func_8002F87C(void);
+void func_8002FA00(s32 arg0);
+void func_80032BB0(s32 arg0);
+
+#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80001944.s")
 
 void func_8000205C(void) {
     s32 count;
