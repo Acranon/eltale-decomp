@@ -210,7 +210,93 @@ s32 func_80010A4C(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     return ret;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/113F0/func_80010BC8.s")
+s32 func_80010BC8(f32 x, f32 z, f32 scale, u16 flags, CollMesh *mesh, CollResult *out) {
+    CollTri *tri;
+    s32 ret;
+    CollVert *verts;
+    CollVert *va;
+    CollVert *vb;
+    CollVert *vc;
+    f32 ax;
+    f32 az;
+    f32 minX;
+    f32 maxX;
+    f32 minZ;
+    f32 maxZ;
+    f32 bx;
+    f32 bz;
+    f32 cx;
+    f32 cz;
+    f32 nx;
+    f32 ny;
+    f32 nz;
+    f32 ay;
+    s32 c;
+    s32 n;
+    s32 i0;
+    s32 i1;
+    s32 i2;
+
+    ret = 0;
+    tri = mesh->tris;
+    verts = mesh->verts;
+    if (tri != NULL) {
+        ax = mesh->minX * scale;
+        bx = mesh->maxX * scale;
+        az = mesh->minZ * scale;
+        bz = mesh->maxZ * scale;
+        if (x < ax || bx < x || z < az || bz < z) {
+            return 0;
+        }
+        for (n = mesh->ntris; n != 0; n--, tri++) {
+            if (tri->flags & flags) {
+                i0 = tri->v0;
+                i1 = tri->v1;
+                i2 = tri->v2;
+                va = (CollVert *)((u8 *)verts + i0 * 8);
+                vb = (CollVert *)((u8 *)verts + i1 * 8);
+                vc = (CollVert *)((u8 *)verts + i2 * 8);
+                ax = va->x * scale;
+                az = va->z * scale;
+                bx = vb->x * scale;
+                bz = vb->z * scale;
+                cx = vc->x * scale;
+                cz = vc->z * scale;
+                if (x == ax && z == az) {
+                    c = 1;
+                } else if (x == bx && z == bz) {
+                    c = 1;
+                } else if (x == cx && z == cz) {
+                    c = 1;
+                } else {
+                    if (0) {
+                    }
+                    c = func_80010F34(x, z, ax, az, bx, bz);
+                    c += func_80010F34(x, z, bx, bz, cx, cz);
+                    c += func_80010F34(x, z, ax, az, cx, cz);
+                }
+                if (c == 1) {
+                    ny = tri->ny;
+                    nx = tri->nx;
+                    nz = tri->nz;
+                    ay = va->y * scale;
+                    if (ny != 0.0f) {
+                        out->y = -((nx * x + nz * z) - (nx * ax + ny * ay + nz * az)) / ny;
+                        out->unk18 = tri->flags;
+                    } else {
+                        out->unk18 = tri->flags;
+                    }
+                    out->nx = nx;
+                    out->ny = ny;
+                    out->nz = nz;
+                    ret = 1;
+                    break;
+                }
+            }
+        }
+    }
+    return ret;
+}
 
 s32 func_80010F34(f32 px, f32 pz, f32 ax, f32 az, f32 bx, f32 bz) {
     if ((az <= pz && pz < bz) || (bz <= pz && pz < az)) {
