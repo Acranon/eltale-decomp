@@ -809,7 +809,105 @@ void func_8001C298(s32 arg0, f32 arg1, f32 arg2, f32 arg3) {
     p->unk10 = arg3;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001C2F8.s")
+extern Gfx D_800C4780[];
+extern u8 D_800C47C0[];
+extern Gfx D_800C4840[];
+extern u8 D_8004F038[];
+extern u8 D_8004F02C[][4];
+
+void func_8001C2F8(void* arg0) {
+    s32 cnt;
+    Unk800877A8* p;
+    s32 first;
+    u8 alpha;
+    s32 j;
+    Unk1B200Vec3* pt;
+    f32 x0;
+    f32 y0;
+    f32 z0;
+    f32 x1;
+    f32 y1;
+    f32 z1;
+    f32 len;
+    f32 scale;
+    u8* color;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    MtxF mtx;
+
+    first = 0;
+    p = D_800877A8;
+    cnt = 4;
+    do {
+        if (p->unk0) {
+            if (first == 0) {
+                gSPDisplayList(D_8007A184++, D_800C4780);
+                gDPLoadTextureBlock(D_8007A184++, D_800C47C0, G_IM_FMT_I, G_IM_SIZ_8b, 8, 8, 0, G_TX_WRAP, G_TX_WRAP, 3, 0, G_TX_NOLOD, G_TX_NOLOD);
+                first++;
+            }
+            p->unk2++;
+            alpha = D_8004F038[p->unk2 & 1];
+            switch (p->unk0) {
+                case 1:
+                    if (p->unk2 < 4) {
+                        alpha = (alpha * p->unk2) >> 2;
+                    }
+                    if (p->unk4 < p->unk2) {
+                        p->unk0++;
+                    } else {
+                        scale = sinf(p->unk2 * 3.141592653589793 / (p->unk4 * 2));
+                    }
+                    break;
+                case 3:
+                    alpha = (alpha * (p->unk4 - p->unk2)) / p->unk4;
+                    if (!(p->unk2 < p->unk4)) {
+                        p->unk0 = 0;
+                    }
+                    break;
+            }
+            color = D_8004F02C[p->unk6];
+            gDPSetEnvColor(D_8007A184++, color[0], color[1], color[2], alpha);
+            pt = p->pts;
+            j = 16;
+            do {
+                x0 = pt->x;
+                y0 = pt->y + 5.0f;
+                z0 = pt->z;
+                pt++;
+                if (--j == 0) {
+                    pt = p->pts;
+                }
+                x1 = pt->x;
+                y1 = pt->y + 5.0f;
+                z1 = pt->z;
+                if (p->unk0 == 1) {
+                    x0 = (x0 - p->unk8) * scale + p->unk8;
+                    y0 = (y0 - p->unkC) * scale + p->unkC;
+                    z0 = (z0 - p->unk10) * scale + p->unk10;
+                    x1 = (x1 - p->unk8) * scale + p->unk8;
+                    y1 = (y1 - p->unkC) * scale + p->unkC;
+                    z1 = (z1 - p->unk10) * scale + p->unk10;
+                }
+                dx = x1 - x0;
+                dy = y1 - y0;
+                dz = z1 - z0;
+                len = sqrtf(dx * dx + dy * dy + dz * dz);
+                if (len != 0.0f) {
+                    func_800278C8(&mtx, dx, dy, dz);
+                    func_80027CB4(&mtx, 2.0f, len, 1.5f);
+                    mtx.mf[3][0] = x0;
+                    mtx.mf[3][1] = y0;
+                    mtx.mf[3][2] = z0;
+                    guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[D_8007A180]);
+                    gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                    gSPDisplayList(D_8007A184++, D_800C4840);
+                }
+            } while (j != 0);
+        }
+        p++;
+    } while (--cnt != 0);
+}
 
 void func_8001C7E8(void) {
     s32 i = 32;
