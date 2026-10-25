@@ -1309,7 +1309,33 @@ s32 func_800168F0(s32 arg0, u16 arg1);
 s32 func_800167B0(u16 count, u8 *seq);
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800085D8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80008840.s")
+void func_80008840(PlayerState *p, Actor *a, AnimEntry *anims) {
+    Unk800C185C *e;
+    s32 anim;
+    s32 next;
+    u16 t;
+
+    a->unk64->unk8 -= D_800C186E[p->unk120];
+    e = &D_800C185C[(p->unk122 >> 8) & 0xF][p->unk122 & 0xFF];
+    if (e->unk18 == 2) {
+        p->unk8 |= 4;
+        anim = 0x17;
+        next = 0x16;
+    } else {
+        anim = 3;
+        next = D_8007A910;
+    }
+    t = anims[anim].unk2;
+    p->unk0 = 0xE;
+    p->unk124 = 0x12;
+    p->unk120 = 0;
+    p->unk4 = t;
+    a->vx = a->vz = 0.0f;
+    a->unk60 |= 1;
+    func_800201A0(a, anim, 1, next, 1, 1);
+    func_80015F44(0x2D, a);
+    D_8008C15E = 0x1E;
+}
 
 void func_80008970(PlayerState *arg0) {
     f32 dx;
