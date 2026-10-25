@@ -224,7 +224,7 @@ void func_800271B4(f32, Unk17360Vec2*);
 
 void func_80018480();
 void func_80018CD8(s32, Actor17360*);
-s32 func_8001809C(Unk80018444*);
+s32 func_8001809C();
 void func_8002373C(Actor17360*, s32, u16, s32);
 void func_8002433C(Actor17360*);
 
@@ -874,7 +874,91 @@ void func_80017F48(Unk80017F48* arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001809C.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ u8 pad18[0x10];
+    /* 0x28 */ Actor17360* unk28;
+    /* 0x2C */ Unk17360CamCfg* cfg;
+} Unk8001809C;
+extern f32 D_8007AA24;
+extern f32 D_8007AA28;
+extern f32 D_8007AA44;
+extern Unk17360Model* D_8007AA84;
+extern Unk8007B908_b* D_800863C4;
+s32 func_8001A2A0(s32, Actor17360*);
+s32 func_8001809C(arg0, arg1)
+    Unk8001809C* arg0;
+    s32 arg1;
+{
+    Actor17360* a;
+    Unk8007B908_b* p;
+    s32 n;
+    f32 dx;
+    f32 dy;
+    Actor17360* ret;
+    f32 dz;
+    f32 dist;
+    Actor17360* target;
+
+    target = arg0->unk28;
+    if (target != NULL) {
+        if (!(target->unk5E & 1)) {
+            ret = (Actor17360*)D_8007AA20;
+            if (func_8001A2A0(arg1, target)) {
+                ret = NULL;
+            } else {
+                dx = ret->x - arg0->x;
+                dz = ret->z - arg0->z;
+                dy = (ret->y + ret->unk64->unk1C * ret->scale * 0.5 - arg0->y) * 0.5;
+                dist = sqrtf(dx * dx + dy * dy + dz * dz);
+                if (arg0->cfg->unk1C + ret->unk64->unk18 * ret->scale < dist) {
+                    ret = NULL;
+                }
+            }
+        } else {
+            n = D_8007B900;
+            p = (Unk8007B908_b*)D_8007B908;
+            while (n != 0) {
+                if (p->unk7C != -1) {
+                    a = (Actor17360*)p->unk2C;
+                    ret = a;
+                    if (!func_8001A2A0(arg1, a)) {
+                        dx = a->x - arg0->x;
+                        dz = a->z - arg0->z;
+                        switch (a->unk64->unk0) {
+                            default:
+                                dy = 0.0f;
+                                break;
+                            case 0:
+                                dy = (a->y + a->unk64->unk1C * a->scale * 0.5 - arg0->y) * 0.5;
+                                break;
+                            case 1:
+                                dy = (a->unk68->unk94 - arg0->y) * 0.5;
+                                break;
+                        }
+                        dist = sqrtf(dx * dx + dy * dy + dz * dz);
+                        if (dist < arg0->cfg->unk1C + a->unk64->unk18 * a->scale) {
+                            break;
+                        }
+                    }
+                    n--;
+                }
+                p++;
+            }
+            if (n == 0) {
+                ret = NULL;
+            } else {
+                D_800863C4 = p;
+            }
+        }
+    } else {
+        ret = NULL;
+    }
+    return (s32)ret;
+}
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x28];
@@ -967,9 +1051,64 @@ void func_80018480(Unk80018480* arg0, Actor17360* arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001860C.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0xA];
+    /* 0x0A */ u16 unkA;
+} Unk8001860CRec;
+void func_8001AE24(Actor17360*, s32, s32);
+void func_8001860C(Unk80018480* arg0, Actor17360* arg1) {
+    u16 amt;
+    s32 pad;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800187C4.s")
+    if (arg1->unk5E & 1) {
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        amt = arg1->unk64->unk6 * arg0->cfg->unkC / 100;
+        amt += func_80026E90(amt >> 2);
+        ((Unk8001860CRec*)D_800863C4)->unkA += amt;
+        if (((Unk8001860CRec*)D_800863C4)->unkA > arg1->unk64->unk6) {
+            ((Unk8001860CRec*)D_800863C4)->unkA = arg1->unk64->unk6;
+        }
+    } else {
+        amt = (D_8007AA1C->unk24[arg0->cfg->unk6] >> 1) + arg1->unk64->unk6 * arg0->cfg->unkC / 100;
+        amt += func_80026E90(amt >> 2);
+        if (arg1->unk64->unk4 != arg1->unk64->unk6) {
+            arg1->unk64->unk4 += amt;
+            if (arg1->unk64->unk4 > arg1->unk64->unk6) {
+                arg1->unk64->unk4 = arg1->unk64->unk6;
+            }
+            D_8007AA1C->unk2A++;
+        }
+    }
+    func_8001AE24(arg1, 1, amt);
+}
+
+void func_800187C4(Unk80018480* arg0, Actor17360* arg1) {
+    u16 amt;
+    Actor17360* pl;
+
+    pl = (Actor17360*)D_8007AA20;
+    if (arg1->unk5E & 1) {
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        amt = (D_800863C4->unkC * 11 + 63) >> 6;
+        D_800863C4->unkC -= amt;
+        if (D_8007AA08.unk7C->unk8 != D_8007AA08.unk7C->unkA) {
+            pl->unk64->unk8 += amt;
+            if (pl->unk64->unk8 > pl->unk64->unkA) {
+                pl->unk64->unk8 = pl->unk64->unkA;
+            }
+            D_8007AA08.unk14->unk2A++;
+        }
+    } else {
+        amt = (arg1->unk64->unk8 * 11 + 63) >> 6;
+        arg1->unk64->unk8 -= amt;
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        D_800863C4->unkC += amt;
+        if (D_800863C4->unkC > arg0->unk24->unk64->unkA) {
+            D_800863C4->unkC = arg0->unk24->unk64->unkA;
+        }
+    }
+    func_8001AE24(arg1, 1, amt);
+}
 
 void func_80018968(s32 arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
