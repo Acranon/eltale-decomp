@@ -488,15 +488,119 @@ void func_8002A7C8(s32, s32, s32);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80022970.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800230A8.s")
+extern u16 D_8008C040;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800231C4.s")
+typedef struct {
+    /* 0x00 */ char unk0[0x14];
+    /* 0x14 */ Vec3f_216E0 unk14;
+    /* 0x20 */ char unk20[0x84 - 0x20];
+} Struct_8007ABF0;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800232A8.s")
+extern s32 D_8007A9C0;
+extern Struct_8007ABF0 D_8007ABF0[];
+extern s32 D_8008C17C;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_8002338C.s")
+void func_800230A8(void) {
+    s32 sx;
+    s32 bob;
+    Vec3f_216E0* p;
+    u16 *angle = &D_8008C040;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023470.s")
+    p = &D_8007ABF0[D_8007A9C0 - 1].unk14;
+    if (func_80027FFC(p->x, p->y + 14.0, p->z, &sx, &D_8008C17C)) {
+        bob = sins(*angle) >> 13;
+        if (bob < 0) {
+            bob = -bob;
+        }
+        *angle += 0x600;
+        gSPDisplayList(D_8007A184++, D_803AA448);
+        func_80024D40(sx, D_8008C17C - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
+    } else {
+        D_8008C17C = 0xF0;
+    }
+}
+
+void func_800231C4(void) {
+    s32 sx;
+    s32 sy;
+    s32 bob;
+    u16 *angle = &D_8008C050;
+
+    if (func_80027FFC(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+        bob = sins(*angle) >> 13;
+        if (bob < 0) {
+            bob = -bob;
+        }
+        *angle += 0x600;
+        gSPDisplayList(D_8007A184++, D_803AA538);
+        func_80024D40(sx, sy - bob - 30, 24, 30, 0, 0, 0x400, 0x400);
+    }
+}
+
+void func_800232A8(void) {
+    s32 sx;
+    s32 sy;
+    s32 bob;
+    u16 *angle = &D_8008C14C[0];
+
+    if (func_80027FFC(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+        bob = sins(*angle) >> 13;
+        if (bob < 0) {
+            bob = -bob;
+        }
+        *angle += 0x600;
+        gSPDisplayList(D_8007A184++, D_803AA4C0);
+        func_80024D40(sx, sy - bob - 30, 0x10, 30, 0, 0, 0x400, 0x400);
+    }
+}
+
+void func_8002338C(void) {
+    s32 sx;
+    s32 sy;
+    s32 bob;
+    u16 *angle = &D_8008C14C[1];
+
+    if (func_80027FFC(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+        bob = sins(*angle) >> 13;
+        if (bob < 0) {
+            bob = -bob;
+        }
+        *angle += 0x800;
+        gSPDisplayList(D_8007A184++, D_803AA448);
+        func_80024D40(sx, sy - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
+    }
+}
+
+extern u16 D_8008C150;
+
+extern Gfx D_803AA5B0[];
+
+void func_80023470(u16 arg0) {
+    s32 sx;
+    s32 sy;
+    s32 bob;
+    f32 y;
+    Struct_8002373C* a;
+    u16 *angle = &D_8008C150;
+
+    a = (Struct_8002373C*)D_8007B908[arg0].unk2C;
+    if (a->unk64->unk0 == 1) {
+        y = a->unk68->unk94;
+    } else if (a->unk64->unk0 == 2) {
+        y = a->unk4 + 350.0 * a->unk24;
+    } else {
+        y = a->unk4 + a->unk64->unk1C * a->unk24;
+    }
+    if (func_80027FFC(a->unk0, y, a->unk8, &sx, &sy)) {
+        bob = sins(*angle) >> 13;
+        if (bob < 0) {
+            bob = -bob;
+        }
+        *angle += 0x800;
+        gSPDisplayList(D_8007A184++, D_803AA5B0);
+        func_80024D40(sx - 4, sy - bob - 42, 24, 42, 0, 0, 0x400, 0x400);
+    }
+}
 
 void func_800235D8(void) {
     s32 sx;
