@@ -237,7 +237,43 @@ void func_80016760(void) {
     D_80085F90 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800167B0.s")
+s32 func_800167B0(u16 n, u8* arg1) {
+    s32 grp;
+    u32 i;
+    Unk800C185C* rec;
+    u8 t;
+    u8 buf[4];
+    u32 k;
+
+    grp = arg1[0];
+    for (i = 0; i != n; i++) {
+        buf[i] = arg1[i];
+    }
+    if (n >= 3) {
+        if (buf[2] < buf[1]) {
+            t = buf[2];
+            buf[2] = buf[1];
+            buf[1] = t;
+        }
+    }
+    rec = D_800C185C[grp];
+    for (i = 15; i != 0; i--, rec++) {
+        if (n == rec->unk4) {
+            for (k = 0; k < rec->unk4; k++) {
+                if (buf[k] != rec->unk6[k]) {
+                    break;
+                }
+            }
+            if (k == rec->unk4) {
+                break;
+            }
+        }
+    }
+    if (i == 0) {
+        i = 15;
+    }
+    return (grp << 8) - i + 15;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800168F0.s")
 
@@ -714,7 +750,39 @@ void func_80017F48(Unk80017F48* arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001809C.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018348.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x28];
+    /* 0x28 */ Actor17360* unk28;
+} Unk80018348;
+extern Unk8007B908_b* D_800863C4;
+s32 func_8001A2A0(s32, Actor17360*);
+Actor17360* func_80018348(Unk80018348* arg0, s32 arg1) {
+    Actor17360* ret;
+    Unk8007B908_b* p;
+    s32 n;
+
+    if (!(arg0->unk28->unk5E & 1)) {
+        ret = (Actor17360*)D_8007AA20;
+        if (func_8001A2A0(arg1, (Actor17360*)D_8007AA20)) {
+            ret = NULL;
+        }
+    } else if ((ret = arg0->unk28) == NULL || func_8001A2A0(arg1, ret)) {
+        n = D_8007B900;
+        ret = NULL;
+        p = (Unk8007B908_b*)D_8007B908;
+        while (n != 0) {
+            if (p->unk7C != -1) {
+                if (!func_8001A2A0(arg1, (Actor17360*)p->unk2C)) {
+                    ret = (Actor17360*)p->unk2C;
+                    D_800863C4 = p;
+                }
+                n--;
+            }
+            p++;
+        }
+    }
+    return ret;
+}
 
 s32 func_80018444(Unk80018444* arg0) {
     s32 ret = 0;
@@ -864,7 +932,74 @@ void func_80018D88(s32 arg0, Actor17360* arg1) {
     func_80018CD8(arg0, arg1);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018DC0.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x2C];
+    /* 0x2C */ f32 x;
+    /* 0x30 */ f32 y;
+    /* 0x34 */ f32 z;
+    /* 0x38 */ u8 pad38[0x44];
+    /* 0x7C */ s16 unk7C;
+    /* 0x7E */ u8 pad7E[0xB2];
+} Unk80018DC0Rec; // size = 0x130
+typedef struct {
+    /* 0x00 */ u8 pad0[2];
+    /* 0x02 */ u16 unk2;
+} Unk80018DC0Cfg;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ Actor17360* unk24;
+    /* 0x28 */ void* unk28;
+    /* 0x2C */ Unk80018DC0Cfg* cfg;
+} Unk80018DC0;
+f32 func_800270D0(f32, f32);
+void func_80018DC0(Unk80018DC0* arg0) {
+    f32 angle;
+    f32 best;
+    f32 d;
+    s32 n;
+    Unk80018DC0Rec* p;
+    Actor17360* caster;
+
+    caster = arg0->unk24;
+    if (caster->unk5E & 1) {
+        arg0->unk28 = D_8007AA20;
+        return;
+    }
+    if ((arg0->cfg->unk2 & 8) && (arg0->unk18 != 0.0f || arg0->unk20 != 0.0f)) {
+        angle = func_800270D0(arg0->unk18, arg0->unk20);
+    } else {
+        angle = caster->ry;
+    }
+    caster = arg0->unk24;
+    best = 9.424778f;
+    n = D_8007B900;
+    p = (Unk80018DC0Rec*)D_8007B908;
+    while (n != 0) {
+        if (p->unk7C != -1) {
+            D_800863B8.x = p->x - caster->x;
+            D_800863B8.y = p->z - caster->z;
+            func_800271B4(angle, &D_800863B8);
+            d = func_800270D0(D_800863B8.x, D_800863B8.y);
+            if (d > 3.141592653589793) {
+                d -= 6.283185307179586;
+            } else if (d < -3.141592653589793) {
+                d += 6.283185307179586;
+            }
+            if (d < 0.0f) {
+                d = -d;
+            }
+            if (d < best) {
+                best = d;
+                arg0->unk28 = &p->x;
+            }
+            n--;
+        }
+        p++;
+    }
+}
 
 void func_80018FB0(Unk80018FB0* arg0) {
     s32 i;
