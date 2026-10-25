@@ -670,4 +670,42 @@ extern s16 D_800614CC[];
 extern f32 D_8008FB48;
 extern f32 D_8008FB4C;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002F87C.s")
+void func_8002F87C(void) {
+    s32 cnt = 0;
+    s32 i;
+    s32 count = 0;
+    s32 sub = -1;
+    f32 x;
+
+    s32 idx;
+    f32 y;
+
+    for (i = 0; D_80060F30[i].a != -8; i++) {
+        switch (D_80060F30[i].a) {
+            case -2:
+                i++;
+                sub++;
+                break;
+            case -1:
+                i++;
+                count++;
+                sub = -1;
+                break;
+        }
+        if (D_80060F30[i].a == D_800842BC && D_80060F30[i].b == D_800842C0) {
+            break;
+        }
+    }
+    D_8008FB50 = count;
+    D_8008FB54 = sub;
+    cnt = D_8008FB50;
+    if (cnt < 6 && D_8008FB54 < 0) { idx = cnt; if (D_80060F28 == -1.0f) { D_80060F28 = 115.0f;
+            D_80060F2C = 86.0f;
+        }
+        x = D_80060F28 - D_800614CC[idx];
+        y = D_80060F2C;
+        y = y - D_800614CC[idx + 6];
+        D_8008FB48 = D_800614B4[idx] * x;
+        D_8008FB4C = D_800614B4[idx + 6] * y;
+    }
+}
