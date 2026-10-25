@@ -263,7 +263,9 @@ typedef struct {
     /* 0x20 */ u8 pad20[0x24];
 } Unk800C185C; /* size 0x44 */
 
-extern SpawnDef D_80056718[];
+extern Unk80056718 D_80056718;
+extern u16 D_8005685A;
+extern u16 D_8005685C;
 extern Unk800C185C *D_800C185C[];
 extern Enemy *D_8007C068;
 extern Obj *D_8007C06C;
@@ -877,7 +879,23 @@ s32 func_8000CAB8(Obj *arg0) {
     return i;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000CAE8.s")
+void func_8000CAE8(Obj *obj) {
+    f32 y;
+    Unk800C18D8 *t;
+
+    D_8007C070.x = D_80056718.unk148;
+    D_8007C070.y = D_80056718.unk14C;
+    t = &D_800C18D8[D_80056718.unk140];
+    D_8007C070.z = obj->unk28;
+    if (obj->unk64->unk0 == 1) {
+        y = obj->unk68->unk94;
+    } else {
+        y = obj->y + obj->unk64->unk1C * 0.5 * obj->unk24;
+    }
+    func_80019820(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &D_8007C070, obj);
+    func_8001B3FC(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
+                  obj->unk64->unk18 * obj->unk24 * 3.6);
+}
 
 void func_8000CC30(void) {
     D_8007C064 = 0;
