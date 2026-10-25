@@ -171,7 +171,29 @@ void func_8000CEE0(void) {
     D_8007C13C[0] = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/DAE0/func_8000CEF0.s")
+void func_8000CEF0(void) {
+    s32 start;
+    s32 end;
+    s32 i;
+    s32 size;
+    Unk803AB3D0 *p;
+
+    D_8007C140 = 0;
+    for (i = 0; i < 8; i++) {
+        p = &D_803AB3D0[i];
+        if (D_800842BC == p->unk0 && D_800842C0 == p->unk2) {
+            if (func_8000D398(i) == 0) {
+                start = D_803AB390[p->unk4].start;
+                end = D_803AB390[p->unk4].end;
+                size = end - start;
+                func_80028120(start, D_802A7BC0, size);
+                func_8000D19C(i, p->unkC, p->unk10, p->unk14, &D_8007C148);
+                D_8007C140 = i + 1;
+            }
+            return;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/DAE0/func_8000CFD8.s")
 
