@@ -114,7 +114,8 @@ typedef struct {
     /* 0x10A */ u16 unk10A;
     /* 0x10C */ u16 unk10C;
     /* 0x10E */ u16 unk10E;
-    /* 0x110 */ s32 unk110;
+    /* 0x110 */ u16 unk110;
+    /* 0x112 */ u16 unk112;
     /* 0x114 */ f32 unk114;
     /* 0x118 */ u8 unk118[0x11C - 0x118];
     /* 0x11C */ u8 unk11C;
@@ -302,7 +303,46 @@ void func_80003B20(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003BE0.s")
 
+typedef struct {
+    f32 x;
+    f32 y;
+    f32 z;
+} Vec3f;
+
+extern Gfx *D_8007A184;
+extern s32 D_8007AB60;
+extern u8 D_10000A0[];
+extern u8 D_8007A928[];
+extern f32 D_8007A92C;
+extern Vec3f D_8007AB48;
+extern Vec3f D_8008BFC0;
+void func_800107F0(f32 x, f32 y, f32 z, s32 flags, void *out);
+void func_80012B88(s32 arg0);
+void func_800131F0(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
+void func_80020428(s32 arg0, Actor *arg1, AnimEntry *arg2, void *arg3);
+void func_8002099C(u16 arg0, Actor *arg1, AnimEntry *arg2);
+
+/* fields of D_8007AA08.actor under their own names */
+extern f32 D_8007AA24;
+extern f32 D_8007AA44;
+extern f32 D_8007AA48;
+extern f32 D_8007AA4C;
+extern f32 D_8007AA50;
+extern f32 D_8007AA54;
+extern s16 D_8007AA70;
+extern s16 D_8007AA72;
+extern u16 D_8007AA78;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_8000464C.s")
+
+extern s32 D_8007A9B4;
+extern s32 D_8007A9B8;
+extern s32 D_8007AA10; /* .unk8 */
+extern s32 D_8007AA18; /* .unk10 */
+extern PlayerStateSub14 *D_8007AA1C; /* .unk14 */
+extern f32 D_8007AA30; /* .actor.rot */
+extern u16 D_8007AA80; /* .actor.unk60 */
+extern f32 D_8007AB3C;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800047F8.s")
 
