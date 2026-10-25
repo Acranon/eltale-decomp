@@ -1082,7 +1082,33 @@ void func_8001860C(Unk80018480* arg0, Actor17360* arg1) {
     func_8001AE24(arg1, 1, amt);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800187C4.s")
+void func_800187C4(Unk80018480* arg0, Actor17360* arg1) {
+    u16 amt;
+    Actor17360* pl;
+
+    pl = (Actor17360*)D_8007AA20;
+    if (arg1->unk5E & 1) {
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        amt = (D_800863C4->unkC * 11 + 63) >> 6;
+        D_800863C4->unkC -= amt;
+        if (D_8007AA08.unk7C->unk8 != D_8007AA08.unk7C->unkA) {
+            pl->unk64->unk8 += amt;
+            if (pl->unk64->unk8 > pl->unk64->unkA) {
+                pl->unk64->unk8 = pl->unk64->unkA;
+            }
+            D_8007AA08.unk14->unk2A++;
+        }
+    } else {
+        amt = (arg1->unk64->unk8 * 11 + 63) >> 6;
+        arg1->unk64->unk8 -= amt;
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        D_800863C4->unkC += amt;
+        if (D_800863C4->unkC > arg0->unk24->unk64->unkA) {
+            D_800863C4->unkC = arg0->unk24->unk64->unkA;
+        }
+    }
+    func_8001AE24(arg1, 1, amt);
+}
 
 void func_80018968(s32 arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
