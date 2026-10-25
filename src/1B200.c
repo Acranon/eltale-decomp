@@ -630,7 +630,36 @@ void func_8001C7E8(void) {
     } while (i != 0);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001C818.s")
+Unk80086798b* func_8001C818(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 arg10, f32 arg11) {
+    s32 i;
+    Unk80086798b* p;
+
+    i = 31;
+    p = D_80086798;
+    while (i != 0 && p->unk0 != 0) {
+        i--;
+        p++;
+    }
+    p->unkC = arg5;
+    p->unk10 = arg6;
+    p->unk14 = arg7;
+    p->unk18 = arg8;
+    p->unk1C = arg9;
+    p->unk20 = arg10;
+    p->unk24 = arg11;
+    p->unk28 = 0.0f;
+    p->unk2C = 0.0f;
+    p->unk30 = 1.0f;
+    p->unk38 = D_800EB2B4[arg0];
+    p->unk4 = 0;
+    p->unk6 = arg3;
+    p->unk38.unk8 = D_800CADA8[arg1];
+    p->unk0 = p->unk2 = p->unk38.unk2;
+    p->unk8 = arg4;
+    p->unk34 = 0;
+    p->unk44 = D_800DA0F0[arg2];
+    return p;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001C948.s")
 
