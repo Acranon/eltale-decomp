@@ -180,7 +180,61 @@ void func_80020AE0(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800213A8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80021920.s")
+typedef struct {
+    /* 0x00 */ Mtx unk0[3];
+    /* 0xC0 */ Mtx unkC0[1];
+} Unk2000000;
+
+extern s32 D_8004DCA0;
+extern s32 D_8007A180;
+extern Unk2000000 D_2000000;
+extern f32 D_80085E74;
+extern f32 D_8008FB48;
+extern f32 D_8008FB4C;
+extern s32 D_8008FB50;
+extern s32 D_8008FB54;
+extern Gfx D_803AA758[];
+extern Struct_80024A54 D_803A86F8;
+f32 sqrtf(f32);
+f32 func_800270D0(f32, f32);
+void func_800271B4(f32, Vec3f_216E0*);
+void func_80027430(f32 (*)[4], f32, f32, f32);
+
+void func_80021920(Unk2000000* buf) {
+    f32 dx;
+    f32 dz;
+    f32 dist;
+    f32 ang;
+    f32 mf[4][4];
+
+    D_8008C174 = 0x104;
+    D_8008C178 = 0x18;
+    func_80027430(mf, 0.0f, 0.0f, D_80085E74);
+    mf[3][0] = D_8008C174 + 17;
+    mf[3][1] = D_8008C178 + 17;
+    mf[3][2] = 0.0f;
+    guMtxF2L(mf, &buf->unkC0[D_8007A180]);
+    gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPDisplayList(D_8007A184++, D_803AA758);
+    func_80024EB0(&D_803A86F8, 13, 10, 11, 14, 0x93, 0, 0x400, 0x400);
+    if (D_8008FB50 < 6 && D_8008FB54 < 0 && !(D_8004DCA0 & 0x80)) {
+        dx = D_8008FB48 - D_8007AA08.unk18;
+        dz = D_8008FB4C - D_8007AA08.unk20;
+        dist = sqrtf(dx * dx + dz * dz);
+        if (dist > 10.0) {
+            ang = func_800270D0(dx, dz) - D_80085E74;
+            if (ang < -3.141592653589793) {
+                ang += 6.283185307179586;
+            } else if (ang > 3.141592653589793) {
+                ang -= 6.283185307179586;
+            }
+            D_8008C140.x = 0.0f;
+            D_8008C140.y = 18.0f;
+            func_800271B4(ang, &D_8008C140);
+            func_80024EB0(&D_803A86F8, D_8008C140.x + 14.0f, D_8008C140.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80021C04.s")
 
