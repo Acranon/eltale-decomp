@@ -1120,7 +1120,86 @@ typedef struct {
 extern Unk800C363C* D_800C363C[];
 void func_8001B3FC(s32, s32, f32, f32, f32, f32);
 void func_8001B7E0(s32, f32, f32, f32, f32);
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800199C0.s")
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ u8 pad10[0x30];
+    /* 0x40 */ s8 unk40;
+    /* 0x41 */ u8 unk41;
+} Unk800199C0Def;
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[6];
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ Actor17360* unk24;
+    /* 0x28 */ Actor17360* unk28;
+    /* 0x2C */ Unk17360CamCfg* cfg;
+    /* 0x30 */ Unk800199C0Def* def;
+    /* 0x34 */ struct Unk80019BFCRet* unk34;
+} Unk800199C0;
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u8 pad4[8];
+} Unk800C363C_c; // size = 0xC
+f32 func_800270D0(f32, f32);
+void func_800199C0(Unk800199C0* arg0, Actor17360* arg1) {
+    Unk80019BFCRet* ret;
+    Unk17360CamCfg* cfg;
+    Unk800C363C_c* fx;
+    f32 h;
+    Unk800199C0Def* def;
+    Unk800C18D8* tbl;
+    f32 y;
+    f32 angle;
+
+    def = arg0->def;
+    cfg = arg0->cfg;
+    if (def->unk0 >= 0) {
+        tbl = &D_800C18D8[def->unk0];
+        D_800863B8.x = def->unk8;
+        D_800863B8.y = def->unkC;
+        D_800863B8.z = cfg->unk1C;
+        if (arg0->unk18 != 0.0f || arg0->unk20 != 0.0f) {
+            angle = func_800270D0(arg0->unk18, arg0->unk20);
+        } else {
+            angle = arg1->ry;
+        }
+        arg0->unk34 = func_80019820(def->unk2, def->unk4, arg0->x, arg0->y, arg0->z, angle, tbl, &D_800863B8, arg1);
+        arg0->unk34->unk28 = arg0->unk18;
+        arg0->unk34->unk2C = arg0->unk1C;
+        arg0->unk34->unk30 = arg0->unk20;
+    } else {
+        arg0->unk34 = NULL;
+    }
+    fx = &((Unk800C363C_c**)D_800C363C)[arg0->unk0][arg0->unk2];
+    if (fx->unk0 != 0) {
+        h = 2.0 * arg1->unk64->unk18 * arg1->scale;
+        y = arg1->y + arg1->unk64->unk1C * arg1->scale;
+        switch (fx->unk0) {
+            case 1:
+                func_8001B3FC(fx->unk2, 30, arg1->x, y, arg1->z, h * 1.2);
+                break;
+            case 2:
+                func_8001B7E0(fx->unk2, arg1->x, y, arg1->z, h * 0.2);
+                break;
+        }
+    }
+    if (def->unk40 >= 0) {
+        func_8002A7C8(def->unk41, def->unk40, 0xFF);
+    }
+}
 
 void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
     Unk80019BFCRet* ret;
