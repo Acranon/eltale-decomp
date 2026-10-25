@@ -61,4 +61,22 @@
 /* gu/sintable.h */
 #define sintable D_8006DEF0
 
+/* controller pak (J-era io files) */
+#define __osPfsGetStatus func_80046C90
+#define __osPfsRequestOneChannel func_80046D60
+#define __osPfsGetOneChannelData func_80046E24
+#define __osPfsSelectBank func_80046EC0
+#define __osContRamRead func_80046F40
+#define __osPfsLastChannel D_8006EB30
+#define __osSumcalc func_80047170
+#define __osIdCheckSum func_800471E4
+#define __osRepairPackId func_800472E0
+#define __osCheckPackId func_80047630
+#define __osGetId func_80047794
+#define __osCheckId func_80047940
+#define __osPfsRWInode func_80047A14
+#define __osContAddressCrc func_80048740
+#define __osContDataCrc func_80048810
+#define __osContRamWrite func_800488B0
+
 #endif
