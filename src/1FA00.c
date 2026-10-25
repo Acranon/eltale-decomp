@@ -56,7 +56,7 @@ extern u16 D_8008BE52;
 extern Struct_8007C284_30* D_8008BF98;
 extern Struct_8007C284_34* D_8008BF9C;
 
-s32 func_80026E90(s32);
+u32 func_80026E90(u32);
 extern f32 D_8008BFAC;
 extern u16 D_8008BFB0;
 
@@ -97,9 +97,9 @@ extern f32 D_8007C174;
 extern f32 D_8007C178;
 extern f32 D_8007C17C;
 extern f32 D_8007C184;
-extern s16 D_8008BE4C;
-extern s16 D_8008BE4E;
-extern s16 D_8008BE50;
+extern u16 D_8008BE4C;
+extern u16 D_8008BE4E;
+extern u16 D_8008BE50;
 extern u16 D_8008BE54;
 extern s16 D_8008BE56;
 extern u16 D_8008BE58;
@@ -176,7 +176,7 @@ void func_8001EE94(void) {
         D_8008BFAC += D_8007A9A8;
         if (D_8008BFAC >= 50.0) {
             D_8008BFB0 += 50;
-            if ((u32)func_80026E90(2000) < D_8008BFB0) {
+            if (func_80026E90(2000) < D_8008BFB0) {
                 x = D_8007AA08.unk18;
                 y = D_8007AA08.unk20;
                 pt = func_8001FE08(x, y);
@@ -217,9 +217,48 @@ void func_8001EE94(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001F164.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001F36C.s")
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ char unk4[4];
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ char unkA[2];
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+    /* 0x18 */ char unk18[0x2C - 0x18];
+    /* 0x2C */ f32 unk2C;
+    /* 0x30 */ char unk30[0x3C - 0x30];
+    /* 0x3C */ f32 unk3C;
+    /* 0x40 */ f32 unk40;
+    /* 0x44 */ f32 unk44;
+    /* 0x48 */ f32 unk48;
+    /* 0x4C */ f32 unk4C;
+    /* 0x50 */ char unk50[0x58 - 0x50];
+    /* 0x58 */ f32 unk58;
+    /* 0x5C */ f32 unk5C;
+    /* 0x60 */ char unk60[0x70 - 0x60];
+    /* 0x70 */ f32 unk70;
+    /* 0x74 */ char unk74[0x80 - 0x74];
+    /* 0x80 */ void* unk80;
+} Struct_80085E48;
 
 typedef struct {
+    f32 unk0;
+    f32 unk4;
+    f32 unk8;
+} Struct_8004F0B0;
+
+extern Struct_80085E48 D_80085E48;
+extern Struct_8004F0B0 D_8004F0B0[];
+extern f32 D_80085F78;
+extern f32 D_80085F84;
+extern s32 D_80085F60;
+extern s32 D_800842BC;
+extern Struct_8001FF10_Pos D_8008BE40;
+void func_800271B4(f32, Struct_8001FF10_Pos*);
+void func_80015DB4(s32);
+
+typedef struct Actor {
     /* 0x00 */ f32 unk0;
     /* 0x04 */ f32 unk4;
     /* 0x08 */ f32 unk8;
@@ -227,9 +266,104 @@ typedef struct {
     /* 0x24 */ f32 unk24;
     /* 0x28 */ char unk28[0x60 - 0x28];
     /* 0x60 */ u16 unk60;
-    /* 0x64 */ struct { char unk0[0x18]; f32 unk18; }* unk64;
+    /* 0x64 */ struct { char unk0[0x18]; f32 unk18; f32 unk1C; }* unk64;
     /* 0x68 */ struct { char unk0[0x90]; f32 unk90; }* unk68;
 } Actor;
+
+extern Actor D_8007AA20;
+
+void func_8001F36C(void) {
+    f32 dx;
+    f32 dz;
+    f32 ang;
+    Actor* a;
+
+    switch (D_8008BE4C) {
+        case 0:
+            a = (Actor*)D_8007B908[D_8008BE50].unk2C;
+            dx = a->unk0 - D_8007AA08.unk18;
+            dz = a->unk8 - D_8007AA08.unk20;
+            ang = func_800270D0(dx, dz);
+            if (func_80026E90(100) > 50) {
+                ang += 3.141592653589793;
+                if (ang < -3.141592653589793) {
+                    ang += 6.283185307179586;
+                } else if (ang > 3.141592653589793) {
+                    ang -= 6.283185307179586;
+                }
+            }
+            ang += 0.39269908169872414;
+            if (ang < -3.141592653589793) {
+                ang += 6.283185307179586;
+            } else if (ang > 3.141592653589793) {
+                ang -= 6.283185307179586;
+            }
+            D_8008BE40.unk0 = 0.0f;
+            if (a->unk64->unk1C < a->unk64->unk18) {
+                D_8008BE40.unk4 = a->unk64->unk18 * a->unk24 * 2.0 + 15.0;
+            } else {
+                D_8008BE40.unk4 = a->unk64->unk1C * a->unk24 * 2.0 + 15.0;
+            }
+            D_80085E48.unk4C = D_8008BE40.unk4 * 1.5;
+            func_800271B4(ang, &D_8008BE40);
+            D_80085E48.unkC = a->unk0 + D_8008BE40.unk0;
+            D_80085E48.unk14 = a->unk8 + D_8008BE40.unk4;
+            D_80085E48.unk10 = a->unk4 + 15.0;
+            if (D_80085E48.unk10 < D_8007AA08.unk1C) {
+                D_80085E48.unk10 = D_8007AA08.unk1C;
+            }
+            D_80085E48.unk48 = 0.0f;
+            D_80085E48.unk0 = 0;
+            D_80085E48.unk3C = 0.0f;
+            D_80085E48.unk44 = D_80085E48.unk48;
+            D_80085E48.unk40 = D_80085E48.unk44;
+            D_80085E48.unk58 = 15.0f;
+            D_80085E48.unk80 = a;
+            D_80085E48.unk70 = 0.01f;
+            D_80085F78 = D_80085E48.unk2C;
+            D_8008BE4C++;
+            D_8008BE4E = 60;
+            break;
+        case 1:
+            if (--D_8008BE4E == 0) {
+                D_8008BE52 &= ~0x200;
+                func_80015DB4(D_80085F60);
+                dx = D_8008BE5C - D_8007AA08.unk18;
+                dz = D_8008BE60 - D_8007AA08.unk20;
+                ang = func_800270D0(dx, dz) + 3.141592653589793;
+                if (ang > 3.141592653589793) {
+                    ang -= 6.283185307179586;
+                } else if (ang < -3.141592653589793) {
+                    ang += 6.283185307179586;
+                }
+                D_8008BE40.unk0 = 0.0f;
+                D_8008BE40.unk4 = 50.0f;
+                func_800271B4(ang, &D_8008BE40);
+                D_80085E48.unk0 = 4;
+                D_80085E48.unk8 |= 0x10;
+                D_80085E48.unkC = D_8007AA08.unk18 + D_8008BE40.unk0;
+                D_80085E48.unk48 = 0.0f;
+                D_80085E48.unk10 = D_8007AA08.unk1C + 30.0;
+                D_80085E48.unk14 = D_8007AA08.unk20 + D_8008BE40.unk4;
+                D_80085E48.unk44 = D_80085E48.unk48;
+                D_80085E48.unk3C = 0.0f;
+                D_80085E48.unk40 = D_80085E48.unk44;
+                if ((D_8008BE52 & 0x100) && D_8008BFA8 == 8) {
+                    D_80085E48.unk58 = 50.0f;
+                    D_80085E48.unk5C = 28.0f;
+                    D_80085E48.unk4C = 180.0f;
+                } else {
+                    D_80085E48.unk58 += D_8004F0B0[D_800842BC].unk0;
+                    D_80085E48.unk4C += D_8004F0B0[D_800842BC].unk4;
+                }
+                D_80085E48.unk80 = &D_8007AA20;
+                D_80085E48.unk70 = 0.02f;
+                D_80085F84 = 0.0f;
+            }
+            break;
+    }
+}
+
 
 extern Actor D_8007AA20;
 extern s32 D_8007A9BC;
