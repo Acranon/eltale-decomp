@@ -481,7 +481,48 @@ s32 func_8000F4C8(s32 id) {
     return i;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000F50C.s")
+void func_8000F50C(s32 state, s32 frame, s32 type, s32 id) {
+    Unk80084238 *p;
+    s32 i;
+    AnimInfo *anim;
+
+    i = 3;
+    p = D_80084238;
+    // D_80084238[0].timer, read through the preceding array so IDO does not share its address with p
+    if (*(s32 *)&D_80083638[256] != 0) {
+        do {
+            i--;
+            p++;
+            if (i == 0) {
+                break;
+            }
+        } while (p->timer != 0);
+    }
+    p->state = state;
+    p->frame = frame;
+    p->type = type;
+    p->id = id;
+    p->z = 0.0f;
+    p->x = 0.0f;
+    if (state != 0) {
+        switch ((type >> 8) & 0xF) {
+            case 2:
+            case 3:
+                if (p->type & 1) {
+                    anim = &D_80057F80;
+                } else {
+                    anim = &D_800579F8;
+                }
+                break;
+            case 4:
+                anim = &D_80058008;
+                break;
+        }
+        p->timer = anim->unk6 - frame + 1;
+    } else {
+        p->timer = 7;
+    }
+}
 
 void func_8000F5DC(void) {
     Unk80084238 *p;
