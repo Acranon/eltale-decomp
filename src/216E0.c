@@ -500,12 +500,118 @@ typedef struct {
     /* 0x4 */ f32 y;
 } Struct_8004F324;
 
-void func_800245D0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4);
+void func_800245D0(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4);
 extern Struct_8004F324 D_8004F304[];
 extern u8 D_8004F2CC[][4];
 extern Gfx D_803AA2F8[];
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80021C04.s")
+void func_80021C04(Unk2000000* buf, Struct_80021C04* arg1) {
+    s32 i;
+    s32 x1;
+    u8* col;
+    s32 x2;
+    s32 x3;
+    s32 x0;
+    s32 y0;
+    s32 y1;
+    s32 y2;
+    s32 y3;
+    s32 yoff;
+    f32* pos;
+    f32 fx;
+    f32 fy;
+    u8 str[0x8];
+
+    D_8008C174 = 0x22;
+    D_8008C178 = 0x8C;
+    x0 = 0x47;
+    y0 = 0;
+    x1 = 0;
+    y1 = 0x18;
+    x2 = 0x47;
+    y2 = 0x31;
+    x3 = 0x91;
+    y3 = 0x18;
+    yoff = 0;
+    gDPPipeSync(D_8007A184++);
+    gDPSetTextureFilter(D_8007A184++, G_TF_POINT);
+    gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
+    if (D_8008C15A && (D_8008C15C & 2)) {
+        i = D_8008C15A * D_8008C15A;
+        x0 = 0x47 - i * 20 / 64;
+        y0 = -(i * 10 / 64);
+        x1 = 0 - i * 10 / 64;
+        y1 = i * 20 / 64 + 0x18;
+        x2 = i * 20 / 64 + 0x47;
+        y2 = i * 10 / 64 + 0x31;
+        x3 = i * 10 / 64 + 0x91;
+        y3 = 0x18 - i * 20 / 64;
+        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
+        /* Keep this block on one line for IDO scheduling. */
+        { Gfx* _g = D_8007A184++; if (i) {} _g->words.w0 = 0xFCFF9BFF; _g->words.w1 = 0xFF34FE7F; }
+        gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255 - i * 255 / 64);
+    }
+    if (arg1->unk120 < 3) {
+        func_80024EB0(&D_803A8718, x0, y0, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, x1, y1, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, x2, y2, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, x3, y3, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        for (i = 0; i < arg1->unk120; i++) {
+            str[i] = arg1->unk11D[i];
+        }
+        str[i] = 0;
+        func_800245D0(x0, y0 + 3, str, i + 1, arg1->unk14->unk8);
+        str[i] = 1;
+        func_800245D0(x1, y1 + 3, str, i + 1, arg1->unk14->unk8);
+        str[i] = 2;
+        func_800245D0(x2, y2 + 3, str, i + 1, arg1->unk14->unk8);
+        str[i] = 3;
+        func_800245D0(x3, y3 + 3, str, i + 1, arg1->unk14->unk8);
+    }
+    D_8008C174 = 0x69;
+    D_8008C178 = 0x32;
+    if (D_8008C15A && (D_8008C15C & 2)) {
+        i = D_8008C15A * D_8008C15A;
+        yoff = i * 40 / 64;
+        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
+        gDPSetCombine(D_8007A184++, 0xFF9BFF, 0xFF34FE7F);
+        gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255 - i * 255 / 64);
+    }
+    gDPPipeSync(D_8007A184++);
+    gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
+    func_80024EB0(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
+    x0 = 0x37 - arg1->unk120 * 6;
+    for (i = 0; i < arg1->unk120; i++) {
+        y0 = arg1->unk11D[i];
+        func_80024EB0(&D_803A8718, x0, yoff + 0xD, 0xB, 0xB, 0x40, y0 * 0xB + 0x24, 0x400, 0x400);
+        x0 += 0xC;
+    }
+    func_800245D0(0, yoff + 3, arg1->unk11D, arg1->unk120, arg1->unk14->unk8);
+    D_8008C174 = 0x22;
+    D_8008C178 = 0x8C;
+    if (arg1->unk120 != 3) {
+        gDPPipeSync(D_8007A184++);
+        gDPSetRenderMode(D_8007A184++, 0x0F0A4000, 0);
+        gDPSetCombine(D_8007A184++, 0xFFFFFF, 0xFFFCF279);
+        gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
+        func_80024EB0(&D_803A8718, 0x6D, 0xD, 0x24, 0x24, 0x40, 0, 0x400, 0x400);
+    }
+    if (D_8008C15A && (D_8008C15C & 1)) {
+        col = D_8004F2CC[arg1->unk11D[arg1->unk120 - 1]];
+        pos = (f32*)D_8004F304 + arg1->unk11D[arg1->unk120 - 1] * 2;
+        fx = pos[0] + 109.0f + D_8008C174;
+        fy = pos[1] + 13.0f + D_8008C178;
+        guTranslate(&buf->unkC0[D_8007A180], fx, fy, 0.0f);
+        gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        gDPPipeSync(D_8007A184++);
+        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], D_8008C15A * 255 / 8);
+        gSPDisplayList(D_8007A184++, D_803AA2F8);
+    }
+    if (D_8008C15A) {
+        D_8008C15A--;
+    }
+}
+
 
 typedef struct {
     /* 0x000 */ char unk0[0x122];
@@ -1066,14 +1172,14 @@ void func_8002440C(void) {
     } while (i != 0);
 }
 
-void func_800245D0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
+void func_800245D0(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4) {
     u32 id;
     s32 w;
     u8 flags;
     u8* str;
     u32 tmp;
 
-    id = func_800167B0(arg3, arg2);
+    id = func_800167B0(arg3, (s32)arg2);
     flags = func_800168F0(id, arg4);
     tmp = (id >> 8) & 0xF;
     id &= 0xFF;
