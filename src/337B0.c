@@ -43,7 +43,26 @@ typedef struct {
     /* 0x00 */ u8 v[32];
 } Bytes32;
 
+typedef struct {
+    /* 0x00 */ u8 *p[5];
+} TexPtrs5;
+
+typedef struct {
+    /* 0x00 */ s32 w;
+    /* 0x04 */ s32 h;
+    /* 0x08 */ s32 cms;
+    /* 0x0C */ s32 cmt;
+    /* 0x10 */ s32 masks;
+    /* 0x14 */ s32 maskt;
+} TexParam; /* size = 0x18 */
+
+typedef struct {
+    /* 0x00 */ TexParam e[5];
+} TexParams5;
+
 extern Gfx *D_8007A184;
+extern TexPtrs5 D_800616D0;
+extern TexParams5 D_800616E4;
 extern Unk8Bytes D_800616B8;
 extern Unk8Bytes D_800616C0;
 extern Unk8Bytes D_800616C8;

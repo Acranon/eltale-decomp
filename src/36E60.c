@@ -17,8 +17,19 @@ typedef struct {
 } Unk801D8620; /* size = 0x20 */
 
 typedef struct {
+    /* 0x00 */ u16 frame;
+    /* 0x02 */ u16 dur;
+    /* 0x04 */ s16 x;
+    /* 0x06 */ s16 y;
+    /* 0x08 */ s16 w;
+    /* 0x0A */ s16 h;
+    /* 0x0C */ u16 *tlut;
+    /* 0x10 */ u8 *img;
+} Cue; /* size = 0x14 */
+
+typedef struct {
     /* 0x00 */ u16 unk0;
-    /* 0x04 */ void *unk4;
+    /* 0x04 */ Cue *unk4;
 } Unk80092EE8; /* size = 0x8 */
 
 typedef struct {
@@ -64,7 +75,9 @@ extern s32 D_80092ED4;
 extern s32 D_80092ED8;
 extern Unk80092EDC *D_80092EDC;
 extern s32 D_80092EE0;
-extern void *D_80092EE4;
+extern Cue *D_80092EE4;
+extern Gfx *D_8007A184;
+extern Gfx D_8006CC90[];
 extern Unk80092EE8 D_80092EE8[32];
 extern Unk801D8620 D_801D8620[];
 
