@@ -43,10 +43,35 @@ typedef struct {
 } IntroSprite; /* size = 0x50 */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x22];
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ s16 unk2;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s16 unk8;
+    /* 0x0A */ s16 unkA;
+    /* 0x0C */ s16 unkC;
+    /* 0x0E */ s16 unkE;
+    /* 0x10 */ s16 unk10;
+    /* 0x12 */ s16 unk12;
+    /* 0x14 */ s16 unk14;
+    /* 0x16 */ s16 unk16;
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+    /* 0x20 */ s16 unk20;
     /* 0x22 */ s16 unk22;
-    /* 0x24 */ u8 pad24[4];
+    /* 0x24 */ u16 unk24;
 } Unk28; /* size = 0x28 */
+
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s16 unk4;
+    /* 0x06 */ s16 unk6;
+    /* 0x08 */ s32 unk8;
+} AnimFrame; /* size = 0xC */
+
+typedef struct {
+    /* 0x00 */ AnimFrame *unk0;
+    /* 0x04 */ u32 unk4;
+} AnimTbl;
 
 typedef struct {
     /* 0x00 */ Unk28 *unk0;
@@ -79,6 +104,24 @@ extern s32 D_802684D4;
 extern s32 D_802684D8;
 extern s32 D_802684DC;
 extern IntroSprite D_802684E0[150];
+extern AnimTbl D_80212810_ovl_intro[];
+extern s32 D_80276F44;
+extern s32 D_80277074;
+extern u8 D_80277078;
+extern Gfx D_802122E0_ovl_intro[];
+extern u16 D_80217A80_ovl_intro[];
+extern u8 D_80217C80_ovl_intro[];
+void func_8020E108_ovl_intro(s32);
+void func_8002A338(s32);
+s32 func_8020D454_ovl_intro(void);
+s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx);
+void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
+                             s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13);
+void func_8020D300_ovl_intro(s32 idx);
+s16 func_8020D504_ovl_intro(void);
+void func_8020D8AC_ovl_intro(s32 idx);
+void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2);
+void func_8020E0EC_ovl_intro(s32 idx);
 
 void func_8020D1DC_ovl_intro(void);
 
