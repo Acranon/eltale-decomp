@@ -460,9 +460,36 @@ void func_80029880(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80029A38.s")
+void func_80029A38(s32 arg0) {
+    s32 i = D_800559B0;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80029A88.s")
+    D_8005594C[i] = arg0;
+    D_8005596C[i] = 0;
+    D_8005598C[i++] = 0x40;
+    D_800559B0 = i & 7;
+    // FAKE: under -g3 IDO never fills the delay slot of the final epilogue jr;
+    // the label plus a loop-wrapped return give the retail block layout.
+end:
+    while (TRUE) {
+        D_8008FAE0 = i;
+        return;
+    }
+}
+
+void func_80029A88(s32 arg0, s32 arg1, s32 arg2) {
+    s32 i = D_800559B0;
+
+    D_8005594C[i] = arg0;
+    D_8005596C[i] = arg1;
+    D_8005598C[i++] = arg2;
+    D_800559B0 = i & 7;
+    // FAKE: same block layout trick as func_80029A38.
+end:
+    while (TRUE) {
+        D_8008FAE4 = i;
+        return;
+    }
+}
 
 extern s32 D_800559FC[5];
 extern s32 D_80055A10[5];
