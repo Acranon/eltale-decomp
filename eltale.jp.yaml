@@ -335,8 +335,10 @@ segments:
     symbol_name_format: $VRAM_$SEG
     subsegments:
       - [0xDAB5F0, c, ovl_title/DAB5F0]
+      - [0xDAC190, c, ovl_title/DAC190]
       - [0xDAE700, data]
       - [0xDC6250, .rodata, ovl_title/DAB5F0]
+      - [0xDC6270, .rodata, ovl_title/DAC190]
 
   - name: ovl_intro
     type: code

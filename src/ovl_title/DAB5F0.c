@@ -52,7 +52,213 @@ s32 func_8020C11C_ovl_title(void) {
     return 2;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_title/DAB5F0/func_8020C178_ovl_title.s")
+extern u8 D_8006CC80;
+extern u8 D_8007A1CC;
+extern s8 D_80092C81;
+extern s8 D_80092C82;
+extern u8 D_8020F1E4_ovl_title;
+extern u32 D_8020F1E8_ovl_title;
+extern u16 D_8020F1EC_ovl_title;
+extern u8 D_8020F1F0_ovl_title;
+void func_8020C7A8_ovl_title(void);
+void func_8020CBE4_ovl_title(void);
+void func_8020EF00_ovl_title(void);
+
+
+extern s32 D_8020F200_ovl_title;
+extern s32 D_8020F260_ovl_title;
+extern s32 D_8020F2A8_ovl_title;
+extern s32 D_8020F300_ovl_title;
+extern s32 D_8020F3B0_ovl_title;
+extern s32 D_8020F458_ovl_title;
+extern s32 D_8020F4D0_ovl_title;
+extern s32 D_8020F4D4_ovl_title;
+extern s32 D_8020F4D8_ovl_title;
+
+// D_8020F1E4..F1F0 are this function's statics in the original. IDO never keeps a static's
+// address in a register, but it does for an extern that is used more than once. Until D2
+// moves the data into C, each access names its static through a different symbol.
+#define AT(sym, off, type) (*(type*) ((u8*) &(sym) + (off)))
+
+s32 func_8020C178_ovl_title(void) {
+    u32 count; // stands in for the static D_8020F1E8, which IDO kept in a register
+
+    if (D_8020F1F0_ovl_title == 0) {
+        D_80226D90 = 3;
+        D_80226D94 = 1;
+        D_80226DA4 = 0;
+        D_8006CC80 = 0;
+        AT(D_8020F200_ovl_title, -0x10, u8) = D_8020F1F0_ovl_title + 1;
+    }
+
+    switch (D_80226D90) {
+        case 3:
+            D_80226D94 = D_80226D94 - 1;
+            if (D_80226D94 == 0) {
+                D_80226D94 = 0x1518;
+                D_80226D90++;
+                D_8020F4F4_ovl_title = 0x14;
+                D_8020F4F0_ovl_title = 2;
+            }
+            break;
+        case 4:
+            func_8020C7A8_ovl_title();
+            if (D_8020F4F0_ovl_title == 2) {
+                func_8020EF00_ovl_title();
+            }
+            if ((D_80226D94 == 0) && (D_80226DA4 == 0) && (D_8020F1E0_ovl_title == 0)) {
+                D_8020F1E0_ovl_title = 1;
+                D_8020F4F4_ovl_title = 0x3C;
+                D_8020F4F0_ovl_title = 1;
+                D_80226D94 = 0x3C;
+            }
+            if (D_8020F1E0_ovl_title == 1) {
+                func_8020EF00_ovl_title();
+                if (D_8020F4F0_ovl_title == 0) {
+                    D_80226D9C = 0;
+                    D_80226DA0 = 8;
+                    D_80226D94 = 0;
+                    D_80226D90 = 0;
+                    D_8020F1E0_ovl_title = 0;
+                    D_80226DA4 = 0;
+                }
+            }
+            if ((D_80226D94 == 0) && (D_80226DA4 == 1)) {
+                D_80226DA4 = 2;
+                D_80226D94 = 2;
+                D_80226D90++;
+            }
+            break;
+        case 5:
+            func_8020C7A8_ovl_title();
+            if (D_8020F1EC_ovl_title == 0) {
+                count = D_8020F1E8_ovl_title + 1;
+            } else {
+                count = 0;
+            }
+            if (!(D_80092C86 & 0xF000) && (D_80092C81 >= -0x13) && (D_80092C81 < 0x14) && (D_80092C82 >= -0x13) &&
+                (D_80092C82 < 0x14)) {
+                AT(D_8020F2A8_ovl_title, -0xbc, u16) = 0;
+            } else {
+                AT(D_8020F300_ovl_title, -0x114, u16) = 1;
+            }
+            AT(D_8020F260_ovl_title, -0x78, u32) = count;
+            if (count >= 0x1C21U) {
+                AT(D_8020F3B0_ovl_title, -0x1c4, u16) = 0;
+                D_80226DA4 = 4;
+                D_8020F1E0_ovl_title = 1;
+                D_80226D94 = 2;
+                AT(D_8020F458_ovl_title, -0x270, u32) = 0;
+            }
+            if (D_8020F1E0_ovl_title == 0) {
+                D_80226D94 = 0x14;
+            }
+            if ((D_80226D94 == 0) && ((D_80226DA4 == 3) || (D_80226DA4 == 4))) {
+                if (D_80226DA4 == 4) {
+                    // Fake: keeps count live like the original static D_8020F1E8 (found by the permuter).
+                    if (!count) {
+                    }
+                    D_8020F1E0_ovl_title = 2;
+                    D_8020F4F4_ovl_title = 0x3C;
+                    D_8020F4F0_ovl_title = 1;
+                }
+                D_80226D94 = 0x3C;
+                if (D_80226DA4 == 3) {
+                    D_80226DA4 = 5;
+                    D_80226D90 += 1;
+                    D_80226D9C = 0xFF;
+                    D_80226DA0 = 0;
+                    D_8020F1E0_ovl_title = 0;
+                }
+            }
+            if (D_8020F1E0_ovl_title == 2) {
+                func_8020EF00_ovl_title();
+                if (D_8020F4F0_ovl_title == 0) {
+                    D_80226D9C = 0;
+                    D_80226DA0 = 8;
+                    D_80226D94 = 0;
+                    D_80226D98 = 0;
+                    D_80226D90 = 3;
+                    D_80226DA4 = 0;
+                    D_8020F1E0_ovl_title = 0;
+                }
+            }
+            break;
+        case 6:
+            func_8020C7A8_ovl_title();
+            if (D_8020F1E4_ovl_title < 2) {
+                AT(D_8020F4D0_ovl_title, -0x2ec, u8) = D_8020F1E4_ovl_title + 1;
+            } else if ((D_8007A1CC & 0xF0) == 0x10) {
+                D_80226D90 = 8;
+                D_8020F4F4_ovl_title = 0x3C;
+                D_8020F4F0_ovl_title = 1;
+            } else {
+                D_80226D90 = 8;
+                D_8020F4F4_ovl_title = 0x3C;
+                D_8020F4F0_ovl_title = 1;
+            }
+            break;
+        case 7:
+            func_8020C7A8_ovl_title();
+            if (D_8020F1E0_ovl_title == 0) {
+                D_80226D94 = 0x14;
+            }
+            if (D_80226DA4 == 2) {
+                D_80226D90 = 5;
+            }
+            if ((D_80226D94 == 0) && ((D_80226DA4 == 0xB) || (D_80226DA4 == 0xC) || (D_80226DA4 == 0xD) ||
+                                      (D_80226DA4 == 0xE) || (D_80226DA4 == 9) || (D_80226DA4 == 0xA))) {
+                if (D_80226DA4 == 9) {
+                    D_80226D94 = 0xA;
+                    D_80226D90 = 5;
+                    D_8020F1E0_ovl_title = 0;
+                    D_80226DA4 = 2;
+                }
+                if (D_80226DA4 == 0xA) {
+                    D_80226D94 = 0xA;
+                    D_80226D90 = 5;
+                    D_8020F1E0_ovl_title = 0;
+                    D_80226DA4 = 2;
+                }
+                if (D_80226DA4 == 0xC) {
+                    D_80226D94 = 5;
+                    D_80226DA4 = 9;
+                    D_8020F1E0_ovl_title = 0;
+                }
+                if (D_80226DA4 == 0xB) {
+                    D_80226D94 = 0x3C;
+                    D_80226D90 += 1;
+                    D_80226DA4 = 0xF;
+                    D_80226D9C = 0;
+                    D_80226DA0 = 0x100;
+                    D_8020F4F4_ovl_title = 0x3C;
+                    D_8020F4F0_ovl_title = 1;
+                    D_8020F1E0_ovl_title = 0;
+                }
+                if (D_80226DA4 == 0xD) {
+                    D_80226D94 = 5;
+                    D_80226DA4 = 0xA;
+                    D_8020F1E0_ovl_title = 0;
+                }
+                if (D_80226DA4 == 0xE) {
+                    D_80226D94 = 0xA;
+                    D_80226D90 = 5;
+                    D_80226DA4 = 2;
+                    D_8020F1E0_ovl_title = 0;
+                }
+            }
+            break;
+        case 8:
+            func_8020CBE4_ovl_title();
+            func_8020EF00_ovl_title();
+            break;
+    }
+    if (D_80226D94 == 0) {
+        AT(D_8020F4D4_ovl_title, -0x2e8, u16) = 0;
+        AT(D_8020F4D8_ovl_title, -0x2f0, u32) = 0;
+    }
+    return D_80226D94;
+}
 
 void func_8020C7A8_ovl_title(void) {
     s32 var_v0;
@@ -149,63 +355,4 @@ void func_8020CBE4_ovl_title(void) {
     if (--D_80226D94 == 0) {
         D_80226DA4 = 0xF;
     }
-}
-
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_title/DAB5F0/func_8020CC70_ovl_title.s")
-
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_title/DAB5F0/func_8020EF00_ovl_title.s")
-
-void func_8020EFE4_ovl_title(UnkStruct_8020EF00* arg0) {
-    s32 rgbColorValue;
-    s32 alpha;
-
-    arg0->unk2 -= 1;
-    if (D_8020F4F0_ovl_title & 1) {
-        arg0->unk8 += arg0->unk4;
-    } else {
-        arg0->unk8 -= arg0->unk4;
-    }
-    switch (D_8020F4F0_ovl_title) {
-    case 3:
-    case 4:
-        rgbColorValue = 255;
-        break;
-    case 1:
-    case 2:
-        rgbColorValue = 0;
-        break;
-    default:
-        rgbColorValue = 0;
-        break;
-    }
-
-    if (arg0->unk8 <= 0.0f) {
-        D_8020F4F0_ovl_title = 0;
-        arg0->unk8 = 0.0f;
-        arg0->unk0 = 0;
-    } else if (arg0->unk8 > 255.0f) {
-        D_8020F4F0_ovl_title = 0;
-        arg0->unk8 = 255.0f;
-        arg0->unk0 = 0;
-    }
-    if (arg0->unk2 == 0) {
-        if ((D_8020F4F0_ovl_title == 3) || (D_8020F4F0_ovl_title == 1)) {
-            D_8020F4F0_ovl_title = 0;
-            arg0->unk8 = 255.0f;
-            arg0->unk0 = 0;
-        } else if ((D_8020F4F0_ovl_title == 4) || (D_8020F4F0_ovl_title == 2)) {
-            D_8020F4F0_ovl_title = 0;
-            arg0->unk8 = 0.0f;
-            arg0->unk0 = 0;
-        }
-    }
-
-    alpha = arg0->unk8;
-    gDPPipeSync(D_8007A184++);
-    gDPSetPrimColor(D_8007A184++, 0, 0, rgbColorValue, rgbColorValue, rgbColorValue, alpha);
-    gDPSetRenderMode(D_8007A184++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-    gSPDisplayList(D_8007A184++, D_8020F470_ovl_title);
-    gDPFillRectangle(D_8007A184++, 0, 0, 336, 960);
-
-    D_80226DC0 = rgbColorValue;
 }
