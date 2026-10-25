@@ -17,7 +17,79 @@ void func_8002A954(void) {
     D_8008FB3C = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002A984.s")
+extern Gfx* D_8007A184;
+extern Gfx D_80061770[];
+extern u16 D_8007A170;
+extern s8 D_8008FB40;
+extern s32 D_8008FB44;
+extern u16 D_80092C86;
+void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
+
+void func_8002AC1C(void);
+void func_8002AE58(s32);
+void func_8002B844(s32);
+void func_8002C598(s32);
+void func_8002D7CC(s32);
+void func_8002E9DC();
+void func_8002FA6C(void);
+
+void func_8002A984(s32 arg0) {
+    gSPDisplayList(D_8007A184++, D_80061770);
+    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    func_8002E9DC();
+    D_8008FB44++;
+    if (D_8008FB3E & 0x4000) {
+        func_8002FA6C();
+    } else if (D_8008FB3E & 0x2000) {
+        func_8002AC1C();
+    } else {
+        switch ((u16)(D_8008FB3E & 3)) {
+            case 0:
+                func_8002AE58(0);
+                break;
+            case 1:
+                func_8002C598(0);
+                break;
+            case 2:
+                func_8002D7CC(0);
+                break;
+            case 3:
+                func_8002B844(0);
+                break;
+        }
+    }
+    D_8008FB3E &= ~0x10;
+    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+    gDPSetBlendColor(D_8007A184++, 0, 0, 0, 1);
+    if ((D_80092C86 & 0x5000) && !(D_8008FB3E & 0x6020)) {
+        D_8008FB3E &= 0x7FFF;
+        func_8002A7C8(0, 1, 0xFF);
+    }
+    if (!(D_8008FB3E & 0x8000)) {
+        if (D_8008FB3E & 0x4000) {
+            switch ((u16)(D_8008FB3E & 0xC)) {
+                case 0:
+                    if (D_8008FB70 & 0x80) {
+                        D_8007A170 = 1;
+                        D_8008FB40 = 1;
+                    } else {
+                        D_8007A170 = 3;
+                        D_8008FB40 = 0;
+                    }
+                    break;
+                case 8:
+                    D_8007A170 = 3;
+                    break;
+                case 4:
+                    D_8007A170 = 1;
+                    break;
+            }
+        } else {
+            D_8007A170 = 1;
+        }
+        func_8002A954();
+    }
+}
 
 extern s32 D_8008FB30;
 extern s32 D_8008FB34;
