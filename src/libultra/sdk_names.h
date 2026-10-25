@@ -79,4 +79,14 @@
 #define __osContDataCrc func_80048810
 #define __osContRamWrite func_800488B0
 
+#define osPfsFileState func_8003DEA0
+#define osPfsFreeBlocks func_8003E080
+#define osPfsAllocateFile func_8003E220
+#define osPfsDeleteFile func_8003E6A0
+#define osPfsReadWriteFile func_8003E9E4
+#define osPfsRepairId func_8003ED60
+#define osPfsNumFiles func_8003EDC0
+#define osPfsChecker func_80047CF0
+#define osPfsFindFile func_80048BE0
+
 #endif
