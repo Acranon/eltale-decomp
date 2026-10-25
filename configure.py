@@ -30,6 +30,8 @@ ASM_PROC = "python3 tools/asm-processor/build.py --input-enc=utf-8 --output-enc=
 # Flags by path prefix; the first match wins. Per-file entries go first.
 # Confirm each entry on a matched function before relying on it.
 FLAGS = [
+    ("src/libultra/io/vimgr.c", "-mips2 -O2"),
+    ("src/libultra/io/pimgr.c", "-mips2 -O2"),
     ("src/libultra/io/gbpakinit.c", "-mips2 -O2"),
     ("src/libultra/io/pfsinitpak.c", "-mips2 -O2"),
     ("src/libultra/io/motor.c", "-mips2 -O2"),
