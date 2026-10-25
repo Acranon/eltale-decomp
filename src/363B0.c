@@ -114,7 +114,77 @@ void func_80035970(s32 cont) {
     D_80092C88 = ~button;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/363B0/func_80035A24.s")
+s32 func_80035A24(s32 cont) {
+    s32 i;
+    s32 pad1;
+    OSPfs *pfs;
+    s32 err;
+    s32 found;
+    s32 cnt;
+    s32 pad2[3];
+    OSPfsState st;
+
+    found = 0;
+    cnt = 0;
+    D_80092E48[cont].unk13 = 0xFF;
+    D_80092E48[cont].unk0 = 0;
+    for (i = 0; i < 16; i++) {
+        D_80092E48[cont].unk2[i] = -1;
+    }
+    pfs = &D_80092CA8[cont];
+    err = func_8003D0F0(&D_80092C90, pfs, cont);
+    if (err != 0) {
+        if (err == 10) {
+            if (func_8003D554(&D_80092C90, pfs, cont) == 0) {
+                return 1;
+            }
+            if (func_8003D6B0(&D_80092C90, pfs, cont) == 0) {
+                return 1;
+            }
+            err = 10;
+        }
+        return err;
+    }
+    for (i = 0; i < 16; i++) {
+        err = func_8003DEA0(pfs, i, &st);
+        if (err == 0) {
+            if (st.game_code == 0x4E45544A && st.company_code == 0x3943) {
+                if (func_800360F8(D_80061810, st.game_name, 16) == 0) {
+                    found++;
+                    D_80092E48[cont].unk2[i] = ((u8 *) st.ext_name)[0];
+                    D_80092E48[cont].unk0 |= 0x4000;
+                } else {
+                    D_80092E48[cont].unk2[i] = 0x7F;
+                }
+            } else {
+                D_80092E48[cont].unk2[i] = 0x7F;
+            }
+            cnt++;
+        } else if (err == 5) {
+            D_80092E48[cont].unk2[i] = -1;
+            err = 0;
+        } else {
+            break;
+        }
+    }
+    if (err == 0) {
+        D_80092E48[cont].unk0 &= 0xFFF0;
+        D_80092E48[cont].unk0 |= found;
+        if (found >= 16) {
+            D_80092E48[cont].unk0 |= 0x2000;
+        }
+        if (cnt >= 16) {
+            D_80092E48[cont].unk0 |= 0x2000;
+        }
+        func_8003E080(pfs, &i);
+        i = i / 256;
+        D_80092E48[cont].unk13 = i;
+        if (i < 2) {
+            D_80092E48[cont].unk0 |= 0x2000;
+        }
+    }
+    return err;
+}
 
 u8 func_80035CC8(s32 arg0) {
     s32 i;
