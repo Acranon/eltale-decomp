@@ -181,7 +181,17 @@ void func_80009764(s32);
 void func_800097F8(NPCDef *, s32);
 void func_80009A54(f32 *, f32 *, Unk80009988 *);
 void func_8000A1D0(s32, u8 *);
-void func_800107F0(f32, f32, f32, s32, CollOut *);
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} CollResult;
+
+void func_800107F0(f32, f32, f32, s32, void *);
 void func_800201A0(void *, s32, s32, s32, s32, s32);
 u32 func_80026E90(s32);
 void func_80028120();
