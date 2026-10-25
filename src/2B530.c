@@ -1,5 +1,6 @@
 #include "common.h"
 
+extern Gfx* D_8007A184;
 extern u16 D_8008FB3C;
 extern u16 D_8008FB3E;
 extern u16 D_8008FB70;
@@ -32,7 +33,44 @@ void func_8002A954(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002E42C.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002E9DC.s")
+typedef struct {
+    s32 v[4];
+} Unk4Words;
+typedef struct {
+    u8* v[4];
+} Unk4Ptrs;
+extern Unk4Words D_80061614;
+extern Unk4Words D_80061624;
+extern Unk4Ptrs D_80061634;
+extern u16 D_80066E88[];
+
+void func_8002E9DC(void) {
+    s32 i;
+    s32 y;
+    Unk4Words texH = D_80061614;
+    Unk4Words stripH = D_80061624;
+    Unk4Ptrs tex = D_80061634;
+
+    gDPPipeSync(D_8007A184++);
+    gDPLoadTLUT_pal256(D_8007A184++, D_80066E88);
+    D_8008FB3E &= ~0x10;
+    for (i = 0, y = 22; i < 4; i++) {
+        gDPLoadTextureTile(D_8007A184++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+                           G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
+        gSPTextureRectangle(D_8007A184++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0, 0,
+                            0x4A8, 0x4E6);
+        gDPPipeSync(D_8007A184++);
+        y += stripH.v[i];
+    }
+    for (i = 3, y = 120; i >= 0; i--) {
+        gDPLoadTextureTile(D_8007A184++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+                           G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
+        gSPTextureRectangle(D_8007A184++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0,
+                            (texH.v[i] - 1) << 5, 0x4A8, -0x4E6);
+        gDPPipeSync(D_8007A184++);
+        y += stripH.v[i];
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002EED8.s")
 
