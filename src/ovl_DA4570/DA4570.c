@@ -19,7 +19,8 @@ typedef struct {
 
 typedef struct {
     u32 unk0;
-    char unk4[6];
+    u32 unk4;
+    u16 unk8;
     u8 unkA;
     char unkB[3];
     u8 name[18];
