@@ -484,7 +484,110 @@ void func_8001AE24(void* arg0, s32 arg1, s32 arg2) {
     var_t0->unk18 = var_v1 - 1;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001AF90.s")
+typedef struct {
+    /* 0x00 */ u16 type;
+    /* 0x02 */ u8 pad2[0x1A];
+    /* 0x1C */ f32 height;
+} Unk1B200DmgModel;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x94];
+    /* 0x94 */ f32 top;
+} Unk1B200DmgModel2;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ u8 padC[0x18];
+    /* 0x24 */ f32 scale;
+    /* 0x28 */ u8 pad28[0x3C];
+    /* 0x64 */ Unk1B200DmgModel* model;
+    /* 0x68 */ Unk1B200DmgModel2* model2;
+} Unk1B200DmgActor;
+
+extern Gfx D_800C40C0[];
+extern u8 D_8039E290[];
+extern u8 D_8004EF94[][4];
+s32 func_80027FFC(f32, f32, f32, s32*, s32*);
+s16 sins(u16);
+
+void func_8001AF90(void) {
+    s32 n;
+    Unk800865C0* d;
+    s32 first;
+    Unk1B200DmgActor* actor;
+    s32 sx;
+    s32 sy;
+    f32 y;
+    s16 dsdx;
+    s16 dtdy;
+    s32 w;
+    s32 h;
+    s32 k;
+    u8* dp;
+    u8* c;
+
+    first = 0;
+    n = 10;
+    d = D_800865C0;
+    do {
+        if (d->timer) {
+            actor = d->target;
+            if (actor->model->type == 0) {
+                y = actor->y + actor->model->height * actor->scale;
+            } else if (actor->model->type == 1) {
+                y = actor->model2->top;
+            } else {
+                y = actor->y + 600.0 * actor->scale;
+            }
+            if (func_80027FFC(actor->x, y, actor->z, &sx, &sy)) {
+                if (!first) {
+                    gSPDisplayList(D_8007A184++, D_800C40C0);
+                    gDPLoadTextureBlock(D_8007A184++, D_8039E290, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 10, 0, G_TX_WRAP, G_TX_WRAP, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+                    first++;
+                }
+                if (d->unk10 & 0x8000) {
+                    dsdx = 0x280;
+                    dtdy = 0x280;
+                    w = 6;
+                    h = 8;
+                } else {
+                    dsdx = 0x400;
+                    dtdy = 0x400;
+                    w = 4;
+                    h = 5;
+                }
+                if (d->timer >= 30) {
+                    s32 a = sins((45 - d->timer) << 12) >> 11;
+                    if (a < 0) {
+                        a = -a;
+                    }
+                    sy -= a;
+                }
+                sx -= d->unk18 * w;
+                sy = sy - d->unk18 * 5 - 8;
+                c = D_8004EF94[d->unk10 & 0xF];
+                gDPPipeSync(D_8007A184++);
+                gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], 255);
+                dp = d->digits;
+                sx -= (k = d->numDigits) * 4;
+                while (k) {
+                    k--;
+                    if (*dp != 0x20) {
+                        gSPTextureRectangle(D_8007A184++, (sx - w) << 2, (sy - h) << 2, (sx + w) << 2, (sy + h) << 2, G_TX_RENDERTILE, *dp << 8, 0, dtdy, dsdx);
+                        sx += w * 2;
+                    }
+                    dp++;
+                }
+            }
+            d->timer--;
+        }
+        n--;
+        d++;
+    } while (n);
+}
+
 
 void func_8001B3CC(void) {
     Unk800866D8* p = D_800866D8;
