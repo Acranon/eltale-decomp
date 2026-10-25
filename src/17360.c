@@ -651,7 +651,8 @@ typedef struct {
     /* 0x47 */ u8 unk47;
 } Unk80019BFCDef;
 typedef struct {
-    /* 0x00 */ u8 pad0[4];
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
     /* 0x04 */ u16 unk4;
     /* 0x06 */ u8 pad6[6];
     /* 0x0C */ f32 x;
@@ -756,7 +757,65 @@ void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019D2C.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019FC8.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x20];
+    /* 0x20 */ s16 unk20;
+    /* 0x22 */ u16 unk22;
+    /* 0x24 */ u16 unk24;
+    /* 0x26 */ u8 pad26[2];
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 unk2C;
+    /* 0x30 */ u8 pad30[0x14];
+    /* 0x44 */ s8 unk44;
+    /* 0x45 */ u8 unk45;
+} Unk80019FC8Def;
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u8 pad8[4];
+} Unk800C363C; // size = 0xC
+extern Unk800C363C* D_800C363C[];
+void func_8001B3FC(s32, s32, f32, f32, f32, f32);
+void func_8001B7E0(s32, f32, f32, f32, f32);
+void func_80019FC8(Unk80019BFC* arg0, Actor17360* arg1) {
+    Unk80019BFCRet* ret;
+    Unk17360CamCfg* cfg;
+    Unk800C363C* fx;
+    Unk80019FC8Def* def;
+    f32 h;
+    f32 y;
+    Unk800C18D8* tbl;
+
+    def = (Unk80019FC8Def*)arg0->def;
+    cfg = arg0->cfg;
+    if (def->unk20 >= 0) {
+        tbl = &D_800C18D8[def->unk20];
+        D_800863B8.x = def->unk28;
+        D_800863B8.y = def->unk2C;
+        D_800863B8.z = cfg->unk1C;
+        ret = func_80019820(def->unk22, def->unk24, arg0->x, arg0->y, arg0->z, arg1->ry, tbl, &D_800863B8, arg0->unk24);
+        ret->unk28 = arg0->unk18;
+        ret->unk2C = arg0->unk1C;
+        ret->unk30 = arg0->unk20;
+    }
+    fx = &D_800C363C[arg0->unk0][arg0->unk2];
+    if (fx->unk4 != 0) {
+        h = 2.0 * arg1->unk64->unk18 * arg1->scale;
+        y = arg1->y + arg1->unk64->unk1C * arg1->scale;
+        switch (fx->unk4) {
+            case 1:
+                func_8001B3FC(fx->unk6, 30, arg1->x, y, arg1->z, h * 1.2);
+                break;
+            case 2:
+                func_8001B7E0(fx->unk6, arg1->x, y, arg1->z, h * 0.2);
+                break;
+        }
+    }
+    if (def->unk44 >= 0) {
+        func_8002A7C8(def->unk45, def->unk44, 0xFF);
+    }
+}
 
 void func_8001A1A4(Actor17360* arg0) {
     Unk17360Data* data = arg0->unk68;
