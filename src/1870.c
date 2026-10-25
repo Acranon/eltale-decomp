@@ -240,7 +240,34 @@ void func_80000F4C(void) {
     D_8007A1CD = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80001084.s")
+void func_80001084(void) {
+    u16 *b;
+    u16 *a;
+    u32 i;
+
+    func_80028120(D_71920, D_80095AF0, D_753F0 - D_71920);
+    D_8007A1D8 = D_80095AF0;
+    func_80028120(D_D490C0, D_800C0000, D_D74AC0 - D_D490C0);
+    a = D_8039ADB0;
+    func_80028120(D_D74AC0, a, D_D86170 - D_D74AC0);
+    D_80301000[0].data.msg = 2;
+    D_80301000[0].data.framebuffer = D_803B5000;
+    func_800011B8(&D_80301000[0]);
+    D_80301000[1].data.msg = 2;
+    D_80301000[1].data.framebuffer = D_803DA800;
+    func_800011B8(&D_80301000[1]);
+    D_8007A17C = 0;
+    i = 320 * 240;
+    b = D_803B5000;
+    a = D_803DA800;
+    while (i != 0) {
+        *a = 0;
+        *b = 0;
+        b++;
+        a++;
+        i--;
+    }
+}
 
 void func_800011B8(GfxFrame *arg0) {
     arg0->task.list.t.type = M_GFXTASK;
