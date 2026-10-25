@@ -12,7 +12,10 @@ typedef struct {
 } Unk80018FB0;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x2C];
+    /* 0x000 */ u8 pad0[0xA];
+    /* 0x00A */ u16 unkA;
+    /* 0x00C */ u16 unkC;
+    /* 0x00E */ u8 padE[0x1E];
     /* 0x02C */ u8 unk2C[0x50];
     /* 0x07C */ s16 unk7C;
     /* 0x07E */ u8 pad7E[0xB2];
@@ -374,7 +377,130 @@ typedef struct {
 } Unk8004ED68;
 extern Unk8004ED68 D_8004ED68;
 extern Unk8004ED68 D_8004ED7C;
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800169B8.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0xA];
+    /* 0x0A */ u16 unkA;
+    /* 0x0C */ u8 padC[6];
+    /* 0x12 */ u16 unk12;
+    /* 0x14 */ u16 unk14;
+    /* 0x16 */ u8 pad16[2];
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 pad1A[6];
+    /* 0x20 */ u16 unk20;
+    /* 0x22 */ u16 unk22;
+    /* 0x24 */ u16 unk24;
+    /* 0x26 */ u16 unk26;
+    /* 0x28 */ u8 pad28[2];
+    /* 0x2A */ u16 unk2A;
+    /* 0x2C */ u16 unk2C;
+    /* 0x2E */ u8 pad2E[2];
+    /* 0x30 */ s16 unk30;
+    /* 0x32 */ u8 pad32[0x12];
+} Unk800169B8Def; // size = 0x44
+typedef struct {
+    /* 0x00 */ s16 unk0[0x24];
+} Unk800169B8Def2; // size = 0x48
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+} Unk800C1878;
+extern Unk800169B8Def* D_800C185C_b[];
+extern Unk800169B8Def2* D_800C3268[];
+extern Unk800C1878 D_800C1878[];
+extern Unk8004ED68 D_8004ED54;
+extern u8 D_800EB700[];
+extern Unk80017F48 D_80085F98_b[];
+extern void (*D_8004ECB8[])(Unk80017F48*);
+extern void (*D_8004EC90[])(Unk80017F48*, Actor17360*);
+void func_8001A340(s32);
+void func_800199C0();
+void func_800169B8(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
+    Unk80086358_b* r;
+    Unk800169B8Def2* def2;
+    Unk80017F48* p;
+    s32 i;
+    Unk800169B8Def* def;
+    s32 boost;
+    Unk8004ED68 sizes;
+
+    sizes = D_8004ED54;
+    if (arg2 == 0) {
+        func_80012B34(D_8007A1C8, 2, 8, D_800EB700);
+        D_80085F90 |= 1;
+        D_80085F94 = 8;
+    }
+    def = &((Unk800169B8Def**)D_800C185C)[(arg1 >> 8) & 0xF][arg1 & 0xFF];
+    def2 = &D_800C3268[(arg1 >> 8) & 0xF][arg1 & 0xFF];
+    if (arg2 == 0 && def->unk20 >= 2) {
+        r = (Unk80086358_b*)D_80086358;
+        i = 3;
+        while (i != 0 && r->unk0 != 0) {
+            i--;
+            r++;
+        }
+        r->unk0 = def->unk20 - 1;
+        if (arg3 & 0x10) {
+            r->unk0 *= 2;
+        }
+        r->unk2 = def->unk22 + 1;
+        r->unk4 = 0;
+        r->unk8 = arg1;
+        r->unkC = arg3;
+        r->unk10 = (Unk80086358Cfg*)def;
+        r->unk14 = arg0;
+    }
+    p = (Unk80017F48*)D_80085F98;
+    i = 15;
+    while (i != 0 && p->unk4 != 0) {
+        i--;
+        p++;
+    }
+    p->unk0 = (arg1 >> 8) & 0xF;
+    p->unk2 = arg1 & 0xFF;
+    p->unk24 = (Actor17360*)arg0;
+    p->target = NULL;
+    p->cfg = (Unk80017F48Cfg*)def;
+    p->unk30 = (s16*)def2;
+    p->unk4 = def->unkA;
+    p->unk8 = def->unk24;
+    p->unk6 = 100;
+    p->unkA = arg3;
+    func_8001A340(15 - i);
+    switch (def->unk12) {
+        case 0:
+            D_800863B8.x = D_800C1878[(def->unk2C + arg2) & 7].x * sizes.v[def->unk30];
+            D_800863B8.y = D_800C1878[(def->unk2C + arg2) & 7].z * sizes.v[def->unk30];
+            boost = arg3 & 0x10;
+            func_800271B4(((Actor17360*)arg0)->ry, &D_800863B8);
+            p->vx = D_800863B8.x;
+            p->vz = D_800863B8.y;
+            if (def->unk2A & 2) {
+                p->vy = 0.0f;
+            } else {
+                p->vy = D_800C1878[(def->unk2C + arg2) & 7].y * sizes.v[def->unk30];
+            }
+            if (boost) {
+                p->unk4 += p->unk4 >> 1;
+            }
+            break;
+        case 1:
+        case 2:
+            p->vx = p->vy = p->vz = 0.0f;
+            break;
+    }
+    D_8004ECB8[def->unk18](p);
+    if (p->target != NULL) {
+        D_8004EC90[def->unk26](p, (Actor17360*)arg0);
+        if (def->unk14 == 2) {
+            func_800107F0(p->x, p->y, p->z, 0xA00, &D_800863C8);
+            p->y = D_800863C8.y;
+        }
+        func_800199C0(p, p->unk24);
+    } else {
+        p->unk4 = 0;
+    }
+}
 
 void func_80016DE0(Unk80016DE0* arg0, Actor17360* arg1) {
     arg0->x = arg1->x;
@@ -1142,7 +1268,45 @@ void func_800195E0(s32 arg0, Actor17360* arg1) {
     arg1->unk68->unk0 |= 0x800;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800195FC.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x2A];
+    /* 0x2A */ u16 unk2A;
+} Unk800195FCStats;
+typedef struct {
+    /* 0x000 */ u8 pad0[0x28];
+    /* 0x028 */ Unk800195FCStats* unk28;
+    /* 0x02C */ u8 pad2C[0x104];
+} Unk800195FCRec; // size = 0x130
+typedef struct {
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ u8 stats[1];
+} Unk8007A9D0;
+extern u16 D_8004ED90[];
+extern Unk8007A9D0 D_8007A9D0;
+u16 func_800195FC(Unk80018480Cfg* arg0, Actor17360* arg1) {
+    u16 lv;
+    u16* p;
+    f32 sum;
+    f32 step;
+    s32 i;
+
+    if (arg1->unk5E & 1) {
+        lv = ((Unk800195FCRec*)D_8007B908)[func_8000CAB8(arg1)].unk28->unk2A;
+    } else {
+        p = &D_8004ED90[arg0->unk6 * 2];
+        lv = D_8007A9D0.stats[arg0->unk6];
+        lv += D_8007A9D0.stats[*p++] >> 4;
+        lv += D_8007A9D0.stats[*p++] >> 3;
+        lv += D_8007A9D0.stats[*p] >> 3;
+    }
+    sum = arg0->unkC * 0.02;
+    step = sum * 0.2;
+    for (i = 0; i != lv; i++) {
+        sum += step;
+        step *= 1.03;
+    }
+    return (u32)sum;
+}
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
