@@ -50,6 +50,44 @@ extern Unk80084998 D_80084998[8];
 extern s32 D_80084B18[4][3];
 extern s32 D_8008C164;
 
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+} Unk8004DEF4; /* size 0xC */
+
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ u8 pad4[0x38];
+} Unk80084994Elem; /* size 0x3C */
+
+typedef struct {
+    /* 0x00 */ Unk80084994Elem *unk0;
+    /* 0x04 */ s32 unk4;
+} Unk80084994;
+
+extern Unk8004DEF4 D_8004DEF4[];
+extern u16 D_800806B0[];
+extern u16 D_800808B0[][0x100];
+extern s32 D_80084330;
+extern s32 D_80084334;
+extern s16 D_80084338;
+extern s32 D_8008498C;
+extern Unk80084994 *D_80084994;
+extern u16 D_8007C280;
+extern s32 D_8007A17C;
+extern Gfx *D_8007A184;
+extern s16 D_8007A1A0;
+extern s16 D_8007A1A2;
+extern Lights3 D_80084590;
+extern Lights3 D_800845C8;
+extern s32 D_80084B48[4][3];
+extern s32 D_80084B78[];
+
+void func_80012A60(void);
+void func_8001263C(Lights3 *arg0);
+void func_800130F8(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
+
 void func_80011A10(Unk80011A10Arg *arg0) {
     D_80084318 = arg0->unk1E;
     D_80084300.unk0 = D_80084318[0];
@@ -79,7 +117,17 @@ void func_80011EA0(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011EF4.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/12610/func_800124E8.s")
+void func_800124E8(void) {
+    Lights3 *l;
+
+    l = D_8007A17C ? &D_800845C8 : &D_80084590;
+    func_8001263C(l);
+    func_800130F8(l, D_80084B18, D_80084B48);
+    D_8007A1A0 = D_80084B78[0];
+    D_8007A1A2 = D_80084B78[1];
+    gSPFogPosition(D_8007A184++, D_8007A1A0, D_8007A1A2);
+    gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/12610/func_8001263C.s")
 

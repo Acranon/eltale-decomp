@@ -45,7 +45,9 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u16 type;
-    /* 0x002 */ u8 pad2[6];
+    /* 0x002 */ s16 unk2;
+    /* 0x004 */ u8 pad4[2];
+    /* 0x006 */ u16 unk6;
     /* 0x008 */ u16 flags;
     /* 0x00A */ u8 padA[0x1E];
     /* 0x028 */ Unk28 *unk28;
@@ -113,7 +115,20 @@ typedef struct {
     /* 0x00 */ u8 pad0[10];
 } Unk800C18D8;
 
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u8 pad2[2];
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ s16 unk8;
+    /* 0x0A */ s16 unkA;
+} Unk8000BA20;
+
 void func_8000A5E4(void);
+void func_8000CC40(s32, s32);
+f32 func_800270D0(f32, f32);
+void func_800201A0(Obj *, s32, s32, s32, s32, s32);
+void func_80015F44(s32, Obj *);
 void func_8000BB90(Obj *, f32, f32);
 void func_8000BCA4(s32, f32, f32, Obj *, EnemyAI *);
 void func_8000BFE0(Obj *, Vec3f *);
@@ -231,9 +246,53 @@ void func_8000B030(Obj *obj, EnemyAI *ai, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B7A4.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BA20.s")
+void func_8000BA20(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
+    s32 t = arg2->unk0 & 0x8000;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BB90.s")
+    if (t && (e->unk98 & 0x40)) {
+        e->type = 0;
+        func_800201A0(obj, 0, 1, 0, 1, 1);
+        func_8001FC14(obj);
+        return;
+    }
+    if (t) {
+        e->type = 5;
+    } else {
+        e->type = 4;
+    }
+    e->unk6 = 0;
+    e->unk2 = arg2->unk4;
+    e->flags &= 0xFFD7;
+    obj->unk60 = 1;
+    obj->angle = func_800270D0(D_8007AA08.x - obj->x, D_8007AA08.z - obj->z);
+    func_800201A0(obj, arg2->unk8, 1, arg2->unkA == -1 ? 0 : arg2->unkA, 1, 1);
+    func_80015F44(arg2->unk4 + 0xF, obj);
+    if (e->unk2 == 0) {
+        e->unk2 = 1;
+    }
+    if (D_8008BE52 & 0x100) {
+        func_8000CC40(arg2->unk0 & 0xFF, (s32)e);
+    }
+}
+
+void func_8000BB90(Obj *obj, f32 x, f32 z) {
+    f32 diff;
+
+    x -= obj->x;
+    z -= obj->z;
+    diff = func_800270D0(x, z) - obj->angle;
+    if (diff > 3.141592653589793) {
+        diff -= 6.283185307179586;
+    } else if (diff < -3.141592653589793) {
+        diff += 6.283185307179586;
+    }
+    obj->angle += diff * 0.05;
+    if (obj->angle > 3.141592653589793) {
+        obj->angle -= 6.283185307179586;
+    } else if (obj->angle < -3.141592653589793) {
+        obj->angle += 6.283185307179586;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BCA4.s")
 
