@@ -201,8 +201,8 @@ extern Unk8004EE20 D_8004EFE4;
 extern Gfx D_800EB6D0[];
 extern u16 D_80087DF8;
 extern u16 D_800863F4;
-void func_8001CBD0(Unk80086798b*, void*);
-void func_8001CDF4(Unk80086798b*);
+s32 func_8001CBD0(Unk80086798b*, void*);
+s32 func_8001CDF4(Unk80086798b*);
 void func_80027430(MtxF*, f32, f32, f32);
 f32 func_800270D0(f32, f32);
 u32 func_80026E90(u32);
@@ -224,7 +224,7 @@ void func_8001BB48(void*);
 void func_8001C2F8(void*);
 void func_8001C948(void*);
 void func_8001D6A8(void*);
-void func_8001D9A8(void*);
+s32 func_8001D9A8(void*);
 void func_800271B4(f32, Unk1B200Vec2*);
 
 void func_8001A600(void) {
@@ -476,7 +476,42 @@ void func_8001B3FC(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
     p->unk14 = arg5;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001B45C.s")
+void func_8001B45C(void) {
+    Unk800866D8* p;
+    f32 x;
+    f32 y;
+    f32 z;
+    s32 i;
+    f32 a;
+    MtxF mtx;
+    f32 b;
+    Unk8004EE20 spawn;
+
+    spawn = D_8004EFA4;
+    p = D_800866D8;
+    i = 8;
+    do {
+        if (p->unk0 != 0) {
+            if (p->unk0 & 1) {
+                a = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
+                b = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
+                func_80027430(&mtx, a, b, 0.0f);
+                guMtxXFMF(mtx.mf, 0.0f, 0.0f, p->unk14, &x, &y, &z);
+                spawn.unk18 = p->unk8 + x;
+                spawn.unk1C = p->unkC + y;
+                spawn.unk20 = p->unk10 + z;
+                spawn.unk30 = x * -0.03;
+                spawn.unk34 = y * -0.03;
+                spawn.unk38 = z * -0.03;
+                spawn.unk3C = p->unk4;
+                func_8001D9A8(&spawn);
+            }
+            p->unk0--;
+        }
+        i--;
+        p++;
+    } while (i != 0);
+}
 
 void func_8001B688(Unk1B200Spark* arg0) {
     u8* c;
