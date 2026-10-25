@@ -1,5 +1,13 @@
 #include "common.h"
 
+extern Gfx* D_8007A184;
+extern s32 D_8020F698_ovl_ending;
+extern Gfx D_8020F6C0_ovl_ending[];
+extern Gfx D_8022EA18[2][2500];
+extern Gfx* D_80238658;
+
+void func_8020C254_ovl_ending(void);
+
 typedef struct {
     s32 unk0;
     s16 unk4;
@@ -131,7 +139,41 @@ void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, 
     temp_v0->unk2E = temp_v0->unk30 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CA60_ovl_ending.s")
+void func_8020CA60_ovl_ending(void) {
+    s32 i;
+    UnkStruct_8022BB38* temp_v0 = D_8022BB38;
+
+    for (i = 0; i < 150; i++, temp_v0++) {
+        temp_v0->unk0 = 0;
+        temp_v0->unk4 = 0;
+        temp_v0->unk6 = 0;
+        temp_v0->unkC = 0;
+        temp_v0->unkE = 0;
+        temp_v0->unk8 = 0;
+        temp_v0->unkA = 0;
+        temp_v0->unk10 = 0;
+        temp_v0->unk12 = 0;
+        temp_v0->unk14 = 0;
+        temp_v0->unk18 = 0;
+        temp_v0->unk48 = 0.0f;
+        temp_v0->unk4E = 0xFF;
+        temp_v0->unk32 = 0;
+        temp_v0->unk1C = 0.0f;
+        temp_v0->unk20 = 0.0f;
+        temp_v0->unk24 = 0;
+        temp_v0->unk2A = 0;
+        temp_v0->unk2C = 0;
+        temp_v0->unk26 = 0;
+        temp_v0->unk28 = 0;
+        temp_v0->unk34 = 0;
+        temp_v0->unk40 = 0.0f;
+        temp_v0->unk44 = 1.0f;
+        temp_v0->unk4C = 0;
+        temp_v0->unk38 = 0;
+        temp_v0->unk3C = 0;
+        temp_v0->unk2E = temp_v0->unk30 = 0;
+    }
+}
 
 void func_8020CB84_ovl_ending(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
@@ -167,9 +209,37 @@ void func_8020CB84_ovl_ending(s32 arg0) {
     temp_v0->unk2E = temp_v0->unk30 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CC28_ovl_ending.s")
+s32 func_8020CC28_ovl_ending(void) {
+    s32 count;
+    UnkStruct_8022BB38* ptr = D_8022BB38;
+    s32 i = 0;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CCD8_ovl_ending.s")
+    count = 0;
+    while (i < 150) {
+        if ((ptr->unk0 & 0x80000000) == 0) {
+            count++;
+        }
+        i++;
+        ptr++;
+    }
+    return count;
+}
+
+s32 func_8020CCD8_ovl_ending(void) {
+    s32 count;
+    UnkStruct_8022BB38* ptr = D_8022BB38;
+    s32 i = 0;
+
+    count = 0;
+    while (i < 150) {
+        if (ptr->unk0 & 0x80000000) {
+            count++;
+        }
+        i++;
+        ptr++;
+    }
+    return count;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CD88_ovl_ending.s")
 
