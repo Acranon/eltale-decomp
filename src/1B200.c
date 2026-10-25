@@ -951,7 +951,59 @@ Unk80086798b* func_8001C818(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f3
     return p;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001C948.s")
+void func_8001C948(void* arg0) {
+    Unk80086798b* p;
+    s32 i;
+    u32 alpha;
+    u8* col;
+    u16* cnt;
+
+    cnt = &D_800863F4;
+    gSPDisplayList(D_8007A184++, D_800EB6D0);
+    D_80087DF8 = 0xFFFF;
+    i = 32;
+    p = D_80086798;
+    do {
+        if (p->unk0 != 0) {
+            func_8001CDF4(p);
+            if (p->unk8 & 2) {
+                if (*cnt & 1) {
+                    alpha = 240;
+                } else {
+                    alpha = 150;
+                }
+            } else {
+                alpha = 250;
+            }
+            if (!(p->unk8 & 1) && p->unk0 < 8) {
+                alpha = (p->unk0 * alpha) >> 3;
+            } else if ((p->unk8 & 0x80) && p->unk4 < 8) {
+                alpha = (p->unk4 * alpha) >> 3;
+            }
+            col = D_800EB5E4[p->unk6 & 0xFF];
+            gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], alpha);
+            if (p->unk8 & 8) {
+                gSPSetGeometryMode(D_8007A184++, G_CULL_BACK);
+            } else {
+                gSPClearGeometryMode(D_8007A184++, G_CULL_BACK);
+            }
+            func_8001CBD0(p, (s32)arg0);
+            p->unk34++;
+            if (--p->unk0 == 0) {
+                if (p->unk8 & 1) {
+                    p->unk0 = p->unk2;
+                }
+            }
+            p->unk4++;
+        }
+        i--;
+        p++;
+    } while (i != 0);
+    gDPPipeSync(D_8007A184++);
+    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+    (*cnt)++;
+}
+
 
 typedef struct {
     f32 x, y, z;
