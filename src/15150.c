@@ -116,7 +116,172 @@ void func_80015DB4(s32);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014994.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014E04.s")
+typedef struct 
+{
+  f32 x;
+  f32 y;
+  f32 z;
+  u8 padC[0xC];
+  u16 flags;
+} Coll15150;
+extern Coll15150 D_80085C20;
+extern u16 D_80085C3C;
+extern s32 D_8004DCA0;
+extern u16 D_80092C84;
+extern u16 D_8008BE52;
+extern f32 D_8007AA24;
+void func_80015B88(Camera15150 *arg0);
+void func_80015B94(Camera15150 *arg0, Unk15150Target *arg1);
+void func_80015C38(Camera15150 *arg0, Unk15150Target *arg1);
+f32 func_80016578(Camera15150 *arg0, f32 arg1);
+void func_800107F0(f32, f32, f32, s32, Coll15150 *);
+void func_80014E04(Camera15150 *arg0)
+{
+  u8 locked;
+  f32 dx;
+  f32 y;
+  f32 dz;
+  f32 dist;
+  f32 a;
+  f32 vx;
+  f32 ny;
+  f32 vz;
+  Unk15150Target *target;
+  target = arg0->target;
+  func_80015B88(arg0);
+  if (((!(D_8004DCA0 & 0x82)) && (!(D_8008BE52 & 0x200))) && (!(arg0->flags & 0x40)))
+  {
+    if ((D_80092C84 & 0x4000) || (arg0->mode == 2))
+    {
+      arg0->flags |= 0x24;
+    }
+    else
+    {
+      arg0->flags &= ~0x24;
+    }
+  }
+  else
+  {
+    arg0->flags &= ~0x24;
+  }
+  dx = target->x - arg0->eyeX;
+  dz = target->z - arg0->eyeZ;
+  dist = sqrtf((dx * dx) + (dz * dz));
+  if (dist != 0.0f)
+  {
+    if (arg0->unk4C < dist)
+    {
+      a = arg0->unk4C / dist;
+      vx = (dx - (dx * a)) * arg0->unk70;
+      vz = (dz - (dz * a)) * arg0->unk70;
+    }
+    else
+      if (dist <= arg0->unk4C)
+    {
+      a = arg0->unk4C / dist;
+      vx = ((dx - (dx * a)) * arg0->unk70) * 0.5;
+      vz = ((dz - (dz * a)) * arg0->unk70) * 0.5;
+    }
+  }
+  else
+  {
+    vz = 0.0f;
+    vx = 0.0f;
+  }
+  arg0->unk40 += vx;
+  arg0->unk48 += vz;
+  arg0->eyeX += arg0->unk40;
+  arg0->eyeZ += arg0->unk48;
+  arg0->unk40 *= arg0->unk74;
+  arg0->unk48 *= arg0->unk74;
+  locked = 0;
+  if ((dist < 25.0f) && (!(D_8004DCA0 & 0x80)))
+  {
+    a = target->ry - arg0->unk28;
+    if (a > 3.141592653589793)
+    {
+      a -= 6.283185307179586;
+    }
+    else
+      if (a < (-3.141592653589793))
+    {
+      a += 6.283185307179586;
+    }
+    if ((a < 1.5707963267948966) && (a > (-1.5707963267948966)))
+    {
+      arg0->unk54 = ((a < 0.0f) ? (1.5707963267948966) : (-1.5707963267948966)) + target->ry;
+    }
+    arg0->flags |= 4;
+    locked = 1;
+  }
+  else
+    if (arg0->flags & 0x20)
+  {
+    arg0->unk54 = target->ry + 3.141592653589793;
+    if (arg0->unk54 > 3.141592653589793)
+    {
+      arg0->unk54 -= 6.283185307179586;
+    }
+    else
+      if (arg0->unk54 < (-3.141592653589793))
+    {
+      arg0->unk54 += 6.283185307179586;
+    }
+  }
+  func_80015C38(arg0, target);
+  D_80085C20.x = 4.0f;
+  func_800107F0(arg0->eyeX, arg0->eyeY, arg0->eyeZ, 0x602, &D_80085C20);
+  arg0->eyeX = D_80085C20.x;
+  arg0->eyeZ = D_80085C20.z;
+  if (D_80085C20.flags & 0x8000)
+  {
+    y = target->y;
+  }
+  else
+  {
+    y = D_80085C20.y;
+  }
+  D_80085C3C = D_80085C20.flags;
+  dz = target->y + arg0->unk58;
+  if (y < dz)
+  {
+    y = dz;
+  }
+  y = func_80016578(arg0, y);
+  if ((D_8008BE52 & 1) && (y < D_8007AA24))
+  {
+    y = D_8007AA24;
+  }
+  ny = y - arg0->eyeY;
+  ny *= arg0->unk70 * ((ny < 0.0f) ? (0.2) : (0.8));
+  arg0->unk44 += ny;
+  arg0->eyeY += arg0->unk44;
+  arg0->unk44 *= arg0->unk74;
+  func_80015B94(arg0, target);
+  dx = arg0->eyeX - arg0->atX;
+  y = arg0->eyeY - arg0->atY;
+  dz = arg0->eyeZ - arg0->atZ;
+  if ((((dx > (-0.5)) && (dx < 0.5)) && (dz > (-0.5))) && (dz < 0.5))
+  {
+    arg0->eyeX += 0.5;
+    arg0->eyeZ += 0.5;
+  }
+  dist = sqrtf((dx * dx) + (dz * dz));
+  if ((y != 0.0f) || (dist != 0.0f))
+  {
+    arg0->unk24 = func_800270D0(y, dist);
+  }
+  if ((dx != 0.0f) || (dz != 0.0f))
+  {
+    arg0->unk2C = func_800270D0(dx, dz);
+    if (!locked)
+    {
+      arg0->unk28 = arg0->unk2C;
+    }
+  }
+}
+
+
 
 void func_80015B88(Camera15150* arg0);
 void func_80015B94(Camera15150* arg0, Unk15150Target* arg1);
