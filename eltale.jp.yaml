@@ -305,7 +305,8 @@ segments:
       - [0x70DC0, .rodata, libc/xldtob]
       - [0x70E20, .rodata, libultra/audio/reverb]
       - [0x70E50, .rodata, libultra/audio/seq]
-      - [0x70E60, rodata, ucode_data]
+      - [0x70E60, rodata, gspF3DEX_data]
+      - [0x71660, rodata, aspMain_data]
       - { start: 0x71920, type: bss, vram: 0x80070D20 }
 
   - [0x71920, databin, data_71920]
@@ -317,8 +318,9 @@ segments:
     exclusive_ram_id: ovl_80100000
     symbol_name_format: $VRAM_$SEG
     subsegments:
-      - [0xDA4570, asm]
+      - [0xDA4570, c, ovl_DA4570/DA4570]
       - [0xDA6510, data]
+      - [0xDAB5C0, .rodata, ovl_DA4570/DA4570]
 
   - name: ovl_title
     type: code
@@ -327,8 +329,9 @@ segments:
     exclusive_ram_id: ovl_8020C0D0
     symbol_name_format: $VRAM_$SEG
     subsegments:
-      - [0xDAB5F0, asm]
+      - [0xDAB5F0, c, ovl_title/DAB5F0]
       - [0xDAE700, data]
+      - [0xDC6250, .rodata, ovl_title/DAB5F0]
 
   - name: ovl_intro
     type: code
@@ -337,8 +340,10 @@ segments:
     exclusive_ram_id: ovl_8020C0D0
     symbol_name_format: $VRAM_$SEG
     subsegments:
-      - [0xDC62B0, asm]
+      - [0xDC62B0, c, ovl_intro/DC62B0]
+      - [0xDC9350, c, ovl_intro/DC9350]
       - [0xDCC410, data]
+      - [0xE22670, .rodata, ovl_intro/DC62B0]
 
   - name: ovl_ending
     type: code
@@ -347,8 +352,9 @@ segments:
     exclusive_ram_id: ovl_8020C0D0
     symbol_name_format: $VRAM_$SEG
     subsegments:
-      - [0xE22690, asm]
+      - [0xE22690, c, ovl_ending/E22690]
       - [0xE25C50, data]
+      - [0xE420C0, .rodata, ovl_ending/E22690]
 
   - [0xE420D0, databin, data_E420D0]
   - [0x1000000]

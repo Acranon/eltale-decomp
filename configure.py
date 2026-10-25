@@ -39,7 +39,8 @@ FLAGS = [
     ("src/libc/xldtob.c", "-mips2 -O3"),
     ("src/libc/xprintf.c", "-mips2 -O3"),
     ("src/libc/", "-mips2 -O2"),
-    ("src/", "-mips2 -O2"),
+    ("src/ovl_", "-mips2 -O2"),
+    ("src/", "-mips2 -O2 -g3"),
 ]
 # Files whose object needs the o32 ABI bit set after compiling (-mips3 -32).
 SET_O32 = {"src/libc/ll.c"}
@@ -116,7 +117,7 @@ def write_ninja(linker_entries):
     ninja.build(ELF_PATH, "ld", LD_PATH, implicit=objects)
     ninja.build(ROM_PATH, "z64", ELF_PATH)
     ninja.build("build/ok", "sha1", ROM_PATH, implicit=["checksum.sha1"])
-    ninja.default("build/ok")
+    ninja.default(ROM_PATH)
 
 
 if __name__ == "__main__":
