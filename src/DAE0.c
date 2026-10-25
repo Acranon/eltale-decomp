@@ -110,7 +110,7 @@ typedef struct {
 } Unk8007A9D0;
 
 f32 sqrtf(f32);
-void func_80028120(u32, void *, u32);
+void func_80028120();
 void func_8000D19C(s32, f32, f32, f32, Unk8007C148 *);
 u8 func_8000D398(u32);
 void func_80020428(s32, Unk8007C174 *, void *, s32);
