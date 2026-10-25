@@ -308,7 +308,31 @@ extern f32 D_8007A8F8;
 extern f32 D_8007A8FC;
 extern f32 D_8007A900;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003350.s")
+void func_80003350(void) {
+    func_80028120(D_869620, D_80206000, D_86F6F0 - D_869620);
+    D_8007A9D0 = D_80055D44;
+    D_8007AA08.actor.scale = D_8007A9D0.unk20;
+    D_8007AA08.actor.unk28 = D_8007A9D0.unk18;
+    D_8007AA08.actor.unk50 = D_8007A9D0.unk2;
+    D_8007AA08.unk14 = (PlayerStateSub14 *)&D_8007A9D0;
+    D_8007AA08.unk6 = 0;
+    D_8007AA08.unk8 = 0;
+    D_8007AA08.unk120 = 0;
+    D_8007AA08.actor.unk52 = -1;
+    D_8007AA08.actor.unk54 = 0;
+    D_8007AA08.actor.unk58 = 1;
+    D_8007AA08.actor.unk64 = &D_8007A9D0;
+    D_8007AA08.actor.unk68 = &D_8007AA8C;
+    D_8007AA08.actor.unk5E = 0;
+    D_8007AA08.actor.unk60 = 0;
+    D_8007A998 = 0x108;
+    D_8007A9AC = 0xD;
+    D_8007A9AE = 0x11;
+    D_8007A9B0 = 0;
+    D_8007A988 = 0.0f;
+    D_8007A8F4 = D_8007A8F8 = 0.0f;
+    D_8007A8FC = D_8007A900 = 0.0f;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003494.s")
 
@@ -1091,7 +1115,30 @@ void func_80006F80(f32 *arg0, f32 *arg1, Actor *arg2) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007320.s")
+void func_80007320(PlayerState *arg0, Actor *arg1) {
+    f32 dx;
+    f32 dz;
+    f32 k = 2.0f;
+
+    switch ((u16)(arg1->unk62 >> 6) & 7) {
+        case 0:
+            break;
+        case 1:
+            if (arg0->unk128 == 0) {
+                func_80007FD8(1, 4, arg1);
+            }
+            arg0->unk128--;
+            break;
+        case 2:
+            dx = arg1->unk2C * k;
+            arg1->x += dx;
+            dz = arg1->unk34 * k;
+            arg1->z += dz;
+            arg1->vx += dx;
+            arg1->vz += dz;
+            break;
+    }
+}
 
 typedef struct {
     /* 0x00 */ f32 x;
@@ -1206,7 +1253,13 @@ void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     func_80015F44(0x23, arg1);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007E04.s")
+s32 func_80007E04(s32 arg0, Actor *arg1) {
+    s16 chance;
+    Monster *m = &D_8007B908[arg0];
+
+    chance = (arg1->unk68->unk86 * 100) / (arg1->unk68->unk86 + ((m->actor.unk68->unk86 + 7) >> 3));
+    return func_80026E90(100) < chance;
+}
 
 extern s32 D_8004DCFC[];
 extern u8 D_8004F760[];
@@ -1280,7 +1333,33 @@ s32 func_800168F0(s32 arg0, u16 arg1);
 s32 func_800167B0(u16 count, u8 *seq);
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800085D8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80008840.s")
+void func_80008840(PlayerState *p, Actor *a, AnimEntry *anims) {
+    Unk800C185C *e;
+    s32 anim;
+    s32 next;
+    u16 t;
+
+    a->unk64->unk8 -= D_800C186E[p->unk120];
+    e = &D_800C185C[(p->unk122 >> 8) & 0xF][p->unk122 & 0xFF];
+    if (e->unk18 == 2) {
+        p->unk8 |= 4;
+        anim = 0x17;
+        next = 0x16;
+    } else {
+        anim = 3;
+        next = D_8007A910;
+    }
+    t = anims[anim].unk2;
+    p->unk0 = 0xE;
+    p->unk124 = 0x12;
+    p->unk120 = 0;
+    p->unk4 = t;
+    a->vx = a->vz = 0.0f;
+    a->unk60 |= 1;
+    func_800201A0(a, anim, 1, next, 1, 1);
+    func_80015F44(0x2D, a);
+    D_8008C15E = 0x1E;
+}
 
 void func_80008970(PlayerState *arg0) {
     f32 dx;
