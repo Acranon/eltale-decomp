@@ -82,7 +82,7 @@ extern u16 D_8008C14C[2];
 extern s16 D_8008C15A;
 extern u16 D_8008C15C;
 extern s16 D_8008C15E;
-extern s16 D_8008C162;
+extern u16 D_8008C162;
 extern s32 D_8008C168;
 extern s32 D_8008C16C;
 extern s32 D_8008C170;
@@ -275,7 +275,70 @@ extern Struct_803AA628 D_803AA628[];
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023D28.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023E14.s")
+typedef struct {
+    /* 0x00 */ char unk0[2];
+    /* 0x02 */ s16 unk2;
+    /* 0x04 */ char unk4[2];
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ char unk8[4];
+    /* 0x0C */ u16 unkC;
+    /* 0x0E */ u16 unkE;
+    /* 0x10 */ char unk10[0x26 - 0x10];
+    /* 0x26 */ u16 unk26;
+    /* 0x28 */ char unk28[2];
+    /* 0x2A */ u16 unk2A;
+} Struct_8007C028_28;
+
+typedef struct {
+    /* 0x00 */ char unk0[0x28];
+    /* 0x28 */ Struct_8007C028_28* unk28;
+    /* 0x2C */ char unk2C[0x98 - 0x2C];
+    /* 0x98 */ u16 unk98;
+} Struct_8007C028;
+
+extern Struct_8007C028* D_8007C028;
+extern u8** D_8007C04C;
+extern u8 D_8039ADB0[];
+extern u8 D_8039EC90[];
+extern Struct_80024A54 D_803A86F8;
+extern Struct_80024A54 D_803A8718;
+void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
+
+void func_80023E14(void) {
+    s32 d;
+
+    D_8008C174 = 0xB5;
+    D_8008C178 = 0x1A;
+    d = D_8008C162 - 50;
+    if (d > 0) {
+        d *= d;
+        D_8008C174 += d * 120 / 100;
+    }
+    gDPPipeSync(D_8007A184++);
+    gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
+    if (D_8007C028->unk98 & 0x80) {
+        func_80024EB0(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, 0, 0x10, 0x6E, 0x10, 0x64, 0x2C, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, 0, 0x20, 0x6E, 0x10, 0x64, 0x3C, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, 0, 0x30, 0x6E, 4, 0x64, 0x4C, 0x400, 0x400);
+    } else {
+        func_80024EB0(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, 0, 0x10, 0x6E, 0xA, 0x64, 0x2C, 0x400, 0x400);
+        func_80024EB0(&D_803A8718, 0, 0x1A, 0x6E, 2, 0x64, 0x4E, 0x400, 0x400);
+    }
+    func_80024694(4, 0x11, 0, D_8007C04C[D_8007C028->unk28->unk2]);
+    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    gDPLoadTLUT_pal256(D_8007A184++, D_8039ADB0);
+    if (D_8007C028->unk98 & 0x80) {
+        func_80024974(3, 0x10, 0x1C, D_8007C028->unk28->unk6);
+        func_80024974(3, 0x10, 0x26, D_8007C028->unk28->unkE);
+        func_80024974(3, 0x46, 0x1C, D_8007C028->unk28->unk2A);
+        func_80024974(3, 0x46, 0x26, D_8007C028->unk28->unkC);
+        if (D_8007C028->unk28->unk26 != 4) {
+            func_80024EB0(&D_803A86F8, 0x5B, 3, 0xC, 0xC, D_8007C028->unk28->unk26 * 0xC + 0x20, 0x10, 0x400, 0x400);
+        }
+    }
+}
 
 void func_8002430C(void) {
     Struct_8008C058* p = D_8008C058;
