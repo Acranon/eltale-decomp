@@ -23,14 +23,25 @@ typedef struct {
 } Unk80090470; /* size = 0x9FC */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[4];
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ s16 unk2;
     /* 0x04 */ s16 unk4;
     /* 0x06 */ s16 unk6;
 } Unk800616A8;
 
 typedef struct {
+    /* 0x00 */ s32 n;
+    /* 0x04 */ s32 m;
+    /* 0x08 */ u8 *rows[4];
+} Unk80090458;
+
+typedef struct {
     /* 0x0 */ u8 v[8];
 } Unk8Bytes;
+
+typedef struct {
+    /* 0x00 */ u8 v[32];
+} Bytes32;
 
 extern Gfx *D_8007A184;
 extern Unk8Bytes D_800616B8;
@@ -38,6 +49,14 @@ extern Unk8Bytes D_800616C0;
 extern Unk8Bytes D_800616C8;
 extern u16 D_80061850[];
 extern Unk800616A8 D_800616A8;
+extern Unk800616A8 D_80061668[];
+extern s8 D_80061660;
+extern s8 D_800616B0;
+extern u8 D_8007B8E0[32];
+extern u8 D_8007B430[0x4B0];
+extern s32 D_80090450;
+extern Unk80090458 D_80090458;
+extern s32 D_8004DCA0;
 extern Unk80090470 D_80090470[4];
 extern u8 D_80092C60;
 extern u16 D_80092C62;
