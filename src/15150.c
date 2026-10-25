@@ -220,7 +220,47 @@ void func_80016218(s32 arg0) {
     D_80085E48.unk54 = D_80085F68.unk10;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/15150/func_8001628C.s")
+typedef struct {
+    /* 0x00 */ s32 mode;
+    /* 0x04 */ f32 x;
+    /* 0x08 */ f32 y;
+    /* 0x0C */ f32 z;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+    /* 0x18 */ f32 unk18;
+} Unk8001628C;
+void func_8001628C(Unk8001628C* arg0, Unk15150Target* arg1) {
+    D_80085E48.mode = arg0->mode;
+    D_80085E48.flags = 0x40;
+    D_80085E48.unk4C = arg0->unk18;
+    D_80085E48.unk58 = arg0->unk14;
+    D_80085E48.unk5C = arg0->unk10;
+    D_80085E48.unk6C = 0.0f;
+    D_80085E48.unk64 = 0.0f;
+    D_80085E48.unk68 = D_80085E48.unk6C;
+    D_80085E48.unk60 = D_80085E48.unk64;
+    D_80085E48.target = arg1;
+    switch (arg0->mode) {
+        case 0:
+            D_80085C10.x = 0.0f;
+            D_80085C10.y = arg0->unk18 + 20.0;
+            func_800271B4(arg1->ry - 3.141592653589793 + 0.39269908169872414, &D_80085C10);
+            D_80085E48.eyeX = arg1->x - D_80085C10.x;
+            D_80085E48.eyeZ = arg1->z - D_80085C10.y;
+            D_80085E48.eyeY = arg1->y + arg0->unk14;
+            break;
+        case 1:
+            D_80085E48.eyeX = arg0->x;
+            D_80085E48.eyeY = arg0->y;
+            D_80085E48.eyeZ = arg0->z;
+            break;
+    }
+    D_80085E48.unk48 = 0.0f;
+    D_80085E48.unk34 = 0.0f;
+    D_80085E48.unk3C = 0.0f;
+    D_80085E48.unk44 = D_80085E48.unk48;
+    D_80085E48.unk40 = D_80085E48.unk44;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/15150/func_800163F4.s")
 
