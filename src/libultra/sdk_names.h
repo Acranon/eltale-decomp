@@ -26,6 +26,9 @@
 /* io/pfsisplug.c */
 #define __osPfsGetInitData func_8004B600
 
+/* io/contpfs.c data (J inode cache) */
+#define __osPfsInodeCacheBank D_8006EB44
+
 /* controller */
 #define __osContPifRam D_800956F0
 
@@ -44,6 +47,10 @@
 
 /* io/viswapcontext.c (libultra/41A70.c) */
 #define __osViSwapContext func_80040E70
+#define __additional_scanline D_8006DEEC
+
+/* os/initialize.c data */
+#define osViClock D_8006CD08
 
 /* symbol_addrs names __osSiRawReadIo/__osSiRawWriteIo as the Sp ones */
 #define __osSiRawReadIo __osSpRawReadIo

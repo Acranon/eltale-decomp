@@ -1,3 +1,11 @@
-#include "common.h"
+#include "libultra/sdk_names.h"
+#include "PR/os_internal.h"
+#include "PRinternal/osint.h"
 
-#pragma GLOBAL_ASM("asm/nonmatchings/libultra/io/yieldthread/osYieldThread.s")
+void osYieldThread(void) {
+    register u32 saveMask = __osDisableInt();
+
+    __osRunningThread->state = OS_STATE_RUNNABLE;
+    __osEnqueueAndYield(&__osRunQueue);
+    __osRestoreInt(saveMask);
+}
