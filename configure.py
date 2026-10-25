@@ -39,6 +39,7 @@ FLAGS = [
     ("src/libc/xldtob.c", "-mips2 -O3"),
     ("src/libc/xprintf.c", "-mips2 -O3"),
     ("src/libc/", "-mips2 -O2"),
+    ("src/ovl_DA4570/", "-mips2 -O2 -g3"),
     ("src/ovl_", "-mips2 -O2"),
     ("src/", "-mips2 -O2 -g3"),
 ]
