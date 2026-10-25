@@ -1462,7 +1462,65 @@ extern u16 D_80092C86;
 
 s32 func_800168F0(s32 arg0, u16 arg1);
 s32 func_800167B0(u16 count, u8 *seq);
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800085D8.s")
+s32 func_800085D8(PlayerState *arg0) {
+    s32 dir;
+    s32 pad;
+    s32 ret;
+    u32 prev;
+    s32 sfx;
+
+    ret = 0;
+    if (arg0->unk120 < 3 && (D_80092C86 & 0xF)) {
+        prev = arg0->unk120;
+        if (D_80092C86 & 8) {
+            dir = 0;
+        } else if (D_80092C86 & 4) {
+            dir = 2;
+        } else if (D_80092C86 & 2) {
+            dir = 1;
+        } else if (D_80092C86 & 1) {
+            dir = 3;
+        }
+        arg0->unk11D[arg0->unk120] = dir;
+        arg0->unk120++;
+        if (func_800168F0(func_800167B0(arg0->unk120, arg0->unk11D), arg0->unk14->unk8) & 5) {
+            sfx = 0x13;
+            arg0->unk120--;
+        } else if (!(D_8004DCA0 & 4)) {
+            D_8004DCA0 |= 4;
+            sfx = 0x17;
+        } else {
+            sfx = 0x17;
+        }
+        func_8002A7C8(0, sfx, 0xFF);
+        if (prev != arg0->unk120) {
+            D_8008C15A = 8;
+            D_8008C15C |= 1;
+            if (arg0->unk120 == 1) {
+                D_8008C15C |= 2;
+            } else {
+                D_8008C15C &= 0xFFFD;
+            }
+        }
+    } else if (arg0->unk120 && (D_80092C86 & 0xA000)) {
+        arg0->unk122 = func_800167B0(arg0->unk120, arg0->unk11D);
+        if (func_800168F0(arg0->unk122, arg0->unk14->unk8) == 0) {
+            D_8004DCA0 &= ~4;
+            ret = 1;
+        }
+    } else if ((D_80092C86 & 0x4000) && (D_8004DCA0 & 4)) {
+        if (arg0->unk120) {
+            arg0->unk120--;
+            D_8008C15A = 8;
+            D_8008C15C &= 0xFFFE;
+        }
+        if (!arg0->unk120) {
+            D_8004DCA0 &= ~4;
+        }
+        func_8002A7C8(0, 0x13, 0xFF);
+    }
+    return ret;
+}
 
 void func_80008840(PlayerState *p, Actor *a, AnimEntry *anims) {
     Unk800C185C *e;
