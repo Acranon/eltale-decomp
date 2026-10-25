@@ -48,10 +48,19 @@ void func_80024A54(s32, s32, s32, s32, s32);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
 
 typedef struct {
+    /* 0x00 */ char unk0[0x1C];
+    /* 0x1C */ f32 unk1C;
+} Struct_8007AA08_7C;
+
+typedef struct {
     /* 0x00 */ char unk0[0x18];
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
+    /* 0x24 */ char unk24[0x3C - 0x24];
+    /* 0x3C */ f32 unk3C;
+    /* 0x40 */ char unk40[0x7C - 0x40];
+    /* 0x7C */ Struct_8007AA08_7C* unk7C;
 } Struct_8007AA08;
 
 extern Gfx* D_8007A184;
@@ -134,7 +143,20 @@ void func_80020AE0(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023470.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800235D8.s")
+void func_800235D8(void) {
+    s32 sx;
+    s32 sy;
+    f32 y;
+    f32 h;
+
+    h = D_8007AA08.unk7C->unk1C * D_8007AA08.unk3C;
+    y = D_8007AA08.unk1C + h;
+    if (func_80027FFC(D_8007AA08.unk18, y, D_8007AA08.unk20, &sx, &sy) != 0) {
+        gDPPipeSync(D_8007A184++);
+        gDPLoadTLUT_pal256(D_8007A184++, D_803A4118);
+        func_80024EB0((s32) D_803A8728, sx - 0x17, sy - 0xF, 0x2E, 0xF, 0x51, 0x31, 0x400, 0x400);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_8002373C.s")
 
