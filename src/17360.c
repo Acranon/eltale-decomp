@@ -1,15 +1,37 @@
 #include "common.h"
 
 typedef struct {
+    /* 0x00 */ u8 pad0[0x5E];
+    /* 0x5E */ u16 unk5E;
+} Unk80018FB0Sub;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ Unk80018FB0Sub* unk24;
+    /* 0x28 */ void* unk28;
+} Unk80018FB0;
+
+typedef struct {
+    /* 0x000 */ u8 pad0[0x2C];
+    /* 0x02C */ u8 unk2C[0x50];
+    /* 0x07C */ s16 unk7C;
+    /* 0x07E */ u8 pad7E[0xB2];
+} Unk8007B908_b; // size = 0x130
+
+extern u8 D_8007AA20[];
+
+typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[0x16];
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
 } Unk17360Model;
 
 typedef struct {
     /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[0x8A];
+    /* 0x02 */ u8 pad2[0x88];
+    /* 0x8A */ u16 unk8A;
     /* 0x8C */ u16 unk8C;
     /* 0x8E */ u8 pad8E[6];
     /* 0x94 */ f32 unk94;
@@ -24,7 +46,9 @@ typedef struct {
     /* 0x14 */ f32 rz;
     /* 0x18 */ u8 pad18[0xC];
     /* 0x24 */ f32 scale;
-    /* 0x28 */ u8 pad28[0x3C];
+    /* 0x28 */ u8 pad28[0x38];
+    /* 0x60 */ u16 unk60;
+    /* 0x62 */ u16 unk62;
     /* 0x64 */ Unk17360Model* unk64;
     /* 0x68 */ Unk17360Data* unk68;
 } Actor17360;
@@ -75,7 +99,7 @@ extern u16 D_8008BE52;
 void func_80018480(s32, Actor17360*);
 void func_80018CD8(s32, Actor17360*);
 s32 func_8001809C(Unk80018444*);
-void func_8002373C(Actor17360*, s32, s32, s32);
+void func_8002373C(Actor17360*, s32, u16, s32);
 void func_8002433C(Actor17360*);
 
 void func_80016760(void) {
@@ -106,7 +130,15 @@ void func_80016DE0(Unk80016DE0* arg0, Actor17360* arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80016E34.s")
+void func_80016E34(Unk80016DE0* arg0, Actor17360* arg1) {
+    arg0->x = arg1->x;
+    arg0->z = arg1->z;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94;
+    } else {
+        arg0->y = arg1->y + arg1->unk64->unk1C * 0.5 * arg1->scale;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80016EA8.s")
 
@@ -176,16 +208,43 @@ void func_80019024(Unk80019024* arg0) {
     arg0->unk28 = arg0->unk24;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019034.s")
+void func_80019034(s32 arg0, Actor17360* arg1) {
+    if (!(D_8008BE52 & 0x100)) {
+        arg1->unk68->unk0 |= 1;
+        arg1->scale = arg1->unk64->unk20 * 0.5;
+        func_8002373C(arg1, 1, 4, -1);
+    } else {
+        func_8002433C(arg1);
+    }
+}
 
 void func_800190BC(s32 arg0, Actor17360* arg1) {
     arg1->unk68->unk0 |= 2;
     func_8002373C(arg1, 2, 2, -1);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019104.s")
+void func_80019104(s32 arg0, Actor17360* arg1) {
+    arg1->unk68->unk0 |= 4;
+    switch (arg0) {
+        case 1:
+            arg1->unk68->unk8A = 0x18;
+            break;
+        case 2:
+            arg1->unk68->unk8A = 0x20;
+            break;
+    }
+    func_8002373C(arg1, 4, 3, -1);
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019184.s")
+void func_80019184(s32 arg0, Actor17360* arg1) {
+    if (!(D_8008BE52 & 0x100)) {
+        arg1->unk68->unk0 |= 8;
+        arg1->unk60 |= 1;
+        func_8002373C(arg1, 8, arg0 - 1, -1);
+    } else {
+        func_8002433C(arg1);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001920C.s")
 
