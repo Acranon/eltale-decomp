@@ -354,6 +354,89 @@ void func_80032558(void) {
     func_8002DECC(0x47, 0xA2, 0xA6, 0x18, 0xE);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/30600/func_800327BC.s")
+void func_800327BC(s32 arg0) {
+    Unk8008FBA8 *e = &D_8008FBA8[arg0];
+    u8 *d;
+    u8 *s;
+    s32 n;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/30600/func_800329B0.s")
+    e->unk0 = D_8007A9D0;
+    e->unk38 = D_80084992;
+    e->unk3A = D_80084990;
+    e->unk3C = D_800842BC;
+    e->unk40 = D_800842C0;
+    e->unk44 = D_800842D0;
+    e->unk48 = D_800842D4;
+    e->unk4C = D_800842D8;
+    e->unk50 = D_800842DC;
+    e->unk54 = D_800842E0;
+    e->unk58 = D_800842E4;
+    e->unk5C = D_8007A9AC;
+    e->unk5E = D_8007A9AE;
+    e->unk60 = D_8007A9B0;
+    e->unk62 = D_800616B0;
+    e->unk63 = D_80060CB0;
+    if (D_8004DCA0 & 0x20000) {
+        e->unk64 = 1;
+    } else {
+        e->unk64 = 0;
+    }
+    d = D_80090228.unk0.b;
+    for (s = D_80085988, n = sizeof(D_80090228.unk0); n != 0; n--) {
+        *d++ = *s++;
+    }
+    d = D_80090248;
+    for (s = D_80085A98, n = sizeof(D_80090228.unk20); n != 0; n--) {
+        *d++ = *s++;
+    }
+    d = D_80090258;
+    for (s = D_8008C9B8, n = sizeof(D_80090228.unk30); n != 0; n--) {
+        *d++ = *s++;
+    }
+    d = D_800902EF;
+    for (s = D_8007C13C, n = sizeof(D_80090228.unkC7); n != 0; n--) {
+        *d++ = *s++;
+    }
+}
+
+void func_800329B0(s32 arg0) {
+    Unk8008FBA8 *e = &D_8008FBA8[arg0];
+    u8 *d;
+    u8 *s;
+    s32 n;
+
+    D_8007A9D0 = e->unk0;
+    D_80084992 = e->unk38;
+    D_80084990 = e->unk3A;
+    D_800842BC = e->unk3C;
+    D_800842C0 = e->unk40;
+    D_800842D0 = e->unk44;
+    D_800842D4 = e->unk48;
+    D_800842D8 = e->unk4C;
+    D_800842DC = e->unk50;
+    D_800842E0 = e->unk54;
+    D_800842E4 = e->unk58;
+    D_8007A9AC = e->unk5C;
+    D_8007A9AE = e->unk5E;
+    D_8007A9B0 = e->unk60;
+    D_800616B0 = e->unk62;
+    D_80060CB0 = e->unk63;
+    if (e->unk64 != 0) {
+        D_8004DCA0 |= 0x20000;
+    }
+    for (s = D_80090228.unk0.b, d = D_80085988, n = sizeof(D_80090228.unk0); n != 0; n--) {
+        *d++ = *s++;
+    }
+    s = D_80090248;
+    for (d = D_80085A98, n = sizeof(D_80090228.unk20); n != 0; n--) {
+        *d++ = *s++;
+    }
+    s = D_80090258;
+    for (d = D_8008C9B8, n = sizeof(D_80090228.unk30); n != 0; n--) {
+        *d++ = *s++;
+    }
+    s = D_800902EF;
+    for (d = D_8007C13C, n = sizeof(D_80090228.unkC7); n != 0; n--) {
+        *d++ = *s++;
+    }
+}
