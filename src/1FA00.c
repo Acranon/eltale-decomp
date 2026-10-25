@@ -142,6 +142,8 @@ void func_8001EE00(void) {
 typedef struct Struct_Stats {
     /* 0x00 */ char unk0[0xC];
     /* 0x0C */ u16 unkC;
+    /* 0x0E */ char unkE[0x34 - 0xE];
+    /* 0x34 */ u8 unk34;
 } Struct_Stats;
 
 typedef struct {
@@ -602,4 +604,21 @@ void func_8001FF10(f32 x, f32 y, f32 z, u16* list) {
 void func_800200F0(void) {
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_800200F8.s")
+s32 func_800200F8(void) {
+    s32 r;
+
+    if (D_8007AA08.unk8 & 0x2000) {
+        r = 3;
+    } else {
+        r = 4;
+    }
+    if ((D_8008BE52 & 0x100) || func_80026E90(r) == 0) {
+        r = D_8007B908[func_80026E90(D_8008BE5A)].unk28->unk34;
+    } else {
+        r = 0xFF;
+    }
+    return r;
+}
+
+void func_8002018C(void) {
+}
