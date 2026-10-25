@@ -35,7 +35,10 @@ typedef struct {
     /* 0x08 */ f32 z;
     /* 0x0C */ u8 padC[4];
     /* 0x10 */ f32 angle;
-    /* 0x14 */ u8 pad14[0x10];
+    /* 0x14 */ u8 pad14[4];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
     /* 0x24 */ f32 unk24;
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 unk2C;
@@ -253,6 +256,12 @@ extern f32 D_8007AA28;
 extern f32 D_8007B928;
 extern f32 D_8007B92C;
 void func_80015D78(s32);
+void func_8000C05C(f32 *, f32 *, Obj *);
+extern f32 D_8008BE5C;
+extern f32 D_8008BE60;
+extern f32 D_8008BE64;
+extern f32 D_8008BE68;
+extern f32 D_8008BE6C;
 
 typedef struct {
     /* 0x00 */ s16 unk0;
@@ -592,7 +601,60 @@ void func_8000BB90(Obj *obj, f32 x, f32 z) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BCA4.s")
+void func_8000BCA4(s32 clamp, f32 dx, f32 dz, Obj *obj, EnemyAI *ai) {
+    Enemy *e = (Enemy *)ai;
+    f32 x;
+    f32 z;
+    f32 d;
+    f32 r;
+    s32 flags;
+
+    if (e->unk20 != 0.0f || e->unk24 != 0.0f) {
+        dx += e->unk20;
+        dz += e->unk24;
+        e->unk20 *= 0.9f;
+        e->unk24 *= 0.9f;
+    }
+    if (clamp) {
+        x = obj->x + obj->unk18 - D_8008BE64;
+        z = obj->z + obj->unk20 - D_8008BE68;
+        d = sqrtf(x * x + z * z);
+        r = e->unk10 * e->unk128;
+        if (r < d) {
+            dx = r * x / d - obj->x + D_8008BE64;
+            dz = r * z / d - obj->z + D_8008BE68;
+            e->flags |= 2;
+        }
+    }
+    x = obj->x + obj->unk18 - D_8008BE5C;
+    z = obj->z + obj->unk20 - D_8008BE60;
+    d = sqrtf(x * x + z * z);
+    if (D_8008BE6C < d) {
+        dx = (D_8008BE6C - 0.5) * x / d - obj->x + D_8008BE5C;
+        dz = (D_8008BE6C - 0.5) * z / d - obj->z + D_8008BE60;
+    }
+    func_8000C05C(&dx, &dz, obj);
+    obj->unk18 = dx;
+    obj->unk20 = dz;
+    obj->x += dx;
+    obj->z += dz;
+    flags = 0xA00;
+    if (obj->unk64->unk0 == 0 && e->type != 0) {
+        flags = 0xA01;
+    }
+    D_8007C080.x = obj->unk64->unk18 * obj->unk64->unk20;
+    func_800107F0(obj->x, obj->y, obj->z, flags, &D_8007C080);
+    obj->x = D_8007C080.x;
+    obj->y = D_8007C080.y;
+    obj->z = D_8007C080.z;
+    if (e->flags & 4) {
+        obj->y -= 30.0;
+    }
+    obj->unk2C = D_8007C080.nx;
+    obj->unk30 = D_8007C080.ny;
+    obj->unk34 = D_8007C080.nz;
+    obj->unk62 = D_8007C080.flags;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BFE0.s")
 
