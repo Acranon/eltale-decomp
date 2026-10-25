@@ -296,7 +296,27 @@ void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     func_8002A7C8(0, 0xB, 0xFF);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_80026284.s")
+void func_80026284(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
+    Struct_803AB358* fx;
+
+    D_8004DCA0 |= 0x80;
+    D_8007A174 = 0x16;
+    D_80084300.unk0 = D_803AAA40[arg1->unk4].unk0;
+    D_80084300.unk4 = D_803AAA40[arg1->unk4].unk2;
+    D_80084300.unk8 = -1;
+    D_8007A98C = D_803AAA40[arg1->unk4].unk4;
+    D_8007A990 = D_803AAA40[arg1->unk4].unk8;
+    D_8007A994 = D_803AAA40[arg1->unk4].unkC;
+    D_8007A998 = 0x108;
+    D_8007AA0E = 0;
+    D_8007A178 = 1;
+    D_8008C190.x = D_803AB36C[1].unk8;
+    D_8008C190.y = D_803AB36C[1].unkC;
+    fx = &D_803AB358[D_803AB36C[1].unk0];
+    D_8008C190.z = 1.0f;
+    func_80019820(D_803AB36C[1].unk2, D_803AB36C[1].unk4, arg0->unk0, arg0->unk4, arg0->unk8, 0.0f, fx, &D_8008C190, arg0);
+    func_8002A7C8(0, 0x3B, 0xFF);
+}
 
 void func_80026400(s32 arg0, Struct_803AAAA0* arg1) {
     func_800169B8(arg0, arg1->unk4, 0, 4);
