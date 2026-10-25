@@ -119,7 +119,39 @@ s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx) {
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020D0F4_ovl_intro.s")
+void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
+                             s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13) {
+    IntroSprite *p = &D_802684E0[idx];
+
+    p->unk0.w = flags;
+    p->unk4 = x;
+    p->unk6 = y;
+    p->unkC = arg4;
+    p->unkE = arg5;
+    p->unk8 = arg6;
+    p->unkA = arg7;
+    if ((flags & 0x4000000) == 0x4000000) {
+        p->unk10 = (arg8 + 15) & 0xFFF0;
+    } else {
+        p->unk10 = arg8;
+    }
+    p->unk12 = arg9;
+    p->unk14 = arg11;
+    p->unk18 = arg10;
+    p->unk4C = 0;
+    p->unk4E = 0xFF;
+    p->unk32 = 0;
+    p->unk24 = 0;
+    p->unk34 = 0;
+    p->unk40 = 0.0f;
+    p->unk44 = 0.0f;
+    p->unk48 = 0.0f;
+    p->unk1C = 0.0f;
+    p->unk20 = 0.0f;
+    p->unk38 = arg12;
+    p->unk3C = arg13;
+    p->unk2E = p->unk30 = 0;
+}
 
 void func_8020D1DC_ovl_intro(void) {
     s32 i;
