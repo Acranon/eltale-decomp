@@ -166,7 +166,18 @@ Unk800859B8* func_80013D08(Unk80013D08Arg* arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/147A0/func_80013E4C.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/147A0/func_80013FA4.s")
+void func_80013FA4(Unk80013FA4Arg* arg0) {
+    f32 s;
+    u8* c;
+
+    s = sinf((f32)arg0->unk3C * 0.09817477042468103) * 0.1;
+    arg0->unk3C += 4;
+    c = (u8*)&D_8004E698[arg0->unk0 & 1];
+    arg0->unk18 += arg0->unk30 + s;
+    arg0->unk1C += arg0->unk34;
+    arg0->unk20 += arg0->unk38 + s;
+    gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], c[3]);
+}
 
 u8 func_800140B0(u16 arg0) {
     return D_80085A98[arg0 >> 3] & D_8004F770[arg0 & 7];

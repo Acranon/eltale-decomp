@@ -132,9 +132,20 @@ typedef struct {
 
 extern Unk17360Vec2 D_800863B8;
 typedef struct {
-    /* 0x00 */ u8 pad0[0x2A];
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ u8 unk24[6];
     /* 0x2A */ u16 unk2A;
 } Unk8007AA1C;
+
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 unk6[0x3E];
+} Unk800C185C; // size = 0x44
+
+extern Unk800C185C* D_800C185C[];
+extern u16 D_800C186E[];
 
 extern Unk8007AA1C* D_8007AA1C;
 extern s32 D_8007B900;
