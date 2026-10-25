@@ -1,6 +1,144 @@
 #include "common.h"
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009150.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[2];
+    /* 0x02 */ s16 unk2;
+} Unk10;
+
+typedef struct {
+    /* 0x00 */ u16 area;
+    /* 0x02 */ u8 pad2[2];
+    /* 0x04 */ u8 unk4;
+    /* 0x05 */ u8 flags;
+    /* 0x06 */ u8 pad6[0xA];
+    /* 0x10 */ Unk10 *unk10;
+    /* 0x14 */ u8 *name;
+    /* 0x18 */ u8 pad18[4];
+    /* 0x1C */ f32 x;
+    /* 0x20 */ f32 z;
+    /* 0x24 */ f32 angle;
+    /* 0x28 */ f32 unk28;
+} NPCDef; /* size 0x2C */
+
+typedef struct {
+    /* 0x00 */ s16 state;
+    /* 0x02 */ s16 timer;
+    /* 0x04 */ f32 homeX;
+    /* 0x08 */ f32 homeZ;
+    /* 0x0C */ f32 homeAngle;
+    /* 0x10 */ u8 pad10[4];
+    /* 0x14 */ f32 x;
+    /* 0x18 */ f32 y;
+    /* 0x1C */ f32 z;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ f32 angle;
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ u8 pad2C[0xC];
+    /* 0x38 */ f32 unk38;
+    /* 0x3C */ f32 unk3C;
+    /* 0x40 */ f32 nx;
+    /* 0x44 */ f32 ny;
+    /* 0x48 */ f32 nz;
+    /* 0x4C */ u8 pad4C[0x28];
+    /* 0x74 */ s16 unk74;
+    /* 0x76 */ u8 pad76[0xA];
+    /* 0x80 */ NPCDef *def;
+} NPC; /* size 0x84 */
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+} CollOut;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ u8 padC[0xC];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ u8 pad1C[4];
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ u8 pad24[8];
+    /* 0x2C */ f32 nx;
+    /* 0x30 */ f32 ny;
+    /* 0x34 */ f32 nz;
+} Unk80009988;
+
+typedef struct {
+    /* 0x00 */ u16 count;
+    /* 0x02 */ u8 pad2[2];
+    /* 0x04 */ NPCDef *defs;
+} NPCList;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x38];
+    /* 0x38 */ NPCList *npcs;
+} Unk8007C284;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x12];
+    /* 0x12 */ u16 unk12;
+} Unk8007C288;
+
+typedef struct {
+    /* 0x00 */ u32 start;
+    /* 0x04 */ u32 end;
+} RomRange;
+
+void func_80009764(s32);
+void func_800097F8(NPCDef *, s32);
+void func_80009A54(f32 *, f32 *, Unk80009988 *);
+void func_8000A1D0(s32, u8 *);
+void func_800107F0(f32, f32, f32, s32, CollOut *);
+void func_800201A0(void *, s32, s32, s32, s32, s32);
+u32 func_80026E90(s32);
+void func_80028120(u32, void *, u32);
+void func_80032D20(s32);
+void func_8020C0D0(void);
+
+extern u8 D_86F6F0[];
+extern u8 D_871D10[];
+extern u8 D_A70350[];
+extern u8 D_A77F10[];
+extern u8 D_D2E2F0[];
+extern u8 D_802A0000[];
+extern u8 D_8020E6F0[];
+extern RomRange D_80056880[];
+extern u8 D_800568B8[];
+extern u16 D_8007A172;
+extern RomRange *D_8007AB70;
+extern s16 D_8007AB74;
+extern CollOut D_8007AB88;
+extern s32 D_8007ABA4;
+extern NPC D_8007ABF0[];
+extern u8 D_8007B430[];
+extern u8 D_8007B8E0[];
+extern Unk8007C284 *D_8007C284;
+extern Unk8007C288 *D_8007C288;
+extern s32 D_800842C0;
+extern u16 D_800842E8;
+
+void func_80009150(void) {
+    NPCList *list;
+
+    D_8007ABA4 = 0;
+    if (!(D_800842E8 & 1)) {
+        func_80009764(D_8007C288->unk12);
+        list = D_8007C284->npcs;
+        if (list != NULL) {
+            func_800097F8(list->defs, list->count);
+        }
+        D_8007AB74 = 0;
+        if (D_8007A172 == 1) {
+            func_8000A1D0(0, D_800568B8);
+            func_80032D20(1);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800091E0.s")
 
@@ -10,14 +148,70 @@
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800097F8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009988.s")
+void func_80009988(f32 dx, f32 dz, Unk80009988 *obj) {
+    func_80009A54(&dx, &dz, obj);
+    obj->unk18 = dx;
+    obj->unk20 = dz;
+    obj->x += dx;
+    obj->z += dz;
+    D_8007AB88.x = 4.0f;
+    func_800107F0(obj->x, obj->y, obj->z, 0xA01, &D_8007AB88);
+    obj->x = D_8007AB88.x;
+    obj->y = D_8007AB88.y;
+    obj->z = D_8007AB88.z;
+    obj->nx = D_8007AB88.nx;
+    obj->ny = D_8007AB88.ny;
+    obj->nz = D_8007AB88.nz;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009A54.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009DDC.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_8000A040.s")
+void func_8000A040(s32 idx) {
+    NPC *npc = &D_8007ABF0[idx];
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_8000A0F8.s")
+    if (npc->def->unk4 == 2) {
+        npc->state = 0;
+        npc->timer = func_80026E90(30) + 30;
+    } else if (npc->def->flags & 2) {
+        npc->state = 0;
+        npc->timer = npc->def->unk10->unk2;
+    } else {
+        npc->state = 3;
+        npc->timer = 15;
+        func_800201A0(&npc->x, 1, 1, 1, 1, 1);
+    }
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_8000A1D0.s")
+void func_8000A0F8(NPC *npc, s32 arg1) {
+    s32 i;
+
+    func_80028120(arg1 + (u32)D_D2E2F0, D_8007B430, 0x4B0);
+    if (npc->def->name != NULL) {
+        for (i = 0; i != 0x20; i++) {
+            D_8007B8E0[i] = npc->def->name[i];
+        }
+    } else {
+        D_8007B8E0[0] = 0xFF;
+    }
+}
+
+void func_8000A1D0(s32 arg0, u8 *arg1) {
+    s32 i;
+    u8 *dst;
+    NPC *npc;
+
+    dst = D_8007B430;
+    for (i = 0x4B0; i != 0; i--) {
+        *dst++ = *arg1++;
+    }
+    npc = &D_8007ABF0[arg0];
+    if (npc->def->name != NULL) {
+        for (i = 0; i != 0x20; i++) {
+            D_8007B8E0[i] = npc->def->name[i];
+        }
+    } else {
+        D_8007B8E0[0] = 0xFF;
+    }
+}

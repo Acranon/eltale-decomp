@@ -1,3 +1,7 @@
 #include "common.h"
 
-#pragma GLOBAL_ASM("asm/nonmatchings/13DE0/func_800131E0.s")
+extern s32 D_80085280;
+
+void func_800131E0(void) {
+    D_80085280 = 0;
+}
