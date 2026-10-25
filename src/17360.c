@@ -358,7 +358,18 @@ void func_80017590(Unk17360Cam* arg0, Actor17360* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017630.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017AB0.s")
+s32 func_80017AB0(void) {
+    s32 i;
+    Unk80085F98* p;
+
+    i = 16;
+    p = D_80085F98;
+    while (i != 0 && p->unk4 == 0) {
+        i--;
+        p++;
+    }
+    return i;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017AEC.s")
 
@@ -472,7 +483,26 @@ void func_80018D88(s32 arg0, Actor17360* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018DC0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018FB0.s")
+void func_80018FB0(Unk80018FB0* arg0) {
+    s32 i;
+    Unk8007B908_b* p;
+
+    if (arg0->unk24->unk5E & 1) {
+        arg0->unk28 = D_8007AA20;
+        return;
+    }
+    p = (Unk8007B908_b*)D_8007B908;
+    i = 6;
+    while (i != 0 && p->unk7C == -1) {
+        i--;
+        p++;
+    }
+    if (i != 0) {
+        arg0->unk28 = p->unk2C;
+        return;
+    }
+    arg0->unk28 = NULL;
+}
 
 void func_80019024(Unk80019024* arg0) {
     arg0->unk28 = arg0->unk24;
