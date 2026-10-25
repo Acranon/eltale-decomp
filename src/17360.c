@@ -128,6 +128,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
 } Unk17360Vec2;
 
 extern Unk17360Vec2 D_800863B8;
@@ -641,7 +642,75 @@ void func_800195E0(s32 arg0, Actor17360* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800199C0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019BFC.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ s16 unk10;
+    /* 0x12 */ u16 unk12;
+    /* 0x14 */ u16 unk14;
+    /* 0x16 */ u8 pad16[2];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ u8 pad20[0x26];
+    /* 0x46 */ s8 unk46;
+    /* 0x47 */ u8 unk47;
+} Unk80019BFCDef;
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[6];
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ s32 unk24;
+    /* 0x28 */ u8 pad28[4];
+    /* 0x2C */ Unk17360CamCfg* cfg;
+    /* 0x30 */ Unk80019BFCDef* def;
+} Unk80019BFC;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x28];
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 unk2C;
+    /* 0x30 */ f32 unk30;
+} Unk80019BFCRet;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ f32 unk10;
+} Unk80019BFCArg1;
+typedef struct {
+    u8 unk0[10];
+} Unk800C18D8;
+extern Unk800C18D8 D_800C18D8[];
+Unk80019BFCRet* func_80019820(u16, u16, f32, f32, f32, f32, Unk800C18D8*, Unk17360Vec2*, s32);
+void func_8002A7C8(u8, s8, s32);
+void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
+    Unk80019BFCRet* ret;
+    Unk17360CamCfg* cfg;
+    Unk80019BFCDef* def;
+    Unk800C18D8* tbl;
+    f32 angle;
+
+    def = arg0->def;
+    cfg = arg0->cfg;
+    tbl = &D_800C18D8[def->unk10];
+    D_800863B8.x = def->unk18;
+    D_800863B8.y = def->unk1C;
+    D_800863B8.z = cfg->unk1C;
+    if (def->unk14 & 0x10) {
+        angle = arg0->unk4 * 3.141592653589793 / 10.0;
+    } else {
+        angle = arg1->unk10;
+    }
+    ret = func_80019820(def->unk12, def->unk14, arg0->x, arg0->y, arg0->z, angle, tbl, &D_800863B8, arg0->unk24);
+    ret->unk28 = arg0->unk18;
+    ret->unk2C = arg0->unk1C;
+    ret->unk30 = arg0->unk20;
+    if (def->unk46 >= 0) {
+        func_8002A7C8(def->unk47, def->unk46, 0xFF);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019D2C.s")
 
