@@ -593,7 +593,74 @@ void func_8000E81C(MtxBuf *arg0) {
     D_8004DDB0 += 2;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000EEA8.s")
+void func_8000EEA8(s32 count, u16 *ids) {
+    Unk8000FA9C *s;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 d;
+    u16 kind;
+
+    for (; count != 0; count--) {
+        s = &D_8007C290[*ids++];
+        if (s->unk16 & 0x1000) {
+            dx = s->x - D_8007AA08.x;
+            dy = s->y - D_8007AA08.y;
+            dz = s->z - D_8007AA08.z;
+            d = sqrtf(dx * dx + dy * dy + dz * dz);
+            if (d < D_800842AC) {
+                D_800842AC = d;
+                D_800842B0 = (s->unk16 & 0xF00) >> 8;
+            }
+        }
+        kind = s->unk16;
+        if (s->unk16 & 0x2000) {
+            kind = 0;
+        } else {
+            kind = (u8)kind;
+        }
+        if (!kind || kind == 8) {
+            if (s->unk16 & 0x4000) {
+                *D_80081CCC++ = s;
+                D_80081CB4++;
+            } else {
+                *D_80081CC8++ = s;
+                D_80081CB0++;
+            }
+        } else if (kind < 4) {
+            if (D_80081CE0 != 0) {
+                *D_80081FE8 = *s;
+            }
+            s->x = sins(D_80082048[kind].a + 0xA000) / D_8004DDD4[kind] + D_80081FE8->x;
+            s->z = sins(D_80082048[kind].a + 0x2000) / D_8004DDF4[kind] + D_80081FE8->z;
+            s->y = sins(D_80082048[kind].b) / D_8004DDE4[kind] + D_80081FE8->y;
+            *D_80081CD4++ = s;
+            D_80081CBC++;
+            D_80081FE8++;
+        } else if (kind == 0x11 || kind == 0x12) {
+            *D_80081CD8++ = s;
+            D_80081CC0++;
+        } else if (kind == 0x10) {
+            *D_80081CD0++ = s;
+            D_80081CB8++;
+            D_8007C2A4++;
+        } else if (kind == 0x7F || kind == 0x80) {
+            *D_80081CD4++ = s;
+            D_80081CBC++;
+        } else if (kind == 0x81) {
+            func_8001A948(s->x, s->y, s->z, s);
+        } else if (kind == 0x83) {
+            func_8000FA9C(s);
+        } else if (kind == 0x84) {
+            func_8000FC50(s);
+        } else if (kind == 0x82) {
+            func_8000FDA8(s->x, s->y, s->z, s->angle, s);
+        } else if (kind >= 0x40 && kind < 0x46) {
+            *D_80081CDC++ = s;
+            D_80081CC4++;
+        }
+    }
+}
 
 void func_8000F34C(MtxBuf *arg0) {
     func_800273C0(&arg0->mtx[D_8007A180], 0.0f, 0.0f, 0.0f, 1.0f, D_80085E48.x, D_80085E48.y - 10.0f, D_80085E48.z);
