@@ -365,7 +365,142 @@ void func_80012B68(s32 arg0, s32 *arg1) {
     D_80084998[arg0].unk2C = arg1;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80012B88.s")
+void func_80012B88(s32 idx) {
+    s32 *f;
+    s32 i;
+    s32 (*src)[3];
+    s32 r;
+    s32 g;
+    Lights3 *l;
+    s32 (*cols)[3];
+    Unk80084998 *p;
+    s32 pad; /* Retain the original -g3 local stack home. */
+    s32 (*dirs)[3];
+    s32 tmp[4][3];
+    s32 b;
+
+    p = &D_80084998[idx];
+    if (D_8007A17C != 0) {
+        l = &D_800847C0[idx];
+    } else {
+        l = &D_80084600[idx];
+    }
+    if (p->unk4 != 0) {
+        cols = (s32 (*)[3])p->unk10;
+        r = (*cols)[0];
+        g = (*cols)[1];
+        b = (*cols)[2];
+        switch (p->unk4) {
+            case 1:
+                p->unk10 += 3;
+                if (--p->unk8 == 0) {
+                    p->unk4 = 0;
+                }
+                break;
+            case 2:
+                if (p->unk8 != 0) {
+                    if (--p->unk8 != 0) {
+                        p->unk10 += 3;
+                    }
+                }
+                break;
+            case 3:
+                if (--p->unk8 == 0) {
+                    p->unk8 = p->unkC;
+                    p->unk10 = p->unk14;
+                } else {
+                    p->unk10 += 3;
+                }
+                break;
+        }
+    } else {
+        r = g = b = 0;
+    }
+    gDPSetEnvColor(D_8007A184++, r, g, b, 0xB4);
+    if (p->unk18 != 0) {
+        f = p->unk24;
+        tmp[0][0] = (f[0] * D_80084B18[0][0]) >> 8;
+        tmp[0][1] = (f[1] * D_80084B18[0][1]) >> 8;
+        tmp[0][2] = (f[2] * D_80084B18[0][2]) >> 8;
+        f += 3;
+        src = &D_80084B18[1];
+        cols = &tmp[1];
+        i = 3;
+        do {
+            (*cols)[0] = (f[0] * (*src)[0]) >> 8;
+            (*cols)[1] = (f[1] * (*src)[1]) >> 8;
+            (*cols)[2] = (f[2] * (*src)[2]) >> 8;
+            i--;
+            src++;
+            cols++;
+        } while (i != 0);
+        D_80084B60 = f[0];
+        D_80084B64 = f[1];
+        D_80084B68 = f[2];
+        cols = tmp;
+        switch (p->unk18) {
+            case 1:
+                p->unk24 += 6;
+                if (--p->unk20 == 0) {
+                    p->unk18 = 0;
+                }
+                break;
+            case 2:
+                if (p->unk20 != 0) {
+                    if (--p->unk20 != 0) {
+                        p->unk24 += 6;
+                    }
+                }
+                break;
+            case 3:
+                if (--p->unk20 == 0) {
+                    p->unk20 = p->unk1C;
+                    p->unk24 = p->unk28;
+                } else {
+                    p->unk24 += 6;
+                }
+                break;
+        }
+    } else {
+        D_80084B60 = D_80084B64 = D_80084B68 = 0xFF;
+        cols = D_80084B18;
+    }
+    dirs = (s32 (*)[3])p->unk2C;
+    if (dirs == NULL) {
+        dirs = D_80084B48;
+    }
+    if (p->unk0 == 2) {
+        src = cols;
+        cols = tmp;
+        i = 3;
+        do {
+            (*cols)[0] = (*src)[0] - ((*src)[0] >> 2) + 0x3F;
+            (*cols)[1] = (*src)[1] - ((*src)[1] >> 2) + 0x3F;
+            (*cols)[2] = (*src)[2] - ((*src)[2] >> 2) + 0x3F;
+            i--;
+            cols++;
+            src++;
+        } while (i != 0);
+        (*cols)[0] = (*src)[0];
+        (*cols)[1] = (*src)[1];
+        (*cols)[2] = (*src)[2];
+        cols = tmp;
+    }
+    func_800130F8(l, cols, dirs);
+    gSPSetLights3(D_8007A184++, (*l));
+    gDPSetFogColor(D_8007A184++, cols[3][0], cols[3][1], cols[3][2], 0xFF);
+    if (D_800842B8 & 0x80) {
+        D_8007A188 = cols[3][0];
+        D_8007A18C = cols[3][1];
+        D_8007A190 = cols[3][2];
+    } else {
+        D_8007A188 = D_8007A18C = D_8007A190 = 0;
+    }
+    D_80084B6C = cols[3][0];
+    D_80084B70 = cols[3][1];
+    D_80084B74 = cols[3][2];
+}
+
 
 void func_800130F8(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]) {
     arg0->l[1].l.dir[0] = (*arg2)[0];
