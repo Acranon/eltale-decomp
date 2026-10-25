@@ -5,6 +5,10 @@
 #include "stdlib.h"
 #include "stdarg.h"
 
+/* The build uses -signed, but libc was built with IDO's default unsigned
+ * char. Everything after this header sees char as unsigned. */
+#define char unsigned char
+
 #ifdef __sgi
 typedef double ldouble; // IDO does not support long doubles
 #else
@@ -16,7 +20,7 @@ typedef struct {
         /* 0x0 */ long long ll;
         /* 0x0 */ ldouble ld;
     } v;
-    /* 0x8 */ unsigned char* s;
+    /* 0x8 */ char* s; /* unsigned char, see above */
     /* 0xC */ int n0;
     /* 0x10 */ int nz0;
     /* 0x14 */ int n1;

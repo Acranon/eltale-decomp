@@ -1,7 +1,6 @@
 #include "stdarg.h"
 #include "PR/os.h"
 #include "PR/os_internal.h"
-#include "xstdio.h"
 
 /* _FINALROM build: both are empty. IDO -O3 emits functions in reverse source
  * order, so ultralib's osSyncPrintf, rmonPrintf come out as rmonPrintf
