@@ -134,13 +134,16 @@ typedef struct {
 } Unk80056718;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ struct Unk8007AA84 *unk14;
     /* 0x18 */ f32 x;
     /* 0x1C */ f32 y;
     /* 0x20 */ f32 z;
     /* 0x24 */ u8 pad24[0x18];
     /* 0x3C */ f32 unk3C;
     /* 0x40 */ f32 unk40;
+    /* 0x44 */ u8 pad44[0x34];
+    /* 0x78 */ u16 unk78;
 } Unk8007AA08;
 
 typedef struct {
@@ -154,9 +157,11 @@ typedef struct {
 extern s32 D_8007C2A4;
 extern Unk8007C2A8 *D_8007C2A8[];
 
-typedef struct {
+typedef struct Unk8007AA84 {
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ f32 unk18;
+    /* 0x1C */ u8 pad1C[0x10];
+    /* 0x2C */ u16 unk2C;
 } Unk8007AA84;
 
 f32 sqrtf(f32);
@@ -176,7 +181,7 @@ typedef struct Unk8000BA20 {
     /* 0x0C */ s16 unkC;
     /* 0x0E */ u8 padE[2];
     /* 0x10 */ f32 unk10;
-    /* 0x14 */ u8 pad14[4];
+    /* 0x14 */ f32 unk14;
 } Unk8000BA20; /* size 0x18 */
 
 typedef struct {
@@ -282,6 +287,14 @@ typedef struct {
 } AnimDef; /* size 0xC */
 
 void func_800169B8(Obj *, s32, s32, s32);
+s32 func_8000C3FC(Obj *obj);
+u16 func_8000C48C(Enemy *arg0);
+s32 func_80007FD8(s32, s32, Obj *);
+void func_8001BE2C(f32, f32, f32);
+void func_8001AE24(Obj *, s32, s32);
+void func_8002373C(Obj *, s32, s32, s32);
+void func_8000847C(void);
+extern f32 D_8007C074;
 extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
 extern Unk8007AA08 D_8007AA08;
@@ -303,7 +316,23 @@ extern u16 D_8008BE58;
 extern Unk800C18D8 D_800C18D8[];
 extern u8 D_8020E6F0[];
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A2A0.s")
+void func_8000A2A0(void) {
+    s32 i;
+    Enemy *e;
+
+    D_8007B900 = 0;
+    D_8007C02C = 0;
+    e = D_8007B908;
+    i = 6;
+    do {
+        e->obj.unk50 = -1;
+        e++;
+        i--;
+    } while (i != 0);
+    if (D_800842E8 & 1) {
+        func_8000A5E4();
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A310.s")
 

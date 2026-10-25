@@ -338,7 +338,20 @@ void func_8000F4A0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000F4C8.s")
+s32 func_8000F4C8(s32 id) {
+    Unk80084238 *p;
+    s32 i;
+
+    i = 4;
+    p = D_80084238;
+    for (; i != 0; i--, p++) {
+        if (p->timer != 0 && id == p->id) {
+            i = 5 - i;
+            break;
+        }
+    }
+    return i;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000F50C.s")
 

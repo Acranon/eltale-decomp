@@ -3,6 +3,8 @@
 typedef struct {
     /* 0x00 */ u8 pad0[2];
     /* 0x02 */ s16 unk2;
+    /* 0x04 */ u8 pad4[0xA];
+    /* 0x0E */ s16 unkE;
 } Unk10;
 
 typedef struct {
@@ -22,7 +24,8 @@ typedef struct {
     /* 0x0C */ u8 padC[4];
     /* 0x10 */ Unk10 *unk10;
     /* 0x14 */ u8 *name;
-    /* 0x18 */ u8 pad18[4];
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ f32 x;
     /* 0x20 */ f32 z;
     /* 0x24 */ f32 angle;
@@ -30,8 +33,8 @@ typedef struct {
 } NPCDef; /* size 0x2C */
 
 typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ s16 timer;
+    /* 0x00 */ u16 state;
+    /* 0x02 */ u16 timer;
     /* 0x04 */ f32 homeX;
     /* 0x08 */ f32 homeZ;
     /* 0x0C */ f32 homeAngle;
@@ -103,7 +106,9 @@ typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ u8 padC[0x18];
+    /* 0x0C */ u8 padC[4];
+    /* 0x10 */ f32 angle;
+    /* 0x14 */ u8 pad14[0x10];
     /* 0x24 */ f32 unk24;
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 rx;
@@ -194,7 +199,22 @@ extern RomRange D_80056880[];
 extern u8 D_800568B8[];
 extern u16 D_8007A172;
 extern RomRange *D_8007AB70;
-extern s16 D_8007AB74;
+extern u16 D_8007AB74;
+extern f32 D_8007AB78[2];
+void func_800271B4(f32, f32 *);
+
+typedef struct {
+    /* 0x00 */ u16 state;
+    /* 0x02 */ u16 timer;
+    /* 0x04 */ f32 homeX;
+    /* 0x08 */ f32 homeZ;
+    /* 0x0C */ f32 homeAngle;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ NPCObj obj;
+    /* 0x70 */ u8 pad70[0x10];
+    /* 0x80 */ NPCDef *def;
+} NPC2; /* size 0x84 */
+void func_80009988(f32, f32, Unk80009988 *);
 extern CollOut D_8007AB88;
 extern s32 D_8007ABA4;
 extern NPC D_8007ABF0[];
