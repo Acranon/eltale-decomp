@@ -35,7 +35,10 @@ typedef struct {
     /* 0x08 */ f32 z;
     /* 0x0C */ u8 padC[4];
     /* 0x10 */ f32 angle;
-    /* 0x14 */ u8 pad14[0x10];
+    /* 0x14 */ u8 pad14[4];
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
     /* 0x24 */ f32 unk24;
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 unk2C;
@@ -113,7 +116,7 @@ typedef struct {
 } Vec3f;
 
 typedef struct {
-    /* 0x00 */ s16 unk0;
+    /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
@@ -137,7 +140,19 @@ typedef struct {
     /* 0x20 */ f32 z;
     /* 0x24 */ u8 pad24[0x18];
     /* 0x3C */ f32 unk3C;
+    /* 0x40 */ f32 unk40;
 } Unk8007AA08;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+} Unk8007C2A8;
+
+extern s32 D_8007C2A4;
+extern Unk8007C2A8 *D_8007C2A8[];
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -153,12 +168,13 @@ typedef struct {
 
 typedef struct Unk8000BA20 {
     /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[2];
+    /* 0x02 */ u16 unk2;
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 pad6[2];
+    /* 0x06 */ u16 unk6;
     /* 0x08 */ s16 unk8;
     /* 0x0A */ s16 unkA;
-    /* 0x0C */ u8 padC[4];
+    /* 0x0C */ s16 unkC;
+    /* 0x0E */ u8 padE[2];
     /* 0x10 */ f32 unk10;
     /* 0x14 */ u8 pad14[4];
 } Unk8000BA20; /* size 0x18 */
@@ -216,7 +232,56 @@ extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
 extern u8 D_8004F760[];
 extern Unk800561A0 D_800561A0[];
 extern u32 D_800566C8[];
-extern Unk80056718 D_80056718;
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+} SpawnDef; /* size 0x10 */
+
+typedef struct {
+    /* 0x00 */ u16 time;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 flags;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+} SpawnScript; /* size 0x18 */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ u8 pad20[0x24];
+} Unk800C185C; /* size 0x44 */
+
+extern SpawnDef D_80056718[];
+extern Unk800C185C *D_800C185C[];
+extern Enemy *D_8007C068;
+extern Obj *D_8007C06C;
+extern f32 D_8007AA20;
+extern f32 D_8007AA24;
+extern f32 D_8007AA28;
+extern f32 D_8007B928;
+extern f32 D_8007B92C;
+void func_80015D78(s32);
+void func_8000C05C(f32 *, f32 *, Obj *);
+extern f32 D_8008BE5C;
+extern f32 D_8008BE60;
+extern f32 D_8008BE64;
+extern f32 D_8008BE68;
+extern f32 D_8008BE6C;
+
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ s16 unk2;
+    /* 0x04 */ u8 pad4[8];
+} AnimDef; /* size 0xC */
+
+void func_800169B8(Obj *, s32, s32, s32);
 extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
 extern Unk8007AA08 D_8007AA08;
@@ -228,8 +293,8 @@ extern u8 **D_8007C048;
 extern s32 D_8007C04C;
 extern u16 D_8007C050[];
 extern Unk800561A0 *D_8007C05C;
-extern Unk8007C060 D_8007C060;
-extern s32 D_8007C064;
+extern u16 D_8007C060;
+extern SpawnScript *D_8007C064;
 extern Vec3f D_8007C070;
 extern Unk8007C288 *D_8007C288;
 extern u16 D_800842E8;
@@ -441,7 +506,62 @@ void func_8000B030(Obj *obj, EnemyAI *ai, s32 arg2) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B0D8.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B508.s")
+void func_8000B508(Obj *obj, Enemy *e, AnimDef *anims) {
+    Unk8000BA20 *a;
+
+    switch (e->unk6) {
+        case 0:
+            if (e->unk1C->unk2 & 2) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                func_800169B8(obj, e->unk1C->unk0 & ~0x8000, 0, 0);
+                a = e->unk1C;
+                e->unk6++;
+                if (a->unkA == -1) {
+                    e->unk2 = anims[a->unk8].unk2 - a->unk4;
+                } else {
+                    e->unk6++;
+                    e->unk2 = a->unk6;
+                }
+                if (e->unk2 <= 0) {
+                    e->unk2 = 15;
+                }
+                func_8001FC14(obj);
+            }
+            break;
+        case 1:
+            if (e->unk1C->unk2 & 0xA) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                e->type = 0;
+                obj->unk60 &= 0xFFFE;
+                e->unk20 = e->unk24 = 0.0f;
+            }
+            break;
+        case 2:
+            if (e->unk1C->unk2 & 0xA) {
+                func_8000BFE0(obj, &D_8007C070);
+                func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            }
+            e->unk2--;
+            if (e->unk2 == 0) {
+                a = e->unk1C;
+                e->unk6--;
+                e->unk2 = anims[a->unkC].unk2;
+                func_800201A0(obj, a->unkC, 1, 0, 1, 1);
+            }
+            if (e->unk2 <= 0) {
+                e->unk2 = 15;
+            }
+            break;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000B7A4.s")
 
@@ -493,11 +613,139 @@ void func_8000BB90(Obj *obj, f32 x, f32 z) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BCA4.s")
+void func_8000BCA4(s32 clamp, f32 dx, f32 dz, Obj *obj, EnemyAI *ai) {
+    Enemy *e = (Enemy *)ai;
+    f32 x;
+    f32 z;
+    f32 d;
+    f32 r;
+    s32 flags;
+
+    if (e->unk20 != 0.0f || e->unk24 != 0.0f) {
+        dx += e->unk20;
+        dz += e->unk24;
+        e->unk20 *= 0.9f;
+        e->unk24 *= 0.9f;
+    }
+    if (clamp) {
+        x = obj->x + obj->unk18 - D_8008BE64;
+        z = obj->z + obj->unk20 - D_8008BE68;
+        d = sqrtf(x * x + z * z);
+        r = e->unk10 * e->unk128;
+        if (r < d) {
+            dx = r * x / d - obj->x + D_8008BE64;
+            dz = r * z / d - obj->z + D_8008BE68;
+            e->flags |= 2;
+        }
+    }
+    x = obj->x + obj->unk18 - D_8008BE5C;
+    z = obj->z + obj->unk20 - D_8008BE60;
+    d = sqrtf(x * x + z * z);
+    if (D_8008BE6C < d) {
+        dx = (D_8008BE6C - 0.5) * x / d - obj->x + D_8008BE5C;
+        dz = (D_8008BE6C - 0.5) * z / d - obj->z + D_8008BE60;
+    }
+    func_8000C05C(&dx, &dz, obj);
+    obj->unk18 = dx;
+    obj->unk20 = dz;
+    obj->x += dx;
+    obj->z += dz;
+    flags = 0xA00;
+    if (obj->unk64->unk0 == 0 && e->type != 0) {
+        flags = 0xA01;
+    }
+    D_8007C080.x = obj->unk64->unk18 * obj->unk64->unk20;
+    func_800107F0(obj->x, obj->y, obj->z, flags, &D_8007C080);
+    obj->x = D_8007C080.x;
+    obj->y = D_8007C080.y;
+    obj->z = D_8007C080.z;
+    if (e->flags & 4) {
+        obj->y -= 30.0;
+    }
+    obj->unk2C = D_8007C080.nx;
+    obj->unk30 = D_8007C080.ny;
+    obj->unk34 = D_8007C080.nz;
+    obj->unk62 = D_8007C080.flags;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BFE0.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000C05C.s")
+void func_8000C05C(f32 *dx, f32 *dz, Obj *obj) {
+    f32 nx;
+    f32 nz;
+    f32 ddx;
+    f32 ddz;
+    f32 r;
+    f32 d;
+    s32 hit;
+    f32 radius;
+    s32 i;
+    Obj **list;
+    Obj *other;
+    Unk8007C2A8 **list2;
+    Unk8007C2A8 *other2;
+
+    nx = *dx + obj->x;
+    nz = *dz + obj->z;
+    radius = obj->unk28 * obj->unk24;
+    hit = 0;
+    ddx = nx - D_8007AA08.x;
+    ddz = nz - D_8007AA08.z;
+    r = D_8007AA08.unk40 * D_8007AA08.unk3C + radius;
+    if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+        d = sqrtf(ddx * ddx + ddz * ddz);
+        if (d < r) {
+            d = r / d;
+            hit = 1;
+            ddx *= d;
+            ddz *= d;
+            *dx = D_8007AA20 + ddx - obj->x;
+            *dz = D_8007AA28 + ddz - obj->z;
+        }
+    }
+    i = D_8007C02C;
+    if (i != 0) {
+        for (list = D_8007C030; !hit && i != 0; i--) {
+            other = *list++;
+            if (other != obj) {
+                ddx = nx - other->x;
+                ddz = nz - other->z;
+                r = other->unk28 * other->unk24 + radius;
+                if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+                    d = sqrtf(ddx * ddx + ddz * ddz);
+                    if (d != 0.0f && d < r) {
+                        d = r / d;
+                        hit++;
+                        ddx *= d;
+                        ddz *= d;
+                        *dx = other->x + ddx - obj->x;
+                        *dz = other->z + ddz - obj->z;
+                    }
+                }
+            }
+        }
+    }
+    i = D_8007C2A4;
+    if (i != 0) {
+        for (list2 = D_8007C2A8; !hit && i != 0; i--) {
+            other2 = *list2++;
+            ddx = nx - other2->x;
+            ddz = nz - other2->z;
+            r = radius + other2->unk10 * 2.0;
+            if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+                d = sqrtf(ddx * ddx + ddz * ddz);
+                if (d < r) {
+                    d = r / d;
+                    hit++;
+                    ddx *= d;
+                    ddz *= d;
+                    *dx = other2->x + ddx - obj->x;
+                    *dz = other2->z + ddz - obj->z;
+                }
+            }
+        }
+    }
+}
 
 s32 func_8000C3FC(Obj *obj) {
     s16 chance;
@@ -547,10 +795,10 @@ void func_8000CC30(void) {
 }
 
 void func_8000CC40(s32 arg0, s32 arg1) {
-    D_8007C060.unk0 = 0;
-    D_8007C060.unk4 = D_800566C8[arg0];
-    D_8007C060.unk8 = arg1;
-    D_8007C060.unkC = &D_8007B908[0].obj;
+    ((Unk8007C060 *)&D_8007C060)->unk0 = 0;
+    ((Unk8007C060 *)&D_8007C060)->unk4 = D_800566C8[arg0];
+    ((Unk8007C060 *)&D_8007C060)->unk8 = arg1;
+    ((Unk8007C060 *)&D_8007C060)->unkC = &D_8007B908[0].obj;
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000CC78.s")

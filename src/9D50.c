@@ -140,6 +140,8 @@ typedef struct {
 } Unk8007C2A8;
 
 f32 sqrtf(f32);
+extern f32 D_8007AA20;
+extern f32 D_8007AA28;
 extern s32 D_8007C2A4;
 extern Unk8007C2A8 *D_8007C2A8[];
 
@@ -276,7 +278,82 @@ void func_80009988(f32 dx, f32 dz, Unk80009988 *obj) {
     obj->nz = D_8007AB88.nz;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009A54.s")
+void func_80009A54(f32 *dx, f32 *dz, Unk80009988 *obj) {
+    f32 nx;
+    f32 nz;
+    f32 ddx;
+    f32 ddz;
+    f32 r;
+    f32 d;
+    s32 hit;
+    f32 radius;
+    s32 i;
+    NPCObj **list;
+    NPCObj *other;
+    Unk8007C2A8 **list2;
+    Unk8007C2A8 *other2;
+
+    nx = *dx + obj->x;
+    nz = *dz + obj->z;
+    radius = obj->unk28 * obj->unk24;
+    hit = 0;
+    ddx = nx - D_8007AA08.x;
+    ddz = nz - D_8007AA08.z;
+    r = D_8007AA08.unk40 * D_8007AA08.unk3C + radius;
+    if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+        d = sqrtf(ddx * ddx + ddz * ddz);
+        if (d < r) {
+            d = r / d;
+            hit = 1;
+            ddx *= d;
+            ddz *= d;
+            *dx = D_8007AA20 + ddx - obj->x;
+            *dz = D_8007AA28 + ddz - obj->z;
+        }
+    }
+    i = D_8007ABA8;
+    if (i != 0) {
+        for (list = D_8007ABB0; !hit && i != 0; i--) {
+            other = *list++;
+            if ((void *)other != (void *)obj) {
+                ddx = nx - other->x;
+                ddz = nz - other->z;
+                r = other->unk28 * other->unk24 + radius;
+                if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+                    d = sqrtf(ddx * ddx + ddz * ddz);
+                    if (d < r) {
+                        d = r / d;
+                        hit = 1;
+                        ddx *= d;
+                        ddz *= d;
+                        *dx = other->x + ddx - obj->x;
+                        *dz = other->z + ddz - obj->z;
+                    }
+                }
+            }
+        }
+    }
+    i = D_8007C2A4;
+    if (i != 0) {
+        for (list2 = D_8007C2A8; !hit && i != 0; i--) {
+            other2 = *list2++;
+            ddx = nx - other2->x;
+            ddz = nz - other2->z;
+            r = radius + other2->unk10 * 2.0;
+            if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
+                d = sqrtf(ddx * ddx + ddz * ddz);
+                if (d < r) {
+                    d = r / d;
+                    hit = 1;
+                    ddx *= d;
+                    ddz *= d;
+                    *dx = other2->x + ddx - obj->x;
+                    *dz = other2->z + ddz - obj->z;
+                }
+            }
+        }
+    }
+}
 
 void func_80009DDC(s32 idx) {
     s32 pad;
