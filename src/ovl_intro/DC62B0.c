@@ -245,7 +245,83 @@ s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020DAF0_ovl_intro.s")
+s32 func_8020DAF0_ovl_intro(s32 idx, s32 flags) {
+    IntroSprite *p = &D_802684E0[idx];
+    f32 step;
+    s32 tx;
+    s32 ty;
+    s32 dx;
+    s32 dy;
+    s32 dir;
+
+    if (!(flags & 0x80000000)) {
+        return 0;
+    }
+    p->unk24++;
+    step = ((f32) p->unk2A - (f32) p->unk26) / p->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    p->unk1C += step;
+    dir = 2;
+    tx = p->unk1C;
+    step = ((f32) p->unk2C - (f32) p->unk28) / p->unk38;
+    dx = tx;
+    if (step < 0) {
+        step = -step;
+    }
+    p->unk20 += step;
+    ty = p->unk20;
+    dy = ty;
+    if (p->unk4 < p->unk2A) {
+        dir = 1;
+    } else {
+        dx = -tx;
+    }
+    if (p->unk6 < p->unk2C) {
+        dir |= 4;
+    } else {
+        dy = -ty;
+        dir |= 8;
+    }
+    p->unk4 += dx;
+    p->unk6 += dy;
+    if (p->unk1C >= 1.0f) {
+        p->unk1C -= tx;
+    }
+    if (p->unk20 >= 1.0f) {
+        p->unk20 -= ty;
+    }
+    if (p->unk24 >= p->unk38) {
+        p->unk4 = p->unk2A;
+        p->unk6 = p->unk2C;
+    }
+    if (dir & 1) {
+        if (p->unk4 >= p->unk2A) {
+            p->unk4 = p->unk2A;
+        }
+    } else if (dir & 2) {
+        if (p->unk4 <= p->unk2A) {
+            p->unk4 = p->unk2A;
+        }
+    }
+    if (dir & 4) {
+        if (p->unk6 >= p->unk2C) {
+            p->unk6 = p->unk2C;
+        }
+    } else if (dir & 8) {
+        if (p->unk6 <= p->unk2C) {
+            p->unk6 = p->unk2C;
+        }
+    }
+    if (p->unk24 >= p->unk38) {
+        p->unk24 = 0;
+        p->unk1C = 0.0f;
+        p->unk20 = 0.0f;
+        return 0xFF;
+    }
+    return 0;
+}
 
 void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2) {
     IntroSprite *p = &D_802684E0[idx];
