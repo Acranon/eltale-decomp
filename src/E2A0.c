@@ -79,9 +79,11 @@ typedef struct {
 } Unk80085E48;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ s32 unk1C;
-} Unk80084994;
+} Unk80084994; /* size 0x20 */
 
 typedef struct {
     /* 0x00 */ u32 start;
@@ -120,11 +122,19 @@ typedef struct {
 extern SpriteObj D_8004DE04;
 extern u8 *D_8004DE14;
 extern f32 D_8004DE1C;
-extern f32 D_8004DE20;
-extern f32 D_8004DE24;
+typedef struct {
+    f32 y;
+    f32 z;
+} Unk8004DE20;
+extern Unk8004DE20 D_8004DE20;
 extern f32 D_8004DE2C;
 extern f32 D_8004DE30;
-extern f32 D_8004DE34;
+typedef struct {
+    f32 a;
+    f32 pad;
+    f32 b;
+} Unk8004DE34;
+extern Unk8004DE34 D_8004DE34;
 extern f32 D_8004DE3C;
 extern f32 D_8004DE5C;
 extern f32 D_8004DE60;
@@ -165,9 +175,117 @@ extern Unk8005E518 D_8005E51C[];
 extern Unk8005E518 D_8005E5A0[];
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ u8 padC[2];
+    /* 0x0E */ u16 unkE;
+    /* 0x10 */ u8 pad10[4];
+} Unk8007C288C; /* size 0x14 */
+
+typedef struct {
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u8 pad4[8];
+    /* 0x0C */ Unk8007C288C *unkC;
+    /* 0x10 */ u8 pad10[4];
+    /* 0x14 */ u16 unk14;
+    /* 0x16 */ u8 pad16[2];
+} Unk8007C288; /* size 0x18 */
+
+typedef struct {
+    /* 0x00 */ u16 count;
+    /* 0x02 */ u8 pad2[0x16];
+    /* 0x18 */ Unk8000FA9C *objs;
+    /* 0x1C */ u8 pad1C[0x10];
+} Unk8007C28C; /* size 0x2C */
+
+typedef struct {
+    /* 0x00 */ u16 flags;
+    /* 0x02 */ u8 pad2[2];
+    /* 0x04 */ u32 romStart;
+    /* 0x08 */ u32 romEnd;
+    /* 0x0C */ void *dst;
+    /* 0x10 */ Unk8007C294 *unk10;
+    /* 0x14 */ Unk8007C28C *unk14;
+    /* 0x18 */ Unk8007C288 *unk18;
+    /* 0x1C */ Unk80084994 *unk1C;
     /* 0x20 */ Unk8005E518 *unk20;
-} Unk8007C284;
+    /* 0x24 */ u8 pad24[4];
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ s32 unk2C;
+    /* 0x30 */ u8 pad30[0xC];
+    /* 0x3C */ s32 unk3C;
+    /* 0x40 */ u8 pad40[4];
+} Unk8007C284; /* size 0x44 */
+
+typedef struct {
+    /* 0x00 */ u32 start;
+    /* 0x04 */ u32 end;
+    /* 0x08 */ void *dst;
+} Unk80057540; /* size 0xC */
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} CollResult;
+
+typedef struct {
+    /* 0x00 */ s32 v[6];
+} Unk8004DD98; /* size 0x18 */
+
+void func_80028120();
+void func_8000F4A0(void);
+void func_8000FD54(void);
+void func_800107F0(f32, f32, f32, s32, CollResult *);
+extern Unk8007C284 D_80056BB0[];
+extern Unk80057540 D_80057540[];
+extern Unk8007C288 *D_8007C288;
+extern Unk8007C28C *D_8007C28C;
+extern u16 D_8007C280;
+extern u16 D_8007C282;
+extern s32 D_8007C298;
+extern s32 D_8007C29C;
+extern s32 D_800842B4;
+extern u16 D_800842B8;
+extern s32 D_800842C0;
+extern s32 D_800842C4;
+extern s32 D_800842C8;
+extern s32 D_800842CC;
+extern s32 D_800842D0;
+extern s32 D_800842D4;
+extern s32 D_800842D8;
+extern s32 D_800842DC;
+extern s32 D_800842E0;
+extern s32 D_800842E4;
+extern s32 D_80084308;
+extern f32 D_8007A98C;
+extern f32 D_8007A990;
+extern f32 D_8007A994;
+extern s32 D_8007A99C;
+extern u16 D_80081B78[];
+extern u16 D_80081B7A[];
+extern CollResult D_80082000;
+extern Unk8004DD98 D_8004DD98;
+extern Unk8004DD98 D_80081CE8[32];
+extern u8 D_753F0[];
+extern u8 D_851F0[];
+extern u8 D_C8DE0[];
+extern u8 D_D86170[];
+extern u8 D_D86770[];
+extern u8 D_3E1090[];
+extern u8 D_3F1BA0[];
+extern u8 D_80100000[];
+extern u8 D_8010FE00[];
+extern u8 D_801E0000[];
+extern u16 D_800842E8;
+extern u8 D_800808B0[];
+extern u8 D_8007C6B0[];
 
 extern Unk8007C284 *D_8007C284;
 
