@@ -248,7 +248,21 @@ s32 func_8000C3FC(Obj *obj) {
     return func_80026E90(100) < chance;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000C48C.s")
+u16 func_8000C48C(Enemy *arg0) {
+    u16 dmg;
+
+    dmg = arg0->unk11C;
+    dmg = (dmg * arg0->unk122) >> 4;
+    if (func_80026E90(32) == 0) {
+        dmg = dmg + (dmg >> 1);
+        func_800269B8(4, 0, D_8004F760);
+        arg0->flags |= 0x20;
+    }
+    if (arg0->unk98 & 1) {
+        dmg >>= 1;
+    }
+    return dmg;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000C528.s")
 
