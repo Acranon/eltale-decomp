@@ -707,7 +707,15 @@ void func_8000BCA4(s32 clamp, f32 dx, f32 dz, Obj *obj, EnemyAI *ai) {
     obj->unk62 = D_8007C080.flags;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000BFE0.s")
+void func_8000BFE0(Obj *obj, Vec3f *out) {
+    u8 *anims;
+
+    anims = D_8007C048[obj->unk50];
+    func_80020214(obj, anims + obj->unk52 * 0xC, obj->unk24, out);
+    out->x = -obj->unk44;
+    out->y = obj->unk4C;
+    func_800271B4(obj->angle, out);
+}
 
 void func_8000C05C(f32 *dx, f32 *dz, Obj *obj) {
     f32 nx;
