@@ -278,7 +278,24 @@ s32 func_800167B0(u16 n, u8* arg1) {
     return (grp << 8) - i + 15;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800168F0.s")
+s32 func_800168F0(u32 arg0, u16 arg1) {
+    s32 flags = 0;
+    Unk800C185C* rec;
+    s32 grp = (arg0 >> 8) & 0xF;
+    arg0 &= 0xFF;
+    rec = &D_800C185C[grp][arg0];
+    if (D_8007AA1C->unk24[grp] < rec->unk0) {
+        flags = 4;
+    }
+    if (!(((D_8008BE52 & 1) ? 1 : 2) & rec->unk2)) {
+        flags |= 2;
+    }
+    if (arg1 < D_800C186E[rec->unk4]) {
+        flags |= 1;
+    }
+    return flags;
+}
+
 
 typedef struct {
     /* 0x00 */ u8 pad0[2];
