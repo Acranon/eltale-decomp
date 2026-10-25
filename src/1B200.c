@@ -22,6 +22,8 @@ typedef struct {
     /* 0x30 */ f32 unk30;
     /* 0x34 */ f32 unk34;
     /* 0x38 */ f32 unk38;
+    /* 0x3C */ u8 unk3C;
+    /* 0x3D */ u8 pad3D[3];
 } Unk8004EE20;
 
 typedef struct {
@@ -190,8 +192,15 @@ extern Unk800EB2B4 D_800EB2B4[];
 extern u8 D_800CADA8[][4];
 extern Unk800DA0F0 D_800DA0F0[];
 extern Unk80086798b D_80086798[];
+typedef struct {
+    f32 mf[4][4];
+} MtxF;
+
+extern Unk8004EE20 D_8004EFA4;
+extern Unk8004EE20 D_8004EFE4;
+void func_80027430(MtxF*, f32, f32, f32);
 f32 func_800270D0(f32, f32);
-s32 func_80026E90(s32);
+u32 func_80026E90(u32);
 s32 func_800281F0(s32, u8*, u16);
 
 void func_8001A6B4(void);
@@ -485,7 +494,31 @@ void func_8001B688(Unk1B200Spark* arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001B7E0.s")
+void func_8001B7E0(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
+    s32 i;
+    f32 a;
+    f32 b;
+    f32 c;
+    MtxF mtx;
+    Unk8004EE20 spawn;
+    spawn = D_8004EFE4;
+    i = 15;
+    do {
+        a = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
+        b = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
+        func_80027430(&mtx, a, b, 0.0f);
+        guMtxXFMF(mtx.mf, 0.0f, 0.0f, arg4, &a, &b, &c);
+        spawn.unk18 = arg1;
+        spawn.unk1C = arg2;
+        spawn.unk20 = arg3;
+        spawn.unk30 = a;
+        spawn.unk34 = b;
+        spawn.unk38 = c;
+        spawn.unk3C = arg0;
+        func_8001D9A8(&spawn);
+        i--;
+    } while (i != 0);
+}
 
 void func_8001B9C0(Unk1B200Spark* arg0) {
     u8* c;
