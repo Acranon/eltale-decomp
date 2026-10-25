@@ -10,3 +10,6 @@ osAppNMIBuffer = 0x8000031C;
 
 /* Buffers past the end of bss that the code addresses directly. */
 D_80124E00 = 0x80124E00;
+
+/* Second name for a ROM address that is both one block's end and the next block's start (func_8000D6A0 uses both). */
+D_851F0_end = 0x851F0;

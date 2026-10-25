@@ -285,6 +285,8 @@ extern Unk8004DD98 D_8004DD98;
 extern Unk8004DD98 D_80081CE8[32];
 extern u8 D_753F0[];
 extern u8 D_851F0[];
+/* Same address as D_851F0: the end of the ROM block that starts at D_753F0 (a separate linker symbol in the original). */
+extern u8 D_851F0_end[];
 extern u8 D_C8DE0[];
 extern u8 D_D86170[];
 extern u8 D_D86770[];
@@ -378,7 +380,140 @@ extern u16 *D_80083468;
 extern u16 *D_80083550;
 extern s32 D_80084980;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000D6A0.s")
+void func_8000D6A0(void) {
+    u32 *q;
+    u32 start;
+    u32 end;
+    u16 *src;
+    u16 *dst;
+    s32 i;
+    Unk8007C288C *sp;
+    u32 n;
+    Unk8000FA9C *s;
+    Vec3f *v;
+    s32 k;
+    s32 kind;
+    Unk80082048 *z;
+
+    D_8007C284 = &D_80056BB0[D_800842C4];
+    if (D_800842BC != -1) {
+        if (D_800842C4 == 11) {
+            if (D_800842C0 == 2 && D_800842C8 == 0) {
+                D_800842D0 = D_800842C4;
+                D_800842D4 = D_800842C8;
+                D_800842D8 = D_80084308;
+            }
+        } else if (D_800842C4 == 6) {
+            D_800842D0 = D_800842C4;
+            D_800842D4 = D_800842C8;
+            D_800842D8 = D_80084308;
+        } else if ((D_800842B8 & 1) && (D_8007C284->flags & 4)) {
+            D_800842D0 = D_800842C4;
+            D_800842D4 = D_800842C8;
+            D_800842D8 = D_80084308;
+        } else if (D_800842C4 != D_800842BC && (D_8007C284->flags & 8)) {
+            D_800842DC = D_800842C4;
+            D_800842E0 = D_800842C8;
+            D_800842E4 = D_80084308;
+            if (D_800842DC == 0x1A && D_800842E0 == 4) {
+                D_800842E0 = 2;
+                D_800842E4 = 1;
+            }
+        }
+    }
+    if (D_800842BC == -1) {
+        func_80028120(D_753F0, D_80100000, D_851F0_end - D_753F0);
+        func_80028120(D_D86170, D_800814B0, 0x600);
+        func_80028120(D_D86770, D_80081AB0, 0x200);
+    }
+    if (D_800842BC != D_800842C4) {
+        D_800842CC = D_800842BC;
+        D_800842BC = D_800842C4;
+        D_800842B8 = D_8007C284->flags;
+        if (D_800842B8 & 7) {
+            if (D_800842B8 & 2) {
+                func_80028120(D_851F0, D_8010FE00, D_C8DE0 - D_851F0);
+            }
+            q = &((u32 *)D_80057540)[D_8007C284->unk3C * 3];
+            start = *q++;
+            end = *q++;
+            func_80028120(start, *q, end - start);
+        }
+        func_80028120(D_8007C284->romStart, D_8007C284->dst, D_8007C284->romEnd - D_8007C284->romStart);
+        switch (D_800842BC) {
+            case 3:
+            case 5:
+            case 7:
+            case 12:
+                func_80028120(D_3E1090, D_801E0000, D_3F1BA0 - D_3E1090);
+                break;
+        }
+    }
+    n = 0x65;
+    src = D_80081B78;
+    dst = D_80081B7A;
+    do {
+        *dst++ = *src--;
+        n--;
+    } while (n != 0);
+    k = D_800842C0 = D_800842C8;
+    D_8007C288 = &D_8007C284->unk18[k];
+    D_8007C294 = D_8007C284->unk10;
+    D_8007C28C = &D_8007C284->unk14[D_8007C288->unk0];
+    D_80084994 = &D_8007C284->unk1C[D_8007C288->unk2];
+    D_8007C290 = D_8007C28C->objs;
+    D_8007C298 = D_8007C284->unk2C;
+    D_8007C29C = D_8007C284->unk28;
+    D_800842E8 = D_8007C288->unk14;
+    D_8007C280 = D_80084994->unk18;
+    if (D_8007C282 != D_80084994->unk1C) {
+        D_8007C282 = D_80084994->unk1C;
+        func_80028120(D_80060C48[D_8007C282].start, D_800808B0, 0x800);
+        func_80028120(D_80060C48[D_8007C282].start + 0x800, D_8007C6B0, 0x4000);
+    }
+    if (D_80084308 != -1) {
+        sp = &D_8007C288->unkC[D_80084308];
+        D_8007A98C = sp->x;
+        D_8007A990 = sp->y;
+        D_8007A994 = sp->z;
+        D_8007A99C = sp->unkE;
+    }
+    n = D_8007C28C->count;
+    s = D_8007C290;
+    D_8007C2A4 = k = 0;
+    v = D_80083638;
+    for (; n != 0; n--, s++) {
+        if (s->unk16 & 0x8000) {
+            func_800107F0(s->x, s->y, s->z, 0xA00, &D_80082000);
+            s->y = D_80082000.y;
+        }
+        kind = s->unk16 & 0xFF;
+        if (kind == 0x10) {
+            v->x = D_80082000.nx;
+            v->y = D_80082000.ny;
+            v->z = D_80082000.nz;
+            s->angle = k++;
+            v++;
+        } else if (kind == 0x83) {
+            s->timer = 0;
+        } else if (kind == 0x84) {
+            s->timer = func_80026E90(150) + 150;
+        } else if (s->unk16 >= 0x11 && s->unk16 < 0x15) {
+            s->timer = func_80026E90(16);
+        }
+    }
+    for (z = D_80082048; z < &D_80082048[4]; z++) {
+        z->a = 0;
+        z->b = 0;
+    }
+    for (i = 0; i < 32; i++) {
+        D_80081CE8[i] = D_8004DD98;
+    }
+    D_80081CE0 = 1;
+    func_8000F4A0();
+    func_8000FD54();
+    D_800842B4 = -1;
+}
 
 void func_8000DDBC(void) {
     s32 i;
