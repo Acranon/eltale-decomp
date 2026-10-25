@@ -12,6 +12,8 @@ extern u16 D_80267048_ovl_intro[];
 extern u8 D_80267250_ovl_intro[];
 extern u16 D_80268018_ovl_intro[];
 extern u8 D_80260490_ovl_intro[];
+extern u8 D_80264740_ovl_intro[];
+extern u16 D_80264E98_ovl_intro[];
 extern u16 D_802615A8_ovl_intro[];
 
 void func_8020F5B4_ovl_intro(void);
