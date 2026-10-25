@@ -85,7 +85,27 @@ typedef struct {
     /* 0x0C */ s32 unkC;
     /* 0x10 */ s32 unk10;
     /* 0x14 */ s32 unk14;
-} IntroRect;
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ s32 unk2C;
+    /* 0x30 */ s32 unk30;
+    /* 0x34 */ s32 unk34;
+} IntroRect; /* size = 0x38 */
+
+typedef struct {
+    /* 0x00 */ u32 key;
+    /* 0x04 */ u16 idx;
+} SortEnt; /* size = 0x8 */
+
+#define GFX_WORDS(a, b)                    \
+    {                                      \
+        Gfx *_g = D_8007A184++;            \
+        _g->words.w0 = (a);                \
+        _g->words.w1 = (b);                \
+    }
 
 extern Unk802170E8 D_802170E8_ovl_intro[];
 extern u32 D_802170F0_ovl_intro;
@@ -122,6 +142,15 @@ s16 func_8020D504_ovl_intro(void);
 void func_8020D8AC_ovl_intro(s32 idx);
 void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2);
 void func_8020E0EC_ovl_intro(s32 idx);
+extern Gfx D_802122C8_ovl_intro[];
+s32 func_8020D5EC_ovl_intro(s32 idx, s32 flags, IntroRect *r);
+s32 func_8020D750_ovl_intro(s32 idx, s32 flags, IntroRect *r);
+s32 func_8020D8E8_ovl_intro(s32 idx, s32 arg1);
+s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1);
+s32 func_8020DAF0_ovl_intro(s32 idx, s32 flags);
+s32 func_8020DDA0_ovl_intro(s32 idx, s32 flags);
+s32 func_8020DF20_ovl_intro(s32 idx, s32 flags);
+s32 func_8020E0A0_ovl_intro(s32 idx);
 
 void func_8020D1DC_ovl_intro(void);
 

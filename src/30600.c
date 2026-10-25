@@ -136,6 +136,13 @@ s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 s32 func_80035A24(s32);
 void func_8003226C(void);
+extern s16 D_8006C9FC[][4];
+extern u8 *D_8006C934[];
+extern u8 *D_8006C998[];
+extern s16 D_8006CAC4[][2];
+extern s8 D_80092C82;
+extern u16 D_80092C86;
+void func_8002A7C8(s32, s32, s32);
 
 void func_8002FA00(s32 arg0) {
     D_8007A170 = 2;
