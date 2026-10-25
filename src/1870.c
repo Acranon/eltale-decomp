@@ -403,10 +403,6 @@ void func_80001278(GfxFrame *arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80001944.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_8000205C.s")
-
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_800023F4.s")
-
 extern s32 D_8007A180;
 extern s32 D_8007A1D0;
 extern s8 D_8008FAF0;
@@ -425,6 +421,194 @@ void func_800361E8(void);
 void func_80036220(void);
 void func_800266D0(void);
 void func_8020C0D0(void);
+
+typedef struct {
+    s32 unk0;
+    u8 unk4[0x2C];
+} Unk80084998;
+
+extern u16 D_8007A160;
+extern s32 D_8007A174;
+extern u16 D_8007A17A;
+extern s32 D_8007A1C4;
+extern s32 D_80084980;
+extern Unk80084998 D_80084998[];
+extern s32 D_800863F0;
+extern s8 D_8008FAF4;
+extern u8 D_801C0000[];
+extern u8 D_E420D0[];
+extern u8 D_E43780[];
+void func_80002DB0(void);
+void func_80002E74(void);
+void func_80002F40(s32 arg0);
+s32 func_80003184(void);
+void func_8000328C(s32 arg0);
+void func_8000DDBC(void);
+void func_80011AE0(void);
+void func_80011C60(void);
+s32 func_80012A90(void);
+void func_800131E0(void);
+void func_800292DC(s32 arg0);
+s32 func_80029328(s32 arg0);
+void func_8002A38C(void);
+void func_80036260(void);
+void func_8003627C(void);
+void func_8003642C(void);
+void func_800364F4(void);
+
+void func_8000205C(void) {
+    s32 count;
+    GfxFrame *frame;
+    OSMesg msg;
+
+    count = 0;
+    msg = NULL;
+    func_80028120(D_E420D0, D_801C0000, D_E43780 - D_E420D0);
+    D_8007A174 = 0;
+    D_8007A178 = 3;
+    D_80084980 = 0x41EB;
+    while (D_8007A170 == 6) {
+        if (D_8004DCA0 & 0x40) {
+            D_8007A1D0 = 0;
+            func_80002F40(count++);
+            func_80011AE0();
+            D_8007A1C8 = func_80012A90();
+            D_8007A1C4 = func_80012A90();
+            D_8007AB60 = func_80012A90();
+            D_80084998[D_8007AB60].unk0 = 2;
+            func_800266D0();
+            D_8008CA50 |= 8;
+            if (D_8004DCA0 & 0x20) {
+                D_8004DCA0 &= ~0x20;
+                func_80002DB0();
+            }
+            D_8004DCA0 &= ~0x1C0;
+        }
+        func_80035970(D_80092C80);
+        D_8007A180 = 0;
+        D_800863F0 = 0;
+        func_800131E0();
+        if (func_80003184() != 0) {
+            func_8000328C(count);
+        }
+        func_80011C60();
+        func_8000DDBC();
+        func_80001278(&D_80301000[D_8007A17C]);
+        frame = &D_80301000[D_8007A17C];
+        if (D_8004DCA0 & 0x80) {
+            if (--D_8007A174 == 0) {
+                func_8002A38C();
+                if (count >= 7) {
+                    D_8007A170 = 5;
+                    D_8004DCA0 |= 0x160;
+                } else {
+                    D_8004DCA0 |= 0x160;
+                }
+            } else if (D_8007A174 == D_8007A17A) {
+                func_80002E74();
+            }
+        }
+        func_8002A558();
+        if (D_8007A1D0 == 0) {
+            D_8007A1D0++;
+            func_80002D44(1);
+        } else {
+            func_80002D44(2);
+            while (D_8007A160 < 2) {
+                osRecvMesg(&D_8007A870, &msg, OS_MESG_BLOCK);
+            }
+        }
+        osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
+        D_8007A160 = 0;
+        D_8007A17C ^= 1;
+        if (D_8004DCA0 & 0x40) {
+            func_80002D44(2);
+            D_8007A1D0 = 0;
+        }
+    }
+    if (D_8004DCA0 & 0x200) {
+        func_800292DC(0);
+    }
+    if (D_8004DCA0 & 0x200) {
+        D_8004DCA0 &= ~0x200;
+        while (func_80029328(0) != 0) {
+        }
+    }
+}
+
+void func_800023F4(void) {
+    s32 count;
+    OSMesg msg;
+    GfxFrame *frame;
+
+    msg = NULL;
+    func_80028120(D_E43780, D_801C0000, D_E5BF60 - D_E43780);
+    D_8007A174 = 0;
+    D_8007A178 = 2;
+    D_8008FAF4 = 0;
+    func_80036260();
+    while (D_8007A170 == 7) {
+        if (D_8004DCA0 & 0x40) {
+            D_8007A1D0 = 0;
+            func_8003627C();
+            func_80011AE0();
+            D_8007A1C8 = func_80012A90();
+            D_8007A1C4 = func_80012A90();
+            D_8007AB60 = func_80012A90();
+            D_80084998[D_8007AB60].unk0 = 2;
+            func_800266D0();
+            D_8008CA50 |= 8;
+            if (D_8004DCA0 & 0x20) {
+                D_8004DCA0 &= ~0x20;
+                func_80002DB0();
+            }
+            D_8004DCA0 &= ~0xC0;
+        }
+        func_80035970(D_80092C80);
+        D_8007A180 = 0;
+        D_800863F0 = 0;
+        func_800131E0();
+        func_8003642C();
+        func_80011C60();
+        func_8000DDBC();
+        func_80001278(&D_80301000[D_8007A17C]);
+        frame = &D_80301000[D_8007A17C];
+        if (D_8004DCA0 & 0x80) {
+            if (--D_8007A174 == 0) {
+                func_8002A38C();
+                func_800364F4();
+            } else if (D_8007A174 == D_8007A17A) {
+                func_80002E74();
+            }
+        }
+        func_8002A558();
+        if (D_8007A1D0 == 0) {
+            D_8007A1D0++;
+            func_80002D44(1);
+        } else {
+            func_80002D44(2);
+            while (D_8007A160 < 2) {
+                osRecvMesg(&D_8007A870, &msg, OS_MESG_BLOCK);
+            }
+        }
+        osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
+        D_8007A160 = 0;
+        D_8007A17C ^= 1;
+        if (D_8004DCA0 & 0x40) {
+            func_80002D44(2);
+            D_8007A1D0 = 0;
+        }
+    }
+    if (D_8004DCA0 & 0x200) {
+        func_800292DC(0);
+    }
+    if (D_8004DCA0 & 0x200) {
+        D_8004DCA0 &= ~0x200;
+        while (func_80029328(0) != 0) {
+        }
+    }
+    D_8004DCA0 |= 0x20000;
+}
 
 void func_8000275C(void) {
     GfxFrame *frame;
