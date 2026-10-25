@@ -138,9 +138,47 @@ void func_8020F448_ovl_intro(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC9350/func_8020F5B4_ovl_intro.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC9350/func_8020F878_ovl_intro.s")
+void func_8020F878_ovl_intro(void) {
+    s32 i;
+    s32 x;
+    s16 rx;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC9350/func_8020FCDC_ovl_intro.s")
+    gDPPipeSync(D_8007A184++);
+    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gDPLoadTLUT_pal16(D_8007A184++, 0, D_80267048_ovl_intro);
+    x = 0;
+    i = 8;
+    do {
+        gDPLoadTextureTile_4b(D_8007A184++, D_802650A0_ovl_intro, G_IM_FMT_CI, 176, 0, x, 0, x + 19, 91, 0, 0, 0, 0, 0, 0, 0);
+        rx = x + 75;
+        gSPTextureRectangle(D_8007A184++, rx << 2, 73 << 2, (s16) (rx + 20) << 2, 165 << 2, G_TX_RENDERTILE, x << 5, 0, 1 << 10, 1 << 10);
+        x += 20;
+    } while (--i != 0);
+    gDPLoadTextureTile_4b(D_8007A184++, D_802650A0_ovl_intro, G_IM_FMT_CI, 176, 0, x, 0, x + 7, 91, 0, 0, 0, 0, 0, 0, 0);
+    rx = x + 75;
+    gSPTextureRectangle(D_8007A184++, rx << 2, 73 << 2, (s16) (rx + 8) << 2, 165 << 2, G_TX_RENDERTILE, x << 5, 0, 1 << 10, 1 << 10);
+}
+
+void func_8020FCDC_ovl_intro(void) {
+    s32 i;
+    s32 x;
+    s16 rx;
+
+    gDPPipeSync(D_8007A184++);
+    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gDPLoadTLUT_pal16(D_8007A184++, 0, D_80268018_ovl_intro);
+    x = 0;
+    i = 3;
+    do {
+        gDPLoadTextureTile_4b(D_8007A184++, D_80267250_ovl_intro, G_IM_FMT_CI, 176, 0, x, 0, x + 47, 39, 0, 0, 0, 0, 0, 0, 0);
+        rx = x + 75;
+        gSPTextureRectangle(D_8007A184++, rx << 2, 99 << 2, (s16) (rx + 48) << 2, 139 << 2, G_TX_RENDERTILE, x << 5, 0, 1 << 10, 1 << 10);
+        x += 48;
+    } while (--i != 0);
+    gDPLoadTextureTile_4b(D_8007A184++, D_80267250_ovl_intro, G_IM_FMT_CI, 176, 0, x, 0, x + 23, 39, 0, 0, 0, 0, 0, 0, 0);
+    rx = x + 75;
+    gSPTextureRectangle(D_8007A184++, rx << 2, 99 << 2, (s16) (rx + 24) << 2, 139 << 2, G_TX_RENDERTILE, x << 5, 0, 1 << 10, 1 << 10);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC9350/func_80210140_ovl_intro.s")
 
