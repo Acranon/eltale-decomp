@@ -184,7 +184,7 @@ void func_8000A1D0(s32, u8 *);
 void func_800107F0(f32, f32, f32, s32, CollOut *);
 void func_800201A0(void *, s32, s32, s32, s32, s32);
 u32 func_80026E90(s32);
-void func_80028120(u32, void *, u32);
+void func_80028120();
 void func_80032D20(s32);
 void func_8020C0D0(void);
 
@@ -278,7 +278,17 @@ void func_80009594(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009764.s")
+void func_80009764(s32 arg0) {
+    u32 start;
+    u32 end;
+
+    D_8007AB70 = &D_80056880[arg0];
+    func_80028120(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
+    func_80028120(D_A70350, D_802A0000, D_A77F10 - D_A70350);
+    start = D_8007AB70->start;
+    end = D_8007AB70->end;
+    func_80028120(start, D_8020E6F0, end - start);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800097F8.s")
 
