@@ -495,7 +495,39 @@ void func_8001F888(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001FC14.s")
+void func_8001FC14(Vec3f* arg0) {
+    s32 n;
+    s32 max; s32 id;
+    Struct_8007B908* e;
+
+    func_8001A1A4(arg0);
+    if (D_8008BE52 & 1) {
+        if (!(D_8008BE52 & 2)) {
+            n = D_8008BE5A;
+            while (n != 0) {
+                D_8008BE58++;
+                max = D_8008BE5A;
+                if (D_8008BE58 >= max) {
+                    D_8008BE58 = 0;
+                }
+                e = &D_8007B908[id = D_8007C050[D_8008BE58]];
+                if (e->unkA != 0 && e->unk7C != -1) {
+                    break;
+                }
+                n--;
+            }
+            if (n == 0) {
+                D_8008BE52 |= 0x400;
+            }
+            D_8008BE54 = 0x14;
+        } else {
+            D_8008BE54 = 0;
+        }
+        func_8001C298(D_8008BF96, arg0->x, arg0->y, arg0->z);
+        D_8008BE52 ^= 2;
+        D_8008BE52 |= 4;
+    }
+}
 
 Struct_8001FD44* func_8001FD44(f32 x, f32 y, Struct_8007C284_30* list) {
     Struct_8001FD44* r = NULL;
