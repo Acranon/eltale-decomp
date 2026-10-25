@@ -63,7 +63,7 @@ extern s32* D_8008F75C;
 extern s32* D_80055A24[];
 extern s32 D_800559CC;
 extern s32 D_800559D0;
-extern s32 D_8005594C[8];
+extern u32 D_8005594C[8];
 extern s32 D_8005596C[8];
 extern s32 D_8005598C[8];
 extern s32 D_800559AC;
@@ -332,7 +332,65 @@ void func_800295D0(s32 id) {
     alSndpGetState(&D_8008F450);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80029618.s")
+extern s32 D_800559BC;
+extern s32 D_8008F764;
+extern s32* D_8008F760;
+extern s32* D_8008F77C;
+extern s32* D_8008F780;
+extern s32* D_8008F784;
+extern s32* D_8008F788;
+extern s32* D_8008F78C;
+extern s32* D_8008F790;
+extern s32* D_8008F794;
+extern s32* D_8008F798;
+extern s32* D_8008F79C;
+extern s32* D_8008F7A0;
+void func_80029AD4(void);
+void func_80029D10(void);
+void func_8002A118(void);
+void func_8002A1F8(void);
+
+void func_80029618(void) {
+    for (D_8008F764 = 0; D_8008F764 < 5; D_8008F764++) {
+        if (D_800559E8[D_8008F764] != 0) {
+            switch (D_8008F764) {
+                case 0:
+                    D_8008F75C = D_8008F77C;
+                    D_8008F760 = D_8008F790;
+                    break;
+                case 1:
+                    D_8008F75C = D_8008F780;
+                    D_8008F760 = D_8008F794;
+                    break;
+                case 2:
+                    D_8008F75C = D_8008F784;
+                    D_8008F760 = D_8008F798;
+                    break;
+                case 3:
+                    D_8008F75C = D_8008F788;
+                    D_8008F760 = D_8008F79C;
+                    break;
+                case 4:
+                    D_8008F75C = D_8008F78C;
+                    D_8008F760 = D_8008F7A0;
+                    break;
+            }
+            if (--D_800559E8[D_8008F764] == 0) {
+                func_80029D10();
+            }
+        }
+    }
+    if (D_800559BC != 0xFF) {
+        func_80029880(D_800559BC);
+    }
+    if (D_800559CC != 0) {
+        func_8002A118();
+    }
+    if (D_800559D0 != 0) {
+        func_8002A1F8();
+    }
+    func_80029AD4();
+}
 
 void func_800297F4(s32 arg0) {
     if (arg0 >= 0 && arg0 < 0x47) {
