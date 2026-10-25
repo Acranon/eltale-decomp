@@ -5,7 +5,8 @@ typedef struct {
     /* 0x02 */ s16 unk2;
     /* 0x04 */ u8 pad4[2];
     /* 0x06 */ u16 unk6;
-    /* 0x08 */ u8 pad8[4];
+    /* 0x08 */ u8 pad8[2];
+    /* 0x0A */ u16 unkA;
     /* 0x0C */ u16 unkC;
     /* 0x0E */ u16 unkE;
     /* 0x10 */ s32 unk10;
@@ -14,7 +15,8 @@ typedef struct {
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
     /* 0x24 */ u16 unk24;
-    /* 0x26 */ u8 pad26[4];
+    /* 0x26 */ u16 unk26;
+    /* 0x28 */ s16 unk28;
     /* 0x2A */ u16 unk2A;
     /* 0x2C */ u16 unk2C;
     /* 0x2E */ u8 pad2E[2];
@@ -23,7 +25,8 @@ typedef struct {
 } EnemyDef; /* size 0x38 */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x86];
+    /* 0x00 */ u8 pad0[0x84];
+    /* 0x84 */ u16 unk84;
     /* 0x86 */ u16 unk86;
     /* 0x88 */ u8 pad88[0xC];
     /* 0x94 */ f32 unk94;
@@ -232,6 +235,7 @@ u32 func_80026E90(s32);
 void func_800271B4(f32, Vec3f *);
 void func_80028120();
 void func_8002A7C8(s32, s32, s32);
+extern s32 D_8004DD38[];
 
 extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
 extern u8 D_8004F760[];
