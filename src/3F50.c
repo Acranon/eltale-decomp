@@ -160,7 +160,8 @@ typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
+    /* 0x0C */ u16 unkC;
+    /* 0x0E */ u16 unkE;
     /* 0x10 */ s32 unk10;
     /* 0x14 */ f32 unk14;
 } Unk80084300;
@@ -312,7 +313,18 @@ typedef struct {
 extern Gfx *D_8007A184;
 extern s32 D_8007AB60;
 extern u8 D_10000A0[];
-extern u8 D_8007A928[];
+/* collision query result (func_800107F0) */
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 unk4;
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+    /* 0x18 */ u16 unk18;
+} Unk8007A928;
+
+extern Unk8007A928 D_8007A928;
 extern f32 D_8007A92C;
 extern Vec3f D_8007AB48;
 extern Vec3f D_8008BFC0;
@@ -692,6 +704,13 @@ void func_800069E0(Actor *arg0, s32 arg1, Vec2f *arg2) {
 void func_80006A50(void) {
 }
 
+extern f32 D_8007A9A0;
+extern f32 D_8007A9A4;
+extern f32 D_8008BE5C;
+extern f32 D_8008BE60;
+extern f32 D_8008BE6C;
+void func_80006F80(f32 *vx, f32 *vz, Actor *arg2);
+
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006A58.s")
 
 /* D_8007ABF0: objects of 0x84 bytes with an Actor at +0x14 */
@@ -750,6 +769,22 @@ s32 func_80006D24(PlayerState *arg0, Actor *arg1) {
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006F80.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007320.s")
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ s16 rot;
+    /* 0x0E */ u8 unkE[0x18 - 0xE];
+} Unk8007C290; /* size 0x18 */
+
+extern f32 D_8007AA2C; /* .actor.unkC */
+extern f32 D_8007AA34; /* .actor.unk14 */
+extern f32 D_8007AB34;
+extern f32 D_8007AB38;
+extern Unk8007C290 *D_8007C290;
+void func_80007658(PlayerState *arg0, Actor *arg1);
+void func_8000F50C(s32 arg0, s32 arg1, u16 arg2, Unk8007C290 *arg3);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800073E8.s")
 
