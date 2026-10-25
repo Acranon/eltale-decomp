@@ -714,7 +714,39 @@ void func_80017F48(Unk80017F48* arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001809C.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80018348.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0x28];
+    /* 0x28 */ Actor17360* unk28;
+} Unk80018348;
+extern Unk8007B908_b* D_800863C4;
+s32 func_8001A2A0(s32, Actor17360*);
+Actor17360* func_80018348(Unk80018348* arg0, s32 arg1) {
+    Actor17360* ret;
+    Unk8007B908_b* p;
+    s32 n;
+
+    if (!(arg0->unk28->unk5E & 1)) {
+        ret = (Actor17360*)D_8007AA20;
+        if (func_8001A2A0(arg1, (Actor17360*)D_8007AA20)) {
+            ret = NULL;
+        }
+    } else if ((ret = arg0->unk28) == NULL || func_8001A2A0(arg1, ret)) {
+        n = D_8007B900;
+        ret = NULL;
+        p = (Unk8007B908_b*)D_8007B908;
+        while (n != 0) {
+            if (p->unk7C != -1) {
+                if (!func_8001A2A0(arg1, (Actor17360*)p->unk2C)) {
+                    ret = (Actor17360*)p->unk2C;
+                    D_800863C4 = p;
+                }
+                n--;
+            }
+            p++;
+        }
+    }
+    return ret;
+}
 
 s32 func_80018444(Unk80018444* arg0) {
     s32 ret = 0;
