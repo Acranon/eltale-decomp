@@ -728,6 +728,27 @@ Unk80019BFCRet* func_80019820(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f32 arg4, 
     return func_8001C818(arg6->unk8, arg6->unk4, arg6->unk6, arg0 & 0xFF, arg1, arg2, arg3, arg4, arg5, sx, sy, sx);
 }
 
+typedef struct {
+    /* 0x00 */ u8 pad0[0x20];
+    /* 0x20 */ s16 unk20;
+    /* 0x22 */ u16 unk22;
+    /* 0x24 */ u16 unk24;
+    /* 0x26 */ u8 pad26[2];
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 unk2C;
+    /* 0x30 */ u8 pad30[0x14];
+    /* 0x44 */ s8 unk44;
+    /* 0x45 */ u8 unk45;
+} Unk80019FC8Def;
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u8 pad8[4];
+} Unk800C363C; // size = 0xC
+extern Unk800C363C* D_800C363C[];
+void func_8001B3FC(s32, s32, f32, f32, f32, f32);
+void func_8001B7E0(s32, f32, f32, f32, f32);
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800199C0.s")
 
 void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
@@ -757,27 +778,6 @@ void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
     }
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ s16 unk20;
-    /* 0x22 */ u16 unk22;
-    /* 0x24 */ u16 unk24;
-    /* 0x26 */ u8 pad26[2];
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ u8 pad30[0x14];
-    /* 0x44 */ s8 unk44;
-    /* 0x45 */ u8 unk45;
-} Unk80019FC8Def;
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u8 pad8[4];
-} Unk800C363C; // size = 0xC
-extern Unk800C363C* D_800C363C[];
-void func_8001B3FC(s32, s32, f32, f32, f32, f32);
-void func_8001B7E0(s32, f32, f32, f32, f32);
 typedef struct {
     /* 0x00 */ u8 pad0[0x30];
     /* 0x30 */ s16 unk30;
