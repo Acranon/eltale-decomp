@@ -170,6 +170,55 @@ typedef struct {
 } Unk8007C284;
 
 extern Unk8007C284 *D_8007C284;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ f32 x;
+    /* 0x1C */ f32 y;
+    /* 0x20 */ f32 z;
+} Unk8007AA08;
+
+typedef struct {
+    /* 0x00 */ u16 a;
+    /* 0x02 */ u16 b;
+} Unk80082048;
+
+extern Unk8007AA08 D_8007AA08;
+extern Unk8000FA9C *D_8007C290;
+extern s32 D_8007C2A4;
+extern f32 D_800842AC;
+extern s32 D_800842B0;
+extern s32 D_80081CB0;
+extern s32 D_80081CB4;
+extern s32 D_80081CB8;
+extern s32 D_80081CBC;
+extern s32 D_80081CC0;
+extern s32 D_80081CC4;
+extern Unk8000FA9C **D_80081CC8;
+extern Unk8000FA9C **D_80081CCC;
+extern Unk8000FA9C **D_80081CD0;
+extern Unk8000FA9C **D_80081CD4;
+extern Unk8000FA9C **D_80081CD8;
+extern Unk8000FA9C **D_80081CDC;
+extern s32 D_80081CE0;
+extern Unk8000FA9C *D_80081FE8;
+extern u8 D_80060C88[];
+extern u16 D_8004DD70;
+extern u16 D_8004DDB0;
+extern u8 *D_8004DDB4[];
+extern u16 D_8004DDC8[];
+extern Unk8000FA9C *D_80082860[];
+extern Unk8000FA9C *D_80082C60[];
+extern Unk8000FA9C *D_80083068[];
+void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
+extern Unk80082048 D_80082048[];
+extern f32 D_8004DDD4[];
+extern f32 D_8004DDE4[];
+extern f32 D_8004DDF4[];
+void func_8001A948(f32, f32, f32, Unk8000FA9C *);
+void func_8000FA9C(Unk8000FA9C *);
+void func_8000FC50(Unk8000FA9C *);
+void func_8000FDA8(f32, f32, f32, f32, Unk8000FA9C *);
 extern Vec3f D_80083638[];
 extern f32 D_80085F50;
 f32 sqrtf(f32);
@@ -207,7 +256,67 @@ extern s32 D_80084980;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000DE54.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000E81C.s")
+void func_8000E81C(MtxBuf *arg0) {
+    Unk8000FA9C *s;
+    s32 n;
+    s32 k;
+    s16 idx;
+    s32 t;
+    f32 rot;
+
+    D_80081CD4 = D_80082860;
+    n = D_80081CBC;
+    if (n != 0) {
+        gDPPipeSync(D_8007A184++);
+        gDPSetRenderMode(D_8007A184++, 0x0C1849D8, 0);
+        gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80060C88[D_800842BC]);
+        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+    }
+    for (; n != 0; n--) {
+        s = *D_80081CD4++;
+        idx = s->timer;
+        guPosition(&arg0->mtx[D_8007A180], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
+        gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
+        D_8007A180++;
+        gSPDisplayList(D_8007A184++, D_8007C294[idx].dl);
+        D_8007C2A0++;
+    }
+    if (D_80081CC4 != 0) {
+        gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80060C88[D_800842BC]);
+        gDPSetRenderMode(D_8007A184++, 0xC81049D8, 0);
+        gDPSetCombine(D_8007A184++, 0x121A04, 0xFFFFFFF8);
+    }
+    D_80081CDC = D_80083068;
+    n = D_80081CC4;
+    for (; n != 0; n--) {
+        s = *D_80081CDC++;
+        rot = s->angle;
+        k = (s->unk16 & 0xFF) - 0x40;
+        idx = s->timer;
+        guPosition(&arg0->mtx[D_8007A180], 0.0f, rot, 0.0f, s->scale, s->x, s->y, s->z);
+        gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
+        D_8007A180++;
+        gDPLoadTextureTile(D_8007A184++, D_8004DDB4[k], G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, D_8004DDC8[k], 0, 0, 31,
+                           D_8004DDC8[k] - 1, 0, G_TX_WRAP, G_TX_WRAP, 5, (D_8004DDC8[k] == 32) ? 5 : 6, G_TX_NOLOD,
+                           G_TX_NOLOD);
+        gDPSetTileSize(D_8007A184++, G_TX_RENDERTILE, 0, (t = D_8004DDB0 % 256) << 2, 32 << 2, (D_8004DDC8[k] + t) << 2);
+        gSPDisplayList(D_8007A184++, D_8007C294[idx].dl);
+        D_8007C2A0++;
+    }
+    if (D_80081CC0 != 0) {
+        gDPPipeSync(D_8007A184++);
+        gDPSetRenderMode(D_8007A184++, 0x0C1849D8, 0);
+        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+        D_80081CD8 = D_80082C60;
+        func_80010104(arg0, D_80081CC0, 0x11, D_80081CD8);
+        func_80010104(arg0, D_80081CC0, 0x12, D_80081CD8);
+    }
+    D_8004DD70++;
+    gDPPipeSync(D_8007A184++);
+    gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+    D_8004DDB0 += 2;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000EEA8.s")
 
