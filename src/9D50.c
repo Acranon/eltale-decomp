@@ -3,6 +3,8 @@
 typedef struct {
     /* 0x00 */ u8 pad0[2];
     /* 0x02 */ s16 unk2;
+    /* 0x04 */ u8 pad4[0xA];
+    /* 0x0E */ s16 unkE;
 } Unk10;
 
 typedef struct {
@@ -22,7 +24,8 @@ typedef struct {
     /* 0x0C */ u8 padC[4];
     /* 0x10 */ Unk10 *unk10;
     /* 0x14 */ u8 *name;
-    /* 0x18 */ u8 pad18[4];
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ f32 x;
     /* 0x20 */ f32 z;
     /* 0x24 */ f32 angle;
@@ -30,8 +33,8 @@ typedef struct {
 } NPCDef; /* size 0x2C */
 
 typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ s16 timer;
+    /* 0x00 */ u16 state;
+    /* 0x02 */ u16 timer;
     /* 0x04 */ f32 homeX;
     /* 0x08 */ f32 homeZ;
     /* 0x0C */ f32 homeAngle;
@@ -103,7 +106,9 @@ typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ u8 padC[0x18];
+    /* 0x0C */ u8 padC[4];
+    /* 0x10 */ f32 angle;
+    /* 0x14 */ u8 pad14[0x10];
     /* 0x24 */ f32 unk24;
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 rx;
@@ -176,10 +181,20 @@ void func_80009764(s32);
 void func_800097F8(NPCDef *, s32);
 void func_80009A54(f32 *, f32 *, Unk80009988 *);
 void func_8000A1D0(s32, u8 *);
-void func_800107F0(f32, f32, f32, s32, CollOut *);
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} CollResult;
+
+void func_800107F0(f32, f32, f32, s32, void *);
 void func_800201A0(void *, s32, s32, s32, s32, s32);
 u32 func_80026E90(s32);
-void func_80028120(u32, void *, u32);
+void func_80028120();
 void func_80032D20(s32);
 void func_8020C0D0(void);
 
@@ -194,7 +209,22 @@ extern RomRange D_80056880[];
 extern u8 D_800568B8[];
 extern u16 D_8007A172;
 extern RomRange *D_8007AB70;
-extern s16 D_8007AB74;
+extern u16 D_8007AB74;
+extern f32 D_8007AB78[2];
+void func_800271B4(f32, f32 *);
+
+typedef struct {
+    /* 0x00 */ u16 state;
+    /* 0x02 */ u16 timer;
+    /* 0x04 */ f32 homeX;
+    /* 0x08 */ f32 homeZ;
+    /* 0x0C */ f32 homeAngle;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ NPCObj obj;
+    /* 0x70 */ u8 pad70[0x10];
+    /* 0x80 */ NPCDef *def;
+} NPC2; /* size 0x84 */
+void func_80009988(f32, f32, Unk80009988 *);
 extern CollOut D_8007AB88;
 extern s32 D_8007ABA4;
 extern NPC D_8007ABF0[];
@@ -258,7 +288,17 @@ void func_80009594(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_80009764.s")
+void func_80009764(s32 arg0) {
+    u32 start;
+    u32 end;
+
+    D_8007AB70 = &D_80056880[arg0];
+    func_80028120(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
+    func_80028120(D_A70350, D_802A0000, D_A77F10 - D_A70350);
+    start = D_8007AB70->start;
+    end = D_8007AB70->end;
+    func_80028120(start, D_8020E6F0, end - start);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800097F8.s")
 
