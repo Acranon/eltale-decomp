@@ -286,8 +286,8 @@ void func_800292DC(s32 slot) {
     alSeqpStop((ALSeqPlayer*) &D_8008F7A8[slot].player);
 }
 
-void func_80029328(s32 slot) {
-    alSeqpGetState((ALSeqPlayer*) &D_8008F7A8[slot].player);
+s32 func_80029328(s32 slot) {
+    return alSeqpGetState((ALSeqPlayer*) &D_8008F7A8[slot].player);
 }
 
 void func_80029374(u32 start, u32 end, u8* table) {
