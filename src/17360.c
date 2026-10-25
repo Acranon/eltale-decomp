@@ -37,7 +37,7 @@ typedef struct {
     /* 0x94 */ f32 unk94;
 } Unk17360Data;
 
-typedef struct {
+typedef struct Actor17360 {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
@@ -46,7 +46,8 @@ typedef struct {
     /* 0x14 */ f32 rz;
     /* 0x18 */ u8 pad18[0xC];
     /* 0x24 */ f32 scale;
-    /* 0x28 */ u8 pad28[0x38];
+    /* 0x28 */ u8 pad28[0x36];
+    /* 0x5E */ u16 unk5E;
     /* 0x60 */ u16 unk60;
     /* 0x62 */ u16 unk62;
     /* 0x64 */ Unk17360Model* unk64;
@@ -95,6 +96,30 @@ extern u16 D_8004ED34[];
 extern u16 D_8007AB18;
 extern Unk8007B908 D_8007B908[];
 extern u16 D_8008BE52;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ f32 unk1C;
+} Unk17360CamCfg;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ u8 pad18[0x10];
+    /* 0x28 */ struct Actor17360* target;
+    /* 0x2C */ Unk17360CamCfg* cfg;
+} Unk17360Cam;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+} Unk17360Vec2;
+
+extern Unk17360Vec2 D_800863B8;
+u32 func_80026E90(u32);
+f32 sqrtf(f32);
+void func_800271B4(f32, Unk17360Vec2*);
 
 void func_80018480(s32, Actor17360*);
 void func_80018CD8(s32, Actor17360*);
@@ -140,21 +165,114 @@ void func_80016E34(Unk80016DE0* arg0, Actor17360* arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80016EA8.s")
+void func_80016EA8(Unk17360Cam* arg0, Actor17360* arg1) {
+    arg0->x = arg1->x;
+    arg0->z = arg1->z;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94 + arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    } else {
+        arg0->y = arg1->y + 2.0 * arg1->unk64->unk1C * arg1->scale + arg0->cfg->unk1C;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80016F3C.s")
+void func_80016F3C(Unk17360Cam* arg0, Actor17360* arg1) {
+    D_800863B8.x = 0.0f;
+    D_800863B8.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    func_800271B4(arg1->ry, &D_800863B8);
+    arg0->x = arg1->x + D_800863B8.x;
+    arg0->z = arg1->z + D_800863B8.y;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94;
+    } else {
+        arg0->y = arg1->y + arg1->unk64->unk1C * 0.5 * arg1->scale;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017028.s")
+void func_80017028(Unk17360Cam* arg0, Actor17360* arg1) {
+    D_800863B8.x = 0.0f;
+    D_800863B8.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    func_800271B4(arg1->ry, &D_800863B8);
+    arg0->x = arg1->x + D_800863B8.x;
+    arg0->z = arg1->z + D_800863B8.y;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94 + arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    } else {
+        arg0->y = arg1->y + 2.0 * arg1->unk64->unk1C * arg1->scale + arg0->cfg->unk1C;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017134.s")
+void func_80017134(Unk17360Cam* arg0, Actor17360* arg1) {
+    D_800863B8.x = 0.0f;
+    D_800863B8.y = -arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    func_800271B4(arg1->ry, &D_800863B8);
+    arg0->x = arg1->x + D_800863B8.x;
+    arg0->z = arg1->z + D_800863B8.y;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94 + arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    } else {
+        arg0->y = arg1->y + 2.0 * arg1->unk64->unk1C * arg1->scale + arg0->cfg->unk1C;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017244.s")
+void func_80017244(Unk17360Cam* arg0, Actor17360* arg1) {
+    if (arg0->target != NULL) {
+        arg1 = arg0->target;
+    }
+    arg0->x = arg1->x;
+    arg0->z = arg1->z;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94 - arg1->unk64->unk18 * arg1->scale;
+    } else if (arg1->unk64->unk0 == 2) {
+        arg0->y = arg1->y + 100.0f * arg1->scale;
+    } else {
+        arg0->y = arg1->y;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800172D0.s")
+void func_800172D0(Unk17360Cam* arg0, Actor17360* arg1) {
+    D_800863B8.x = 0.0f;
+    D_800863B8.y = (f32)func_80026E90(20) + 20.0;
+    func_800271B4((f32)func_80026E90(16) * 3.141592653589793 / 8.0f - 3.141592653589793, &D_800863B8);
+    arg0->x = arg1->x + D_800863B8.x;
+    arg0->z = arg1->z + D_800863B8.y;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94 + arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    } else {
+        arg0->y = arg1->y + 2.0 * arg1->unk64->unk1C * arg1->scale + arg0->cfg->unk1C;
+    }
+}
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001744C.s")
+void func_8001744C(Unk17360Cam* arg0, Actor17360* arg1) {
+    f32 dist;
+    f32 dz;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017590.s")
+    if (arg1->unk5E & 1) {
+        dist = arg0->target->x - arg1->x;
+        dz = arg0->target->z - arg1->z;
+        dist = sqrtf(dist * dist + dz * dz);
+    } else {
+        dist = arg1->unk64->unk18 * 10.0 * arg1->scale;
+    }
+    D_800863B8.y = dist;
+    D_800863B8.x = dist * 1.5;
+    func_800271B4(arg1->ry, &D_800863B8);
+    arg0->x = arg1->x + D_800863B8.x;
+    arg0->z = arg1->z + D_800863B8.y;
+    if (arg1->unk64->unk0 == 1) {
+        arg0->y = arg1->unk68->unk94 - arg1->unk64->unk18 * arg1->scale;
+    } else {
+        arg0->y = arg1->y;
+    }
+}
+
+void func_80017590(Unk17360Cam* arg0, Actor17360* arg1) {
+    D_800863B8.x = 0.0f;
+    D_800863B8.y = 380.0f;
+    func_800271B4(arg1->ry, &D_800863B8);
+    arg0->x = arg1->x + D_800863B8.x * arg1->scale;
+    arg0->y = arg1->y + 380.0f * arg1->scale;
+    arg0->z = arg1->z + D_800863B8.y * arg1->scale;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017630.s")
 
