@@ -336,7 +336,54 @@ s16 func_8020CD88_ovl_ending(void) {
     return -1;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020CE70_ovl_ending.s")
+s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
+    UnkStruct_8022BB38* temp_v1;
+    s32 v;
+    s32 x;
+    s32 y;
+    s32 flag;
+
+    temp_v1 = &D_8022BB38[arg0];
+    // Fake (permuter): a dead read of x here gives v the register retail uses.
+    v = x;
+    if (!(temp_v1->unk0 & 0x80000000)) {
+        return 0xFF;
+    }
+    x = temp_v1->unk8;
+    y = temp_v1->unkA;
+    flag = arg1 & 0x100;
+    temp_v1->unk4C++;
+    if (flag) {
+        arg1 = temp_v1->unk38;
+        temp_v1->unk40 += (f32) x / (f32) arg1;
+        v = temp_v1->unk40;
+        if ((v >= x) || (temp_v1->unk4C >= arg1)) {
+            // Fake (permuter): a dead read of x here gives v the register retail uses.
+    v = x;
+        }
+        arg2->unk0 = temp_v1->unk2E - v;
+        arg2->unk10 = v;
+    }
+    if (!flag) {
+        arg1 = temp_v1->unk38;
+        temp_v1->unk44 += (f32) y / (f32) arg1;
+        v = temp_v1->unk44;
+        if ((v >= y) || (temp_v1->unk4C >= arg1)) {
+            v = y;
+        }
+        arg2->unk4 = temp_v1->unk30 - v;
+        arg2->unk14 = v;
+    }
+    if (temp_v1->unk4C >= temp_v1->unk38) {
+        temp_v1->unk4C = 0;
+        temp_v1->unk2E = 0;
+        temp_v1->unk30 = 0;
+        temp_v1->unk40 = 0.0f;
+        temp_v1->unk44 = 0.0f;
+        return 0xFF;
+    }
+    return 0;
+}
 
 s32 func_8020CFD4_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     UnkStruct_8022BB38* temp_v1;
@@ -663,7 +710,7 @@ void func_8020D970_ovl_ending(s32 arg0) {
     D_8022BB38[arg0].unk34 = 0;
 }
 
-s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
+s32 func_8020CE70_ovl_ending();
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D98C_ovl_ending.s")
 
