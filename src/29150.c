@@ -350,7 +350,50 @@ s32 func_80029834(void) {
     return 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80029880.s")
+extern s32 D_800559BC;
+extern s32 D_800559C0;
+s32 func_8002A2AC(s32 seqNo);
+
+void func_80029880(s32 arg0) {
+    s32 seq;
+
+    D_800559BC = arg0;
+    if (arg0 == 1) {
+        if (D_800559C0 == 0xFF) {
+            if (func_8002A2AC(0) != 0) {
+                return;
+            }
+        } else if (D_8008F7A8[0].player.state != 0) {
+            alSeqpStop((ALSeqPlayer*) &D_8008F7A8[0].player);
+            return;
+        }
+        D_800559B8 = 1;
+        alSeqpSetVol((ALSeqPlayer*) &D_8008F7A8[1].player, 0x7FFF);
+        D_800559C4[1] = 0x7FFF;
+        func_80029224(1);
+        D_800559BC = 0xFF;
+        return;
+    }
+    D_800559B8 = 0;
+    alSeqpStop((ALSeqPlayer*) &D_8008F7A8[1].player);
+    if (arg0 >= 0x50) {
+        seq = arg0 - 0x50;
+        if (D_800559C0 == seq || func_8002A2AC(seq) == 0) {
+            func_80029224(0);
+            alSeqpSetVol((ALSeqPlayer*) &D_8008F7A8[0].player, 0);
+            D_800559C4[0] = 0;
+            D_800559D0 = 0x100;
+            D_800559C0 = seq;
+            D_800559BC = 0xFF;
+        }
+    } else if (arg0 == D_800559C0 || func_8002A2AC(arg0) == 0) {
+        func_80029224(0);
+        alSeqpSetVol((ALSeqPlayer*) &D_8008F7A8[0].player, 0x7FFF);
+        D_800559C4[0] = 0x7FFF;
+        D_800559C0 = arg0;
+        D_800559BC = 0xFF;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80029A38.s")
 
