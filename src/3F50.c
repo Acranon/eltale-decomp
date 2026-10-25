@@ -308,7 +308,31 @@ extern f32 D_8007A8F8;
 extern f32 D_8007A8FC;
 extern f32 D_8007A900;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003350.s")
+void func_80003350(void) {
+    func_80028120(D_869620, D_80206000, D_86F6F0 - D_869620);
+    D_8007A9D0 = D_80055D44;
+    D_8007AA08.actor.scale = D_8007A9D0.unk20;
+    D_8007AA08.actor.unk28 = D_8007A9D0.unk18;
+    D_8007AA08.actor.unk50 = D_8007A9D0.unk2;
+    D_8007AA08.unk14 = (PlayerStateSub14 *)&D_8007A9D0;
+    D_8007AA08.unk6 = 0;
+    D_8007AA08.unk8 = 0;
+    D_8007AA08.unk120 = 0;
+    D_8007AA08.actor.unk52 = -1;
+    D_8007AA08.actor.unk54 = 0;
+    D_8007AA08.actor.unk58 = 1;
+    D_8007AA08.actor.unk64 = &D_8007A9D0;
+    D_8007AA08.actor.unk68 = &D_8007AA8C;
+    D_8007AA08.actor.unk5E = 0;
+    D_8007AA08.actor.unk60 = 0;
+    D_8007A998 = 0x108;
+    D_8007A9AC = 0xD;
+    D_8007A9AE = 0x11;
+    D_8007A9B0 = 0;
+    D_8007A988 = 0.0f;
+    D_8007A8F4 = D_8007A8F8 = 0.0f;
+    D_8007A8FC = D_8007A900 = 0.0f;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003494.s")
 
