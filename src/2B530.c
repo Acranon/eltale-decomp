@@ -411,7 +411,113 @@ void func_8002D7CC(s32 x) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002DECC.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002E42C.s")
+typedef struct {
+    u16* v[4];
+} Unk4Pals;
+typedef struct {
+    u8* v[4][2];
+} Unk4x2Ptrs;
+extern Unk4Pals D_800615E4;
+extern Unk4x2Ptrs D_800615F4;
+extern Gfx D_80060ED8[];
+extern Gfx D_80060EF0[];
+
+void func_8002E42C(s32 arg0, s32 arg1) {
+    s32 k;
+    s32 j;
+    s32 d;
+    Unk4Pals pals = D_800615E4;
+    Unk4x2Ptrs tex = D_800615F4;
+    s32 xr;
+    s32 x;
+    s32 y;
+    s32 w;
+    s32 h = 0;
+    s32 texW;
+    s32 texH;
+    s32 ult;
+    s32 s[1];
+    s32 t;
+    s32 ret;
+
+    for (k = 0; k < 4; k++) {
+        gDPPipeSync(D_8007A184++);
+        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
+        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+        gDPPipeSync(D_8007A184++);
+        if (k != 1) {
+            gSPDisplayList(D_8007A184++, D_80060ED8);
+        } else {
+            gSPDisplayList(D_8007A184++, D_80060EF0);
+            gDPSetEnvColor(D_8007A184++, 255, 255, 255, 0x80);
+        }
+        gDPPipeSync(D_8007A184++);
+        gDPLoadTLUT_pal256(D_8007A184++, pals.v[k]);
+        for (j = 0; j < 2; j++) {
+            s[0] = 0;
+            switch (k) {
+                case 2:
+                    x = arg1 + 0x87;
+                    ult = 0x32 - arg0 / 2;
+                    y = ult + 0x52;
+                    w = 0x19;
+                    h = 0x32;
+                    texW = 0x19;
+                    texH = 0x32;
+                    t = ult << 5;
+                    break;
+                case 3:
+                    ult = 0;
+                    t = 0;
+                    x = arg1 + 0x84;
+                    y = 0x4F;
+                    w = 0x1C;
+                    h = 0x38;
+                    texW = 0x1C;
+                    texH = 0x38;
+                    break;
+                default:
+                    ult = 0;
+                    t = 0;
+                    x = arg1 + 0x87;
+                    y = 0x52;
+                    w = 0x19;
+                    h = 0x32;
+                    texW = 0x19;
+                    texH = 0x32;
+                    break;
+            }
+            x += w * j;
+            if (x < 0 && x + w >= 0) {
+                d = -x;
+                x = 0;
+                w -= d;
+                s[0] = d << 5;
+            }
+            if (x > 320) {
+                ret = -1;
+            } else {
+                ret = 0;
+                xr = x + w;
+                if (xr > 320) {
+                    w = w - xr + 320;
+                }
+            }
+            if (w <= 0) {
+                ret = -1;
+            }
+            if (ret >= 0) {
+                gDPLoadTextureTile(D_8007A184++, tex.v[k][j], G_IM_FMT_CI, G_IM_SIZ_8b, texW, texH, 0, ult, texW - 1,
+                                   texH - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
+                                   G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h - ult) << 2, G_TX_RENDERTILE, s[0],
+                                    t, 1 << 10, 1 << 10);
+                gDPPipeSync(D_8007A184++);
+            }
+        }
+    }
+    D_8008FB3E &= ~0x10;
+}
 
 typedef struct {
     s32 v[4];
