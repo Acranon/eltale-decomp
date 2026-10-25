@@ -2,7 +2,7 @@
 /assets/
 /build/
 /expected/
-/.venv/
+/.venv
 /baserom*.z64
 /baserom/
 *.n64
@@ -18,10 +18,10 @@ permuter_settings.toml
 ctx.c
 __pycache__/
 nonmatchings/
-/tools/asm-processor/
-/tools/asm-differ/
-/tools/decomp-permuter/
-/tools/m2c/
-/tools/ido_5.3/
+/tools/asm-processor
+/tools/asm-differ
+/tools/decomp-permuter
+/tools/m2c
+/tools/ido_5.3
 eltale.d
-/tools/ultralib/
+/tools/ultralib
