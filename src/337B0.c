@@ -54,7 +54,48 @@ void func_80032BB0(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80033050.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_8003403C.s")
+s32 func_8003403C(s32 idx) {
+    Unk80090470 *p = &D_80090470[idx];
+    s32 ret;
+    s32 ww;
+    s32 hh;
+    s32 x;
+    s32 y;
+    s16 cx;
+    s16 cy;
+    u32 steps;
+
+    ret = 0;
+    cx = p->unk4 + (p->unk8 >> 1);
+    cy = p->unk6 + (p->unkA >> 1);
+    if (p->unk0 & 0x10000000) {
+        steps = 10;
+        ww = p->unk8 / steps;
+        ww = p->unkC * ww;
+        hh = p->unkA / steps;
+        hh = p->unkC * hh;
+    } else {
+        steps = 8;
+        ww = p->unk8 / steps;
+        ww = (9 - p->unkC) * ww;
+        hh = p->unkA / steps;
+        hh = (9 - p->unkC) * hh;
+    }
+    x = cx - (ww >> 1);
+    y = cy - (hh >> 1);
+    func_80034C9C(0, x, y, ww, hh);
+    func_80034C9C(3, x + ww, y + 3, 3, hh);
+    func_80034C9C(3, x + 3, y + hh, ww, 3);
+    func_80034C9C(3, x, y, ww, 1);
+    func_80034C9C(3, x, y + hh - 1, ww, 1);
+    func_80034C9C(3, x, y, 1, hh);
+    func_80034C9C(3, x + ww - 1, y, 1, hh);
+    p->unkC++;
+    if (p->unkC > steps) {
+        ret = -1;
+    }
+    return ret;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80034274.s")
 
