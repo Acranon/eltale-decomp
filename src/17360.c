@@ -638,10 +638,6 @@ void func_800195E0(s32 arg0, Actor17360* arg1) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800195FC.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80019820.s")
-
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800199C0.s")
-
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ s16 unk10;
@@ -664,7 +660,7 @@ typedef struct {
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
-    /* 0x24 */ s32 unk24;
+    /* 0x24 */ Actor17360* unk24;
     /* 0x28 */ u8 pad28[4];
     /* 0x2C */ Unk17360CamCfg* cfg;
     /* 0x30 */ Unk80019BFCDef* def;
@@ -680,11 +676,57 @@ typedef struct {
     /* 0x10 */ f32 unk10;
 } Unk80019BFCArg1;
 typedef struct {
-    u8 unk0[10];
-} Unk800C18D8;
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8;
+} Unk800C18D8; // size = 0xA
 extern Unk800C18D8 D_800C18D8[];
-Unk80019BFCRet* func_80019820(u16, u16, f32, f32, f32, f32, Unk800C18D8*, Unk17360Vec2*, s32);
+Unk80019BFCRet* func_80019820(u16, u16, f32, f32, f32, f32, Unk800C18D8*, Unk17360Vec2*, Actor17360*);
 void func_8002A7C8(u8, s8, s32);
+
+
+Unk80019BFCRet* func_8001C818(u16, u16, u16, s32, u16, f32, f32, f32, f32, f32, f32, f32);
+Unk80019BFCRet* func_80019820(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, Unk800C18D8* arg6, Unk17360Vec2* arg7, Actor17360* arg8) {
+    f32 sx;
+    f32 sy;
+
+    switch (arg6->unk0) {
+        case 0:
+            sx = arg8->unk64->unk18 * arg8->scale * arg7->x;
+            break;
+        case 1:
+            sx = arg8->unk64->unk1C * arg8->scale * arg7->x;
+            break;
+        case 3:
+            sx = arg7->z * arg7->x;
+            break;
+        default:
+            do {} while (0);
+            sx = arg7->x;
+            break;
+    }
+    switch (arg6->unk2) {
+        case 0:
+            sy = arg8->unk64->unk18 * arg8->scale * arg7->y;
+            break;
+        case 1:
+            sy = arg8->unk64->unk1C * arg8->scale * arg7->y;
+            break;
+        case 3:
+            sy = arg7->z * arg7->y;
+            break;
+        default:
+            do {} while (0);
+            sy = arg7->y;
+            break;
+    }
+    return func_8001C818(arg6->unk8, arg6->unk4, arg6->unk6, arg0 & 0xFF, arg1, arg2, arg3, arg4, arg5, sx, sy, sx);
+}
+
+#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800199C0.s")
+
 void func_80019BFC(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
     Unk80019BFCRet* ret;
     Unk17360CamCfg* cfg;
