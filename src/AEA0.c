@@ -25,15 +25,20 @@ typedef struct {
     /* 0x14 */ u8 pad14[0x10];
     /* 0x24 */ f32 unk24;
     /* 0x28 */ f32 unk28;
-    /* 0x2C */ u8 pad2C[0x18];
+    /* 0x2C */ f32 unk2C;
+    /* 0x30 */ f32 unk30;
+    /* 0x34 */ f32 unk34;
+    /* 0x38 */ u8 pad38[0xC];
     /* 0x44 */ f32 unk44;
     /* 0x48 */ u8 pad48[4];
     /* 0x4C */ f32 unk4C;
     /* 0x50 */ s16 unk50;
     /* 0x52 */ s16 unk52;
-    /* 0x54 */ u8 pad54[0xC];
+    /* 0x54 */ u8 pad54[4];
+    /* 0x58 */ u16 unk58;
+    /* 0x5A */ u8 pad5A[6];
     /* 0x60 */ u16 unk60;
-    /* 0x62 */ u8 pad62[2];
+    /* 0x62 */ u16 unk62;
     /* 0x64 */ EnemyDef *unk64;
     /* 0x68 */ EnemyStats *unk68;
 } Obj; /* size 0x6C */
@@ -46,7 +51,7 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u16 type;
     /* 0x002 */ s16 unk2;
-    /* 0x004 */ u8 pad4[2];
+    /* 0x004 */ u16 unk4;
     /* 0x006 */ u16 unk6;
     /* 0x008 */ u16 flags;
     /* 0x00A */ u8 padA[0x1E];
@@ -124,7 +129,21 @@ typedef struct {
     /* 0x0A */ s16 unkA;
 } Unk8000BA20;
 
+typedef struct {
+    /* 0x00 */ u8 pad0[0xE];
+    /* 0x0E */ s16 unkE;
+} Unk8000AA74;
+
 void func_8000A5E4(void);
+Unk8000BA20 *func_8000B7A4(Enemy *, Obj *);
+void func_8000BA20(Enemy *, Obj *, Unk8000BA20 *);
+extern Enemy *D_8007C028;
+extern s16 D_8008C162;
+void func_80020428(s32, Obj *, u8 *, s32);
+void func_8002099C(u16, Obj *, u8 *);
+void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
+extern Obj *D_8007C030[];
+extern Gfx *D_8007A184;
 void func_8000CC40(s32, s32);
 f32 func_800270D0(f32, f32);
 void func_800201A0(Obj *, s32, s32, s32, s32, s32);
@@ -176,7 +195,46 @@ extern u8 D_8020E6F0[];
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A310.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A3E4.s")
+void func_8000A3E4(s32 arg0) {
+    Enemy *e;
+    s32 n;
+    Obj **list;
+    Obj *obj;
+    u8 *anims;
+    f32 y;
+    f32 h;
+
+    D_8007C02C = 0;
+    list = D_8007C030;
+    gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+    n = D_8007B900;
+    e = D_8007B908;
+    while (n != 0) {
+        obj = &e->obj;
+        if (e->obj.unk50 != -1) {
+            y = obj->y;
+            anims = D_8007C048[obj->unk50];
+            if (obj->unk64->unk0 == 1) {
+                h = obj->unk64->unk1C * obj->unk24;
+                if (y < D_8007AA08.y) {
+                    obj->y = D_8007AA08.y;
+                }
+                obj->y += h;
+                obj->unk68->unk94 = obj->y;
+            }
+            func_80020428(1, obj, &anims[obj->unk52 * 12], arg0);
+            func_8002099C(obj->unk58, obj, &anims[obj->unk52 * 12]);
+            obj->y = y;
+            if (obj->unk64->unk0 != 2 && !(obj->unk62 & 0x8000)) {
+                func_800131F0(obj->x, obj->y, obj->z, obj->unk2C, obj->unk30, obj->unk34, obj->unk28 * obj->unk24);
+            }
+            *list++ = obj;
+            n--;
+            D_8007C02C++;
+        }
+        e++;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A5E4.s")
 
@@ -203,7 +261,47 @@ void func_8000AA28(void) {
     D_8007B908[D_8007C050[D_8008BE58]].flags |= 1;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000AA74.s")
+void func_8000AA74(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
+    Unk8000BA20 *v;
+
+    func_8000BFE0(obj, &D_8007C070);
+    func_8000BCA4(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+    if (e->flags & 1) {
+        D_8007C028 = e;
+        D_8008C162 = 60;
+        e->flags &= 0xFFFC;
+        if (e->unk98 & 8) {
+            func_8001FC14(obj);
+            return;
+        }
+        v = func_8000B7A4(e, obj);
+        if (v != NULL) {
+            if (!(e->flags & 0x10)) {
+                func_8000BA20(e, obj, v);
+                return;
+            }
+            e->type = 1;
+            e->unk4 = 4;
+            if (D_8008BE52 & 0x100) {
+                e->unk2 = arg2->unkE;
+                func_800201A0(obj, 1, 1, 1, 1, 1);
+            } else {
+                e->unk2 = arg2->unkE / 10;
+                func_800201A0(obj, 1, 10, 1, 10, 1);
+            }
+        } else {
+            e->type = 1;
+            e->unk4 = 4;
+            if (D_8008BE52 & 0x100) {
+                e->unk2 = arg2->unkE;
+                func_800201A0(obj, 1, 1, 1, 1, 1);
+            } else {
+                e->unk2 = arg2->unkE / 10;
+                func_800201A0(obj, 1, 10, 1, 10, 1);
+            }
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000AC84.s")
 

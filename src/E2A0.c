@@ -169,6 +169,24 @@ extern u16 D_8004DE84[];
 extern u8 D_8004DE88[];
 extern f32 D_80085E74;
 
+typedef struct {
+    /* 0x00 */ s32 start;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u16 id;
+} Unk8004DE98; /* size 0x8 */
+
+extern Unk8004DE98 D_8004DE98[];
+extern s32 D_8004DE8C;
+extern s32 D_8004DE90;
+extern s32 D_8004DE94;
+extern u16 D_800810B0[];
+extern u16 D_800814B0[][0x100];
+extern s32 D_80082858;
+extern u16 *D_80083060;
+extern u16 *D_80083468;
+extern u16 *D_80083550;
+extern s32 D_80084980;
+
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000D6A0.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000DDBC.s")
