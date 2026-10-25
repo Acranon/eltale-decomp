@@ -88,7 +88,7 @@ def clean():
 
 def write_permuter_settings():
     with open("permuter_settings.toml", "w") as f:
-        f.write(f'''compiler_command = "{IDO} -c -G 0 {WARNINGS} {INCLUDES} {DEFINES} -mips2 -O2"
+        f.write(f'''compiler_command = "{IDO} -c -G 0 {WARNINGS} {INCLUDES} {DEFINES} -mips2 -O2 -g3"
 assembler_command = "{AS}"
 compiler_type = "ido"
 
