@@ -877,7 +877,93 @@ void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
 
 extern u16 D_8007A90C;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006168.s")
+void func_80006168(f32 sx, f32 sz, Actor *a, PlayerState *p) {
+    s32 anim;
+    s32 next;
+    s32 speed;
+    s32 mode;
+    s32 flag;
+    f32 d;
+    f32 X;
+    f32 spd;
+    f32 cur;
+
+    cur = sqrtf(a->vx * a->vx + a->vz * a->vz);
+    mode = 0;
+    if (sx != 0.0f || sz != 0.0f) {
+        spd = sqrtf(sx * sx + sz * sz) * 0.025;
+        if (spd > 2.0) {
+            sx = sx * 2.0 / spd;
+            sz = sz * 2.0 / spd;
+            spd = 2.0f;
+        }
+        d = func_800270D0(sx, sz) - a->rot;
+        if (d > 3.141592653589793) {
+            d -= 6.283185307179586;
+        } else if (d < -3.141592653589793) {
+            d += 6.283185307179586;
+        }
+        if (d > 0.7853981633974483) {
+            d = 0.7853982f;
+        } else if (d < -0.7853981633974483) {
+            d = -0.7853982f;
+        }
+        spd *= 1.0 - ((d >= 0.0f) ? d : -d) / 0.7853981633974483;
+        a->rot = a->rot + d * 0.5;
+        if (a->rot > 3.141592653589793) {
+            a->rot -= 6.283185307179586;
+        } else if (a->rot < -3.141592653589793) {
+            a->rot += 6.283185307179586;
+        }
+        D_8007A918.x = 0.0f;
+        D_8007A918.z = cur + (spd - cur) * 0.85;
+        func_800271B4(a->rot, &D_8007A918);
+        a->vx = D_8007A918.x;
+        a->vz = D_8007A918.z;
+        anim = 1;
+        next = 1;
+        flag = 0;
+        speed = spd * 14.0f + 3.0f;
+        if (spd > 1.5 || (f32)(cur + (spd - cur) * 0.85) > 1.5) {
+            p->unk0 = 2;
+            p->unk4 = 0x1E;
+            D_8007A90C = 0;
+        }
+    } else {
+        a->vx *= 0.82;
+        a->vz *= 0.82;
+        if (cur > 1.0) {
+            anim = 0xF;
+            next = D_8007A910;
+            mode = 3;
+            p->unk0 = 4;
+            p->unk4 = 8;
+            a->unkC = 0.0f;
+            a->unk14 = 0.0f;
+            a->vx *= 0.9;
+            a->vz *= 0.9;
+            speed = 1;
+            flag = 1;
+            func_8001A6E4(a);
+        } else {
+            anim = 1;
+            next = 1;
+            flag = 0;
+            speed = cur * 14.0f + 3.0f;
+            if (cur < 0.1) {
+                p->unk0 = 0;
+                a->vx = 0.0f;
+                a->vz = 0.0f;
+            }
+        }
+    }
+    if (anim != a->unk52 && anim != a->unk5A) {
+        func_800201A0(a, anim, speed, next, speed, flag);
+        a->unk54 = mode;
+    } else {
+        a->unk58 = speed;
+    }
+}
 
 
 void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p) {
