@@ -136,7 +136,17 @@ void func_8020F448_ovl_intro(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC9350/func_8020F5B4_ovl_intro.s")
+void func_8020F5B4_ovl_intro(void) {
+    s32 i;
+
+    gDPPipeSync(D_8007A184++);
+    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gDPLoadTLUT_pal16(D_8007A184++, 0, D_80264E98_ovl_intro);
+    for (i = 0; i * 9 + 120 != 138; i++) {
+        gDPLoadTextureTile_4b(D_8007A184++, D_80264740_ovl_intro, G_IM_FMT_CI, 208, 0, 0, i * 9, 200, i * 9 + 8, 0, 0, 0, 0, 0, 0, 0);
+        gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 9 + 111) << 2, 261 << 2, (i * 9 + 120) << 2, G_TX_RENDERTILE, 0, (i * 9) << 5, 1 << 10, 1 << 10);
+    }
+}
 
 void func_8020F878_ovl_intro(void) {
     s32 i;
