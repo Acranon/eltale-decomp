@@ -19,7 +19,26 @@ typedef struct {
 } Struct_8001FE08;
 
 typedef struct {
-    /* 0x00 */ char unk0[8];
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+} Struct_8001FF10_C;
+
+typedef struct {
+    /* 0x00 */ Struct_8001FF10_C* unk0;
+    /* 0x04 */ u16 unk4;
+    /* 0x06 */ u16 unk6;
+} Struct_8001FF10_8;
+
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 unk4;
+    /* 0x08 */ f32 unk8;
+} Struct_8001FF10_Pos;
+
+typedef struct {
+    /* 0x00 */ Struct_8001FF10_Pos** unk0;
+    /* 0x04 */ Struct_8001FF10_8* unk4;
     /* 0x08 */ Struct_8001FE08* unk8;
     /* 0x0C */ s32 unkC;
 } Struct_8007C284_34;
@@ -183,7 +202,53 @@ Struct_8001FE08* func_8001FE08(f32 x, f32 y) {
     return p;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001FF10.s")
+extern Struct_8001FF10_Pos D_8008BE40;
+void func_800271B4(f32, Struct_8001FF10_Pos*);
+void func_8000A6D0(s32, f32, f32, f32, void*, Struct_8007B908*);
+
+void func_8001FF10(f32 x, f32 y, f32 z, u16* list) {
+    Struct_8001FF10_8* e;
+    s32 n;
+    Struct_8001FF10_C* p;
+    Struct_8001FF10_Pos* pos;
+    Struct_8007B908* actor;
+    s32 (*o)[2];
+    s32 cnt;
+    s32 out[8][2];
+
+    cnt = func_80026E90(*list++);
+    e = &D_8008BF9C->unk4[list[cnt]];
+    pos = &(*D_8008BF9C->unk0)[e->unk6];
+    n = e->unk4;
+    p = e->unk0;
+    actor = D_8007B908;
+    o = out;
+    D_8008BF90 = 0;
+    while (n != 0) {
+        cnt = p->unk4;
+        if (p->unk8 != 0) {
+            cnt += func_80026E90(p->unk8 + 1);
+        }
+        (*o)[0] = p->unk0;
+        (*o)[1] = cnt;
+        o++;
+        D_8007B900 += cnt;
+        D_8008BF70[D_8008BF90++] = &actor->unk2C;
+        while (cnt != 0) {
+            D_8008BE40.unk0 = pos->unk0;
+            D_8008BE40.unk4 = pos->unk4;
+            func_800271B4(z, &D_8008BE40);
+            func_8000A6D0(p->unk0, x + D_8008BE40.unk0, y + D_8008BE40.unk4, z, &actor->unk2C, actor);
+            cnt--;
+            actor++;
+            pos++;
+        }
+        n--;
+        p++;
+    }
+    func_8000A95C();
+    D_8008BE5A = D_8007B900;
+}
 
 void func_800200F0(void) {
 }
