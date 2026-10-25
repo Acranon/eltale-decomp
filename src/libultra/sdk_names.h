@@ -18,10 +18,19 @@
 #define piAccessBuf D_80095780
 #define __osPiAccessQueue D_80095788
 
+/* io/siacs.c data */
+#define siAccessBuf D_800957E0
+#define __osSiAccessQueue D_800957E8
+#define __osSiAccessQueueEnabled D_8006EB20
+
+/* io/pfsisplug.c */
+#define __osPfsGetInitData func_8004B600
+
 /* controller */
 #define __osContPifRam D_800956F0
 
-/* io/siacs.c, io/sirawdma.c (libultra/477D0.c, libultra/49290.c) */
+/* io/siacs.c, io/sirawdma.c  */
+#define __osSiCreateAccessQueue func_80046BD0
 #define __osSiGetAccess func_80046C20
 #define __osSiRelAccess func_80046C64
 #define __osSiRawStartDma func_80048690
