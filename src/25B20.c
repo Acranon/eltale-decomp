@@ -111,9 +111,34 @@ s32 func_8002504C(void) {
     return count;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_80025094.s")
+void func_80025094(u8 arg0) {
+    s32 i;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_800250D8.s")
+    for (i = 0; i < 0x96; i++) {
+        if (D_8008C9B8[i] == 0xFF) {
+            break;
+        }
+    }
+    D_8008C9B8[i] = arg0;
+}
+
+s32 func_800250D8(u8 arg0) {
+    s32 ret = 0;
+    Struct_803AAAA0* item = &D_803AAAA0[arg0];
+
+    if ((D_8008BE52 & 1) && (item->unk0 & 2)) {
+        ret = 1;
+    } else if (!(D_8008BE52 & 1) && (item->unk0 & 1)) {
+        ret = 1;
+    }
+    if (ret) {
+        ret = D_8004F4A0[item->unk2](D_8007AA20, item, arg0);
+    }
+    if (ret) {
+        func_800079B4(arg0);
+    }
+    return ret;
+}
 
 void func_800251CC(u8 arg0, void* arg1) {
     D_8004F4B0[D_803AAAA0[arg0].unk2](arg1, &D_803AAAA0[arg0], arg0);

@@ -9,7 +9,17 @@ typedef struct {
 } Vec3f;
 
 typedef struct {
-    /* 0x00 */ char unk0[0x50];
+    /* 0x00 */ Vec3f unk0;
+    /* 0x0C */ Vec3f unkC;
+    /* 0x18 */ char unk18[0x24 - 0x18];
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ char unk28[0x38 - 0x28];
+    /* 0x38 */ f32 unk38;
+    /* 0x3C */ f32 unk3C;
+    /* 0x40 */ f32 unk40;
+    /* 0x44 */ f32 unk44;
+    /* 0x48 */ f32 unk48;
+    /* 0x4C */ f32 unk4C;
     /* 0x50 */ s16 unk50;
     /* 0x52 */ s16 unk52;
     /* 0x54 */ u16 unk54;
@@ -42,6 +52,25 @@ typedef struct {
     char unk1C[4];
 } Struct_80020A28;
 
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 unk4;
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ char unkC[0x32 - 0xC];
+    /* 0x32 */ u16 unk32;
+} Struct_80020214_kf;
+
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x04 */ Struct_80020A28* unk4;
+} Struct_80020214_set;
+
+extern s32 D_8008BFF0;
+
+void func_80026A00(Struct_80020A28*, Vec3f*, s32);
+void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
+void func_80020568(MtxF*, Vec3f, s32, s32, s32, s32, Struct_80020214_set*, Struct_80020A28*, s32);
+
 void func_800201A0(Struct_800201A0* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
     if (arg1 != -1) {
         if (arg1 != arg0->unk52) {
@@ -66,7 +95,28 @@ void func_800201A0(Struct_800201A0* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4
 
 #pragma GLOBAL_ASM("asm/nonmatchings/20DA0/func_80020214.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/20DA0/func_80020428.s")
+void func_80020428(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s32 arg3) {
+    s32 i;
+    u16 frame;
+    Struct_80020A28* anims;
+    u16 total;
+    MtxF mtx;
+    Vec3f scale;
+
+    D_8008BFF0 = 0;
+    func_80027220(&mtx, arg1->unkC.x, arg1->unkC.y, arg1->unkC.z, arg1->unk24, arg1->unk0.x, arg1->unk0.y, arg1->unk0.z);
+    scale.x = arg1->unk24;
+    scale.y = arg1->unk24;
+    scale.z = arg1->unk24;
+    anims = arg2->unk4;
+    frame = arg1->unk54;
+    total = arg1->unk56;
+    for (i = 0; i < arg2->unk0; i++) {
+        if (anims[i].unk14 == 0) {
+            func_80020568(&mtx, scale, arg0, i, frame, total, arg2, anims, arg3);
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/20DA0/func_80020568.s")
 
