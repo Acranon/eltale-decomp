@@ -967,7 +967,36 @@ void func_80018480(Unk80018480* arg0, Actor17360* arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_8001860C.s")
+typedef struct {
+    /* 0x00 */ u8 pad0[0xA];
+    /* 0x0A */ u16 unkA;
+} Unk8001860CRec;
+void func_8001AE24(Actor17360*, s32, s32);
+void func_8001860C(Unk80018480* arg0, Actor17360* arg1) {
+    u16 amt;
+    s32 pad;
+
+    if (arg1->unk5E & 1) {
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        amt = arg1->unk64->unk6 * arg0->cfg->unkC / 100;
+        amt += func_80026E90(amt >> 2);
+        ((Unk8001860CRec*)D_800863C4)->unkA += amt;
+        if (((Unk8001860CRec*)D_800863C4)->unkA > arg1->unk64->unk6) {
+            ((Unk8001860CRec*)D_800863C4)->unkA = arg1->unk64->unk6;
+        }
+    } else {
+        amt = (D_8007AA1C->unk24[arg0->cfg->unk6] >> 1) + arg1->unk64->unk6 * arg0->cfg->unkC / 100;
+        amt += func_80026E90(amt >> 2);
+        if (arg1->unk64->unk4 != arg1->unk64->unk6) {
+            arg1->unk64->unk4 += amt;
+            if (arg1->unk64->unk4 > arg1->unk64->unk6) {
+                arg1->unk64->unk4 = arg1->unk64->unk6;
+            }
+            D_8007AA1C->unk2A++;
+        }
+    }
+    func_8001AE24(arg1, 1, amt);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/17360/func_800187C4.s")
 
