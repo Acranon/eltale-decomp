@@ -394,9 +394,109 @@ void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2) {
     temp_v0->unk28 = temp_v0->unk6;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D624_ovl_ending.s")
+s32 func_8020D624_ovl_ending(s32 arg0, s32 arg1) {
+    UnkStruct_8022BB38* temp_v1;
+    f32 step;
+    s32 dir;
+    s32 d;
+    s32 delta;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D7A4_ovl_ending.s")
+    if (!(arg1 & 0x80000000)) {
+        return 0xFF;
+    }
+    temp_v1 = &D_8022BB38[arg0];
+    temp_v1->unk24++;
+    step = ((f32) temp_v1->unk2A - (f32) temp_v1->unk26) / (f32) temp_v1->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    temp_v1->unk1C += step;
+    d = temp_v1->unk1C;
+    delta = d;
+    if (temp_v1->unk4 < temp_v1->unk2A) {
+        dir = 1;
+    } else {
+        dir = 2;
+        delta = -d;
+    }
+    temp_v1->unk4 += delta;
+    if (temp_v1->unk1C >= 1.0f) {
+        temp_v1->unk1C -= d;
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk4 = temp_v1->unk2A;
+    }
+    if (dir & 1) {
+        if (temp_v1->unk4 >= temp_v1->unk2A) {
+            temp_v1->unk4 = temp_v1->unk2A;
+        }
+    } else if (dir & 2) {
+        if (temp_v1->unk4 <= temp_v1->unk2A) {
+            temp_v1->unk4 = temp_v1->unk2A;
+        }
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk24 = 0;
+        temp_v1->unk1C = 0.0f;
+        temp_v1->unk20 = 0.0f;
+        return 0xFF;
+    }
+    if (!temp_v1) {
+    }
+    return 0;
+}
+
+s32 func_8020D7A4_ovl_ending(s32 arg0, s32 arg1) {
+    UnkStruct_8022BB38* temp_v1;
+    f32 step;
+    s32 dir;
+    s32 d;
+    s32 delta;
+
+    if (!(arg1 & 0x80000000)) {
+        return 0xFF;
+    }
+    temp_v1 = &D_8022BB38[arg0];
+    temp_v1->unk24++;
+    step = ((f32) temp_v1->unk2C - (f32) temp_v1->unk28) / (f32) temp_v1->unk38;
+    if (step < 0) {
+        step = -step;
+    }
+    temp_v1->unk20 += step;
+    d = temp_v1->unk20;
+    delta = d;
+    if (temp_v1->unk6 < temp_v1->unk2C) {
+        dir = 4;
+    } else {
+        dir = 8;
+        delta = -d;
+    }
+    temp_v1->unk6 += delta;
+    if (temp_v1->unk20 >= 1.0f) {
+        temp_v1->unk20 -= d;
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk6 = temp_v1->unk2C;
+    }
+    if (dir & 4) {
+        if (temp_v1->unk6 >= temp_v1->unk2C) {
+            temp_v1->unk6 = temp_v1->unk2C;
+        }
+    } else if (dir & 8) {
+        if (temp_v1->unk6 <= temp_v1->unk2C) {
+            temp_v1->unk6 = temp_v1->unk2C;
+        }
+    }
+    if (temp_v1->unk24 >= temp_v1->unk38) {
+        temp_v1->unk24 = 0;
+        temp_v1->unk1C = 0.0f;
+        temp_v1->unk20 = 0.0f;
+        return 0xFF;
+    }
+    if (!temp_v1) {
+    }
+    return 0;
+}
 
 s32 func_8020D924_ovl_ending(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
