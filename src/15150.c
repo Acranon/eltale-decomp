@@ -249,7 +249,57 @@ void func_80015D78(s32 arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80015DB4.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80015F44.s")
+extern Unk15150Target D_80085C40;
+extern f32 D_8007AA24;
+extern u16 D_8008BE52;
+void func_80015F44(s32 arg0, Unk15150Target* arg1) {
+    f32 h;
+
+    if (!(D_8008BE52 & 1)) {
+        return;
+    }
+    if (!(D_80085E48.flags & 0x40)) {
+        D_80085B80 = D_80085E48;
+    }
+    D_80085C40.x = arg1->x;
+    D_80085C40.z = arg1->z;
+    if (arg1->unk5E & 4) {
+        D_80085C40.y = D_8007AA24;
+    } else if (arg1->unk64->unk0 == 1) {
+        D_80085C40.y = arg1->unk68->unk94;
+    } else {
+        D_80085C40.y = arg1->y;
+    }
+    D_80085C40.scale = arg1->scale;
+    D_80085C40.unk64 = arg1->unk64;
+    D_80085C40.unk68 = arg1->unk68;
+    if (arg1->unk5E & 4) {
+        h = arg1->unk64->unk1C * arg1->scale + 40.0;
+    } else if (arg1->unk64->unk1C < arg1->unk64->unk18) {
+        h = arg1->unk64->unk18 * arg1->scale * 2.0 + 40.0;
+    } else {
+        h = arg1->unk64->unk1C * arg1->scale * 2.0 + 40.0;
+    }
+    D_80085E48.mode = 4;
+    D_80085E48.flags |= 0x40;
+    D_80085E48.target = &D_80085C40;
+    D_80085E48.unk58 = (arg1->unk5E & 4) ? 20.0 : 15.0;
+    D_80085E48.unk48 = 0.0f;
+    D_80085E48.unk4C = h;
+    D_80085E48.unk4 = arg0;
+    D_80085E48.unk44 = D_80085E48.unk48;
+    D_80085E48.unk3C = 0.0f;
+    D_80085C10.x = 0.0f;
+    D_80085E48.unk40 = D_80085E48.unk44;
+    D_80085C10.y = h + 10.0;
+    func_800271B4(D_80085E48.unk54, &D_80085C10);
+    D_80085E48.eyeX = arg1->x + D_80085C10.x;
+    D_80085E48.eyeY = D_80085C40.y + D_80085E48.unk58 * 1.1;
+    D_80085E48.eyeZ = arg1->z + D_80085C10.y;
+    if (D_80085E48.eyeY < D_8007AA24) {
+        D_80085E48.eyeY = D_8007AA24;
+    }
+}
 
 void func_80016218(s32 arg0) {
     func_80015DB4(arg0);
