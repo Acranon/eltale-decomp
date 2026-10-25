@@ -58,7 +58,7 @@ extern Struct_8007C284_34* D_8008BF9C;
 
 s32 func_80026E90(s32);
 extern f32 D_8008BFAC;
-extern s16 D_8008BFB0;
+extern u16 D_8008BFB0;
 
 typedef struct {
     f32 x, y, z;
@@ -67,7 +67,8 @@ typedef struct {
 typedef struct {
     /* 0x000 */ char unk0[0xA];
     /* 0x00A */ u16 unkA;
-    /* 0x00C */ char unkC[0x2C - 0xC];
+    /* 0x00C */ char unkC[0x28 - 0xC];
+    /* 0x028 */ struct Struct_Stats* unk28;
     /* 0x02C */ char unk2C[0x7C - 0x2C];
     /* 0x07C */ s16 unk7C;
     /* 0x07E */ char unk7E[0x130 - 0x7E];
@@ -136,7 +137,78 @@ void func_8001EE00(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001EE94.s")
+typedef struct Struct_Stats {
+    /* 0x00 */ char unk0[0xC];
+    /* 0x0C */ u16 unkC;
+} Struct_Stats;
+
+typedef struct {
+    /* 0x00 */ char unk0[0x14];
+    /* 0x14 */ Struct_Stats* unk14;
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+} Struct_8007AA08;
+
+extern Struct_8007AA08 D_8007AA08;
+extern f32 D_8007A9A8;
+extern u16 D_8007AA80;
+Struct_8001FD44* func_8001FD44(f32 x, f32 y, Struct_8007C284_30* list);
+Struct_8001FE08* func_8001FE08(f32 x, f32 y);
+void func_8001FF10(f32 x, f32 y, f32 z, u16* list);
+f32 func_800270D0(f32, f32);
+
+void func_8001EE94(void) {
+    f32 x;
+    f32 y;
+    f32 dx;
+    f32 dy;
+    f32 ang;
+    Struct_8001FD44* area;
+    Struct_8001FE08* pt;
+
+    if (!(D_8008BE52 & 1) && !(D_8008BE52 & 0x8000) && !(D_8007AA80 & 1) && (D_8007A9A8 != 0.0f)) {
+        D_8008BFAC += D_8007A9A8;
+        if (D_8008BFAC >= 50.0) {
+            D_8008BFB0 += 50;
+            if ((u32)func_80026E90(2000) < D_8008BFB0) {
+                x = D_8007AA08.unk18;
+                y = D_8007AA08.unk20;
+                pt = func_8001FE08(x, y);
+                if (pt != NULL) {
+                    area = func_8001FD44(x, y, D_8008BF98);
+                    if (area != NULL) {
+                        D_8008BFB0 = 0;
+                        dx = x - pt->unk0;
+                        dy = y - pt->unk2;
+                        ang = func_800270D0(dx, dy);
+                        func_8001FF10(pt->unk0, pt->unk2, ang, (u16*)area->unk8);
+                        D_8008BE5C = pt->unk0;
+                        D_8008BE60 = pt->unk2;
+                        D_8008BE52 = 0x205;
+                        D_8008BE56 = 0;
+                        D_8008BE54 = 20;
+                        if (D_8007AA08.unk14->unkC < D_8007B908[D_8007C050[0]].unk28->unkC) {
+                            D_8008BE58 = 0;
+                            D_8008BE52 |= 2;
+                        } else {
+                            D_8008BE58 = D_8008BE5A - 1;
+                        }
+                        func_800047F8();
+                        func_8002430C();
+                        D_8008BE6C = 100.0f;
+                        D_8008BF94 = func_8001C060(0, D_8008BE5C, D_8007AA08.unk1C, D_8008BE60, D_8008BE6C * 1.04);
+                        D_8008BE4C = 0;
+                        D_8008BE4E = 1;
+                        D_8008BE50 = func_80026E90(D_8007B900);
+                        func_8002A6B8(13);
+                    }
+                }
+            }
+            D_8008BFAC = 0.0f;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001F164.s")
 
