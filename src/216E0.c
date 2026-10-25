@@ -572,7 +572,40 @@ extern Struct_803AA628 D_803AA628[];
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023930.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80023D28.s")
+void func_80023D28(Struct_8002373C* arg0) {
+    Struct_8002373C_68* s = arg0->unk68;
+    u32 i;
+    Struct_80023930_fx* fx;
+
+    for (i = 0; i < 7; i++) {
+        if (s->unk12[i] != 0) {
+            s->unk12[i] = 0;
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        if (s->unk44[i] != 0) {
+            fx = (Struct_80023930_fx*)s->unk44[i];
+            fx->unk0 = 8;
+            fx->unk8 &= ~1;
+            s->unk44[i] = 0;
+        }
+    }
+}
+
+void func_80023DEC(void) {
+}
+
+void func_80023DF4(void) {
+}
+
+void func_80023DFC(void) {
+}
+
+void func_80023E04(void) {
+}
+
+void func_80023E0C(void) {
+}
 
 typedef struct {
     /* 0x00 */ char unk0[2];
