@@ -90,7 +90,7 @@ extern OSViMode D_8006CDF0;
 extern OSViMode D_8006D6B0;
 extern u16 D_8007A170;
 extern u16 D_8007A172;
-extern s16 D_8007A178;
+extern u16 D_8007A178;
 extern s32 D_8007A17C;
 extern OSMesgQueue D_8007A1A8;
 extern OSMesg D_8007A1C0;
@@ -415,8 +415,63 @@ void func_80001278(GfxFrame *arg0) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80002BDC.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80002D44.s")
+void func_800269B8(s32 arg0, s32 arg1, void *arg2);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80002DB0.s")
+extern u8 D_8004F5A0[];
+extern u8 D_8004F5DC[];
+extern u8 D_8004F5E0[];
+extern u8 D_8004F61C[];
+extern u8 D_8004F620[];
+extern u8 D_8004F69C[];
+extern u8 D_8004F6C0[];
+extern u8 D_8004F73C[];
+extern u8 D_8008CA58[];
+extern u8 D_8008CE54[];
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80002E74.s")
+void func_80002D44(s16 arg0) {
+    OSMesg msg = NULL;
+
+    do {
+        osRecvMesg(&D_8007A870, &msg, OS_MESG_BLOCK);
+    } while (arg0 != *(s16 *)msg);
+}
+
+void func_80002DB0(void) {
+    switch (D_8007A178) {
+        case 0:
+            func_800269B8(0x10, 4, D_8004F5DC);
+            break;
+        case 1:
+            func_800269B8(0x10, 4, D_8004F61C);
+            break;
+        case 2:
+            func_800269B8(0x20, 4, D_8004F69C);
+            break;
+        case 3:
+            func_800269B8(0x20, 4, D_8004F73C);
+            break;
+        case 4:
+            func_800269B8(0x100, 4, D_8008CE54);
+            break;
+    }
+}
+
+void func_80002E74(void) {
+    switch (D_8007A178) {
+        case 0:
+            func_800269B8(0xF, 2, D_8004F5A0);
+            break;
+        case 1:
+            func_800269B8(0xF, 2, D_8004F5E0);
+            break;
+        case 2:
+            func_800269B8(0x1F, 2, D_8004F620);
+            break;
+        case 3:
+            func_800269B8(0x1F, 2, D_8004F6C0);
+            break;
+        case 4:
+            func_800269B8(0xFF, 2, D_8008CA58);
+            break;
+    }
+}
