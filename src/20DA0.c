@@ -48,8 +48,9 @@ typedef struct {
     s8 unk15;
     u8 unk16;
     char unk17;
-    s32 unk18;
-    char unk1C[4];
+    s32* unk18;
+    u16 unk1C;
+    char unk1E[2];
 } Struct_80020A28;
 
 typedef struct {
@@ -63,6 +64,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ s16 unk0;
     /* 0x04 */ Struct_80020A28* unk4;
+    /* 0x08 */ Gfx** unk8;
 } Struct_80020214_set;
 
 extern s32 D_8008BFF0;
@@ -118,7 +120,104 @@ void func_80020428(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/20DA0/func_80020568.s")
+typedef struct {
+    /* 0x00 */ Vec3f unk0;
+    /* 0x0C */ Vec3f unkC;
+    /* 0x18 */ Vec3f unk18;
+} Struct_80020568_xf;
+
+typedef struct {
+    /* 0x00 */ Mtx unk0[3];
+    /* 0xC0 */ Mtx unkC0[1];
+} Unk2000000;
+
+typedef struct {
+    /* 0x00 */ char unk0[0xC];
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+} Struct_80085E48;
+
+extern Gfx* D_8007A184;
+extern s32 D_8007A180;
+extern Unk2000000 D_2000000;
+extern MtxF D_8008BFF8;
+extern Vec3f D_8008BFC0[];
+extern Struct_80085E48 D_80085E48;
+void func_80027ADC(MtxF*, f32, f32, f32, f32, f32, f32, f32, f32, f32);
+void func_80027D40(MtxF*, MtxF*, MtxF*);
+void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
+void func_80027CB4(MtxF*, f32, f32, f32);
+void func_80020A28(MtxF* arg0, Struct_80020A28* arg1);
+
+void func_80020568(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, Struct_80020214_set* set,
+                   Struct_80020A28* anims, s32 buf) {
+    s32 fr;
+    s32 i;
+    Gfx** dls;
+    s32* tbl;
+    MtxF mtx;
+    Struct_80020568_xf xf;
+    Struct_80020A28* anim;
+
+    anim = &anims[idx];
+    fr = anim->unk6;
+    if (fr != 0) {
+        fr = frame % fr;
+    } else {
+        fr = 0;
+    }
+    func_80026A00(anim, (Vec3f*)&xf, fr);
+    if (anim->unk14 == 0) {
+        if (flags & 1) {
+            xf.unk0.x = 0.0f;
+            xf.unk0.z = 0.0f;
+        }
+        if (flags & 2) {
+            xf.unk0.y = 0.0f;
+        }
+    }
+    func_80027ADC(&mtx, xf.unk0.x, xf.unk0.y, xf.unk0.z, xf.unkC.y, xf.unkC.x, xf.unkC.z, xf.unk18.x, xf.unk18.y,
+                  xf.unk18.z);
+    func_80020A28(&mtx, anim);
+    scale.x *= xf.unk18.x;
+    scale.y *= xf.unk18.y;
+    scale.z *= xf.unk18.z;
+    if (anim->unk16 & 1) {
+        func_80027D40(parent, &mtx, &mtx);
+        func_800275DC(&D_8008BFF8, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], D_80085E48.unkC, D_80085E48.unk10,
+                      D_80085E48.unk14);
+        func_80027CB4(&D_8008BFF8, scale.x, scale.y, scale.z);
+        guMtxF2L(D_8008BFF8.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
+    } else {
+        func_80027D40(parent, &mtx, &mtx);
+        guMtxF2L(mtx.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
+    }
+    gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+    if (anim->unk16 & 2) {
+        D_8008BFC0[D_8008BFF0].x = mtx.mf[3][0];
+        D_8008BFC0[D_8008BFF0].y = mtx.mf[3][1];
+        D_8008BFC0[D_8008BFF0].z = mtx.mf[3][2];
+        D_8008BFF0++;
+    }
+    dls = set->unk8;
+    tbl = anim->unk18;
+    if (tbl == NULL) {
+        i = anim->unk15;
+        if (i != -1) {
+            if (dls[i] != NULL) {
+                gSPDisplayList(D_8007A184++, dls[i]);
+            }
+        }
+    } else {
+        gSPDisplayList(D_8007A184++, dls[tbl[total % anim->unk1C]]);
+    }
+    for (i = 0; i < set->unk0; i++) {
+        if (anims[i].unk14 == idx + 1) {
+            func_80020568(&mtx, scale, flags, i, frame, total, set, anims, buf);
+        }
+    }
+}
 
 void func_8002099C(s32 arg0, Struct_800201A0* arg1, Struct_8002099C* arg2) {
     s32 temp_v0 = arg1->unk54 += arg0;
