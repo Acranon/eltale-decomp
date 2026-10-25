@@ -1304,7 +1304,6 @@ extern s32 D_8007A9BC;
 extern u8 D_8007A9BF;
 extern s16 D_8008C160;
 
-void func_8001D94C();
 void func_8001D94C(s32 arg0);
 void func_80008A40(PlayerState *p, Actor *a) {
     u16 cost;
