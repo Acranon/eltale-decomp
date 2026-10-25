@@ -65,7 +65,7 @@ extern s32 D_8008C054;
 extern s32 D_8008C138;
 extern u16 D_8008C14C[2];
 extern s16 D_8008C15A;
-extern s16 D_8008C15C;
+extern u16 D_8008C15C;
 extern s16 D_8008C15E;
 extern s16 D_8008C162;
 extern s32 D_8008C168;
@@ -81,7 +81,23 @@ s32 func_80027FFC(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80020AE0.s")
+void func_80020AE0(void) {
+    D_8008C168 = 0;
+    D_8008C16C = 0;
+    D_8008C170 = -1;
+    D_8008C178 = 0;
+    D_8008C174 = D_8008C178;
+    D_8008C048 = 0;
+    D_8008C044 = D_8008C048;
+    D_8008C04C = 0x140;
+    D_8008C054 = 0xF0;
+    D_8008C162 = 0;
+    D_8008C15E = 0;
+    D_8008C15C = 0;
+    D_8008C15A = D_8008C15C;
+    D_8008C138 = 0;
+    D_8008C042 = 0;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80020B78.s")
 
