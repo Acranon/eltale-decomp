@@ -965,7 +965,52 @@ extern f32 D_8008BE60;
 extern f32 D_8008BE6C;
 void func_80006F80(f32 *vx, f32 *vz, Actor *arg2);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006A58.s")
+void func_80006A58(u16 arg0, Actor *arg1, PlayerState *arg2) {
+    f32 dx;
+    f32 dz;
+    f32 max;
+    f32 dist;
+
+    if ((D_8008BE52 & 1) && !(D_8008BE52 & 6)) {
+        dx = arg1->x + arg1->vx - D_8008BE64;
+        dz = arg1->z + arg1->vz - D_8008BE68;
+        dist = sqrtf(dx * dx + dz * dz);
+        max = arg2->unkC * arg2->unk114;
+        if (max < dist) {
+            arg1->vx = max * dx / dist - arg1->x + D_8008BE64;
+            arg1->vz = max * dz / dist - arg1->z + D_8008BE68;
+        }
+        dx = arg1->x + arg1->vx - D_8008BE5C;
+        dz = arg1->z + arg1->vz - D_8008BE60;
+        dist = sqrtf(dx * dx + dz * dz);
+        if (D_8008BE52 & 0x100) {
+            if (D_8008BE6C < dist) {
+                arg1->vx = D_8008BE6C * dx / dist - arg1->x + D_8008BE5C;
+                arg1->vz = D_8008BE6C * dz / dist - arg1->z + D_8008BE60;
+            }
+        } else if (D_8008BE6C < dist) {
+            arg2->unk8 |= 0x20;
+        } else {
+            arg2->unk8 &= ~0x20;
+        }
+    }
+    func_80006F80(&arg1->vx, &arg1->vz, arg1);
+    D_8007A9A0 = arg1->vx;
+    D_8007A9A4 = arg1->vz;
+    dx = arg1->x + arg1->vx;
+    dz = arg1->z + arg1->vz;
+    D_8007A928.unk0 = arg1->unk64->unk18 * arg1->unk64->unk20;
+    func_800107F0(dx, arg1->y, dz, arg0, &D_8007A928);
+    arg1->vx = D_8007A928.unk0 - arg1->x;
+    arg1->vz = D_8007A928.unk8 - arg1->z;
+    arg1->x = D_8007A928.unk0;
+    arg1->y = D_8007A928.unk4;
+    arg1->z = D_8007A928.unk8;
+    arg1->unk2C = D_8007A928.unkC;
+    arg1->unk30 = D_8007A928.unk10;
+    arg1->unk34 = D_8007A928.unk14;
+    arg1->unk62 = D_8007A928.unk18;
+}
 
 /* D_8007ABF0: objects of 0x84 bytes with an Actor at +0x14 */
 typedef struct {
