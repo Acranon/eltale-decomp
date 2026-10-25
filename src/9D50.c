@@ -152,7 +152,7 @@ extern Unk8007C2A8 *D_8007C2A8[];
 
 void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
 void func_80020428(s32, NPCObj *, AnimEntry *, s32);
-void func_8002099C(u16, NPCObj *, AnimEntry *);
+void func_8002099C(s32, NPCObj *, AnimEntry *);
 extern Gfx *D_8007A184;
 extern Unk8007AA08 D_8007AA08;
 extern s32 D_8007ABA8;
@@ -166,9 +166,9 @@ typedef struct {
 } Unk80090458;
 
 f32 func_800270D0(f32, f32);
-s32 func_80024FF0(s32);
-void func_80025094(s32);
-s32 func_8000D398(s32);
+s32 func_80024FF0(u8);
+void func_80025094(u8);
+u8 func_8000D398(u32);
 void func_8000A0F8(NPC *, s32);
 extern s32 D_8004DCA0;
 extern u8 D_8004DD10[];
@@ -191,9 +191,9 @@ typedef struct {
     /* 0x18 */ u16 flags;
 } CollResult;
 
-void func_800107F0(f32, f32, f32, s32, void *);
-void func_800201A0(void *, s32, s32, s32, s32, s32);
-u32 func_80026E90(s32);
+void func_800107F0(f32, f32, f32, u16, void *);
+void func_800201A0(void *, s32, s32, s32, s32, u16);
+u32 func_80026E90(u32);
 void func_80028120();
 void func_80032D20(s32);
 void func_8020C0D0(void);
@@ -300,7 +300,41 @@ void func_80009764(s32 arg0) {
     func_80028120(start, D_8020E6F0, end - start);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800097F8.s")
+void func_800097F8(NPCDef *def, s32 n) {
+    NPC *npc = D_8007ABF0;
+    CollResult out;
+
+    for (; n != 0; n--, def++) {
+        if (D_800842C0 == def->area) {
+            npc->state = 0;
+            npc->timer = 1;
+            npc->def = def;
+            npc->x = def->x;
+            npc->z = def->z;
+            npc->angle = def->angle;
+            npc->unk20 = 0.0f;
+            npc->unk28 = 0.0f;
+            npc->unk38 = def->unk28;
+            npc->unk3C = 50.0f;
+            func_800107F0(npc->x, npc->y, npc->z, 0xA00, &out);
+            npc->y = out.y;
+            npc->nx = out.nx;
+            npc->ny = out.ny;
+            npc->nz = out.nz;
+            func_800201A0(&npc->x, 0, 1, 0, 1, 1);
+            npc->homeX = def->x;
+            npc->homeZ = def->z;
+            npc->homeAngle = def->angle;
+            if (def->flags & 1) {
+                npc->unk74 = 0x1000;
+            } else {
+                npc->unk74 = 0;
+            }
+            npc++;
+            D_8007ABA4++;
+        }
+    }
+}
 
 void func_80009988(f32 dx, f32 dz, Unk80009988 *obj) {
     func_80009A54(&dx, &dz, obj);

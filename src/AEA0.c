@@ -211,13 +211,13 @@ void func_8000BA20(Enemy *, Obj *, Unk8000BA20 *);
 extern Enemy *D_8007C028;
 extern s16 D_8008C162;
 void func_80020428(s32, Obj *, u8 *, s32);
-void func_8002099C(u16, Obj *, u8 *);
+void func_8002099C(s32, Obj *, u8 *);
 void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
 extern Obj *D_8007C030[];
 extern Gfx *D_8007A184;
 void func_8000CC40(s32, s32);
 f32 func_800270D0(f32, f32);
-void func_800201A0(Obj *, s32, s32, s32, s32, s32);
+void func_800201A0(Obj *, s32, s32, s32, s32, u16);
 void func_80015F44(s32, Obj *);
 void func_8000BB90(Obj *, f32, f32);
 void func_8000BCA4(s32, f32, f32, Obj *, EnemyAI *);
@@ -230,11 +230,11 @@ void func_8001FC14(Obj *);
 void func_80020214(Obj *, u8 *, f32, Vec3f *);
 void func_80023D28(Obj *);
 void func_8002433C(void);
-void func_800269B8(s32, s32, void *);
-u32 func_80026E90(s32);
+void func_800269B8(s32, u16, void *);
+u32 func_80026E90(u32);
 void func_800271B4(f32, Vec3f *);
 void func_80028120();
-void func_8002A7C8(s32, s32, s32);
+void func_8002A7C8(u8, s8, u8);
 extern s32 D_8004DD38[];
 
 extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
@@ -298,7 +298,7 @@ u16 func_8000C48C(Enemy *arg0);
 s32 func_80007FD8(s32, s32, Obj *);
 void func_8001BE2C(f32, f32, f32);
 void func_8001AE24(Obj *, s32, s32);
-void func_8002373C(Obj *, s32, s32, s32);
+void func_8002373C(Obj *, u16, u16, s16);
 void func_8000847C(void);
 extern f32 D_8007C074;
 extern s32 D_8007A9B4;
@@ -428,7 +428,56 @@ void func_8000A65C(void) {
     D_8007B900 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A6D0.s")
+void func_8000A6D0(s32 idx, f32 x, f32 z, f32 angle, Obj *obj, Enemy *e) {
+    s32 pad;
+    EnemyDef *def;
+
+    def = &D_8007C05C->unkC[idx];
+    obj->unk50 = def->unk2;
+    func_800201A0(obj, 0, 1, 0, 1, 1);
+    obj->unk54 = func_80026E90(16);
+    obj->unk24 = def->unk20;
+    obj->unk28 = def->unk18;
+    obj->unk68 = (EnemyStats *)&e->unk98;
+    obj->unk64 = def;
+    e->unk28 = def;
+    e->unkA = def->unk6;
+    e->unkC = def->unk6;
+    e->type = 0;
+    e->flags = 0;
+    e->unk10 = (f32)def->unkC * 0.2857 + 17.0;
+    e->unk20 = e->unk24 = 0;
+    D_8007C080.x = obj->unk64->unk18 * obj->unk64->unk20;
+    func_800107F0(x, 0.0f, z, 0xA01, &D_8007C080);
+    if (D_8007C080.flags & 0x8000) {
+        if (obj->unk64->unk0 == 0) {
+            func_800107F0(x + 0.5, 0.0f, z + 0.5, 0xA01, &D_8007C080);
+            if (D_8007C080.flags & 0x8000) {
+                D_8007C080.y = D_8007AA08.y;
+            }
+        } else {
+            D_8007C080.y = D_8007AA08.y;
+        }
+    }
+    obj->x = D_8007C080.x;
+    obj->y = D_8007C080.y;
+    obj->z = D_8007C080.z;
+    obj->angle = angle;
+    obj->unk2C = D_8007C080.nx;
+    obj->unk30 = D_8007C080.ny;
+    obj->unk34 = D_8007C080.nz;
+    obj->unk62 = D_8007C080.flags;
+    obj->unk5E = 1;
+    obj->unk60 = 0;
+    e->unk98 = 0;
+    e->unk124 = 0;
+    e->unk11C = e->unk28->unk2A;
+    e->unk122 = 16;
+    e->unk11E = obj->unk64->unkC;
+    e->unk120 = obj->unk64->unkE;
+    e->unk128 = 1.0f;
+    e->unk12C = obj->y;
+}
 
 void func_8000A95C(void) {
     u32 i;
