@@ -1,11 +1,27 @@
 #include "common.h"
 
 typedef struct {
-    char unk0[8];
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ s16 unk2;
+    /* 0x04 */ s16 unk4;
+    /* 0x06 */ s16 unk6;
+    /* 0x08 */ char unk8[0x18 - 0x8];
+} Struct_8001FD44;
+
+typedef struct {
+    /* 0x00 */ Struct_8001FD44* unk0;
+    /* 0x04 */ s32 unk4;
 } Struct_8007C284_30;
 
 typedef struct {
-    char unk0[0x10];
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ s16 unk2;
+} Struct_8001FE08;
+
+typedef struct {
+    /* 0x00 */ char unk0[8];
+    /* 0x08 */ Struct_8001FE08* unk8;
+    /* 0x0C */ s32 unkC;
 } Struct_8007C284_34;
 
 typedef struct {
@@ -18,8 +34,10 @@ extern Struct_8007C284* D_8007C284;
 extern s32 D_800842C0;
 extern u16 D_800842E8;
 extern u16 D_8008BE52;
-extern s32 D_8008BF98;
-extern s32 D_8008BF9C;
+extern Struct_8007C284_30* D_8008BF98;
+extern Struct_8007C284_34* D_8008BF9C;
+
+s32 func_80026E90(s32);
 extern f32 D_8008BFAC;
 extern s16 D_8008BFB0;
 
@@ -29,12 +47,12 @@ void func_8001EE00(void) {
     D_8008BFB0 = 0;
     if (D_800842E8 & 1) {
         if (D_8007C284->unk30 != NULL) {
-            D_8008BF98 = (s32) &D_8007C284->unk30[D_800842C0];
-            D_8008BF9C = (s32) &D_8007C284->unk34[D_800842C0];
+            D_8008BF98 = &D_8007C284->unk30[D_800842C0];
+            D_8008BF9C = &D_8007C284->unk34[D_800842C0];
             return;
         }
-        D_8008BF98 = 0;
-        D_8008BF9C = 0;
+        D_8008BF98 = NULL;
+        D_8008BF9C = NULL;
     }
 }
 
@@ -48,9 +66,61 @@ void func_8001EE00(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001FC14.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001FD44.s")
+Struct_8001FD44* func_8001FD44(f32 x, f32 y, Struct_8007C284_30* list) {
+    Struct_8001FD44* r = NULL;
+    s32 n;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001FE08.s")
+    if (list != NULL) {
+        n = list->unk4;
+        r = list->unk0;
+        while (n != 0) {
+            if (r->unk0 <= x && r->unk2 <= y && x - r->unk0 <= r->unk4 && y - r->unk2 <= r->unk6) {
+                break;
+            }
+            n--;
+            r++;
+        }
+        if (n == 0) {
+            r = NULL;
+        }
+    }
+    return r;
+}
+
+Struct_8001FE08* func_8001FE08(f32 x, f32 y) {
+    s32 n;
+    Struct_8001FE08* p;
+    s32 cnt;
+    f32 dx;
+    f32 dy;
+    f32 d;
+    Struct_8001FE08* cands[6];
+
+    n = 0;
+
+    if (D_8008BF9C != NULL) {
+        cnt = D_8008BF9C->unkC;
+        p = D_8008BF9C->unk8;
+        while (n < 6 && cnt != 0) {
+            cnt--;
+            dx = p->unk0 - x;
+            dy = p->unk2 - y;
+            d = dx * dx + dy * dy;
+            if (d >= 2500.0f && d <= 8100.0f) {
+                cands[n++] = p;
+            }
+            p++;
+        }
+        if (n == 0) {
+            p = NULL;
+        } else {
+            p = cands[func_80026E90(n)];
+        }
+    } else {
+        p = NULL;
+    }
+    return p;
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1FA00/func_8001FF10.s")
 
