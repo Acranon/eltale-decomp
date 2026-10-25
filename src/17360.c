@@ -25,7 +25,8 @@ typedef struct {
     /* 0x02 */ u8 pad2[2];
     /* 0x04 */ u16 unk4;
     /* 0x06 */ u16 unk6;
-    /* 0x08 */ u8 pad8[4];
+    /* 0x08 */ u16 unk8;
+    /* 0x0A */ u16 unkA;
     /* 0x0C */ u16 unkC;
     /* 0x0E */ u16 unkE;
     /* 0x10 */ u8 pad10[8];
@@ -179,7 +180,9 @@ typedef struct {
     /* 0x08 */ s32 unk8;
     /* 0x0C */ u8 padC[8];
     /* 0x14 */ Unk8007AA1C* unk14;
-    /* 0x18 */ u8 pad18[0xF8];
+    /* 0x18 */ u8 pad18[0x64];
+    /* 0x7C */ Unk17360Model* unk7C;
+    /* 0x80 */ u8 pad80[0x90];
     /* 0x110 */ u16 unk110;
 } Unk8007AA08;
 
@@ -384,8 +387,6 @@ s32 func_80017AB0(void) {
     return i;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/17360/func_80017AEC.s")
-
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ u16 unk14;
@@ -393,8 +394,11 @@ typedef struct {
     /* 0x18 */ u16 unk18;
     /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ f32 unk1C;
-    /* 0x20 */ u8 pad20[0xA];
+    /* 0x20 */ u8 pad20[8];
+    /* 0x28 */ u16 unk28;
     /* 0x2A */ u16 unk2A;
+    /* 0x2C */ u8 pad2C[2];
+    /* 0x2E */ u16 unk2E;
 } Unk80017F48Cfg;
 typedef struct {
     /* 0x00 */ u16 unk0;
@@ -415,7 +419,7 @@ typedef struct {
     /* 0x24 */ u8 pad24[4];
     /* 0x28 */ Actor17360* target;
     /* 0x2C */ Unk80017F48Cfg* cfg;
-    /* 0x30 */ u8 pad30[4];
+    /* 0x30 */ s16* unk30;
     /* 0x34 */ Unk80017F48Sub* unk34;
 } Unk80017F48;
 typedef struct {
@@ -426,6 +430,103 @@ extern Coll17360 D_800863C8;
 void func_800107F0(f32, f32, f32, s32, Coll17360*);
 void func_80015D78(s32);
 void func_80019FC8();
+typedef struct {
+    /* 0x00 */ f32 v[5];
+} Unk8004ED68;
+extern Unk8004ED68 D_8004ED68;
+extern Unk8004ED68 D_8004ED7C;
+void func_80017AEC(Unk80017F48* arg0) {
+    u16 flags;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    Actor17360* t;
+    f32 vx;
+    f32 vy;
+    f32 vz;
+    f32 d;
+    s32 pad[2];
+    Unk8004ED68 speeds;
+    Unk8004ED68 turns;
+
+    speeds = D_8004ED68;
+    turns = D_8004ED7C;
+    flags = arg0->unkA;
+    t = arg0->target;
+    if (flags & 1) {
+        return;
+    }
+    if (t != NULL) {
+        if ((flags & 2) || t->unk50 == -1) {
+            dz = 0.0f;
+            dy = 0.0f;
+            dx = 0.0f;
+        } else {
+            dx = t->x - arg0->x;
+            if (t->unk64->unk0 == 1) {
+                dy = t->unk68->unk94 - arg0->y;
+            } else {
+                dy = t->y + t->unk64->unk1C * t->scale * 0.5 - arg0->y;
+            }
+            dz = t->z - arg0->z;
+            d = sqrtf(dx * dx + dy * dy + dz * dz);
+            dx = speeds.v[arg0->cfg->unk28] * dx / d;
+            dy = speeds.v[arg0->cfg->unk28] * dy / d;
+            dz = speeds.v[arg0->cfg->unk28] * dz / d;
+        }
+        vx = arg0->vx;
+        vy = arg0->vy;
+        vz = arg0->vz;
+        d = sqrtf(vx * vx + vy * vy + vz * vz);
+        if (d != 0.0f) {
+            vx /= (f64)d;
+            vy /= (f64)d;
+            vz /= (f64)d;
+            dx += vx;
+            dy += vy;
+            dz += vz;
+        }
+        d = sqrtf(dx * dx + dy * dy + dz * dz);
+        dx = turns.v[arg0->cfg->unk2E] * dx / d;
+        dy = turns.v[arg0->cfg->unk2E] * dy / d;
+        dz = turns.v[arg0->cfg->unk2E] * dz / d;
+        arg0->vx = arg0->vx * 0.9 + dx;
+        arg0->vy = arg0->vy * 0.9 + dy;
+        arg0->vz = arg0->vz * 0.9 + dz;
+    }
+    if (arg0->cfg->unk2A & 1) {
+        arg0->vy -= 0.3;
+    }
+    arg0->x += arg0->vx;
+    arg0->y += arg0->vy;
+    arg0->z += arg0->vz;
+    if (arg0->cfg->unk14 != 0) {
+        func_800107F0(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
+        switch (arg0->cfg->unk14) {
+            case 1:
+                if (arg0->y < D_800863C8.y) {
+                    arg0->unkA |= 1;
+                    arg0->unk4 = 8;
+                    arg0->vz = 0.0f;
+                    arg0->vy = 0.0f;
+                    arg0->vx = 0.0f;
+                    if (arg0->unk34 != NULL) {
+                        arg0->unk34->unk0 = 15;
+                        arg0->unk34->unk8 &= ~1;
+                    }
+                    func_80015D78(1);
+                    if (arg0->unk30[0x10] >= 0) {
+                        func_80019FC8(arg0, arg0->target);
+                    }
+                }
+                break;
+            case 2:
+                arg0->y = D_800863C8.y;
+                break;
+        }
+    }
+}
+
 void func_80017F48(Unk80017F48* arg0) {
     if (!(arg0->unkA & 1)) {
         if (arg0->cfg->unk2A & 1) {
