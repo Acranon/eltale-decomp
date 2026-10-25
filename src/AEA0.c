@@ -230,7 +230,7 @@ void func_8002433C(void);
 void func_800269B8(s32, s32, void *);
 u32 func_80026E90(s32);
 void func_800271B4(f32, Vec3f *);
-void func_80028120(u32, void *, u32);
+void func_80028120();
 void func_8002A7C8(s32, s32, s32);
 
 extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
@@ -377,7 +377,17 @@ void func_8000A3E4(s32 arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000A5E4.s")
+void func_8000A5E4(void) {
+    u32 start;
+    u32 end;
+
+    D_8007C05C = &D_800561A0[D_8007C288->unk12];
+    D_8007C048 = D_8007C05C->unk8;
+    D_8007C04C = D_8007C05C->unk10;
+    start = D_8007C05C->start;
+    end = D_8007C05C->end;
+    func_80028120(start, D_8020E6F0, end - start, &D_8007C05C);
+}
 
 void func_8000A65C(void) {
     Enemy *e;
