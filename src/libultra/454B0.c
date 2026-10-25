@@ -1,3 +1,3 @@
 #include "common.h"
 
-#pragma GLOBAL_ASM("asm/nonmatchings/libultra/454B0/func_800448B0.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/libultra/454B0/alAuxBusParam.s")

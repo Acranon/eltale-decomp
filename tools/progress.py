@@ -20,19 +20,19 @@ def area(path):
 def main():
     still_asm = set()
     for c in (ROOT / "src").rglob("*.c"):
-        still_asm.update(re.findall(r'GLOBAL_ASM\("([^"]+)"\)', c.read_text(encoding="utf-8", errors="replace")))
+        still_asm.update(re.findall(r'GLOBAL_ASM\("[^"]*/(\w+)\.s"\)', c.read_text(encoding="utf-8", errors="replace")))
     tot = defaultdict(lambda: [0, 0, 0, 0])  # funcs, bytes, done funcs, done bytes
-    for s in (ROOT / "asm" / "nonmatchings").rglob("*.s"):
+    files = list((ROOT / "asm" / "nonmatchings").rglob("*.s")) + list((ROOT / "asm" / "matchings").rglob("*.s"))
+    for s in files:
         text = s.read_text(encoding="utf-8", errors="replace")
         if "glabel" not in text:
             continue
         size = 4 * len(LINE.findall(text))
-        rel = str(s.relative_to(ROOT))
-        a = area(rel)
+        a = area(str(s.relative_to(ROOT)))
         t = tot[a]
         t[0] += 1
         t[1] += size
-        if rel not in still_asm:
+        if s.stem not in still_asm:
             t[2] += 1
             t[3] += size
     allt = [sum(v[i] for v in tot.values()) for i in range(4)]

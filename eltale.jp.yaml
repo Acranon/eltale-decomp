@@ -21,6 +21,7 @@ options:
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
   migrate_rodata_to_functions: True
+  disassemble_all: True
 
   symbol_addrs_path:
     - symbol_addrs.txt
