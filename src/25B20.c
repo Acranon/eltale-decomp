@@ -48,6 +48,62 @@ void func_80028120(void*, void*, s32);
 void func_800079B4(u8);
 void func_800169B8(s32, s32, s32, s32);
 
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 unk4;
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ char unkC[0x64 - 0xC];
+    /* 0x64 */ Struct_80026054_64* unk64;
+} Struct_80026140;
+
+typedef struct {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ u16 unk2;
+    /* 0x4 */ u16 unk4;
+    /* 0x8 */ f32 unk8;
+    /* 0xC */ f32 unkC;
+} Struct_803AB36C;
+
+typedef struct {
+    /* 0x0 */ u16 unk0;
+    /* 0x2 */ u16 unk2;
+    /* 0x4 */ f32 unk4;
+    /* 0x8 */ f32 unk8;
+    /* 0xC */ f32 unkC;
+} Struct_803AAA40;
+
+typedef struct {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+    /* 0x8 */ s32 unk8;
+} Struct_80084300;
+
+typedef struct {
+    f32 x, y, z;
+} Vec3f;
+
+typedef struct {
+    char unk0[0xA];
+} Struct_803AB358;
+
+extern s32 D_8004DCA0;
+extern s32 D_8007A174;
+extern s16 D_8007A178;
+extern f32 D_8007A98C;
+extern f32 D_8007A990;
+extern f32 D_8007A994;
+extern s32 D_8007A998;
+extern s16 D_8007AA0E;
+extern Struct_80084300 D_80084300;
+extern Vec3f D_8008C190;
+extern Struct_803AAA40 D_803AAA40[];
+extern Struct_803AB358 D_803AB358[];
+extern Struct_803AB36C D_803AB36C[];
+
+void func_8001AE24(Struct_80026140*, s32, s32);
+void func_80019820(u16, u16, f32, f32, f32, f32, Struct_803AB358*, Vec3f*, Struct_80026140*);
+void func_8002A7C8(s32, s32, s32);
+
 void func_80024F20(void) {
     s32 i;
     u8* p;
@@ -211,7 +267,34 @@ s32 func_800260F4(s32 arg0, Struct_803AAAA0* arg1) {
 void func_80026130(s32 arg0, Struct_803AAAA0* arg1) {
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_80026140.s")
+void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
+    u16 amt;
+    Struct_80026054_64* st = arg0->unk64;
+    Struct_803AB358* fx;
+
+    if (arg1->unk4 != 0) {
+        amt = st->unk6 - st->unk4;
+        if (arg1->unk4 < amt) {
+            amt = arg1->unk4;
+        }
+        st->unk4 += amt;
+        func_8001AE24(arg0, 1, amt);
+    }
+    if (arg1->unk6 != 0) {
+        amt = st->unkA - st->unk8;
+        if (arg1->unk6 < amt) {
+            amt = arg1->unk6;
+        }
+        st->unk8 += amt;
+        func_8001AE24(arg0, 2, amt);
+    }
+    D_8008C190.x = D_803AB36C[0].unk8;
+    D_8008C190.y = D_803AB36C[0].unkC;
+    fx = &D_803AB358[D_803AB36C[0].unk0];
+    D_8008C190.z = 1.0f;
+    func_80019820(D_803AB36C[0].unk2, D_803AB36C[0].unk4, arg0->unk0, arg0->unk4, arg0->unk8, 0.0f, fx, &D_8008C190, arg0);
+    func_8002A7C8(0, 0xB, 0xFF);
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_80026284.s")
 
