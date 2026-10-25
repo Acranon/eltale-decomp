@@ -113,7 +113,7 @@ extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
 void func_8020E108_ovl_intro(s32);
 void func_8002A338(s32);
-s32 func_8020D454_ovl_intro(void);
+s32 func_8020D454_ovl_intro();
 s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx);
 void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
                              s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13);
@@ -305,9 +305,31 @@ void func_8020D300_ovl_intro(s32 idx) {
     p->unk2E = p->unk30 = 0;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020D3A4_ovl_intro.s")
+s32 func_8020D3A4_ovl_intro(s32 n) {
+    s32 i;
+    IntroSprite *p = D_802684E0;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020D454_ovl_intro.s")
+    n = 0;
+    for (i = 0; i < 150; i++, p++) {
+        if (!(p->unk0.w & 0x80000000)) {
+            n++;
+        }
+    }
+    return n;
+}
+
+s32 func_8020D454_ovl_intro(s32 n) {
+    s32 i;
+    IntroSprite *p = D_802684E0;
+
+    n = 0;
+    for (i = 0; i < 150; i++, p++) {
+        if (p->unk0.w & 0x80000000) {
+            n++;
+        }
+    }
+    return n;
+}
 
 s16 func_8020D504_ovl_intro(void) {
     s32 i;
