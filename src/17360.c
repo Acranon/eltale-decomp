@@ -24,7 +24,8 @@ typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
     /* 0x04 */ u16 unk4;
-    /* 0x06 */ u8 pad6[6];
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u8 pad8[4];
     /* 0x0C */ u16 unkC;
     /* 0x0E */ u16 unkE;
     /* 0x10 */ u8 pad10[8];
@@ -473,6 +474,8 @@ typedef struct {
     /* 0x02 */ u16 unk2;
     /* 0x04 */ u8 pad4[2];
     /* 0x06 */ u8 unk6;
+    /* 0x07 */ u8 pad7[5];
+    /* 0x0C */ u16 unkC;
 } Unk80018480Cfg;
 typedef struct {
     /* 0x00 */ u8 pad0[0x24];
