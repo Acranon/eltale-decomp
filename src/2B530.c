@@ -220,7 +220,57 @@ void func_8002E9DC(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002EED8.s")
+extern u8* D_80060D74[];
+extern u16 D_80061E98[];
+
+void func_8002EED8(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
+    s32 i;
+    u64 div;
+    s64 v;
+    s8 digits[10];
+    s32 xoff;
+    s32 j;
+    s32 n;
+
+    div = 1000000000;
+    v = value;
+    xoff = 0;
+    j = 9;
+    if (ndigits >= 10) {
+        ndigits = 9;
+    }
+    for (i = 0; i < 9; i++) {
+        n = 0;
+        while (TRUE) {
+            v -= div;
+            if (v < 0) {
+                v += div;
+                break;
+            }
+            n++;
+        }
+        digits[j--] = n;
+        div /= 10;
+    }
+    digits[0] = v;
+    i = 0;
+    if (!(D_8008FB3E & 0x10)) {
+        gDPPipeSync(D_8007A184++);
+        gDPLoadTLUT_pal256(D_8007A184++, D_80061E98);
+        D_8008FB3E |= 0x10;
+    }
+    for (n = ndigits - 1; n >= 0; n--) {
+        i += digits[n];
+        if (i != 0 || n == 0) {
+            gDPLoadTextureTile(D_8007A184++, D_80060D74[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
+                               0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
+            gSPTextureRectangle(D_8007A184++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
+                                G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+            gDPPipeSync(D_8007A184++);
+        }
+        xoff += 7;
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002F2E4.s")
 
