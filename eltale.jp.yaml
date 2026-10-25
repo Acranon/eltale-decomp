@@ -108,6 +108,7 @@ segments:
       - [0x38390, c, libultra/io/sptask]
       - [0x38680, c, libultra/io/viswapbuf]
       - [0x386D0, c, libultra/io/vigetcurrframebuf]
+      - [0x38710, pad]
       - [0x38770, c, libultra/38770]
       - [0x38A80, c, libultra/io/visetmode]
       - [0x38AF0, c, libultra/io/visetspecial]

@@ -36,9 +36,9 @@ FLAGS = [
     ("src/libultra/os/", "-mips2 -O1"),
     ("src/libultra/", "-mips2 -O1"),
     ("src/libc/ll.c", "-mips3 -32 -O1"),
-    ("src/libc/xldtob.c", "-mips2 -O3"),
-    ("src/libc/xprintf.c", "-mips2 -O3"),
-    ("src/libc/", "-mips2 -O2"),
+    # libultra is 2.0I-era (osInitialize is between ultralib's I and J): like
+    # ultralib's VERSION <= I rules, -O1 except gu/audio/libc at -O3 (ll.c -O1).
+    ("src/libc/", "-mips2 -O3"),
     ("src/ovl_", "-mips2 -O2"),
     ("src/", "-mips2 -O2 -g3"),
 ]

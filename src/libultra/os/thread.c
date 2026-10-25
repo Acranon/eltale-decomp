@@ -1,3 +1,24 @@
-#include "common.h"
+#include "libultra/sdk_names.h"
+#include "PR/os_internal.h"
+#include "PRinternal/osint.h"
 
-#pragma GLOBAL_ASM("asm/nonmatchings/libultra/os/thread/__osDequeueThread.s")
+
+void __osDequeueThread(register OSThread** queue, register OSThread* t) {
+    register OSThread* pred;
+    register OSThread* succ;
+
+    pred = (OSThread*)queue;
+    succ = pred->next;
+
+    while (succ != NULL) {
+        if (succ == t) {
+            pred->next = t->next;
+#ifdef _DEBUG
+            t->next = NULL;
+#endif
+            return;
+        }
+        pred = succ;
+        succ = pred->next;
+    }
+}
