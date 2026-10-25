@@ -253,7 +253,73 @@ void func_80009150(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/9D50/func_800091E0.s")
+void func_800091E0(void) {
+    NPC *npc;
+    s32 i;
+    NPCObj *obj;
+    f32 dx;
+    f32 dz;
+
+    i = D_8007ABA4;
+    npc = D_8007ABF0;
+    for (; i != 0; i--, npc++) {
+        obj = (NPCObj *)&npc->x;
+        switch (npc->state) {
+            case 0:
+                if (npc->def->unk4 == 2) {
+                    if (--npc->timer == 0) {
+                        if (D_8007AB74 < 3) {
+                            npc->state = 1;
+                            npc->timer = (func_80026E90(2) + 1) * npc->def->unk10->unkE;
+                            func_800201A0(obj, 1, 1, 1, 1, 1);
+                            dx = npc->homeX - obj->x;
+                            dz = npc->homeZ - obj->z;
+                            if (sqrtf(dx * dx + dz * dz) > 50.0) {
+                                obj->angle = func_800270D0(dx, dz);
+                            } else {
+                                obj->angle = (f32)func_80026E90(16) * 0.39269908169872414 - 1.5707963267948966;
+                            }
+                            D_8007AB74++;
+                        } else {
+                            npc->timer = (func_80026E90(2) + 1) * npc->def->unk10->unk2;
+                        }
+                    }
+                }
+                break;
+            case 1:
+                D_8007AB78[0] = 0.0f;
+                D_8007AB78[1] = 0.4f;
+                func_800271B4(obj->angle, D_8007AB78);
+                func_80009988(D_8007AB78[0], D_8007AB78[1], (Unk80009988 *)obj);
+                if (--npc->timer == 0) {
+                    npc->state = 0;
+                    npc->timer = npc->def->unk10->unk2;
+                    func_800201A0(obj, 0, 1, 0, 1, 1);
+                    D_8007AB74--;
+                }
+                break;
+            case 2:
+                if (npc->timer != 0) {
+                    npc->timer--;
+                    obj->angle += npc->unk10 / 15.0f;
+                    if (npc->timer == 0) {
+                        func_800201A0(obj, npc->def->unk18, 1, npc->def->unk18, 1, 1);
+                    }
+                }
+                break;
+            case 3:
+                npc->timer--;
+                obj->angle -= npc->unk10 / 15.0f;
+                if (npc->timer == 0) {
+                    npc->state = 0;
+                    npc->timer = npc->def->unk10->unk2;
+                    obj->angle = npc->homeAngle;
+                    func_800201A0(obj, 0, 1, 0, 1, 1);
+                }
+                break;
+        }
+    }
+}
 
 void func_80009594(s32 arg0) {
     NPC *npc;
