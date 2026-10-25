@@ -176,7 +176,15 @@ typedef struct {
 } Unk800EB2B4; // size = 0xC
 
 typedef struct {
-    /* 0x00 */ s32 unk0[5];
+    /* 0x00 */ u16 flags;
+    /* 0x02 */ u16 mask;
+    /* 0x04 */ u16 shift;
+    /* 0x06 */ u16 tlut;
+    /* 0x08 */ s32 img;
+    /* 0x0C */ s16 s;
+    /* 0x0E */ s16 t;
+    /* 0x10 */ s16 ds;
+    /* 0x12 */ s16 dt;
 } Unk800DA0F0; // size = 0x14
 
 typedef struct {
@@ -216,6 +224,7 @@ extern Unk8004EE20 D_8004EFA4;
 extern Unk8004EE20 D_8004EFE4;
 extern Gfx D_800EB6D0[];
 extern u16 D_80087DF8;
+extern s32 D_8004F03C[];
 extern u16 D_800863F4;
 s32 func_8001CBD0(Unk80086798b*, s32);
 s32 func_8001CDF4(Unk80086798b*);
@@ -892,7 +901,82 @@ s32 func_8001CBD0(Unk80086798b* arg0, s32 arg1) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001CDF4.s")
+s32 func_8001CDF4(Unk80086798b* arg0) {
+    Unk800DA0F0* t;
+    u32 mask;
+    u32 size;
+    s32 geom = 0;
+    s32 img;
+    s32 clamp;
+
+    if (arg0->unk44.img != 0) {
+        t = &arg0->unk44;
+        if (arg0->unk8 & 0x20) {
+            geom = G_LIGHTING;
+        }
+        t->s += t->ds;
+        t->t += t->dt;
+        img = t->img;
+        size = (t->flags & 1) ? 16 : 32;
+        if (t->flags & 1) {
+            mask = 4;
+        } else {
+            mask = 5;
+        }
+        if (t->flags & 4) {
+            img += (arg0->unk4 >> t->shift) * size * size;
+        } else if (t->flags & 8) {
+            img += ((arg0->unk4 >> t->shift) & t->mask) * size * size;
+        }
+        if (t->flags & 0x10) {
+            clamp = 1;
+        } else {
+            clamp = 0;
+        }
+        if (t->flags & 2) {
+            gDPLoadTextureBlock(D_8007A184++, img, G_IM_FMT_I, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            if (t->flags & 0x40) {
+                if (arg0->unk8 & 0x20) {
+                    gDPSetCombine(D_8007A184++, 0x629A04, 0x1F10FFFF);
+                } else {
+                    gDPSetCombine(D_8007A184++, 0x629BFF, 0x1F10FE3F);
+                }
+            } else if (arg0->unk8 & 0x20) {
+                gDPSetCombine(D_8007A184++, 0x62FE04, 0x1F10FBFF);
+            } else {
+                gDPSetCombine(D_8007A184++, 0x62FFFF, 0x1F10FA3F);
+            }
+        } else {
+            gDPLoadTextureBlock(D_8007A184++, img, G_IM_FMT_CI, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+            if (arg0->unk8 & 0x20) {
+                gDPSetCombine(D_8007A184++, 0x129804, 0xFF17FFFF);
+            } else {
+                gDPSetCombine(D_8007A184++, 0x1299FF, 0xFF17FE3F);
+            }
+            if (D_80087DF8 != t->tlut) {
+                D_80087DF8 = t->tlut;
+                gDPLoadTLUT_pal256(D_8007A184++, D_8004F03C[D_80087DF8]);
+            }
+        }
+        gDPSetTileSize(D_8007A184++, G_TX_RENDERTILE, t->s, t->t, t->s + size, t->t + size);
+        if (t->flags & 0x20) {
+            gSPTexture(D_8007A184++, size << 6, size << 6, 0, G_TX_RENDERTILE, G_ON);
+            geom |= G_LIGHTING | G_TEXTURE_GEN;
+        } else {
+            gSPTexture(D_8007A184++, 0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON);
+        }
+    } else {
+        gDPPipeSync(D_8007A184++);
+        gDPSetCombine(D_8007A184++, 0x62CBFF, 0x4FFE7E38);
+        gSPTexture(D_8007A184++, 0x8000, 0x8000, 0, G_TX_RENDERTILE, G_OFF);
+    }
+    gSPClearGeometryMode(D_8007A184++, G_LIGHTING | G_TEXTURE_GEN);
+    if (geom) {
+        gSPSetGeometryMode(D_8007A184++, geom);
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001D688.s")
 
