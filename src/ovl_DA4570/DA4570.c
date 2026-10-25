@@ -127,7 +127,11 @@ void func_8010022C_ovl_DA4570(s16 arg0, s16 arg1) {
 void func_80100284_ovl_DA4570(void) {
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_DA4570/DA4570/func_8010028C_ovl_DA4570.s")
+void func_8010028C_ovl_DA4570(u8* arg0, s32 arg1) {
+    while (arg1-- && *arg0) {
+        func_801000E4_ovl_DA4570(*arg0++);
+    }
+}
 
 void func_801002F0_ovl_DA4570(s32 arg0) {
     D_80107044_ovl_DA4570 = D_8010700C_ovl_DA4570 + arg0 * 4;
