@@ -234,7 +234,25 @@ void func_8002440C(void) {
     } while (i != 0);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_800245D0.s")
+void func_800245D0(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u16 arg4) {
+    u32 id;
+    s32 w;
+    u8 flags;
+    u8* str;
+    u32 tmp;
+
+    id = func_800167B0(arg3, arg2);
+    flags = func_800168F0(id, arg4);
+    tmp = (id >> 8) & 0xF;
+    id &= 0xFF;
+    str = D_800C03D8[tmp][id];
+    if (flags & 4) {
+        str = D_8004F2C4;
+    }
+    w = func_80024904(str);
+    arg0 = arg0 - w / 2 + 0x37;
+    func_80024694(arg0, arg1, D_8004F498[flags], str);
+}
 
 void func_80024694(s32 x, s32 y, s32 pal, u8* str) {
     s32 cur = 8;
