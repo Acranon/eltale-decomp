@@ -1078,7 +1078,86 @@ u16 func_8000C48C(Enemy *arg0) {
     return dmg;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000C528.s")
+u16 func_8000C528(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
+    f32 q;
+    Obj *obj;
+    f32 a;
+    u8 *anims;
+    Enemy *enemies;
+
+    obj = &D_8007B908[idx].obj;
+    anims = D_8007C048[D_8007B908[idx].obj.unk50];
+    if (D_8007B908[idx].unkA) {
+        if (dmg) {
+            if (!(flags & 0x8000)) {
+                switch (D_8004DD38[D_8007B908[idx].unk28->unk26] | D_8004DD38[elem]) {
+                    case 1:
+                    case 2:
+                    case 4:
+                    case 8:
+                        dmg >>= 1;
+                        break;
+                    case 5:
+                    case 10:
+                        dmg += dmg >> 2;
+                        break;
+                }
+            } else {
+                a = func_800270D0(src->x - obj->x, src->z - obj->z) - obj->angle;
+                if (a > 3.141592653589793) {
+                    a -= 6.283185307179586;
+                } else if (a < -3.141592653589793) {
+                    a += 6.283185307179586;
+                }
+                if (a < 0.0f) {
+                    a = -a;
+                }
+                if (a > 2.356194490192345) {
+                    dmg += dmg >> 1;
+                }
+            }
+            a = src->unk68->unk84;
+            a /= (f32)(src->unk68->unk84 + D_8007B908[idx].unk120);
+            dmg = dmg * a;
+            q = sqrtf(dmg);
+            dmg += func_80026E90(q * 0.75 + 1.0);
+            if (!dmg) {
+                dmg++;
+            }
+            if (D_8007B908[idx].unkA < dmg) {
+                D_8007B908[idx].unkA = 0;
+            } else {
+                D_8007B908[idx].unkA -= dmg;
+            }
+            if (D_8007B908[idx].unk98 & 0x200) {
+                D_8007B908[idx].unkC += dmg;
+                enemies = D_8007B908;
+                if (obj->unk64->unkA < enemies[idx].unkC) {
+                    D_8007B908[idx].unkC = obj->unk64->unkA;
+                }
+                func_8002373C(obj, 0x200, 2, 30);
+            }
+            func_8001AE24(obj, (flags & 0x4000) ? 0x8003 : 0, dmg);
+        }
+        D_8007B908[idx].type = 2;
+        obj->unk60 |= 1;
+        if (flags & 4) {
+            obj->unk60 |= 2;
+        }
+        if (D_8008BE52 & 0x100) {
+            D_8007B908[idx].unk2 = ((AnimDef *)anims)[D_8007B908[idx].unk28->unk28].unk2;
+            func_800201A0(obj, D_8007B908[idx].unk28->unk28, 1, 0, 1, 1);
+        } else {
+            D_8007B908[idx].unk2 = ((AnimDef *)anims)[D_8007B908[idx].unk28->unk28].unk2 / 10;
+            func_800201A0(obj, D_8007B908[idx].unk28->unk28, 10, 0, 1, 1);
+        }
+    }
+    if (flags & 0x8000) {
+        func_8002A7C8(0, 0x18, 0xFF);
+    }
+    return dmg;
+}
+
 
 void func_8000CA88(void) {
     func_8002433C();
