@@ -694,7 +694,74 @@ void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80006168.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_8000665C.s")
+void func_8001A6E4(Actor *arg0);
+
+void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p) {
+    s32 anim;
+    s32 next;
+    s32 speed;
+    s32 mode;
+    s32 flag;
+    f32 d;
+    f32 pad;
+    f32 spd;
+    f32 cur;
+    f32 newspd;
+
+    cur = sqrtf(a->vx * a->vx + a->vz * a->vz);
+    if (sx != 0.0f || sz != 0.0f) {
+        spd = sqrtf(sx * sx + sz * sz) * 0.025;
+        if (spd > 2.0) {
+            sx = sx * 2.0 / spd;
+            sz = sz * 2.0 / spd;
+            spd = 2.0f;
+        }
+        d = func_800270D0(sx, sz) - a->rot;
+        if (d > 3.141592653589793) {
+            d -= 6.283185307179586;
+        } else if (d < -3.141592653589793) {
+            d += 6.283185307179586;
+        }
+        a->rot = a->rot + d * 0.4;
+        if (a->rot > 3.141592653589793) {
+            a->rot -= 6.283185307179586;
+        } else if (a->rot < -3.141592653589793) {
+            a->rot += 6.283185307179586;
+        }
+        D_8007A918.x = 0.0f;
+        D_8007A918.z = newspd = cur + (spd - cur) * 0.2;
+        func_800271B4(a->rot, &D_8007A918);
+        a->vx = D_8007A918.x;
+        a->vz = D_8007A918.z;
+        anim = 2;
+        next = 2;
+        mode = 0;
+        speed = spd * 14.0f + 3.0f;
+        flag = 0;
+        if (newspd < 1.0 && spd < 1.0) {
+            p->unk0 = 1;
+        }
+    } else {
+        anim = 0xF;
+        next = D_8007A910;
+        mode = 3;
+        p->unk0 = 4;
+        p->unk4 = 8;
+        a->unkC = 0.0f;
+        a->unk14 = 0.0f;
+        a->vx *= 0.9;
+        a->vz *= 0.9;
+        speed = 1;
+        flag = 1;
+        func_8001A6E4(a);
+    }
+    if (anim != a->unk52 && anim != a->unk5A) {
+        func_800201A0(a, anim, speed, next, speed, flag);
+        a->unk54 = mode;
+    } else {
+        a->unk58 = speed;
+    }
+}
 
 void func_800069E0(Actor *arg0, s32 arg1, Vec2f *arg2) {
     func_80007A38(arg0);
