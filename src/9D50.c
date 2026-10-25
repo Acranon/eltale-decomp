@@ -71,7 +71,8 @@ typedef struct {
     /* 0x18 */ f32 unk18;
     /* 0x1C */ u8 pad1C[4];
     /* 0x20 */ f32 unk20;
-    /* 0x24 */ u8 pad24[8];
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 nx;
     /* 0x30 */ f32 ny;
     /* 0x34 */ f32 nz;
@@ -102,7 +103,9 @@ typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ u8 padC[0x20];
+    /* 0x0C */ u8 padC[0x18];
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 rx;
     /* 0x30 */ f32 ry;
     /* 0x34 */ f32 rz;
@@ -123,7 +126,22 @@ typedef struct {
     /* 0x18 */ f32 x;
     /* 0x1C */ u8 pad1C[4];
     /* 0x20 */ f32 z;
+    /* 0x24 */ u8 pad24[0x18];
+    /* 0x3C */ f32 unk3C;
+    /* 0x40 */ f32 unk40;
 } Unk8007AA08;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+} Unk8007C2A8;
+
+f32 sqrtf(f32);
+extern s32 D_8007C2A4;
+extern Unk8007C2A8 *D_8007C2A8[];
 
 void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
 void func_80020428(s32, NPCObj *, AnimEntry *, s32);
