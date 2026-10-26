@@ -35,21 +35,6 @@ typedef struct {
     /* 0x2C */ s32 *unk2C;
 } Unk80084998; /* size 0x30 */
 
-extern Unk80084300 D_80084300;
-extern u16 *D_80084318;
-extern s32 D_80084340;
-extern s32 D_8008433C;
-extern u16 *D_80084344;
-extern u16 *D_80084348;
-extern u16 D_80084350[];
-extern s32 D_8008C164;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-} Unk8004DEF4; /* size 0xC */
-
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ u8 pad4[0x38];
@@ -64,11 +49,54 @@ typedef struct {
     /* 0x14 */ s32 unk14;
 } Unk80084994;
 
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 z;
+} Vec2f_12610;
+
+/* This file's .bss, 80084300..80084B80, in address order (first declaration fixes
+ * the order). D_80084320 is used only by 113F0 (it sits between this file's
+ * objects). The asm's interior labels (D_80084308.., D_80084B1C..D_80084B44,
+ * D_80084B24, D_80084B60..D_80084B74, D_80084B7C) are aliases in undefined_syms.txt. */
+Unk80084300 D_80084300;
+u16 *D_80084318;
+Vec2f_12610 D_80084320;
+u8 D_80084328[8]; /* unreferenced */
+s32 D_80084330;
+s32 D_80084334;
+u16 D_80084338;
+s32 D_8008433C;
+s32 D_80084340;
+u16 *D_80084344;
+u16 *D_80084348;
+u16 D_80084350[0x100];
+f32 D_80084550[4][4];
+Lights3 D_80084590;
+Lights3 D_800845C8;
+Lights3 D_80084600[8];
+Lights3 D_800847C0[8];
+s32 D_80084980;
+s32 D_80084984;
+s32 D_80084988;
+s32 D_8008498C;
+u16 D_80084990;
+u16 D_80084992;
+Unk80084994 *D_80084994;
+Unk80084998 D_80084998[8];
+s32 D_80084B18[4][3];
+s32 D_80084B48[4][3];
+s32 D_80084B78[2];
+extern s32 D_8008C164;
+
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+} Unk8004DEF4; /* size 0xC */
+
+
 extern u16 D_800806B0[];
 extern u16 D_800808B0[][0x100];
-extern s32 D_80084330;
-extern s32 D_80084334;
-extern u16 D_80084338;
 extern u16 D_800842B8;
 extern u16 D_8008BE52;
 extern s32 D_8004DCA0;
@@ -115,21 +143,6 @@ Unk8004DEF4 D_8004DEF4[1] = {
     { 0x537F, 3, 0x80 },
 };
 
-/* This file's .bss, 80084980..80084B80. The asm's interior labels
- * (D_80084B1C..D_80084B44, D_80084B24, D_80084B60..D_80084B74, D_80084B7C)
- * are aliases in undefined_syms.txt. */
-s32 D_80084980;
-s32 D_80084984;
-s32 D_80084988;
-s32 D_8008498C;
-u16 D_80084990;
-u16 D_80084992;
-Unk80084994 *D_80084994;
-Unk80084998 D_80084998[8];
-s32 D_80084B18[4][3];
-s32 D_80084B48[4][3];
-s32 D_80084B78[2];
-
 void func_80011EF4(s32, Unk80084994 *);
 void func_80012854(s32);
 void func_80012800(s32, u16 *, u16 *);
@@ -138,19 +151,14 @@ extern s32 D_8007A17C;
 extern Gfx *D_8007A184;
 extern s16 D_8007A1A0;
 extern s16 D_8007A1A2;
-extern Lights3 D_80084590;
-extern Lights3 D_800845C8;
 
 void func_80012A60(void);
 void func_8001263C(void);
 void func_80027430(f32 (*)[4], f32, f32, f32);
 void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
 void func_800277A4(Mtx *, f32, f32, f32, f32 *, f32 *, f32 *);
-extern f32 D_80084550[4][4];
 extern Mtx D_80085F10;
 void func_800130F8(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
-extern Lights3 D_80084600[];
-extern Lights3 D_800847C0[];
 extern s32 D_80084B60;
 extern s32 D_80084B64;
 extern s32 D_80084B68;
