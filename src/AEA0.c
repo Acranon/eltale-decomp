@@ -1205,3 +1205,15 @@ void func_8000CC40(s32 arg0, s32 arg1) {
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000CC78.s")
+
+/* .data 8004DD20..8004DD50 */
+typedef void (*Fn8004DD20)(Obj*, Enemy*, u8*);
+Fn8004DD20 D_8004DD20[6] = {
+    (Fn8004DD20) func_8000AA74,
+    (Fn8004DD20) func_8000AC84,
+    (Fn8004DD20) func_8000AF14,
+    (Fn8004DD20) func_8000B030,
+    (Fn8004DD20) func_8000B0D8,
+    (Fn8004DD20) func_8000B508,
+};
+s32 D_8004DD38[5] = { 1, 2, 4, 8, 0x10 };

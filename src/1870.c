@@ -131,7 +131,7 @@ extern u8 D_ECD470[];
 extern u64 D_8004B980[]; /* rspboot text */
 extern u64 D_8004BA50[]; /* gfx ucode text (= rspboot end) */
 extern u64 D_80070260[]; /* gfx ucode data */
-extern s32 D_8004DCA0;
+s32 D_8004DCA0 = 0;
 extern OSViMode D_8006CDF0;
 extern OSViMode D_8006D6B0;
 extern u16 D_8007A170;
@@ -344,7 +344,7 @@ extern s32 D_8007A1C8;
 extern s32 D_8007A1D4;
 extern s32 D_8007AB60;
 extern u16 D_8007C280;
-extern s32 D_8004DCA4;
+s32 D_8004DCA4 = 0;
 extern s8 D_8006CC80;
 extern u8 D_1000010[];
 extern u8 D_2000000[];
