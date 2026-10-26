@@ -140,7 +140,8 @@ typedef struct {
     /* 0x130 */ f32 unk130;
     /* 0x134 */ f32 unk134;
     /* 0x138 */ f32 unk138;
-} PlayerState;
+    /* 0x13C */ u8 unk13C[4];
+} PlayerState; /* size 0x140 */
 
 /* per-character data, from the D_80055D40 table */
 typedef struct {
@@ -195,6 +196,24 @@ typedef struct {
     /* 0x2 */ u8 unk2[0xA];
 } Unk803AAAA2; /* size 0xC */
 
+typedef struct {
+    f32 x;
+    f32 y;
+    f32 z;
+} Vec3f;
+
+/* collision query result (func_800107F0) */
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 unk4;
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 unk1A[0x60 - 0x1A]; /* not referenced; the next label is 8007A988 */
+} Unk8007A928;
+
 void func_800069E0(Actor *arg0, s32 arg1, Vec2f *arg2);
 void func_80006A58(u16 arg0, Actor *arg1, PlayerState *arg2);
 void func_80006168(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
@@ -237,33 +256,9 @@ f32 sqrtf(f32 x);
 extern s32 D_8004DCA0;
 extern s32 D_8004DCF8;
 extern u16 D_800842E8;
-extern u16 D_800842E8;
 extern u16 D_80092C86;
-extern u16 D_80092C86;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
 extern CharData *D_80055D40[];
 extern RomRange D_80055F98[];
-extern f32 D_8007A988;
-extern PlayerState D_8007AA08;
-extern Actor D_8007AA20;
 extern Monster D_8007B908[];
 extern u16 D_8008BE52;
 extern u16 D_8008BE54;
@@ -275,6 +270,94 @@ extern u16 D_800C186E[];
 extern s32 D_8007A174;
 extern u16 D_8007A178;
 extern s16 D_8007A17A;
+extern Unk8007AC70 D_8007AC70[];
+extern Unk80084300 D_80084300;
+extern s32 D_800842BC;
+extern s32 D_800842C0;
+extern Unk80085E48 D_80085E48;
+extern s16 D_8008C152;
+extern u16 D_8008C154;
+extern s32 D_80090450;
+extern s32 D_80090454;
+extern Unk803AAAA2 D_803AAAA2[];
+extern u8 D_869620[];
+extern u8 D_86F6F0[];
+extern u8 D_80206000[];
+extern ActorStats D_80055D44;
+
+/* This file's .bss, 8007A8F0..8007AB70, in address order. IDO lays .bss out
+ * in the order names are first declared, so this block comes before any other
+ * mention of these names. IDO also numbers symbols in blocks of 256 (typedefs,
+ * struct tags and data declarations count, prototypes don't) and emits the
+ * later block first, so the whole list must sit inside one block: the externs
+ * above are here to push it past a boundary. Labels inside these objects
+ * (fields of D_8007A9D0, D_8007AA08, ...) are aliases in undefined_syms.txt.
+ * D_8007A90E, D_8007A914, D_8007A924, D_8007A9B2, D_8007AB54..5C are
+ * unreferenced gaps. */
+s32 D_8007A8F0;
+f32 D_8007A8F4;
+f32 D_8007A8F8;
+f32 D_8007A8FC;
+f32 D_8007A900;
+s32 D_8007A904;
+s32 D_8007A908;
+u16 D_8007A90C;
+u16 D_8007A90E;
+s32 D_8007A910;
+s32 D_8007A914;
+Vec2f D_8007A918;
+s32 D_8007A924;
+Unk8007A928 D_8007A928;
+f32 D_8007A988;
+f32 D_8007A98C;
+f32 D_8007A990;
+f32 D_8007A994;
+s32 D_8007A998;
+s32 D_8007A99C;
+f32 D_8007A9A0;
+f32 D_8007A9A4;
+f32 D_8007A9A8;
+u16 D_8007A9AC;
+u16 D_8007A9AE;
+u16 D_8007A9B0;
+u16 D_8007A9B2;
+s32 D_8007A9B4;
+s32 D_8007A9B8;
+s32 D_8007A9BC;
+s32 D_8007A9C0;
+s32 D_8007A9C4;
+s32 D_8007A9C8;
+s32 D_8007A9CC;
+ActorStats D_8007A9D0;
+PlayerState D_8007AA08;
+Vec3f D_8007AB48;
+s32 D_8007AB54;
+s32 D_8007AB58;
+s32 D_8007AB5C;
+s32 D_8007AB60;
+
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern u16 D_8007A90C;
+extern f32 D_8007A988;
+extern PlayerState D_8007AA08;
+extern Actor D_8007AA20;
 extern s32 D_8007A910;
 extern Vec2f D_8007A918;
 extern f32 D_8007A98C;
@@ -286,21 +369,7 @@ extern u16 D_8007A9AE;
 extern u16 D_8007A9B0;
 extern s32 D_8007A9C0;
 extern s16 D_8007AA0E;
-extern Unk8007AC70 D_8007AC70[];
-extern Unk80084300 D_80084300;
-extern s32 D_800842BC;
-extern s32 D_800842C0;
-extern Unk80085E48 D_80085E48;
-extern s16 D_8008C152;
-extern u16 D_8008C154;
-extern s32 D_80090450;
-extern s32 D_80090454;
-extern Unk803AAAA2 D_803AAAA2[];
 
-extern u8 D_869620[];
-extern u8 D_86F6F0[];
-extern u8 D_80206000[];
-extern ActorStats D_80055D44;
 extern ActorStats D_8007A9D0;
 extern ActorSub68 D_8007AA8C;
 extern f32 D_8007A8F4;
@@ -372,25 +441,10 @@ void func_80003B20(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003BE0.s")
 
-typedef struct {
-    f32 x;
-    f32 y;
-    f32 z;
-} Vec3f;
 
 extern Gfx *D_8007A184;
 extern s32 D_8007AB60;
 extern u8 D_10000A0[];
-/* collision query result (func_800107F0) */
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ u16 unk18;
-} Unk8007A928;
 
 extern Unk8007A928 D_8007A928;
 extern f32 D_8007A92C;
