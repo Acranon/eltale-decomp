@@ -254,7 +254,6 @@ void func_8002433C(Actor *arg0);
 f32 sqrtf(f32 x);
 
 extern s32 D_8004DCA0;
-extern s32 D_8004DCF8;
 extern u16 D_800842E8;
 extern u16 D_80092C86;
 extern CharData *D_80055D40[];
@@ -1605,7 +1604,40 @@ void func_800079B4(u8 arg0) {
     func_800201A0(&D_8007AA20, 0x17, 1, 0x16, 1, 1);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A38.s")
+/* .data 8004DCB0..8004DD10 in source order: this table (after the functions it
+ * points to), func_80007A38's static cache (8004DCF8), D_8004DCFC (end of file). */
+typedef void (*Fn8004DCB0)(Actor*, PlayerState*, CharData*);
+Fn8004DCB0 D_8004DCB0[18] = {
+    (Fn8004DCB0) func_800049F4,
+    (Fn8004DCB0) func_800049F4,
+    (Fn8004DCB0) func_800049F4,
+    (Fn8004DCB0) func_80004DEC,
+    (Fn8004DCB0) func_80004E28,
+    (Fn8004DCB0) func_80004ED0,
+    (Fn8004DCB0) func_8000503C,
+    (Fn8004DCB0) func_800050E8,
+    (Fn8004DCB0) func_8000525C,
+    (Fn8004DCB0) func_80005850,
+    (Fn8004DCB0) func_80005A18,
+    (Fn8004DCB0) func_80005AB4,
+    (Fn8004DCB0) func_80005C00,
+    (Fn8004DCB0) func_800052E0,
+    (Fn8004DCB0) func_8000571C,
+    (Fn8004DCB0) func_80005D18,
+    (Fn8004DCB0) func_800052E0,
+    (Fn8004DCB0) func_80005E78,
+};
+
+void func_80007A38(Actor *arg0) {
+    static s32 D_8004DCF8 = -1;
+    RomRange *r;
+
+    if (D_8004DCF8 != arg0->unk52) {
+        D_8004DCF8 = arg0->unk52;
+        r = &D_80055F98[D_8004DCF8];
+        func_80028120(r->start, (void *) 0x80200000, r->end - r->start);
+    }
+}
 
 extern u16 D_8007C050[];
 extern u16 D_8008BE5A;
@@ -1954,27 +1986,4 @@ void func_80008A40(PlayerState *p, Actor *a) {
     }
 }
 
-/* .data 8004DCB0..8004DD10, after the functions D_8004DCB0 points to. */
-typedef void (*Fn8004DCB0)(Actor*, PlayerState*, CharData*);
-Fn8004DCB0 D_8004DCB0[18] = {
-    (Fn8004DCB0) func_800049F4,
-    (Fn8004DCB0) func_800049F4,
-    (Fn8004DCB0) func_800049F4,
-    (Fn8004DCB0) func_80004DEC,
-    (Fn8004DCB0) func_80004E28,
-    (Fn8004DCB0) func_80004ED0,
-    (Fn8004DCB0) func_8000503C,
-    (Fn8004DCB0) func_800050E8,
-    (Fn8004DCB0) func_8000525C,
-    (Fn8004DCB0) func_80005850,
-    (Fn8004DCB0) func_80005A18,
-    (Fn8004DCB0) func_80005AB4,
-    (Fn8004DCB0) func_80005C00,
-    (Fn8004DCB0) func_800052E0,
-    (Fn8004DCB0) func_8000571C,
-    (Fn8004DCB0) func_80005D18,
-    (Fn8004DCB0) func_800052E0,
-    (Fn8004DCB0) func_80005E78,
-};
-s32 D_8004DCF8 = -1;
 s32 D_8004DCFC[4] = { 0x40, 0x40, 0x39, 0x3C };
