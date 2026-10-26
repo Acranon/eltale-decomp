@@ -402,9 +402,10 @@ segments:
     subsegments:
       - [0xDAB5F0, c, ovl_title/DAB5F0]
       - [0xDAC190, c, ovl_title/DAC190]
+      - [0xDAE700, c, ovl_title/DAEA30]
       - [0xDAE700, .data, ovl_title/DAB5F0]      # 8020F1E0..8020F200
       - [0xDAE720, .data, ovl_title/DAC190]      # 8020F200..8020F510
-      - [0xDAEA30, data]
+      - [0xDAEA30, .data, ovl_title/DAEA30]      # 8020F510..80226D30
       - [0xDC6250, .rodata, ovl_title/DAB5F0]
       - [0xDC6270, .rodata, ovl_title/DAC190]
       - { start: 0xDC62B0, type: .bss, vram: 0x80226D90, name: ovl_title/DAB5F0 }
