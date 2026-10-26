@@ -67,7 +67,10 @@ typedef struct {
     /* 0x08 */ Gfx** unk8;
 } Struct_80020214_set;
 
-extern s32 D_8008BFF0;
+/* This file's .bss, 8008BFC0..8008C040, in address order. */
+Vec3f D_8008BFC0[4];
+s32 D_8008BFF0;
+MtxF D_8008BFF8;
 
 void func_80026A00(Struct_80020A28*, Vec3f*, s32);
 void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
@@ -198,8 +201,6 @@ typedef struct {
 extern Gfx* D_8007A184;
 extern s32 D_8007A180;
 extern Unk2000000 D_2000000;
-extern MtxF D_8008BFF8;
-extern Vec3f D_8008BFC0[];
 extern Struct_80085E48 D_80085E48;
 void func_80027ADC(MtxF*, f32, f32, f32, f32, f32, f32, f32, f32, f32);
 void func_80027D40(MtxF*, MtxF*, MtxF*);

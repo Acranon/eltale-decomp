@@ -50,15 +50,38 @@ typedef struct {
 } Struct_8007C284;
 
 extern Struct_8007C284* D_8007C284;
+
+/* This file's .bss, 8008BE40..8008BFC0, in address order (first declaration fixes the order). */
+Struct_8001FF10_Pos D_8008BE40;
+u16 D_8008BE4C;
+u16 D_8008BE4E;
+u16 D_8008BE50;
+u16 D_8008BE52;
+u16 D_8008BE54;
+s16 D_8008BE56;
+u16 D_8008BE58;
+u16 D_8008BE5A;
+f32 D_8008BE5C;
+f32 D_8008BE60;
+f32 D_8008BE64;
+f32 D_8008BE68;
+f32 D_8008BE6C;
+u8 D_8008BE70[0x100]; /* unreferenced */
+void* D_8008BF70[8];
+u32 D_8008BF90;
+s16 D_8008BF94;
+u16 D_8008BF96;
+Struct_8007C284_30* D_8008BF98;
+Struct_8007C284_34* D_8008BF9C;
+void* D_8008BFA0;
+void* D_8008BFA4;
+s32 D_8008BFA8;
+f32 D_8008BFAC;
+u16 D_8008BFB0;
 extern s32 D_800842C0;
 extern u16 D_800842E8;
-extern u16 D_8008BE52;
-extern Struct_8007C284_30* D_8008BF98;
-extern Struct_8007C284_34* D_8008BF9C;
 
 u32 func_80026E90(u32);
-extern f32 D_8008BFAC;
-extern u16 D_8008BFB0;
 
 typedef struct {
     f32 x, y, z;
@@ -78,10 +101,6 @@ typedef struct {
 
 extern Struct_8007B908 D_8007B908[];
 extern u16 D_8007C050[];
-extern u16 D_8008BE54;
-extern u16 D_8008BE58;
-extern u16 D_8008BE5A;
-extern u16 D_8008BF96;
 
 void func_8001A1A4(Vec3f*);
 void func_8001C298(u16, f32, f32, f32);
@@ -97,22 +116,6 @@ extern f32 D_8007C174;
 extern f32 D_8007C178;
 extern f32 D_8007C17C;
 extern f32 D_8007C184;
-extern u16 D_8008BE4C;
-extern u16 D_8008BE4E;
-extern u16 D_8008BE50;
-extern u16 D_8008BE54;
-extern s16 D_8008BE56;
-extern u16 D_8008BE58;
-extern u16 D_8008BE5A;
-extern f32 D_8008BE5C;
-extern f32 D_8008BE60;
-extern f32 D_8008BE6C;
-extern void* D_8008BF70[];
-extern u32 D_8008BF90;
-extern s16 D_8008BF94;
-extern void* D_8008BFA0;
-extern void* D_8008BFA4;
-extern s32 D_8008BFA8;
 extern u8 D_803ABA58[];
 extern u8 D_803AC3F8[];
 
@@ -295,7 +298,6 @@ extern f32 D_80085F78;
 extern f32 D_80085F84;
 extern s32 D_80085F60;
 extern s32 D_800842BC;
-extern Struct_8001FF10_Pos D_8008BE40;
 void func_800271B4(f32, Struct_8001FF10_Pos*);
 void func_80015DB4(s32);
 
@@ -410,8 +412,6 @@ extern Actor D_8007AA20;
 extern s32 D_8007A9BC;
 extern s32 D_80085F60;
 extern s32 D_800842BC;
-extern f32 D_8008BE64;
-extern f32 D_8008BE68;
 extern s16 D_8008C162;
 
 void func_8000D3CC(u16);
@@ -585,7 +585,6 @@ Struct_8001FE08* func_8001FE08(f32 x, f32 y) {
     return p;
 }
 
-extern Struct_8001FF10_Pos D_8008BE40;
 void func_800271B4(f32, Struct_8001FF10_Pos*);
 void func_8000A6D0(s32, f32, f32, f32, void*, Struct_8007B908*);
 
