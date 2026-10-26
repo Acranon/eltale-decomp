@@ -43,6 +43,44 @@ typedef struct Unk8000FA9C {
 } Unk8000FA9C;
 
 typedef struct {
+    f32 x;
+    f32 y;
+    f32 z;
+} Vec3f;
+
+/* Part of this file's .bss, 80082860..800842F0 (the run 80082030..80082860
+ * comes first: see D_80082030). These objects are declared here, before the
+ * file's 256th declaration, and IDO emits the later declaration block (with
+ * D_80082030..D_80082858) first. */
+Unk8000FA9C *D_80082860[0x100];
+Unk8000FA9C *D_80082C60[0x100];
+u16 *D_80083060;
+Unk8000FA9C *D_80083068[0x100];
+u16 *D_80083468;
+Unk80083470 D_80083470[8];
+u16 *D_80083550;
+Unk80083470 D_80083558[8];
+Vec3f D_80083638[0x100];
+Unk80084238 D_80084238[4];
+u16 D_800842A8;
+f32 D_800842AC;
+s32 D_800842B0;
+s32 D_800842B4;
+u16 D_800842B8;
+s32 D_800842BC;
+s32 D_800842C0;
+s32 D_800842C4;
+s32 D_800842C8;
+s32 D_800842CC;
+s32 D_800842D0;
+s32 D_800842D4;
+s32 D_800842D8;
+s32 D_800842DC;
+s32 D_800842E0;
+s32 D_800842E4;
+u16 D_800842E8;
+
+typedef struct {
     /* 0x00 */ u16 alpha;
     /* 0x02 */ u8 pad2[0x16];
     /* 0x18 */ f32 x;
@@ -106,23 +144,13 @@ void func_800271B4(f32, f32 *);
 void func_8001D9A8(SpriteObj *);
 void func_800273C0(Mtx *, f32, f32, f32, f32, f32, f32, f32);
 
-extern Unk80084238 D_80084238[4];
 extern AnimInfo D_800579F8;
 extern AnimInfo D_80057F80;
 extern AnimInfo D_80058008;
 extern s32 D_8007A17C;
-extern Unk80083470 D_80083470[8];
-extern Unk80083470 D_80083558[8];
 extern Gfx *D_8007A184;
-extern u16 D_800842A8;
-typedef struct {
-    f32 x;
-    f32 y;
-    f32 z;
-} Vec3f;
 
 extern u8 D_8005E9F8[];
-extern s32 D_800842BC;
 extern u16 D_80124E00[];
 extern s32 D_8007A180;
 extern Unk80085E48 D_80085E48;
@@ -277,18 +305,6 @@ void func_8000FD54(void);
 void func_800107F0(f32, f32, f32, u16, CollResult *);
 extern Unk8007C284 D_80056BB0[];
 extern Unk80057540 D_80057540[];
-extern s32 D_800842B4;
-extern u16 D_800842B8;
-extern s32 D_800842C0;
-extern s32 D_800842C4;
-extern s32 D_800842C8;
-extern s32 D_800842CC;
-extern s32 D_800842D0;
-extern s32 D_800842D4;
-extern s32 D_800842D8;
-extern s32 D_800842DC;
-extern s32 D_800842E0;
-extern s32 D_800842E4;
 extern s32 D_80084308;
 extern f32 D_8007A98C;
 extern f32 D_8007A990;
@@ -308,28 +324,15 @@ extern u8 D_3F1BA0[];
 extern u8 D_80100000[];
 extern u8 D_8010FE00[];
 extern u8 D_801E0000[];
-extern u16 D_800842E8;
 
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ f32 x;
-    /* 0x1C */ f32 y;
-    /* 0x20 */ f32 z;
-} Unk8007AA08;
 
 typedef struct {
     /* 0x00 */ u16 a;
     /* 0x02 */ u16 b;
 } Unk80082048;
 
-extern Unk8007AA08 D_8007AA08;
-extern f32 D_800842AC;
-extern s32 D_800842B0;
 extern u8 D_80060C88[];
-extern Unk8000FA9C *D_80082860[];
-extern Unk8000FA9C *D_80082C60[];
-extern Unk8000FA9C *D_80083068[];
 void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
 /* The rest of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
  * holds func_800104C0's static at 80082858). Nothing names 80082030..80082048
@@ -338,11 +341,20 @@ u8 D_80082030[0x18];
 Unk80082048 D_80082048[4];
 u16 D_80082058[0x200];
 u16 D_80082458[0x200];
+/* Declared after the definitions above: IDO orders a file's .bss by declaration
+ * number mod 256 (later blocks first on a tie), and these declarations keep
+ * func_800104C0's static D_80082858 after D_80082458. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ f32 x;
+    /* 0x1C */ f32 y;
+    /* 0x20 */ f32 z;
+} Unk8007AA08;
+extern Unk8007AA08 D_8007AA08;
 void func_8001A948(f32, f32, f32, Unk8000FA9C *);
 void func_8000FA9C(Unk8000FA9C *);
 void func_8000FC50(Unk8000FA9C *);
 void func_8000FDA8(f32, f32, f32, f32, Unk8000FA9C *);
-extern Vec3f D_80083638[];
 extern f32 D_80085F50;
 f32 sqrtf(f32);
 f32 func_800270D0(f32, f32);
@@ -358,9 +370,6 @@ typedef struct {
     /* 0x06 */ u16 id;
 } Unk8004DE98; /* size 0x8 */
 
-extern u16 *D_80083060;
-extern u16 *D_80083468;
-extern u16 *D_80083550;
 extern s32 D_80084980;
 
 /* This file's .data, 8004DD70..8004DED0, in source order: these tables, then
