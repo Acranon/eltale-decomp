@@ -29,17 +29,10 @@ typedef struct {
 typedef s32 (*ItemFunc)(void*, Struct_803AAAA0*, u8);
 
 extern u8 D_D384B0[];
-extern ItemFunc D_8004F4A0[];
-extern ItemFunc D_8004F4B0[];
 extern u8 D_8007AA20[];
 extern Struct_8007C288* D_8007C288;
 extern u16 D_800842B8;
 extern u16 D_8008BE52;
-extern s32 D_8008C19C;
-extern s32 D_8008C1A0;
-extern s32 D_8008C1A4;
-extern u8 D_8008C1B0[8];
-extern u8 D_8008C9B8[0x97];
 extern u8 D_8008CA4E;
 extern u8 D_803AC460[];
 extern Struct_803AAAA0 D_803AAAA0[];
@@ -95,7 +88,6 @@ extern f32 D_8007A994;
 extern s32 D_8007A998;
 extern s16 D_8007AA0E;
 extern Struct_80084300 D_80084300;
-extern Vec3f D_8008C190;
 extern Struct_803AAA40 D_803AAA40[];
 extern Struct_803AB358 D_803AB358[];
 extern Struct_803AB36C D_803AB36C[];
@@ -103,6 +95,41 @@ extern Struct_803AB36C D_803AB36C[];
 void func_8001AE24(Struct_80026140*, s32, s32);
 void func_80019820(u16, u16, f32, f32, f32, f32, Struct_803AB358*, Vec3f*, Struct_80026140*);
 void func_8002A7C8(s32, s32, s32);
+
+s32 func_80026040(s32 arg0, Struct_803AAAA0* arg1);
+s32 func_80026054(Struct_80026054* arg0, Struct_803AAAA0* arg1);
+s32 func_800260A8(s32 arg0, Struct_803AAAA0* arg1);
+s32 func_800260F4(s32 arg0, Struct_803AAAA0* arg1);
+void func_80026130(s32 arg0, Struct_803AAAA0* arg1);
+void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1);
+void func_80026284(Struct_80026140* arg0, Struct_803AAAA0* arg1);
+void func_80026400(s32 arg0, Struct_803AAAA0* arg1);
+
+/* .bss 8008C190..8008CA50, in address order (IDO emits .bss by first declaration). */
+Vec3f D_8008C190;
+s32 D_8008C19C;
+s32 D_8008C1A0;
+s32 D_8008C1A4;
+s32 D_8008C1A8; /* unreferenced */
+s32 D_8008C1AC; /* unreferenced */
+u8 D_8008C1B0[8];
+u8 D_8008C1B8[0x800];
+u8 D_8008C9B8[0x97];
+
+/* .data 8004F4A0..8004F4D0 */
+ItemFunc D_8004F4A0[] = {
+    (ItemFunc) func_80026040,
+    (ItemFunc) func_80026054,
+    (ItemFunc) func_800260A8,
+    (ItemFunc) func_800260F4,
+};
+ItemFunc D_8004F4B0[] = {
+    (ItemFunc) func_80026130,
+    (ItemFunc) func_80026140,
+    (ItemFunc) func_80026284,
+    (ItemFunc) func_80026400,
+};
+u16 D_8004F4C0 = 0; /* only func_80025318 uses it */
 
 void func_80024F20(void) {
     s32 i;

@@ -269,8 +269,12 @@ segments:
       - [0x4EB00, data]
       - [0x4FA20, .data, 1B200]                  # 8004EE20..8004F060
       - [0x4FC60, data]
+      - [0x500A0, .data, 25B20]                  # 8004F4A0..8004F4D0
+      - [0x500D0, data]
       - [0x50370, .data, 27A90]
       - [0x50380, data]
+      - [0x56530, .data, 29150]                  # 80055930..80055B40
+      - [0x56740, data]
       - [0x6D900, .data, libultra/os/initialize]
       - [0x6D920, data]
       - [0x6EAD0, .data, libultra/io/vimgr]
@@ -336,6 +340,8 @@ segments:
       - { start: 0x71920, type: bss, vram: 0x80084B80, name: 80084B80 }
       - { start: 0x71920, type: .bss, vram: 0x800865C0, name: 1B200 }
       - { start: 0x71920, type: bss, vram: 0x80087E00, name: 80087E00 }
+      - { start: 0x71920, type: .bss, vram: 0x8008C190, name: 25B20 }      # 8008C190..8008CA50
+      - { start: 0x71920, type: bss, vram: 0x8008CA50, name: 8008CA50 }
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: bss, vram: 0x80093000, name: 80093000 }
       - { start: 0x71920, type: .bss, vram: 0x80094380, name: libultra/io/vimgr }

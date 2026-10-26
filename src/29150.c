@@ -36,9 +36,9 @@ extern ALGlobals D_8008F3D8;
 extern ALSynConfig D_8008F428;
 extern AMDMAState D_8008F4C8;
 extern AMDMABuffer D_8008F4D8[32];
-extern s32 D_80055934;
-extern u32 D_80055938;
-extern ALSeqFile* D_80055930;
+ALSeqFile* D_80055930 = NULL;
+s32 D_80055934 = 0;
+u32 D_80055938 = 0;
 extern ALBankFile* D_80055928;
 extern OSThread D_8008CEC0;
 extern SeqSlot D_8008F7A8[2];
@@ -202,7 +202,172 @@ void func_800289DC(void) {
     D_80055938++;
 }
 
+/* Only func_80028AAC uses these three (its function statics once it is C). */
+s32 D_8005593C = 0;
+s32 D_80055940 = 1;
+s16 D_80055944[4] = { 0 };
+
 #pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80028AAC.s")
+
+extern u8 D_8004F8A4[];
+extern u8 D_8004F8FC[];
+extern u8 D_8004F964[];
+extern u8 D_8004F9EC[];
+extern u8 D_8004FA04[];
+extern u8 D_8004FABC[];
+extern u8 D_8004FAD4[];
+extern u8 D_8004FAEC[];
+extern u8 D_8004FB04[];
+extern u8 D_8004FB1C[];
+extern u8 D_8004FB34[];
+extern u8 D_8004FB4C[];
+extern u8 D_8004FB64[];
+extern u8 D_8004FB7C[];
+extern u8 D_8004FB94[];
+extern u8 D_8004FBBC[];
+extern u8 D_8004FBD4[];
+extern u8 D_8004FBEC[];
+extern u8 D_8004FC04[];
+extern u8 D_8004FC1C[];
+extern u8 D_8004FC34[];
+extern u8 D_8004FC4C[];
+extern u8 D_8004FC64[];
+extern u8 D_8004FC7C[];
+extern u8 D_8004FC94[];
+extern u8 D_8004FCAC[];
+extern u8 D_8005003C[];
+extern u8 D_80050204[];
+extern u8 D_80050C64[];
+extern u8 D_80051BD4[];
+extern u8 D_80051E74[];
+extern u8 D_80052114[];
+extern u8 D_80052474[];
+extern u8 D_80052494[];
+extern u8 D_800524EC[];
+extern u8 D_80052604[];
+extern u8 D_8005261C[];
+extern u8 D_8005298C[];
+extern u8 D_800529EC[];
+extern u8 D_80052A44[];
+extern u8 D_80052B9C[];
+extern u8 D_80052D9C[];
+extern u8 D_80052EB4[];
+extern u8 D_80052FCC[];
+extern u8 D_800530F4[];
+extern u8 D_800532AC[];
+extern u8 D_80053344[];
+extern u8 D_8005350C[];
+extern u8 D_800535B4[];
+extern u8 D_8005383C[];
+extern u8 D_80053AB4[];
+extern u8 D_80053AEC[];
+extern u8 D_80053C3C[];
+extern u8 D_80053FD4[];
+extern u8 D_80053FFC[];
+extern u8 D_80054174[];
+extern u8 D_800541B4[];
+extern u8 D_8005429C[];
+extern u8 D_80054384[];
+extern u8 D_800546EC[];
+extern u8 D_800548B4[];
+extern u8 D_80054D1C[];
+extern u8 D_80054F84[];
+extern u8 D_8005522C[];
+extern u8 D_80055894[];
+extern u8 D_800558AC[];
+extern u8 D_800558C4[];
+extern u8 D_800558DC[];
+extern u8 D_800558F4[];
+extern u8 D_8005590C[];
+
+u32 D_8005594C[8] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+s32 D_8005596C[8] = { 0 };
+s32 D_8005598C[8] = { 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40 };
+s32 D_800559AC = 0;
+s32 D_800559B0 = 0;
+s32 D_800559B4 = 0x7FFF;
+s32 D_800559B8 = 0;
+s32 D_800559BC = 0xFF;
+s32 D_800559C0 = 0xFF;
+s32 D_800559C4[2] = { 0x7FFF, 0x7FFF };
+s32 D_800559CC = 0;
+s32 D_800559D0 = 0;
+s32 D_800559D4[5] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+s32 D_800559E8[5] = { 0 };
+s32 D_800559FC[5] = { 0 };
+s32 D_80055A10[5] = { 0x40, 0x40, 0x40, 0x40, 0x40 };
+s32* D_80055A24[] = {
+    (s32*) D_8004F8A4,
+    (s32*) D_8004F8FC,
+    (s32*) D_8004F964,
+    (s32*) D_8004F9EC,
+    (s32*) D_8004FA04,
+    (s32*) D_8004FABC,
+    (s32*) D_8004FAD4,
+    (s32*) D_8004FAEC,
+    (s32*) D_8004FB04,
+    (s32*) D_8004FB1C,
+    (s32*) D_8004FB34,
+    (s32*) D_8004FB4C,
+    (s32*) D_8004FB64,
+    (s32*) D_8004FB7C,
+    (s32*) D_8004FB94,
+    (s32*) D_8004FBBC,
+    (s32*) D_8004FBD4,
+    (s32*) D_8004FBEC,
+    (s32*) D_8004FC04,
+    (s32*) D_8004FC1C,
+    (s32*) D_8004FC34,
+    (s32*) D_8004FC4C,
+    (s32*) D_8004FC64,
+    (s32*) D_8004FC7C,
+    (s32*) D_8004FC94,
+    (s32*) D_8004FCAC,
+    (s32*) D_8005003C,
+    (s32*) D_80050204,
+    (s32*) D_80050C64,
+    (s32*) D_80051BD4,
+    (s32*) D_80051E74,
+    (s32*) D_80052114,
+    (s32*) D_80052474,
+    (s32*) D_80052494,
+    (s32*) D_800524EC,
+    (s32*) D_80052604,
+    (s32*) D_8005261C,
+    (s32*) D_8005298C,
+    (s32*) D_800529EC,
+    (s32*) D_80052A44,
+    (s32*) D_80052B9C,
+    (s32*) D_80052D9C,
+    (s32*) D_80052EB4,
+    (s32*) D_80052FCC,
+    (s32*) D_800530F4,
+    (s32*) D_800532AC,
+    (s32*) D_80053344,
+    (s32*) D_8005350C,
+    (s32*) D_800535B4,
+    (s32*) D_8005383C,
+    (s32*) D_80053AB4,
+    (s32*) D_80053AEC,
+    (s32*) D_80053C3C,
+    (s32*) D_80053FD4,
+    (s32*) D_80053FFC,
+    (s32*) D_80054174,
+    (s32*) D_800541B4,
+    (s32*) D_8005429C,
+    (s32*) D_80054384,
+    (s32*) D_800546EC,
+    (s32*) D_800548B4,
+    (s32*) D_80054D1C,
+    (s32*) D_80054F84,
+    (s32*) D_8005522C,
+    (s32*) D_80055894,
+    (s32*) D_800558AC,
+    (s32*) D_800558C4,
+    (s32*) D_800558DC,
+    (s32*) D_800558F4,
+    (s32*) D_8005590C,
+};
 
 void func_80028F00(u32 devAddr) {
     s32 size;
