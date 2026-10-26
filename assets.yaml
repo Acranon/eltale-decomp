@@ -3,7 +3,64 @@
 # build/assets/<name>.inc.c. name = the C symbol, rom = ROM offset, size in bytes,
 # type = element type of the C array (u8, u16, u32; big-endian).
 
-# ovl_DA4570 .data (ROM = vram - 0x80105660 + 0xDA9BD0)
+# ovl_DA4570 .data (ROM = vram - 0x80101FA0 + 0xDA6510)
+- { name: D_80101FA0_ovl_DA4570, rom: 0xDA6510, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80101FC0_ovl_DA4570, rom: 0xDA6530, size: 0x70, type: u8 }      # texture
+- { name: D_80102030_ovl_DA4570, rom: 0xDA65A0, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80102050_ovl_DA4570, rom: 0xDA65C0, size: 0x200, type: u8 }     # texture
+- { name: D_80102250_ovl_DA4570, rom: 0xDA67C0, size: 0x200, type: u8 }     # texture
+- { name: D_80102450_ovl_DA4570, rom: 0xDA69C0, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80102470_ovl_DA4570, rom: 0xDA69E0, size: 0x80, type: u8 }      # texture
+- { name: D_801024F0_ovl_DA4570, rom: 0xDA6A60, size: 0x80, type: u8 }      # texture
+- { name: D_80102570_ovl_DA4570, rom: 0xDA6AE0, size: 0x80, type: u8 }      # texture
+- { name: D_801025F0_ovl_DA4570, rom: 0xDA6B60, size: 0x80, type: u8 }      # texture
+- { name: D_80102670_ovl_DA4570, rom: 0xDA6BE0, size: 0x80, type: u8 }      # texture
+- { name: D_801026F0_ovl_DA4570, rom: 0xDA6C60, size: 0x80, type: u8 }      # texture
+- { name: D_80102770_ovl_DA4570, rom: 0xDA6CE0, size: 0x80, type: u8 }      # texture
+- { name: D_801027F0_ovl_DA4570, rom: 0xDA6D60, size: 0x80, type: u8 }      # texture
+- { name: D_80102870_ovl_DA4570, rom: 0xDA6DE0, size: 0x80, type: u8 }      # texture
+- { name: D_801028F0_ovl_DA4570, rom: 0xDA6E60, size: 0x90, type: u8 }      # texture
+- { name: D_80102980_ovl_DA4570, rom: 0xDA6EF0, size: 0x90, type: u8 }      # texture
+- { name: D_80102A10_ovl_DA4570, rom: 0xDA6F80, size: 0x90, type: u8 }      # texture
+- { name: D_80102AA0_ovl_DA4570, rom: 0xDA7010, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80102AC0_ovl_DA4570, rom: 0xDA7030, size: 0x80, type: u8 }      # texture
+- { name: D_80102B40_ovl_DA4570, rom: 0xDA70B0, size: 0x80, type: u8 }      # texture
+- { name: D_80102BC0_ovl_DA4570, rom: 0xDA7130, size: 0x80, type: u8 }      # texture
+- { name: D_80102C40_ovl_DA4570, rom: 0xDA71B0, size: 0x80, type: u8 }      # texture
+- { name: D_80102CC0_ovl_DA4570, rom: 0xDA7230, size: 0x80, type: u8 }      # texture
+- { name: D_80102D40_ovl_DA4570, rom: 0xDA72B0, size: 0x80, type: u8 }      # texture
+- { name: D_80102DC0_ovl_DA4570, rom: 0xDA7330, size: 0x80, type: u8 }      # texture
+- { name: D_80102E40_ovl_DA4570, rom: 0xDA73B0, size: 0x80, type: u8 }      # texture
+- { name: D_80102EC0_ovl_DA4570, rom: 0xDA7430, size: 0x80, type: u8 }      # texture
+- { name: D_80102F40_ovl_DA4570, rom: 0xDA74B0, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80102F60_ovl_DA4570, rom: 0xDA74D0, size: 0x78, type: u8 }      # texture
+- { name: D_80102FD8_ovl_DA4570, rom: 0xDA7548, size: 0xB0, type: u8 }      # texture
+- { name: D_80103088_ovl_DA4570, rom: 0xDA75F8, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_801030A8_ovl_DA4570, rom: 0xDA7618, size: 0x460, type: u8 }     # texture
+- { name: D_80103508_ovl_DA4570, rom: 0xDA7A78, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80103528_ovl_DA4570, rom: 0xDA7A98, size: 0x180, type: u8 }     # texture
+- { name: D_801036A8_ovl_DA4570, rom: 0xDA7C18, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_801036C8_ovl_DA4570, rom: 0xDA7C38, size: 0xC0, type: u8 }      # texture
+- { name: D_80103788_ovl_DA4570, rom: 0xDA7CF8, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_801037A8_ovl_DA4570, rom: 0xDA7D18, size: 0xB0, type: u8 }      # texture
+- { name: D_80103858_ovl_DA4570, rom: 0xDA7DC8, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80103878_ovl_DA4570, rom: 0xDA7DE8, size: 0xC0, type: u8 }      # texture
+- { name: D_80103938_ovl_DA4570, rom: 0xDA7EA8, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80103958_ovl_DA4570, rom: 0xDA7EC8, size: 0xC0, type: u8 }      # texture
+- { name: D_80103A18_ovl_DA4570, rom: 0xDA7F88, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80103A38_ovl_DA4570, rom: 0xDA7FA8, size: 0x1E0, type: u8 }     # texture
+- { name: D_80103C18_ovl_DA4570, rom: 0xDA8188, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80103C38_ovl_DA4570, rom: 0xDA81A8, size: 0x180, type: u8 }     # texture
+- { name: D_80103DB8_ovl_DA4570, rom: 0xDA8328, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80103DD8_ovl_DA4570, rom: 0xDA8348, size: 0xC0, type: u8 }      # texture
+- { name: D_80103E98_ovl_DA4570, rom: 0xDA8408, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: D_80103EB8_ovl_DA4570, rom: 0xDA8428, size: 0x70, type: u8 }      # texture
+- { name: D_80105408_ovl_DA4570, rom: 0xDA9978, size: 0x40, type: u8 }      # message text
+- { name: D_80105448_ovl_DA4570, rom: 0xDA99B8, size: 0x68, type: u8 }      # message text
+- { name: D_801054B0_ovl_DA4570, rom: 0xDA9A20, size: 0x38, type: u8 }      # message text
+- { name: D_801054E8_ovl_DA4570, rom: 0xDA9A58, size: 0x90, type: u8 }      # message text
+- { name: D_80105578_ovl_DA4570, rom: 0xDA9AE8, size: 0x90, type: u8 }      # message text
+- { name: D_80105608_ovl_DA4570, rom: 0xDA9B78, size: 0x58, type: u8 }      # message text
 - { name: D_8010567C_ovl_DA4570, rom: 0xDA9BEC, size: 0x10, type: u16 }    # font palette, 8 colours
 - { name: D_8010568C_ovl_DA4570, rom: 0xDA9BFC, size: 0x1980, type: u8 }   # 4bpp font bitmap
 - { name: D_8010700C_ovl_DA4570, rom: 0xDAB57C, size: 0x38, type: u16 }    # 7 palettes of 4 colours
