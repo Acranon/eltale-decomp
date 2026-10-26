@@ -150,3 +150,10 @@ D_80085F78 = D_80085F68 + 0x10;
 /* D2: osViModeTable entries that src/1870.c uses (libultra/io/vitbl.c, 8006CD50). */
 D_8006CDF0 = osViModeTable + 0xA0;
 D_8006D6B0 = osViModeTable + 0x960;
+
+/* D2: labels inside objects that src/2B530.c defines (80055D40..80061650). */
+D_8005685A = D_80056718 + 0x142;
+D_8005685C = D_80056718 + 0x144;
+D_8005E51C = D_8005E508 + 0x14;
+D_8005E5AC = D_8005E5A0 + 0xC;
+D_80060C4C = D_80060C48 + 0x4;
