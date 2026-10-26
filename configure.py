@@ -140,12 +140,18 @@ def write_ninja(linker_entries):
         seg = entry.segment
         if entry.object_path is None:
             continue
-        if seg.type[0] == ".":
+        # A .data/.bss entry is linked from its C file's object, which the c entry builds.
+        # Without a c entry it is a data-only C file (no text, e.g. libultra's vitbl.c):
+        # build it here, once.
+        data_only = seg.type[0] == "." and seg.sibling is None and not seg.siblings
+        if seg.type[0] == "." and not data_only:
             continue
         obj = str(entry.object_path)
         srcs = [str(s) for s in entry.src_paths]
+        if obj in objects:
+            continue
         objects.append(obj)
-        if isinstance(seg, splat.segtypes.common.c.CommonSegC):
+        if data_only or isinstance(seg, splat.segtypes.common.c.CommonSegC):
             src = srcs[0]
             ninja.build(obj, "cc", srcs, order_only=["assets"],
                         variables={"flags": flags_for(src), "o32": "1" if src in SET_O32 else ""})

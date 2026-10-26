@@ -40,29 +40,56 @@
 #define ms *(((s32)((f32)44.1))&~0x7)
  
 
-/* SMALLROOM_PARAMS: data stays in asm until D2 */
-extern s32 D_8006E850[];
-#define SMALLROOM_PARAMS D_8006E850
+/* .data 8006E850..8006E9E0 */
+static s32 SMALLROOM_PARAMS[26] = {
+    /* sections	   length */
+          3,        100 ms,
+                                      /*       chorus  chorus   filter
+       input  output  fbcoef  ffcoef   gain     rate   depth     coef  */
+           0,   54 ms,  9830,  -9830,      0,      0,      0,      0,
+       19 ms,   38 ms,  3276,  -3276, 0x3fff,      0,      0,      0,
+           0,   60 ms,  5000,      0,      0,      0,      0, 0x5000
+};
 
-/* BIGROOM_PARAMS: data stays in asm until D2 */
-extern s32 D_8006E8B8[];
-#define BIGROOM_PARAMS D_8006E8B8
+static s32 BIGROOM_PARAMS[34] = {
+    /* sections	   length */
+          4,        100 ms,
+                                      /*       chorus  chorus   filter
+       input  output  fbcoef  ffcoef   gain     rate   depth     coef  */
+           0,   66 ms,  9830,  -9830,      0,      0,      0,      0,
+       22 ms,   54 ms,  3276,  -3276, 0x3fff,      0,      0,      0,
+       66 ms,   91 ms,  3276,  -3276, 0x3fff,      0,      0,      0,
+           0,   94 ms,  8000,      0,      0,      0,      0, 0x5000
+};
 
-/* ECHO_PARAMS: data stays in asm until D2 */
-extern s32 D_8006E940[];
-#define ECHO_PARAMS D_8006E940
+static s32 ECHO_PARAMS[10] = {
+    /* sections	   length */
+          1,       200 ms,
+                                      /*       chorus  chorus   filter
+       input  output  fbcoef  ffcoef   gain     rate   depth     coef   */
+           0,  179 ms, 12000,      0, 0x7fff,      0,      0,      0
+};
 
-/* CHORUS_PARAMS: data stays in asm until D2 */
-extern s32 D_8006E968[];
-#define CHORUS_PARAMS D_8006E968
+static s32 CHORUS_PARAMS[10] = {
+    /* sections	   length */
+          1,        20 ms,
+                                      /*       chorus  chorus   filter
+       input  output  fbcoef  ffcoef   gain     rate   depth     coef   */
+	  0,   5 ms, 0x4000,      0,  0x7fff,   7600,   700,      0
+};
 
-/* FLANGE_PARAMS: data stays in asm until D2 */
-extern s32 D_8006E990[];
-#define FLANGE_PARAMS D_8006E990
+static s32 FLANGE_PARAMS[10] = {
+    /* sections	   length */
+          1,        20 ms,
+                                      /*       chorus  chorus   filter
+       input  output  fbcoef  ffcoef   gain     rate   depth     coef   */
+	   0,   5 ms,      0, 0x5fff, 0x7fff,    380,   500,      0
+};
 
-/* NULL_PARAMS: data stays in asm until D2 */
-extern s32 D_8006E9B8[];
-#define NULL_PARAMS D_8006E9B8
+static s32 NULL_PARAMS[10] = {
+    0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+};
 
 
 void _init_lpfilter(ALLowPass *lp)
