@@ -39,8 +39,9 @@
         else                                     \
             return x.nchar;                      \
     }
-extern char D_8006E800[33]; /* spaces: 32 blanks */
-extern char D_8006E824[33]; /* zeroes: 32 '0's */
+/* .data 8006E800..8006E850 */
+static char D_8006E800[] = "                                "; /* spaces */
+static char D_8006E824[] = "00000000000000000000000000000000"; /* zeroes */
 #define spaces D_8006E800
 #define zeroes D_8006E824
 

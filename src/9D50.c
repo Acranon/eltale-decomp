@@ -171,8 +171,13 @@ void func_80025094(u8);
 u8 func_8000D398(u32);
 void func_8000A0F8(NPC *, s32);
 extern s32 D_8004DCA0;
-extern u8 D_8004DD10[];
-extern u8 D_8004DD18[];
+/* Message text that func_80009DDC hands to the text box. */
+u8 D_8004DD10[8] = {
+#include "assets/D_8004DD10.inc.c"
+};
+u8 D_8004DD18[8] = {
+#include "assets/D_8004DD18.inc.c"
+};
 extern s32 D_8007A174;
 extern s32 D_80090454;
 extern Unk80090458 D_80090458;

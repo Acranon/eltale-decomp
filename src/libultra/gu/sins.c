@@ -37,7 +37,7 @@
  * ====================================================================
  */
 
-extern short sintable[];
+#include "sintable.h"   /* .data 8006DEF0..8006E6F0 */
 
 signed short
 sins( unsigned short x )

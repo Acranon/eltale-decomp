@@ -5,7 +5,7 @@
 #define SI_Q_BUF_LEN 1
 extern OSMesg siAccessBuf[SI_Q_BUF_LEN];
 extern OSMesgQueue __osSiAccessQueue;
-extern u32 __osSiAccessQueueEnabled;
+u32 __osSiAccessQueueEnabled = 0;   /* .data 8006EB20 */
 
 void __osSiCreateAccessQueue(void) {
     __osSiAccessQueueEnabled = 1;

@@ -23,6 +23,8 @@
 
 #include <libaudio.h>
 
+ALGlobals *alGlobals = 0;   /* .data 8006E6F0..8006E700 */
+
 
 
 void alInit(ALGlobals *g, ALSynConfig *c)

@@ -263,7 +263,11 @@ segments:
       - [0x4C580, databin, rspboot]
       - [0x4C650, databin, gspF3DEX_text]
       - [0x4DA80, databin, aspMain_text]
-      - [0x4E8A0, data]
+      - [0x4E8A0, .data, 1870]                   # 8004DCA0..8004DCB0
+      - [0x4E8B0, .data, 3F50]                   # 8004DCB0..8004DD10
+      - [0x4E910, .data, 9D50]                   # 8004DD10..8004DD20
+      - [0x4E920, .data, AEA0]                   # 8004DD20..8004DD50
+      - [0x4E950, .data, DAE0]                   # 8004DD50..8004DD70
       - [0x4E970, .data, E2A0]                   # 8004DD70..8004DED0
       - [0x4EAD0, .data, 12610]                  # 8004DED0..8004DF00
       - [0x4EB00, .data, 140D0]                  # 8004DF00..8004DFC0
@@ -272,18 +276,37 @@ segments:
       - [0x4F770, .data, 15150]                  # 8004EB70..8004EC90
       - [0x4F890, .data, 17360]                  # 8004EC90..8004EE20
       - [0x4FA20, .data, 1B200]                  # 8004EE20..8004F060
-      - [0x4FC60, data]
+      - [0x4FC60, .data, 1E570]                  # 8004F060..8004F0B0
+      - [0x4FCB0, .data, 1FA00]                  # 8004F0B0..8004F2C0
+      - [0x4FEC0, .data, 216E0]                  # 8004F2C0..8004F4A0
       - [0x500A0, .data, 25B20]                  # 8004F4A0..8004F4D0
       - [0x500D0, data]
       - [0x50370, .data, 27A90]
       - [0x50380, .data, 29150]                  # 8004F780..80055B40
       - [0x56740, data]
       - [0x6D900, .data, libultra/os/initialize]
-      - [0x6D920, data]
+      - [0x6D920, .data, libultra/io/pimgr]      # 8006CD20..8006CD50
+      - [0x6D950, .data, libultra/io/vitbl]      # 8006CD50..8006DED0 (data-only file)
       - [0x6EAD0, .data, libultra/io/vimgr]
-      - [0x6EAF0, data]
+      - [0x6EAF0, .data, libultra/gu/sins]       # 8006DEF0..8006E6F0
+      - [0x6F2F0, .data, libultra/audio/sl]      # 8006E6F0..8006E700
+      - [0x6F300, .data, libultra/io/aisetnextbuf] # 8006E700..8006E710
+      - [0x6F310, .data, libultra/os/controller] # 8006E710..8006E720
+      - [0x6F320, data]                          # exceptasm's __osHwIntTable/__osPiIntTable (hasm)
+      - [0x6F350, .data, libultra/os/thread]     # 8006E750..8006E770
+      - [0x6F370, .data, libultra/io/piacs]      # 8006E770..8006E780
+      - [0x6F380, .data, libultra/io/vi]         # 8006E780..8006E7F0
       - [0x6F3F0, .data, libultra/os/timerintr]
-      - [0x6F400, data]
+      - [0x6F400, .data, libc/xprintf]           # 8006E800..8006E850
+      - [0x6F450, .data, libultra/audio/drvrNew] # 8006E850..8006E9E0
+      - [0x6F5E0, .data, libultra/audio/env]     # 8006E9E0..8006EB20
+      - [0x6F720, .data, libultra/io/siacs]      # 8006EB20..8006EB30
+      - [0x6F730, .data, libultra/io/contramread] # 8006EB30..8006EB40
+      - [0x6F740, .data, libultra/io/contpfs]    # 8006EB40..8006EB50
+      - [0x6F750, .data, libultra/vimodes/vimodepallan1]  # data-only files
+      - [0x6F7A0, .data, libultra/vimodes/vimodempallan1]
+      - [0x6F7F0, .data, libultra/vimodes/vimodentsclan1]
+      - [0x6F840, .data, libc/xlitob]            # 8006EC40..8006EC70
       - [0x6F870, .rodata, 1870]
       - [0x6F8C0, .rodata, 3B40]
       - [0x6F8D0, .rodata, 3F50]

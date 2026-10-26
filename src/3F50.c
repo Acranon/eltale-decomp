@@ -1953,3 +1953,28 @@ void func_80008A40(PlayerState *p, Actor *a) {
         a->unk60 &= 0xFFFE;
     }
 }
+
+/* .data 8004DCB0..8004DD10, after the functions D_8004DCB0 points to. */
+typedef void (*Fn8004DCB0)(Actor*, PlayerState*, CharData*);
+Fn8004DCB0 D_8004DCB0[18] = {
+    (Fn8004DCB0) func_800049F4,
+    (Fn8004DCB0) func_800049F4,
+    (Fn8004DCB0) func_800049F4,
+    (Fn8004DCB0) func_80004DEC,
+    (Fn8004DCB0) func_80004E28,
+    (Fn8004DCB0) func_80004ED0,
+    (Fn8004DCB0) func_8000503C,
+    (Fn8004DCB0) func_800050E8,
+    (Fn8004DCB0) func_8000525C,
+    (Fn8004DCB0) func_80005850,
+    (Fn8004DCB0) func_80005A18,
+    (Fn8004DCB0) func_80005AB4,
+    (Fn8004DCB0) func_80005C00,
+    (Fn8004DCB0) func_800052E0,
+    (Fn8004DCB0) func_8000571C,
+    (Fn8004DCB0) func_80005D18,
+    (Fn8004DCB0) func_800052E0,
+    (Fn8004DCB0) func_80005E78,
+};
+s32 D_8004DCF8 = -1;
+s32 D_8004DCFC[4] = { 0x40, 0x40, 0x39, 0x3C };

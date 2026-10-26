@@ -20,8 +20,7 @@
  * @return 0 if the DMA was enqueued successfully, -1 if the DMA could not yet be queued.
  */
 s32 osAiSetNextBuffer(void* bufPtr, u32 size) {
-    extern u8 D_8006E700;
-#define hdwrBugFlag D_8006E700
+    static u8 hdwrBugFlag = FALSE;   /* .data 8006E700 */
     char* bptr;
 
 #if BUILD_VERSION >= VERSION_J
