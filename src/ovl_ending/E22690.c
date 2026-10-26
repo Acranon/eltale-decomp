@@ -113,7 +113,7 @@ Gfx D_8022EA18_ovl_ending[2][2500];
 Gfx* D_80238658_ovl_ending;
 /* 8023865C..80238660: func_8020C254's static */
 
-/* ovl_ending .data 8020F690..8020F6C0 (the rest of the slab is still asm). */
+/* ovl_ending .data 8020F690..8020F6C0 (8020F6C0.. is E25C80.c's). */
 u32 D_8020F690_ovl_ending = 0;
 s32 D_8020F694_ovl_ending = 0;
 s32 D_8020F698_ovl_ending = 0;

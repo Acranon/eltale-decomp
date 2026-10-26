@@ -42,7 +42,16 @@ typedef struct {
 } Struct_8001DA3C;
 
 extern Mtx D_2000000[];
-extern u8 D_8004F060[];
+Gfx D_8004F060[8] = {
+    {{ 0xE7000000, 0x00000000 }},
+    {{ 0xBA001402, 0x00100000 }},
+    {{ 0xB900031D, 0x0C184A50 }},
+    {{ 0xB6000000, 0x000F3205 }},
+    {{ 0xB7000000, 0x00000205 }},
+    {{ 0xFCFFFFFF, 0xFFFCF238 }},
+    {{ 0xBB000001, 0x80008000 }},
+    {{ 0xB8000000, 0x00000000 }},
+};
 extern s32 D_8007A180;
 extern Gfx* D_8007A184;
 extern Struct_80085E48 D_80085E48;
@@ -138,9 +147,7 @@ void func_8001DA3C(Struct_8001DA3C* arg0) {
     }
 }
 
-extern u8 D_8004F0A0[];
-
-extern u8 D_8004F0A0[];
+u8 D_8004F0A0[8] = { 2, 4, 8, 16, 32, 64, 128, 0 };
 
 void func_8001DCE8(u8 fmt, u8* timg, s32 width, s32 height, u8 cms, u8 cmt) {
     u8 masks;

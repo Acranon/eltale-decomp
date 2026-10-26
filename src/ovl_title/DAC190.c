@@ -20,7 +20,7 @@ typedef struct {
 } UnkFade_8020F4F8;
 
 extern Gfx* D_8007A184;
-extern u8 D_8020FE10_ovl_title[];
+extern u16 D_8020FE10_ovl_title[];
 extern u8 D_80210010_ovl_title[];
 extern u8 D_80210D20_ovl_title[];
 
