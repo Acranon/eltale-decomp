@@ -264,6 +264,8 @@ segments:
       - [0x4C650, databin, gspF3DEX_text]
       - [0x4DA80, databin, aspMain_text]
       - [0x4E8A0, data]
+      - [0x4EAD0, .data, 12610]                  # 8004DED0..8004DF00
+      - [0x4EB00, data]
       - [0x50370, .data, 27A90]
       - [0x50380, data]
       - [0x6D900, .data, libultra/os/initialize]
@@ -321,6 +323,8 @@ segments:
       - [0x70E60, rodata, gspF3DEX_data]
       - [0x71660, rodata, aspMain_data]
       - { start: 0x71920, type: bss, vram: 0x80070D20 }
+      - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }
+      - { start: 0x71920, type: bss, vram: 0x80084B80, name: 80084B80 }
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: bss, vram: 0x80093000, name: 80093000 }
       - { start: 0x71920, type: .bss, vram: 0x80094380, name: libultra/io/vimgr }

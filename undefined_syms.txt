@@ -13,3 +13,17 @@ D_80124E00 = 0x80124E00;
 
 /* Second name for a ROM address that is both one block's end and the next block's start (func_8000D6A0 uses both). */
 D_851F0_end = 0x851F0;
+
+/* D2: names the asm (or another file's extern) uses for addresses inside an
+ * object a C file now defines. Keep them relative to the owning object. */
+/* 12610.c: D_80084B18[4][3], D_80084B48[4][3], D_80084B78[2] */
+D_80084B1C = D_80084B18 + 0x04;
+D_80084B20 = D_80084B18 + 0x08;
+D_80084B24 = D_80084B18 + 0x0C;
+D_80084B60 = D_80084B48 + 0x18;
+D_80084B64 = D_80084B48 + 0x1C;
+D_80084B68 = D_80084B48 + 0x20;
+D_80084B6C = D_80084B48 + 0x24;
+D_80084B70 = D_80084B48 + 0x28;
+D_80084B74 = D_80084B48 + 0x2C;
+D_80084B7C = D_80084B78 + 0x04;
