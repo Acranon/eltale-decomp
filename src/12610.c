@@ -42,12 +42,6 @@ extern s32 D_8008433C;
 extern u16 *D_80084344;
 extern u16 *D_80084348;
 extern u16 D_80084350[];
-extern s32 D_80084980;
-extern s32 D_80084984;
-extern s32 D_80084988;
-extern u16 D_80084990;
-extern Unk80084998 D_80084998[8];
-extern s32 D_80084B18[4][3];
 extern s32 D_8008C164;
 
 typedef struct {
@@ -70,18 +64,15 @@ typedef struct {
     /* 0x14 */ s32 unk14;
 } Unk80084994;
 
-extern Unk8004DEF4 D_8004DEF4[];
 extern u16 D_800806B0[];
 extern u16 D_800808B0[][0x100];
 extern s32 D_80084330;
 extern s32 D_80084334;
 extern u16 D_80084338;
-extern u16 D_80084992;
 extern u16 D_800842B8;
 extern u16 D_8008BE52;
 extern s32 D_8004DCA0;
 extern s32 D_8008C168;
-extern Unk8004DEF4 D_8004DED0[];
 typedef struct {
     /* 0x00 */ s32 r;
     /* 0x04 */ s32 g;
@@ -113,11 +104,35 @@ typedef struct {
     /* 0x04 */ s32 count;
 } KeyTrack;
 
+/* This file's .data, 8004DED0..8004DF00: the day-phase table (D_8004DEF4 is
+ * its last entry, named separately by the asm). */
+Unk8004DEF4 D_8004DED0[3] = {
+    { 0x15F9, 0, 0x80 },
+    { 0x2328, 1, 0x80 },
+    { 0x4AB5, 2, 0x80 },
+};
+Unk8004DEF4 D_8004DEF4[1] = {
+    { 0x537F, 3, 0x80 },
+};
+
+/* This file's .bss, 80084980..80084B80. The asm's interior labels
+ * (D_80084B1C..D_80084B44, D_80084B24, D_80084B60..D_80084B74, D_80084B7C)
+ * are aliases in undefined_syms.txt. */
+s32 D_80084980;
+s32 D_80084984;
+s32 D_80084988;
+s32 D_8008498C;
+u16 D_80084990;
+u16 D_80084992;
+Unk80084994 *D_80084994;
+Unk80084998 D_80084998[8];
+s32 D_80084B18[4][3];
+s32 D_80084B48[4][3];
+s32 D_80084B78[2];
+
 void func_80011EF4(s32, Unk80084994 *);
 void func_80012854(s32);
 void func_80012800(s32, u16 *, u16 *);
-extern s32 D_8008498C;
-extern Unk80084994 *D_80084994;
 extern u16 D_8007C280;
 extern s32 D_8007A17C;
 extern Gfx *D_8007A184;
@@ -125,8 +140,6 @@ extern s16 D_8007A1A0;
 extern s16 D_8007A1A2;
 extern Lights3 D_80084590;
 extern Lights3 D_800845C8;
-extern s32 D_80084B48[4][3];
-extern s32 D_80084B78[];
 
 void func_80012A60(void);
 void func_8001263C(void);
@@ -158,7 +171,21 @@ void func_80011A10(Unk80011A10Arg *arg0) {
     D_80084300.unk14 = arg0->unk8;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011A60.s")
+/*A60S*/
+void func_80011A60(void) {
+    s32 i;
+
+    D_80084980 = 0x1EC3;
+    D_80084984 = 0x6978;
+    D_80084990 = 1;
+    D_8008C164 = 7;
+    for (i = 0; i < 4; i++) {
+        D_80084B18[i][0] = 0;
+        D_80084B18[i][1] = 0;
+        D_80084B18[i][2] = 0;
+    }
+}
+/*A60E*/
 
 #pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011AE0.s")
 
