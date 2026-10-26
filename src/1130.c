@@ -63,9 +63,12 @@ void func_80000AA0(NNSched *sc);
 void func_80000BD4(NNSched *sc, NNScTask *task);
 void osSpTaskLoad(OSTask *task);
 
-extern u64 D_80078160[];
-extern u64 D_80079160[];
-extern u16 D_8007A160;
+/* This file's .bss, 80077160..8007A170: the three thread stacks (each passed
+ * by its top, the next object's address) and the retrace counter D_8007A160. */
+u64 D_80077160[0x1000 / sizeof(u64)];
+u64 D_80078160[0x1000 / sizeof(u64)];
+u64 D_80079160[0x1000 / sizeof(u64)];
+u16 D_8007A160;
 
 void func_80000530(NNSched *sc, u8 numFields) {
     sc->curGraphicsTask = 0;
