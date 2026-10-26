@@ -76,9 +76,13 @@ Unk8004E6A0 D_8004E6A0[0x26] = {
     { 0x21, 0, 858.5f, -438.0f, 0.0f, 10.0f, 0, 0x0D88, 0x0D90 },
 };
 s32 D_8004EB60 = 0x26; /* the entry count; nothing reads it */
-extern s32 D_80085ABC;
-extern Unk80085AC0 D_80085AC0[];
-extern Unk80085AB0 D_80085AB0;
+/* This file's .bss, 80085AB0..80085B80, in address order (first declaration fixes
+ * the order). Splat's D_80085AC8/D_80085ACC are func_80014130's D_80085AC0[0].unk8
+ * and &D_80085AC0[1]. */
+Unk80085AB0 D_80085AB0;
+s32 D_80085AB8; /* unreferenced */
+s32 D_80085ABC;
+Unk80085AC0 D_80085AC0[16];
 extern u8 D_D37700[];
 extern u8 D_8007B8E0[];
 extern u8 D_8007B430[];

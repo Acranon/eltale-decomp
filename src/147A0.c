@@ -30,7 +30,8 @@ typedef struct {
     /* 0x0C */ f32 unkC;
     /* 0x10 */ f32 unk10;
     /* 0x14 */ f32 unk14;
-} Unk80085A78;
+    /* 0x18 */ u16 unk18;
+} Unk80085A78; // size = 0x1C (func_800107F0's result)
 
 typedef struct {
     /* 0x00 */ f32 x;
@@ -89,13 +90,16 @@ typedef struct {
     u8 r, g, b, a;
 } Color_147A0;
 
-extern u8 D_80085A98[];
+/* This file's .bss, 800859B0..80085AB0, in address order (first declaration fixes
+ * the order). Splat's D_80085AA8 is func_80013BA0's loop end, &D_80085A98[0x10]. */
+s32 D_800859B0;
+Unk800859B8 D_800859B8[8];
+Unk80085A78 D_80085A78;
+u8 D_80085A98[0x10];
+
 extern u8 D_8004F770[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
-extern s32 D_800859B0;
-extern Unk800859B8 D_800859B8[];
-extern Unk80085A78 D_80085A78;
 
 extern Gfx* D_8007A184;
 
