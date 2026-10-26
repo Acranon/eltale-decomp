@@ -16,7 +16,7 @@ typedef struct {
     /* 0x0C */ u16 unkC;
     /* 0x0E */ u16 unkE;
     /* 0x10 */ u32 unk10;
-    /* 0x14 */ u8 unk14[0x18 - 0x14];
+    /* 0x14 */ s32 unk14;
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
@@ -24,7 +24,8 @@ typedef struct {
 } ActorStats;
 
 typedef struct {
-    /* 0x00 */ u8 unk0[0x84];
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u8 unk2[0x84 - 0x2];
     /* 0x84 */ u16 unk84;
     /* 0x86 */ u16 unk86;
     /* 0x88 */ u8 unk88[0x94 - 0x88];
@@ -234,7 +235,7 @@ void func_800271B4(f32 arg0, Vec2f *arg1);
 void func_8002A338(s32 arg0);
 void func_8002A6B8(s32 arg0);
 void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
-void func_80032D20(s32 arg0);
+s32 func_80032D20(s32 arg0);
 s32 func_80007E04(s32 arg0, Actor *arg1);
 u16 func_80007EAC(PlayerState *arg0);
 void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
@@ -293,7 +294,7 @@ extern ActorStats D_80055D44;
  * (fields of D_8007A9D0, D_8007AA08, ...) are aliases in undefined_syms.txt.
  * D_8007A90E, D_8007A914, D_8007A924, D_8007A9B2, D_8007AB54..5C are
  * unreferenced gaps. */
-s32 D_8007A8F0;
+f32 D_8007A8F0;
 f32 D_8007A8F4;
 f32 D_8007A8F8;
 f32 D_8007A8FC;
@@ -324,9 +325,9 @@ s32 D_8007A9B4;
 s32 D_8007A9B8;
 s32 D_8007A9BC;
 s32 D_8007A9C0;
-s32 D_8007A9C4;
-s32 D_8007A9C8;
-s32 D_8007A9CC;
+void *D_8007A9C4;
+Actor *D_8007A9C8;
+void *D_8007A9CC;
 ActorStats D_8007A9D0;
 PlayerState D_8007AA08;
 Vec3f D_8007AB48;
@@ -438,7 +439,235 @@ void func_80003B20(void) {
     D_800842C0 = -1;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003BE0.s")
+/* D_8007A9C4: func_80013D08's result */
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ u16 unk10;
+    /* 0x12 */ s16 unk12;
+    /* 0x14 */ u8 unk14;
+} Unk8007A9C4;
+
+typedef struct {
+    /* 0x00 */ u8 unk0[0x18];
+    /* 0x18 */ s32 unk18;
+} Unk8007A9CCEntry;
+
+/* D_8007A9CC: func_80014318's result */
+typedef struct {
+    /* 0x00 */ Unk8007A9CCEntry *entry;
+} Unk8007A9CC;
+
+extern void *D_8007A9C4;
+extern Actor *D_8007A9C8;
+extern void *D_8007A9CC;
+extern s32 D_8007A904;
+extern s32 D_8007A908;
+extern f32 D_8007A9A0;
+extern f32 D_8007A9A4;
+extern s32 D_8007A9B4;
+extern s32 D_8007A9B8;
+extern s32 D_8007A9BC;
+extern f32 D_8007A8F0;
+extern s32 D_8008C17C;
+extern s16 D_8008C160;
+extern u8 D_8004F5A0[];
+extern u8 D_8004F5B4[];
+extern void (*D_8004DCB0[])(Actor *, PlayerState *, CharData *);
+u16 func_80007A8C(Actor *arg0);
+s32 func_80006D24(PlayerState *arg0, Actor *arg1);
+void *func_80013D08(Actor *arg0);
+Actor *func_80013808(Actor *arg0);
+void *func_80014318(Actor *arg0);
+s32 func_8000D100(void);
+void func_8000D40C(s32 arg0);
+void func_80009DDC(s32 idx);
+void func_800140F0(u16 arg0);
+s32 func_80024FC4(void);
+void func_800139EC(Actor *arg0);
+void func_800144B4(void *arg0);
+s32 func_80008540(PlayerState *arg0, Actor *arg1);
+void func_800269B8(s32 arg0, u16 arg1, void *arg2);
+s32 func_800085D8(PlayerState *arg0);
+void func_80008840(PlayerState *p, Actor *a, AnimEntry *anims);
+s32 func_80024FF0(u8 arg0);
+s32 func_8002504C(void);
+void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2);
+void func_8000791C(PlayerState *arg0, Actor *arg1, s32 arg2);
+
+void func_80003BE0(void) {
+    PlayerState *p = &D_8007AA08;
+    s32 pad;
+    CharData *cd;
+    u8 *s;
+
+    cd = D_80055D40[p->actor.unk50];
+    if (p->unk14->unk4 * 3 < p->unk14->unk6) {
+        D_8007A910 = 0x19;
+    } else {
+        D_8007A910 = (D_8008BE52 & 1) ? 0x11 : 0;
+    }
+    D_8007A9A0 = D_8007A9A4 = 0.0f;
+    if (!(D_8004DCA0 & 0x87)) {
+        if (D_8008BE52 & 1) {
+            if (!(D_8008BE52 & 2) && !(p->actor.unk60 & 1)) {
+                p->unk2 = func_80007A8C(&D_8007AA20);
+            }
+        } else if (!(p->actor.unk60 & 1)) {
+            D_8007A9C0 = func_80006D24(&D_8007AA08, &D_8007AA20);
+            if (D_8007A9C0 == 0) {
+                D_8007A9C4 = func_80013D08(&D_8007AA20);
+                if (D_8007A9C4 == NULL) {
+                    D_8007A9C8 = func_80013808(&D_8007AA20);
+                    if (D_8007A9C8 == NULL) {
+                        D_8007A9CC = func_80014318(&D_8007AA20);
+                        if (D_8007A9CC == NULL) {
+                            if ((D_8007A904 = func_8000D100()) != 0) {
+                                func_8000D40C(D_8007A904 - 1);
+                                D_8007A908 = 0x1E;
+                                D_8004DCA0 |= 2;
+                                p->unk8 |= 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (!(D_8004DCA0 & 0xF)) {
+        if (D_80092C86 & 0xA000) {
+            if ((D_8008BE52 & 1) && !(p->actor.unk60 & 1)) {
+                if (!(D_8008BE52 & 6) && func_80017AB0() == 0) {
+                    if (p->unk2 != 0) {
+                        func_80007D30(&D_8007AA08, &D_8007AA20, cd);
+                    } else {
+                        func_80008970(&D_8007AA08);
+                        p->unk2 = 0;
+                        func_8001FC14(&D_8007AA20);
+                    }
+                }
+            } else if (!(p->actor.unk60 & 1)) {
+                if (D_8007A9C0 != 0) {
+                    D_8007A9C0--;
+                    p->unk0 = 7;
+                    p->actor.vz = 0.0f;
+                    p->actor.vx = 0.0f;
+                    p->actor.unk14 = 0.0f;
+                    p->actor.unkC = 0.0f;
+                    func_800201A0(&D_8007AA20, D_8007A910, 1, D_8007A910, 1, 1);
+                    func_80009DDC(D_8007A9C0);
+                    func_80032D20(D_8008C17C < 70 ? 0 : 1);
+                    D_8004DCA0 |= 2;
+                } else if (D_8007A9C4 != NULL) {
+                    s = p->unk14->unk24;
+                    if (s[0] == 50 && s[1] == 50 && s[2] == 50 && s[3] == 50) {
+                    } else {
+                        D_8004DCA0 |= 8;
+                        p->unk0 = 0;
+                        func_800140F0(((Unk8007A9C4 *) D_8007A9C4)->unk14);
+                        ((Unk8007A9C4 *) D_8007A9C4)->unk10 |= 1;
+                        D_8008C160 = 8;
+                        func_8002A7C8(0, 1, 0xFF);
+                    }
+                } else if (func_80024FC4() != 0 && D_8007A9C8 != NULL) {
+                    func_800139EC(D_8007A9C8);
+                    D_8007A918.x = 0.0f;
+                    D_8007A918.z = p->actor.scale * 171.0f;
+                    func_800271B4(D_8007A9C8->rot, &D_8007A918);
+                    p->actor.x = D_8007A9C8->x + D_8007A918.x;
+                    p->actor.z = D_8007A9C8->z + D_8007A918.z;
+                    p->actor.rot = D_8007A9C8->rot;
+                    p->unk138 = D_8007A9C8->rot + 3.141592653589793;
+                    p->unk11C = D_8007A9C8->unk50;
+                    func_8000791C(&D_8007AA08, &D_8007AA20, (s32) cd);
+                    D_8007A9C8 = NULL;
+                } else if (D_8007A9CC != NULL) {
+                    func_800144B4(D_8007A9CC);
+                    p->unk0 = 0x11;
+                    p->actor.unk60 |= 1;
+                    p->actor.vz = 0.0f;
+                    p->actor.vx = 0.0f;
+                    p->actor.unk14 = 0.0f;
+                    p->actor.unkC = 0.0f;
+                    if (((Unk8007A9CC *) D_8007A9CC)->entry->unk18 & 2) {
+                        p->unk4 = 0xF;
+                        p->unk8 |= 0x200;
+                        func_800201A0(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
+                    } else {
+                        p->unk4 = 0xF;
+                        func_800201A0(&D_8007AA20, 0xC, 1, 0xD, 1, 1);
+                    }
+                    D_8007A9CC = NULL;
+                } else {
+                    p->unk0 = 3;
+                    p->unk4 = 0xF;
+                    p->actor.vz = 0.0f;
+                    p->actor.vx = 0.0f;
+                    p->actor.unk14 = 0.0f;
+                    p->actor.unkC = 0.0f;
+                    p->actor.unk60 |= 1;
+                    func_800201A0(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
+                }
+            }
+        } else if (func_80008540(&D_8007AA08, &D_8007AA20) != 0) {
+            if (!(D_8004DCA0 & 4) && (D_80092C86 & 0x10)) {
+                D_8004DCA0 ^= 1;
+                func_800269B8(6, 2, D_8004F5A0);
+                func_8002A7C8(0, 1, 0xFF);
+                p->actor.unk60 |= 1;
+            }
+            if (!(D_8004DCA0 & 1) && !(p->actor.unk68->unk0 & 0x40) && func_800085D8(&D_8007AA08) != 0) {
+                func_80008840(&D_8007AA08, &D_8007AA20, (AnimEntry *) cd);
+            }
+        }
+    } else if (D_8004DCA0 & 4) {
+        if (func_800085D8(&D_8007AA08) != 0) {
+            func_80008840(&D_8007AA08, &D_8007AA20, (AnimEntry *) cd);
+        }
+    } else if (D_8004DCA0 & 1) {
+        if (D_80092C86 & 0x4010) {
+            D_8004DCA0 ^= 1;
+            func_800269B8(6, 4, D_8004F5B4);
+            func_8002A7C8(0, 2, 0xFF);
+            p->actor.unk60 &= ~1;
+        }
+    }
+    if (D_8008BE52 & 8) {
+        D_8008BE52 &= ~8;
+        p->actor.unk64->unk10 += D_8007A9B4;
+        p->actor.unk64->unk14 += D_8007A9B8;
+        if (D_8007A9BC != 0xFF) {
+            if ((u32) func_80024FF0(D_8007A9BC) >= 3 || (u32) func_8002504C() >= 0x8D) {
+                D_8007A9BC = 0xFF;
+            }
+        }
+        func_80023D28(&D_8007AA20);
+        D_8007AA8C.unk0 = 0;
+        p->unk0 = 0xF;
+        p->unk4 = cd->unkC2;
+        p->actor.unk60 |= 1;
+        p->actor.vz = 0.0f;
+        p->actor.vx = 0.0f;
+        p->actor.unk14 = 0.0f;
+        p->actor.unkC = 0.0f;
+        func_800201A0(&D_8007AA20, 0x10, 1, D_8007A910, 1, 1);
+    } else if (D_8008BE52 & 0x10) {
+        func_80023D28(&D_8007AA20);
+        D_8007AA8C.unk0 = 0;
+    }
+    D_8004DCB0[p->unk0](&D_8007AA20, &D_8007AA08, cd);
+    D_8007A9A8 = sqrtf(D_8007A9A0 * D_8007A9A0 + D_8007A9A4 * D_8007A9A4);
+    if (!(D_8008BE52 & 1) && p->actor.unk64->unk8 < p->actor.unk64->unkA) {
+        D_8007A8F0 += D_8007A9A8;
+        if (D_8007A8F0 > 60.0) {
+            D_8007A8F0 -= 60.0;
+            p->actor.unk64->unk8++;
+        }
+    }
+}
+
 
 
 extern Gfx *D_8007A184;
@@ -1669,7 +1898,7 @@ s32 func_80007E04(s32 arg0, Actor *arg1) {
 
 extern s32 D_8004DCFC[];
 extern u8 D_8004F760[];
-void func_800269B8(s32 arg0, s32 arg1, void *arg2);
+void func_800269B8(s32 arg0, u16 arg1, void *arg2);
 
 u16 func_80007EAC(PlayerState *arg0) {
     s32 n;
