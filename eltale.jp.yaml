@@ -421,10 +421,11 @@ segments:
     subsegments:
       - [0xDC62B0, c, ovl_intro/DC62B0]
       - [0xDC9350, c, ovl_intro/DC9350]
+      - [0xDCC410, c, ovl_intro/DCC450]
       - [0xDCC410, .data, ovl_intro/DC62B0]      # 80212230..80212250
       - [0xDCC430, .data, ovl_intro/DC9350]      # 80212250..80212270
-      - [0xDCC450, data]
-      - [0xE22670, .rodata, ovl_intro/DC62B0]
+      - [0xDCC450, .data, ovl_intro/DCC450]      # 80212270..80268480
+      - [0xE22660, .rodata, ovl_intro/DC62B0]
       - { start: 0xE22690, type: .bss, vram: 0x802684B0, name: ovl_intro/DC62B0 }
       - { start: 0xE22690, type: .bss, vram: 0x80277080, name: ovl_intro/DC9350 }
 

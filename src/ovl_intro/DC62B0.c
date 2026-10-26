@@ -178,7 +178,6 @@ extern Unk80092E48 D_80092E48[4];
 extern u8 D_8006CC74;
 extern u8 D_8006CC78;
 extern u8 D_8006CC7C;
-extern char D_80268480_ovl_intro[];
 
 s32 func_80035A24(s32);
 s32 func_8003609C(s32);
@@ -230,7 +229,7 @@ s32 func_8020C16C_ovl_intro(void) {
         switch (D_80212238_ovl_intro) {
             case 0:
                 err = func_8003609C(func_80035A24(D_80092C80));
-                func_8003D8EC(D_80268480_ovl_intro, err);
+                func_8003D8EC("pack_status = %d\n", err);
                 if (err != -1 && err != -2 && err != -3) {
                     if (D_80092E48[D_80092C80].unk0 & 0x2000) {
                         D_80212238_ovl_intro = 1;
@@ -865,4 +864,3 @@ void func_8020E0EC_ovl_intro(s32 idx) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020E108_ovl_intro.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/D_80268490_ovl_intro.s")
