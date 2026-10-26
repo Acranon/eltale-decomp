@@ -608,6 +608,12 @@ void func_800301DC(void) {
     }
 }
 
+/* .data 80061650..80061660: func_80030D5C's local message (an initialized u8[14]
+ * that IDO copies to the stack); becomes its initializer when the function is C. */
+u8 D_80061650[0xE] = {
+#include "assets/D_80061650.inc.c"
+};
+
 #pragma GLOBAL_ASM("asm/nonmatchings/30600/func_80030D5C.s")
 
 void func_80031B28(void) {

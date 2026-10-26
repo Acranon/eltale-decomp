@@ -3,6 +3,9 @@
 # build/assets/<name>.inc.c. name = the C symbol, rom = ROM offset, size in bytes,
 # type = element type of the C array (u8, u16, u32; big-endian).
 
+# main .data 80055B40..8006CD00 (ROM = vram - 0x7FFFF400)
+- { name: D_80061650, rom: 0x62250, size: 0xE, type: u8 }                  # message text (func_80030D5C)
+
 # ovl_DA4570 .data (ROM = vram - 0x80101FA0 + 0xDA6510)
 - { name: D_80101FA0_ovl_DA4570, rom: 0xDA6510, size: 0x20, type: u16 }     # palette, 16 colours
 - { name: D_80101FC0_ovl_DA4570, rom: 0xDA6530, size: 0x70, type: u8 }      # texture
