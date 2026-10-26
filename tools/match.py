@@ -64,6 +64,9 @@ def check(src: Path, funcs):
     with obj.open("rb") as f:
         elf = ELFFile(f)
         text = elf.get_section_by_name(".text")
+        if text is None or text.data_size == 0:
+            print("  (data-only file: no functions; ./build.sh checks its data)")
+            return True
         data = text.data()
         masks = {}
         for sec in elf.iter_sections():
