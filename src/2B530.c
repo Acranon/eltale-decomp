@@ -660,7 +660,6 @@ void func_8002F2E4(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002F6D8.s")
 
 typedef struct { s8 a; s8 b; } Unk80060F30;
 extern Unk80060F30 D_80060F30[];
@@ -671,45 +670,6 @@ extern f32 D_80060F2C;
 extern s16 D_800614B4[];
 extern s16 D_800614CC[];
 
-void func_8002F87C(void) {
-    s32 cnt = 0;
-    s32 i;
-    s32 count = 0;
-    s32 sub = -1;
-    f32 x;
-
-    s32 idx;
-    f32 y;
-
-    for (i = 0; D_80060F30[i].a != -8; i++) {
-        switch (D_80060F30[i].a) {
-            case -2:
-                i++;
-                sub++;
-                break;
-            case -1:
-                i++;
-                count++;
-                sub = -1;
-                break;
-        }
-        if (D_80060F30[i].a == D_800842BC && D_80060F30[i].b == D_800842C0) {
-            break;
-        }
-    }
-    D_8008FB50 = count;
-    D_8008FB54 = sub;
-    cnt = D_8008FB50;
-    if (cnt < 6 && D_8008FB54 < 0) { idx = cnt; if (D_80060F28 == -1.0f) { D_80060F28 = 115.0f;
-            D_80060F2C = 86.0f;
-        }
-        x = D_80060F28 - D_800614CC[idx];
-        y = D_80060F2C;
-        y = y - D_800614CC[idx + 6];
-        D_8008FB48 = D_800614B4[idx] * x;
-        D_8008FB4C = D_800614B4[idx + 6] * y;
-    }
-}
 
 /* ---------------------------------------------------------------------------
  * .data 80055D40..80061650 (after 2B0F0, before 30600). Besides this file's own
@@ -1458,6 +1418,91 @@ Unk4x2Ptrs D_800615F4 = { { { D_800690B8, D_800695A8 }, { D_8006AAF8, D_8006AFE8
 Unk4Words D_80061614 = { { 32, 32, 32, 24 } };
 Unk4Words D_80061624 = { { 26, 26, 26, 20 } };
 Unk4Ptrs D_80061634 = { { D_80067090, D_80067898, D_800680A0, D_800688A8 } };
-u8 D_80061644[0xC] = {
+
+void func_80035350(s32, s32, u8 *);
+
+
+
+
+
+
+
+void func_8002F6D8(s32 ndigits, s32 x, s32 y, u32 value) {
+    s32 i;
+    u64 div = 1000000000;
+    s64 v = value;
+    s8 digits[10];
+    s32 j;
+    u8 msg[5] = {
 #include "assets/D_80061644.inc.c"
-};
+    };
+    s32 n;
+
+    j = 9;
+    if (ndigits >= 10) {
+        ndigits = 9;
+    }
+    for (i = 0; i < 9; i++) {
+        n = 0;
+        while (TRUE) {
+            v -= div;
+            if (v < 0) {
+                v += div;
+                break;
+            }
+            n++;
+        }
+        digits[j--] = n;
+        div /= 10;
+    }
+    digits[0] = v;
+    i = 0;
+    for (n = ndigits - 1; n >= 0; n--) {
+        i += digits[n];
+        if (i != 0 || n == 0) {
+            msg[3] = digits[n];
+            func_80035350(x, y, msg);
+        }
+        x += 10;
+    }
+}
+
+void func_8002F87C(void) {
+    s32 cnt = 0;
+    s32 i;
+    s32 count = 0;
+    s32 sub = -1;
+    f32 x;
+
+    s32 idx;
+    f32 y;
+
+    for (i = 0; D_80060F30[i].a != -8; i++) {
+        switch (D_80060F30[i].a) {
+            case -2:
+                i++;
+                sub++;
+                break;
+            case -1:
+                i++;
+                count++;
+                sub = -1;
+                break;
+        }
+        if (D_80060F30[i].a == D_800842BC && D_80060F30[i].b == D_800842C0) {
+            break;
+        }
+    }
+    D_8008FB50 = count;
+    D_8008FB54 = sub;
+    cnt = D_8008FB50;
+    if (cnt < 6 && D_8008FB54 < 0) { idx = cnt; if (D_80060F28 == -1.0f) { D_80060F28 = 115.0f;
+            D_80060F2C = 86.0f;
+        }
+        x = D_80060F28 - D_800614CC[idx];
+        y = D_80060F2C;
+        y = y - D_800614CC[idx + 6];
+        D_8008FB48 = D_800614B4[idx] * x;
+        D_8008FB4C = D_800614B4[idx + 6] * y;
+    }
+}
