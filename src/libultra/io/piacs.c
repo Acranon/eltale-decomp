@@ -3,7 +3,7 @@
 #include "PR/os_internal.h"
 
 #define PI_Q_BUF_LEN 1
-extern u32 __osPiAccessQueueEnabled;
+u32 __osPiAccessQueueEnabled = 0;   /* .data 8006E770 */
 extern OSMesg piAccessBuf[PI_Q_BUF_LEN];
 extern OSMesgQueue __osPiAccessQueue;
 

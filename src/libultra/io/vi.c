@@ -8,7 +8,10 @@
 // TODO: this comes from a header
 #ident "$Revision: 1.17 $"
 
-extern __OSViContext vi[2];
+/* .data 8006E780..8006E7F0, as in ultralib */
+static __OSViContext vi[2] ALIGNED(0x8) = { 0 };
+__OSViContext* __osViCurr = &vi[0];
+__OSViContext* __osViNext = &vi[1];
 
 void __osViInit(void) {
     bzero(vi, sizeof(vi));

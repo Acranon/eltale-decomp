@@ -34,9 +34,31 @@ extern u32 rate_num, rate_cnt, rate_max, rate_min;
 extern u32 vol_num, vol_cnt, vol_max, vol_min;
 #endif
 #define EQPOWER_LENGTH 128
-/* eqpower: data stays in asm until D2 */
-extern s16 D_8006E9E0[];
-#define eqpower D_8006E9E0
+/* .data 8006E9E0..8006EB20: eqpower, then _getRate's logtab */
+static s16 eqpower[ EQPOWER_LENGTH ] = {
+    32767,  32764,  32757,  32744,  32727,  32704,
+    32677,  32644,  32607,  32564,  32517,  32464,
+    32407,  32344,  32277,  32205,  32127,  32045,
+    31958,  31866,  31770,  31668,  31561,  31450,
+    31334,  31213,  31087,  30957,  30822,  30682,
+    30537,  30388,  30234,  30075,  29912,  29744,
+    29572,  29395,  29214,  29028,  28838,  28643,
+    28444,  28241,  28033,  27821,  27605,  27385,
+    27160,  26931,  26698,  26461,  26220,  25975,
+    25726,  25473,  25216,  24956,  24691,  24423,
+    24151,  23875,  23596,  23313,  23026,  22736,
+    22442,  22145,  21845,  21541,  21234,  20924,
+    20610,  20294,  19974,  19651,  19325,  18997,
+    18665,  18331,  17993,  17653,  17310,  16965,
+    16617,  16266,  15913,  15558,  15200,  14840,
+    14477,  14113,  13746,  13377,  13006,  12633,
+    12258,  11881,  11503,  11122,  10740,  10357,
+    9971,   9584,   9196,   8806,   8415,   8023,
+    7630,   7235,   6839,   6442,   6044,   5646,
+    5246,   4845,   4444,   4042,   3640,   3237,
+    2833,   2429,   2025,   1620,   1216,    810,
+    405,      0
+};
 
 extern	f64	__pow(f64, f64);
 
@@ -437,8 +459,6 @@ _ldexpf(f64 in, s32 ex)
 		    RWW 28jun95
 */
 
-typedef struct { f64 v[8]; } EnvLogTab;
-extern EnvLogTab D_8006EAE0;
 
 static
 s16 _getRate(f64 vol, f64 tgt, s32 count, u16* ratel)
@@ -503,13 +523,13 @@ s16 _getRate(f64 vol, f64 tgt, s32 count, u16* ratel)
      Enjoy!
      */
     {
-	/* logtab's initializer (-0.912537 ... -0.045804) stays in asm data until D2 */
-	EnvLogTab logtab = D_8006EAE0;
+	f64 logtab[] = { -0.912537, -0.752072, -0.607683, -0.476438,
+                         -0.356144, -0.245112, -0.142019, -0.045804  };
 
 	i_invn = (s32) _ldexpf( invn, NFRACBITS );
 	mant = _frexpf( tgt/vol, &ex );
 	indx = (s32) (_ldexpf( mant, NBITS+1 ) ); /* NPOS <= indx < 2*NPOS */
-	eps = (logtab.v[indx - NPOS] + ex) * M_LN2;
+	eps = (logtab[indx - NPOS] + ex) * M_LN2;
 	eps /= _ldexpf( 1, NFRACBITS ); /* eps / 2^NFRACBITS */
 	fs = (1.0 + eps);
 	a = 1.0;

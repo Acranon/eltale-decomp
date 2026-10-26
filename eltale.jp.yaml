@@ -280,11 +280,28 @@ segments:
       - [0x56530, .data, 29150]                  # 80055930..80055B40
       - [0x56740, data]
       - [0x6D900, .data, libultra/os/initialize]
-      - [0x6D920, data]
+      - [0x6D920, .data, libultra/io/pimgr]      # 8006CD20..8006CD50
+      - [0x6D950, .data, libultra/io/vitbl]      # 8006CD50..8006DED0 (data-only file)
       - [0x6EAD0, .data, libultra/io/vimgr]
-      - [0x6EAF0, data]
+      - [0x6EAF0, .data, libultra/gu/sins]       # 8006DEF0..8006E6F0
+      - [0x6F2F0, .data, libultra/audio/sl]      # 8006E6F0..8006E700
+      - [0x6F300, .data, libultra/io/aisetnextbuf] # 8006E700..8006E710
+      - [0x6F310, .data, libultra/os/controller] # 8006E710..8006E720
+      - [0x6F320, data]                          # exceptasm's __osHwIntTable/__osPiIntTable (hasm)
+      - [0x6F350, .data, libultra/os/thread]     # 8006E750..8006E770
+      - [0x6F370, .data, libultra/io/piacs]      # 8006E770..8006E780
+      - [0x6F380, .data, libultra/io/vi]         # 8006E780..8006E7F0
       - [0x6F3F0, .data, libultra/os/timerintr]
-      - [0x6F400, data]
+      - [0x6F400, .data, libc/xprintf]           # 8006E800..8006E850
+      - [0x6F450, .data, libultra/audio/drvrNew] # 8006E850..8006E9E0
+      - [0x6F5E0, .data, libultra/audio/env]     # 8006E9E0..8006EB20
+      - [0x6F720, .data, libultra/io/siacs]      # 8006EB20..8006EB30
+      - [0x6F730, .data, libultra/io/contramread] # 8006EB30..8006EB40
+      - [0x6F740, .data, libultra/io/contpfs]    # 8006EB40..8006EB50
+      - [0x6F750, .data, libultra/vimodes/vimodepallan1]  # data-only files
+      - [0x6F7A0, .data, libultra/vimodes/vimodempallan1]
+      - [0x6F7F0, .data, libultra/vimodes/vimodentsclan1]
+      - [0x6F840, .data, libc/xlitob]            # 8006EC40..8006EC70
       - [0x6F870, .rodata, 1870]
       - [0x6F8C0, .rodata, 3B40]
       - [0x6F8D0, .rodata, 3F50]

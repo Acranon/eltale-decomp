@@ -9,8 +9,9 @@
 
 #define BUFF_LEN 0x18
 
-extern char D_8006EC40[]; /* ldigs: "0123456789abcdef" */
-extern char D_8006EC54[]; /* udigs: "0123456789ABCDEF" */
+/* .data 8006EC40..8006EC70 */
+static char D_8006EC40[] = "0123456789abcdef"; /* ldigs */
+static char D_8006EC54[] = "0123456789ABCDEF"; /* udigs */
 #define ldigs D_8006EC40
 #define udigs D_8006EC54
 

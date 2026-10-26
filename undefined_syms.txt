@@ -219,3 +219,7 @@ D_80085EC4 = D_80085E48 + 0x7C;
 D_80085EC8 = D_80085E48 + 0x80;
 D_80085ECC = D_80085E48 + 0x84;
 D_80085F78 = D_80085F68 + 0x10;
+
+/* D2: osViModeTable entries that src/1870.c uses (libultra/io/vitbl.c, 8006CD50). */
+D_8006CDF0 = osViModeTable + 0xA0;
+D_8006D6B0 = osViModeTable + 0x960;

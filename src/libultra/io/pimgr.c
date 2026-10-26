@@ -16,7 +16,12 @@ extern OSMesgQueue D_800942A0;       /* piEventQueue (piThreadStack ends here) *
 extern OSMesg D_800942B8[1];         /* piEventBuf */
 extern OSPiHandle D_80093000;        /* __Dom1SpeedParam */
 extern OSPiHandle D_80093078;        /* __Dom2SpeedParam */
-extern OSDevMgr __osPiDevMgr;
+
+/* This file's data, as in ultralib's pimgr.c (J): .data 8006CD20..8006CD50. */
+OSDevMgr __osPiDevMgr = { 0 };
+OSPiHandle* __osPiTable = NULL;
+OSPiHandle* __osCurrentHandle[2] ALIGNED(0x8) = { &D_80093000, &D_80093078 };
+
 extern s32 __osPiRawStartDma(s32, u32, void*, u32);
 extern s32 __osEPiRawStartDma(OSPiHandle*, s32, u32, void*, u32);
 

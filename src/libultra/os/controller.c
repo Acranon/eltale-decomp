@@ -14,7 +14,7 @@ extern OSMesgQueue D_80095758; /* __osEepromTimerQ */
 #define __osEepromTimerQ D_80095758
 extern OSMesg D_80095770; /* __osEepromTimerMsg */
 #define __osEepromTimerMsg D_80095770
-extern s32 D_8006E710; /* __osContinitialized */
+s32 D_8006E710 = 0; /* __osContinitialized, .data 8006E710 */
 #define __osContinitialized D_8006E710
 
 /* I-era: a fixed 500 ms count (46.875 MHz), not OS_USEC_TO_CYCLES. */
