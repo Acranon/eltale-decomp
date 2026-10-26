@@ -17,7 +17,7 @@ typedef struct {
  * (8004F77C), which must be a function-scope static for IDO to match. */
 u8 D_8004F770[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 u32 D_8004F778 = 0x9B0;
-extern MtxF D_8008CE60;
+MtxF D_8008CE60; /* .bss 8008CE60..8008CEA0 */
 
 extern MtxF D_80085F10;
 extern f32 D_80085F54;
