@@ -111,7 +111,7 @@ s32 D_8022BB34_ovl_ending;
 UnkStruct_8022BB38 D_8022BB38_ovl_ending[150];
 Gfx D_8022EA18_ovl_ending[2][2500];
 Gfx* D_80238658_ovl_ending;
-s32 D_8023865C_ovl_ending;
+/* 8023865C..80238660: func_8020C254's static */
 
 /* ovl_ending .data 8020F690..8020F6C0 (the rest of the slab is still asm). */
 u32 D_8020F690_ovl_ending = 0;
@@ -173,7 +173,136 @@ void func_8020D970_ovl_ending(s32 arg0);
 void func_8020D98C_ovl_ending(s32 arg0);
 s32 func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020C254_ovl_ending.s")
+s32 func_8020C254_ovl_ending(void) {
+    UnkStruct_802107F0_inner* entries;
+    UnkStep_8020F880* steps;
+    u32 listIdx;
+    UnkStruct_8022BB38* obj;
+    s32 slot;
+    s32 dx;
+    s32 dy;
+    s32 i;
+    u32 j;
+    s32 flags;
+    static s32 D_8023865C_ovl_ending;
+
+    if (D_8022BB28_ovl_ending == 0) {
+        D_8023865C_ovl_ending = 0;
+        D_8022BB20_ovl_ending = 0;
+        D_8022BB28_ovl_ending = 1;
+    }
+    D_8022BB20_ovl_ending++;
+    D_8023865C_ovl_ending++;
+    D_8022BB34_ovl_ending++;
+    if ((D_8022BB34_ovl_ending >= D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0[D_8022BB2C_ovl_ending].unk2) &&
+        (D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0[D_8022BB2C_ovl_ending].unk22 == -1) && (D_8020F694_ovl_ending == 0)) {
+        do {
+            slot = func_8020CD88_ovl_ending();
+            if (slot == -1) {
+                break;
+            }
+            entries = D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0;
+            entries[D_8022BB2C_ovl_ending].unk20 = 0;
+            entries[D_8022BB2C_ovl_ending].unk22 = slot;
+            steps = D_8020F880_ovl_ending[entries[D_8022BB2C_ovl_ending].unk0].steps;
+            func_8020C978_ovl_ending(slot, 0x80000000 | entries[D_8022BB2C_ovl_ending].unk4 | steps[entries[D_8022BB2C_ovl_ending].unk20].flags,
+                                     entries[D_8022BB2C_ovl_ending].unk8, entries[D_8022BB2C_ovl_ending].unkA, entries[D_8022BB2C_ovl_ending].unk10,
+                                     entries[D_8022BB2C_ovl_ending].unk12, entries[D_8022BB2C_ovl_ending].unkC, entries[D_8022BB2C_ovl_ending].unkE,
+                                     entries[D_8022BB2C_ovl_ending].unk14, entries[D_8022BB2C_ovl_ending].unk16, entries[D_8022BB2C_ovl_ending].unk18,
+                                     entries[D_8022BB2C_ovl_ending].unk1C, steps[entries[D_8022BB2C_ovl_ending].unk20].duration, D_8022BB24_ovl_ending);
+            D_8022BB24_ovl_ending++;
+            if (entries[D_8022BB2C_ovl_ending].unk2 == 0) {
+                entries[D_8022BB2C_ovl_ending].unk24 = D_8022BB30_ovl_ending;
+            } else {
+                D_8022BB30_ovl_ending = D_8022BB2C_ovl_ending;
+            }
+            if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0xC800) {
+                if (entries[D_8022BB2C_ovl_ending].unk2 == 0) {
+                    dx = entries[D_8022BB2C_ovl_ending].unk8 - entries[D_8022BB30_ovl_ending].unk8;
+                    dy = entries[D_8022BB2C_ovl_ending].unkA - entries[D_8022BB30_ovl_ending].unkA;
+                } else {
+                    dx = 0;
+                    dy = 0;
+                }
+                func_8020D5F0_ovl_ending(slot, steps[entries[D_8022BB2C_ovl_ending].unk20].x + dx, steps[entries[D_8022BB2C_ovl_ending].unk20].y + dy);
+            }
+            if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0x1000) {
+                func_8020D970_ovl_ending(slot);
+            }
+            if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0x60000000) {
+                func_8020D130_ovl_ending(slot);
+            }
+            D_8022BB2C_ovl_ending++;
+            if (D_8022BB2C_ovl_ending >= D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk4) {
+                D_8022BB2C_ovl_ending = 0;
+                D_8020F694_ovl_ending = 1;
+                D_8022BB34_ovl_ending = 0;
+                break;
+            }
+            D_8022BB34_ovl_ending = 0;
+        } while (entries[D_8022BB2C_ovl_ending].unk2 == 0);
+    }
+    func_8020D98C_ovl_ending(1);
+    if (D_8022BB20_ovl_ending >= 0xF78) {
+        func_8020E9C8_ovl_ending(1, 0x4C2);
+    }
+    func_8020D98C_ovl_ending(0);
+    for (i = 0, obj = D_8022BB38_ovl_ending; i < 150; i++, obj++) {
+        if (i) {
+        }
+        if (obj->unk0 & 0x80000000) {
+            j = func_8020C8FC_ovl_ending(i, &listIdx);
+            if (j != -1) {
+                flags = obj->unk0;
+                entries = D_802107F0_ovl_ending[listIdx].unk0;
+                steps = D_8020F880_ovl_ending[entries[j].unk0].steps;
+                if (flags & 0x800000) {
+                    flags &= ~0x800000;
+                }
+                if (!(steps[entries[j].unk20].flags & flags)) {
+                    // Fake: an empty use of D_8020F690 here stops IDO keeping its address in a
+                    // register for the increment at the end of the function (found by the permuter).
+                    if (D_8020F690_ovl_ending) {
+                    }
+                    entries[j].unk20++;
+                    if (entries[j].unk20 >= D_8020F880_ovl_ending[entries[j].unk0].count) {
+                        func_8020CB84_ovl_ending(i);
+                        entries[j].unk22 = -1;
+                    } else {
+                        obj->unk0 &= ~0x800000;
+                        obj->unk0 |= steps[entries[j].unk20].flags;
+                        obj->unk38 = steps[entries[j].unk20].duration;
+                        if (steps[entries[j].unk20].flags & 0xC800) {
+                            if (entries[j].unk2 == 0) {
+                                dx = entries[j].unk8 - entries[(s32)entries[j].unk24].unk8;
+                                dy = entries[j].unkA - entries[(s32)entries[j].unk24].unkA;
+                            } else {
+                                dx = 0;
+                                dy = 0;
+                            }
+                            func_8020D5F0_ovl_ending(i, steps[entries[j].unk20].x + dx, steps[entries[j].unk20].y + dy);
+                        }
+                        if (steps[entries[j].unk20].flags & 0x1000) {
+                            func_8020D970_ovl_ending(i);
+                        }
+                        if (steps[entries[j].unk20].flags & 0x60000000) {
+                            func_8020D130_ovl_ending(i);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if ((func_8020CCD8_ovl_ending() == 0) && (D_8020F694_ovl_ending != 0)) {
+        D_8020F694_ovl_ending = 0;
+        D_8020F690_ovl_ending++;
+        if (D_8020F690_ovl_ending >= D_802107F8_ovl_ending) {
+            D_8020F690_ovl_ending = 0;
+            return 0;
+        }
+    }
+    return 1;
+}
 
 s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1) {
     u32 i, j;
