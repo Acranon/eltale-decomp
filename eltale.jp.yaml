@@ -264,6 +264,8 @@ segments:
       - [0x4C650, databin, gspF3DEX_text]
       - [0x4DA80, databin, aspMain_text]
       - [0x4E8A0, data]
+      - [0x4EAD0, .data, 12610]                  # 8004DED0..8004DF00
+      - [0x4EB00, data]
       - [0x50370, .data, 27A90]
       - [0x50380, data]
       - [0x6D900, .data, libultra/os/initialize]
@@ -323,6 +325,8 @@ segments:
       - { start: 0x71920, type: bss, vram: 0x80070D20 }
       - { start: 0x71920, type: .bss, vram: 0x8007A8F0, name: 3F50 }       # 8007A8F0..8007AB70
       - { start: 0x71920, type: bss, vram: 0x8007AB70, name: 8007AB70 }
+      - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }
+      - { start: 0x71920, type: bss, vram: 0x80084B80, name: 80084B80 }
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: bss, vram: 0x80093000, name: 80093000 }
       - { start: 0x71920, type: .bss, vram: 0x80094380, name: libultra/io/vimgr }
@@ -338,10 +342,13 @@ segments:
     vram: 0x80100000
     exclusive_ram_id: ovl_80100000
     symbol_name_format: $VRAM_$SEG
+    bss_size: 0x280
     subsegments:
       - [0xDA4570, c, ovl_DA4570/DA4570]
       - [0xDA6510, data]
+      - [0xDA9BD0, .data, ovl_DA4570/DA4570]    # 80105660..80107050
       - [0xDAB5C0, .rodata, ovl_DA4570/DA4570]
+      - { start: 0xDAB5F0, type: .bss, vram: 0x80107080, name: ovl_DA4570/DA4570 }
 
   - name: ovl_title
     type: code
@@ -349,12 +356,17 @@ segments:
     vram: 0x8020C0D0
     exclusive_ram_id: ovl_8020C0D0
     symbol_name_format: $VRAM_$SEG
+    bss_size: 0x40
     subsegments:
       - [0xDAB5F0, c, ovl_title/DAB5F0]
       - [0xDAC190, c, ovl_title/DAC190]
       - [0xDAE700, data]
+      - [0xDAE720, .data, ovl_title/DAC190]      # 8020F200..8020F510
+      - [0xDAEA30, data]
       - [0xDC6250, .rodata, ovl_title/DAB5F0]
       - [0xDC6270, .rodata, ovl_title/DAC190]
+      - { start: 0xDC62B0, type: .bss, vram: 0x80226D90, name: ovl_title/DAB5F0 }
+      - { start: 0xDC62B0, type: .bss, vram: 0x80226DB0, name: ovl_title/DAC190 }
 
   - name: ovl_intro
     type: code

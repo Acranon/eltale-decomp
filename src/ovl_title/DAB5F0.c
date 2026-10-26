@@ -14,38 +14,39 @@ extern Gfx D_8020F208_ovl_title[];
 extern Gfx D_8020F470_ovl_title[];
 extern s32 D_8020F4F0_ovl_title;
 extern s32 D_8020F4F4_ovl_title;
-extern s32 D_80226D90;
-extern s32 D_80226D94;
-extern s32 D_80226D98;
-extern s32 D_80226D9C;
-extern s32 D_80226DA0;
-extern s32 D_80226DA4;
-extern s8 D_80226DB0;
-extern s32 D_80226DB4;
-extern s32 D_80226DC0;
+/* .bss 80226D90..80226DB0 */
+s32 D_80226D90_ovl_title;
+s32 D_80226D94_ovl_title;
+s32 D_80226D98_ovl_title;
+s32 D_80226D9C_ovl_title;
+s32 D_80226DA0_ovl_title;
+s32 D_80226DA4_ovl_title;
+extern s8 D_80226DB0_ovl_title;
+extern s32 D_80226DB4_ovl_title;
+extern s32 D_80226DC0_ovl_title;
 
 void func_80029A88(s32, s32, s32);
 s32 func_8020C178_ovl_title(void);
 void func_8020CC70_ovl_title(s32);
 
 void func_8020C0D0_ovl_title(void) {
-    D_80226D90 = 0;
-    D_80226DA4 = 0;
+    D_80226D90_ovl_title = 0;
+    D_80226DA4_ovl_title = 0;
     D_8020F4F4_ovl_title = 1;
     D_8020F4F0_ovl_title = 0;
-    D_80226D94 = 1;
-    D_80226D9C = 0;
-    D_80226DA0 = 8;
-    D_80226D98 = 0;
+    D_80226D94_ovl_title = 1;
+    D_80226D9C_ovl_title = 0;
+    D_80226DA0_ovl_title = 8;
+    D_80226D98_ovl_title = 0;
 }
 
 s32 func_8020C11C_ovl_title(void) {
     if (func_8020C178_ovl_title() == 0) {
-        if (D_80226DA4 == 0) {
+        if (D_80226DA4_ovl_title == 0) {
             return 1;
         }
-        if (D_80226DA4 == 0xF) {
-            D_80226DA4 = 0;
+        if (D_80226DA4_ovl_title == 0xF) {
+            D_80226DA4_ovl_title = 0;
             return 0;
         }
     }
@@ -71,9 +72,8 @@ extern s32 D_8020F2A8_ovl_title;
 extern s32 D_8020F300_ovl_title;
 extern s32 D_8020F3B0_ovl_title;
 extern s32 D_8020F458_ovl_title;
-extern s32 D_8020F4D0_ovl_title;
-extern s32 D_8020F4D4_ovl_title;
-extern s32 D_8020F4D8_ovl_title;
+extern s32 D_8020F280_ovl_title;
+extern s32 D_8020F358_ovl_title;
 
 // D_8020F1E4..F1F0 are this function's statics in the original. IDO never keeps a static's
 // address in a register, but it does for an extern that is used more than once. Until D2
@@ -84,19 +84,19 @@ s32 func_8020C178_ovl_title(void) {
     u32 count; // stands in for the static D_8020F1E8, which IDO kept in a register
 
     if (D_8020F1F0_ovl_title == 0) {
-        D_80226D90 = 3;
-        D_80226D94 = 1;
-        D_80226DA4 = 0;
+        D_80226D90_ovl_title = 3;
+        D_80226D94_ovl_title = 1;
+        D_80226DA4_ovl_title = 0;
         D_8006CC80 = 0;
         AT(D_8020F200_ovl_title, -0x10, u8) = D_8020F1F0_ovl_title + 1;
     }
 
-    switch (D_80226D90) {
+    switch (D_80226D90_ovl_title) {
         case 3:
-            D_80226D94 = D_80226D94 - 1;
-            if (D_80226D94 == 0) {
-                D_80226D94 = 0x1518;
-                D_80226D90++;
+            D_80226D94_ovl_title = D_80226D94_ovl_title - 1;
+            if (D_80226D94_ovl_title == 0) {
+                D_80226D94_ovl_title = 0x1518;
+                D_80226D90_ovl_title++;
                 D_8020F4F4_ovl_title = 0x14;
                 D_8020F4F0_ovl_title = 2;
             }
@@ -106,27 +106,27 @@ s32 func_8020C178_ovl_title(void) {
             if (D_8020F4F0_ovl_title == 2) {
                 func_8020EF00_ovl_title();
             }
-            if ((D_80226D94 == 0) && (D_80226DA4 == 0) && (D_8020F1E0_ovl_title == 0)) {
+            if ((D_80226D94_ovl_title == 0) && (D_80226DA4_ovl_title == 0) && (D_8020F1E0_ovl_title == 0)) {
                 D_8020F1E0_ovl_title = 1;
                 D_8020F4F4_ovl_title = 0x3C;
                 D_8020F4F0_ovl_title = 1;
-                D_80226D94 = 0x3C;
+                D_80226D94_ovl_title = 0x3C;
             }
             if (D_8020F1E0_ovl_title == 1) {
                 func_8020EF00_ovl_title();
                 if (D_8020F4F0_ovl_title == 0) {
-                    D_80226D9C = 0;
-                    D_80226DA0 = 8;
-                    D_80226D94 = 0;
-                    D_80226D90 = 0;
+                    D_80226D9C_ovl_title = 0;
+                    D_80226DA0_ovl_title = 8;
+                    D_80226D94_ovl_title = 0;
+                    D_80226D90_ovl_title = 0;
                     D_8020F1E0_ovl_title = 0;
-                    D_80226DA4 = 0;
+                    D_80226DA4_ovl_title = 0;
                 }
             }
-            if ((D_80226D94 == 0) && (D_80226DA4 == 1)) {
-                D_80226DA4 = 2;
-                D_80226D94 = 2;
-                D_80226D90++;
+            if ((D_80226D94_ovl_title == 0) && (D_80226DA4_ovl_title == 1)) {
+                D_80226DA4_ovl_title = 2;
+                D_80226D94_ovl_title = 2;
+                D_80226D90_ovl_title++;
             }
             break;
         case 5:
@@ -145,16 +145,16 @@ s32 func_8020C178_ovl_title(void) {
             AT(D_8020F260_ovl_title, -0x78, u32) = count;
             if (count >= 0x1C21U) {
                 AT(D_8020F3B0_ovl_title, -0x1c4, u16) = 0;
-                D_80226DA4 = 4;
+                D_80226DA4_ovl_title = 4;
                 D_8020F1E0_ovl_title = 1;
-                D_80226D94 = 2;
+                D_80226D94_ovl_title = 2;
                 AT(D_8020F458_ovl_title, -0x270, u32) = 0;
             }
             if (D_8020F1E0_ovl_title == 0) {
-                D_80226D94 = 0x14;
+                D_80226D94_ovl_title = 0x14;
             }
-            if ((D_80226D94 == 0) && ((D_80226DA4 == 3) || (D_80226DA4 == 4))) {
-                if (D_80226DA4 == 4) {
+            if ((D_80226D94_ovl_title == 0) && ((D_80226DA4_ovl_title == 3) || (D_80226DA4_ovl_title == 4))) {
+                if (D_80226DA4_ovl_title == 4) {
                     // Fake: keeps count live like the original static D_8020F1E8 (found by the permuter).
                     if (!count) {
                     }
@@ -162,24 +162,24 @@ s32 func_8020C178_ovl_title(void) {
                     D_8020F4F4_ovl_title = 0x3C;
                     D_8020F4F0_ovl_title = 1;
                 }
-                D_80226D94 = 0x3C;
-                if (D_80226DA4 == 3) {
-                    D_80226DA4 = 5;
-                    D_80226D90 += 1;
-                    D_80226D9C = 0xFF;
-                    D_80226DA0 = 0;
+                D_80226D94_ovl_title = 0x3C;
+                if (D_80226DA4_ovl_title == 3) {
+                    D_80226DA4_ovl_title = 5;
+                    D_80226D90_ovl_title += 1;
+                    D_80226D9C_ovl_title = 0xFF;
+                    D_80226DA0_ovl_title = 0;
                     D_8020F1E0_ovl_title = 0;
                 }
             }
             if (D_8020F1E0_ovl_title == 2) {
                 func_8020EF00_ovl_title();
                 if (D_8020F4F0_ovl_title == 0) {
-                    D_80226D9C = 0;
-                    D_80226DA0 = 8;
-                    D_80226D94 = 0;
-                    D_80226D98 = 0;
-                    D_80226D90 = 3;
-                    D_80226DA4 = 0;
+                    D_80226D9C_ovl_title = 0;
+                    D_80226DA0_ovl_title = 8;
+                    D_80226D94_ovl_title = 0;
+                    D_80226D98_ovl_title = 0;
+                    D_80226D90_ovl_title = 3;
+                    D_80226DA4_ovl_title = 0;
                     D_8020F1E0_ovl_title = 0;
                 }
             }
@@ -187,13 +187,13 @@ s32 func_8020C178_ovl_title(void) {
         case 6:
             func_8020C7A8_ovl_title();
             if (D_8020F1E4_ovl_title < 2) {
-                AT(D_8020F4D0_ovl_title, -0x2ec, u8) = D_8020F1E4_ovl_title + 1;
+                AT(D_8020F280_ovl_title, -0x9c, u8) = D_8020F1E4_ovl_title + 1;
             } else if ((D_8007A1CC & 0xF0) == 0x10) {
-                D_80226D90 = 8;
+                D_80226D90_ovl_title = 8;
                 D_8020F4F4_ovl_title = 0x3C;
                 D_8020F4F0_ovl_title = 1;
             } else {
-                D_80226D90 = 8;
+                D_80226D90_ovl_title = 8;
                 D_8020F4F4_ovl_title = 0x3C;
                 D_8020F4F0_ovl_title = 1;
             }
@@ -201,49 +201,49 @@ s32 func_8020C178_ovl_title(void) {
         case 7:
             func_8020C7A8_ovl_title();
             if (D_8020F1E0_ovl_title == 0) {
-                D_80226D94 = 0x14;
+                D_80226D94_ovl_title = 0x14;
             }
-            if (D_80226DA4 == 2) {
-                D_80226D90 = 5;
+            if (D_80226DA4_ovl_title == 2) {
+                D_80226D90_ovl_title = 5;
             }
-            if ((D_80226D94 == 0) && ((D_80226DA4 == 0xB) || (D_80226DA4 == 0xC) || (D_80226DA4 == 0xD) ||
-                                      (D_80226DA4 == 0xE) || (D_80226DA4 == 9) || (D_80226DA4 == 0xA))) {
-                if (D_80226DA4 == 9) {
-                    D_80226D94 = 0xA;
-                    D_80226D90 = 5;
+            if ((D_80226D94_ovl_title == 0) && ((D_80226DA4_ovl_title == 0xB) || (D_80226DA4_ovl_title == 0xC) || (D_80226DA4_ovl_title == 0xD) ||
+                                      (D_80226DA4_ovl_title == 0xE) || (D_80226DA4_ovl_title == 9) || (D_80226DA4_ovl_title == 0xA))) {
+                if (D_80226DA4_ovl_title == 9) {
+                    D_80226D94_ovl_title = 0xA;
+                    D_80226D90_ovl_title = 5;
                     D_8020F1E0_ovl_title = 0;
-                    D_80226DA4 = 2;
+                    D_80226DA4_ovl_title = 2;
                 }
-                if (D_80226DA4 == 0xA) {
-                    D_80226D94 = 0xA;
-                    D_80226D90 = 5;
+                if (D_80226DA4_ovl_title == 0xA) {
+                    D_80226D94_ovl_title = 0xA;
+                    D_80226D90_ovl_title = 5;
                     D_8020F1E0_ovl_title = 0;
-                    D_80226DA4 = 2;
+                    D_80226DA4_ovl_title = 2;
                 }
-                if (D_80226DA4 == 0xC) {
-                    D_80226D94 = 5;
-                    D_80226DA4 = 9;
+                if (D_80226DA4_ovl_title == 0xC) {
+                    D_80226D94_ovl_title = 5;
+                    D_80226DA4_ovl_title = 9;
                     D_8020F1E0_ovl_title = 0;
                 }
-                if (D_80226DA4 == 0xB) {
-                    D_80226D94 = 0x3C;
-                    D_80226D90 += 1;
-                    D_80226DA4 = 0xF;
-                    D_80226D9C = 0;
-                    D_80226DA0 = 0x100;
+                if (D_80226DA4_ovl_title == 0xB) {
+                    D_80226D94_ovl_title = 0x3C;
+                    D_80226D90_ovl_title += 1;
+                    D_80226DA4_ovl_title = 0xF;
+                    D_80226D9C_ovl_title = 0;
+                    D_80226DA0_ovl_title = 0x100;
                     D_8020F4F4_ovl_title = 0x3C;
                     D_8020F4F0_ovl_title = 1;
                     D_8020F1E0_ovl_title = 0;
                 }
-                if (D_80226DA4 == 0xD) {
-                    D_80226D94 = 5;
-                    D_80226DA4 = 0xA;
+                if (D_80226DA4_ovl_title == 0xD) {
+                    D_80226D94_ovl_title = 5;
+                    D_80226DA4_ovl_title = 0xA;
                     D_8020F1E0_ovl_title = 0;
                 }
-                if (D_80226DA4 == 0xE) {
-                    D_80226D94 = 0xA;
-                    D_80226D90 = 5;
-                    D_80226DA4 = 2;
+                if (D_80226DA4_ovl_title == 0xE) {
+                    D_80226D94_ovl_title = 0xA;
+                    D_80226D90_ovl_title = 5;
+                    D_80226DA4_ovl_title = 2;
                     D_8020F1E0_ovl_title = 0;
                 }
             }
@@ -253,106 +253,106 @@ s32 func_8020C178_ovl_title(void) {
             func_8020EF00_ovl_title();
             break;
     }
-    if (D_80226D94 == 0) {
-        AT(D_8020F4D4_ovl_title, -0x2e8, u16) = 0;
-        AT(D_8020F4D8_ovl_title, -0x2f0, u32) = 0;
+    if (D_80226D94_ovl_title == 0) {
+        AT(D_8020F358_ovl_title, -0x16c, u16) = 0;
+        AT(D_8020F470_ovl_title, -0x288, u32) = 0;
     }
-    return D_80226D94;
+    return D_80226D94_ovl_title;
 }
 
 void func_8020C7A8_ovl_title(void) {
     s32 var_v0;
 
     gSPDisplayList(D_8007A184++, D_8020F208_ovl_title);
-    gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80226D9C);
+    gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80226D9C_ovl_title);
 
-    func_8020CC70_ovl_title((u32)D_80226DA4);
-    D_80226D9C += D_80226DA0;
-    if (D_80226D9C >= 0x100) {
-        D_80226D9C = 0xFF;
-        D_80226DA0 = -D_80226DA0;
-    } else if (D_80226D9C < 0) {
-        D_80226D9C = 0;
-        D_80226D9C = 0;
-        D_80226DA0 = -D_80226DA0;
+    func_8020CC70_ovl_title((u32)D_80226DA4_ovl_title);
+    D_80226D9C_ovl_title += D_80226DA0_ovl_title;
+    if (D_80226D9C_ovl_title >= 0x100) {
+        D_80226D9C_ovl_title = 0xFF;
+        D_80226DA0_ovl_title = -D_80226DA0_ovl_title;
+    } else if (D_80226D9C_ovl_title < 0) {
+        D_80226D9C_ovl_title = 0;
+        D_80226D9C_ovl_title = 0;
+        D_80226DA0_ovl_title = -D_80226DA0_ovl_title;
     }
-    D_80226DB4 = D_80226D9C;
+    D_80226DB4_ovl_title = D_80226D9C_ovl_title;
     if (D_8020F4F0_ovl_title == 0) {
-        if ((D_80226DA4 == 0) && (D_80092C86 & 0x1000)) {
+        if ((D_80226DA4_ovl_title == 0) && (D_80092C86 & 0x1000)) {
             func_80029A88(1, 0xFF, 0x40);
-            D_80226D9C = 0;
-            D_80226DA0 = 0x80;
-            D_80226DA4 = 1;
-            D_80226D94 = 0x3C;
-        } else if (D_80226DA4 == 2) {
+            D_80226D9C_ovl_title = 0;
+            D_80226DA0_ovl_title = 0x80;
+            D_80226DA4_ovl_title = 1;
+            D_80226D94_ovl_title = 0x3C;
+        } else if (D_80226DA4_ovl_title == 2) {
             if (D_80092C86 & 0xB000) {
                 func_80029A88(1, 0xFF, 0x40);
-                D_80226D9C = 0;
-                D_80226DA0 = 0x80;
-                D_80226DA4 = 3;
-                D_80226D94 = 0x3C;
+                D_80226D9C_ovl_title = 0;
+                D_80226DA0_ovl_title = 0x80;
+                D_80226DA4_ovl_title = 3;
+                D_80226D94_ovl_title = 0x3C;
                 D_8020F1E0_ovl_title = 1;
             } else if (D_80092C86 & 0x4000) {
                 func_80029A88(2, 0xFF, 0x40);
-                D_80226D9C = 0xFF;
-                D_80226DA0 = 0x80;
-                D_80226DA4 = 4;
-                D_80226D94 = 2;
+                D_80226D9C_ovl_title = 0xFF;
+                D_80226DA0_ovl_title = 0x80;
+                D_80226DA4_ovl_title = 4;
+                D_80226D94_ovl_title = 2;
                 D_8020F1E0_ovl_title = 1;
             }
-        } else if ((D_80226DA4 == 8) || (D_80226DA4 == 7)) {
+        } else if ((D_80226DA4_ovl_title == 8) || (D_80226DA4_ovl_title == 7)) {
             if (D_80092C86 & 0xB000) {
                 func_80029A88(1, 0xFF, 0x40);
-                D_80226D9C = 0;
-                D_80226DA0 = 0x80;
+                D_80226D9C_ovl_title = 0;
+                D_80226DA0_ovl_title = 0x80;
                 D_8020F1E0_ovl_title = 1;
-                D_80226D94 = 0x3C;
-                if (D_80226DB0 == 0) {
-                    if (D_80226DA4 == 8) {
-                        D_80226DA4 = 0xB;
+                D_80226D94_ovl_title = 0x3C;
+                if (D_80226DB0_ovl_title == 0) {
+                    if (D_80226DA4_ovl_title == 8) {
+                        D_80226DA4_ovl_title = 0xB;
                     } else {
-                        D_80226DA4 = 0xD;
+                        D_80226DA4_ovl_title = 0xD;
                     }
-                } else if (D_80226DA4 == 8) {
-                    D_80226DA4 = 0xC;
+                } else if (D_80226DA4_ovl_title == 8) {
+                    D_80226DA4_ovl_title = 0xC;
                 } else {
-                    D_80226DA4 = 0xE;
+                    D_80226DA4_ovl_title = 0xE;
                 }
             } else if (D_80092C86 & 0x4000) {
                 func_80029A88(2, 0xFF, 0x40);
-                D_80226D9C = 0xFF;
-                D_80226DA0 = 0x80;
-                D_80226DA4 = 2;
-                D_80226D94 = 2;
+                D_80226D9C_ovl_title = 0xFF;
+                D_80226DA0_ovl_title = 0x80;
+                D_80226DA4_ovl_title = 2;
+                D_80226D94_ovl_title = 2;
                 D_8020F1E0_ovl_title = 1;
             }
-        } else if (D_80226DA4 == 6) {
+        } else if (D_80226DA4_ovl_title == 6) {
             if (D_80092C86 & 0xF000) {
                 func_80029A88(2, 0xFF, 0x40);
-                D_80226D9C = 0xFF;
-                D_80226DA0 = 0x80;
-                D_80226DA4 = 2;
-                D_80226D94 = 2;
+                D_80226D9C_ovl_title = 0xFF;
+                D_80226DA0_ovl_title = 0x80;
+                D_80226DA4_ovl_title = 2;
+                D_80226D94_ovl_title = 2;
             }
-        } else if (D_80226DA4 == 9) {
+        } else if (D_80226DA4_ovl_title == 9) {
             if (D_80092C86 & 0xB000) {
                 func_80029A88(1, 0xFF, 0x40);
                 D_8020F1E0_ovl_title = 1;
             }
-        } else if ((D_80226DA4 == 0xA) && (D_80092C86 & 0xB000)) {
+        } else if ((D_80226DA4_ovl_title == 0xA) && (D_80092C86 & 0xB000)) {
             func_80029A88(1, 0xFF, 0x40);
             D_8020F1E0_ovl_title = 1;
         }
     }
-    D_80226D94 -= 1;
+    D_80226D94_ovl_title -= 1;
 }
 
 void func_8020CBE4_ovl_title(void) {
     gSPDisplayList(D_8007A184++, D_8020F208_ovl_title);
     gDPSetEnvColor(D_8007A184++, 0x00, 0x00, 0x00, 0xFF);
 
-    func_8020CC70_ovl_title(D_80226DA4);
-    if (--D_80226D94 == 0) {
-        D_80226DA4 = 0xF;
+    func_8020CC70_ovl_title(D_80226DA4_ovl_title);
+    if (--D_80226D94_ovl_title == 0) {
+        D_80226DA4_ovl_title = 0xF;
     }
 }
