@@ -34,7 +34,7 @@
 - { name: D_8005E5F8, rom: 0x5F1F8, size: 0x400, type: u16 }           # palette, 512 colours
 - { name: D_8005E9F8, rom: 0x5F5F8, size: 0x2000, type: u8 }           # texture
 - { name: D_80060AB8, rom: 0x616B8, size: 0x100, type: u8 }            # texture
-- { name: D_80061644, rom: 0x62244, size: 0xC, type: u8 }              # message text
+- { name: D_80061644, rom: 0x62244, size: 0x5, type: u8 }              # message text
 - { name: D_80061650, rom: 0x62250, size: 0xE, type: u8 }                  # message text (func_80030D5C)
 - { name: D_80061850, rom: 0x62450, size: 0x200, type: u16 }           # palette, 256 colours
 - { name: D_80061A50, rom: 0x62650, size: 0x100, type: u8 }            # texture
