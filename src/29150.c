@@ -225,12 +225,137 @@ void func_800289DC(void) {
     D_80055938++;
 }
 
-/* Only func_80028AAC uses these three (its function statics once it is C). */
-s32 D_8005593C = 0;
-s32 D_80055940 = 1;
-s16 D_80055944[4] = { 0 };
+typedef short NNScMsg;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/29150/func_80028AAC.s")
+typedef struct SCClient_s {
+    struct SCClient_s* next;
+    OSMesgQueue* msgQ;
+} NNScClient;
+
+typedef struct SCTask_s {
+    struct SCTask_s* next;
+    u32 state;
+    u32 flags;
+    void* framebuffer;
+    OSTask list;
+    OSMesgQueue* msgQ;
+    OSMesg msg;
+} NNScTask;
+
+extern s32 D_8008F758;
+extern u8 D_8004B980[];
+extern u8 D_8004BA50[];
+extern u8 D_8004CE80[];
+extern u8 D_80070A60[];
+void func_800007F4(void* sc, NNScClient* c, OSMesgQueue* msgQ);
+OSMesgQueue* func_800006F8(void* sc);
+Acmd* alAudioFrame(Acmd* cmdList, s32* cmdLen, s16* outBuf, s32 outLen);
+s16 n_alSeqpGetVol(ALSeqPlayer* seqp);
+void func_80029618(void);
+
+void func_80028AAC(void* arg) {
+    OSMesgQueue msgQ;
+    OSMesg msgBuf[8];
+    OSMesgQueue rtnQ;
+    OSMesg rtnBuf[8];
+    NNScClient client;
+    f32 fsize;
+    u32 i;
+    s32 idx;
+    s32 frameSize;
+    NNScTask* task;
+    u32 samplesLeft = 0;
+    s16* phys;
+    OSMesgQueue* audioMQ;
+    NNScTask tasks[2];
+    Acmd* end;
+    NNScMsg* msg = NULL;
+    u32 state = 0;
+    s16 vol0[2];
+    s16 vol[2];
+    static s32 D_8005593C = 0;
+    static s32 D_80055940 = 1;
+    static s16 D_80055944[4] = { 0 };
+
+    fsize = (f32) D_8008F428.outputRate * 1 / 60.0f;
+    frameSize = (s32) fsize;
+    if (frameSize < fsize) {
+        frameSize++;
+    }
+    if (frameSize & 0xF) {
+        frameSize = (frameSize & ~0xF) + 0x10;
+    }
+    osCreateMesgQueue(&msgQ, msgBuf, 8);
+    osCreateMesgQueue(&rtnQ, rtnBuf, 8);
+    func_800007F4(arg, &client, &msgQ);
+    audioMQ = func_800006F8(arg);
+    while (TRUE) {
+        osRecvMesg(&msgQ, (OSMesg*) &msg, OS_MESG_BLOCK);
+        switch (*msg) {
+            case 1:
+                func_80029618();
+                switch (state) {
+                    case 1:
+                    for (i = 0; i < 2; i++) {
+                        vol[i] -= vol0[i] / 28;
+                        if (vol[i] < 0) {
+                            vol[i] = 0;
+                        }
+                        alSeqpSetVol((ALSeqPlayer*) &D_8008F7A8[i].player, vol[i]);
+                    }
+                    if (vol[0] == 0 && vol[1] == 0) {
+                        state++;
+                    }
+                    default:
+                task = &tasks[D_8005593C];
+                end = D_8008F080[D_8005593C];
+                idx = D_80055940 % 3;
+                func_800289DC();
+                phys = (s16*) osVirtualToPhysical(D_8008F090[idx]);
+                D_80055944[idx] = (frameSize - samplesLeft + 0x60) & ~0xF;
+                if (D_80055944[idx] < frameSize - 16) {
+                    D_80055944[idx] = frameSize - 16;
+                }
+                end = alAudioFrame(end, &D_8008F758, phys, D_80055944[idx]);
+                task->next = NULL;
+                task->msgQ = &rtnQ;
+                task->msg = NULL;
+                task->list.t.data_ptr = D_8008F080[D_8005593C];
+                task->list.t.data_size = (end - D_8008F080[D_8005593C]) * sizeof(Acmd);
+                task->list.t.type = M_AUDTASK;
+                task->list.t.flags = 0;
+                task->list.t.ucode_boot = (u64*) D_8004B980;
+                task->list.t.ucode_boot_size = (u32) D_8004BA50 - (u32) D_8004B980;
+                task->list.t.ucode = (u64*) D_8004CE80;
+                task->list.t.ucode_data = (u64*) D_80070A60;
+                task->list.t.ucode_data_size = SP_UCODE_DATA_SIZE;
+                task->list.t.dram_stack = NULL;
+                task->list.t.dram_stack_size = 0;
+                task->list.t.output_buff = NULL;
+                task->list.t.output_buff_size = 0;
+                task->list.t.yield_data_ptr = NULL;
+                task->list.t.yield_data_size = 0;
+                osSendMesg(audioMQ, task, OS_MESG_BLOCK);
+                samplesLeft = osAiGetLength() >> 2;
+                D_8005593C ^= 1;
+                D_80055940++;
+                osRecvMesg(&rtnQ, NULL, OS_MESG_BLOCK);
+                osAiSetNextBuffer(D_8008F090[idx], D_80055944[idx] << 2);
+                    break;
+                    case 2:
+                        break;
+                }
+                break;
+            case 3:
+                state++;
+                vol0[0] = n_alSeqpGetVol((ALSeqPlayer*) &D_8008F7A8[0].player);
+                vol0[1] = vol[1] = n_alSeqpGetVol((ALSeqPlayer*) &D_8008F7A8[1].player);
+                vol[0] = vol0[0] & 0xFFFF;
+                break;
+        }
+    }
+}
+
 
 
 u32 D_8005594C[8] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
