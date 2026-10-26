@@ -467,7 +467,31 @@ extern s16 D_8007AA70;
 extern s16 D_8007AA72;
 extern u16 D_8007AA78;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_8000464C.s")
+void func_8000464C(void *arg0) {
+    s32 flag;
+    s32 pad[2];
+    AnimEntry *anims;
+    PlayerState *p = &D_8007AA08;
+
+    gSPDisplayList(D_8007A184++, D_10000A0);
+    func_80012B88(D_8007AB60);
+    if (D_8007AA08.unk0 == 0xA || p->unk0 == 0xB) {
+        flag = 1;
+    } else {
+        flag = 0;
+    }
+    anims = (AnimEntry *)D_80055D40[D_8007AA70];
+    func_80007A38(&D_8007AA20);
+    func_80020428(flag, &D_8007AA20, &anims[D_8007AA72], arg0);
+    func_8002099C(D_8007AA78, &D_8007AA20, &anims[D_8007AA72]);
+    func_80007A38(&D_8007AA20);
+    func_800107F0(D_8008BFC0.x, D_8007AA24, D_8008BFC0.z, 0xA00, &D_8007A928);
+    D_8007AB48.x = D_8008BFC0.x;
+    D_8007AB48.y = D_8007A92C;
+    D_8007AB48.z = D_8008BFC0.z;
+    func_800131F0(D_8007AB48.x, D_8007AB48.y, D_8007AB48.z, p->actor.unk2C, p->actor.unk30, p->actor.unk34,
+                  p->actor.unk28 * p->actor.scale);
+}
 
 extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
@@ -478,7 +502,47 @@ extern f32 D_8007AA30; /* .actor.rot */
 extern u16 D_8007AA80; /* .actor.unk60 */
 extern f32 D_8007AB3C;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800047F8.s")
+void func_800047F8(void) {
+    PlayerState *p = &D_8007AA08;
+    ActorStats *stats;
+    CharData *cd;
+    s32 quarter;
+    s32 i;
+
+    D_8007A9B4 = D_8007A9B8 = 0;
+    stats = D_8007AA08.actor.unk64;
+    cd = D_80055D40[D_8007AA08.actor.unk50];
+    D_8007AA08.unkC = (f32)(u32)stats->unkC * 0.2857 + 17.0;
+    D_8007AA08.unk84 = 0;
+    D_8007AA08.unk110 = 0;
+    D_8007AA08.unk108 = D_8007AA08.unk14->unk24[0] + D_8007AA08.unk14->unk24[1] + D_8007AA08.unk14->unk24[2] +
+                        D_8007AA08.unk14->unk24[3];
+    D_8007AA08.unk10E = 0x10;
+    D_8007AA08.unk10A = stats->unkC;
+    D_8007AA08.unk10C = stats->unkE;
+    D_8007AA08.unk10 = D_8007AA08.unk108;
+    D_8007AA08.unk114 = 1.0f;
+    quarter = D_8007AA08.unk108 >> 2;
+    for (i = 0; i < 4; i++) {
+        if (quarter < p->unk14->unk24[i]) {
+            p->unk10 = p->unk10 - p->unk14->unk24[i] + quarter;
+        }
+    }
+    p->unk10 = p->unk10 / 10 + 1;
+    if (p->unk10 > 16) {
+        p->unk10 = 16;
+    }
+    p->unk0 = 3;
+    p->unk4 = cd->unkDA;
+    p->unk2 = 0;
+    p->unk134 = p->actor.rot;
+    p->unk8 &= ~0x20;
+    p->actor.unk60 |= 1;
+    if (D_8007A910 != 0x19) {
+        D_8007A910 = 0x11;
+    }
+    func_800201A0(&p->actor, 0x12, 1, D_8007A910, 1, 1);
+}
 
 /* particle/effect spawn parameters */
 typedef struct {
@@ -1408,9 +1472,65 @@ extern f32 D_8007AB34;
 extern f32 D_8007AB38;
 extern Unk8007C290 *D_8007C290;
 void func_80007658(PlayerState *arg0, Actor *arg1);
-void func_8000F50C(s32 arg0, s32 arg1, u16 arg2, Unk8007C290 *arg3);
+void func_8000F50C(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800073E8.s")
+void func_800073E8(void) {
+    PlayerState *p = &D_8007AA08;
+    s32 kind = (D_80084300.unkC >> 8) & 0xF;
+    f32 r;
+    Unk8007C290 *pos;
+
+    D_8007A998 = D_80084300.unkC;
+    if (D_80084300.unkC & 4) {
+        p->unk0 = 3;
+        p->unk4 = 0x1E;
+        p->unk6 = 0;
+        p->actor.unk60 |= 1;
+        func_800201A0(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
+        D_8007A174 = 0x13;
+        return;
+    }
+    switch (kind) {
+        case 1:
+            p->unk0 = 8;
+            p->unk4 = 0x1E;
+            p->unk6 = 0;
+            r = D_80084300.unk14;
+            p->actor.unk14 = 0.0f;
+            p->actor.unkC = 0.0f;
+            D_8007A918.x = 0.0f;
+            D_8007A918.z = 40.0f;
+            p->actor.rot = r;
+            func_800271B4(r, &D_8007A918);
+            p->unk12C = D_8007A918.x;
+            p->unk130 = D_8007A918.z;
+            p->actor.unk60 |= 1;
+            func_8002A7C8(5, 0x21, 0xFF);
+            func_8002A7C8(0xF, 0x21, 0xFF);
+            D_8007A174 = 0x13;
+            break;
+        case 2:
+        case 3:
+            func_80007658(p, &p->actor);
+            if (D_80084300.unkC & 1) {
+                D_8007A174 = 0x32;
+            } else {
+                D_8007A174 = 0x32;
+            }
+            p->actor.unk60 |= 1;
+            break;
+        case 4:
+            pos = &D_8007C290[D_80084300.unk10];
+            func_8000F50C(1, 0, D_80084300.unkC, pos);
+            p->unk0 = 3;
+            p->unk4 = 0x1E;
+            p->unk6 = 0;
+            p->actor.unk60 |= 1;
+            func_800201A0(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
+            D_8007A174 = 0x19;
+            break;
+    }
+}
 
 void func_80007658(PlayerState *arg0, Actor *arg1) {
     s32 pad[2];
