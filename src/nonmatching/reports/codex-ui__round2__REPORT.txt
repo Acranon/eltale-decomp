@@ -1,0 +1,88 @@
+UI D1 matching round 2, 2026-10-25
+
+Verified match: func_80021C04, commit16c683d in eltale-wcodex-ui.
+  Stock match.py OK; full retail ROM exact; fresh asm/build/.splache rebuild exact.
+  Corrected the old report: the saved-register swap was x0/x1, not x0/y0.
+  The original lifetime reuses x0 for the later character-row cursor. Reusing x1
+  instead caused exactly eight register differences. IDO -K .s made this visible.
+  A defined empty if(i) before the first fade EnvColor fixed register priority,
+  leaving three scheduling words. Putting that empty if inside the first Combine
+  macro expansion, after Gfx* initialization and before the two command stores,
+  allowed li a0,255 to schedule ahead of the stores. Keep that block on one line.
+  The already-proven u8* argument for 245D0 is included and still matches.
+
+Remaining seven functions retain GLOBAL_ASM. Measurements below come from stock
+compiles and compare only each glabel..endlabel code range, excluding late_rodata.
+See MEASUREMENTS.json for exact draft locations and sizes. No broad flag/data edits.
+
+30D5C: material new lead, raw words697->315, aligned register-sensitive count262.
+  Source3508 bytes vs retail3532: still24 bytes short. Saved30D5C.best.c/full.c.
+  Removed e local and used D_8008FBA8[idx] directly. Persistent p as a one-element
+  pointer array reproduces memory residence from definition; color as a one-element
+  s32 array fixes its delayed stores. Added the missing high pad home before color;
+  swapped idx++ before ptr[0]++. Most instructions through +0x8B8 now match, with
+  pointer-home offset and two increment-store ordering exceptions. Later flag/cursor
+  lifetime is still wrong and accounts for much of the remaining tail.
+  A second unused pointer-array element or extra pad_y expands the frame and is worse.
+  Do not claim whole-body exact length or a full-ROM near match: code is still short.
+
+31E10: best remains20 register words (804/804 bytes), corresponding to prior best.
+  New narrow idx/k types, actual byte-pointer views, source/index lifetimes around
+  calls, controlled initializers, address forms and defined empty uses did not solve.
+  Diagnostic costs: idx bit3 adjusted save1.6/denom5, pointer-expression bit10 save1/4.
+  Therefore idx wins a3 before pointer gets t0; target wants the opposite. The named
+  p is copy-propagated away; changing declaration order or dead initializer cannot
+  change the constrained priority. Final reload in id rather than k returns old20.
+
+33050: remains18 words, 4076/4076 code bytes. Late-rodata causes STUCK's larger size.
+  Rechecked narrow old/new cursor types, split post-increments, field-address forms,
+  signed-load-then-unsigned conversions, second-advance role variables, defined uses.
+  Main differences: D616B0 valuea1 vs a2, old cursorv1 vs a1, second new cursors1 vs v0,
+  ending E700 constanta2 vs a3. All relevant ranges are constrained; broad register
+  permutation and declaration searches are not a principled next step.
+
+3453C: no new gain. Baseline892/892 bytes, frame0x40 vs retail0x48 and extra s-register.
+  Tested width/range-supported rows/cols and row-counter types, deliberate memory
+  residence, merging c/copy-count live ranges with preserved homes, and loop shapes.
+  Need an explanation of the rows spill and saved-register pressure before more search.
+
+34C9C: valid partial gain136->92 words, still1028 vs1024 bytes. Flat parameter views,
+  texture/parameter index type separation, harmless conversions, narrow type argument
+  did not solve the dead texture-pointer spill plus original-type branch. u16 parameter
+  makes frame/body length match but adds an entry mask/home and many other changes;
+  it is not a better draft. The later stack-aware permuter run below supplied the
+  valid92-word expanded candidate; it still does not match and stays outside source.
+
+35350: no new gain. Baseline120 words,1108/1108 code bytes. Tested preserving original
+  command byte separately from dispatch, narrow command types, reusing y parameter to
+  avoid a false y local lifetime, and mask-block boundaries. These did not resolve
+  the command/display-pointer register exchange and GBI expression ordering.
+
+22658: no new gain. Prior best7 aligned differences remains796 vs792 bytes because
+  one extra andi shifts the rest (183 positional words). New nonvolatile aggregate
+  id storage with split row-pointer evaluation, typed row pointers, high-index role
+  reuse and defined high-index branches did not improve it. Do not call this register-only.
+
+Diagnostics:
+  ir_func_80031E10/ and ir_func_80033050/ hold faithful full preprocessed .c,
+  stock .B/.O/.G/.T/.s plus uoptlist/function.trace and constrained costs.log.
+  Diagnostic .O byte-identical to stock was explicitly checked.
+  ir/ holds21C04's11-word-stage trace used for the lifetime breakthrough.
+
+One coordinated2-job nice19 5-minute21C04 permuter run finished8729 iterations.
+  Direct preprocessed base matched the hand11-word result, but AST rewriting changed
+  macro line grouping; best output was55 raw words. No winner was accepted. Overlay
+  agent later supplied a validated GBI-line normalizer for future runs.
+
+A second coordinated2-job nice19 5-minute34C9C run used --stack-diffs and that
+  normalizer after proving parsed/reprinted baseline136 words/1028 bytes was faithful.
+  Finished7825 iterations. Replayed12 best candidates in the actual file.
+  output-1106-1 is valid and92 words: caches a0xFFF mask and adds an unused Gfx copy.
+  output-1123-1 got25 words/exact size only by truncating the E4000000 command opcode
+  through volatileu16. REJECTED. Replacing that local withu32 repairs semantics but
+  gives92 words/1028 bytes. Saved34C9C.repaired.best.c/full.c, the original valid
+  output-1106-1.34C9C.c, all reviewed snippets, and34C9C.perm-results.json.
+  Permuter folder /home/sean/eltale-perm/codex-ui34C9C remains for later targeted work.
+
+No permuter left running. Worker restored to committed sources and final retail build
+verified. Detailed scratch experiments are in C:/code/eltale-sol/codex-ui-r2-*.

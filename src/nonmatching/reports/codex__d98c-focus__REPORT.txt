@@ -1,0 +1,50 @@
+2026-10-26 focused D98C pass at main f529079
+
+No match and no commits. Only src/ovl_ending/E22690.c was changed temporarily.
+The D2-named25-word draft is reproduced and verified by a full linked ROM:
+exactly25 differing instruction words, all inside D98C. Other E22690 C
+functions remain match.py OK. Input draft.c and verified25.full.c are saved;
+individual differing ROM addresses are in rom-differences.txt.
+
+Fresh stock compiler/backend proof:
+ir/source.{c,B,O,G,T,s,o} is a compact preprocessed one-function compilation
+that still gives25 differences. The separate diagnostic ugen's trace.G is
+byte-identical to stock source.G. Trace is ir/trace.log. Generated streams were
+used only for diagnosis; validation always used stock compiler/full build.
+
+Exact first discrepancy is function+0xF10 (ROM E24E5C), in the second flip
+texrect's RDPHALF2 packed step word. The high component is dsdx and the low
+component dtdy. Current ugen allocation chain, trace lines1571-1583 zero-based:
+high load24 -> AND15 -> SHL13(reg12) -> SHL3(reg25);
+low load14 -> AND11; OR13.
+As1 folds the redundant high mask/two shifts, leaving high load12 / shift25.
+Retail wants high load15 / shift12, with the same low14/11 and OR13. The
+remaining allocation swap in this ending function is predominantly t4/t9
+(intro's related residual used different register numbers). Two final loop-
+limit instructions also differ. The trace establishes the folding interaction
+but does not establish an original C spelling.
+
+New bounded experiments:
+1. Changed lexical scope around the PRECEDING RDPHALF1 command without moving
+any packet write: close outer texrect before half2; close before both half
+packets; nest half2 inside half1; flatten either half packet into a uniquely
+named parent-scope Gfx pointer. Every legal variant remains25 exactly.
+2. Empty predicates inside the preceding initialized half1 scope on _g,
+rect.dsdx,rect.dtdy,their equality, and dsdx>0: all25 unchanged. No uninitialized
+read was tested or retained.
+3. One-stage high expression duplicated with | or &, triple xor, or a
+subtract/add identity: uopt removes the identity before ugen;51 words remain.
+4. Relocated the extra split-shift allocation into the PRECEDING half1 high
+sfrac or low texture-coordinate shift, with/without keeping the second step
+split. All source forms are semantically valid, but give45-68 words. Thus a
+simple allocation-count relocation does not reproduce the needed free order.
+
+Specific next experiment: obtain assembler peephole/copy-propagation trace
+for the second high-step tree and compare one-stage vs two-stage source,
+especially why the former preserves load15/shift12 while the latter preserves
+load12/shift25. The desired free queue at the low load differs despite identical
+preceding machine instructions; another broad arithmetic spelling sweep is
+unlikely to help without that additional backend evidence.
+
+No permuter run. Source pragma restored. git status clean and build.sh matches
+retail. No pending processes or unlanded commits.

@@ -1,0 +1,16 @@
+2026-10-26 overlay resume, isolated checkout /home/sean/eltale-wcodex-overlay-resume
+Base main f529079; clean rebuild before and after work: build/eltale.z64 OK (matches retail). Checkout left clean. No commits.
+
+All five source drafts were replayed in the current D2 layout with stock tools/match.py diff. Other functions in each touched file stayed OK. None matched and every exploratory full ROM build mismatched as expected.
+
+ovl_intro C6A8: 37 differing words, frame 0xF8 vs target 0xF0; s0/s1 entries/steps swapped through both loops. New BSS integration finding: the Claude 37-word draft initially shifts function static D_80276F44/48 by +8 if the file's D_80277074/78 globals remain before the function. Move the 77074/78 definitions after C6A8. IDO orders them by first code reference, placing 77078 before 77074; insert a no-op `if (D_80277074_ovl_intro) {}` immediately after the declarations to force target offsets. Saved complete replay: c6a8_bss_37w_full.c. Verified readelf offsets: D_80276F44 ea94, D_80276F48 ea98, D_80277074 ebc4, D_80277078 ebc8. Swapping entries/steps declaration order, changing individual locals to s16/u16, alternate simple GBI macro forms, and direct Gfx stores did not improve 37. Next exact-match route: identify the single extra 8-byte compiler home in the fade GBI block while preserving spill position and shift live-range priority so entries/steps use retail s0/s1. The old 15-minute permuter attempts already found no result; none run this session.
+
+ovl_intro E108: 23 words, first +0xF30, frame 0x648 correct. Replayed codex/d1-overlay/func_8020E108_ovl_intro_23words.c with D2 BSS suffixes. Safe high/low packed texrect variations (plus/xor instead of OR, low andi/u16/shift, high u16/u32 and shift variants) gave 23 or worse. Residual is ugen/as1 temp rotation, t3/t4, starting in second TEXRECT RDPHALF word. Stock-verified diagnostic path described in codex/d1-overlay/REPORT.txt.
+
+ovl_ending D98C: 25 words, first +0xF10, reproduced claude/rpc/d98c_25w_ovlnames.c. Same packed texrect temp rotation as E108. Prior 128 form sweep found no improvement. No further source change this session.
+
+ovl_ending E9C8: 757 words, frame 0x198 vs target 0x1A8, current static draft claude/d2r2/e9c8_statics_757.c. A volatile 4-word pad makes frame match but still 755 words and 0x24 bytes shorter code, beginning +0x4. Concrete next step: reconstruct the retail TLUT/settile Gfx pointer lifetimes and arg0 home/reloads before address/register matching. The pad alone is insufficient.
+
+ovl_DA4570 09EC: 42 words, first +0x1160, reproduced claude/rpc/09ec_42w_ovlnames.c with 008F0's real u8* argument; 008F0 remains OK. The two controller direction calculations differ in OR scheduling and t-register allocation. Tested staged, staged with s16 casts, and nested-right forms independently in first, second, and both pad blocks; all 47-57 words. The 42-word form remains best. No ABI changes.
+
+Source files restored to unmatched pragmas and checkout clean. No YAML, shared header, or symbol changes; no permuter run.

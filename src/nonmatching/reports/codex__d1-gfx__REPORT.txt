@@ -1,0 +1,89 @@
+Eltale D1 gfx implementation pass, 2026-10-25
+Starting main: 974b0bc. Checkout: /home/sean/eltale-wcodex-gfx.
+Owned files: src/113F0.c, src/12610.c, src/E2A0.c.
+
+No exact matches or commits from this worker. All four assigned functions had
+substantive attempts; the best valid source improvements and new compiler
+diagnostics are saved here. No D2 data, shared headers, symbols, or flags changed.
+The source checkout has been restored to its original GLOBAL_ASM pragmas.
+
+func_80011EF4
+--------------
+Fresh aggregate reconstruction confirms the twelve-byte copy grouping. Explicit
+Color3 assignments and cursor walks produce the target's at/temp/at copy triples;
+the cursor interpolation also reproduces the otherwise distinctive duplicated
+pointer moves. A single 36-byte aggregate copy and a three-iteration loop do not
+produce the correct straight-line copy path. The function still has substantial
+structural differences: selective ambient/light-base rematerialization, pointer
+propagation, and scheduling of division checks. The better cursor forms are about
+0x608 bytes against retail 0x5F4. Identity expressions on the light pointer can
+reduce this to 0x5F8, but introduce an s0 spill/frame and incorrect pointer sharing.
+They are diagnostic leads, not close matches. No claim that data ownership is
+proven to block this function; its old D2 classification remains unproven.
+Replays: codex_d1_ef4*.py in C:/code/eltale-sol.
+Useful named drafts: func_80011EF4.ptr_linear.c and
+func_80011EF4.all_copy_cursor.c; many experimental variants are retained.
+
+func_8000DE54
+--------------
+Concrete structural improvement: the D_80082048 update loop now emits retail's
+operation ordering, apart from the surrounding register-number differences.
+Compute the two u16 sums, advance b, set existing k = b < end, advance a, write
+a[-1].a and a[-1].b, then break if !k. This hoists b++ and sltu ahead of both adds
+and places the final halfword store in the branch delay slot. It needs no added
+home or frame. The aggregate-local alternative instead grows the frame and is
+ruled out. Saved valid source: func_8000DE54.best_valid.c (same as loop_pretest.c).
+
+The larger missing identity is now demonstrated: uopt CSEs D_80082058's address
+across calls and keeps it in a saved register; retail rematerializes it. As a
+diagnostic only, spelling its second use relative to the existing D_80082458
+symbol suppresses that CSE. With the loop fix, size becomes exactly 0x9C8 and the
+raw differing-word count drops from 522 to 244. Only a small structural residue
+then remains. The cross-object pointer expression is not approved source and was
+not landed. The integer-address equivalent is defined for the N64 implementation
+but emits additional instructions. The target's remaining animation-copy move
+versus an andi in the draft is another useful lead after the address context is
+correct. See diagnostic_alias_reloc.c and its .dis; the file is explicitly marked
+diagnostic. Identity casts/divide-by-one and dead variable seeds do not suppress
+the address CSE. No full-ROM-match claim is made for any DE54 draft.
+
+func_80011034
+--------------
+The original v3 remains best: 392 instructions versus retail 390, with the correct
+frame. An aligned instruction diagnostic separates the real causes from the 166
+positional differing words induced by the two extra instructions. Source changes
+to endpoint ordering, named roles, initialized predicates, dead seeds, lossless
+f32->f64->f32 casts, duplicated assignments, and bounded control-flow splits did
+not improve it; casts remain as real conversion instructions, while extra basic
+blocks perturb the whole FP allocation.
+
+New, verified compiler explanation from stock -K intermediates and diagnostic
+uopt traces (the diagnostic .O is byte-identical to stock):
+  - named a is bit 10, color 29 / f18, savings 1.727 over denominator 11;
+  - ax-cx is independently promoted expression bit 176, color 24 / f0, savings
+    3 over denominator 1. Forwarding removes the named a assignment. That value
+    wins the register before az, overwriting its useful f0 value and forcing a
+    reload of az;
+  - named dz is bit 178, color 27 / f14, savings 3.667 over denominator 3;
+  - final iz-cz is expression bit 224, color 24 / f0, savings 2 over denominator
+    2. Its separate allocation produces the unwanted f0-to-f14 copy;
+  - az is bit 23, initially savings 1.154 over denominator 13, then split and
+    reloaded after those higher-priority expression ranges are allocated.
+This is constrained expression allocation, not the unconstrained named-variable
+first-occurrence problem solved in F87C. Reordering declarations is not the next
+useful approach. Trace folder: trace_func_80011034, with base.B/O/G/T/s/o,
+uoptlist2, uoptlist6, and costs-detail.log (procedure 5).
+
+func_80011AE0
+--------------
+The prior 8-word source remains best. The table-time load is expression bit 0 and
+is globally colored a2; target keeps it in local t6. This rotates two later local
+temporaries. Explicit named caching and initialization seeds do not remove the
+promotion; a same-basic-block spelling changes allocation but still misses. A
+volatile one-load experiment adds address instructions and was discarded.
+Trace folder: trace_func_80011AE0, with faithful stock -K intermediates and
+diagnostic uoptlist2/uoptlist6. Diagnostic output .O is byte-identical to stock.
+
+Stock IDO remains the sole match validator. The host diagnostic uopt was used
+only for explanations; its byte-identical optimized streams were checked before
+drawing conclusions. No permuter was launched during this pass.

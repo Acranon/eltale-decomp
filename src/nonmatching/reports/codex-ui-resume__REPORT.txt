@@ -1,0 +1,16 @@
+UI resume, 2026-10-26
+Checkout /home/sean/eltale-wcodex-ui-resume started clean at f529079. Fresh full build matched retail before and after experiments. No commits. Main untouched. Stock compiler used. Three unmatched source snapshots in this directory preserve all six draft functions; do not copy them wholesale into main.
+
+22658: Latest draft remains 72 register-only differing words. Target uses ra for high byte and t9 for low byte, storing low at sp+40 before shifting. Draft uses t9/a2, shifts before store, and rotates t7/t8 afterward. Eleven new u8/u16/s32 temporaries and pointer indexing spellings gave 72-189 words. Need a lifetime change placing low in t9 without an extra andi.
+
+33050: Latest draft remains 18 register-only words, with every other matched function in the file OK. D_800616B0 pointer/value is a1 vs target a2; unk12 cursor is v1 vs target a1; later cursor advance is s1 vs target v0; closing E7000000 is a2 vs target a3. Thirty neutral empty branch probes on live locals did not improve it. Need a real equivalent lifetime split around cursor updates or register pressure change before D_800616B0 materializes, preserving 0x110 frame.
+
+3453C: Round2 draft is 221 differing words, 0x40 frame vs retail 0x48. Sixteen cols/rows type pairs tested. Unsigned rows gives 192 words but changes negative height behavior and is invalid. Target spills rows at sp+28 and uses four saved registers; draft has sp+34 and five. Needs a loop/lifetime rewrite that puts cols in ra while preserving signed rows.
+
+34C9C: Semantically repaired round2 GBI draft at 92 words, current 0x404 bytes vs retail 0x400. Earlier 25-word permuter candidate corrupts E4000000 opcode and is invalid. Current frame 0xE0 vs target 0xD8; target tests type, draft tests spilled texture pointer. Need retain scalar type test while preserving GBI expression order and dead sp+4 pointer store.
+
+30D5C: Ported round2 best to current D2 ownership with 14-byte struct D_80061650, named fields and u8 D_8008FB7B. Compiles at 309 words, 0xDB4 bytes vs retail 0xDCC. One volatile four-byte gap after ptr worsened to 373 and changed frame, so reverted from checkout; the saved snapshot retains this temporary declaration. Target buf sp+38, pointer sp+30; draft pointer sp+34. Need a home between buffer and pointer without frame growth, then flag spill repair.
+
+31E10: Round2 draft remains 20 register-only words with correct 0x40 frame. Tested all 127 subsets of harmless zero initializers for err/n/id/i/idx/k/cont; all remain 20. Initial index a1 vs target t0; id t0 vs a0; marker a0 vs a1. Need equivalent variable reuse/interference change around loop.
+
+All unmatched pragmas restored. Final git status clean. Final clean build: build/eltale.z64: OK (matches retail).

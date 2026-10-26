@@ -1,0 +1,48 @@
+2026-10-25 fresh structural review of func_8002DECC
+
+No exact match and no source changes retained. Worked only src/2B530.c after
+pulling main00e982d; the already matched F87C was preserved.
+
+Measured target code0x560 bytes, frame0xD8. Inventory0x588 included its jump
+table. Target homes: texture width94, texture pointer98, lrt9C, lrsA0, dA4,
+texHA8, dtdyAC, dsdxB0, tB4, sB8, ulsBC, ultC0, masktC4, masksC8, xrCC,
+alphaD0, retD4. Width argument remains atsp+E4, yE0,hE8. The target stores
+lrs/lrt and zero s before the switch, then reloads width and s throughout
+clipping. DY_0 has the correct frame and width memory accesses but forwards
+lrs/lrt as dimension expressions and holds s in a register until the draw gate.
+
+Fresh coherent hypothesis: the contiguous texW/tex/lrt/lrs homes could be an
+original local texture descriptor aggregate. Replaced those4 scalar locals
+with a correctly ordered16-byte struct occupying exactly the same homes.
+RESULT: function bytes are literally IDENTICAL to DY_0 (0x55C,frameD8,
+328 positional words/60 aligned opcode differences). IDO scalar-promotes these
+members just like ordinary locals; aggregate ownership alone does not explain
+the target's residency. Using matched peer2E42C's s[1] idiom with that aggregate,
+with/without volatile width, did not solve the discrepancy.
+
+Fresh coherent live-alias test: unlike earlier dead address-taking probes,
+actually access w/s or lrs/lrt through local pointers, fitting pointer homes
+into the existing pad area. None matched. On existing G6_D2, a real pw=&w used
+for all width accesses gives0x558/frameD8,307 positional words/48 aligned opcode
+differences (g6_widthpointer.c). This is NOT a matching or dependable improved
+implementation: it stores incoming w toE4 but still uses its promoted value
+through clipping, with final width store at+158, so required repeated reloads
+are absent. G6_D2 baseline is0x558/frameD8,324 words/58 opcode differences.
+Volatile-width G6_D2 emits0x574 (20 bytes too long) even though opcode score48.
+Scores alone obscure the wrong memory-access pattern.
+
+Checked D6A8's newly successful scope mechanism in a coherent packet grouping:
+expanded the first pipe-sync packet without moving any writes, keeping its
+Gfx*_g scope open either through the render preamble or all following packets.
+Both versions compile to the SAME0x55C/frameD8 baseline code; no match.
+
+Conclusion: stack size/contiguous local layout is already consistent. The
+remaining blocker is simultaneous optimizer residency/forward substitution of
+w,s,lrs,lrt, not a newly demonstrated data-definition dependency. No evidence
+from this pass supports moving it to D2. The specific aggregate and packet-
+scope explanations above are ruled out; future work should inspect uopt's
+decisions to forward lrs/lrt and keep s/w live, using the exact home-access
+pattern as the acceptance criterion, not positional diff totals.
+
+Probe files saved alongside; no permuter run, no commit. Checkout restored,
+git clean, ./build.sh matches retail.

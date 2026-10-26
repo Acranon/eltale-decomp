@@ -1,0 +1,59 @@
+2026-10-26 focused09EC pass, base main f529079
+
+No exact match or commit. New valid checkpoint:37 differing stock object words
+and exactly37 differing words in the fully linked ROM, all within09EC. Every
+non-register instruction field matches retail: operations, constants, stack
+offsets, call/branch targets, code length0x1294 and frame0x180. First differing
+word is function+0x1154, ROM0xDA60B0. Original42-word draft is retained too.
+
+Saved source: func_801009EC_37words.c (same as best.c).
+Complete current-D2 replay: verified37.full.c. It includes008F0's correct u8*
+parameter;008F0 and all other compiled functions remain matching. Individual
+ROM word locations: rom-differences.txt.
+
+Concrete improvement:
+The original `(signedStick > 32)` becomes one ugen UGEQ operation. It emits
+slti/xori using the same register, unlike retail's separate temporaries.
+Explicit `((signedStick < 33) ^ 1)` preserves separate comparison and XOR tree
+nodes and reproduces retail's separate temporary registers. These expressions
+are equivalent for every signed input, not only normal controller values.
+
+The37-word form caches stick_y in the existing16-bit unused3 home (changed from
+u16 to s16), separately in each pad calculation. Its values fit exactly in
+s16. It reloads after osContGetReadData; there are no intervening writes to the
+pad array inside either calculation. Direction bits are computed with the
+explicit XOR form, staged as Y-positive|X-positive, then Y-negative and
+X-negative. Keep the physical statement lines as saved because -g3 scheduling
+can depend on line boundaries. Final results are unchanged and bounded0..15.
+
+Remaining measured register assignments in the tail:
+* Pad pointer: ours s1, retail s0, through both pad reads.
+* Signed stick_x: ours a1, retail s1.
+* Signed stick_y: v1 agrees with retail.
+* First partial OR: ours t2, retail t6; later OR temps and repeat/input tail
+  also rotate. Instruction order now agrees, unlike the prior42-word source.
+
+Experiment outcomes:
+* Explicit XOR with old nested casts:55; plain OR tree:57.
+* Y-first staged XOR:41; adding the signed Y cache:37.
+* Distinct accumulator lifetimes for the two pad calculations:39, makes the
+  pointer s0 but puts Y in s1 and X in a1. Not an improvement overall.
+* Switching the cache to X, unsigned accumulator, separate partial local and
+  alternate equivalent tree boundaries did not improve37. No unsafe or
+  uninitialized-read candidates retained. No permuter run.
+
+Compiler evidence: ir/source.{c,B,O,G,T,s,o} and trace outputs correspond to
+the ORIGINAL42-word draft, which was verified in its compact form. Diagnostic
+uopt .O and ugen .G streams are byte-identical to stock. Their table/trace
+establishes the single-UGEQ versus separate-comparison/XOR mechanism. Do not
+mistake these original42-word traces for a37-word allocation trace.
+
+Specific next experiment: capture37-word uopt constrained-register costs and
+live ranges for the pad pointer, raw X, cached Y and reused direction scalar,
+then compare with the39-word split-accumulator source. Determine why removing
+the shared accumulator moves the pointer correctly but prioritizes cached Y
+over raw X. Work on that concrete interference/lifetime cause; declaration
+reordering and another broad OR-form grid are unlikely to help.
+
+Repository state restored to original pragma. Clean retail rebuild passes;
+git status clean. No active searches/processes or unlanded commits.
