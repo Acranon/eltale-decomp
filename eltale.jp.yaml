@@ -385,9 +385,16 @@ segments:
       - { start: 0x71920, type: .bss, vram: 0x800942C0, name: libultra/os/seteventmesg } # 800942C0..80094340
       - { start: 0x71920, type: .bss, vram: 0x80094340, name: libultra/io/sptask }       # 80094340..80094380
       - { start: 0x71920, type: .bss, vram: 0x80094380, name: libultra/io/vimgr }
-      - { start: 0x71920, type: bss, vram: 0x800955A0, name: 800955A0 }
+      - { start: 0x71920, type: .bss, vram: 0x800955A0, name: libultra/gu/position }     # 800955A0..800955B0
+      - { start: 0x71920, type: .bss, vram: 0x800955B0, name: libultra/io/motor }        # 800955B0..800956B0
+      - { start: 0x71920, type: .bss, vram: 0x800956B0, name: libultra/io/gbpakinit }    # 800956B0..800956F0
+      - { start: 0x71920, type: .bss, vram: 0x800956F0, name: libultra/os/controller }   # 800956F0..80095780
+      - { start: 0x71920, type: .bss, vram: 0x80095780, name: libultra/io/piacs }        # 80095780..800957A0
       - { start: 0x71920, type: .bss, vram: 0x800957A0, name: libultra/os/timerintr }
-      - { start: 0x71920, type: bss, vram: 0x800957E0, name: 800957E0 }
+      - { start: 0x71920, type: .bss, vram: 0x800957E0, name: libultra/io/siacs }        # 800957E0..80095800
+      - { start: 0x71920, type: .bss, vram: 0x80095800, name: libultra/io/contpfs }      # 80095800..80095900
+      - { start: 0x71920, type: .bss, vram: 0x80095900, name: libultra/debug/kdebugserver } # 80095900..80095AB0 (data-only file)
+      - { start: 0x71920, type: .bss, vram: 0x80095AB0, name: libultra/io/pfsisplug }    # 80095AB0..80095AF0
 
   - [0x71920, databin, data_71920]
 

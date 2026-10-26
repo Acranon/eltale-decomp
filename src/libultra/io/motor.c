@@ -10,7 +10,7 @@
 #include "PRinternal/siint.h"
 
 #if BUILD_VERSION >= VERSION_J
-extern OSPifRam __MotorDataBuf[MAXCONTROLLERS]; /* bss, D2 */
+static OSPifRam __MotorDataBuf[MAXCONTROLLERS]; /* .bss 800955B0..800956B0 */
 
 #define READFORMAT(ptr) ((__OSContRamReadFormat*)(ptr))
 
