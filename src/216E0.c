@@ -34,7 +34,42 @@ typedef struct {
     /* 0x1A */ u16 unk1A;
 } Struct_8008C058;
 
-extern Struct_8008C058 D_8008C058[8];
+typedef struct {
+    f32 x, y, z;
+} Vec3f_216E0;
+
+/* This file's .bss, 8008C040..8008C190, in address order (first declaration fixes
+ * the order). D_8008C164 is used only by 12610. */
+u16 D_8008C040;
+u16 D_8008C042;
+s32 D_8008C044;
+s32 D_8008C048;
+s32 D_8008C04C;
+u16 D_8008C050;
+s32 D_8008C054;
+Struct_8008C058 D_8008C058[8];
+u32 D_8008C138;
+u32 D_8008C13C;
+Vec3f_216E0 D_8008C140;
+u16 D_8008C14C[2];
+u16 D_8008C150;
+u16 D_8008C152;
+u16 D_8008C154;
+u16 D_8008C156;
+u16 D_8008C158;
+u16 D_8008C15A;
+u16 D_8008C15C;
+u16 D_8008C15E;
+u16 D_8008C160;
+u16 D_8008C162;
+s32 D_8008C164;
+s32 D_8008C168;
+s32 D_8008C16C;
+s32 D_8008C170;
+s32 D_8008C174;
+s32 D_8008C178;
+s32 D_8008C17C;
+u16 D_8008C180;
 extern u8** D_800C03D8[];
 extern u8 D_8004F2C4[];
 extern u8 D_8004F498[];
@@ -71,23 +106,6 @@ typedef struct {
 
 extern Gfx* D_8007A184;
 extern Struct_8007AA08 D_8007AA08;
-extern u16 D_8008C042;
-extern s32 D_8008C044;
-extern s32 D_8008C048;
-extern s32 D_8008C04C;
-extern u16 D_8008C050;
-extern s32 D_8008C054;
-extern u32 D_8008C138;
-extern u16 D_8008C14C[2];
-extern u16 D_8008C15A;
-extern u16 D_8008C15C;
-extern u16 D_8008C15E;
-extern u16 D_8008C162;
-extern s32 D_8008C168;
-extern s32 D_8008C16C;
-extern s32 D_8008C170;
-extern s32 D_8008C174;
-extern s32 D_8008C178;
 extern Gfx D_803AA448[];
 extern Gfx D_803AA4C0[];
 extern Gfx D_803AA538[];
@@ -96,9 +114,6 @@ s32 func_80027FFC(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f_216E0;
 
 extern u8 D_803A4118[];
 extern u8 D_803A8728[];
@@ -150,7 +165,6 @@ typedef struct {
 
 extern u16 D_8004F2DC[];
 extern u16 D_8004F2EC[];
-extern Vec3f_216E0 D_8008C140;
 extern Struct_803AA690 D_803AA690[];
 extern Struct_803AA6C4 D_803AA6C4[];
 
@@ -209,8 +223,6 @@ extern Struct_8007C288* D_8007C288;
 extern u16 D_800842B8;
 extern s32 D_80085F90;
 extern u16 D_8008BE52;
-extern u16 D_8008C152;
-extern u16 D_8008C154;
 extern Gfx D_803A8788[];
 
 struct Struct_80021030;
@@ -321,10 +333,6 @@ typedef struct Struct_80021030 {
     /* 0x64 */ Struct_80021030_64* unk64;
 } Struct_80021030;
 
-extern u16 D_8008C152;
-extern u16 D_8008C154;
-extern u16 D_8008C156;
-extern u16 D_8008C158;
 extern Struct_80024A54 D_803A86F8;
 void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
 
@@ -375,8 +383,6 @@ extern s32 D_8004F2F4[];
 extern Gfx D_803AA3C8[];
 extern u8 D_8004F2CC[][4];
 extern Gfx D_803AA2F8[];
-extern u32 D_8008C13C;
-extern u16 D_8008C180;
 
 void func_800213A8(Unk2000000* buf, s32 arg1) {
     s32 x;
@@ -643,8 +649,6 @@ extern u8 D_8007A9F4;
 extern u8 D_8007A9F5;
 extern u8 D_8007A9F6;
 extern u8 D_8007A9F7;
-extern u32 D_8008C13C;
-extern u16 D_8008C160;
 extern u16 D_80092C86;
 extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
@@ -731,7 +735,6 @@ void func_80022970(Unk2000000* buf, Struct_80022970* pl) {
     }
 }
 
-extern u16 D_8008C040;
 
 typedef struct {
     /* 0x00 */ char unk0[0x14];
@@ -741,7 +744,6 @@ typedef struct {
 
 extern s32 D_8007A9C0;
 extern Struct_8007ABF0 D_8007ABF0[];
-extern s32 D_8008C17C;
 
 void func_800230A8(void) {
     s32 sx;
@@ -814,7 +816,6 @@ void func_8002338C(void) {
     }
 }
 
-extern u16 D_8008C150;
 
 extern Gfx D_803AA5B0[];
 
