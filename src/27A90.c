@@ -12,8 +12,11 @@ typedef struct {
     f32 y;
 } Vec2f;
 
-extern u32 D_8004F778;
-extern f32 D_8004F77C;
+/* This file's .data, 8004F770..8004F780: a bit table (used by other files),
+ * the random seed, and func_80027ADC's static degrees-to-radians factor
+ * (8004F77C), which must be a function-scope static for IDO to match. */
+u8 D_8004F770[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+u32 D_8004F778 = 0x9B0;
 extern MtxF D_8008CE60;
 
 extern MtxF D_80085F10;
@@ -291,7 +294,46 @@ void func_80027A8C(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
     guMtxF2L(D_8008CE60.mf, arg0);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/27A90/func_80027ADC.s")
+void func_80027ADC(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8,
+                   f32 arg9) {
+    f32 sin1;
+    f32 sin2;
+    f32 sin3;
+    f32 cos1;
+    f32 cos2;
+    f32 cos3;
+    static f32 D_8004F77C = 0.017453292f;
+
+    arg4 *= D_8004F77C;
+    arg5 *= D_8004F77C;
+    arg6 *= D_8004F77C;
+    sin1 = sinf(arg4);
+    cos1 = cosf(arg4);
+    sin2 = sinf(arg5);
+    cos2 = cosf(arg5);
+    sin3 = sinf(arg6);
+    cos3 = cosf(arg6);
+
+    arg0->mf[0][0] = ((cos3 * cos2) + (sin3 * sin1 * sin2)) * arg7;
+    arg0->mf[0][1] = sin3 * cos1 * arg7;
+    arg0->mf[0][2] = ((-sin2 * cos3) + (sin3 * sin1 * cos2)) * arg7;
+    arg0->mf[0][3] = 0.0f;
+
+    arg0->mf[1][0] = ((-sin3 * cos2) + (cos3 * sin1 * sin2)) * arg8;
+    arg0->mf[1][1] = cos3 * cos1 * arg8;
+    arg0->mf[1][2] = ((-sin3 * -sin2) + (cos3 * sin1 * cos2)) * arg8;
+    arg0->mf[1][3] = 0.0f;
+
+    arg0->mf[2][0] = cos1 * sin2 * arg9;
+    arg0->mf[2][1] = -sin1 * arg9;
+    arg0->mf[2][2] = cos1 * cos2 * arg9;
+    arg0->mf[2][3] = 0.0f;
+
+    arg0->mf[3][0] = arg1;
+    arg0->mf[3][1] = arg2;
+    arg0->mf[3][2] = arg3;
+    arg0->mf[3][3] = 1.0f;
+}
 
 void func_80027CB4(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
     arg0->mf[0][0] *= arg1;
