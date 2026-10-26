@@ -269,6 +269,8 @@ segments:
       - [0x4EB00, data]
       - [0x4EBC0, .data, 147A0]                  # 8004DFC0..8004E6A0
       - [0x4F2A0, data]
+      - [0x4F770, .data, 15150]                  # 8004EB70..8004EC90
+      - [0x4F890, data]
       - [0x4FA20, .data, 1B200]                  # 8004EE20..8004F060
       - [0x4FC60, data]
       - [0x50370, .data, 27A90]
@@ -336,6 +338,8 @@ segments:
       - { start: 0x71920, type: bss, vram: 0x80082860, name: 80082860 }
       - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }
       - { start: 0x71920, type: bss, vram: 0x80084B80, name: 80084B80 }
+      - { start: 0x71920, type: .bss, vram: 0x80085B80, name: 15150 }      # 80085B80..80085F90
+      - { start: 0x71920, type: bss, vram: 0x80085F90, name: 80085F90 }
       - { start: 0x71920, type: .bss, vram: 0x800865C0, name: 1B200 }
       - { start: 0x71920, type: bss, vram: 0x80087E00, name: 80087E00 }
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }

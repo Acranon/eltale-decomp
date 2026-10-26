@@ -92,15 +92,57 @@ typedef struct {
     /* 0x08 */ f32 z;
 } Unk8007ABB0;
 
-extern Camera15150 D_80085E48;
-extern Unk80085F68 D_80085F68;
-extern s32 D_80085CAC;
-extern f32 D_80085CB0;
-extern f32 D_80085CB4;
-extern f32 D_8004EC68[];
-extern f32 D_8004EC88;
-extern f32 D_8004EC8C;
-extern Vec2f_15150 D_80085C10;
+typedef struct 
+{
+  f32 x;
+  f32 y;
+  f32 z;
+  u8 padC[0xC];
+  u16 flags;
+} Coll15150;
+
+typedef struct {
+    /* 0x00 */ s32 mode;
+    /* 0x04 */ f32 unk4;
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ f32 unk1C;
+    /* 0x20 */ f32 unk20;
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 unk2C;
+    /* 0x30 */ f32 unk30;
+    /* 0x34 */ f32 unk34;
+} Camera15150Preset; // size = 0x38
+
+/* 15150 .bss, 80085B80..80085F90, in address order (first declaration fixes the order). */
+Camera15150 D_80085B80;
+u8 D_80085C08[8];
+Vec2f_15150 D_80085C10;
+u8 D_80085C18[8];
+Coll15150 D_80085C20;
+u16 D_80085C3C;
+Unk15150Target D_80085C40;
+s32 D_80085CAC;
+f32 D_80085CB0;
+f32 D_80085CB4;
+u8 D_80085CB8[0x190];
+Camera15150 D_80085E48;
+Mtx D_80085ED0;
+Mtx D_80085F10;
+f32 D_80085F50;
+f32 D_80085F54;
+f32 D_80085F58;
+f32 D_80085F5C;
+s32 D_80085F60;
+Camera15150Preset* D_80085F64;
+Unk80085F68 D_80085F68;
+f32 D_80085F84;
+u8 D_80085F88[8];
+
 extern s32 D_8007ABA8;
 extern Unk8007ABB0* D_8007ABB0[];
 
@@ -111,21 +153,30 @@ f32 cosf(f32);
 f32 sqrtf(f32);
 void func_80014E04(Camera15150*);
 void func_80015DB4(s32);
+void func_80015494(Camera15150*);
+void func_80015810(Camera15150*);
+void func_80015878(Camera15150*);
+void func_80015AD8(Camera15150*);
+
+Camera15150Preset D_8004EB70[3] = {
+    { 0, 0.0f, 0.0f, 0.0f, 11.0f, 15.0f, 65.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },
+    { 0, 0.0f, 0.0f, 0.0f, 11.0f, 72.0f, 144.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },
+    { 0, 0.0f, 0.0f, 0.0f, 11.0f, 2e+01f, 55.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },
+};
+void (*D_8004EC18[6])(Camera15150*) = {
+    func_80014E04, func_80015494, func_80014E04, func_80015810, func_80015878, func_80015AD8,
+};
+s32 D_8004EC30[7][2] = {
+    { 25, 2 }, { 25, 3 }, { 25, 4 }, { 25, 5 }, { 25, 8 }, { 25, 9 }, { 12, 2 },
+};
+f32 D_8004EC68[8] = { 0.0f, -0.1f, 0.0f, -0.05f, 0.1f, -0.1f, -0.05f, 0.08f };
+f32 D_8004EC88 = 0.0f;
+f32 D_8004EC8C = 0.0f;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014550.s")
 
 #pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014994.s")
 
-typedef struct 
-{
-  f32 x;
-  f32 y;
-  f32 z;
-  u8 padC[0xC];
-  u16 flags;
-} Coll15150;
-extern Coll15150 D_80085C20;
-extern u16 D_80085C3C;
 extern s32 D_8004DCA0;
 extern u16 D_80092C84;
 extern u16 D_8008BE52;
@@ -363,8 +414,6 @@ void func_80015810(Camera15150* arg0) {
     }
 }
 
-extern Camera15150 D_80085B80;
-extern f32 D_80085F84;
 extern f32 D_8008BE5C;
 extern f32 D_8008BE60;
 extern u16 D_80092C86;
@@ -481,9 +530,34 @@ void func_80015D78(s32 arg0) {
     D_80085CB4 = D_8004EC68[arg0 * 2 + 1];
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80015DB4.s")
+void func_80015DB4(s32 arg0) {
+    Camera15150* cam = &D_80085E48;
 
-extern Unk15150Target D_80085C40;
+    D_80085F60 = arg0;
+    if (cam->flags & 0x40) {
+        cam->target = D_80085B80.target;
+    }
+    cam->mode = D_80085F64[arg0].mode;
+    if (cam->mode != 0 && cam->mode != 2) {
+        cam->eyeX = D_80085F64[arg0].unk4;
+        cam->eyeY = D_80085F64[arg0].unk8;
+        cam->eyeZ = D_80085F64[arg0].unkC;
+    }
+    cam->flags &= 0xFFAF;
+    cam->unk4C = D_80085F64[arg0].unk18;
+    cam->unk58 = D_80085F64[arg0].unk14;
+    cam->unk5C = D_80085F64[arg0].unk10;
+    cam->unk68 = D_80085F64[arg0].unk24;
+    cam->unk6C = D_80085F64[arg0].unk28;
+    cam->unk60 = D_80085F64[arg0].unk1C;
+    cam->unk64 = D_80085F64[arg0].unk20;
+    D_80085F50 = D_80085F64[arg0].unk2C;
+    D_80085F54 = D_80085F64[arg0].unk30;
+    D_80085F58 = D_80085F64[arg0].unk34;
+    cam->unk40 = cam->unk44 = cam->unk48 = 0.0f;
+    cam->unk3C = 0.0f;
+}
+
 extern f32 D_8007AA24;
 extern u16 D_8008BE52;
 void func_80015F44(s32 arg0, Unk15150Target* arg1) {
