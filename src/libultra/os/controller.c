@@ -7,12 +7,14 @@
 #include "PRinternal/controller.h"
 #include "PRinternal/siint.h"
 
-extern OSPifRam __osContPifRam;
-extern u8 __osContLastCmd;
-extern u8 __osMaxControllers;
-extern OSMesgQueue D_80095758; /* __osEepromTimerQ */
+/* .bss 800956F0..80095780, as in ultralib's controller.c */
+OSPifRam __osContPifRam;
+u8 __osContLastCmd;
+u8 __osMaxControllers;
+OSTimer __osEepromTimer;                    /* 80095738 */
+OSMesgQueue D_80095758 ALIGNED(0x8);        /* __osEepromTimerQ */
 #define __osEepromTimerQ D_80095758
-extern OSMesg D_80095770; /* __osEepromTimerMsg */
+OSMesg D_80095770;                          /* __osEepromTimerMsg */
 #define __osEepromTimerMsg D_80095770
 s32 D_8006E710 = 0; /* __osContinitialized, .data 8006E710 */
 #define __osContinitialized D_8006E710

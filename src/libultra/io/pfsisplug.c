@@ -4,7 +4,7 @@
 #include "PRinternal/controller.h"
 #include "PRinternal/siint.h"
 
-extern OSPifRam __osPfsPifRam;
+OSPifRam __osPfsPifRam; /* .bss 80095AB0..80095AF0 */
 
 s32 osPfsIsPlug(OSMesgQueue* mq, u8* pattern) {
     s32 ret = 0;

@@ -31,12 +31,10 @@
 void guPositionF(float mf[4][4], float r, float p, float h, float s,
 		 float x, float y, float z)
 {
-extern float D_800955A0;
+        static float    dtor = 3.1415926 / 180.0; /* .bss 800955A0 */
         float   sinr, sinp, sinh;
         float   cosr, cosp, cosh;
 
-        float dtor = 3.1415926 / 180.0;
-        D_800955A0 = dtor;
         r *= dtor;
         p *= dtor;
         h *= dtor;
