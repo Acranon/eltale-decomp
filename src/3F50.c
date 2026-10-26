@@ -650,12 +650,81 @@ void func_8000525C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
 
 extern s32 D_80085E4C;
 void func_8000CA88(Actor *arg0);
-void func_8001AE24(Actor *arg0, s32 arg1, u16 arg2);
+void func_8001AE24(Actor *arg0, s32 arg1, s32 arg2);
 void func_8001BE2C(f32 x, f32 y, f32 z);
-void func_8002373C(Actor *arg0, s32 arg1, s32 arg2, s32 arg3);
+void func_8002373C(Actor *arg0, u16 arg1, u16 arg2, s16 arg3);
 
-u16 func_8000C528(s32 target, u16 dmg, s32 elem, u16 flags, Actor *arg4);
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_800052E0.s")
+u16 func_8000C528(s32 target, u16 dmg, u16 elem, u16 flags, Actor *arg4);
+void func_800052E0(Actor *a, PlayerState *p, CharData *cd) {
+    u16 dmg;
+    s32 flags;
+    s32 t;
+
+    a->vz = 0.0f;
+    a->vx = 0.0f;
+    if (--p->unk4 == 0) {
+        if (func_80007E04(p->unk2 - 1, a) != 0) {
+            dmg = func_80007EAC(p);
+            if (p->unk0 == 0x10) {
+                dmg *= 0.5;
+            }
+            flags = 0x8004;
+            if (p->unk8 & 0x400) {
+                flags = 0xC004;
+                p->unk8 &= ~0x400;
+            }
+            dmg = func_8000C528(p->unk2 - 1, dmg, (p->unk122 >> 8) & 0xF, flags, a);
+            if (dmg != 0) {
+                a->unk64->unk8++;
+                if (a->unk64->unkA < a->unk64->unk8) {
+                    a->unk64->unk8 = a->unk64->unkA;
+                }
+                if (p->unk84 & 2) {
+                    t = ((dmg + 3) >> 2) + 1;
+                    dmg = t;
+                    a->unk64->unk4 += dmg;
+                    if (a->unk64->unk6 < a->unk64->unk4) {
+                        a->unk64->unk4 = a->unk64->unk6;
+                    }
+                    func_8001AE24(a, 1, dmg);
+                    func_8002373C(a, 2, 1, 0x1E);
+                }
+                D_8007A918.x = 0.0f;
+                D_8007A918.z = 2.0f * (a->unk64->unk18 * a->scale);
+                func_800271B4(a->rot, &D_8007A918);
+                func_8001BE2C(a->x + D_8007A918.x, a->y + a->unk64->unk1C * a->scale * 0.7f, a->z + D_8007A918.z);
+            }
+            p->unk14->unk28++;
+        } else {
+            func_8000CA88(&D_8007B908[p->unk2 - 1].actor);
+        }
+        if (D_8007B908[p->unk2 - 1].unkA == 0) {
+            p->unk8 &= ~0x100;
+        }
+        if (p->unk0 == 0xD && (p->unk8 & 0x100)) {
+            p->unk0 = 0x10;
+            p->unk4 = 0x12;
+            p->unk8 &= ~0x100;
+            a->unk60 |= 1;
+            func_800201A0(a, 0xB, 1, D_8007A910, 1, 1);
+            D_80085E4C = 0x23;
+            return;
+        }
+        p->unk0 = 3;
+        if (p->unk0 == 0xD) {
+            p->unk4 = cd->unk7A - 0x14;
+        } else {
+            p->unk4 = cd->unk86 - 0x16;
+        }
+        p->unk2 = 0;
+        p->unk8 &= ~0x100;
+        func_80008970(p);
+        p->unk2 = 0;
+        func_8001FC14(a);
+    } else if (p->unk0 == 0xD && p->unk10 >= p->unk4 && (D_80092C86 & 0xA000)) {
+        p->unk8 |= 0x100;
+    }
+}
 
 void func_8000571C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     arg0->vz = 0.0f;
