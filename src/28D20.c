@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern OSMesgQueue D_8007A1A8;
-extern OSIoMesg D_8008CEA0;
+OSIoMesg D_8008CEA0; /* .bss 8008CEA0..8008CEC0 */
 
 void func_80028120(u8* devAddr, void* vAddr, s32 size) {
     u32 mesgSize;
