@@ -277,7 +277,8 @@ segments:
       - [0x500D0, data]
       - [0x50370, .data, 27A90]
       - [0x50380, .data, 29150]                  # 8004F780..80055B40
-      - [0x56740, data]
+      - [0x56740, .data, 2B0F0]                  # 80055B40..80055D40
+      - [0x56940, data]
       - [0x6D900, .data, libultra/os/initialize]
       - [0x6D920, .data, libultra/io/pimgr]      # 8006CD20..8006CD50
       - [0x6D950, .data, libultra/io/vitbl]      # 8006CD50..8006DED0 (data-only file)
