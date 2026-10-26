@@ -171,18 +171,7 @@ Gfx D_8004E208[10] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 u8 D_8004E258[4][0x100] = {
-    {
-        /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
-    },
-    {
-        /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
-    },
-    {
-        /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
-    },
-    {
-        /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
-    },
+#include "assets/D_8004E258.inc.c"
 };
 
 void func_80013BA0(void) {

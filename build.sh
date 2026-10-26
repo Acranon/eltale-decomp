@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 [ -f baserom.jp.z64 ] || { echo "baserom.jp.z64 missing (Eltale Monsters (J), z64 byte order)"; exit 1; }
 . .venv/bin/activate
 [ -d asm ] || rm -f .splache
-if [ ! -d asm ] || [ eltale.jp.yaml -nt build.ninja ] || [ symbol_addrs.txt -nt build.ninja ]; then
+if [ ! -d asm ] || [ eltale.jp.yaml -nt build.ninja ] || [ symbol_addrs.txt -nt build.ninja ] || [ assets.yaml -nt build.ninja ]; then
     python3 configure.py
 fi
 ninja "$@"

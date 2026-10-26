@@ -11,6 +11,9 @@ import ninja_syntax
 import splat
 import splat.scripts.split as split
 
+sys.path.insert(0, str(Path(__file__).parent / "tools"))
+import extract_assets  # noqa: E402
+
 ROOT = Path(__file__).parent.resolve()
 YAML_FILE = "eltale.jp.yaml"
 BASENAME = "eltale"
@@ -18,11 +21,13 @@ LD_PATH = f"{BASENAME}.ld"
 ELF_PATH = f"build/{BASENAME}.elf"
 ROM_PATH = f"build/{BASENAME}.z64"
 MAP_PATH = f"build/{BASENAME}.map"
+ASSETS_MANIFEST = "assets.yaml"
+ASSETS_DIR = "build/assets"
 
 IDO = "tools/ido_5.3/cc"
 CROSS = "mips-linux-gnu-"
 AS = f"{CROSS}as -EB -mtune=vr4300 -march=vr4300 -mabi=32"
-INCLUDES = "-I. -Iinclude -Iinclude/ultra64 -Iinclude/ultra64/PR -Isrc"
+INCLUDES = "-I. -Iinclude -Iinclude/ultra64 -Iinclude/ultra64/PR -Isrc -Ibuild"
 DEFINES = "-D_LANGUAGE_C -DF3DEX_GBI -DNDEBUG -D_FINALROM -DBUILD_VERSION=VERSION_J"
 WARNINGS = "-fullwarn -verbose -Xcpluscomm -signed -nostdinc -non_shared -Wab,-r4300_mul -woff 649,838,712,516,624"
 ASM_PROC = "python3 tools/asm-processor/build.py --input-enc=utf-8 --output-enc=euc-jp"
@@ -118,6 +123,18 @@ def write_ninja(linker_entries):
     ninja.rule("z64", description="z64 $out", command=f"{CROSS}objcopy $in $out -O binary")
     ninja.rule("sha1", description="check $in", command="sha1sum -c checksum.sha1 && touch $out")
 
+    # ROM assets (assets.yaml): build/assets/<name>.inc.c, included by C files.
+    # Every cc edge waits for them (order-only); the depfile then tracks which
+    # object includes which, and restat skips recompiles when nothing changed.
+    ninja.rule("assets", description="extract assets", restat=True,
+               command=f"python3 tools/extract_assets.py $in {ASSETS_DIR}")
+    asset_outs = [str(extract_assets.output_path(ASSETS_DIR, e))
+                  for e in extract_assets.load_manifest(ASSETS_MANIFEST)]
+    if asset_outs:
+        ninja.build(asset_outs, "assets", [ASSETS_MANIFEST, "baserom.jp.z64"],
+                    implicit=["tools/extract_assets.py"])
+    ninja.build("assets", "phony", asset_outs)
+
     objects = []
     for entry in linker_entries:
         seg = entry.segment
@@ -130,7 +147,8 @@ def write_ninja(linker_entries):
         objects.append(obj)
         if isinstance(seg, splat.segtypes.common.c.CommonSegC):
             src = srcs[0]
-            ninja.build(obj, "cc", srcs, variables={"flags": flags_for(src), "o32": "1" if src in SET_O32 else ""})
+            ninja.build(obj, "cc", srcs, order_only=["assets"],
+                        variables={"flags": flags_for(src), "o32": "1" if src in SET_O32 else ""})
         elif isinstance(seg, (splat.segtypes.common.asm.CommonSegAsm, splat.segtypes.common.data.CommonSegData)) \
                 or seg.type in ("hasm", "header", "asm", "data", "rodata", "bss"):
             ninja.build(obj, "as", srcs)

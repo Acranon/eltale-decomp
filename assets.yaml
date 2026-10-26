@@ -1,0 +1,12 @@
+# ROM assets that C files include (see tools/extract_assets.py and GUIDE "Assets").
+# The bytes are not in the repo: the build reads them from baserom.jp.z64 and writes
+# build/assets/<name>.inc.c. name = the C symbol, rom = ROM offset, size in bytes,
+# type = element type of the C array (u8, u16, u32; big-endian).
+
+# ovl_DA4570 .data (ROM = vram - 0x80105660 + 0xDA9BD0)
+- { name: D_8010567C_ovl_DA4570, rom: 0xDA9BEC, size: 0x10, type: u16 }    # font palette, 8 colours
+- { name: D_8010568C_ovl_DA4570, rom: 0xDA9BFC, size: 0x1980, type: u8 }   # 4bpp font bitmap
+- { name: D_8010700C_ovl_DA4570, rom: 0xDAB57C, size: 0x38, type: u16 }    # 7 palettes of 4 colours
+
+# main .data (ROM = vram - 0x7FFFF400)
+- { name: D_8004E258, rom: 0x4EE58, size: 0x400, type: u8 }                # 4 textures of 0x100 bytes

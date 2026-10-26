@@ -39,14 +39,16 @@ extern u8 D_803245A0[];
 s32 D_80105660_ovl_DA4570 = 0;
 u16* D_80105664_ovl_DA4570[2] = { (u16*) 0x80200000, (u16*) 0x80225800 };
 UnkFont_8010566C D_8010566C_ovl_DA4570[1] = { { 10, 13, 10, 14 } };
-u16 D_8010567C_ovl_DA4570[8] = { /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */ };
+u16 D_8010567C_ovl_DA4570[8] = {
+#include "assets/D_8010567C_ovl_DA4570.inc.c"
+};
 /* 4bpp font bitmap, 0x1980 bytes */
 u8 D_8010568C_ovl_DA4570[0x1980] = {
-    /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
+#include "assets/D_8010568C_ovl_DA4570.inc.c"
 };
 /* 7 palettes of 4 colours */
 u16 D_8010700C_ovl_DA4570[28] = {
-    /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
+#include "assets/D_8010700C_ovl_DA4570.inc.c"
 };
 u16* D_80107044_ovl_DA4570 = &D_8010700C_ovl_DA4570[4];
 /* func_80101C80's two statics follow at 80107048/4C */
