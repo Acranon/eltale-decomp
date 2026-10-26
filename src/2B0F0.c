@@ -12,12 +12,14 @@ typedef struct {
     s8 unk4;
 } BgmMapEntry;
 
-extern s8 D_8008FAF0;
-extern s8 D_8008FAF1;
-extern u16 D_8008FAF2;
-extern u8 D_8008FAF4;
-extern u16 D_8008FAF6;
-extern BgmFade D_8008FAF8[16];
+/* .bss 8008FAF0..8008FB30 */
+s8 D_8008FAF0;
+s8 D_8008FAF1;
+u16 D_8008FAF2;
+u8 D_8008FAF4;
+u16 D_8008FAF6;
+BgmFade D_8008FAF8[16];
+
 /* This file's .data, 80055B40..80055D40. */
 BgmMapEntry D_80055B40[72] = {
     { 0, 2, 33 }, { 0, 3, 33 }, { 0, 4, 33 }, { 11, 4, -1 }, { 11, 3, -1 }, { 11, 5, -1 },

@@ -1,8 +1,22 @@
 #include "common.h"
 
+/* .bss 8008FB30..8008FB70 */
+s32 D_8008FB30;
+s32 D_8008FB34;
+s32 D_8008FB38;
+u16 D_8008FB3C;
+u16 D_8008FB3E;
+s8 D_8008FB40;
+s32 D_8008FB44;
+f32 D_8008FB48;
+f32 D_8008FB4C;
+s32 D_8008FB50;
+s32 D_8008FB54;
+s32 D_8008FB58; /* only func_8002B844 (asm) uses it */
+f32 D_8008FB5C; /* only func_8002C598 (asm) uses these two */
+f32 D_8008FB60;
+
 extern Gfx* D_8007A184;
-extern u16 D_8008FB3C;
-extern u16 D_8008FB3E;
 extern u16 D_8008FB70;
 
 void func_8002A930(void) {
@@ -20,8 +34,6 @@ void func_8002A954(void) {
 extern Gfx* D_8007A184;
 extern Gfx D_80061770[];
 extern u16 D_8007A170;
-extern s8 D_8008FB40;
-extern s32 D_8008FB44;
 extern u16 D_80092C86;
 void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
 
@@ -91,9 +103,6 @@ void func_8002A984(s32 arg0) {
     }
 }
 
-extern s32 D_8008FB30;
-extern s32 D_8008FB34;
-extern s32 D_8008FB38;
 void func_8002AE58(s32);
 void func_8002B844(s32);
 void func_8002C598(s32);
@@ -186,8 +195,6 @@ extern u8 D_8007AA03;
 extern s32 D_8007AA10;
 extern u16 D_80055F0C[];
 extern s8 D_80060D64[];
-extern s32 D_8008FB38;
-extern s32 D_8008FB44;
 extern s8 D_80092C81;
 extern u16 D_80092C84;
 void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
@@ -316,8 +323,6 @@ extern u8 D_8007A9F7;
 extern s32 D_8007A9E0;
 extern u8 D_8007AA04;
 extern u32 D_80055D7C[];
-extern s32 D_8008FB38;
-extern s32 D_8008FB44;
 extern s8 D_80092C81;
 extern u16 D_80092C84;
 void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
@@ -661,14 +666,10 @@ typedef struct { s8 a; s8 b; } Unk80060F30;
 extern Unk80060F30 D_80060F30[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
-extern s32 D_8008FB50;
-extern s32 D_8008FB54;
 extern f32 D_80060F28;
 extern f32 D_80060F2C;
 extern s16 D_800614B4[];
 extern s16 D_800614CC[];
-extern f32 D_8008FB48;
-extern f32 D_8008FB4C;
 
 void func_8002F87C(void) {
     s32 cnt = 0;
