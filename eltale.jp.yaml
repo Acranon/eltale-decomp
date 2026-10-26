@@ -377,11 +377,14 @@ segments:
       - { start: 0x71920, type: .bss, vram: 0x800859B0, name: 147A0 }      # 800859B0..80085AB0
       - { start: 0x71920, type: .bss, vram: 0x80085AB0, name: 14CF0 }      # 80085AB0..80085B80
       - { start: 0x71920, type: .bss, vram: 0x80085B80, name: 15150 }      # 80085B80..80085F90
-      - { start: 0x71920, type: bss, vram: 0x80085F90, name: 80085F90 }
-      - { start: 0x71920, type: .bss, vram: 0x800865C0, name: 1B200 }
-      - { start: 0x71920, type: bss, vram: 0x80087E00, name: 80087E00 }
+      - { start: 0x71920, type: .bss, vram: 0x80085F90, name: 17360 }      # 80085F90..800863F0
+      - { start: 0x71920, type: .bss, vram: 0x800863F0, name: 1B200 }      # 800863F0..80087E30
+      - { start: 0x71920, type: bss, vram: 0x80087E30, name: 80087E30 }
       - { start: 0x71920, type: .bss, vram: 0x8008C190, name: 25B20 }      # 8008C190..8008CA50
-      - { start: 0x71920, type: bss, vram: 0x8008CA50, name: 8008CA50 }
+      - { start: 0x71920, type: .bss, vram: 0x8008CA50, name: 272D0 }      # 8008CA50..8008CE60
+      - { start: 0x71920, type: .bss, vram: 0x8008CE60, name: 27A90 }      # 8008CE60..8008CEA0
+      - { start: 0x71920, type: .bss, vram: 0x8008CEA0, name: 28D20 }      # 8008CEA0..8008CEC0
+      - { start: 0x71920, type: bss, vram: 0x8008CEC0, name: 8008CEC0 }
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: .bss, vram: 0x80093000, name: libultra/io/pimgr }        # 80093000..800942C0
       - { start: 0x71920, type: .bss, vram: 0x800942C0, name: libultra/os/seteventmesg } # 800942C0..80094340

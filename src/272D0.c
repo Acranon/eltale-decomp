@@ -9,11 +9,12 @@ extern Mtx D_2000000[];
 extern Mtx D_2000040[];
 extern s32 D_8007A180;
 extern Gfx* D_8007A184;
-extern u16 D_8008CA50;
-extern u8 D_8008CA58[0x100][4];
-extern s32 D_8008CE58;
 typedef struct { u8 r, g, b, a; } Color_RGBA8;
-extern Color_RGBA8* D_8008CE5C;
+/* .bss 8008CA50..8008CE60 */
+u16 D_8008CA50;
+u8 D_8008CA58[0x100][4];
+s32 D_8008CE58;
+Color_RGBA8* D_8008CE5C;
 
 /* .data 8004F4D0..8004F770: the fade quad, its display lists and the fade colour ramps. */
 Vtx D_8004F4D0[4] = {
