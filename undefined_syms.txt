@@ -79,6 +79,10 @@ D_8007AB38 = D_8007AA08 + 0x130;
 D_8007AB3C = D_8007AA08 + 0x134;
 D_8007AB40 = D_8007AA08 + 0x138;
 
+/* D2: labels inside objects that src/9D50.c defines (8007AB70..8007B900). */
+D_8007AC70 = D_8007ABF0 + 0x80;
+D_8007B7E2 = D_8007B430 + 0x3B2;
+
 /* D2: labels inside objects that src/12610.c defines (80084980..80084B80):
  * D_80084B18[4][3], D_80084B48[4][3], D_80084B78[2]. */
 D_80084B1C = D_80084B18 + 0x04;
