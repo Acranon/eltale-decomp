@@ -317,7 +317,14 @@ extern Unk8000FA9C *D_80082860[];
 extern Unk8000FA9C *D_80082C60[];
 extern Unk8000FA9C *D_80083068[];
 void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
-extern Unk80082048 D_80082048[];
+/* Part of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
+ * holds D_80082858). Nothing names 80082030..80082048 (splat's D_80082030 is
+ * func_8000D6A0's loop end), so it is a placeholder. */
+u8 D_80082030[0x18];
+Unk80082048 D_80082048[4];
+u16 D_80082058[0x200];
+u16 D_80082458[0x200];
+s32 D_80082858;
 void func_8001A948(f32, f32, f32, Unk8000FA9C *);
 void func_8000FA9C(Unk8000FA9C *);
 void func_8000FC50(Unk8000FA9C *);
@@ -340,7 +347,6 @@ typedef struct {
 
 extern u16 D_800810B0[];
 extern u16 D_800814B0[][0x100];
-extern s32 D_80082858;
 extern u16 *D_80083060;
 extern u16 *D_80083468;
 extern u16 *D_80083550;
