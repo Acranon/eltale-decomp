@@ -1560,7 +1560,22 @@ extern PlayerStateSub14 *D_8007AA1C; /* .unk14 */
 extern s16 D_8007AA70;    /* .actor.unk50 */
 extern u16 D_8007AA80;    /* .actor.unk60 */
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_8000847C.s")
+void func_8000847C(void) {
+    PlayerState *p = &D_8007AA08;
+    CharData *cd;
+
+    if (p->unk0 != 6) {
+        if (p->unk14->unk4 != 0) {
+            cd = D_80055D40[p->actor.unk50];
+            p->unk0 = 3;
+            p->unk4 = cd->unk56;
+            p->actor.unk60 |= 3;
+            func_800201A0(&p->actor, 7, 1, D_8007A910, 1, 1);
+            func_8002433C(&p->actor);
+            func_8002A7C8(0, 0x17, 0xFF);
+        }
+    }
+}
 
 s32 func_80008540(PlayerState *arg0, Actor *arg1) {
     s32 ret = 0;
