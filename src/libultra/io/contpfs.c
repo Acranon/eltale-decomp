@@ -6,8 +6,7 @@
 #include "PR/rmon.h"
 
 #if BUILD_VERSION >= VERSION_J
-/* defined in data/bss (D2) */
-extern __OSInode __osPfsInodeCache;
+__OSInode __osPfsInodeCache ALIGNED(0x8); /* .bss 80095800..80095900 */
 s32 __osPfsInodeCacheChannel = -1;   /* .data 8006EB40 */
 u8 __osPfsInodeCacheBank = 250;
 #endif

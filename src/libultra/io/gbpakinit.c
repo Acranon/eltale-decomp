@@ -8,10 +8,10 @@
 #include "PRinternal/controller.h"
 #include "PRinternal/controller_gbpak.h"
 
-/* bss, D2 */
-extern OSTimer __osGbpakTimer;
-extern OSMesgQueue __osGbpakTimerQ;
-extern OSMesg __osGbpakTimerMsg;
+/* .bss 800956B0..800956F0 */
+OSTimer __osGbpakTimer;
+OSMesgQueue __osGbpakTimerQ ALIGNED(0x8);
+OSMesg __osGbpakTimerMsg;
 
 s32 osGbpakInit(OSMesgQueue* mq, OSPfs* pfs, int channel) {
     int i;
