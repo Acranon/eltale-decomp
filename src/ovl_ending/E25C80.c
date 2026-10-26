@@ -1,7 +1,8 @@
 #include "common.h"
 
 /* ovl_ending .data 8020F6C0..8022BB00: display lists, credit scroll tables and images.
-   A data-only file: E22690.c's .data ends at 8020F6B5 and this starts 16-aligned at 8020F6C0. */
+   A data-only file: E22690.c's .data ends at 8020F6B5 and this starts 16-aligned at 8020F6C0.
+   The 8-byte Gfx after some tables and images is a gsSPEndDisplayList that follows them. */
 
 typedef struct {
     u32 flags;
@@ -251,8 +252,11 @@ Gfx D_80221610_ovl_ending[1] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* texture */
-u8 D_80221618_ovl_ending[0xA4B8] = {
+u8 D_80221618_ovl_ending[0xA4B0] = {
 #include "assets/D_80221618_ovl_ending.inc.c"
+};
+Gfx D_8022BAC8_ovl_ending[1] = {
+    {{ 0xB8000000, 0x00000000 }},
 };
 /* palette, 16 colours */
 u16 D_8022BAD0_ovl_ending[0x10] = {

@@ -1,7 +1,8 @@
 #include "common.h"
 
 /* ovl_title .data 8020F510..80226D30: the title screen's images, palettes and message text.
-   A data-only file: DAC190.c's .data ends at 8020F504 and this starts 16-aligned at 8020F510. */
+   A data-only file: DAC190.c's .data ends at 8020F504 and this starts 16-aligned at 8020F510.
+   The 8-byte Gfx after some images is a gsSPEndDisplayList that follows the converted texture. */
 
 /* palette, 256 colours */
 u16 D_8020F510_ovl_title[0x100] = {
@@ -16,12 +17,18 @@ u16 D_8020FE10_ovl_title[0x100] = {
 #include "assets/D_8020FE10_ovl_title.inc.c"
 };
 /* texture */
-u8 D_80210010_ovl_title[0x5E8] = {
+u8 D_80210010_ovl_title[0x5E0] = {
 #include "assets/D_80210010_ovl_title.inc.c"
 };
+Gfx D_802105F0_ovl_title[1] = {
+    {{ 0xB8000000, 0x00000000 }},
+};
 /* texture */
-u8 D_802105F8_ovl_title[0x508] = {
+u8 D_802105F8_ovl_title[0x500] = {
 #include "assets/D_802105F8_ovl_title.inc.c"
+};
+Gfx D_80210AF8_ovl_title[1] = {
+    {{ 0xB8000000, 0x00000000 }},
 };
 /* palette, 256 colours */
 u16 D_80210B00_ovl_title[0x100] = {
@@ -32,12 +39,18 @@ u16 D_80210D00_ovl_title[0x10] = {
 #include "assets/D_80210D00_ovl_title.inc.c"
 };
 /* texture */
-u8 D_80210D20_ovl_title[0x428] = {
+u8 D_80210D20_ovl_title[0x420] = {
 #include "assets/D_80210D20_ovl_title.inc.c"
 };
+Gfx D_80211140_ovl_title[1] = {
+    {{ 0xB8000000, 0x00000000 }},
+};
 /* texture */
-u8 D_80211148_ovl_title[0x60] = {
+u8 D_80211148_ovl_title[0x58] = {
 #include "assets/D_80211148_ovl_title.inc.c"
+};
+Gfx D_802111A0_ovl_title[1] = {
+    {{ 0xB8000000, 0x00000000 }},
 };
 /* palette, 256 colours */
 u16 D_802111A8_ovl_title[0x100] = {
@@ -84,8 +97,11 @@ u16 D_802150F0_ovl_title[0x100] = {
 #include "assets/D_802150F0_ovl_title.inc.c"
 };
 /* texture */
-u8 D_802152F0_ovl_title[0x11808] = {
+u8 D_802152F0_ovl_title[0x11800] = {
 #include "assets/D_802152F0_ovl_title.inc.c"
+};
+Gfx D_80226AF0_ovl_title[1] = {
+    {{ 0xB8000000, 0x00000000 }},
 };
 /* palette, 256 colours */
 u16 D_80226AF8_ovl_title[0x100] = {
