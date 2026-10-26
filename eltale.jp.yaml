@@ -323,6 +323,8 @@ segments:
       - [0x70E60, rodata, gspF3DEX_data]
       - [0x71660, rodata, aspMain_data]
       - { start: 0x71920, type: bss, vram: 0x80070D20 }
+      - { start: 0x71920, type: .bss, vram: 0x8007A170, name: 1870 }       # 8007A170..8007A8C0
+      - { start: 0x71920, type: bss, vram: 0x8007A8C0, name: 8007A8C0 }
       - { start: 0x71920, type: .bss, vram: 0x8007A8F0, name: 3F50 }       # 8007A8F0..8007AB70
       - { start: 0x71920, type: bss, vram: 0x8007AB70, name: 8007AB70 }
       - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }

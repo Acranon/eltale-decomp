@@ -14,6 +14,11 @@ D_80124E00 = 0x80124E00;
 /* Second name for a ROM address that is both one block's end and the next block's start (func_8000D6A0 uses both). */
 D_851F0_end = 0x851F0;
 
+/* D2: labels inside objects that src/1870.c defines (8007A170..8007A8C0). */
+D_8007A254 = D_8007A1E0 + 0x74;
+D_8007A8AC = D_8007A8A8 + 0x4;
+D_8007A8BC = D_8007A8B8 + 0x4;
+
 /* D2: labels inside objects that src/3F50.c defines (8007A8F0..8007AB70). */
 D_8007A91C = D_8007A918 + 0x4;
 D_8007A92C = D_8007A928 + 0x4;
