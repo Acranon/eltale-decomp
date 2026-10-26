@@ -17,7 +17,7 @@
         ptr = (void*)osVirtualToPhysical(ptr); \
     } (void)0
 
-extern OSTask D_80094340;
+static OSTask D_80094340; /* tmp_task, .bss 80094340..80094380 */
 #define tmp_task D_80094340
 
 OSTask* _VirtualToPhysicalTask(OSTask* intp) {
