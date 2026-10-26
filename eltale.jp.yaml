@@ -368,7 +368,8 @@ segments:
       - { start: 0x71920, type: .bss, vram: 0x8007A8F0, name: 3F50 }       # 8007A8F0..8007AB70
       - { start: 0x71920, type: .bss, vram: 0x8007AB70, name: 9D50 }       # 8007AB70..8007B900
       - { start: 0x71920, type: .bss, vram: 0x8007B900, name: AEA0 }       # 8007B900..8007C0B0
-      - { start: 0x71920, type: bss, vram: 0x8007C0B0, name: 8007C0B0 }
+      - { start: 0x71920, type: .bss, vram: 0x8007C0B0, name: DAE0 }       # 8007C0B0..8007C280
+      - { start: 0x71920, type: bss, vram: 0x8007C280, name: 8007C280 }
       - { start: 0x71920, type: .bss, vram: 0x80082030, name: E2A0 }
       - { start: 0x71920, type: bss, vram: 0x80082860, name: 80082860 }
       - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }
