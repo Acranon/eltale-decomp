@@ -5,6 +5,167 @@
 
 # main .data 80055B40..8006CD00 (ROM = vram - 0x7FFFF400)
 - { name: D_80061650, rom: 0x62250, size: 0xE, type: u8 }                  # message text (func_80030D5C)
+- { name: D_80061850, rom: 0x62450, size: 0x200, type: u16 }           # palette, 256 colours
+- { name: D_80061A50, rom: 0x62650, size: 0x100, type: u8 }            # texture
+- { name: D_80061B50, rom: 0x62750, size: 0x208, type: u8 }            # texture
+- { name: D_80061D58, rom: 0x62958, size: 0x90, type: u8 }             # texture
+- { name: D_80061DE8, rom: 0x629E8, size: 0x10, type: u8 }             # texture
+- { name: D_80061DF8, rom: 0x629F8, size: 0xA0, type: u8 }             # texture
+- { name: D_80061E98, rom: 0x62A98, size: 0x208, type: u16 }           # palette, 256 colours
+- { name: D_800620A0, rom: 0x62CA0, size: 0x108, type: u8 }            # texture
+- { name: D_800621A8, rom: 0x62DA8, size: 0xD8, type: u8 }             # texture
+- { name: D_80062280, rom: 0x62E80, size: 0x10, type: u8 }             # texture
+- { name: D_80062290, rom: 0x62E90, size: 0x10, type: u8 }             # texture
+- { name: D_800622A0, rom: 0x62EA0, size: 0x98, type: u8 }             # texture
+- { name: D_80062338, rom: 0x62F38, size: 0x48, type: u8 }             # texture
+- { name: D_80062380, rom: 0x62F80, size: 0xB8, type: u8 }             # texture
+- { name: D_80062438, rom: 0x63038, size: 0xB8, type: u8 }             # texture
+- { name: D_800624F0, rom: 0x630F0, size: 0x10, type: u8 }             # texture
+- { name: D_80062500, rom: 0x63100, size: 0x10, type: u8 }             # texture
+- { name: D_80062510, rom: 0x63110, size: 0x58, type: u8 }             # texture
+- { name: D_80062568, rom: 0x63168, size: 0x58, type: u8 }             # texture
+- { name: D_800625C0, rom: 0x631C0, size: 0x58, type: u8 }             # texture
+- { name: D_80062618, rom: 0x63218, size: 0x58, type: u8 }             # texture
+- { name: D_80062670, rom: 0x63270, size: 0x58, type: u8 }             # texture
+- { name: D_800626C8, rom: 0x632C8, size: 0x58, type: u8 }             # texture
+- { name: D_80062720, rom: 0x63320, size: 0x58, type: u8 }             # texture
+- { name: D_80062778, rom: 0x63378, size: 0x58, type: u8 }             # texture
+- { name: D_800627D0, rom: 0x633D0, size: 0x58, type: u8 }             # texture
+- { name: D_80062828, rom: 0x63428, size: 0x58, type: u8 }             # texture
+- { name: D_80062880, rom: 0x63480, size: 0x58, type: u8 }             # texture
+- { name: D_800628D8, rom: 0x634D8, size: 0x58, type: u8 }             # texture
+- { name: D_80062930, rom: 0x63530, size: 0x58, type: u8 }             # texture
+- { name: D_80062988, rom: 0x63588, size: 0x58, type: u8 }             # texture
+- { name: D_800629E0, rom: 0x635E0, size: 0x58, type: u8 }             # texture
+- { name: D_80062A38, rom: 0x63638, size: 0x58, type: u8 }             # texture
+- { name: D_80062A90, rom: 0x63690, size: 0x438, type: u8 }            # texture
+- { name: D_80062EC8, rom: 0x63AC8, size: 0x170, type: u8 }            # texture
+- { name: D_80063038, rom: 0x63C38, size: 0x178, type: u8 }            # texture
+- { name: D_800631B0, rom: 0x63DB0, size: 0x228, type: u8 }            # texture
+- { name: D_800633D8, rom: 0x63FD8, size: 0x1B0, type: u8 }            # texture
+- { name: D_80063588, rom: 0x64188, size: 0x10, type: u8 }             # texture
+- { name: D_80063598, rom: 0x64198, size: 0xE8, type: u8 }             # texture
+- { name: D_80063680, rom: 0x64280, size: 0x4C0, type: u8 }            # texture
+- { name: D_80063B40, rom: 0x64740, size: 0x290, type: u8 }            # texture
+- { name: D_80063DD0, rom: 0x649D0, size: 0x200, type: u8 }            # texture
+- { name: D_80063FD0, rom: 0x64BD0, size: 0x258, type: u8 }            # texture
+- { name: D_80064228, rom: 0x64E28, size: 0xF8, type: u8 }             # texture
+- { name: D_80064320, rom: 0x64F20, size: 0x60, type: u8 }             # texture
+- { name: D_80064380, rom: 0x64F80, size: 0x60, type: u8 }             # texture
+- { name: D_800643E0, rom: 0x64FE0, size: 0x60, type: u8 }             # texture
+- { name: D_80064440, rom: 0x65040, size: 0xF8, type: u8 }             # texture
+- { name: D_80064538, rom: 0x65138, size: 0xF8, type: u8 }             # texture
+- { name: D_80064630, rom: 0x65230, size: 0x3A8, type: u8 }            # texture
+- { name: D_800649D8, rom: 0x655D8, size: 0xC8, type: u8 }             # texture
+- { name: D_80064AA0, rom: 0x656A0, size: 0x468, type: u8 }            # texture
+- { name: D_80064F08, rom: 0x65B08, size: 0x98, type: u8 }             # texture
+- { name: D_80064FA0, rom: 0x65BA0, size: 0x98, type: u8 }             # texture
+- { name: D_80065038, rom: 0x65C38, size: 0x98, type: u8 }             # texture
+- { name: D_800650D0, rom: 0x65CD0, size: 0x98, type: u8 }             # texture
+- { name: D_80065168, rom: 0x65D68, size: 0x1E8, type: u8 }            # texture
+- { name: D_80065350, rom: 0x65F50, size: 0xA8, type: u8 }             # texture
+- { name: D_800653F8, rom: 0x65FF8, size: 0x10, type: u8 }             # texture
+- { name: D_80065408, rom: 0x66008, size: 0x10, type: u8 }             # texture
+- { name: D_80065418, rom: 0x66018, size: 0x178, type: u8 }            # texture
+- { name: D_80065590, rom: 0x66190, size: 0x18, type: u8 }             # texture
+- { name: D_800655A8, rom: 0x661A8, size: 0x18, type: u8 }             # texture
+- { name: D_800655C0, rom: 0x661C0, size: 0x18, type: u8 }             # texture
+- { name: D_800655D8, rom: 0x661D8, size: 0x18, type: u8 }             # texture
+- { name: D_800655F0, rom: 0x661F0, size: 0x18, type: u8 }             # texture
+- { name: D_80065608, rom: 0x66208, size: 0x18, type: u8 }             # texture
+- { name: D_80065620, rom: 0x66220, size: 0x18, type: u8 }             # texture
+- { name: D_80065638, rom: 0x66238, size: 0x10, type: u8 }             # texture
+- { name: D_80065648, rom: 0x66248, size: 0x138, type: u8 }            # texture
+- { name: D_80065780, rom: 0x66380, size: 0x10, type: u8 }             # texture
+- { name: D_80065790, rom: 0x66390, size: 0x10, type: u8 }             # texture
+- { name: D_800657A0, rom: 0x663A0, size: 0x5D8, type: u8 }            # texture
+- { name: D_80065D78, rom: 0x66978, size: 0x190, type: u8 }            # texture
+- { name: D_80065F08, rom: 0x66B08, size: 0x190, type: u8 }            # texture
+- { name: D_80066098, rom: 0x66C98, size: 0x178, type: u8 }            # texture
+- { name: D_80066210, rom: 0x66E10, size: 0x120, type: u8 }            # texture
+- { name: D_80066330, rom: 0x66F30, size: 0x158, type: u8 }            # texture
+- { name: D_80066488, rom: 0x67088, size: 0x58, type: u8 }             # texture
+- { name: D_800664E0, rom: 0x670E0, size: 0x58, type: u8 }             # texture
+- { name: D_80066538, rom: 0x67138, size: 0x58, type: u8 }             # texture
+- { name: D_80066590, rom: 0x67190, size: 0x58, type: u8 }             # texture
+- { name: D_800665E8, rom: 0x671E8, size: 0x58, type: u8 }             # texture
+- { name: D_80066640, rom: 0x67240, size: 0x58, type: u8 }             # texture
+- { name: D_80066698, rom: 0x67298, size: 0x58, type: u8 }             # texture
+- { name: D_800666F0, rom: 0x672F0, size: 0x58, type: u8 }             # texture
+- { name: D_80066748, rom: 0x67348, size: 0x58, type: u8 }             # texture
+- { name: D_800667A0, rom: 0x673A0, size: 0x58, type: u8 }             # texture
+- { name: D_800667F8, rom: 0x673F8, size: 0x58, type: u8 }             # texture
+- { name: D_80066850, rom: 0x67450, size: 0xC8, type: u8 }             # texture
+- { name: D_80066918, rom: 0x67518, size: 0xC8, type: u8 }             # texture
+- { name: D_800669E0, rom: 0x675E0, size: 0x10, type: u8 }             # texture
+- { name: D_800669F0, rom: 0x675F0, size: 0xF8, type: u8 }             # texture
+- { name: D_80066AE8, rom: 0x676E8, size: 0x3A0, type: u8 }            # texture
+- { name: D_80066E88, rom: 0x67A88, size: 0x208, type: u16 }           # palette, 256 colours
+- { name: D_80067090, rom: 0x67C90, size: 0x808, type: u8 }            # texture
+- { name: D_80067898, rom: 0x68498, size: 0x808, type: u8 }            # texture
+- { name: D_800680A0, rom: 0x68CA0, size: 0x808, type: u8 }            # texture
+- { name: D_800688A8, rom: 0x694A8, size: 0x608, type: u8 }            # texture
+- { name: D_80068EB0, rom: 0x69AB0, size: 0x208, type: u16 }           # palette, 256 colours
+- { name: D_800690B8, rom: 0x69CB8, size: 0x4F0, type: u8 }            # texture
+- { name: D_800695A8, rom: 0x6A1A8, size: 0x4F0, type: u8 }            # texture
+- { name: D_80069A98, rom: 0x6A698, size: 0x208, type: u16 }           # palette, 256 colours
+- { name: D_80069CA0, rom: 0x6A8A0, size: 0x628, type: u8 }            # texture
+- { name: D_8006A2C8, rom: 0x6AEC8, size: 0x628, type: u8 }            # texture
+- { name: D_8006A8F0, rom: 0x6B4F0, size: 0x208, type: u16 }           # palette, 256 colours
+- { name: D_8006AAF8, rom: 0x6B6F8, size: 0x4F0, type: u8 }            # texture
+- { name: D_8006AFE8, rom: 0x6BBE8, size: 0x4F0, type: u8 }            # texture
+- { name: D_8006B4D8, rom: 0x6C0D8, size: 0x208, type: u16 }           # palette, 256 colours
+- { name: D_8006B6E0, rom: 0x6C2E0, size: 0x4F0, type: u8 }            # texture
+- { name: D_8006BBD0, rom: 0x6C7D0, size: 0x4F0, type: u8 }            # texture
+- { name: D_8006C0C0, rom: 0x6CCC0, size: 0x2C, type: u8 }             # message text
+- { name: D_8006C0EC, rom: 0x6CCEC, size: 0x20, type: u8 }             # message text
+- { name: D_8006C10C, rom: 0x6CD0C, size: 0x1C, type: u8 }             # message text
+- { name: D_8006C128, rom: 0x6CD28, size: 0x1C, type: u8 }             # message text
+- { name: D_8006C144, rom: 0x6CD44, size: 0x28, type: u8 }             # message text
+- { name: D_8006C16C, rom: 0x6CD6C, size: 0x8, type: u8 }              # message text
+- { name: D_8006C174, rom: 0x6CD74, size: 0xC, type: u8 }              # message text
+- { name: D_8006C180, rom: 0x6CD80, size: 0x8, type: u8 }              # message text
+- { name: D_8006C188, rom: 0x6CD88, size: 0x8, type: u8 }              # message text
+- { name: D_8006C190, rom: 0x6CD90, size: 0x2C, type: u8 }             # message text
+- { name: D_8006C1BC, rom: 0x6CDBC, size: 0x24, type: u8 }             # message text
+- { name: D_8006C1E0, rom: 0x6CDE0, size: 0x78, type: u8 }             # message text
+- { name: D_8006C258, rom: 0x6CE58, size: 0x28, type: u8 }             # message text
+- { name: D_8006C280, rom: 0x6CE80, size: 0x4C, type: u8 }             # message text
+- { name: D_8006C2CC, rom: 0x6CECC, size: 0xA4, type: u8 }             # message text
+- { name: D_8006C370, rom: 0x6CF70, size: 0x20, type: u8 }             # message text
+- { name: D_8006C390, rom: 0x6CF90, size: 0x28, type: u8 }             # message text
+- { name: D_8006C3B8, rom: 0x6CFB8, size: 0x50, type: u8 }             # message text
+- { name: D_8006C408, rom: 0x6D008, size: 0x50, type: u8 }             # message text
+- { name: D_8006C458, rom: 0x6D058, size: 0x6C, type: u8 }             # message text
+- { name: D_8006C4C4, rom: 0x6D0C4, size: 0x4, type: u8 }              # message text
+- { name: D_8006C4C8, rom: 0x6D0C8, size: 0x44, type: u8 }             # message text
+- { name: D_8006C50C, rom: 0x6D10C, size: 0x54, type: u8 }             # message text
+- { name: D_8006C560, rom: 0x6D160, size: 0x4, type: u8 }              # message text
+- { name: D_8006C564, rom: 0x6D164, size: 0x94, type: u8 }             # message text
+- { name: D_8006C5F8, rom: 0x6D1F8, size: 0x44, type: u8 }             # message text
+- { name: D_8006C63C, rom: 0x6D23C, size: 0x1C, type: u8 }             # message text
+- { name: D_8006C658, rom: 0x6D258, size: 0x20, type: u8 }             # message text
+- { name: D_8006C678, rom: 0x6D278, size: 0x54, type: u8 }             # message text
+- { name: D_8006C6CC, rom: 0x6D2CC, size: 0x18C, type: u8 }            # message text
+- { name: D_8006C858, rom: 0x6D458, size: 0x28, type: u8 }             # message text
+- { name: D_8006C880, rom: 0x6D480, size: 0x78, type: u8 }             # message text
+- { name: D_8006CAD4, rom: 0x6D6D4, size: 0x14, type: u8 }             # message text
+- { name: D_8006CAE8, rom: 0x6D6E8, size: 0x10, type: u8 }             # message text
+- { name: D_8006CAF8, rom: 0x6D6F8, size: 0x18, type: u8 }             # message text
+- { name: D_8006CB10, rom: 0x6D710, size: 0x1C, type: u8 }             # message text
+- { name: D_8006CB2C, rom: 0x6D72C, size: 0x14, type: u8 }             # message text
+- { name: D_8006CB40, rom: 0x6D740, size: 0x14, type: u8 }             # message text
+- { name: D_8006CB54, rom: 0x6D754, size: 0x14, type: u8 }             # message text
+- { name: D_8006CB68, rom: 0x6D768, size: 0x20, type: u8 }             # message text
+- { name: D_8006CB88, rom: 0x6D788, size: 0x14, type: u8 }             # message text
+- { name: D_8006CB9C, rom: 0x6D79C, size: 0x10, type: u8 }             # message text
+- { name: D_8006CBAC, rom: 0x6D7AC, size: 0x14, type: u8 }             # message text
+- { name: D_8006CBC0, rom: 0x6D7C0, size: 0x18, type: u8 }             # message text
+- { name: D_8006CBD8, rom: 0x6D7D8, size: 0x14, type: u8 }             # message text
+- { name: D_8006CBEC, rom: 0x6D7EC, size: 0x10, type: u8 }             # message text
+- { name: D_8006CBFC, rom: 0x6D7FC, size: 0xC, type: u8 }              # message text
+- { name: D_8006CC08, rom: 0x6D808, size: 0x10, type: u8 }             # message text
+- { name: D_8006CC18, rom: 0x6D818, size: 0x10, type: u8 }             # message text
 
 # ovl_DA4570 .data (ROM = vram - 0x80101FA0 + 0xDA6510)
 - { name: D_80101FA0_ovl_DA4570, rom: 0xDA6510, size: 0x20, type: u16 }     # palette, 16 colours
