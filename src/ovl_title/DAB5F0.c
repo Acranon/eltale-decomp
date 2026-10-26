@@ -57,38 +57,26 @@ extern u8 D_8006CC80;
 extern u8 D_8007A1CC;
 extern s8 D_80092C81;
 extern s8 D_80092C82;
-extern u8 D_8020F1E4_ovl_title;
-extern u32 D_8020F1E8_ovl_title;
-extern u16 D_8020F1EC_ovl_title;
-extern u8 D_8020F1F0_ovl_title;
 void func_8020C7A8_ovl_title(void);
 void func_8020CBE4_ovl_title(void);
 void func_8020EF00_ovl_title(void);
 
 
-extern s32 D_8020F200_ovl_title;
-extern s32 D_8020F260_ovl_title;
-extern s32 D_8020F2A8_ovl_title;
-extern s32 D_8020F300_ovl_title;
-extern s32 D_8020F3B0_ovl_title;
-extern s32 D_8020F458_ovl_title;
-extern s32 D_8020F280_ovl_title;
-extern s32 D_8020F358_ovl_title;
-
-// D_8020F1E4..F1F0 are this function's statics in the original. IDO never keeps a static's
-// address in a register, but it does for an extern that is used more than once. Until D2
-// moves the data into C, each access names its static through a different symbol.
-#define AT(sym, off, type) (*(type*) ((u8*) &(sym) + (off)))
+/* .data 8020F1E0..8020F200: D_8020F1E0, then func_8020C178's statics F1E4..F1F0. */
+s32 D_8020F1E0_ovl_title = 0;
 
 s32 func_8020C178_ovl_title(void) {
-    u32 count; // stands in for the static D_8020F1E8, which IDO kept in a register
+    static u8 D_8020F1E4_ovl_title = 0;
+    static u32 D_8020F1E8_ovl_title = 0;
+    static u16 D_8020F1EC_ovl_title = 0;
+    static u8 D_8020F1F0_ovl_title = 0;
 
     if (D_8020F1F0_ovl_title == 0) {
         D_80226D90_ovl_title = 3;
         D_80226D94_ovl_title = 1;
         D_80226DA4_ovl_title = 0;
         D_8006CC80 = 0;
-        AT(D_8020F200_ovl_title, -0x10, u8) = D_8020F1F0_ovl_title + 1;
+        D_8020F1F0_ovl_title++;
     }
 
     switch (D_80226D90_ovl_title) {
@@ -132,32 +120,28 @@ s32 func_8020C178_ovl_title(void) {
         case 5:
             func_8020C7A8_ovl_title();
             if (D_8020F1EC_ovl_title == 0) {
-                count = D_8020F1E8_ovl_title + 1;
+                D_8020F1E8_ovl_title++;
             } else {
-                count = 0;
+                D_8020F1E8_ovl_title = 0;
             }
             if (!(D_80092C86 & 0xF000) && (D_80092C81 >= -0x13) && (D_80092C81 < 0x14) && (D_80092C82 >= -0x13) &&
                 (D_80092C82 < 0x14)) {
-                AT(D_8020F2A8_ovl_title, -0xbc, u16) = 0;
+                D_8020F1EC_ovl_title = 0;
             } else {
-                AT(D_8020F300_ovl_title, -0x114, u16) = 1;
+                D_8020F1EC_ovl_title = 1;
             }
-            AT(D_8020F260_ovl_title, -0x78, u32) = count;
-            if (count >= 0x1C21U) {
-                AT(D_8020F3B0_ovl_title, -0x1c4, u16) = 0;
+            if (D_8020F1E8_ovl_title >= 0x1C21U) {
+                D_8020F1EC_ovl_title = 0;
                 D_80226DA4_ovl_title = 4;
                 D_8020F1E0_ovl_title = 1;
                 D_80226D94_ovl_title = 2;
-                AT(D_8020F458_ovl_title, -0x270, u32) = 0;
+                D_8020F1E8_ovl_title = 0;
             }
             if (D_8020F1E0_ovl_title == 0) {
                 D_80226D94_ovl_title = 0x14;
             }
             if ((D_80226D94_ovl_title == 0) && ((D_80226DA4_ovl_title == 3) || (D_80226DA4_ovl_title == 4))) {
                 if (D_80226DA4_ovl_title == 4) {
-                    // Fake: keeps count live like the original static D_8020F1E8 (found by the permuter).
-                    if (!count) {
-                    }
                     D_8020F1E0_ovl_title = 2;
                     D_8020F4F4_ovl_title = 0x3C;
                     D_8020F4F0_ovl_title = 1;
@@ -187,7 +171,7 @@ s32 func_8020C178_ovl_title(void) {
         case 6:
             func_8020C7A8_ovl_title();
             if (D_8020F1E4_ovl_title < 2) {
-                AT(D_8020F280_ovl_title, -0x9c, u8) = D_8020F1E4_ovl_title + 1;
+                D_8020F1E4_ovl_title++;
             } else if ((D_8007A1CC & 0xF0) == 0x10) {
                 D_80226D90_ovl_title = 8;
                 D_8020F4F4_ovl_title = 0x3C;
@@ -254,8 +238,8 @@ s32 func_8020C178_ovl_title(void) {
             break;
     }
     if (D_80226D94_ovl_title == 0) {
-        AT(D_8020F358_ovl_title, -0x16c, u16) = 0;
-        AT(D_8020F470_ovl_title, -0x288, u32) = 0;
+        D_8020F1EC_ovl_title = 0;
+        D_8020F1E8_ovl_title = 0;
     }
     return D_80226D94_ovl_title;
 }
