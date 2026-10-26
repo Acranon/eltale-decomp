@@ -61,13 +61,18 @@ void func_8002A6B8(s8 arg0);
 void func_80032BB0(s32 arg0, s32 arg1);
 void func_80032D20(u8 arg0);
 
+/* This file's .bss, 8007A8C0..8007A8F0, in address order. D_8007A8C0 and
+ * D_8007A8EC are unreferenced gaps (D_8007A8C0 could as well be 1870.c's tail). */
+u8 D_8007A8C0[0x20];
+s32 D_8007A8E0;
+s32 D_8007A8E4;
+Unk8007A8E8 *D_8007A8E8;
+s32 D_8007A8EC;
+
 extern s32 D_8004DCA0;
 extern s32 D_8007A174;
 extern u16 D_8007A178;
 extern s16 D_8007A17A;
-extern s32 D_8007A8E0;
-extern s32 D_8007A8E4;
-extern Unk8007A8E8 *D_8007A8E8;
 extern f32 D_8007A98C;
 extern f32 D_8007A990;
 extern f32 D_8007A994;
