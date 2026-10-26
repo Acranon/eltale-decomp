@@ -267,6 +267,8 @@ segments:
       - [0x4E970, .data, E2A0]                   # 8004DD70..8004DED0
       - [0x4EAD0, .data, 12610]                  # 8004DED0..8004DF00
       - [0x4EB00, data]
+      - [0x4EBC0, .data, 147A0]                  # 8004DFC0..8004E6A0
+      - [0x4F2A0, data]
       - [0x4FA20, .data, 1B200]                  # 8004EE20..8004F060
       - [0x4FC60, data]
       - [0x50370, .data, 27A90]
