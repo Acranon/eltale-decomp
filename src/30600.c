@@ -59,6 +59,23 @@ typedef struct {
     s8 unk1;
 } Unk8008FB80;
 
+/* .bss 8008FB70..80090450 */
+u16 D_8008FB70;
+u8 D_8008FB72;
+u8 D_8008FB73;
+s32 D_8008FB74;
+u8 D_8008FB78;
+s8 D_8008FB79;
+s8 D_8008FB7A;
+s8 D_8008FB7B;
+u8 D_8008FB7C;
+Unk8008FB80 D_8008FB80[17];
+Unk8008FBA8 D_8008FBA8[16];
+Unk80090228 D_80090228;
+Unk8008FBA8 D_800902F0; /* func_80035EA8 reads 0x80 bytes into it */
+u8 D_80090358[0x18];    /* the rest of that 0x80-byte buffer: unreferenced */
+u8 D_80090370[0xE0];
+
 extern s32 D_8004DCA0;
 extern s8 D_80060CB0;
 extern s8 D_800616B0;
@@ -80,31 +97,17 @@ extern u16 D_80084992;
 extern u8 D_80085988[];
 extern u8 D_80085A98[];
 extern u8 D_8008C9B8[];
-extern Unk8008FBA8 D_8008FBA8[];
-extern Unk8008FBA8 D_800902F0;
 extern Unk80092E48 D_80092E48[];
 extern Gfx D_80061770[];
 extern s16 D_8007A170;
 extern Gfx *D_8007A184;
 extern u16 D_8008FB3E;
-extern u16 D_8008FB70;
-extern u8 D_8008FB72;
-extern u8 D_8008FB73;
 extern s16 D_8006C90C[][4];
 extern u8 *D_8006C8F8[];
-extern s32 D_8008FB74;
-extern u8 D_8008FB78;
-extern s8 D_8008FB79;
-extern s8 D_8008FB7A;
-extern s8 D_8008FB7B;
-extern u8 D_8008FB7C;
-extern Unk8008FB80 D_8008FB80[17];
 extern u8 D_8008FB81[];
-extern Unk80090228 D_80090228;
 extern u8 D_80090248[];
 extern u8 D_80090258[];
 extern u8 D_800902EF[];
-extern u8 D_80090370[];
 extern s8 D_80092C80;
 
 void func_8002FBE0(void);
