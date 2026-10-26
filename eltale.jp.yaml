@@ -395,10 +395,13 @@ segments:
     vram: 0x8020C0D0
     exclusive_ram_id: ovl_8020C0D0
     symbol_name_format: $VRAM_$SEG
+    bss_size: 0xCB50
     subsegments:
       - [0xE22690, c, ovl_ending/E22690]
-      - [0xE25C50, data]
+      - [0xE25C50, .data, ovl_ending/E22690]     # 8020F690..8020F6C0
+      - [0xE25C80, data]
       - [0xE420C0, .rodata, ovl_ending/E22690]
+      - { start: 0xE420D0, type: .bss, vram: 0x8022BB10, name: ovl_ending/E22690 }
 
   - [0xE420D0, databin, data_E420D0]
   - [0x1000000]

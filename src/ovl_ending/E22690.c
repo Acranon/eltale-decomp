@@ -1,10 +1,7 @@
 #include "common.h"
 
 extern Gfx* D_8007A184;
-extern s32 D_8020F698_ovl_ending;
 extern Gfx D_8020F6C0_ovl_ending[];
-extern Gfx D_8022EA18[2][2500];
-extern Gfx* D_80238658;
 
 s32 func_8020C254_ovl_ending(void);
 
@@ -100,23 +97,30 @@ typedef struct {
     u32 unk4;
 } UnkStruct_802107F0;
 
-extern UnkStruct_8022BB38 D_8022BB38[];
+/* ovl_ending .bss 8022BB10..80238660: all of it is this file's (source order). */
+s32 D_8022BB10_ovl_ending;
+s32 D_8022BB14_ovl_ending;
+s32 D_8022BB18_ovl_ending;
+s32 D_8022BB1C_ovl_ending;
+u32 D_8022BB20_ovl_ending;
+s32 D_8022BB24_ovl_ending;
+s32 D_8022BB28_ovl_ending;
+u32 D_8022BB2C_ovl_ending;
+u32 D_8022BB30_ovl_ending;
+s32 D_8022BB34_ovl_ending;
+UnkStruct_8022BB38 D_8022BB38_ovl_ending[150];
+Gfx D_8022EA18_ovl_ending[2][2500];
+Gfx* D_80238658_ovl_ending;
+s32 D_8023865C_ovl_ending;
+
+/* ovl_ending .data 8020F690..8020F6C0 (the rest of the slab is still asm). */
+u32 D_8020F690_ovl_ending = 0;
+s32 D_8020F694_ovl_ending = 0;
+s32 D_8020F698_ovl_ending = 0;
+
 extern UnkStruct_802107F0 D_802107F0_ovl_ending[];
 extern u32 D_802107F8_ovl_ending;
 extern UnkAnim_8020F880 D_8020F880_ovl_ending[];
-extern s32 D_8023865C;
-extern u32 D_8020F690_ovl_ending;
-extern s32 D_8020F694_ovl_ending;
-extern s32 D_8022BB10;
-extern s32 D_8022BB14;
-extern s32 D_8022BB18;
-extern s32 D_8022BB1C;
-extern u32 D_8022BB20;
-extern s32 D_8022BB24;
-extern s32 D_8022BB28;
-extern u32 D_8022BB2C;
-extern u32 D_8022BB30;
-extern s32 D_8022BB34;
 extern Gfx D_8020F718_ovl_ending[];
 extern Gfx D_8020F748_ovl_ending[];
 
@@ -124,18 +128,18 @@ void func_8020CA60_ovl_ending(void);
 
 void func_8020C0D0_ovl_ending(void) {
     func_8020CA60_ovl_ending();
-    D_8022BB10 = 0xA;
-    D_8022BB14 = 1;
-    D_8022BB18 = 0x12C;
-    D_8022BB1C = 0xDF;
-    D_8022BB2C = 0;
-    D_8022BB30 = 0;
-    D_8022BB20 = 0;
-    D_8022BB24 = 0;
-    D_8022BB34 = 0;
+    D_8022BB10_ovl_ending = 0xA;
+    D_8022BB14_ovl_ending = 1;
+    D_8022BB18_ovl_ending = 0x12C;
+    D_8022BB1C_ovl_ending = 0xDF;
+    D_8022BB2C_ovl_ending = 0;
+    D_8022BB30_ovl_ending = 0;
+    D_8022BB20_ovl_ending = 0;
+    D_8022BB24_ovl_ending = 0;
+    D_8022BB34_ovl_ending = 0;
     D_8020F690_ovl_ending = 0;
     D_8020F694_ovl_ending = 0;
-    D_8022BB28 = 0;
+    D_8022BB28_ovl_ending = 0;
 }
 
 s32 func_8020C15C_ovl_ending(void) {
@@ -143,8 +147,8 @@ s32 func_8020C15C_ovl_ending(void) {
     s32 ret;
 
     idx = (D_8020F698_ovl_ending + 1) & 1;
-    D_80238658 = D_8007A184;
-    D_8007A184 = D_8022EA18[idx];
+    D_80238658_ovl_ending = D_8007A184;
+    D_8007A184 = D_8022EA18_ovl_ending[idx];
     gSPDisplayList(D_8007A184++, D_8020F6C0_ovl_ending);
     // D_8020F698 is a function static in the original: IDO does not keep its address
     // in a register. Until D2 moves the data into C, write it through the neighbouring
@@ -153,8 +157,8 @@ s32 func_8020C15C_ovl_ending(void) {
     ret = func_8020C254_ovl_ending();
     idx = D_8020F698_ovl_ending;
     gSPEndDisplayList(D_8007A184++);
-    D_8007A184 = D_80238658;
-    gSPDisplayList(D_8007A184++, D_8022EA18[idx]);
+    D_8007A184 = D_80238658_ovl_ending;
+    gSPDisplayList(D_8007A184++, D_8022EA18_ovl_ending[idx]);
     return ret;
 }
 
@@ -189,7 +193,7 @@ s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1) {
 void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38[arg0];
+    temp_v0 = &D_8022BB38_ovl_ending[arg0];
     temp_v0->unk0 = arg1;
     temp_v0->unk4 = arg2;
     temp_v0->unk6 = arg3;
@@ -222,7 +226,7 @@ void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, 
 
 void func_8020CA60_ovl_ending(void) {
     s32 i;
-    UnkStruct_8022BB38* temp_v0 = D_8022BB38;
+    UnkStruct_8022BB38* temp_v0 = D_8022BB38_ovl_ending;
 
     for (i = 0; i < 150; i++, temp_v0++) {
         temp_v0->unk0 = 0;
@@ -259,7 +263,7 @@ void func_8020CA60_ovl_ending(void) {
 void func_8020CB84_ovl_ending(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38[arg0];
+    temp_v0 = &D_8022BB38_ovl_ending[arg0];
     temp_v0->unk0 = 0;
     temp_v0->unk4 = 0;
     temp_v0->unk6 = 0;
@@ -292,7 +296,7 @@ void func_8020CB84_ovl_ending(s32 arg0) {
 
 s32 func_8020CC28_ovl_ending(void) {
     s32 count;
-    UnkStruct_8022BB38* ptr = D_8022BB38;
+    UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
     s32 i = 0;
 
     count = 0;
@@ -308,7 +312,7 @@ s32 func_8020CC28_ovl_ending(void) {
 
 s32 func_8020CCD8_ovl_ending(void) {
     s32 count;
-    UnkStruct_8022BB38* ptr = D_8022BB38;
+    UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
     s32 i = 0;
 
     count = 0;
@@ -323,7 +327,7 @@ s32 func_8020CCD8_ovl_ending(void) {
 }
 
 s16 func_8020CD88_ovl_ending(void) {
-    UnkStruct_8022BB38* ptr = D_8022BB38;
+    UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
     s32 i = 0;
 
     while (i < 150) {
@@ -343,7 +347,7 @@ s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     s32 y;
     s32 flag;
 
-    temp_v1 = &D_8022BB38[arg0];
+    temp_v1 = &D_8022BB38_ovl_ending[arg0];
     // Fake (permuter): a dead read of x here gives v the register retail uses.
     v = x;
     if (!(temp_v1->unk0 & 0x80000000)) {
@@ -392,7 +396,7 @@ s32 func_8020CFD4_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     s16 y;
     s32 flag;
 
-    temp_v1 = &D_8022BB38[arg0];
+    temp_v1 = &D_8022BB38_ovl_ending[arg0];
     if (!(temp_v1->unk0 & 0x80000000)) {
         return 0xFF;
     }
@@ -433,7 +437,7 @@ s32 func_8020CFD4_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
 void func_8020D130_ovl_ending(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38[arg0];
+    temp_v0 = &D_8022BB38_ovl_ending[arg0];
     temp_v0->unk2E = temp_v0->unk4 + temp_v0->unk8;
     temp_v0->unk30 = temp_v0->unk6 + temp_v0->unkA;
 }
@@ -442,7 +446,7 @@ s32 func_8020D16C_ovl_ending(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v0;
     f32 step;
 
-    temp_v0 = &D_8022BB38[arg0];
+    temp_v0 = &D_8022BB38_ovl_ending[arg0];
     if (!(temp_v0->unk0 & 0x80000000)) {
         return 0;
     }
@@ -474,7 +478,7 @@ s32 func_8020D270_ovl_ending(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v0;
     f32 step;
 
-    temp_v0 = &D_8022BB38[arg0];
+    temp_v0 = &D_8022BB38_ovl_ending[arg0];
     if (!(temp_v0->unk0 & 0x80000000)) {
         return 0;
     }
@@ -511,7 +515,7 @@ s32 func_8020D374_ovl_ending(s32 arg0, s32 arg1) {
     s32 deltaX;
     s32 deltaY;
 
-    temp_v1 = &D_8022BB38[arg0];
+    temp_v1 = &D_8022BB38_ovl_ending[arg0];
     if (!(arg1 & 0x80000000)) {
         return 0;
     }
@@ -584,7 +588,7 @@ s32 func_8020D374_ovl_ending(s32 arg0, s32 arg1) {
 void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38[arg0];
+    temp_v0 = &D_8022BB38_ovl_ending[arg0];
     temp_v0->unk2A = (s16) arg1;
     temp_v0->unk2C = (s16) arg2;
     temp_v0->unk26 = temp_v0->unk4;
@@ -601,7 +605,7 @@ s32 func_8020D624_ovl_ending(s32 arg0, s32 arg1) {
     if (!(arg1 & 0x80000000)) {
         return 0xFF;
     }
-    temp_v1 = &D_8022BB38[arg0];
+    temp_v1 = &D_8022BB38_ovl_ending[arg0];
     temp_v1->unk24++;
     step = ((f32) temp_v1->unk2A - (f32) temp_v1->unk26) / (f32) temp_v1->unk38;
     if (step < 0) {
@@ -653,7 +657,7 @@ s32 func_8020D7A4_ovl_ending(s32 arg0, s32 arg1) {
     if (!(arg1 & 0x80000000)) {
         return 0xFF;
     }
-    temp_v1 = &D_8022BB38[arg0];
+    temp_v1 = &D_8022BB38_ovl_ending[arg0];
     temp_v1->unk24++;
     step = ((f32) temp_v1->unk2C - (f32) temp_v1->unk28) / (f32) temp_v1->unk38;
     if (step < 0) {
@@ -698,7 +702,7 @@ s32 func_8020D7A4_ovl_ending(s32 arg0, s32 arg1) {
 s32 func_8020D924_ovl_ending(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38[arg0];
+    temp_v0 = &D_8022BB38_ovl_ending[arg0];
     temp_v0->unk34 += 1;
     if (temp_v0->unk34 >= temp_v0->unk38) {
         return 0xFF;
@@ -707,11 +711,20 @@ s32 func_8020D924_ovl_ending(s32 arg0) {
 }
 
 void func_8020D970_ovl_ending(s32 arg0) {
-    D_8022BB38[arg0].unk34 = 0;
+    D_8022BB38_ovl_ending[arg0].unk34 = 0;
 }
 
 s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D98C_ovl_ending.s")
+
+/* func_8020E9C8's function statics; globals here while it is asm. */
+f32 D_8020F69C_ovl_ending = 32767.0f;
+s32 D_8020F6A0_ovl_ending = 0;
+f32 D_8020F6A4_ovl_ending = 0.0f;
+f32 D_8020F6A8_ovl_ending = 0.0f;
+u8 D_8020F6AC_ovl_ending = 1;
+u8 D_8020F6B0_ovl_ending = 0;
+u8 D_8020F6B4_ovl_ending = 0;
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020E9C8_ovl_ending.s")
