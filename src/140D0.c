@@ -86,7 +86,6 @@ typedef struct {
 extern u8 D_80085988[];
 extern u8 D_800859A8[];
 extern u8 D_8004F770[];
-extern Unk8004DF1C D_8004DF1C[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
 extern s32 D_80085950;
@@ -94,8 +93,35 @@ extern Unk80085290 D_80085290[];
 extern Unk80085968 D_80085968;
 extern Unk80085958 D_80085958;
 extern Unk8010FDC4 D_8010FDC4[];
-extern u8 D_8004DF00[];
-extern u8 D_8004DF08[];
+/* Message text around the name in func_80013A50. */
+u8 D_8004DF00[8] = {
+#include "assets/D_8004DF00.inc.c"
+};
+u8 D_8004DF08[20] = {
+#include "assets/D_8004DF08.inc.c"
+};
+/* Per-map placement groups (the group arrays are in the map overlays). */
+Unk8004DF1C D_8004DF1C[19] = {
+    { 0x0D, (Unk140D0Group*) 0x80199140 },
+    { 0x0E, (Unk140D0Group*) 0x801A3B44 },
+    { 0x0F, (Unk140D0Group*) 0x801697A4 },
+    { 0x11, (Unk140D0Group*) 0x8016AA24 },
+    { 0x13, (Unk140D0Group*) 0x8015EB40 },
+    { 0x15, (Unk140D0Group*) 0x801A6C18 },
+    { 0x16, (Unk140D0Group*) 0x80183200 },
+    { 0x17, (Unk140D0Group*) 0x8018CBAC },
+    { 0x18, (Unk140D0Group*) 0x80166608 },
+    { 0x19, (Unk140D0Group*) 0x80171794 },
+    { 0x1A, (Unk140D0Group*) 0x8016D584 },
+    { 0x1B, (Unk140D0Group*) 0x8016E9E4 },
+    { 0x1C, (Unk140D0Group*) 0x80169D7C },
+    { 0x1D, (Unk140D0Group*) 0x80133504 },
+    { 0x1E, (Unk140D0Group*) 0x801527CC },
+    { 0x1F, (Unk140D0Group*) 0x8014C030 },
+    { 0x20, (Unk140D0Group*) 0x8013D5D4 },
+    { 0x21, (Unk140D0Group*) 0x80143378 },
+    { 0x09, (Unk140D0Group*) 0x8015F1E4 },
+};
 extern u8 D_8007B430[];
 extern u8 D_8007B8E0;
 extern u8* D_803AB288[];
