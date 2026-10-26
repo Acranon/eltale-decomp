@@ -22,20 +22,48 @@ typedef struct {
     /* 0x198 */ s32 unk198;
 } SeqSlot; /* size = 0x19C */
 
-extern ALHeap D_8008F070;
+/* .bss 8008CEC0..8008FAF0 */
+OSThread D_8008CEC0;
+u64 D_8008D070[0x2000 / 8]; /* func_80028AAC's stack (its top is D_8008F070) */
+ALHeap D_8008F070;
+Acmd* D_8008F080[2];
+void* D_8008F088[2];
+s16* D_8008F090[3];
+OSMesgQueue D_8008F0A0;
+OSMesgQueue D_8008F0B8;
+OSMesg D_8008F0D0;
+OSMesg D_8008F0D4;
+OSIoMesg D_8008F0D8[32];
+ALGlobals D_8008F3D8;
+ALSynConfig D_8008F428;
+ALSndPlayer D_8008F450;
+ALSndpConfig D_8008F4A8;
+ALInstrument* D_8008F4B4;
+ALBank* D_8008F4B8;
+s16* D_8008F4BC;
+s32 D_8008F4C0;
+AMDMAState D_8008F4C8;
+AMDMABuffer D_8008F4D8[32];
+s32 D_8008F758;
+s32* D_8008F75C;
+s32* D_8008F760;
+s32 D_8008F764;
+u32 D_8008F768[5];
+s32* D_8008F77C;
+s32* D_8008F780;
+s32* D_8008F784;
+s32* D_8008F788;
+s32* D_8008F78C;
+s32* D_8008F790;
+s32* D_8008F794;
+s32* D_8008F798;
+s32* D_8008F79C;
+s32* D_8008F7A0;
+SeqSlot D_8008F7A8[2];
+s32 D_8008FAE0;
+s32 D_8008FAE4;
+
 extern u8 D_80332DB0[];
-extern Acmd* D_8008F080[2];
-extern void* D_8008F088[2];
-extern s16* D_8008F090[3];
-extern OSMesgQueue D_8008F0A0;
-extern OSMesgQueue D_8008F0B8;
-extern OSMesg D_8008F0D0;
-extern OSMesg D_8008F0D4;
-extern OSIoMesg D_8008F0D8[];
-extern ALGlobals D_8008F3D8;
-extern ALSynConfig D_8008F428;
-extern AMDMAState D_8008F4C8;
-extern AMDMABuffer D_8008F4D8[32];
 f32 D_8004F780[73] = {
 #include "assets/D_8004F780.inc.c"
 };
@@ -47,19 +75,10 @@ ALBankFile* D_8005592C = NULL;
 ALSeqFile* D_80055930 = NULL;
 s32 D_80055934 = 0;
 u32 D_80055938 = 0;
-extern OSThread D_8008CEC0;
-extern SeqSlot D_8008F7A8[2];
 
 void func_80028AAC(void*);
 void alCSeqNew(ALCSeq*, u8*);
 
-extern ALSndpConfig D_8008F4A8;
-extern ALSndPlayer D_8008F450;
-extern ALInstrument* D_8008F4B4;
-extern ALBank* D_8008F4B8;
-extern s16* D_8008F4BC;
-extern s32 D_8008F4C0;
-extern s32* D_8008F75C;
 extern s32* D_80055A24[];
 extern s32 D_800559CC;
 extern s32 D_800559D0;
@@ -68,8 +87,6 @@ extern s32 D_8005596C[8];
 extern s32 D_8005598C[8];
 extern s32 D_800559AC;
 extern s32 D_800559B0;
-extern s32 D_8008FAE0;
-extern s32 D_8008FAE4;
 extern s32 D_800559B4;
 extern s32 D_800559B8;
 extern s32 D_800559C4[2];
@@ -438,18 +455,6 @@ void func_800295D0(s32 id) {
 }
 
 extern s32 D_800559BC;
-extern s32 D_8008F764;
-extern s32* D_8008F760;
-extern s32* D_8008F77C;
-extern s32* D_8008F780;
-extern s32* D_8008F784;
-extern s32* D_8008F788;
-extern s32* D_8008F78C;
-extern s32* D_8008F790;
-extern s32* D_8008F794;
-extern s32* D_8008F798;
-extern s32* D_8008F79C;
-extern s32* D_8008F7A0;
 void func_80029AD4(void);
 void func_80029D10(void);
 void func_8002A118(void);
@@ -643,7 +648,6 @@ void func_80029AD4(void) {
     }
 }
 
-extern u32 D_8008F768[5];
 
 void func_80029D10(void) {
     s32 snd = D_800559D4[D_8008F764];
