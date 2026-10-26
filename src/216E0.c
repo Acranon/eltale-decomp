@@ -1311,3 +1311,26 @@ void func_80024EB0(void* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5,
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/D_8006F530.s")
+
+/* .data 8004F2C0..8004F4A0 */
+s32 D_8004F2C0 = 0; /* nothing references it */
+u8 D_8004F2C4[8] = {
+#include "assets/D_8004F2C4.inc.c"
+};
+u8 D_8004F2CC[4][4] = {
+    { 0xFF, 0x00, 0x00, 0x00 },
+    { 0xFF, 0xC8, 0x00, 0x00 },
+    { 0x00, 0x00, 0xFF, 0x00 },
+    { 0x00, 0xFF, 0x00, 0x00 },
+};
+u16 D_8004F2DC[8] = { 0x4, 0x1, 0x400, 0x20, 0x10, 0x80, 0x40, 0x0 };
+u16 D_8004F2EC[4] = { 0x8, 0x2, 0x200, 0x100 };
+s32 D_8004F2F4[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
+Struct_8004F324 D_8004F304[4] = { { 17.0f, 5.0f }, { 5.0f, 17.0f }, { 17.0f, 30.0f }, { 30.0f, 17.0f } };
+Struct_8004F324 D_8004F324[4] = { { 30.0f, 35.0f }, { 12.0f, 51.0f }, { 30.0f, 66.0f }, { 48.0f, 51.0f } };
+s32 D_8004F344[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
+s32 D_8004F354[77] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 3, 3, 3, 2, 0, 0, 5 }; /* nothing references it */
+u8 D_8004F488[0x10] = { /* message text, nothing references it */
+#include "assets/D_8004F488.inc.c"
+};
+u8 D_8004F498[8] = { 0, 1, 2, 2, 2, 2, 2, 2 };
