@@ -10,8 +10,9 @@ typedef struct {
     /* 0x18 */ f32 scale;
 } Unk84B80; // size = 0x1C
 
-extern s32 D_80085280;
-extern Unk84B80 D_80084B80[];
+/* This file's .bss, 80084B80..80085290 (13DE0 also uses D_80085280). */
+Unk84B80 D_80084B80[0x40];
+s32 D_80085280;
 extern Gfx* D_8007A184;
 extern s32 D_8007A180;
 extern s16 D_8007A1A0;

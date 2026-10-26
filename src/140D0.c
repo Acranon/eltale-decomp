@@ -64,7 +64,8 @@ typedef struct {
     /* 0x0C */ f32 unkC;
     /* 0x10 */ f32 unk10;
     /* 0x14 */ f32 unk14;
-} Unk80085968;
+    /* 0x18 */ u16 unk18;
+} Unk80085968; // size = 0x1C (func_800107F0's result)
 
 typedef struct {
     /* 0x00 */ f32 x;
@@ -83,15 +84,18 @@ typedef struct {
     u8 unk0[0xC];
 } Unk8010FDC4;
 
-extern u8 D_80085988[];
-extern u8 D_800859A8[];
+/* This file's .bss, 80085290..800859B0, in address order (first declaration fixes the order). */
+Unk80085290 D_80085290[16];
+s32 D_80085950;
+Unk80085958 D_80085958;
+u8 D_80085960[8]; /* unreferenced */
+Unk80085968 D_80085968;
+u8 D_80085988[0x20];
+u8 D_800859A8[8];
+
 extern u8 D_8004F770[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
-extern s32 D_80085950;
-extern Unk80085290 D_80085290[];
-extern Unk80085968 D_80085968;
-extern Unk80085958 D_80085958;
 extern Unk8010FDC4 D_8010FDC4[];
 /* Message text around the name in func_80013A50. */
 u8 D_8004DF00[8] = {
