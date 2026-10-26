@@ -33,16 +33,23 @@ extern UnkStruct_801004E8 D_80104DD8_ovl_DA4570[];
 extern UnkStruct_801004E8 D_80105288_ovl_DA4570[];
 extern UnkStruct_801004E8 D_801053E8_ovl_DA4570[];
 extern UnkStruct_801004E8 D_801053F8_ovl_DA4570[];
-extern s32 D_80105660_ovl_DA4570;
-extern u16* D_80105664_ovl_DA4570[];
-extern UnkFont_8010566C D_8010566C_ovl_DA4570[];
-extern u16 D_8010567C_ovl_DA4570[];
-extern u8 D_8010568C_ovl_DA4570[];
-extern s32 D_80107048_ovl_DA4570;
-extern s32 D_8010704C_ovl_DA4570;
 extern u8 D_803245A0[];
-extern u16 D_8010700C_ovl_DA4570[];
-extern u16* D_80107044_ovl_DA4570;
+
+/* .data 80105660..80107050 (the earlier overlay data is still asm) */
+s32 D_80105660_ovl_DA4570 = 0;
+u16* D_80105664_ovl_DA4570[2] = { (u16*) 0x80200000, (u16*) 0x80225800 };
+UnkFont_8010566C D_8010566C_ovl_DA4570[1] = { { 10, 13, 10, 14 } };
+u16 D_8010567C_ovl_DA4570[8] = { /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */ };
+/* 4bpp font bitmap, 0x1980 bytes */
+u8 D_8010568C_ovl_DA4570[0x1980] = {
+    /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
+};
+/* 7 palettes of 4 colours */
+u16 D_8010700C_ovl_DA4570[28] = {
+    /* asset bytes removed from history; extracted from the ROM at build time (assets.yaml) */
+};
+u16* D_80107044_ovl_DA4570 = &D_8010700C_ovl_DA4570[4];
+/* func_80101C80's two statics follow at 80107048/4C */
 /* .bss 80107080..80107300 */
 UnkStruct_80107080 D_80107080_ovl_DA4570[16];
 s32 D_80107280_ovl_DA4570;
@@ -282,4 +289,74 @@ void func_80100944_ovl_DA4570(void) {
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_DA4570/DA4570/func_801009EC_ovl_DA4570.s")
 
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_DA4570/DA4570/func_80101C80_ovl_DA4570.s")
+void func_80101C80_ovl_DA4570(s32 x, s32 y, u8* str) {
+    s32 rowOff = 0;
+    s32 curX = x;
+    s32 curY = y;
+    UnkFont_8010566C* f;
+    u16* dst;
+    u8* src;
+    s32 rows;
+    s32 n;
+    u16 px;
+    s32 arg;
+    static s32 font = 0;
+    static s32 spacing = 0;
+
+    if (*str != 0xFF) { do {
+        if (*str & 0x80) {
+            arg = *str & 0x1F;
+            switch (*str & 0x60) {
+                case 0x00:
+                    rowOff = (arg * 0x130) / 2;
+                        rowOff = rowOff * 13;
+                    break;
+                case 0x20:
+                    break;
+                case 0x40:
+                    if (arg < 0x10) {
+                        font = arg;
+                    } else {
+                        spacing = arg;
+                    }
+                    break;
+                case 0x60:
+                    switch (arg) {
+                        case 0:
+                            curX = x;
+                            curY += D_8010566C_ovl_DA4570[font].lineHeight;
+                            break;
+                        case 30:
+                            break;
+                    }
+                    break;
+            }
+        } else {
+            f = &D_8010566C_ovl_DA4570[font];
+            if (*str == 0x7F) {
+                curX += f->advance + spacing;
+            } else {
+                dst = D_801072E0_ovl_DA4570 + (curY * 320 + curX);
+                arg = *str & 0x7F;
+                src = D_803245A0 + (f->width >> 1) * arg + rowOff;
+                for (rows = f->height; rows != 0;) {
+                    for (n = f->width >> 1; n != 0; n--) {
+                        if ((px = D_8010567C_ovl_DA4570[(*src & 0xF0) >> 4]) & 1) {
+                            *dst = px;
+                        }
+                        dst++;
+                        if ((px = D_8010567C_ovl_DA4570[*src++ & 0xF]) & 1) {
+                            *dst = px;
+                        }
+                        dst++;
+                    }
+                    dst += 320 - f->width;
+                    src += 0x98 - (f->width >> 1);
+                    rows--;
+                }
+                curX += f->advance + spacing;
+            }
+        }
+    } while (*++str != 0xFF);
+    }
+}

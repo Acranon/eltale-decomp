@@ -340,6 +340,7 @@ segments:
     subsegments:
       - [0xDA4570, c, ovl_DA4570/DA4570]
       - [0xDA6510, data]
+      - [0xDA9BD0, .data, ovl_DA4570/DA4570]    # 80105660..80107050
       - [0xDAB5C0, .rodata, ovl_DA4570/DA4570]
       - { start: 0xDAB5F0, type: .bss, vram: 0x80107080, name: ovl_DA4570/DA4570 }
 
