@@ -117,7 +117,8 @@ extern CollMesh *D_8007C294;
 extern CollWalls *D_8007C298;
 extern CollWalls *D_8007C29C;
 extern s32 D_800842C0;
-extern f32 D_800842F0;
+/* This file's .bss, 800842F0..80084300. */
+f32 D_800842F0;
 extern Vec2f D_80084320;
 extern u16 D_8008BE52;
 extern u8 D_8008C9B8[];

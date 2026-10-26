@@ -371,7 +371,8 @@ segments:
       - { start: 0x71920, type: .bss, vram: 0x8007C0B0, name: DAE0 }       # 8007C0B0..8007C280
       - { start: 0x71920, type: .bss, vram: 0x8007C280, name: E2A0 }       # 8007C280..80082860
       - { start: 0x71920, type: bss, vram: 0x80082860, name: 80082860 }
-      - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }
+      - { start: 0x71920, type: .bss, vram: 0x800842F0, name: 113F0 }      # 800842F0..80084300
+      - { start: 0x71920, type: .bss, vram: 0x80084300, name: 12610 }      # 80084300..80084B80
       - { start: 0x71920, type: .bss, vram: 0x80084B80, name: 13DF0 }      # 80084B80..80085290
       - { start: 0x71920, type: .bss, vram: 0x80085290, name: 140D0 }      # 80085290..800859B0
       - { start: 0x71920, type: .bss, vram: 0x800859B0, name: 147A0 }      # 800859B0..80085AB0
@@ -379,7 +380,10 @@ segments:
       - { start: 0x71920, type: .bss, vram: 0x80085B80, name: 15150 }      # 80085B80..80085F90
       - { start: 0x71920, type: .bss, vram: 0x80085F90, name: 17360 }      # 80085F90..800863F0
       - { start: 0x71920, type: .bss, vram: 0x800863F0, name: 1B200 }      # 800863F0..80087E30
-      - { start: 0x71920, type: bss, vram: 0x80087E30, name: 80087E30 }
+      - { start: 0x71920, type: .bss, vram: 0x80087E30, name: 1E570 }      # 80087E30..8008BE40
+      - { start: 0x71920, type: .bss, vram: 0x8008BE40, name: 1FA00 }      # 8008BE40..8008BFC0
+      - { start: 0x71920, type: .bss, vram: 0x8008BFC0, name: 20DA0 }      # 8008BFC0..8008C040
+      - { start: 0x71920, type: .bss, vram: 0x8008C040, name: 216E0 }      # 8008C040..8008C190
       - { start: 0x71920, type: .bss, vram: 0x8008C190, name: 25B20 }      # 8008C190..8008CA50
       - { start: 0x71920, type: .bss, vram: 0x8008CA50, name: 272D0 }      # 8008CA50..8008CE60
       - { start: 0x71920, type: .bss, vram: 0x8008CE60, name: 27A90 }      # 8008CE60..8008CEA0

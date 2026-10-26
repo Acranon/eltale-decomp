@@ -201,3 +201,8 @@ D_80060C4C = D_80060C48 + 0x4;
 
 /* D2: labels inside objects that src/272D0.c defines (8008CA50..8008CE60). */
 D_8008CE54 = D_8008CA58 + 0x3FC;
+
+/* D2: fields of D_80084300 (src/12610.c) that asm and other files name. */
+D_80084308 = D_80084300 + 0x8;
+D_8008430C = D_80084300 + 0xC;
+D_80084314 = D_80084300 + 0x14;

@@ -55,8 +55,9 @@ Gfx D_8004F060[8] = {
 extern s32 D_8007A180;
 extern Gfx* D_8007A184;
 extern Struct_80085E48 D_80085E48;
-extern s32 D_80087E30;
-extern Struct_80087E38 D_80087E38[0x100];
+/* This file's .bss, 80087E30..8008BE40. */
+s32 D_80087E30;
+Struct_80087E38 D_80087E38[0x100];
 
 void func_8001DCE8(u8, u8*, s32, s32, u8, u8);
 void func_80027430(MtxF*, f32, f32, f32);
