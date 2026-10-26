@@ -26,20 +26,26 @@ R_MIPS_26, R_MIPS_HI16, R_MIPS_LO16 = 4, 5, 6
 
 
 def retail_funcs():
-    """name -> ROM offset, from the split asm."""
+    """name -> (ROM offset, size in bytes without trailing nops), from the split asm."""
     out = {}
     for p in (ROOT / "asm").rglob("*.s"):
         name = None
         for ln in p.open(encoding="utf-8", errors="replace"):
             if ln.startswith("glabel "):
                 name = ln.split()[1]
+                out[name] = [None, 0]
                 continue
-            if name:
-                m = LINE.search(ln)
-                if m:
-                    out[name] = int(m.group(1), 16)
-                    name = None
-    return out
+            if ln.startswith(("endlabel", ".section", "dlabel", "jlabel")):
+                name = None
+                continue
+            m = LINE.search(ln) if name else None
+            if m:
+                rec = out[name]
+                if rec[0] is None:
+                    rec[0] = int(m.group(1), 16)
+                if m.group(3) != "00000000":
+                    rec[1] = int(m.group(1), 16) + 4 - rec[0]
+    return {k: (v[0], v[1]) for k, v in out.items() if v[0] is not None}
 
 
 def obj_path(src: Path) -> Path:
@@ -80,7 +86,7 @@ def check(src: Path, funcs):
                 print(f"  {name}: no retail address (renamed? add it to symbol_addrs.txt)")
                 ok = False
                 continue
-            rom = funcs[name]
+            rom, retail_size = funcs[name]
             ndiff = 0
             first = None
             for k in range(0, size, 4):
@@ -92,10 +98,14 @@ def check(src: Path, funcs):
                     if first is None:
                         first = k
             # the retail function must not be longer either
-            nxt = sorted(v for v in funcs.values() if v > rom)
-            retail_size = (nxt[0] - rom) if nxt else size
-            tail = ROM[rom + size:rom + retail_size]
-            longer = any(tail[j:j + 4] != b"\0\0\0\0" for j in range(0, len(tail), 4))
+            # (retail_size comes from the function's own .s, without trailing nops)
+            longer = retail_size > size
+            # splat has no label for a function that follows another without padding (an
+            # empty one, say), so its words sit in the previous .s: give it that address
+            if longer and i + 1 < len(syms) and syms[i + 1][1] not in funcs:
+                nxt_off = syms[i + 1][0]
+                funcs[syms[i + 1][1]] = (rom + nxt_off - off, retail_size - (nxt_off - off))
+                longer = False  # the rest is checked as that next function
             if ndiff == 0 and not longer:
                 print(f"  {name}: OK")
             else:
