@@ -1898,3 +1898,76 @@ void func_8001A56C(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
         arg1->unk68->timers[arg2] = func_80026E90(D_8004EDEC[arg2]) + 3;
     }
 }
+
+/* .data 8004EC90..8004EE20: the state tables, after the functions they point to. */
+typedef void (*FnEC90)(Unk80017F48*, Actor17360*);
+typedef void (*FnECB8)(Unk80017F48*);
+typedef void (*FnECC4)(Unk80017F48*);
+typedef Actor17360* (*FnECD0)(Unk80017F48*, s32);
+typedef void (*FnECDC)(Unk80017F48*, Actor17360*);
+typedef void (*FnED04)(u8, Actor17360*);
+FnEC90 D_8004EC90[10] = {
+    (FnEC90) func_80016DE0,
+    (FnEC90) func_80016E34,
+    (FnEC90) func_80016EA8,
+    (FnEC90) func_80016F3C,
+    (FnEC90) func_80017028,
+    (FnEC90) func_80017134,
+    (FnEC90) func_80017244,
+    (FnEC90) func_800172D0,
+    (FnEC90) func_8001744C,
+    (FnEC90) func_80017590,
+};
+FnECB8 D_8004ECB8[3] = {
+    (FnECB8) func_80018DC0,
+    (FnECB8) func_80018FB0,
+    (FnECB8) func_80019024,
+};
+FnECC4 D_8004ECC4[3] = {
+    (FnECC4) func_80017AEC,
+    (FnECC4) func_80017F48,
+    (FnECC4) func_80017F48,
+};
+FnECD0 D_8004ECD0[3] = {
+    (FnECD0) func_8001809C,
+    (FnECD0) func_80018348,
+    (FnECD0) func_80018444,
+};
+FnECDC D_8004ECDC[10] = {
+    (FnECDC) func_80018480,
+    (FnECDC) func_8001860C,
+    (FnECDC) func_800187C4,
+    (FnECDC) func_80018968,
+    (FnECDC) func_800189F0,
+    (FnECDC) func_80018AAC,
+    (FnECDC) func_80018B40,
+    (FnECDC) func_80018C14,
+    (FnECDC) func_80018CD8,
+    (FnECDC) func_80018D88,
+};
+FnED04 D_8004ED04[12] = {
+    (FnED04) func_80019034,
+    (FnED04) func_800190BC,
+    (FnED04) func_80019104,
+    (FnED04) func_80019184,
+    (FnED04) func_8001920C,
+    (FnED04) func_800192C8,
+    (FnED04) func_800193A4,
+    (FnED04) func_80019408,
+    (FnED04) func_80019450,
+    (FnED04) func_80019498,
+    (FnED04) func_800194E0,
+    (FnED04) func_800195E0,
+};
+u16 D_8004ED34[16] = {
+    0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080,
+    0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000,
+};
+Unk8004ED68 D_8004ED54 = { { 2.0f, 3.0f, 4.0f, 6.0f, 7.0f } };
+Unk8004ED68 D_8004ED68 = { { 0.0f, 1.0f, 2.0f, 10.0f, 10.0f } };
+Unk8004ED68 D_8004ED7C = { { 0.4f, 0.5f, 0.7f, 1.0f, 1.2f } };
+u16 D_8004ED90[10] = { 2, 1, 3, 2, 0, 3, 1, 0, 2, 0 };
+s32 D_8004EDA4[3] = { 1, 2, 0 };
+u8 D_8004EDB0[12] = { 24, 24, 24, 16, 24, 24, 16, 24, 24, 24, 24, 24 };
+s32 D_8004EDBC[12] = { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
+s32 D_8004EDEC[12] = { 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
