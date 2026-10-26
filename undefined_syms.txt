@@ -110,6 +110,16 @@ D_8007C1C6 = D_8007C148 + 0x7E;
 D_8007C1CC = D_8007C148 + 0x84;
 D_8007C1D8 = D_8007C148 + 0x90;
 
+/* D2: labels inside objects that src/E2A0.c defines (8007C280..80082030). */
+D_80081B78 = D_80081AB0 + 0xC8;
+D_80081B7A = D_80081AB0 + 0xCA;
+D_80081C3E = D_80081AB0 + 0x18E;
+D_80081C40 = D_80081AB0 + 0x190;
+D_80081C42 = D_80081AB0 + 0x192;
+D_80081D00 = D_80081CE8 + 0x18;
+D_80081D18 = D_80081CE8 + 0x30;
+D_80081D30 = D_80081CE8 + 0x48;
+
 /* D2: labels inside objects that src/12610.c defines (80084980..80084B80):
  * D_80084B18[4][3], D_80084B48[4][3], D_80084B78[2]. */
 D_80084B1C = D_80084B18 + 0x04;
@@ -191,6 +201,11 @@ D_80060C4C = D_80060C48 + 0x4;
 
 /* D2: labels inside objects that src/272D0.c defines (8008CA50..8008CE60). */
 D_8008CE54 = D_8008CA58 + 0x3FC;
+
+/* D2: labels inside objects that src/29150.c defines (8008CEC0..8008FAF0), used by func_80028AAC. */
+D_8008F440 = D_8008F428 + 0x18;
+D_8008F7C4 = D_8008F7A8 + 0x1C;
+D_8008F960 = D_8008F7A8 + 0x1B8;
 
 /* D2: fields of D_80084300 (src/12610.c) that asm and other files name. */
 D_80084308 = D_80084300 + 0x8;

@@ -147,15 +147,10 @@ void func_800273C0(Mtx *, f32, f32, f32, f32, f32, f32, f32);
 extern AnimInfo D_800579F8;
 extern AnimInfo D_80057F80;
 extern AnimInfo D_80058008;
-extern Unk80082020 D_80082020;
-extern s32 D_8007C6A8;
-extern s32 D_8007C6AC;
 extern s32 D_8007A17C;
 extern Gfx *D_8007A184;
 
 extern u8 D_8005E9F8[];
-extern f32 D_80081FF0[2];
-extern u16 D_80081AB0[];
 extern u16 D_80124E00[];
 extern s32 D_8007A180;
 extern Unk80085E48 D_80085E48;
@@ -172,8 +167,6 @@ typedef struct {
     /* 0x14 */ u8 pad14[0xC];
 } Unk8007C294; /* size 0x20 */
 
-extern Unk8007C294 *D_8007C294;
-extern s32 D_8007C2A0;
 
 typedef struct {
     /* 0x00 */ Gfx *a;
@@ -258,18 +251,60 @@ typedef struct {
     /* 0x00 */ s32 v[6];
 } Unk8004DD98; /* size 0x18 */
 
+/* This file's .bss starts here: 8007C280..80082030 in address order, then
+ * D_80082030.. below. D_8007C2A8 is a pointer table other files use.
+ * D_80081CE4, D_80081FEC, D_80081FF8 and D_8008201C are
+ * unreferenced. Splat's labels inside D_80081AB0 (D_80081B78..D_80081C42) and
+ * D_80081CE8 (D_80081D00..D_80081D30) are aliases in undefined_syms.txt. */
+u16 D_8007C280;
+u16 D_8007C282;
+Unk8007C284 *D_8007C284;
+Unk8007C288 *D_8007C288;
+Unk8007C28C *D_8007C28C;
+Unk8000FA9C *D_8007C290;
+Unk8007C294 *D_8007C294;
+s32 D_8007C298;
+s32 D_8007C29C;
+s32 D_8007C2A0;
+s32 D_8007C2A4;
+void *D_8007C2A8[0x100];
+s32 D_8007C6A8;
+s32 D_8007C6AC;
+u8 D_8007C6B0[0x4000];
+u16 D_800806B0[0x100];
+u8 D_800808B0[0x800];
+u16 D_800810B0[0x200];
+u16 D_800814B0[3][0x100];
+u16 D_80081AB0[0x100];
+s32 D_80081CB0;
+s32 D_80081CB4;
+s32 D_80081CB8;
+s32 D_80081CBC;
+s32 D_80081CC0;
+s32 D_80081CC4;
+Unk8000FA9C **D_80081CC8;
+Unk8000FA9C **D_80081CCC;
+Unk8000FA9C **D_80081CD0;
+Unk8000FA9C **D_80081CD4;
+Unk8000FA9C **D_80081CD8;
+Unk8000FA9C **D_80081CDC;
+s32 D_80081CE0;
+s32 D_80081CE4;
+Unk8004DD98 D_80081CE8[32];
+Unk8000FA9C *D_80081FE8;
+s32 D_80081FEC;
+f32 D_80081FF0[2];
+s32 D_80081FF8[2];
+CollResult D_80082000;
+s32 D_8008201C;
+Unk80082020 D_80082020;
+
 void func_80028120();
 void func_8000F4A0(void);
 void func_8000FD54(void);
 void func_800107F0(f32, f32, f32, u16, CollResult *);
 extern Unk8007C284 D_80056BB0[];
 extern Unk80057540 D_80057540[];
-extern Unk8007C288 *D_8007C288;
-extern Unk8007C28C *D_8007C28C;
-extern u16 D_8007C280;
-extern u16 D_8007C282;
-extern s32 D_8007C298;
-extern s32 D_8007C29C;
 extern s32 D_80084308;
 extern f32 D_8007A98C;
 extern f32 D_8007A990;
@@ -277,8 +312,6 @@ extern f32 D_8007A994;
 extern s32 D_8007A99C;
 extern u16 D_80081B78[];
 extern u16 D_80081B7A[];
-extern CollResult D_80082000;
-extern Unk8004DD98 D_80081CE8[32];
 extern u8 D_753F0[];
 extern u8 D_851F0[];
 /* Same address as D_851F0: the end of the ROM block that starts at D_753F0 (a separate linker symbol in the original). */
@@ -291,49 +324,33 @@ extern u8 D_3F1BA0[];
 extern u8 D_80100000[];
 extern u8 D_8010FE00[];
 extern u8 D_801E0000[];
-extern u8 D_800808B0[];
-extern u8 D_8007C6B0[];
 
-extern Unk8007C284 *D_8007C284;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ f32 x;
-    /* 0x1C */ f32 y;
-    /* 0x20 */ f32 z;
-} Unk8007AA08;
 
 typedef struct {
     /* 0x00 */ u16 a;
     /* 0x02 */ u16 b;
 } Unk80082048;
 
-extern Unk8007AA08 D_8007AA08;
-extern Unk8000FA9C *D_8007C290;
-extern s32 D_8007C2A4;
-extern s32 D_80081CB0;
-extern s32 D_80081CB4;
-extern s32 D_80081CB8;
-extern s32 D_80081CBC;
-extern s32 D_80081CC0;
-extern s32 D_80081CC4;
-extern Unk8000FA9C **D_80081CC8;
-extern Unk8000FA9C **D_80081CCC;
-extern Unk8000FA9C **D_80081CD0;
-extern Unk8000FA9C **D_80081CD4;
-extern Unk8000FA9C **D_80081CD8;
-extern Unk8000FA9C **D_80081CDC;
-extern s32 D_80081CE0;
-extern Unk8000FA9C *D_80081FE8;
 extern u8 D_80060C88[];
 void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
-/* Part of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
+/* The rest of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
  * holds func_800104C0's static at 80082858). Nothing names 80082030..80082048
  * (splat's D_80082030 is func_8000D6A0's loop end), so it is a placeholder. */
 u8 D_80082030[0x18];
 Unk80082048 D_80082048[4];
 u16 D_80082058[0x200];
 u16 D_80082458[0x200];
+/* Declared after the definitions above: IDO orders a file's .bss by declaration
+ * number mod 256 (later blocks first on a tie), and these declarations keep
+ * func_800104C0's static D_80082858 after D_80082458. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ f32 x;
+    /* 0x1C */ f32 y;
+    /* 0x20 */ f32 z;
+} Unk8007AA08;
+extern Unk8007AA08 D_8007AA08;
 void func_8001A948(f32, f32, f32, Unk8000FA9C *);
 void func_8000FA9C(Unk8000FA9C *);
 void func_8000FC50(Unk8000FA9C *);
@@ -353,8 +370,6 @@ typedef struct {
     /* 0x06 */ u16 id;
 } Unk8004DE98; /* size 0x8 */
 
-extern u16 D_800810B0[];
-extern u16 D_800814B0[][0x100];
 extern s32 D_80084980;
 
 /* This file's .data, 8004DD70..8004DED0, in source order: these tables, then
