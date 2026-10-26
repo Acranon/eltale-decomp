@@ -171,7 +171,6 @@ void func_80011A10(Unk80011A10Arg *arg0) {
     D_80084300.unk14 = arg0->unk8;
 }
 
-/*A60S*/
 void func_80011A60(void) {
     s32 i;
 
@@ -185,7 +184,6 @@ void func_80011A60(void) {
         D_80084B18[i][2] = 0;
     }
 }
-/*A60E*/
 
 #pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011AE0.s")
 

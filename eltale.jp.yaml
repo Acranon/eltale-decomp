@@ -264,8 +264,11 @@ segments:
       - [0x4C650, databin, gspF3DEX_text]
       - [0x4DA80, databin, aspMain_text]
       - [0x4E8A0, data]
+      - [0x4E970, .data, E2A0]                   # 8004DD70..8004DED0
       - [0x4EAD0, .data, 12610]                  # 8004DED0..8004DF00
       - [0x4EB00, data]
+      - [0x4FA20, .data, 1B200]                  # 8004EE20..8004F060
+      - [0x4FC60, data]
       - [0x50370, .data, 27A90]
       - [0x50380, data]
       - [0x6D900, .data, libultra/os/initialize]
@@ -327,8 +330,12 @@ segments:
       - { start: 0x71920, type: bss, vram: 0x8007A8C0, name: 8007A8C0 }
       - { start: 0x71920, type: .bss, vram: 0x8007A8F0, name: 3F50 }       # 8007A8F0..8007AB70
       - { start: 0x71920, type: bss, vram: 0x8007AB70, name: 8007AB70 }
+      - { start: 0x71920, type: .bss, vram: 0x80082030, name: E2A0 }
+      - { start: 0x71920, type: bss, vram: 0x80082860, name: 80082860 }
       - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }
       - { start: 0x71920, type: bss, vram: 0x80084B80, name: 80084B80 }
+      - { start: 0x71920, type: .bss, vram: 0x800865C0, name: 1B200 }
+      - { start: 0x71920, type: bss, vram: 0x80087E00, name: 80087E00 }
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: bss, vram: 0x80093000, name: 80093000 }
       - { start: 0x71920, type: .bss, vram: 0x80094380, name: libultra/io/vimgr }

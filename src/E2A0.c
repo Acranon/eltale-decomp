@@ -55,19 +55,24 @@ typedef struct {
 } Particle;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ void *unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
     /* 0x10 */ u8 *unk10;
-    /* 0x14 */ u8 pad14[4];
+    /* 0x14 */ u8 *unk14;
     /* 0x18 */ f32 x;
     /* 0x1C */ f32 y;
     /* 0x20 */ f32 z;
-    /* 0x24 */ u8 pad24[4];
+    /* 0x24 */ f32 unk24;
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 unk2C;
     /* 0x30 */ f32 unk30;
-    /* 0x34 */ u8 pad34[4];
+    /* 0x34 */ f32 unk34;
     /* 0x38 */ f32 unk38;
-} SpriteObj;
+    /* 0x3C */ s32 unk3C;
+} SpriteObj; /* size 0x40 */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
@@ -119,32 +124,8 @@ typedef struct {
     f32 z;
 } Vec3f;
 
-extern SpriteObj D_8004DE04;
-extern u8 *D_8004DE14;
-extern f32 D_8004DE1C;
-typedef struct {
-    f32 y;
-    f32 z;
-} Unk8004DE20;
-extern Unk8004DE20 D_8004DE20;
-extern f32 D_8004DE2C;
-extern f32 D_8004DE30;
-typedef struct {
-    f32 a;
-    f32 pad;
-    f32 b;
-} Unk8004DE34;
-extern Unk8004DE34 D_8004DE34;
-extern f32 D_8004DE3C;
-extern f32 D_8004DE5C;
-extern f32 D_8004DE60;
-extern f32 D_8004DE64;
-extern f32 D_8004DE6C;
-extern f32 D_8004DE70;
-extern SpriteObj D_8004DE44;
 extern u8 D_8005E9F8[];
 extern f32 D_80081FF0[2];
-extern s32 D_8004DEC8;
 extern u16 D_80081AB0[];
 extern s32 D_800842BC;
 extern u16 D_80124E00[];
@@ -281,7 +262,6 @@ extern s32 D_8007A99C;
 extern u16 D_80081B78[];
 extern u16 D_80081B7A[];
 extern CollResult D_80082000;
-extern Unk8004DD98 D_8004DD98;
 extern Unk8004DD98 D_80081CE8[32];
 extern u8 D_753F0[];
 extern u8 D_851F0[];
@@ -333,18 +313,17 @@ extern Unk8000FA9C **D_80081CDC;
 extern s32 D_80081CE0;
 extern Unk8000FA9C *D_80081FE8;
 extern u8 D_80060C88[];
-extern u16 D_8004DD70;
-extern u16 D_8004DDB0;
-extern u8 *D_8004DDB4[];
-extern u16 D_8004DDC8[];
 extern Unk8000FA9C *D_80082860[];
 extern Unk8000FA9C *D_80082C60[];
 extern Unk8000FA9C *D_80083068[];
 void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
-extern Unk80082048 D_80082048[];
-extern f32 D_8004DDD4[];
-extern f32 D_8004DDE4[];
-extern f32 D_8004DDF4[];
+/* Part of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
+ * holds func_800104C0's static at 80082858). Nothing names 80082030..80082048
+ * (splat's D_80082030 is func_8000D6A0's loop end), so it is a placeholder. */
+u8 D_80082030[0x18];
+Unk80082048 D_80082048[4];
+u16 D_80082058[0x200];
+u16 D_80082458[0x200];
 void func_8001A948(f32, f32, f32, Unk8000FA9C *);
 void func_8000FA9C(Unk8000FA9C *);
 void func_8000FC50(Unk8000FA9C *);
@@ -356,10 +335,7 @@ f32 func_800270D0(f32, f32);
 void func_80027220(f32 (*)[4], f32, f32, f32, f32, f32, f32, f32);
 void guMtxF2L(f32 (*)[4], Mtx *);
 void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
-extern u16 D_8004DE62[];
 extern u8 **D_8005E5AC[];
-extern u16 D_8004DE84[];
-extern u8 D_8004DE88[];
 extern f32 D_80085E74;
 
 typedef struct {
@@ -368,17 +344,32 @@ typedef struct {
     /* 0x06 */ u16 id;
 } Unk8004DE98; /* size 0x8 */
 
-extern Unk8004DE98 D_8004DE98[];
-extern s32 D_8004DE8C;
-extern s32 D_8004DE90;
-extern s32 D_8004DE94;
 extern u16 D_800810B0[];
 extern u16 D_800814B0[][0x100];
-extern s32 D_80082858;
 extern u16 *D_80083060;
 extern u16 *D_80083468;
 extern u16 *D_80083550;
 extern s32 D_80084980;
+
+/* This file's .data, 8004DD70..8004DED0, in source order: these tables, then
+ * the static sprite descriptors of func_8000FA9C (8004DE04) and func_8000FC50
+ * (8004DE44), then the tables defined after func_8000FC50. IDO stores a
+ * function-static descriptor's fields with lui/%lo (sharing the lui inside a
+ * 16-byte line), which both functions need. D_8004DD8B (func_8000DE54's asm
+ * name for D_8004DD88 + 3) is an alias in undefined_syms.txt. */
+u16 D_8004DD70 = 0;
+s32 D_8004DD74[4] = { 0x00000000, 0x01600160, 0x01600160, 0x01600100 };
+s32 D_8004DD84 = 0x00500050;
+s32 D_8004DD88[4] = { 0x19, 0x1B, 0x1E, 0x20 };
+Unk8004DD98 D_8004DD98 = { { 0 } };
+u16 D_8004DDB0 = 0;
+u8 *D_8004DDB4[5] = {
+    (u8 *)0x801093B0, (u8 *)0x8010A3B0, (u8 *)0x80129D10, (u8 *)0x80160B30, (u8 *)0x8014DA40,
+};
+u16 D_8004DDC8[6] = { 0x40, 0x40, 0x20, 0x40, 0x20, 0 };
+f32 D_8004DDD4[4] = { 0.0f, 5000.0f, 1000.0f, 3000.0f };
+f32 D_8004DDE4[4] = { 0.0f, 30000.0f, 30000.0f, 48000.0f };
+f32 D_8004DDF4[4] = { 0.0f, 1000.0f, 5000.0f, 3000.0f };
 
 void func_8000D6A0(void) {
     u32 *q;
@@ -832,7 +823,36 @@ void func_8000F740(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000FA9C.s")
+void func_8000FBB4(Particle *arg0);
+void func_8000FCE0(Particle *arg0);
+extern u8 D_80060A38[];
+extern u8 D_80060AB8[];
+extern u8 D_80060BF8[];
+
+void func_8000FA9C(Unk8000FA9C *arg0) {
+    static SpriteObj D_8004DE04 = {
+        0x23, 0, (void *)func_8000FBB4, 0x07202000, 0, D_8005E9F8, D_80060A38,
+        0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 15.0f, 0.0f, 0,
+    };
+
+    arg0->timer++;
+    if (arg0->timer >= 0) {
+        D_8004DE04.x = arg0->x;
+        D_8004DE04.y = arg0->y;
+        D_8004DE04.z = arg0->z;
+        D_8004DE04.unk28 = D_8004DE04.unk2C = arg0->scale * 10.0;
+        D_80081FF0[0] = arg0->scale * 2.0;
+        D_80081FF0[1] = 0.0f;
+        func_800271B4(arg0->angle, D_80081FF0);
+        D_8004DE04.unk30 = D_80081FF0[0];
+        D_8004DE04.unk38 = D_80081FF0[1];
+        D_8004DE04.unk10 = &D_8005E9F8[arg0->timer << 10];
+        func_8001D9A8(&D_8004DE04);
+        if (arg0->timer >= 7) {
+            arg0->timer = func_80026E90(0x3C) - 0x78;
+        }
+    }
+}
 
 void func_8000FBB4(Particle *arg0) {
     arg0->x += arg0->vx;
@@ -842,7 +862,27 @@ void func_8000FBB4(Particle *arg0) {
     gDPSetEnvColor(D_8007A184++, 255, 255, 255, (D_800842A8 & 1) ? 0xDC : 0x78);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000FC50.s")
+void func_8000FC50(Unk8000FA9C *arg0) {
+    static SpriteObj D_8004DE44 = {
+        0xF, 0, (void *)func_8000FCE0, 0x00081000, 0, D_80060AB8, D_80060BF8,
+        0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0,
+    };
+
+    arg0->timer--;
+    if (arg0->timer == 0) {
+        D_8004DE44.x = arg0->x;
+        D_8004DE44.y = arg0->y;
+        D_8004DE44.z = arg0->z;
+        D_8004DE44.unk28 = D_8004DE44.unk2C = arg0->scale;
+        func_8001D9A8(&D_8004DE44);
+        arg0->timer = func_80026E90(0x96) + 0x96;
+    }
+}
+
+/* The rest of this file's .data. */
+u16 D_8004DE84[2] = { 0x10, 0x10 };
+u8 D_8004DE88[4] = { 0x82, 0xDC, 0x78, 0xF0 };
+extern Unk8004DE98 D_8004DE98[];
 
 void func_8000FCE0(Particle *arg0) {
     arg0->y = arg0->y + arg0->vy / 2;
@@ -952,9 +992,70 @@ void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_800104C0.s")
+void func_800104C0(void) {
+    static s32 D_8004DE8C = 0;
+    static s32 D_8004DE90 = 1;
+    static s32 D_8004DE94 = 1;
+    static s32 D_80082858;
+    Unk8004DE98 *p;
+    s32 inv;
+    u16 *src;
+    u16 *src2;
+    u16 *dst;
+    s32 i;
+    u16 r1;
+    u16 g1;
+    u16 b1;
+    u16 r2;
+    u16 g2;
+    u16 b2;
 
-extern s32 D_8004DEC8;
+    p = D_8004DE98;
+    while (p->id != 0xFF) {
+        if (D_80084980 >= p->start && D_80084980 < p[1].start) {
+            D_8004DE8C = p->id;
+            break;
+        }
+        p++;
+    }
+    if (D_8004DE8C != D_8004DE94) {
+        D_80083060 = (u16 *)D_800814B0 + D_8004DE94 * 0x100;
+        D_8004DE90 = D_80082858 = p->unk4;
+        D_80083468 = (u16 *)D_800814B0 + D_8004DE8C * 0x100;
+        D_80083550 = D_800810B0;
+    }
+    if (D_8004DE90 != 0) {
+        dst = D_80083550;
+        src = D_80083060;
+        src2 = D_80083468;
+        inv = D_80082858 - D_8004DE90;
+        i = 0x100;
+        while (i--) {
+            r1 = (*src & 0xF800) >> 11;
+            g1 = (*src & 0x7C0) >> 6;
+            b1 = (*src & 0x3E) >> 1;
+            r2 = (*src2 & 0xF800) >> 11;
+            g2 = (*src2 & 0x7C0) >> 6;
+            b2 = (*src2 & 0x3E) >> 1;
+            if (src) {
+                /* empty: changes IDO's register colouring to retail's (permuter) */
+            }
+            src++;
+            src2++;
+            *dst++ = (((r1 * D_8004DE90 + r2 * inv) / D_80082858) << 11) | (((g1 * D_8004DE90 + g2 * inv) / D_80082858) << 6) | (((b1 * D_8004DE90 + b2 * inv) / D_80082858) << 1);
+        }
+        D_8004DE90--;
+    }
+    D_8004DE94 = D_8004DE8C;
+}
+
+/* func_800104C0's statics come first, then these. */
+Unk8004DE98 D_8004DE98[6] = {
+    { 0, 0x1C, 2 }, { 0x15F9, 0x80, 0 }, { 0x4F1A, 0x1C, 1 },
+    { 0x6513, 0x1C, 2 }, { 0x6977, 0x1C, 2 }, { 0x6979, 0xFF, 0xFF },
+};
+s32 D_8004DEC8 = 0;
+
 extern u16 D_80081AB0[];
 extern u16 D_80081C40;
 extern u16 D_80081C42;

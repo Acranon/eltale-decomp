@@ -14,11 +14,19 @@ typedef struct {
 } Unk80086400; // size = 0x8
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
+    /* 0x00 */ u16 unk0;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ void* unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ void* unk10;
+    /* 0x14 */ void* unk14;
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 unk20;
-    /* 0x24 */ u8 pad24[0xC];
+    /* 0x24 */ f32 unk24;
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 unk2C;
     /* 0x30 */ f32 unk30;
     /* 0x34 */ f32 unk34;
     /* 0x38 */ f32 unk38;
@@ -73,21 +81,11 @@ typedef struct {
 
 extern Gfx* D_8007A184;
 extern Unk80086400 D_80086400[];
-extern Unk8004EE20 D_8004EE20;
 extern Unk1B200Vec2 D_80087E00;
-extern f32 D_8004EE60[];
-extern u8 D_8004EE90[];
 extern s32 D_800863F8;
 extern Unk80086440 D_80086440[];
 extern Unk80086440 D_80086500[];
-extern Unk8004EE20 D_8004EF0C;
-extern f32 D_8004EF24[];
-extern s32 D_8004EF4C[];
-extern f32 D_8004EF58[];
-extern u8 D_8004EF88[];
 extern s16 D_800865CC;
-extern Unk800865DC D_800865DC[];
-extern Unk800866D8 D_800866D8[];
 typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
@@ -125,9 +123,6 @@ typedef struct {
     /* 0x02 */ s16 unk2;
 } Unk80087798; // size = 0x4
 
-extern Unk80087298 D_80087298[];
-extern Unk800877A8 D_800877A8[];
-extern Unk80087798 D_80087798[];
 typedef struct {
     /* 0x00 */ void* target;
     /* 0x04 */ u8 digits[8];
@@ -138,7 +133,6 @@ typedef struct {
     /* 0x18 */ s32 unk18;
 } Unk800865C0; // size = 0x1C
 
-extern Unk800865C0 D_800865C0[];
 typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[0x16];
@@ -158,7 +152,6 @@ extern u8 D_800EB5E4[][4];
 extern s32 D_80084B6C;
 extern s32 D_80084B70;
 extern s32 D_80084B74;
-extern u8 D_8004EEDC[];
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ f32 eyeX;
@@ -209,22 +202,22 @@ typedef struct {
     /* 0x44 */ Unk800DA0F0 unk44;
 } Unk80086798b; // size = 0x58
 
+/* Part of this file's .bss, 800865C0..80087E00: the 16-byte-aligned run that
+ * holds D_80087798 (func_8001D688 shares a lui between its pairs only when it
+ * is defined here). Labels splat put inside these arrays (D_800865CC..,
+ * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
+
 extern Unk80085E48 D_80085E48;
 extern s32 D_8007A17C;
 extern s32 D_800863F0;
 extern Unk800EB2B4 D_800EB2B4[];
 extern u8 D_800CADA8[][4];
 extern Unk800DA0F0 D_800DA0F0[];
-extern Unk80086798b D_80086798[];
 typedef struct {
     f32 mf[4][4];
 } MtxF;
 
-extern Unk8004EE20 D_8004EFA4;
-extern Unk8004EE20 D_8004EFE4;
 extern Gfx D_800EB6D0[];
-extern u16 D_80087DF8;
-extern s32 D_8004F03C[];
 extern u16 D_800863F4;
 s32 func_8001CBD0(Unk80086798b*, s32);
 s32 func_8001CDF4(Unk80086798b*);
@@ -244,6 +237,34 @@ typedef struct {
 extern Unk2000000_1B200 D_2000000;
 extern Gfx D_800EB880[];
 extern Gfx D_800EB8E8[];
+
+void func_8001A828(Unk1B200Particle* arg0);
+void func_8001AC20(Unk1B200Particle* arg0);
+void func_8001AD64(Unk1B200Particle* arg0);
+void func_8001B688(Unk1B200Spark* arg0);
+void func_8001B9C0(Unk1B200Spark* arg0);
+
+/* This file's .data, 8004EE20..8004F060: effect descriptors (Unk8004EE20,
+ * 0x40 bytes each) and their tables, in source order: these first, then
+ * func_8001AB44's static descriptor (8004EE9C), D_8004EEDC, func_8001AD28's
+ * static descriptor (8004EF0C) and the tables after func_8001AD28. Both
+ * descriptors must be function statics: IDO then stores their fields through
+ * lui/%lo instead of the descriptor's address register. */
+Unk8004EE20 D_8004EE20 = {
+    0x000C, 0, (void*)func_8001A828, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C3790,
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
+};
+f32 D_8004EE60[12] = {
+    3.25f, 3.24f, 3.23f, 3.22f, 3.21f, 3.2f, 3.0f, 2.8f, 2.6f, 2.4f, 2.2f, 2.0f,
+};
+u8 D_8004EE90[12] = { 0x10, 0x20, 0x40, 0x50, 0x60, 0x80, 0x90, 0xA0, 0xB0, 0xA0, 0x80, 0x40 };
+Unk800865C0 D_800865C0[10];
+Unk800866D8 D_800866D8[8];
+Unk80086798b D_80086798[32];
+Unk80087298 D_80087298[32];
+Unk80087798 D_80087798[4];
+Unk800877A8 D_800877A8[4];
+u16 D_80087DF8;
 
 void func_8001A6B4(void);
 void func_8001A8F4(void);
@@ -403,7 +424,36 @@ void func_8001A948(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001AB44.s")
+void func_8001AB44(void) {
+    static Unk8004EE20 D_8004EE9C = {
+        0x002D, 0, (void*)func_8001AC20, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
+        0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.25f, 0.05f, 0,
+    };
+    Unk80086440* p;
+    s32 n;
+
+    D_800863F8 = D_800863F0;
+    p = D_8007A17C ? D_80086440 : D_80086500;
+    n = D_800863F8;
+    while (n != 0) {
+        if (p->unk0 != 0 && --p->unk0 == 0) {
+            D_8004EE9C.unk18 = p->x;
+            D_8004EE9C.unk1C = p->y;
+            D_8004EE9C.unk20 = p->z;
+            D_8004EE9C.unk28 = D_8004EE9C.unk2C = p->unk10;
+            func_8001D9A8(&D_8004EE9C);
+            p->unk0 = 0x19;
+        }
+        n--;
+        p++;
+    }
+}
+
+/* func_8001AC20's table sits between the two function statics. */
+u8 D_8004EEDC[48] = {
+    0x08, 0x1C, 0x30, 0x44, 0x58, 0x6C, 0x80, 0x94, 0xA8, 0xBC, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
+    0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xC0, 0xB0, 0xA0, 0x90, 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10, 0x00, 0x00, 0x00,
+};
 
 void func_8001AC20(Unk1B200Particle* arg0) {
     s32 r;
@@ -430,7 +480,42 @@ void func_8001AC20(Unk1B200Particle* arg0) {
     gDPSetEnvColor(D_8007A184++, r, g, b, D_8004EEDC[arg0->unk0]);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001AD28.s")
+void func_8001AD28(f32 x, f32 y, f32 z) {
+    static Unk8004EE20 D_8004EF0C = {
+        0x000C, 0, (void*)func_8001AD64, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.4f, 0.0f, 0.0f, 0.0f, 0,
+    };
+
+    D_8004EF0C.unk18 = x;
+    D_8004EF0C.unk1C = y;
+    D_8004EF0C.unk20 = z;
+    func_8001D9A8(&D_8004EF0C);
+}
+
+/* The rest of this file's .data (each table belongs to one of the functions below). */
+s32 D_8004EF4C[3] = { 0x800C3E30, 0x800C3C30, 0x800C3A30 };
+f32 D_8004EF58[12] = {
+    0.88f, 0.88f, 0.84f, 0.84f, 0.82f, 0.82f, 0.8f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f,
+};
+u8 D_8004EF88[12] = { 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x80, 0xA0, 0xC0, 0xC8, 0x80, 0x60 };
+u8 D_8004EF94[4][4] = {
+    { 0xFF, 0xFF, 0xFF, 0xFF }, { 0xC8, 0xFF, 0xC8, 0xFF }, { 0xC8, 0xC8, 0xFF, 0xFF }, { 0xFF, 0x7F, 0x7F, 0xFF },
+};
+Unk8004EE20 D_8004EFA4 = {
+    0x0014, 0, (void*)func_8001B688, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
+};
+Unk8004EE20 D_8004EFE4 = {
+    0x0014, 0, (void*)func_8001B9C0, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
+};
+u16 D_8004F024[4] = { 0x14, 0xC, 0xC, 0 };
+u8 D_8004F02C[3][4] = { { 0xC8, 0xC8, 0x00, 0x00 }, { 0xC8, 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xC8, 0x00 } };
+u8 D_8004F038[4] = { 0xFF, 0x96, 0x00, 0x00 };
+s32 D_8004F03C[4] = { 0x800CAE68, 0x800CB068, 0x800CB268, 0x800CB468 };
+u8 D_8004F04C[5][4] = {
+    { 0xFF, 0x00, 0x00, 0x00 }, { 0xFF, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0xFF, 0x00 }, { 0x00, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0x00, 0x00 },
+};
 
 void func_8001AD64(Unk1B200Particle* arg0) {
     u16 v = arg0->unk0;
@@ -508,7 +593,6 @@ typedef struct {
 
 extern Gfx D_800C40C0[];
 extern u8 D_8039E290[];
-extern u8 D_8004EF94[][4];
 s32 func_80027FFC(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 
@@ -842,7 +926,6 @@ typedef struct {
 } Unk8007AA08_1B200;
 extern Coll1B200 D_80087E10;
 extern Unk8007AA08_1B200 D_8007AA08;
-extern u16 D_8004F024[];
 void func_800107F0(f32, f32, f32, s32, Coll1B200*);
 s32 func_8001C060(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     s32 i;
@@ -915,8 +998,6 @@ void func_8001C298(s32 arg0, f32 arg1, f32 arg2, f32 arg3) {
 extern Gfx D_800C4780[];
 extern u8 D_800C47C0[];
 extern Gfx D_800C4840[];
-extern u8 D_8004F038[];
-extern u8 D_8004F02C[][4];
 
 void func_8001C2F8(void* arg0) {
     s32 cnt;
@@ -1231,7 +1312,13 @@ s32 func_8001CDF4(Unk80086798b* arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001D688.s")
+void func_8001D688(void) {
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        D_80087798[i].unk0 = 0;
+    }
+}
 
 typedef struct {
     /* 0x00 */ f32 x;
@@ -1242,7 +1329,6 @@ extern Unk8007AB48 D_8007AB48;
 extern f32 D_8007AA44;
 extern Gfx D_800EB9C8[];
 extern Gfx D_800EB990[];
-extern u8 D_8004F04C[][4];
 void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
 void func_8001D6A8(void* arg0) {
     s32 first;
