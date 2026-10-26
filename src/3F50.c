@@ -403,7 +403,152 @@ void func_80003350(void) {
     D_8007A8FC = D_8007A900 = 0.0f;
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80003494.s")
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 rot; /* degrees */
+    /* 0x10 */ u8 unk10[0x18 - 0x10];
+} Unk8007C290; /* size 0x18 */
+
+extern Unk8007C290 *D_8007C290;
+extern s32 D_8007A99C;
+extern f32 D_8007A8F0;
+extern s32 D_8007A9BC;
+extern void *D_8007A9C4;
+extern Actor *D_8007A9C8;
+extern void *D_8007A9CC;
+void func_800107F0(f32 x, f32 y, f32 z, u16 flags, void *out);
+void func_8000F50C(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
+
+void func_80003494(void) {
+    s32 n;
+    s32 pad;
+    PlayerState *p = &D_8007AA08;
+    CharData *cd;
+    Unk8007C290 *pos;
+
+    D_8004DCA0 &= ~0x10000;
+    cd = D_80055D40[D_8007AA08.actor.unk50];
+    D_8007AA08.unk0 = 0;
+    D_8007AA08.unk128 = 0;
+    D_8007AA08.actor.x = D_8007A98C;
+    D_8007AA08.actor.y = 0.0f;
+    D_8007AA08.actor.z = D_8007A990;
+    D_8007AA08.actor.unkC = 0.0f;
+    D_8007AA08.actor.unk14 = 0.0f;
+    D_8007AA08.actor.rot = D_8007A994;
+    D_8007AA08.actor.vx = 0.0f;
+    D_8007AA08.actor.unk1C = 0.0f;
+    D_8007AA08.actor.vz = 0.0f;
+    func_800107F0(D_8007A98C, 0.0f, D_8007A990, 0xA00, &D_8007A928);
+    p->actor.y = D_8007A928.unk4;
+    p->actor.unk2C = D_8007A928.unkC;
+    p->actor.unk30 = D_8007A928.unk10;
+    p->actor.unk34 = D_8007A928.unk14;
+    if (D_8007A928.unk18 & 0x8000) {
+        p->actor.unk62 = 0;
+    } else {
+        p->actor.unk62 = D_8007A928.unk18;
+    }
+    func_800201A0(&D_8007AA20, p->unk6 ? p->unk6 : D_8007A910, 1, D_8007A910, 1, 1);
+    if (D_8007A998 & 8) {
+        p->unk0 = 3;
+        p->unk4 = 0xF;
+        p->actor.unk60 = 1;
+    } else {
+        switch ((D_8007A998 >> 8) & 7) {
+            case 1:
+            case 4:
+                p->unk0 = 8;
+                p->unk4 = 0xF;
+                D_8007A918.x = 0.0f;
+                D_8007A918.z = 20.0f;
+                func_800271B4(p->actor.rot, &D_8007A918);
+                p->unk12C = D_8007A918.x;
+                p->unk130 = D_8007A918.z;
+                p->actor.unk60 = 1;
+                func_8002A7C8(5, 0x21, 0xFF);
+                func_8002A7C8(0xF, 0x21, 0xFF);
+                break;
+            case 2:
+                p->unk0 = 10;
+                pos = &D_8007C290[D_8007A99C];
+                p->unk138 = p->actor.rot = pos->rot * 0.017453292519943295;
+                if (D_8007A998 & 1) {
+                    p->unk4 = 0x15;
+                    p->actor.unk54 = 0x55;
+                    D_8007A918.x = -115.61f;
+                    D_8007A918.z = 15.746f;
+                    n = 0xE;
+                } else {
+                    p->unk4 = 0x1F;
+                    p->unk138 = p->unk138 + 3.141592653589793;
+                    p->actor.unk54 = 0x3C;
+                    D_8007A918.x = -132.831f;
+                    D_8007A918.z = -120.681f;
+                    n = 0x14;
+                }
+                func_800271B4(-pos->rot * 0.017453292519943295, &D_8007A918);
+                p->actor.x = pos->x - D_8007A918.x * p->actor.scale;
+                p->actor.z = pos->z + D_8007A918.z * p->actor.scale;
+                p->actor.unk60 = 1;
+                func_80007A38(&D_8007AA20);
+                func_80020214(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
+                func_8000F50C(1, (u16) p->actor.unk54, D_8007A998, pos);
+                func_8002A7C8(n, 8, 0xFF);
+                break;
+            case 3:
+                p->unk0 = 8;
+                p->unk4 = 0xF;
+                D_8007A918.x = 0.0f;
+                D_8007A918.z = 20.0f;
+                func_800271B4(p->actor.rot, &D_8007A918);
+                p->unk12C = D_8007A918.x;
+                p->unk130 = D_8007A918.z;
+                p->actor.unk60 = 1;
+                func_80007A38(&D_8007AA20);
+                func_80020214(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
+                func_8000F50C(1, (u16) p->actor.unk54, D_8007A998, pos);
+                func_8002A7C8(5, 0x21, 0xFF);
+                func_8002A7C8(0xF, 0x21, 0xFF);
+                break;
+        }
+    }
+    p->unk8 = 0;
+    if (D_80084300.unk8 == -1) {
+        p->unk8 |= 0x10;
+    }
+    if (D_8004DCA0 & 0x800) {
+        p->actor.unk64->unk4 = 1;
+        p->actor.unk64->unk8 = p->actor.unk64->unkA;
+        p->actor.unk68->unk0 = 0;
+    }
+    p->actor.unk68->unk0 = 0;
+    D_8007A9A8 = D_8007A8F0 = 0.0f;
+    D_8007A90C = 0;
+    D_8007A9BC = 0xFF;
+    D_8007A9C0 = 0;
+    D_8007A9C4 = 0;
+    D_8007A9C8 = 0;
+    D_8007A9CC = 0;
+    if (p->unk14->unk24[0] == 50) {
+        p->unk8 |= 0x1000;
+    }
+    if (p->unk14->unk24[1] == 50) {
+        p->unk8 |= 0x2000;
+    }
+    if (p->unk14->unk24[2] == 50) {
+        p->unk8 |= 0x4000;
+    }
+    if (p->unk14->unk24[3] == 50) {
+        p->unk8 |= 0x8000;
+    }
+    if ((p->unk8 & 0xF000) == 0xF000) {
+        p->unk8 |= 0x10000;
+    }
+}
+
 
 
 typedef struct {
@@ -678,7 +823,7 @@ extern Unk8007A928 D_8007A928;
 extern f32 D_8007A92C;
 extern Vec3f D_8007AB48;
 extern Vec3f D_8008BFC0;
-void func_800107F0(f32 x, f32 y, f32 z, s32 flags, void *out);
+void func_800107F0(f32 x, f32 y, f32 z, u16 flags, void *out);
 void func_80012B88(s32 arg0);
 void func_800131F0(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
 void func_80020428(s32 arg0, Actor *arg1, AnimEntry *arg2, void *arg3);
@@ -1686,13 +1831,6 @@ void func_80007320(PlayerState *arg0, Actor *arg1) {
     }
 }
 
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 rot; /* degrees */
-    /* 0x10 */ u8 unk10[0x18 - 0x10];
-} Unk8007C290; /* size 0x18 */
 
 extern f32 D_8007AA2C; /* .actor.unkC */
 extern f32 D_8007AA34; /* .actor.unk14 */
