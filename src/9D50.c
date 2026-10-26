@@ -145,6 +145,23 @@ typedef struct {
 } Unk8007C2A8;
 
 f32 sqrtf(f32);
+/* This file's .bss, 8007AB70..8007B900, in address order. D_8007AB80,
+ * D_8007ABA0 and D_8007ABAC are unreferenced gaps. D_8007AC70 (each NPC's def
+ * field, 3F50) and D_8007B7E2 are aliases in undefined_syms.txt. */
+RomRange *D_8007AB70;
+u16 D_8007AB74;
+f32 D_8007AB78[2];
+s32 D_8007AB80[2];
+CollOut D_8007AB88;
+s32 D_8007ABA0;
+s32 D_8007ABA4;
+s32 D_8007ABA8;
+s32 D_8007ABAC;
+NPCObj *D_8007ABB0[16];
+NPC D_8007ABF0[16];
+u8 D_8007B430[0x4B0];
+u8 D_8007B8E0[0x20];
+
 extern f32 D_8007AA20;
 extern f32 D_8007AA28;
 extern s32 D_8007C2A4;
@@ -155,8 +172,6 @@ void func_80020428(s32, NPCObj *, AnimEntry *, s32);
 void func_8002099C(s32, NPCObj *, AnimEntry *);
 extern Gfx *D_8007A184;
 extern Unk8007AA08 D_8007AA08;
-extern s32 D_8007ABA8;
-extern NPCObj *D_8007ABB0[];
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -213,9 +228,6 @@ extern u8 D_8020E6F0[];
 extern RomRange D_80056880[];
 extern u8 D_800568B8[];
 extern u16 D_8007A172;
-extern RomRange *D_8007AB70;
-extern u16 D_8007AB74;
-extern f32 D_8007AB78[2];
 void func_800271B4(f32, f32 *);
 
 typedef struct {
@@ -230,11 +242,6 @@ typedef struct {
     /* 0x80 */ NPCDef *def;
 } NPC2; /* size 0x84 */
 void func_80009988(f32, f32, Unk80009988 *);
-extern CollOut D_8007AB88;
-extern s32 D_8007ABA4;
-extern NPC D_8007ABF0[];
-extern u8 D_8007B430[];
-extern u8 D_8007B8E0[];
 extern Unk8007C284 *D_8007C284;
 extern Unk8007C288 *D_8007C288;
 extern s32 D_800842C0;

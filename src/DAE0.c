@@ -119,13 +119,24 @@ void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
 void func_800201A0(Unk8007C174 *, s32, s32, s32, s32, u16);
 void func_800107F0(f32, f32, f32, u16, Unk8007C0B0 *);
 
+/* This file's .bss, 8007C0B0..8007C280, in address order. D_8007C0C8,
+ * D_8007C144, D_8007C274 and D_8007C278 are unreferenced gaps (D_8007C148 is
+ * probably an Enemy-like record of 0x130 bytes, like AEA0's D_8007B908[]).
+ * Splat's labels inside D_8007C148 (D_8007C174..D_8007C1D8, its unk2C object)
+ * are aliases in undefined_syms.txt. */
+Unk8007C0B0 D_8007C0B0;
+s32 D_8007C0C8[2];
+Unk8007C174 D_8007C0D0;
+u8 D_8007C13C[4];
+s32 D_8007C140;
+s32 D_8007C144;
+Unk8007C148 D_8007C148;
+s32 D_8007C274;
+s32 D_8007C278[2];
+
 extern u8 D_8004F770[];
 extern Gfx *D_8007A184;
 extern Unk8007AA08 D_8007AA08;
-extern Unk8007C0B0 D_8007C0B0;
-extern u8 D_8007C13C[];
-extern s32 D_8007C140;
-extern Unk8007C148 D_8007C148;
 extern Unk8007C174 D_8007C174;
 extern s16 D_8007C1C6;
 extern u16 D_8007C1CC;
@@ -154,7 +165,6 @@ extern u8 D_8007B430[];
 extern u8 *D_803AC418[];
 extern u8 *D_803AC438[];
 extern u8 D_803AC328[];
-extern Unk8007C174 D_8007C0D0;
 extern Unk803AB820 D_803AB4B0[];
 extern s32 D_8004DCA0;
 extern s16 D_8007A172;

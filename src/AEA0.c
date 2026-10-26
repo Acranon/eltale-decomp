@@ -119,6 +119,52 @@ typedef struct {
 } Vec3f;
 
 typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} CollResult;
+
+typedef struct {
+    /* 0x00 */ u16 time;
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 flags;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ f32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+} SpawnScript; /* size 0x18 */
+
+/* This file's .bss, 8007B900..8007C0B0, in address order. D_8007B904 and
+ * D_8007C09C/D_8007C0A0 are unreferenced gaps. Splat's labels inside the enemy
+ * table (D_8007B918..D_8007BB5C, fields of D_8007B908[0] and [1]) and D_8007C074
+ * (D_8007C070.y) are aliases in undefined_syms.txt. func_8000CC40 treats
+ * D_8007C060..D_8007C06C as one Unk8007C060; they are kept as the scalars the
+ * other functions use. */
+s32 D_8007B900;
+s32 D_8007B904;
+Enemy D_8007B908[6];
+Enemy *D_8007C028;
+s32 D_8007C02C;
+Obj *D_8007C030[6];
+u8 **D_8007C048;
+s32 D_8007C04C;
+u16 D_8007C050[6];
+Unk800561A0 *D_8007C05C;
+u16 D_8007C060;
+SpawnScript *D_8007C064;
+Enemy *D_8007C068;
+Obj *D_8007C06C;
+Vec3f D_8007C070;
+CollResult D_8007C080;
+s32 D_8007C09C;
+s32 D_8007C0A0[4];
+
+typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
     /* 0x04 */ s32 unk4;
@@ -192,28 +238,16 @@ typedef struct {
     /* 0x0E */ s16 unkE;
 } Unk8000AA74;
 
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 nx;
-    /* 0x10 */ f32 ny;
-    /* 0x14 */ f32 nz;
-    /* 0x18 */ u16 flags;
-} CollResult;
 
 void func_800107F0(f32, f32, f32, s32, CollResult *);
-extern CollResult D_8007C080;
 
 void func_8000A5E4(void);
 Unk8000BA20 *func_8000B7A4(Enemy *, Obj *);
 void func_8000BA20(Enemy *, Obj *, Unk8000BA20 *);
-extern Enemy *D_8007C028;
 extern s16 D_8008C162;
 void func_80020428(s32, Obj *, u8 *, s32);
 void func_8002099C(s32, Obj *, u8 *);
 void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
-extern Obj *D_8007C030[];
 extern Gfx *D_8007A184;
 void func_8000CC40(s32, s32);
 f32 func_800270D0(f32, f32);
@@ -251,17 +285,6 @@ typedef struct {
 } SpawnDef; /* size 0x10 */
 
 typedef struct {
-    /* 0x00 */ u16 time;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 flags;
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-} SpawnScript; /* size 0x18 */
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ u8 pad20[0x24];
@@ -271,8 +294,6 @@ extern Unk80056718 D_80056718;
 extern u16 D_8005685A;
 extern u16 D_8005685C;
 extern Unk800C185C *D_800C185C[];
-extern Enemy *D_8007C068;
-extern Obj *D_8007C06C;
 extern f32 D_8007AA20;
 extern f32 D_8007AA24;
 extern f32 D_8007AA28;
@@ -305,16 +326,6 @@ extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
 extern Unk8007AA08 D_8007AA08;
 extern EnemyStats *D_8007AA88;
-extern s32 D_8007B900;
-extern Enemy D_8007B908[6];
-extern s32 D_8007C02C;
-extern u8 **D_8007C048;
-extern s32 D_8007C04C;
-extern u16 D_8007C050[];
-extern Unk800561A0 *D_8007C05C;
-extern u16 D_8007C060;
-extern SpawnScript *D_8007C064;
-extern Vec3f D_8007C070;
 extern Unk8007C288 *D_8007C288;
 extern u16 D_800842E8;
 extern u16 D_8008BE52;

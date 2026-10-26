@@ -80,11 +80,6 @@ typedef struct {
 } Unk800866D8; // size = 0x18
 
 extern Gfx* D_8007A184;
-extern Unk80086400 D_80086400[];
-extern Unk1B200Vec2 D_80087E00;
-extern s32 D_800863F8;
-extern Unk80086440 D_80086440[];
-extern Unk80086440 D_80086500[];
 extern s16 D_800865CC;
 typedef struct {
     /* 0x00 */ u16 unk0;
@@ -202,14 +197,13 @@ typedef struct {
     /* 0x44 */ Unk800DA0F0 unk44;
 } Unk80086798b; // size = 0x58
 
-/* Part of this file's .bss, 800865C0..80087E00: the 16-byte-aligned run that
- * holds D_80087798 (func_8001D688 shares a lui between its pairs only when it
+/* This file's .bss, 800863F0..80087E30 (in address order; first declaration
+ * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds D_80087798 (func_8001D688 shares a lui between its pairs only when it
  * is defined here). Labels splat put inside these arrays (D_800865CC..,
  * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
 
 extern Unk80085E48 D_80085E48;
 extern s32 D_8007A17C;
-extern s32 D_800863F0;
 extern Unk800EB2B4 D_800EB2B4[];
 extern u8 D_800CADA8[][4];
 extern Unk800DA0F0 D_800DA0F0[];
@@ -218,7 +212,6 @@ typedef struct {
 } MtxF;
 
 extern Gfx D_800EB6D0[];
-extern u16 D_800863F4;
 s32 func_8001CBD0(Unk80086798b*, s32);
 s32 func_8001CDF4(Unk80086798b*);
 void func_80027430(MtxF*, f32, f32, f32);
@@ -258,6 +251,20 @@ f32 D_8004EE60[12] = {
     3.25f, 3.24f, 3.23f, 3.22f, 3.21f, 3.2f, 3.0f, 2.8f, 2.6f, 2.4f, 2.2f, 2.0f,
 };
 u8 D_8004EE90[12] = { 0x10, 0x20, 0x40, 0x50, 0x60, 0x80, 0x90, 0xA0, 0xB0, 0xA0, 0x80, 0x40 };
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ f32 y;
+    /* 0x08 */ u8 pad8[4];
+    /* 0x0C */ Unk1B200Vec3 normal;
+    /* 0x18 */ u16 flags;
+} Coll1B200;
+
+s32 D_800863F0;
+u16 D_800863F4;
+s32 D_800863F8;
+Unk80086400 D_80086400[8];
+Unk80086440 D_80086440[8];
+Unk80086440 D_80086500[8];
 Unk800865C0 D_800865C0[10];
 Unk800866D8 D_800866D8[8];
 Unk80086798b D_80086798[32];
@@ -265,6 +272,9 @@ Unk80087298 D_80087298[32];
 Unk80087798 D_80087798[4];
 Unk800877A8 D_800877A8[4];
 u16 D_80087DF8;
+Unk1B200Vec2 D_80087E00;
+u8 D_80087E08[8]; /* unreferenced */
+Coll1B200 D_80087E10;
 
 void func_8001A6B4(void);
 void func_8001A8F4(void);
@@ -914,17 +924,9 @@ void func_8001C038(void) {
 }
 
 typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ f32 y;
-    /* 0x08 */ u8 pad8[4];
-    /* 0x0C */ Unk1B200Vec3 normal;
-    /* 0x18 */ u16 flags;
-} Coll1B200;
-typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
     /* 0x1C */ f32 unk1C;
 } Unk8007AA08_1B200;
-extern Coll1B200 D_80087E10;
 extern Unk8007AA08_1B200 D_8007AA08;
 void func_800107F0(f32, f32, f32, s32, Coll1B200*);
 s32 func_8001C060(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
