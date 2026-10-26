@@ -7,7 +7,8 @@
 #include "PR/ultraerror.h"
 #include "PRinternal/osint.h"
 
-extern __OSEventState __osEventStateTab[OS_NUM_EVENTS];
+/* .bss 800942C0..80094340 */
+__OSEventState __osEventStateTab[OS_NUM_EVENTS] ALIGNED(0x8);
 #if BUILD_VERSION >= VERSION_J
 u32 __osPreNMI = FALSE;
 #endif

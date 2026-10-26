@@ -11,11 +11,14 @@
 
 /* Between ultralib I and J: J's __Dom1SpeedParam/__Dom2SpeedParam, read from
  * the PI registers here instead of in osInitialize. */
-extern OSThread D_800930F0;          /* piThread */
-extern OSMesgQueue D_800942A0;       /* piEventQueue (piThreadStack ends here) */
-extern OSMesg D_800942B8[1];         /* piEventBuf */
-extern OSPiHandle D_80093000;        /* __Dom1SpeedParam */
-extern OSPiHandle D_80093078;        /* __Dom2SpeedParam */
+/* .bss 80093000..800942C0, as in ultralib's pimgr.c (J): IDO places the two
+ * speed params first (their addresses are used in an initializer). */
+OSPiHandle D_80093000 ALIGNED(0x8);  /* __Dom1SpeedParam */
+OSPiHandle D_80093078 ALIGNED(0x8);  /* __Dom2SpeedParam */
+static OSThread D_800930F0 ALIGNED(0x8);                       /* piThread */
+static STACK(D_800932A0, OS_PIM_STACKSIZE) ALIGNED(0x10);      /* piThreadStack */
+static OSMesgQueue D_800942A0 ALIGNED(0x8);                    /* piEventQueue */
+static OSMesg D_800942B8[1];                                   /* piEventBuf */
 
 /* This file's data, as in ultralib's pimgr.c (J): .data 8006CD20..8006CD50. */
 OSDevMgr __osPiDevMgr = { 0 };
