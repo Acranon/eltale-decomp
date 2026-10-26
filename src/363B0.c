@@ -12,19 +12,20 @@ typedef struct {
 
 } Ext4;
 
-extern s8 D_80092C80;
-extern s8 D_80092C81;
-extern s8 D_80092C82;
-extern u16 D_80092C84;
-extern u16 D_80092C86;
-extern u16 D_80092C88;
-extern OSMesgQueue D_80092C90;
-extern OSPfs D_80092CA8[4];
-extern Unk80092E48 D_80092E48[4];
-extern u8 D_80092E98;
-extern OSContStatus D_80092EA0[4];
-extern OSMesg D_80092EB0;
-extern OSContPad D_80092EB8[4];
+/* .bss 80092C80..80092ED0 */
+s8 D_80092C80;
+s8 D_80092C81;
+s8 D_80092C82;
+u16 D_80092C84;
+u16 D_80092C86;
+u16 D_80092C88;
+OSMesgQueue D_80092C90;
+OSPfs D_80092CA8[4];
+Unk80092E48 D_80092E48[4];
+u8 D_80092E98;
+OSContStatus D_80092EA0[4];
+OSMesg D_80092EB0;
+OSContPad D_80092EB8[4];
 /* This file's .data, 80061810..80061850: the pak file's game_name, an
  * unreferenced digit string, and the two ext_name values. */
 u8 D_80061810[16] = "SxbQx";
