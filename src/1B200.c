@@ -245,8 +245,11 @@ void func_8001B688(Unk1B200Spark* arg0);
 void func_8001B9C0(Unk1B200Spark* arg0);
 
 /* This file's .data, 8004EE20..8004F060: effect descriptors (Unk8004EE20,
- * 0x40 bytes each) and their tables. The asm's labels for descriptor fields
- * (D_8004EEB4.., D_8004EF24..) are aliases in undefined_syms.txt. */
+ * 0x40 bytes each) and their tables, in source order: these first, then
+ * func_8001AB44's static descriptor (8004EE9C), D_8004EEDC, func_8001AD28's
+ * static descriptor (8004EF0C) and the tables after func_8001AD28. Both
+ * descriptors must be function statics: IDO then stores their fields through
+ * lui/%lo instead of the descriptor's address register. */
 Unk8004EE20 D_8004EE20 = {
     0x000C, 0, (void*)func_8001A828, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C3790,
     0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
@@ -255,41 +258,6 @@ f32 D_8004EE60[12] = {
     3.25f, 3.24f, 3.23f, 3.22f, 3.21f, 3.2f, 3.0f, 2.8f, 2.6f, 2.4f, 2.2f, 2.0f,
 };
 u8 D_8004EE90[12] = { 0x10, 0x20, 0x40, 0x50, 0x60, 0x80, 0x90, 0xA0, 0xB0, 0xA0, 0x80, 0x40 };
-Unk8004EE20 D_8004EE9C = {
-    0x002D, 0, (void*)func_8001AC20, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
-    0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.25f, 0.05f, 0,
-};
-u8 D_8004EEDC[48] = {
-    0x08, 0x1C, 0x30, 0x44, 0x58, 0x6C, 0x80, 0x94, 0xA8, 0xBC, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
-    0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xC0, 0xB0, 0xA0, 0x90, 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10, 0x00, 0x00, 0x00,
-};
-Unk8004EE20 D_8004EF0C = {
-    0x000C, 0, (void*)func_8001AD64, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
-    0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.4f, 0.0f, 0.0f, 0.0f, 0,
-};
-s32 D_8004EF4C[3] = { 0x800C3E30, 0x800C3C30, 0x800C3A30 };
-f32 D_8004EF58[12] = {
-    0.88f, 0.88f, 0.84f, 0.84f, 0.82f, 0.82f, 0.8f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f,
-};
-u8 D_8004EF88[12] = { 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x80, 0xA0, 0xC0, 0xC8, 0x80, 0x60 };
-u8 D_8004EF94[4][4] = {
-    { 0xFF, 0xFF, 0xFF, 0xFF }, { 0xC8, 0xFF, 0xC8, 0xFF }, { 0xC8, 0xC8, 0xFF, 0xFF }, { 0xFF, 0x7F, 0x7F, 0xFF },
-};
-Unk8004EE20 D_8004EFA4 = {
-    0x0014, 0, (void*)func_8001B688, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
-    0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
-};
-Unk8004EE20 D_8004EFE4 = {
-    0x0014, 0, (void*)func_8001B9C0, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
-    0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
-};
-u16 D_8004F024[4] = { 0x14, 0xC, 0xC, 0 };
-u8 D_8004F02C[3][4] = { { 0xC8, 0xC8, 0x00, 0x00 }, { 0xC8, 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xC8, 0x00 } };
-u8 D_8004F038[4] = { 0xFF, 0x96, 0x00, 0x00 };
-s32 D_8004F03C[4] = { 0x800CAE68, 0x800CB068, 0x800CB268, 0x800CB468 };
-u8 D_8004F04C[5][4] = {
-    { 0xFF, 0x00, 0x00, 0x00 }, { 0xFF, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0xFF, 0x00 }, { 0x00, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0x00, 0x00 },
-};
 Unk800865C0 D_800865C0[10];
 Unk800866D8 D_800866D8[8];
 Unk80086798b D_80086798[32];
@@ -456,7 +424,36 @@ void func_8001A948(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001AB44.s")
+void func_8001AB44(void) {
+    static Unk8004EE20 D_8004EE9C = {
+        0x002D, 0, (void*)func_8001AC20, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
+        0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.25f, 0.05f, 0,
+    };
+    Unk80086440* p;
+    s32 n;
+
+    D_800863F8 = D_800863F0;
+    p = D_8007A17C ? D_80086440 : D_80086500;
+    n = D_800863F8;
+    while (n != 0) {
+        if (p->unk0 != 0 && --p->unk0 == 0) {
+            D_8004EE9C.unk18 = p->x;
+            D_8004EE9C.unk1C = p->y;
+            D_8004EE9C.unk20 = p->z;
+            D_8004EE9C.unk28 = D_8004EE9C.unk2C = p->unk10;
+            func_8001D9A8(&D_8004EE9C);
+            p->unk0 = 0x19;
+        }
+        n--;
+        p++;
+    }
+}
+
+/* func_8001AC20's table sits between the two function statics. */
+u8 D_8004EEDC[48] = {
+    0x08, 0x1C, 0x30, 0x44, 0x58, 0x6C, 0x80, 0x94, 0xA8, 0xBC, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
+    0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xC0, 0xB0, 0xA0, 0x90, 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10, 0x00, 0x00, 0x00,
+};
 
 void func_8001AC20(Unk1B200Particle* arg0) {
     s32 r;
@@ -483,7 +480,42 @@ void func_8001AC20(Unk1B200Particle* arg0) {
     gDPSetEnvColor(D_8007A184++, r, g, b, D_8004EEDC[arg0->unk0]);
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001AD28.s")
+void func_8001AD28(f32 x, f32 y, f32 z) {
+    static Unk8004EE20 D_8004EF0C = {
+        0x000C, 0, (void*)func_8001AD64, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.4f, 0.0f, 0.0f, 0.0f, 0,
+    };
+
+    D_8004EF0C.unk18 = x;
+    D_8004EF0C.unk1C = y;
+    D_8004EF0C.unk20 = z;
+    func_8001D9A8(&D_8004EF0C);
+}
+
+/* The rest of this file's .data (each table belongs to one of the functions below). */
+s32 D_8004EF4C[3] = { 0x800C3E30, 0x800C3C30, 0x800C3A30 };
+f32 D_8004EF58[12] = {
+    0.88f, 0.88f, 0.84f, 0.84f, 0.82f, 0.82f, 0.8f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f,
+};
+u8 D_8004EF88[12] = { 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x80, 0xA0, 0xC0, 0xC8, 0x80, 0x60 };
+u8 D_8004EF94[4][4] = {
+    { 0xFF, 0xFF, 0xFF, 0xFF }, { 0xC8, 0xFF, 0xC8, 0xFF }, { 0xC8, 0xC8, 0xFF, 0xFF }, { 0xFF, 0x7F, 0x7F, 0xFF },
+};
+Unk8004EE20 D_8004EFA4 = {
+    0x0014, 0, (void*)func_8001B688, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
+};
+Unk8004EE20 D_8004EFE4 = {
+    0x0014, 0, (void*)func_8001B9C0, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
+};
+u16 D_8004F024[4] = { 0x14, 0xC, 0xC, 0 };
+u8 D_8004F02C[3][4] = { { 0xC8, 0xC8, 0x00, 0x00 }, { 0xC8, 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xC8, 0x00 } };
+u8 D_8004F038[4] = { 0xFF, 0x96, 0x00, 0x00 };
+s32 D_8004F03C[4] = { 0x800CAE68, 0x800CB068, 0x800CB268, 0x800CB468 };
+u8 D_8004F04C[5][4] = {
+    { 0xFF, 0x00, 0x00, 0x00 }, { 0xFF, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0xFF, 0x00 }, { 0x00, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0x00, 0x00 },
+};
 
 void func_8001AD64(Unk1B200Particle* arg0) {
     u16 v = arg0->unk0;
