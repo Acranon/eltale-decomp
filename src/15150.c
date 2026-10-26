@@ -131,8 +131,8 @@ f32 D_80085CB0;
 f32 D_80085CB4;
 s32 D_80085CB8[100];
 Camera15150 D_80085E48;
-Mtx D_80085ED0;
-Mtx D_80085F10;
+f32 D_80085ED0[4][4];
+f32 D_80085F10[4][4];
 f32 D_80085F50;
 f32 D_80085F54;
 f32 D_80085F58;
@@ -141,7 +141,7 @@ s32 D_80085F60;
 Camera15150Preset* D_80085F64;
 Unk80085F68 D_80085F68;
 f32 D_80085F84;
-u8 D_80085F88[8];
+u16 D_80085F88;
 
 extern s32 D_8007ABA8;
 extern Unk8007ABB0* D_8007ABB0[];
@@ -166,6 +166,29 @@ extern s32 D_800842C0;
 extern Vec3f_15150 D_8007AA20;
 extern f32 D_8007A994;
 void guOrtho(Mtx*, f32, f32, f32, f32, f32, f32, f32);
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ u16 unk14;
+} Unk8007C288;
+
+typedef struct {
+    /* 0x0000 */ Mtx proj;
+    /* 0x0040 */ Mtx unk40;
+    /* 0x0080 */ Mtx view;
+    /* 0x00C0 */ Mtx unkC0[0x226];
+    /* 0x8A40 */ LookAt lookAt;
+} Unk15150Dyn;
+
+extern Unk8007C288* D_8007C288;
+extern u16 D_8008BE52;
+extern s32 D_8004DCA0;
+extern s32 D_8008C168;
+extern u16 D_80092C86;
+extern s32 D_8007A180;
+extern Gfx* D_8007A184;
+extern Unk15150Dyn D_2000000;
+void func_8001668C(Vec3f_15150*);
 
 f32 func_800270D0(f32, f32);
 void func_800271B4(f32, Vec2f_15150*);
@@ -277,7 +300,53 @@ void func_80014550(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014994.s")
+void func_80014994(Unk15150Dyn* arg0) {
+    Camera15150* cam = &D_80085E48;
+    f32 a;
+    s32 idx;
+    s32 pad;
+
+    if ((D_8007C288->unk14 & 2) && !(D_8008BE52 & 1) && cam->mode != 3) {
+        idx = (D_8007AA82 >> 1) & 7;
+        if (idx != D_80085F60) {
+            func_80015DB4(idx);
+        }
+    }
+    D_8004EC18[cam->mode](cam);
+    if (!(D_8004DCA0 & 0x82) && D_8008C168 == 0 && !(D_8008BE52 & 1) && !(D_8007C288->unk14 & 2) &&
+        (D_80092C86 & 0x20) && D_80085C08[0] >= 2) {
+        D_80085F60++;
+        if (D_80085F60 >= D_80085C08[0]) {
+            D_80085F60 = 0;
+        }
+        func_80015DB4(D_80085F60);
+    }
+    D_80085C10.y = 0.0f;
+    if (D_80085CB8[0] != 0) {
+        func_8001668C((Vec3f_15150*)&D_80085C10);
+    }
+    guPerspectiveF(D_80085ED0, &D_80085F88, D_80085F50, 1.3333334f, D_80085F54, D_80085F58, 1.0f);
+    guLookAtReflectF(D_80085F10, &arg0->lookAt, cam->eyeX, cam->eyeY + D_80085C10.y, cam->eyeZ, cam->atX, cam->atY,
+                     cam->atZ, 0.0f, 1.0f, 0.0f);
+    guMtxF2L(D_80085ED0, &arg0->proj);
+    guMtxF2L(D_80085F10, &arg0->view);
+    if (D_80085CAC != 0) {
+        guTranslate(&arg0->unkC0[D_8007A180], D_80085CB0, D_80085CB4, 0.0f);
+        D_80085CB0 *= -0.8;
+        D_80085CB4 *= -0.8;
+        D_80085CAC--;
+        gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180], G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+        D_8007A180++;
+        gSPMatrix(D_8007A184++, &D_2000000.proj, G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+    } else {
+        gSPMatrix(D_8007A184++, &D_2000000.proj, G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+    }
+    gSPMatrix(D_8007A184++, &D_2000000.view, G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
+    gSPLookAt(D_8007A184++, &D_2000000.lookAt);
+    gSPPerspNormalize(D_8007A184++, D_80085F88);
+    a = D_80085F50 * 0.017453292519943295 / 2;
+    D_80085F5C = sinf(a) / cosf(a);
+}
 
 extern s32 D_8004DCA0;
 extern u16 D_80092C84;
