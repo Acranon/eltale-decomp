@@ -37,6 +37,52 @@ typedef struct {
 
 #define OS_SC_SWAPBUFFER 0x0040
 
+/* This file's .bss, 8007A170..8007A8C0, in address order (see 3F50.c's block
+ * for IDO's ordering rules). D_8007A160 just before it (the retrace counter
+ * that 1130.c increments) and 8007A8C0..8007A8F0 stay in the asm slab.
+ * D_8007A254 (a queue inside D_8007A1E0) and the low words D_8007A8AC and
+ * D_8007A8BC are aliases in undefined_syms.txt. D_8007A194..D_8007A19C,
+ * D_8007A1A4, D_8007A1CE, D_8007A1DC, D_8007A85C and D_8007A864 are
+ * unreferenced gaps. */
+u16 D_8007A170;
+u16 D_8007A172;
+s32 D_8007A174;
+u16 D_8007A178;
+u16 D_8007A17A;
+s32 D_8007A17C;
+s32 D_8007A180;
+Gfx *D_8007A184;
+s32 D_8007A188;
+s32 D_8007A18C;
+u32 D_8007A190;
+s32 D_8007A194;
+s32 D_8007A198;
+s32 D_8007A19C;
+s16 D_8007A1A0;
+s16 D_8007A1A2;
+s32 D_8007A1A4;
+OSMesgQueue D_8007A1A8;
+OSMesg D_8007A1C0;
+s32 D_8007A1C4;
+s32 D_8007A1C8;
+u8 D_8007A1CC;
+s8 D_8007A1CD;
+s16 D_8007A1CE;
+s32 D_8007A1D0;
+s32 D_8007A1D4;
+void *D_8007A1D8;
+s32 D_8007A1DC;
+NNSched D_8007A1E0;
+s32 D_8007A85C;
+OSMesgQueue *D_8007A860;
+s32 D_8007A864;
+NNScClient D_8007A868;
+OSMesgQueue D_8007A870;
+OSMesg D_8007A888[8];
+u64 D_8007A8A8;
+u64 D_8007A8B0;
+u64 D_8007A8B8;
+
 void func_80000530(NNSched *sc, u8 numFields);
 void func_8000062C(NNSched *sc);
 OSMesgQueue *func_80000704(NNSched *sc);
@@ -584,7 +630,158 @@ void func_8002F87C(void);
 void func_8002FA00(s32 arg0);
 void func_80032BB0(s32 arg0);
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1870/func_80001944.s")
+void func_80001944(void) {
+    OSMesg msg;
+    GfxFrame *frame;
+
+    D_8007A1D0 = 0;
+    D_8007A174 = 0;
+    msg = NULL;
+    if (D_8004DCA0 & 0x40) {
+        if (D_8004DCA0 & 0x800) {
+            D_800842BC = (u16)D_8007A9AC;
+            D_800842C0 = D_8007A9AE;
+            func_80003B20();
+        }
+        func_80032BB0(0);
+        D_80090450 = 0;
+        func_8000D6A0();
+        func_80013500();
+        func_80013BD0();
+        func_80014130();
+        func_8002F87C();
+        func_80003494();
+        func_80009150();
+        func_8000A2A0();
+        func_8000CEF0();
+        func_80014550();
+        func_80011AE0();
+        D_8007A1C8 = func_80012A90();
+        D_8007A1C4 = func_80012A90();
+        D_8007AB60 = func_80012A90();
+        D_80084998[D_8007AB60].unk0 = 2;
+        func_8001EE00(&D_8007AB60);
+        func_80016760();
+        func_8001A600();
+        func_8001D970();
+        func_800266D0();
+        func_80020AE0();
+        D_8004DCA0 &= ~0x840;
+    }
+    if (D_8004DCA0 & 0x400) {
+        func_800201A0(D_8007AA20, 0, 1, 0, 1, 1);
+    }
+    if (D_8004DCA0 & 0x20) {
+        D_8004DCA0 &= ~0x20;
+        func_80002DB0();
+    }
+    if (D_8004DCA0 & 0x100) {
+        func_8002A744(D_800842BC, D_800842C0, 0);
+        D_8004DCA0 &= ~0x100;
+    }
+    D_8004DCA0 &= ~0x480;
+    D_8007A178 = 0;
+    D_8007A17A = 0x12;
+    D_8007A172 = 0;
+    while (D_8007A170 == 1) {
+        func_80035970(D_80092C80);
+        D_8007A180 = 0;
+        D_800863F0 = 0;
+        func_800131E0();
+        if (D_800842E8 & 1) {
+            func_8001EE94();
+        }
+        if (D_8008BE52 & 1) {
+            if (D_8008BE52 & 0x200) {
+                func_8001F36C();
+            } else {
+                func_8001F888();
+                func_8000A310();
+            }
+        }
+        func_80003BE0();
+        func_800091E0();
+        func_80017630();
+        func_80011C60();
+        func_8000DDBC();
+        func_8000F5DC();
+        func_80001278(&D_80301000[D_8007A17C]);
+        frame = &D_80301000[D_8007A17C];
+        if (!(D_8004DCA0 & 0x87)) {
+            if (!(D_8007AA08.unk78 & 1) && func_80011770(D_8007AA08.x, D_8007AA08.z, D_8007AA08.rot) != 0) {
+                D_8004DCA0 |= 0x80;
+                func_800163F4();
+                func_800073E8();
+                D_8007A178 = 0;
+            } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (D_80092C86 & 0x1000) &&
+                       !(D_8008BE52 & 1) && !(D_80092C84 & 0x2000) && !(D_8004DCA0 & 1)) {
+                D_8007A170 = 2;
+                func_8002A7C8(0, 1, 0xFF);
+            }
+        } else if ((D_8004DCA0 & 0x80) && !(D_8004DCA0 & 2)) {
+            if (--D_8007A174 == 0) {
+                if (D_8007A172 == 4) {
+                    D_8007A170 = 6;
+                } else {
+                    D_8007A170 = 0;
+                }
+                D_8004DCA0 |= 0x20;
+                if (!(D_8004DCA0 & 0x400)) {
+                    D_8004DCA0 |= 0x40;
+                }
+                D_800842C4 = D_80084300.unk0;
+                D_800842C8 = D_80084300.unk4;
+                if (D_8004DCA0 & 0x400) {
+                    D_8007AA08.unk14->unk4 = D_8007AA08.unk14->unk6;
+                    D_8007AA08.unk14->unk8 = D_8007AA08.unk14->unkA;
+                    D_80084980 += 0x2328;
+                    func_80011EA0(D_80084980);
+                    D_8007A9AC = D_800842BC;
+                    D_8007A9AE = D_800842C0;
+                    D_8007A9B0 = D_80084308;
+                    D_8007A178 = 2;
+                }
+                D_8004DCA0 |= 0x100;
+                func_8002A38C();
+            } else if (D_8007A174 == D_8007A17A) {
+                func_80002E74();
+            }
+        }
+        func_8002A558();
+        if (D_8008C170 != -1 && func_80029328(0) == 0) {
+            func_80029198(0, D_8008C170);
+            func_80029224(0);
+            D_8008C170 = -1;
+        }
+        D_8007A8B0 = osGetTime();
+        D_8007A8B8 = (D_8007A8B0 - D_8007A8A8) * 64 / 3000;
+        if (D_8007A1D0 == 0) {
+            D_8007A1D0++;
+            func_80002D44(1);
+        } else {
+            func_80002D44(2);
+            while (D_8007A160 < 2) {
+                osRecvMesg(&D_8007A870, &msg, OS_MESG_BLOCK);
+            }
+        }
+        osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
+        D_8007A160 = 0;
+        D_8007A17C ^= 1;
+        D_8007A8A8 = osGetTime();
+    }
+    if (D_8004DCA0 & 0x200) {
+        func_800292DC(0);
+    }
+    func_80002D44(2);
+    if (D_8004DCA0 & 0x200) {
+        D_8004DCA0 &= ~0x200;
+        while (func_80029328(0) != 0) {
+        }
+    }
+    if (D_8004DCA0 & 0x400) {
+        func_8002FA00(4);
+    }
+}
 
 void func_8000205C(void) {
     s32 count;
