@@ -70,12 +70,14 @@ extern s32 D_80084980;
 extern Unk80085E48 D_80085E48;
 extern f32 D_80085F50;
 extern s32 D_80090450;
-extern s32 D_80092ED0;
-extern s32 D_80092ED4;
-extern s32 D_80092ED8;
-extern Unk80092EDC *D_80092EDC;
-extern s32 D_80092EE0;
-extern Cue *D_80092EE4;
+/* .bss 80092ED0..80092FF0 */
+s32 D_80092ED0;
+s32 D_80092ED4;
+s32 D_80092ED8;
+Unk80092EDC *D_80092EDC;
+s32 D_80092EE0;
+Cue *D_80092EE4;
+Unk80092EE8 D_80092EE8[32];
 extern Gfx *D_8007A184;
 /* This file's .data, 80061850..8006CD00: textures and palettes (assets; the
  * converter put a gsSPEndDisplayList word after most images), message text
@@ -629,7 +631,6 @@ Gfx D_8006CC90[14] = {
     {{ 0xB8000000, 0x00000000 }},
     {{ 0x00000000, 0x00000000 }},
 };
-extern Unk80092EE8 D_80092EE8[32];
 extern Unk801D8620 D_801D8620[];
 
 void func_80003494(void);

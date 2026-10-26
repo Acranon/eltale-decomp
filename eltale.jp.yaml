@@ -392,7 +392,9 @@ segments:
       - { start: 0x71920, type: .bss, vram: 0x8008FB30, name: 2B530 }      # 8008FB30..8008FB70
       - { start: 0x71920, type: .bss, vram: 0x8008FB70, name: 30600 }      # 8008FB70..80090450
       - { start: 0x71920, type: .bss, vram: 0x80090450, name: 337B0 }      # 80090450..80092C70
-      - { start: 0x71920, type: bss, vram: 0x80092C70, name: 80092C70 }
+      - { start: 0x71920, type: .bss, vram: 0x80092C70, name: 35EC0 }      # 80092C70..80092C80
+      - { start: 0x71920, type: .bss, vram: 0x80092C80, name: 363B0 }      # 80092C80..80092ED0
+      - { start: 0x71920, type: .bss, vram: 0x80092ED0, name: 36E60 }      # 80092ED0..80092FF0
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: .bss, vram: 0x80093000, name: libultra/io/pimgr }        # 80093000..800942C0
       - { start: 0x71920, type: .bss, vram: 0x800942C0, name: libultra/os/seteventmesg } # 800942C0..80094340
