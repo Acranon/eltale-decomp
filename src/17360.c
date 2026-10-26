@@ -105,9 +105,32 @@ typedef struct {
     /* 0x28 */ s32 unk28;
 } Unk80019024;
 
-extern Unk80085F98 D_80085F98[];
-extern Unk80086358 D_80086358[];
-extern s32 D_80085F90;
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+} Unk17360Vec2;
+
+typedef struct {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} Coll17360; // size = 0x1C (func_800107F0's result)
+
+/* This file's .bss, 80085F90..800863F0, in address order (first declaration fixes
+ * the order). Splat's D_80085F9C, D_80086370/88/A0, D_800863BC and D_800863CC are
+ * fields of D_80085F98[0], D_80086358[1..3], D_800863B8 and D_800863C8. */
+s32 D_80085F90;
+s32 D_80085F94;
+Unk80085F98 D_80085F98[16];
+Unk80086358 D_80086358[4];
+Unk17360Vec2 D_800863B8;
+Unk8007B908_b* D_800863C4;
+Coll17360 D_800863C8;
 extern u16 D_8004ED34[];
 extern u16 D_8007AB18;
 extern Unk8007B908 D_8007B908[];
@@ -130,13 +153,6 @@ typedef struct {
     /* 0x2C */ Unk17360CamCfg* cfg;
 } Unk17360Cam;
 
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-} Unk17360Vec2;
-
-extern Unk17360Vec2 D_800863B8;
 typedef struct {
     /* 0x00 */ u8 pad0[0x24];
     /* 0x24 */ u8 unk24[6];
@@ -349,11 +365,6 @@ typedef struct {
     /* 0x34 */ Unk80017F48Sub* unk34;
     /* 0x38 */ u8 pad38[4];
 } Unk80017F48;
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-} Coll17360;
-extern Coll17360 D_800863C8;
 void func_800107F0(f32, f32, f32, s32, Coll17360*);
 void func_80015D78(s32);
 void func_80019FC8();
@@ -376,7 +387,6 @@ extern void (*D_8004ECC4[])(Unk80017F48*);
 extern Actor17360* (*D_8004ECD0[])(Unk80017F48*, s32);
 extern void (*D_8004ECDC[])(Unk80017F48*, Actor17360*);
 extern void (*D_8004ED04[])(u8, Actor17360*);
-extern s32 D_80085F94;
 extern s32 D_8007A1C8;
 extern u8 D_800EB7C0[];
 void func_800169B8(s32, u32, s32, u16);
@@ -904,7 +914,6 @@ extern f32 D_8007AA24;
 extern f32 D_8007AA28;
 extern f32 D_8007AA44;
 extern Unk17360Model* D_8007AA84;
-extern Unk8007B908_b* D_800863C4;
 s32 func_8001A2A0(s32, Actor17360*);
 s32 func_8001809C(arg0, arg1)
     Unk8001809C* arg0;
@@ -981,7 +990,6 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x28];
     /* 0x28 */ Actor17360* unk28;
 } Unk80018348;
-extern Unk8007B908_b* D_800863C4;
 s32 func_8001A2A0(s32, Actor17360*);
 Actor17360* func_80018348(Unk80018348* arg0, s32 arg1) {
     Actor17360* ret;
