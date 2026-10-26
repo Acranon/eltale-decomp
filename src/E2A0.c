@@ -318,13 +318,12 @@ extern Unk8000FA9C *D_80082C60[];
 extern Unk8000FA9C *D_80083068[];
 void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
 /* Part of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
- * holds D_80082858). Nothing names 80082030..80082048 (splat's D_80082030 is
- * func_8000D6A0's loop end), so it is a placeholder. */
+ * holds func_800104C0's static at 80082858). Nothing names 80082030..80082048
+ * (splat's D_80082030 is func_8000D6A0's loop end), so it is a placeholder. */
 u8 D_80082030[0x18];
 Unk80082048 D_80082048[4];
 u16 D_80082058[0x200];
 u16 D_80082458[0x200];
-s32 D_80082858;
 void func_8001A948(f32, f32, f32, Unk8000FA9C *);
 void func_8000FA9C(Unk8000FA9C *);
 void func_8000FC50(Unk8000FA9C *);
@@ -883,14 +882,7 @@ void func_8000FC50(Unk8000FA9C *arg0) {
 /* The rest of this file's .data. */
 u16 D_8004DE84[2] = { 0x10, 0x10 };
 u8 D_8004DE88[4] = { 0x82, 0xDC, 0x78, 0xF0 };
-s32 D_8004DE8C = 0;
-s32 D_8004DE90 = 1;
-s32 D_8004DE94 = 1;
-Unk8004DE98 D_8004DE98[6] = {
-    { 0, 0x1C, 2 }, { 0x15F9, 0x80, 0 }, { 0x4F1A, 0x1C, 1 },
-    { 0x6513, 0x1C, 2 }, { 0x6977, 0x1C, 2 }, { 0x6979, 0xFF, 0xFF },
-};
-s32 D_8004DEC8 = 0;
+extern Unk8004DE98 D_8004DE98[];
 
 void func_8000FCE0(Particle *arg0) {
     arg0->y = arg0->y + arg0->vy / 2;
@@ -1000,7 +992,69 @@ void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_800104C0.s")
+void func_800104C0(void) {
+    static s32 D_8004DE8C = 0;
+    static s32 D_8004DE90 = 1;
+    static s32 D_8004DE94 = 1;
+    static s32 D_80082858;
+    Unk8004DE98 *p;
+    s32 inv;
+    u16 *src;
+    u16 *src2;
+    u16 *dst;
+    s32 i;
+    u16 r1;
+    u16 g1;
+    u16 b1;
+    u16 r2;
+    u16 g2;
+    u16 b2;
+
+    p = D_8004DE98;
+    while (p->id != 0xFF) {
+        if (D_80084980 >= p->start && D_80084980 < p[1].start) {
+            D_8004DE8C = p->id;
+            break;
+        }
+        p++;
+    }
+    if (D_8004DE8C != D_8004DE94) {
+        D_80083060 = (u16 *)D_800814B0 + D_8004DE94 * 0x100;
+        D_8004DE90 = D_80082858 = p->unk4;
+        D_80083468 = (u16 *)D_800814B0 + D_8004DE8C * 0x100;
+        D_80083550 = D_800810B0;
+    }
+    if (D_8004DE90 != 0) {
+        dst = D_80083550;
+        src = D_80083060;
+        src2 = D_80083468;
+        inv = D_80082858 - D_8004DE90;
+        i = 0x100;
+        while (i--) {
+            r1 = (*src & 0xF800) >> 11;
+            g1 = (*src & 0x7C0) >> 6;
+            b1 = (*src & 0x3E) >> 1;
+            r2 = (*src2 & 0xF800) >> 11;
+            g2 = (*src2 & 0x7C0) >> 6;
+            b2 = (*src2 & 0x3E) >> 1;
+            if (src) {
+                /* empty: changes IDO's register colouring to retail's (permuter) */
+            }
+            src++;
+            src2++;
+            *dst++ = (((r1 * D_8004DE90 + r2 * inv) / D_80082858) << 11) | (((g1 * D_8004DE90 + g2 * inv) / D_80082858) << 6) | (((b1 * D_8004DE90 + b2 * inv) / D_80082858) << 1);
+        }
+        D_8004DE90--;
+    }
+    D_8004DE94 = D_8004DE8C;
+}
+
+/* func_800104C0's statics come first, then these. */
+Unk8004DE98 D_8004DE98[6] = {
+    { 0, 0x1C, 2 }, { 0x15F9, 0x80, 0 }, { 0x4F1A, 0x1C, 1 },
+    { 0x6513, 0x1C, 2 }, { 0x6977, 0x1C, 2 }, { 0x6979, 0xFF, 0xFF },
+};
+s32 D_8004DEC8 = 0;
 
 extern u16 D_80081AB0[];
 extern u16 D_80081C40;
