@@ -25,9 +25,12 @@ extern u8 D_80092E98;
 extern OSContStatus D_80092EA0[4];
 extern OSMesg D_80092EB0;
 extern OSContPad D_80092EB8[4];
-extern u8 D_80061810[];
-extern Ext4 D_80061840;
-extern Ext4 D_80061844;
+/* This file's .data, 80061810..80061850: the pak file's game_name, an
+ * unreferenced digit string, and the two ext_name values. */
+u8 D_80061810[16] = "SxbQx";
+char D_80061820[] = "012345678901234567890123456789";
+Ext4 D_80061840 = { { 0, 0, 0, 0 } };
+Ext4 D_80061844 = { { 0, 0, 0, 0 } };
 
 s32 osContInit();
 s32 osPfsFreeBlocks();
