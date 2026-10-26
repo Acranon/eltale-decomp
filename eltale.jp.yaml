@@ -336,10 +336,12 @@ segments:
     vram: 0x80100000
     exclusive_ram_id: ovl_80100000
     symbol_name_format: $VRAM_$SEG
+    bss_size: 0x280
     subsegments:
       - [0xDA4570, c, ovl_DA4570/DA4570]
       - [0xDA6510, data]
       - [0xDAB5C0, .rodata, ovl_DA4570/DA4570]
+      - { start: 0xDAB5F0, type: .bss, vram: 0x80107080, name: ovl_DA4570/DA4570 }
 
   - name: ovl_title
     type: code
