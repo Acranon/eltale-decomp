@@ -107,27 +107,39 @@ typedef struct {
         _g->words.w1 = (b);                \
     }
 
+/* ovl_intro .data 80212230..80212250 (80212250.. is DC9350.c's). */
+s32 D_80212230_ovl_intro = 0;
+s32 D_80212234_ovl_intro = 0;
+u8 D_80212238_ovl_intro = 0;
+u8 D_8021223C_ovl_intro = 0;
+s32 D_80212240_ovl_intro = 1;
+
+/* ovl_intro .bss 802684B0..80277080 (80277080.. is DC9350.c's). */
+s32 D_802684B0_ovl_intro;
+s32 D_802684B4_ovl_intro;
+s32 D_802684B8_ovl_intro;
+s32 D_802684BC_ovl_intro;
+s32 D_802684C0_ovl_intro;
+s32 D_802684C4_ovl_intro;
+s32 D_802684C8_ovl_intro;
+s32 D_802684CC_ovl_intro;
+s32 D_802684D0_ovl_intro;
+s32 D_802684D4_ovl_intro;
+s32 D_802684D8_ovl_intro;
+s32 D_802684DC_ovl_intro;
+IntroSprite D_802684E0_ovl_intro[150];
+Gfx D_8026B3C0_ovl_intro[2][0xBB8];
+Gfx *D_80276F40_ovl_intro;
+s32 D_80276F44_ovl_intro;
+u8 D_80276F48_ovl_intro[0x12C]; /* not referenced */
+s32 D_80277074_ovl_intro;
+u8 D_80277078_ovl_intro;
+
+extern s32 D_80212250_ovl_intro;
+extern s32 D_80212254_ovl_intro;
 extern Unk802170E8 D_802170E8_ovl_intro[];
 extern u32 D_802170F0_ovl_intro;
-extern s32 D_80212230_ovl_intro;
-extern s32 D_80212250_ovl_intro;
-extern s32 D_802684B0;
-extern s32 D_802684B4;
-extern s32 D_802684B8;
-extern s32 D_802684BC;
-extern s32 D_802684C0;
-extern s32 D_802684C4;
-extern s32 D_802684C8;
-extern s32 D_802684CC;
-extern s32 D_802684D0;
-extern s32 D_802684D4;
-extern s32 D_802684D8;
-extern s32 D_802684DC;
-extern IntroSprite D_802684E0[150];
 extern AnimTbl D_80212810_ovl_intro[];
-extern s32 D_80276F44;
-extern s32 D_80277074;
-extern u8 D_80277078;
 extern Gfx D_802122E0_ovl_intro[];
 extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
@@ -160,8 +172,6 @@ typedef struct {
 } Unk80092E48; /* size = 0x14 */
 
 extern Gfx *D_8007A184;
-extern Gfx *D_80276F40;
-extern Gfx D_8026B3C0[2][0xBB8];
 extern Gfx D_80212270_ovl_intro[];
 extern s8 D_80092C80;
 extern u16 D_80092C86;
@@ -172,11 +182,6 @@ extern s8 D_8006CC74;
 extern u8 D_8006CC78;
 extern u8 D_8006CC7C;
 extern char D_80268480_ovl_intro[];
-extern s32 D_80212234_ovl_intro;
-extern u8 D_80212238_ovl_intro;
-extern u8 D_8021223C_ovl_intro;
-extern s32 D_80212240_ovl_intro;
-extern s32 D_80212254_ovl_intro;
 
 s32 func_80035A24(s32);
 s32 func_8003609C(s32);
@@ -196,20 +201,20 @@ s32 func_80211634_ovl_intro(void);
 
 void func_8020C0D0_ovl_intro(void) {
     func_8020D1DC_ovl_intro();
-    D_802684B0 = 10;
-    D_802684B4 = 1;
-    D_802684B8 = 300;
-    D_802684BC = 223;
-    D_802684CC = 0;
-    D_802684D0 = 0;
-    D_802684C0 = 0;
-    D_802684C4 = 0;
-    D_802684D4 = 0;
-    D_802684D8 = 0;
-    D_802684DC = 0;
+    D_802684B0_ovl_intro = 10;
+    D_802684B4_ovl_intro = 1;
+    D_802684B8_ovl_intro = 300;
+    D_802684BC_ovl_intro = 223;
+    D_802684CC_ovl_intro = 0;
+    D_802684D0_ovl_intro = 0;
+    D_802684C0_ovl_intro = 0;
+    D_802684C4_ovl_intro = 0;
+    D_802684D4_ovl_intro = 0;
+    D_802684D8_ovl_intro = 0;
+    D_802684DC_ovl_intro = 0;
     D_80212230_ovl_intro = 0;
     D_80212250_ovl_intro = 0;
-    D_802684C8 = 0;
+    D_802684C8_ovl_intro = 0;
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020C16C_ovl_intro.s")
@@ -233,7 +238,7 @@ s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx) {
 
 void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
                              s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk0.w = flags;
     p->unk4 = x;
@@ -267,7 +272,7 @@ void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg
 
 void func_8020D1DC_ovl_intro(void) {
     s32 i;
-    IntroSprite *p = D_802684E0;
+    IntroSprite *p = D_802684E0_ovl_intro;
 
     for (i = 0; i < 150; i++, p++) {
         p->unk0.w = 0;
@@ -302,7 +307,7 @@ void func_8020D1DC_ovl_intro(void) {
 }
 
 void func_8020D300_ovl_intro(s32 idx) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk0.w = 0;
     p->unk4 = 0;
@@ -336,7 +341,7 @@ void func_8020D300_ovl_intro(s32 idx) {
 
 s32 func_8020D3A4_ovl_intro(s32 n) {
     s32 i;
-    IntroSprite *p = D_802684E0;
+    IntroSprite *p = D_802684E0_ovl_intro;
 
     n = 0;
     for (i = 0; i < 150; i++, p++) {
@@ -349,7 +354,7 @@ s32 func_8020D3A4_ovl_intro(s32 n) {
 
 s32 func_8020D454_ovl_intro(s32 n) {
     s32 i;
-    IntroSprite *p = D_802684E0;
+    IntroSprite *p = D_802684E0_ovl_intro;
 
     n = 0;
     for (i = 0; i < 150; i++, p++) {
@@ -362,7 +367,7 @@ s32 func_8020D454_ovl_intro(s32 n) {
 
 s16 func_8020D504_ovl_intro(void) {
     s32 i;
-    IntroSprite *p = D_802684E0;
+    IntroSprite *p = D_802684E0_ovl_intro;
 
     for (i = 0; i < 150; i++, p++) {
         if (!(p->unk0.w & 0x80000000)) {
@@ -379,7 +384,7 @@ s32 func_8020D5EC_ovl_intro(s32 arg0, s32 arg1, IntroRect* arg2) {
     s32 y;
     s32 flag;
 
-    temp_v1 = &D_802684E0[arg0];
+    temp_v1 = &D_802684E0_ovl_intro[arg0];
     if (!(temp_v1->unk0.w & 0x80000000)) {
         return 0xFF;
     }
@@ -419,7 +424,7 @@ s32 func_8020D5EC_ovl_intro(s32 arg0, s32 arg1, IntroRect* arg2) {
 }
 
 s32 func_8020D750_ovl_intro(s32 idx, s32 flags, IntroRect *r) {
-    IntroSprite *s = &D_802684E0[idx];
+    IntroSprite *s = &D_802684E0_ovl_intro[idx];
     IntroSprite *p;
     s32 v;
 
@@ -461,14 +466,14 @@ s32 func_8020D750_ovl_intro(s32 idx, s32 flags, IntroRect *r) {
 }
 
 void func_8020D8AC_ovl_intro(s32 idx) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk2E = p->unk4 + p->unk8;
     p->unk30 = p->unk6 + p->unkA;
 }
 
 s32 func_8020D8E8_ovl_intro(s32 idx, s32 arg1) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
 
     if (!(p->unk0.w & 0x80000000)) {
@@ -499,7 +504,7 @@ s32 func_8020D8E8_ovl_intro(s32 idx, s32 arg1) {
 }
 
 s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
 
     if (!(p->unk0.w & 0x80000000)) {
@@ -530,7 +535,7 @@ s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1) {
 }
 
 s32 func_8020DAF0_ovl_intro(s32 idx, s32 flags) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
     s32 tx;
     s32 ty;
@@ -608,7 +613,7 @@ s32 func_8020DAF0_ovl_intro(s32 idx, s32 flags) {
 }
 
 void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk2A = arg1;
     p->unk2C = arg2;
@@ -617,7 +622,7 @@ void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2) {
 }
 
 s32 func_8020DDA0_ovl_intro(s32 idx, s32 flags) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
     s32 t;
     s32 d;
@@ -667,7 +672,7 @@ s32 func_8020DDA0_ovl_intro(s32 idx, s32 flags) {
 }
 
 s32 func_8020DF20_ovl_intro(s32 idx, s32 flags) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
     s32 t;
     s32 d;
@@ -717,7 +722,7 @@ s32 func_8020DF20_ovl_intro(s32 idx, s32 flags) {
 }
 
 s32 func_8020E0A0_ovl_intro(s32 idx) {
-    IntroSprite *p = &D_802684E0[idx];
+    IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk34++;
     if (p->unk34 >= p->unk38) {
@@ -727,7 +732,7 @@ s32 func_8020E0A0_ovl_intro(s32 idx) {
 }
 
 void func_8020E0EC_ovl_intro(s32 idx) {
-    D_802684E0[idx].unk34 = 0;
+    D_802684E0_ovl_intro[idx].unk34 = 0;
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020E108_ovl_intro.s")
