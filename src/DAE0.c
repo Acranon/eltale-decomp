@@ -137,20 +137,6 @@ s32 D_8007C278[2];
 extern u8 D_8004F770[];
 extern Gfx *D_8007A184;
 extern Unk8007AA08 D_8007AA08;
-extern Unk8007C174 D_8007C174;
-extern s16 D_8007C1C6;
-extern u16 D_8007C1CC;
-extern u16 *D_8007C1D8;
-extern f32 D_8007C178;
-extern f32 D_8007C17C;
-typedef struct {
-    f32 unk24;
-    f32 unk28;
-} Unk8007C198;
-extern Unk8007C198 D_8007C198;
-extern f32 D_8007C1A0;
-extern f32 D_8007C1A4;
-extern f32 D_8007C1A8;
 extern u8 D_802A7BC0[];
 extern RomRange D_803AB390[];
 extern Unk803AB3D0 D_803AB3D0[];
@@ -205,7 +191,22 @@ void func_8000CEF0(void) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/DAE0/func_8000CFD8.s")
+void func_8000CFD8(s32 arg0) {
+    Unk8007C148 *p = &D_8007C148;
+    s32 pad;
+    u8 *temp;
+
+    if (D_8007C140 != 0) {
+        temp = D_803ABA58[D_8007C148.unk2C.unk50];
+        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+        func_80020428(1, &p->unk2C, temp + D_8007C148.unk2C.unk52 * 0xC, arg0);
+        func_8002099C(p->unk2C.unk58, &p->unk2C, temp + p->unk2C.unk52 * 0xC);
+        if (*p->unk2C.unk64 != 2) {
+            func_800131F0(p->unk2C.x, p->unk2C.y, p->unk2C.z, p->unk2C.unk2C, p->unk2C.unk30, p->unk2C.unk34,
+                          p->unk2C.unk28 * p->unk2C.unk24);
+        }
+    }
+}
 
 s32 func_8000D100(void) {
     s32 ret = 0;
