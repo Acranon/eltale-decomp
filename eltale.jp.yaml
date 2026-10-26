@@ -276,8 +276,7 @@ segments:
       - [0x500A0, .data, 25B20]                  # 8004F4A0..8004F4D0
       - [0x500D0, data]
       - [0x50370, .data, 27A90]
-      - [0x50380, data]
-      - [0x56530, .data, 29150]                  # 80055930..80055B40
+      - [0x50380, .data, 29150]                  # 8004F780..80055B40
       - [0x56740, data]
       - [0x6D900, .data, libultra/os/initialize]
       - [0x6D920, data]
