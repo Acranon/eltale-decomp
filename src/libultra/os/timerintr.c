@@ -6,12 +6,16 @@
 #include "PR/os_internal.h"
 #include "PRinternal/osint.h"
 
-extern OSTime __osCurrentTime;
-extern u32 __osBaseCounter;
-extern u32 __osViIntrCount;
-extern u32 __osTimerCounter;
-extern OSTimer __osBaseTimer;
-extern OSTimer* __osTimerList;
+/* This file's data, as in ultralib's timerintr.c: .data __osTimerList at
+ * 8006E7F0 (padded to 8006E800); .bss 800957A0..800957E0, where IDO places
+ * __osBaseTimer first (0x20 bytes), then __osCurrentTime..__osTimerCounter.
+ * __osCurrentTime must be defined here for __osTimerServicesInit to match. */
+OSTime __osCurrentTime;
+u32 __osBaseCounter;
+u32 __osViIntrCount;
+u32 __osTimerCounter;
+OSTimer __osBaseTimer;
+OSTimer* __osTimerList = &__osBaseTimer;
 
 #ifndef _FINALROM
 OSMesgQueue __osProfTimerQ ALIGNED(0x8);
@@ -20,7 +24,15 @@ OSProf* __osProfileListEnd;
 u32 __osProfileOverflowBin;
 #endif
 
-#pragma GLOBAL_ASM("asm/nonmatchings/libultra/os/timerintr/__osTimerServicesInit.s")
+void __osTimerServicesInit(void) {
+    __osCurrentTime = 0;
+    __osBaseCounter = 0;
+    __osViIntrCount = 0;
+    __osTimerList->next = __osTimerList->prev = __osTimerList;
+    __osTimerList->interval = __osTimerList->value = 0;
+    __osTimerList->mq = NULL;
+    __osTimerList->msg = 0;
+}
 
 
 void __osTimerInterrupt(void) {
