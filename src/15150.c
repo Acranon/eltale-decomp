@@ -120,7 +120,7 @@ typedef struct {
 
 /* 15150 .bss, 80085B80..80085F90, in address order (first declaration fixes the order). */
 Camera15150 D_80085B80;
-u8 D_80085C08[8];
+s32 D_80085C08[2];
 Vec2f_15150 D_80085C10;
 u8 D_80085C18[8];
 Coll15150 D_80085C20;
@@ -129,7 +129,7 @@ Unk15150Target D_80085C40;
 s32 D_80085CAC;
 f32 D_80085CB0;
 f32 D_80085CB4;
-u8 D_80085CB8[0x190];
+s32 D_80085CB8[100];
 Camera15150 D_80085E48;
 Mtx D_80085ED0;
 Mtx D_80085F10;
@@ -145,6 +145,27 @@ u8 D_80085F88[8];
 
 extern s32 D_8007ABA8;
 extern Unk8007ABB0* D_8007ABB0[];
+
+typedef struct {
+    /* 0x00 */ Camera15150Preset* presets;
+    /* 0x04 */ u16 count;
+} Unk15150PresetSet; // size = 0x8
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ Unk15150PresetSet* unk24;
+} Unk8007C284;
+
+extern Mtx D_80301098;
+extern Mtx D_8030EB68;
+extern s32 D_80084308;
+extern u16 D_8007AA82;
+extern Unk8007C284* D_8007C284;
+extern s32 D_800842BC;
+extern s32 D_800842C0;
+extern Vec3f_15150 D_8007AA20;
+extern f32 D_8007A994;
+void guOrtho(Mtx*, f32, f32, f32, f32, f32, f32, f32);
 
 f32 func_800270D0(f32, f32);
 void func_800271B4(f32, Vec2f_15150*);
@@ -173,7 +194,88 @@ f32 D_8004EC68[8] = { 0.0f, -0.1f, 0.0f, -0.05f, 0.1f, -0.1f, -0.05f, 0.08f };
 f32 D_8004EC88 = 0.0f;
 f32 D_8004EC8C = 0.0f;
 
-#pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014550.s")
+void func_80014550(void) {
+    s32 pad[2];
+    Camera15150* cam = &D_80085E48;
+    Vec3f_15150* pos = &D_8007AA20;
+    Camera15150Preset* p;
+    s32 i;
+
+    guOrtho(&D_80301098, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
+    guOrtho(&D_8030EB68, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
+    if (D_80084308 < 0) {
+        cam->unk84 = 3.1415927f;
+    }
+    D_80085F60 = (D_8007AA82 >> 1) & 7;
+    if (D_8007C284->unk24 != NULL) {
+        D_80085F64 = D_8007C284->unk24[D_800842C0].presets;
+        D_80085C08[0] = D_8007C284->unk24[D_800842C0].count;
+    } else {
+        D_80085F64 = D_8004EB70;
+        D_80085C08[0] = 1;
+    }
+    p = &D_80085F64[D_80085F60];
+    cam->mode = p->mode;
+    cam->flags = 1;
+    cam->unk4 = 0;
+    cam->target = (Unk15150Target*)pos;
+    cam->unk60 = p->unk1C;
+    cam->unk64 = p->unk20;
+    cam->unk68 = p->unk24;
+    cam->unk6C = p->unk28;
+    cam->unk4C = p->unk18;
+    cam->unk50 = 0.0f;
+    cam->unk58 = p->unk14;
+    cam->unk5C = p->unk10;
+    switch (cam->mode) {
+        case 0:
+        case 2:
+            D_80085C10.x = 0.0f;
+            D_80085C10.y = cam->unk4C * 0.8;
+            cam->eyeY = pos->y + p->unk14;
+            func_800271B4(cam->unk84 + D_8007A994, &D_80085C10);
+            cam->eyeX = pos->x - D_80085C10.x;
+            cam->eyeZ = pos->z - D_80085C10.y;
+            cam->unk54 = 0.0f;
+            break;
+        case 1:
+            cam->eyeX = p->unk4;
+            cam->eyeY = p->unk8;
+            cam->eyeZ = p->unkC;
+            cam->unk54 = 0.0f;
+            break;
+    }
+    cam->unk24 = 0.0f;
+    cam->unk2C = 0.0f;
+    cam->unk28 = 0.0f;
+    cam->atX = pos->x;
+    cam->atY = pos->y + cam->unk5C;
+    cam->atZ = pos->z;
+    cam->unk30 = 0.0f;
+    cam->unk34 = 0.0f;
+    cam->unk38 = 0.0f;
+    cam->unk40 = cam->unk44 = cam->unk48 = 0.0f;
+    cam->unk3C = 0.0f;
+    if (cam) {}
+    cam->unk70 = 0.02f;
+    if (cam) {}
+    cam->unk74 = 0.8f;
+    cam->unk78 = 0.005f;
+    cam->unk7C = 0.8f;
+    D_80085CAC = 0;
+    D_80085C3C = 0;
+    D_80085F50 = p->unk2C;
+    D_80085F54 = p->unk30;
+    D_80085F58 = p->unk34;
+    D_80085F84 = 0.0f;
+    D_80085CB8[0] = 0;
+    for (i = 0; i < 7; i++) {
+        if (D_800842BC == D_8004EC30[i][0] && D_800842C0 == D_8004EC30[i][1]) {
+            D_80085CB8[0]++;
+            break;
+        }
+    }
+}
 
 #pragma GLOBAL_ASM("asm/nonmatchings/15150/func_80014994.s")
 
