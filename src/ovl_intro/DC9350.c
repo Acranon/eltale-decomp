@@ -2,10 +2,29 @@
 
 #define GFX_WORDS(a, b)                    {                                          Gfx *_g = D_8007A184++;                _g->words.w0 = (a);                    _g->words.w1 = (b);                }
 
+
+/* ovl_intro .data 80212250..80212270 (the rest of the slab is still asm). */
+s32 D_80212250_ovl_intro = 0;
+s32 D_80212254_ovl_intro = 0;
+/* func_80210140's statics (globals while it is asm) */
+u8 D_80212258_ovl_intro = 0;
+s8 D_8021225C_ovl_intro = 0;
+s8 D_80212260_ovl_intro = 0;
+/* func_80211634's statics (globals while it is asm) */
+u8 D_80212264_ovl_intro = 0;
+s8 D_80212268_ovl_intro = 0;
+s8 D_8021226C_ovl_intro = 0;
+
+/* ovl_intro .bss 80277080..80277090 */
+s8 D_80277080_ovl_intro;
+s8 D_80277081_ovl_intro;
+s8 D_80277082_ovl_intro;
+s8 D_80277083_ovl_intro;
+s8 D_80277084_ovl_intro;
+s8 D_80277085_ovl_intro;
+
 extern Gfx *D_8007A184;
 extern s32 D_80212230_ovl_intro;
-extern s32 D_80212250_ovl_intro;
-extern s32 D_80212254_ovl_intro;
 extern Gfx D_80212270_ovl_intro[];
 extern u8 D_802650A0_ovl_intro[];
 extern u16 D_80267048_ovl_intro[];
@@ -20,12 +39,6 @@ extern u8 D_8025D500_ovl_intro[];
 extern u16 D_80092C86;
 extern s8 D_80092C81;
 extern s8 D_80092C82;
-extern u8 D_80212264_ovl_intro;
-extern s8 D_80212268_ovl_intro;
-extern s8 D_8021226C_ovl_intro;
-extern s8 D_80277083;
-extern s8 D_80277084;
-extern s8 D_80277085;
 extern u16 D_80264538_ovl_intro[];
 extern u8 D_802617B0_ovl_intro[];
 extern u16 D_80268280_ovl_intro[];
