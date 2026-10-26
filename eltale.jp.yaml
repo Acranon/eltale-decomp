@@ -325,6 +325,8 @@ segments:
       - { start: 0x71920, type: bss, vram: 0x80070D20 }
       - { start: 0x71920, type: .bss, vram: 0x80084980, name: 12610 }
       - { start: 0x71920, type: bss, vram: 0x80084B80, name: 80084B80 }
+      - { start: 0x71920, type: .bss, vram: 0x800865C0, name: 1B200 }
+      - { start: 0x71920, type: bss, vram: 0x80087E00, name: 80087E00 }
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: bss, vram: 0x80093000, name: 80093000 }
       - { start: 0x71920, type: .bss, vram: 0x80094380, name: libultra/io/vimgr }

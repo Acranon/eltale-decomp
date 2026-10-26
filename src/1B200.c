@@ -86,8 +86,6 @@ extern s32 D_8004EF4C[];
 extern f32 D_8004EF58[];
 extern u8 D_8004EF88[];
 extern s16 D_800865CC;
-extern Unk800865DC D_800865DC[];
-extern Unk800866D8 D_800866D8[];
 typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
@@ -125,9 +123,6 @@ typedef struct {
     /* 0x02 */ s16 unk2;
 } Unk80087798; // size = 0x4
 
-extern Unk80087298 D_80087298[];
-extern Unk800877A8 D_800877A8[];
-extern Unk80087798 D_80087798[];
 typedef struct {
     /* 0x00 */ void* target;
     /* 0x04 */ u8 digits[8];
@@ -138,7 +133,6 @@ typedef struct {
     /* 0x18 */ s32 unk18;
 } Unk800865C0; // size = 0x1C
 
-extern Unk800865C0 D_800865C0[];
 typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[0x16];
@@ -209,13 +203,24 @@ typedef struct {
     /* 0x44 */ Unk800DA0F0 unk44;
 } Unk80086798b; // size = 0x58
 
+/* Part of this file's .bss, 800865C0..80087E00: the 16-byte-aligned run that
+ * holds D_80087798 (func_8001D688 shares a lui between its pairs only when it
+ * is defined here). Labels splat put inside these arrays (D_800865CC..,
+ * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
+Unk800865C0 D_800865C0[10];
+Unk800866D8 D_800866D8[8];
+Unk80086798b D_80086798[32];
+Unk80087298 D_80087298[32];
+Unk80087798 D_80087798[4];
+Unk800877A8 D_800877A8[4];
+u16 D_80087DF8;
+
 extern Unk80085E48 D_80085E48;
 extern s32 D_8007A17C;
 extern s32 D_800863F0;
 extern Unk800EB2B4 D_800EB2B4[];
 extern u8 D_800CADA8[][4];
 extern Unk800DA0F0 D_800DA0F0[];
-extern Unk80086798b D_80086798[];
 typedef struct {
     f32 mf[4][4];
 } MtxF;
@@ -223,7 +228,6 @@ typedef struct {
 extern Unk8004EE20 D_8004EFA4;
 extern Unk8004EE20 D_8004EFE4;
 extern Gfx D_800EB6D0[];
-extern u16 D_80087DF8;
 extern s32 D_8004F03C[];
 extern u16 D_800863F4;
 s32 func_8001CBD0(Unk80086798b*, s32);
@@ -1231,7 +1235,13 @@ s32 func_8001CDF4(Unk80086798b* arg0) {
     }
 }
 
-#pragma GLOBAL_ASM("asm/nonmatchings/1B200/func_8001D688.s")
+void func_8001D688(void) {
+    s32 i;
+
+    for (i = 0; i < 4; i++) {
+        D_80087798[i].unk0 = 0;
+    }
+}
 
 typedef struct {
     /* 0x00 */ f32 x;
