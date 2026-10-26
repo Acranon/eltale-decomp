@@ -264,6 +264,7 @@ segments:
       - [0x4C650, databin, gspF3DEX_text]
       - [0x4DA80, databin, aspMain_text]
       - [0x4E8A0, data]
+      - [0x4E970, .data, E2A0]                   # 8004DD70..8004DED0
       - [0x4EAD0, .data, 12610]                  # 8004DED0..8004DF00
       - [0x4EB00, data]
       - [0x4FA20, .data, 1B200]                  # 8004EE20..8004F060
