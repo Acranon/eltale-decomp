@@ -46,10 +46,10 @@ typedef struct MenuMapLocation {
     /* 0x01 */ s8 b;
 } MenuMapLocation; /* 0x2 bytes */
 
-typedef struct MenuExpGaugePalettes { u16 *v[4]; } MenuExpGaugePalettes; /* 0x10 bytes */
-typedef struct MenuExpGaugeTextures { u8 *v[4][2]; } MenuExpGaugeTextures; /* 0x20 bytes */
-typedef struct MenuFourWords { s32 v[4]; } MenuFourWords; /* 0x10 bytes */
-typedef struct MenuFourPointers { u8 *v[4]; } MenuFourPointers; /* 0x10 bytes */
+typedef struct MenuExpGaugePalettes { /* 0x00 */ u16 *v[4]; } MenuExpGaugePalettes; /* 0x10 bytes */
+typedef struct MenuExpGaugeTextures { /* 0x00 */ u8 *v[4][2]; } MenuExpGaugeTextures; /* 0x20 bytes */
+typedef struct MenuFourWords { /* 0x00 */ s32 v[4]; } MenuFourWords; /* 0x10 bytes */
+typedef struct MenuFourPointers { /* 0x00 */ u8 *v[4]; } MenuFourPointers; /* 0x10 bytes */
 
 extern s32 menu_slide_right_x;
 extern s32 menu_slide_left_x;

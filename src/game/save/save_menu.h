@@ -4,12 +4,12 @@
 #include "common.h"
 #include "game/actor/actor.h"
 
-typedef struct SaveBytes20 { u8 b[0x20]; } SaveBytes20; /* 0x20 bytes */
-typedef struct SaveBytes10 { u8 b[0x10]; } SaveBytes10; /* 0x10 bytes */
-typedef struct SaveBytes97 { u8 b[0x97]; } SaveBytes97; /* 0x97 bytes */
-typedef struct SaveBytes1 { u8 b[1]; } SaveBytes1; /* 0x1 byte */
+typedef struct SaveBytes20 { /* 0x00 */ u8 b[0x20]; } SaveBytes20; /* 0x20 bytes */
+typedef struct SaveBytes10 { /* 0x00 */ u8 b[0x10]; } SaveBytes10; /* 0x10 bytes */
+typedef struct SaveBytes97 { /* 0x00 */ u8 b[0x97]; } SaveBytes97; /* 0x97 bytes */
+typedef struct SaveBytes1 { /* 0x00 */ u8 b[1]; } SaveBytes1; /* 0x1 byte */
 #ifdef NON_MATCHING
-typedef struct SaveBytes14 { u8 b[14]; } SaveBytes14; /* 0xE bytes */
+typedef struct SaveBytes14 { /* 0x00 */ u8 b[14]; } SaveBytes14; /* 0xE bytes */
 #endif
 
 typedef struct SaveGameStateBlock {
