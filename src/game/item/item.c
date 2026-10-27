@@ -1,4 +1,16 @@
 #include "game/item/item.h"
+#include "game/audio/sound.h"
+#include "game/battle/battle.h"
+#include "game/core/dma.h"
+#include "game/core/main.h"
+#include "game/env/env.h"
+#include "game/gfx/effect.h"
+#include "game/gfx/fade.h"
+#include "game/input/input.h"
+#include "game/magic/magic.h"
+#include "game/map/map.h"
+#include "game/player/player.h"
+#include "game/text/text.h"
 
 /*
  * Items: the 150-slot inventory (item_inventory), the in-field inventory menu with its icon cache,
@@ -6,23 +18,11 @@
  * Original file: 25B20.c (ROM 0x25B20).
  */
 
-typedef struct {
-    char unk0[0x14];
-    u16 unk14;
-} Struct_8007C288;
 
 extern u8 D_D384B0[];
-extern u8 D_8007AA20[];
-extern Struct_8007C288* map_subarea_def;
-extern u16 map_flags;
-extern u16 battle_flags;
-extern u8 D_8008CA4E;
 extern u8 D_803AC460[];
 extern ItemDef D_803AAAA0[];
 
-void Dma_ReadRom(void*, void*, s32);
-void Player_StartUseItem(u8);
-void Magic_CreateCastEffect(s32, s32, s32, s32);
 
 typedef struct {
     /* 0x0 */ s16 unk0;
@@ -40,32 +40,11 @@ typedef struct {
     /* 0xC */ f32 unkC;
 } Struct_803AAA40;
 
-typedef struct {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ s32 unk8;
-} Struct_80084300;
 
-typedef struct {
-    char unk0[0xA];
-} Struct_803AB358;
-
-extern s32 core_flags;
-extern s32 core_transition_timer;
-extern s16 fade_transition_style;
-extern f32 player_spawn_x;
-extern f32 player_spawn_z;
-extern f32 player_spawn_rot;
-extern s32 player_spawn_type;
-extern s16 D_8007AA0E;
-extern Struct_80084300 exit_destination;
 extern Struct_803AAA40 D_803AAA40[];
-extern Struct_803AB358 D_803AB358[];
+extern MagicVisualDef D_803AB358[];
 extern Struct_803AB36C D_803AB36C[];
 
-void Effect_AddFloatingNumber(Actor*, s32, s32);
-void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AB358*, Vec3f*, Actor*);
-void Sfx_Play(s32, s32, s32);
 
 
 /* .bss 8008C190..8008CA50, in address order (IDO emits .bss by first declaration). */
@@ -178,7 +157,7 @@ s32 Item_TryUse(u8 arg0) {
         ret = 1;
     }
     if (ret) {
-        ret = item_can_use_handlers[item->unk2](D_8007AA20, item, arg0);
+        ret = item_can_use_handlers[item->unk2](&player_state.actor, item, arg0);
     }
     if (ret) {
         Player_StartUseItem(arg0);
@@ -217,12 +196,6 @@ s32 func_80025228(u16 arg0) {
 
 #ifdef NON_MATCHING
 /* stack homes, saved registers and frame differ; code is equivalent */
-void Text_DrawEncodedString(s32, s32, void*);
-void Fade_Start(s32, s32, void*);
-extern Gfx* gfx_dl_head;
-extern s8 input_stick_x;
-extern u16 input_pressed_buttons;
-extern u8 fade_black_ramp_dim[];
 extern Gfx D_1000388[];
 extern u8 D_8039AFB0[];
 extern Gfx D_803AA7C0[];
@@ -436,7 +409,7 @@ s32 Item_CanUseRestore(Actor* arg0, ItemDef* arg1) {
 s32 Item_CanUseWarp(s32 arg0, ItemDef* arg1) {
     s32 ret;
 
-    if ((map_flags & 0xA) || (map_subarea_def->unk14 & 4)) {
+    if ((map_flags & 0xA) || (map_subarea_def->flags & 4)) {
         ret = 0;
     } else {
         ret = 1;
@@ -460,7 +433,7 @@ void Item_UseNothing(s32 arg0, ItemDef* arg1) {
 void Item_UseRestore(Actor* arg0, ItemDef* arg1) {
     u16 amt;
     ActorStats* st = arg0->unk64;
-    Struct_803AB358* fx;
+    MagicVisualDef* fx;
 
     if (arg1->unk4 != 0) {
         amt = st->unk6 - st->unk4;
@@ -487,18 +460,18 @@ void Item_UseRestore(Actor* arg0, ItemDef* arg1) {
 }
 
 void Item_UseWarp(Actor* arg0, ItemDef* arg1) {
-    Struct_803AB358* fx;
+    MagicVisualDef* fx;
 
     core_flags |= 0x80;
     core_transition_timer = 0x16;
-    exit_destination.unk0 = D_803AAA40[arg1->unk4].unk0;
-    exit_destination.unk4 = D_803AAA40[arg1->unk4].unk2;
-    exit_destination.unk8 = -1;
+    exit_destination.map = D_803AAA40[arg1->unk4].unk0;
+    exit_destination.subarea = D_803AAA40[arg1->unk4].unk2;
+    exit_destination.entry = -1;
     player_spawn_x = D_803AAA40[arg1->unk4].unk4;
     player_spawn_z = D_803AAA40[arg1->unk4].unk8;
     player_spawn_rot = D_803AAA40[arg1->unk4].unkC;
     player_spawn_type = 0x108;
-    D_8007AA0E = 0;
+    player_state.unk6 = 0;
     fade_transition_style = 1;
     item_effect_scale.x = D_803AB36C[1].unk8;
     item_effect_scale.y = D_803AB36C[1].unkC;
@@ -512,7 +485,6 @@ void Item_UseSpell(s32 arg0, ItemDef* arg1) {
     Magic_CreateCastEffect(arg0, arg1->unk4, 0, 4);
 }
 
-extern Gfx* gfx_dl_head;
 extern Gfx D_803AA8A8[];
 
 void Item_DrawMenuFrame(s32 x, s32 y, s32 w, s32 h) {
