@@ -1663,21 +1663,21 @@ s8 menu_wobble_offsets[16] = {
     -1, -2, -2, -3, -3, -3, -3, -3, -3, -3, -3, -2, -2, -1, 0, 0,
 };
 u8 *menu_sprite_tex[89] = {
-    D_800620A0, D_800621A8, D_80062280, D_80062290, D_800622A0, D_80062338,
-    D_80062380, D_80062438, D_800624F0, D_80062500, D_80062510, D_80062568,
-    D_800625C0, D_80062618, D_80062670, D_800626C8, D_80062720, D_80062778,
-    D_800627D0, D_80062828, D_80062880, D_800628D8, D_80062930, D_80062988,
-    D_800629E0, D_80062A38, D_80062A90, D_80062EC8, D_80063038, D_800631B0,
-    D_800633D8, D_80063588, D_80063598, D_80063680, D_80063B40, D_80063DD0,
-    D_80063FD0, D_80064228, D_80064320, D_80064380, D_800643E0, D_80064440,
-    D_80064538, D_80064630, D_800649D8, D_80064AA0, D_80064F08, D_80064FA0,
-    D_80065038, D_800650D0, D_80065168, D_80065350, D_800653F8, D_80065408,
-    D_80065418, D_80065590, D_800655A8, D_800655C0, D_800655D8, D_800655F0,
-    D_80065608, D_80065620, D_80065638, D_80065648, D_80065780, D_80065790,
-    D_800657A0, D_80065D78, D_80065F08, D_80066098, D_80066210, D_80066330,
-    D_80066488, D_800664E0, D_80066538, D_80066590, D_800665E8, D_80066640,
-    D_80066698, D_800666F0, D_80066748, D_800667A0, D_800667F8, D_80066850,
-    D_80066918, D_800669E0, D_800669F0, D_80066AE8, NULL,
+    menu_sprite_00_tex, menu_sprite_01_tex, menu_sprite_02_tex, menu_sprite_03_tex, menu_sprite_04_tex, menu_sprite_05_tex,
+    menu_sprite_06_tex, menu_sprite_07_tex, menu_sprite_08_tex, menu_sprite_09_tex, menu_sprite_10_tex, menu_sprite_11_tex,
+    menu_sprite_12_tex, menu_sprite_13_tex, menu_sprite_14_tex, menu_sprite_15_tex, menu_sprite_16_tex, menu_sprite_17_tex,
+    menu_sprite_18_tex, menu_sprite_19_tex, menu_sprite_20_tex, menu_sprite_21_tex, menu_sprite_22_tex, menu_sprite_23_tex,
+    menu_sprite_24_tex, menu_sprite_25_tex, menu_sprite_26_tex, menu_sprite_27_tex, menu_sprite_28_tex, menu_sprite_29_tex,
+    menu_sprite_30_tex, menu_sprite_31_tex, menu_sprite_32_tex, menu_sprite_33_tex, menu_sprite_34_tex, menu_sprite_35_tex,
+    menu_sprite_36_tex, menu_sprite_37_tex, menu_sprite_38_tex, menu_sprite_39_tex, menu_sprite_40_tex, menu_sprite_41_tex,
+    menu_sprite_42_tex, menu_sprite_43_tex, menu_sprite_44_tex, menu_sprite_45_tex, menu_sprite_46_tex, menu_sprite_47_tex,
+    menu_sprite_48_tex, menu_sprite_49_tex, menu_sprite_50_tex, menu_sprite_51_tex, menu_sprite_52_tex, menu_sprite_53_tex,
+    menu_sprite_54_tex, menu_sprite_55_tex, menu_sprite_56_tex, menu_sprite_57_tex, menu_sprite_58_tex, menu_sprite_59_tex,
+    menu_sprite_60_tex, menu_sprite_61_tex, menu_sprite_62_tex, menu_sprite_63_tex, menu_sprite_64_tex, menu_sprite_65_tex,
+    menu_sprite_66_tex, menu_sprite_67_tex, menu_sprite_68_tex, menu_sprite_69_tex, menu_sprite_70_tex, menu_sprite_71_tex,
+    menu_sprite_72_tex, menu_sprite_73_tex, menu_sprite_74_tex, menu_sprite_75_tex, menu_sprite_76_tex, menu_sprite_77_tex,
+    menu_sprite_78_tex, menu_sprite_79_tex, menu_sprite_80_tex, menu_sprite_81_tex, menu_sprite_82_tex, menu_sprite_83_tex,
+    menu_sprite_84_tex, menu_sprite_85_tex, menu_sprite_86_tex, menu_sprite_87_tex, NULL,
 };
 Gfx menu_sprite_opaque_dl[3] = {
     {{ 0xE7000000, 0x00000000 }},
@@ -1807,8 +1807,8 @@ s16 menu_options_bgm_row_pos[5][2] = {
 #ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
 s32 menu_map_loaded_region = -1;
 #endif
-MenuExpGaugePalettes menu_exp_gauge_tluts = { { D_80068EB0, D_8006A8F0, D_8006B4D8, D_80069A98 } };
-MenuExpGaugeTextures menu_exp_gauge_tex = { { { D_800690B8, D_800695A8 }, { D_8006AAF8, D_8006AFE8 }, { D_8006B6E0, D_8006BBD0 }, { D_80069CA0, D_8006A2C8 } } };
+MenuExpGaugePalettes menu_exp_gauge_tluts = { { menu_exp_gauge_layer_0_tlut, menu_exp_gauge_layer_1_tlut, menu_exp_gauge_layer_2_tlut, menu_exp_gauge_layer_3_tlut } };
+MenuExpGaugeTextures menu_exp_gauge_tex = { { { menu_exp_gauge_layer_0_0_tex, menu_exp_gauge_layer_0_1_tex }, { menu_exp_gauge_layer_1_0_tex, menu_exp_gauge_layer_1_1_tex }, { menu_exp_gauge_layer_2_0_tex, menu_exp_gauge_layer_2_1_tex }, { menu_exp_gauge_layer_3_0_tex, menu_exp_gauge_layer_3_1_tex } } };
 MenuFourWords menu_bg_strip_tex_heights = { { 32, 32, 32, 24 } };
 MenuFourWords menu_bg_strip_heights = { { 26, 26, 26, 20 } };
 MenuFourPointers menu_bg_strip_tex = { { menu_bg_strip_tex_0, menu_bg_strip_tex_1, menu_bg_strip_tex_2, menu_bg_strip_tex_3 } };

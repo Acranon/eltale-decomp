@@ -49,269 +49,269 @@ u8 text_choice_cursor_tex[0xA0] = {
 u16 menu_sprite_tlut[0x104] = {
 #include "assets/menu_sprite_tlut.inc.c"
 };
-u8 D_800620A0[0x108] = {
-#include "assets/D_800620A0.inc.c"
+u8 menu_sprite_00_tex[0x108] = {
+#include "assets/menu_sprite_00_tex.inc.c"
 };
-u8 D_800621A8[0xD8] = {
-#include "assets/D_800621A8.inc.c"
+u8 menu_sprite_01_tex[0xD8] = {
+#include "assets/menu_sprite_01_tex.inc.c"
 };
-u8 D_80062280[0x10] = {
-#include "assets/D_80062280.inc.c"
+u8 menu_sprite_02_tex[0x10] = {
+#include "assets/menu_sprite_02_tex.inc.c"
 };
-u8 D_80062290[0x10] = {
-#include "assets/D_80062290.inc.c"
+u8 menu_sprite_03_tex[0x10] = {
+#include "assets/menu_sprite_03_tex.inc.c"
 };
-u8 D_800622A0[0x98] = {
-#include "assets/D_800622A0.inc.c"
+u8 menu_sprite_04_tex[0x98] = {
+#include "assets/menu_sprite_04_tex.inc.c"
 };
-u8 D_80062338[0x48] = {
-#include "assets/D_80062338.inc.c"
+u8 menu_sprite_05_tex[0x48] = {
+#include "assets/menu_sprite_05_tex.inc.c"
 };
-u8 D_80062380[0xB8] = {
-#include "assets/D_80062380.inc.c"
+u8 menu_sprite_06_tex[0xB8] = {
+#include "assets/menu_sprite_06_tex.inc.c"
 };
-u8 D_80062438[0xB8] = {
-#include "assets/D_80062438.inc.c"
+u8 menu_sprite_07_tex[0xB8] = {
+#include "assets/menu_sprite_07_tex.inc.c"
 };
-u8 D_800624F0[0x10] = {
-#include "assets/D_800624F0.inc.c"
+u8 menu_sprite_08_tex[0x10] = {
+#include "assets/menu_sprite_08_tex.inc.c"
 };
-u8 D_80062500[0x10] = {
-#include "assets/D_80062500.inc.c"
+u8 menu_sprite_09_tex[0x10] = {
+#include "assets/menu_sprite_09_tex.inc.c"
 };
-u8 D_80062510[0x58] = {
-#include "assets/D_80062510.inc.c"
+u8 menu_sprite_10_tex[0x58] = {
+#include "assets/menu_sprite_10_tex.inc.c"
 };
-u8 D_80062568[0x58] = {
-#include "assets/D_80062568.inc.c"
+u8 menu_sprite_11_tex[0x58] = {
+#include "assets/menu_sprite_11_tex.inc.c"
 };
-u8 D_800625C0[0x58] = {
-#include "assets/D_800625C0.inc.c"
+u8 menu_sprite_12_tex[0x58] = {
+#include "assets/menu_sprite_12_tex.inc.c"
 };
-u8 D_80062618[0x58] = {
-#include "assets/D_80062618.inc.c"
+u8 menu_sprite_13_tex[0x58] = {
+#include "assets/menu_sprite_13_tex.inc.c"
 };
-u8 D_80062670[0x58] = {
-#include "assets/D_80062670.inc.c"
+u8 menu_sprite_14_tex[0x58] = {
+#include "assets/menu_sprite_14_tex.inc.c"
 };
-u8 D_800626C8[0x58] = {
-#include "assets/D_800626C8.inc.c"
+u8 menu_sprite_15_tex[0x58] = {
+#include "assets/menu_sprite_15_tex.inc.c"
 };
-u8 D_80062720[0x58] = {
-#include "assets/D_80062720.inc.c"
+u8 menu_sprite_16_tex[0x58] = {
+#include "assets/menu_sprite_16_tex.inc.c"
 };
-u8 D_80062778[0x58] = {
-#include "assets/D_80062778.inc.c"
+u8 menu_sprite_17_tex[0x58] = {
+#include "assets/menu_sprite_17_tex.inc.c"
 };
-u8 D_800627D0[0x58] = {
-#include "assets/D_800627D0.inc.c"
+u8 menu_sprite_18_tex[0x58] = {
+#include "assets/menu_sprite_18_tex.inc.c"
 };
-u8 D_80062828[0x58] = {
-#include "assets/D_80062828.inc.c"
+u8 menu_sprite_19_tex[0x58] = {
+#include "assets/menu_sprite_19_tex.inc.c"
 };
-u8 D_80062880[0x58] = {
-#include "assets/D_80062880.inc.c"
+u8 menu_sprite_20_tex[0x58] = {
+#include "assets/menu_sprite_20_tex.inc.c"
 };
-u8 D_800628D8[0x58] = {
-#include "assets/D_800628D8.inc.c"
+u8 menu_sprite_21_tex[0x58] = {
+#include "assets/menu_sprite_21_tex.inc.c"
 };
-u8 D_80062930[0x58] = {
-#include "assets/D_80062930.inc.c"
+u8 menu_sprite_22_tex[0x58] = {
+#include "assets/menu_sprite_22_tex.inc.c"
 };
-u8 D_80062988[0x58] = {
-#include "assets/D_80062988.inc.c"
+u8 menu_sprite_23_tex[0x58] = {
+#include "assets/menu_sprite_23_tex.inc.c"
 };
-u8 D_800629E0[0x58] = {
-#include "assets/D_800629E0.inc.c"
+u8 menu_sprite_24_tex[0x58] = {
+#include "assets/menu_sprite_24_tex.inc.c"
 };
-u8 D_80062A38[0x58] = {
-#include "assets/D_80062A38.inc.c"
+u8 menu_sprite_25_tex[0x58] = {
+#include "assets/menu_sprite_25_tex.inc.c"
 };
-u8 D_80062A90[0x438] = {
-#include "assets/D_80062A90.inc.c"
+u8 menu_sprite_26_tex[0x438] = {
+#include "assets/menu_sprite_26_tex.inc.c"
 };
-u8 D_80062EC8[0x170] = {
-#include "assets/D_80062EC8.inc.c"
+u8 menu_sprite_27_tex[0x170] = {
+#include "assets/menu_sprite_27_tex.inc.c"
 };
-u8 D_80063038[0x178] = {
-#include "assets/D_80063038.inc.c"
+u8 menu_sprite_28_tex[0x178] = {
+#include "assets/menu_sprite_28_tex.inc.c"
 };
-u8 D_800631B0[0x228] = {
-#include "assets/D_800631B0.inc.c"
+u8 menu_sprite_29_tex[0x228] = {
+#include "assets/menu_sprite_29_tex.inc.c"
 };
-u8 D_800633D8[0x1B0] = {
-#include "assets/D_800633D8.inc.c"
+u8 menu_sprite_30_tex[0x1B0] = {
+#include "assets/menu_sprite_30_tex.inc.c"
 };
-u8 D_80063588[0x10] = {
-#include "assets/D_80063588.inc.c"
+u8 menu_sprite_31_tex[0x10] = {
+#include "assets/menu_sprite_31_tex.inc.c"
 };
-u8 D_80063598[0xE8] = {
-#include "assets/D_80063598.inc.c"
+u8 menu_sprite_32_tex[0xE8] = {
+#include "assets/menu_sprite_32_tex.inc.c"
 };
-u8 D_80063680[0x4C0] = {
-#include "assets/D_80063680.inc.c"
+u8 menu_sprite_33_tex[0x4C0] = {
+#include "assets/menu_sprite_33_tex.inc.c"
 };
-u8 D_80063B40[0x290] = {
-#include "assets/D_80063B40.inc.c"
+u8 menu_sprite_34_tex[0x290] = {
+#include "assets/menu_sprite_34_tex.inc.c"
 };
-u8 D_80063DD0[0x200] = {
-#include "assets/D_80063DD0.inc.c"
+u8 menu_sprite_35_tex[0x200] = {
+#include "assets/menu_sprite_35_tex.inc.c"
 };
-u8 D_80063FD0[0x258] = {
-#include "assets/D_80063FD0.inc.c"
+u8 menu_sprite_36_tex[0x258] = {
+#include "assets/menu_sprite_36_tex.inc.c"
 };
-u8 D_80064228[0xF8] = {
-#include "assets/D_80064228.inc.c"
+u8 menu_sprite_37_tex[0xF8] = {
+#include "assets/menu_sprite_37_tex.inc.c"
 };
-u8 D_80064320[0x60] = {
-#include "assets/D_80064320.inc.c"
+u8 menu_sprite_38_tex[0x60] = {
+#include "assets/menu_sprite_38_tex.inc.c"
 };
-u8 D_80064380[0x60] = {
-#include "assets/D_80064380.inc.c"
+u8 menu_sprite_39_tex[0x60] = {
+#include "assets/menu_sprite_39_tex.inc.c"
 };
-u8 D_800643E0[0x60] = {
-#include "assets/D_800643E0.inc.c"
+u8 menu_sprite_40_tex[0x60] = {
+#include "assets/menu_sprite_40_tex.inc.c"
 };
-u8 D_80064440[0xF8] = {
-#include "assets/D_80064440.inc.c"
+u8 menu_sprite_41_tex[0xF8] = {
+#include "assets/menu_sprite_41_tex.inc.c"
 };
-u8 D_80064538[0xF8] = {
-#include "assets/D_80064538.inc.c"
+u8 menu_sprite_42_tex[0xF8] = {
+#include "assets/menu_sprite_42_tex.inc.c"
 };
-u8 D_80064630[0x3A8] = {
-#include "assets/D_80064630.inc.c"
+u8 menu_sprite_43_tex[0x3A8] = {
+#include "assets/menu_sprite_43_tex.inc.c"
 };
-u8 D_800649D8[0xC8] = {
-#include "assets/D_800649D8.inc.c"
+u8 menu_sprite_44_tex[0xC8] = {
+#include "assets/menu_sprite_44_tex.inc.c"
 };
-u8 D_80064AA0[0x468] = {
-#include "assets/D_80064AA0.inc.c"
+u8 menu_sprite_45_tex[0x468] = {
+#include "assets/menu_sprite_45_tex.inc.c"
 };
-u8 D_80064F08[0x98] = {
-#include "assets/D_80064F08.inc.c"
+u8 menu_sprite_46_tex[0x98] = {
+#include "assets/menu_sprite_46_tex.inc.c"
 };
-u8 D_80064FA0[0x98] = {
-#include "assets/D_80064FA0.inc.c"
+u8 menu_sprite_47_tex[0x98] = {
+#include "assets/menu_sprite_47_tex.inc.c"
 };
-u8 D_80065038[0x98] = {
-#include "assets/D_80065038.inc.c"
+u8 menu_sprite_48_tex[0x98] = {
+#include "assets/menu_sprite_48_tex.inc.c"
 };
-u8 D_800650D0[0x98] = {
-#include "assets/D_800650D0.inc.c"
+u8 menu_sprite_49_tex[0x98] = {
+#include "assets/menu_sprite_49_tex.inc.c"
 };
-u8 D_80065168[0x1E8] = {
-#include "assets/D_80065168.inc.c"
+u8 menu_sprite_50_tex[0x1E8] = {
+#include "assets/menu_sprite_50_tex.inc.c"
 };
-u8 D_80065350[0xA8] = {
-#include "assets/D_80065350.inc.c"
+u8 menu_sprite_51_tex[0xA8] = {
+#include "assets/menu_sprite_51_tex.inc.c"
 };
-u8 D_800653F8[0x10] = {
-#include "assets/D_800653F8.inc.c"
+u8 menu_sprite_52_tex[0x10] = {
+#include "assets/menu_sprite_52_tex.inc.c"
 };
-u8 D_80065408[0x10] = {
-#include "assets/D_80065408.inc.c"
+u8 menu_sprite_53_tex[0x10] = {
+#include "assets/menu_sprite_53_tex.inc.c"
 };
-u8 D_80065418[0x178] = {
-#include "assets/D_80065418.inc.c"
+u8 menu_sprite_54_tex[0x178] = {
+#include "assets/menu_sprite_54_tex.inc.c"
 };
-u8 D_80065590[0x18] = {
-#include "assets/D_80065590.inc.c"
+u8 menu_sprite_55_tex[0x18] = {
+#include "assets/menu_sprite_55_tex.inc.c"
 };
-u8 D_800655A8[0x18] = {
-#include "assets/D_800655A8.inc.c"
+u8 menu_sprite_56_tex[0x18] = {
+#include "assets/menu_sprite_56_tex.inc.c"
 };
-u8 D_800655C0[0x18] = {
-#include "assets/D_800655C0.inc.c"
+u8 menu_sprite_57_tex[0x18] = {
+#include "assets/menu_sprite_57_tex.inc.c"
 };
-u8 D_800655D8[0x18] = {
-#include "assets/D_800655D8.inc.c"
+u8 menu_sprite_58_tex[0x18] = {
+#include "assets/menu_sprite_58_tex.inc.c"
 };
-u8 D_800655F0[0x18] = {
-#include "assets/D_800655F0.inc.c"
+u8 menu_sprite_59_tex[0x18] = {
+#include "assets/menu_sprite_59_tex.inc.c"
 };
-u8 D_80065608[0x18] = {
-#include "assets/D_80065608.inc.c"
+u8 menu_sprite_60_tex[0x18] = {
+#include "assets/menu_sprite_60_tex.inc.c"
 };
-u8 D_80065620[0x18] = {
-#include "assets/D_80065620.inc.c"
+u8 menu_sprite_61_tex[0x18] = {
+#include "assets/menu_sprite_61_tex.inc.c"
 };
-u8 D_80065638[0x10] = {
-#include "assets/D_80065638.inc.c"
+u8 menu_sprite_62_tex[0x10] = {
+#include "assets/menu_sprite_62_tex.inc.c"
 };
-u8 D_80065648[0x138] = {
-#include "assets/D_80065648.inc.c"
+u8 menu_sprite_63_tex[0x138] = {
+#include "assets/menu_sprite_63_tex.inc.c"
 };
-u8 D_80065780[0x10] = {
-#include "assets/D_80065780.inc.c"
+u8 menu_sprite_64_tex[0x10] = {
+#include "assets/menu_sprite_64_tex.inc.c"
 };
-u8 D_80065790[0x10] = {
-#include "assets/D_80065790.inc.c"
+u8 menu_sprite_65_tex[0x10] = {
+#include "assets/menu_sprite_65_tex.inc.c"
 };
-u8 D_800657A0[0x5D8] = {
-#include "assets/D_800657A0.inc.c"
+u8 menu_sprite_66_tex[0x5D8] = {
+#include "assets/menu_sprite_66_tex.inc.c"
 };
-u8 D_80065D78[0x190] = {
-#include "assets/D_80065D78.inc.c"
+u8 menu_sprite_67_tex[0x190] = {
+#include "assets/menu_sprite_67_tex.inc.c"
 };
-u8 D_80065F08[0x190] = {
-#include "assets/D_80065F08.inc.c"
+u8 menu_sprite_68_tex[0x190] = {
+#include "assets/menu_sprite_68_tex.inc.c"
 };
-u8 D_80066098[0x178] = {
-#include "assets/D_80066098.inc.c"
+u8 menu_sprite_69_tex[0x178] = {
+#include "assets/menu_sprite_69_tex.inc.c"
 };
-u8 D_80066210[0x120] = {
-#include "assets/D_80066210.inc.c"
+u8 menu_sprite_70_tex[0x120] = {
+#include "assets/menu_sprite_70_tex.inc.c"
 };
-u8 D_80066330[0x158] = {
-#include "assets/D_80066330.inc.c"
+u8 menu_sprite_71_tex[0x158] = {
+#include "assets/menu_sprite_71_tex.inc.c"
 };
-u8 D_80066488[0x58] = {
-#include "assets/D_80066488.inc.c"
+u8 menu_sprite_72_tex[0x58] = {
+#include "assets/menu_sprite_72_tex.inc.c"
 };
-u8 D_800664E0[0x58] = {
-#include "assets/D_800664E0.inc.c"
+u8 menu_sprite_73_tex[0x58] = {
+#include "assets/menu_sprite_73_tex.inc.c"
 };
-u8 D_80066538[0x58] = {
-#include "assets/D_80066538.inc.c"
+u8 menu_sprite_74_tex[0x58] = {
+#include "assets/menu_sprite_74_tex.inc.c"
 };
-u8 D_80066590[0x58] = {
-#include "assets/D_80066590.inc.c"
+u8 menu_sprite_75_tex[0x58] = {
+#include "assets/menu_sprite_75_tex.inc.c"
 };
-u8 D_800665E8[0x58] = {
-#include "assets/D_800665E8.inc.c"
+u8 menu_sprite_76_tex[0x58] = {
+#include "assets/menu_sprite_76_tex.inc.c"
 };
-u8 D_80066640[0x58] = {
-#include "assets/D_80066640.inc.c"
+u8 menu_sprite_77_tex[0x58] = {
+#include "assets/menu_sprite_77_tex.inc.c"
 };
-u8 D_80066698[0x58] = {
-#include "assets/D_80066698.inc.c"
+u8 menu_sprite_78_tex[0x58] = {
+#include "assets/menu_sprite_78_tex.inc.c"
 };
-u8 D_800666F0[0x58] = {
-#include "assets/D_800666F0.inc.c"
+u8 menu_sprite_79_tex[0x58] = {
+#include "assets/menu_sprite_79_tex.inc.c"
 };
-u8 D_80066748[0x58] = {
-#include "assets/D_80066748.inc.c"
+u8 menu_sprite_80_tex[0x58] = {
+#include "assets/menu_sprite_80_tex.inc.c"
 };
-u8 D_800667A0[0x58] = {
-#include "assets/D_800667A0.inc.c"
+u8 menu_sprite_81_tex[0x58] = {
+#include "assets/menu_sprite_81_tex.inc.c"
 };
-u8 D_800667F8[0x58] = {
-#include "assets/D_800667F8.inc.c"
+u8 menu_sprite_82_tex[0x58] = {
+#include "assets/menu_sprite_82_tex.inc.c"
 };
-u8 D_80066850[0xC8] = {
-#include "assets/D_80066850.inc.c"
+u8 menu_sprite_83_tex[0xC8] = {
+#include "assets/menu_sprite_83_tex.inc.c"
 };
-u8 D_80066918[0xC8] = {
-#include "assets/D_80066918.inc.c"
+u8 menu_sprite_84_tex[0xC8] = {
+#include "assets/menu_sprite_84_tex.inc.c"
 };
-u8 D_800669E0[0x10] = {
-#include "assets/D_800669E0.inc.c"
+u8 menu_sprite_85_tex[0x10] = {
+#include "assets/menu_sprite_85_tex.inc.c"
 };
-u8 D_800669F0[0xF8] = {
-#include "assets/D_800669F0.inc.c"
+u8 menu_sprite_86_tex[0xF8] = {
+#include "assets/menu_sprite_86_tex.inc.c"
 };
-u8 D_80066AE8[0x3A0] = {
-#include "assets/D_80066AE8.inc.c"
+u8 menu_sprite_87_tex[0x3A0] = {
+#include "assets/menu_sprite_87_tex.inc.c"
 };
 u16 menu_bg_tlut[0x104] = {
 #include "assets/menu_bg_tlut.inc.c"
@@ -328,41 +328,41 @@ u8 menu_bg_strip_tex_2[0x808] = {
 u8 menu_bg_strip_tex_3[0x608] = {
 #include "assets/menu_bg_strip_tex_3.inc.c"
 };
-u16 D_80068EB0[0x104] = {
-#include "assets/D_80068EB0.inc.c"
+u16 menu_exp_gauge_layer_0_tlut[0x104] = {
+#include "assets/menu_exp_gauge_layer_0_tlut.inc.c"
 };
-u8 D_800690B8[0x4F0] = {
-#include "assets/D_800690B8.inc.c"
+u8 menu_exp_gauge_layer_0_0_tex[0x4F0] = {
+#include "assets/menu_exp_gauge_layer_0_0_tex.inc.c"
 };
-u8 D_800695A8[0x4F0] = {
-#include "assets/D_800695A8.inc.c"
+u8 menu_exp_gauge_layer_0_1_tex[0x4F0] = {
+#include "assets/menu_exp_gauge_layer_0_1_tex.inc.c"
 };
-u16 D_80069A98[0x104] = {
-#include "assets/D_80069A98.inc.c"
+u16 menu_exp_gauge_layer_3_tlut[0x104] = {
+#include "assets/menu_exp_gauge_layer_3_tlut.inc.c"
 };
-u8 D_80069CA0[0x628] = {
-#include "assets/D_80069CA0.inc.c"
+u8 menu_exp_gauge_layer_3_0_tex[0x628] = {
+#include "assets/menu_exp_gauge_layer_3_0_tex.inc.c"
 };
-u8 D_8006A2C8[0x628] = {
-#include "assets/D_8006A2C8.inc.c"
+u8 menu_exp_gauge_layer_3_1_tex[0x628] = {
+#include "assets/menu_exp_gauge_layer_3_1_tex.inc.c"
 };
-u16 D_8006A8F0[0x104] = {
-#include "assets/D_8006A8F0.inc.c"
+u16 menu_exp_gauge_layer_1_tlut[0x104] = {
+#include "assets/menu_exp_gauge_layer_1_tlut.inc.c"
 };
-u8 D_8006AAF8[0x4F0] = {
-#include "assets/D_8006AAF8.inc.c"
+u8 menu_exp_gauge_layer_1_0_tex[0x4F0] = {
+#include "assets/menu_exp_gauge_layer_1_0_tex.inc.c"
 };
-u8 D_8006AFE8[0x4F0] = {
-#include "assets/D_8006AFE8.inc.c"
+u8 menu_exp_gauge_layer_1_1_tex[0x4F0] = {
+#include "assets/menu_exp_gauge_layer_1_1_tex.inc.c"
 };
-u16 D_8006B4D8[0x104] = {
-#include "assets/D_8006B4D8.inc.c"
+u16 menu_exp_gauge_layer_2_tlut[0x104] = {
+#include "assets/menu_exp_gauge_layer_2_tlut.inc.c"
 };
-u8 D_8006B6E0[0x4F0] = {
-#include "assets/D_8006B6E0.inc.c"
+u8 menu_exp_gauge_layer_2_0_tex[0x4F0] = {
+#include "assets/menu_exp_gauge_layer_2_0_tex.inc.c"
 };
-u8 D_8006BBD0[0x4F0] = {
-#include "assets/D_8006BBD0.inc.c"
+u8 menu_exp_gauge_layer_2_1_tex[0x4F0] = {
+#include "assets/menu_exp_gauge_layer_2_1_tex.inc.c"
 };
 u8 D_8006C0C0[0x2C] = {
 #include "assets/D_8006C0C0.inc.c"
