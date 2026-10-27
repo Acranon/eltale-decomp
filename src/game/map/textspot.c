@@ -1,5 +1,11 @@
 #include "game/map/textspot.h"
 #include "game/actor/actor.h"
+#include "game/core/dma.h"
+#include "game/map/map.h"
+#include "game/map/spirit.h"
+#include "game/math/math.h"
+#include "game/npc/npc.h"
+#include "game/player/player.h"
 
 /*
  * Spirits: sets a collected flag. Text spots: fixed per-map points that show a message
@@ -7,11 +13,6 @@
  * Original file: 14CF0.c (ROM 0x14CF0).
  */
 
-
-extern u8 spirit_collected_flags[];
-extern u8 math_bit_masks[];
-extern s32 map_id;
-extern s32 map_subarea;
 TextSpotDef textspot_table[0x26] = {
     { 0x00, 3, 58.0f, -324.0f, -1.5707964f, 10.0f, 0, 0x0070, 0x0078 },
     { 0x00, 3, 168.0f, -295.0f, 1.2217305f, 10.0f, 0, 0x0070, 0x0078 },
@@ -60,13 +61,7 @@ Vec2f textspot_local_dir;
 s32 D_80085AB8; /* unreferenced */
 s32 textspot_count;
 TextSpot textspot_list[16];
-extern u8 D_D37700[];
-extern u8 text_speaker_name[];
-extern u8 text_message_buf[];
-extern f32 D_8007AB3C;
-
-f32 sqrtf(f32);
-void Dma_ReadRom(u8*, void*, s32);
+extern u8 D_D37700[]; /* ROM: the text block (no module defines it) */
 
 void Spirit_SetCollected(u16 arg0) {
     spirit_collected_flags[arg0 >> 3] |= math_bit_masks[arg0 & 7];
@@ -131,5 +126,5 @@ void TextSpot_LoadMessage(TextSpot* arg0) {
     if (text_speaker_name[2] == 0xFF) {
         text_speaker_name[0] = 0xFF;
     }
-    D_8007AB3C = arg0->unk4;
+    player_state.unk134 = arg0->unk4;
 }
