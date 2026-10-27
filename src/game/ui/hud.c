@@ -1,4 +1,17 @@
 #include "game/ui/hud.h"
+#include "game/camera/camera.h"
+#include "game/gfx/effect.h"
+#include "game/audio/sound.h"
+#include "game/battle/battle.h"
+#include "game/core/dma.h"
+#include "game/enemy/enemy.h"
+#include "game/input/input.h"
+#include "game/magic/magic.h"
+#include "game/map/map.h"
+#include "game/math/math.h"
+#include "game/npc/npc.h"
+#include "game/player/player.h"
+#include "game/ui/menu.h"
 #include "game/core/main.h"
 
 /*
@@ -6,27 +19,8 @@
  * Original file: 216E0.c (ROM 0x216E0).
  */
 
-typedef struct {
-    /* 0x00 */ char unk0[4];
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ char unk8[0x1C - 0x8];
-    /* 0x1C */ f32 unk1C;
-} Struct_80024338_64;
 
-typedef struct {
-    /* 0x00 */ char unk0[0x94];
-    /* 0x94 */ f32 unk94;
-} Struct_80024338_68;
 
-typedef struct {
-    /* 0x00 */ char unk0[4];
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ char unk8[0x24 - 0x8];
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ char unk28[0x64 - 0x28];
-    /* 0x64 */ u16* unk64;
-    /* 0x68 */ Struct_80024338_68* unk68;
-} Struct_8002433C_arg;
 
 
 
@@ -63,36 +57,15 @@ s32 hud_draw_origin_y;
 s32 hud_npc_marker_screen_y;
 u16 hud_element_pulse_phase;
 extern u8** D_800C03D8[];
-extern u8 hud_spell_locked_label[];
-extern u8 hud_spell_label_palettes[];
-
-u32 Magic_LookupSpellSequence(u16, s32);
-s32 Magic_GetSpellRestrictionFlags(u32, u16);
-s32 Text_FormatNumber(s32, u8*, u16);
 
 
-typedef struct {
-    /* 0x00 */ char unk0[0x1C];
-    /* 0x1C */ f32 unk1C;
-} Struct_8007AA08_7C;
 
-typedef struct {
-    /* 0x00 */ char unk0[0x18];
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ char unk24[0x3C - 0x24];
-    /* 0x3C */ f32 unk3C;
-    /* 0x40 */ char unk40[0x7C - 0x40];
-    /* 0x7C */ Struct_8007AA08_7C* unk7C;
-} Struct_8007AA08;
 
-extern Gfx* gfx_dl_head;
+
 extern Gfx D_803AA448[];
 extern Gfx D_803AA4C0[];
 extern Gfx D_803AA538[];
 
-s32 Camera_WorldToScreen(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 
 
@@ -102,12 +75,6 @@ extern u8* D_803A8778[];
 extern HudTextureDesc D_803A8748;
 
 
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ char unk2[0x18 - 0x2];
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-} Struct_8002373C_64;
 
 typedef struct {
     /* 0x00 */ u16 unk0;
@@ -118,18 +85,8 @@ typedef struct {
     /* 0x44 */ s32 unk44[4];
     /* 0x54 */ char unk54[0x94 - 0x54];
     /* 0x94 */ f32 unk94;
-} Struct_8002373C_68;
+} Struct_8002373C_68; /* view of ActorBattle opaque status/icon fields */
 
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ char unkC[0x24 - 0xC];
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ char unk28[0x64 - 0x28];
-    /* 0x64 */ Struct_8002373C_64* unk64;
-    /* 0x68 */ Struct_8002373C_68* unk68;
-} Struct_8002373C;
 
 typedef struct {
     /* 0x0 */ s16 unk0;
@@ -139,16 +96,9 @@ typedef struct {
     /* 0xC */ f32 unkC;
 } Struct_803AA6C4;
 
-typedef struct {
-    char unk0[0xA];
-} Struct_803AA690;
-
-extern u16 hud_actor_status_masks[];
-extern u16 hud_actor_status_effect_masks[];
-extern Struct_803AA690 D_803AA690[];
+extern MagicVisualDef D_803AA690[];
 extern Struct_803AA6C4 D_803AA6C4[];
 
-s32 Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AA690*, Vec3f*, Actor*);
 
 void Hud_ResetState(void) {
     D_8008C168 = 0;
@@ -169,34 +119,10 @@ void Hud_ResetState(void) {
 }
 
 
-typedef struct {
-    /* 0x000 */ char unk0[0x2C];
-    /* 0x02C */ char unk2C[0x7C - 0x2C];
-    /* 0x07C */ s16 unk7C;
-    /* 0x07E */ char unk7E[0x130 - 0x7E];
-} Struct_8007B908_216E0;
 
-extern Struct_8007B908_216E0 enemy_slots[];
 
-typedef struct {
-    /* 0x00 */ char unk0[0x14];
-    /* 0x14 */ u16 unk14;
-} Struct_8007C288;
 
 extern GfxFrameData D_2000000;
-extern s32 core_flags;
-extern s32 gfx_mtx_index;
-extern s32 player_talk_npc;
-extern u16 D_8007AA0A;
-extern s32 D_8007AA10;
-extern s32 D_8007AA1C;
-extern u8 D_8007AA20[];
-extern u16 D_8007AA80;
-extern s32 enemy_count;
-extern Struct_8007C288* map_subarea_def;
-extern u16 map_flags;
-extern s32 magic_cast_state;
-extern u16 battle_flags;
 extern Gfx D_803A8788[];
 
 struct Struct_80021030;
@@ -205,7 +131,7 @@ struct Struct_80022970;
 
 void Hud_Draw(GfxFrameData* buf) {
     s32 n;
-    Struct_8007B908_216E0* e;
+    Enemy* e;
 
     gSPMatrix(gfx_dl_head++, &D_2000000.ortho, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
     guTranslate(&buf->mtx[gfx_mtx_index], -160.0f, -120.0f, 0.0f);
@@ -219,8 +145,8 @@ void Hud_Draw(GfxFrameData* buf) {
         hud_panel_transition_state = 2;
     }
     if (!(core_flags & 0xC00)) {
-        Hud_DrawPlayerMeters((Actor*)D_8007AA20);
-        Hud_DrawElementLevels(buf, D_8007AA1C);
+        Hud_DrawPlayerMeters((Actor*)&player_state.actor);
+        Hud_DrawElementLevels(buf, (s32)player_state.unk14);
         if (hud_panel_transition_state == 1) {
             if (++hud_panel_transition_frame >= 13) {
                 hud_panel_transition_frame = 12;
@@ -231,7 +157,7 @@ void Hud_Draw(GfxFrameData* buf) {
             }
         }
     }
-    if ((map_flags & 0xD) && !(battle_flags & 1) && !(map_subarea_def->unk14 & 8) && !(core_flags & 2)) {
+    if ((map_flags & 0xD) && !(battle_flags & 1) && !(map_subarea_def->flags & 8) && !(core_flags & 2)) {
         Hud_DrawCompass(buf);
     }
     if ((battle_flags & 1) && hud_enemy_info_timer) {
@@ -241,23 +167,23 @@ void Hud_Draw(GfxFrameData* buf) {
     hud_draw_origin_x = hud_draw_origin_y = 0;
     if (battle_flags & 1) {
         Hud_DrawPopups();
-        if (!(battle_flags & 2) && D_8007AA0A && !(D_8007AA80 & 1) && !(magic_cast_state & 1)) {
-            Hud_DrawMeleeTargetMarker(D_8007AA0A - 1);
+        if (!(battle_flags & 2) && player_state.unk2 && !(player_state.actor.unk60 & 1) && !(magic_cast_state & 1)) {
+            Hud_DrawMeleeTargetMarker(player_state.unk2 - 1);
         }
-        if ((D_8007AA10 & 0x20) && !(core_flags & 0x800)) {
+        if ((player_state.unk8 & 0x20) && !(core_flags & 0x800)) {
             Hud_DrawOutOfRangeIcon();
         }
-        Hud_UpdateAndDrawActorStatusIndicators((Actor*)D_8007AA20);
+        Hud_UpdateAndDrawActorStatusIndicators((Actor*)&player_state.actor);
         n = enemy_count;
         e = enemy_slots;
         while (n != 0) {
-            if (e->unk7C != -1) {
-                Hud_UpdateAndDrawActorStatusIndicators((Actor*)e->unk2C);
+            if (e->actor.unk50 != -1) {
+                Hud_UpdateAndDrawActorStatusIndicators(&e->actor);
                 n--;
             }
             e++;
         }
-    } else if (!(core_flags & 0x87) && !(D_8007AA80 & 1)) {
+    } else if (!(core_flags & 0x87) && !(player_state.actor.unk60 & 1)) {
         if (player_talk_npc) {
             Hud_DrawNpcTalkMarker();
         } else if (player_front_spirit && !(core_flags & 8)) {
@@ -279,18 +205,7 @@ void Hud_Draw(GfxFrameData* buf) {
     }
 }
 
-typedef struct {
-    /* 0x0 */ char unk0[4];
-    /* 0x4 */ u16 unk4;
-    /* 0x6 */ u16 unk6;
-    /* 0x8 */ u16 unk8;
-    /* 0xA */ u16 unkA;
-} Struct_80021030_64;
 
-typedef struct Struct_80021030 {
-    /* 0x00 */ char unk0[0x64];
-    /* 0x64 */ ActorStats* unk64;
-} Struct_80021030;
 
 extern HudTextureDesc D_803A86F8;
 
@@ -337,9 +252,7 @@ void Hud_DrawPlayerMeters(Actor* arg0) {
     Hud_DrawClippedTextureRect(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
 }
 
-extern s32 hud_element_max_level_masks[];
 extern Gfx D_803AA3C8[];
-extern u8 hud_element_colors[][4];
 extern Gfx D_803AA2F8[];
 
 void Hud_DrawElementLevels(GfxFrameData* buf, s32 arg1) {
@@ -369,7 +282,7 @@ void Hud_DrawElementLevels(GfxFrameData* buf, s32 arg1) {
         x += 0x16;
     }
     for (i = 0; i < 4; i++) {
-        if (((s32*)&player_state)[2] & hud_element_max_level_masks[i]) {
+        if (player_state.unk8 & hud_element_max_level_masks[i]) {
             col = &hud_element_colors[0][i];
             fx = i * 22.0f + 5.0 + (f32)hud_draw_origin_x;
             fy = hud_draw_origin_y + 5.0f;
@@ -395,11 +308,6 @@ void Hud_DrawElementLevels(GfxFrameData* buf, s32 arg1) {
 }
 
 
-extern f32 D_80085E74;
-extern f32 menu_map_marker_x;
-extern f32 menu_map_marker_z;
-extern s32 menu_map_region;
-extern s32 menu_map_spot;
 extern Gfx D_803AA758[];
 extern HudTextureDesc D_803A86F8;
 f32 sqrtf(f32);
@@ -413,7 +321,7 @@ void Hud_DrawCompass(GfxFrameData* buf) {
 
     hud_draw_origin_x = 0x104;
     hud_draw_origin_y = 0x18;
-    Math_MtxFRotate(&mf, 0.0f, 0.0f, D_80085E74);
+    Math_MtxFRotate(&mf, 0.0f, 0.0f, camera_state.yaw);
     mf.mf[3][0] = hud_draw_origin_x + 17;
     mf.mf[3][1] = hud_draw_origin_y + 17;
     mf.mf[3][2] = 0.0f;
@@ -426,7 +334,7 @@ void Hud_DrawCompass(GfxFrameData* buf) {
         dz = menu_map_marker_z - player_state.actor.z;
         dist = sqrtf(dx * dx + dz * dz);
         if (dist > 10.0) {
-            ang = Math_Atan2(dx, dz) - D_80085E74;
+            ang = Math_Atan2(dx, dz) - camera_state.yaw;
             if (ang < -3.141592653589793) {
                 ang += 6.283185307179586;
             } else if (ang > 3.141592653589793) {
@@ -435,7 +343,7 @@ void Hud_DrawCompass(GfxFrameData* buf) {
             hud_temp_vec.x = 0.0f;
             hud_temp_vec.y = 18.0f;
             /* hud_temp_vec is a Vec3f elsewhere; here its x,y pair is the compass offset. */
-            Math_RotateVec2(ang, (Vec2f *)&hud_temp_vec);
+            Math_RotateVec2(ang, (Vec2f *)&hud_temp_vec); /* its x/y pair is the compass offset */
             Hud_DrawTextureTile(&D_803A86F8, hud_temp_vec.x + 14.0f, hud_temp_vec.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
         }
     }
@@ -444,26 +352,9 @@ void Hud_DrawCompass(GfxFrameData* buf) {
 extern u8 D_8039EC90[];
 extern HudTextureDesc D_803A8718;
 
-typedef struct {
-    /* 0x0 */ char unk0[8];
-    /* 0x8 */ u16 unk8;
-} Struct_80021C04_14;
 
-typedef struct Struct_80021C04 {
-    /* 0x000 */ char unk0[0x14];
-    /* 0x014 */ Struct_80021C04_14* unk14;
-    /* 0x018 */ char unk18[0x11D - 0x18];
-    /* 0x11D */ u8 unk11D[3];
-    /* 0x120 */ u16 unk120;
-} Struct_80021C04;
 
-typedef struct {
-    /* 0x0 */ f32 x;
-    /* 0x4 */ f32 y;
-} Struct_8004F324;
 
-extern Vec2f hud_spell_input_icon_positions[];
-extern u8 hud_element_colors[][4];
 extern Gfx D_803AA2F8[];
 
 void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
@@ -574,10 +465,6 @@ void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
 }
 
 
-typedef struct {
-    /* 0x000 */ char unk0[0x122];
-    /* 0x122 */ u16 unk122;
-} Struct_80022658;
 
 extern u8 D_8039EC90[];
 extern HudTextureDesc D_803A8718;
@@ -594,7 +481,7 @@ void Hud_DrawSpellName(void* arg0) {
 
     hud_draw_origin_x = 0x69;
     hud_draw_origin_y = 0x32;
-    w = ((Struct_80022658*)arg0)->unk122;
+    w = ((Player *)arg0)->unk122;
     id = (u8)w;
     str = D_800C03D8[(u8)(w >> 8) & 0xF][(u8)w];
     gDPPipeSync(gfx_dl_head++);
@@ -620,30 +507,11 @@ void Hud_DrawSpellName(void* arg0) {
 #pragma GLOBAL_ASM("asm/nonmatchings/game/ui/hud/Hud_DrawSpellName.s")
 #endif
 
-typedef struct {
-    /* 0x00 */ char unk0[0x24];
-    /* 0x24 */ u8 unk24[4];
-} Struct_80022970_14;
-
-typedef struct Struct_80022970 {
-    /* 0x00 */ char unk0[0x8];
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ char unkC[0x14 - 0xC];
-    /* 0x14 */ Struct_80022970_14* unk14;
-} Struct_80022970;
 
 
-extern u8 hud_element_colors[][4];
-extern Vec2f hud_element_icon_positions[];
-extern s32 hud_element_max_level_set_masks[];
-extern u8 D_8007A9F4;
-extern u8 D_8007A9F5;
-extern u8 D_8007A9F6;
-extern u8 D_8007A9F7;
-extern u16 input_pressed_buttons;
+
 extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
-void Sfx_Play(s32, s32, s32);
 
 void Hud_UpdateElementAllocation(GfxFrameData* buf, Player* pl) {
     u16 alpha;
@@ -677,10 +545,10 @@ void Hud_UpdateElementAllocation(GfxFrameData* buf, Player* pl) {
     Hud_DrawTextureTile(&D_803A8718, 0, yoff + 0x3C, 0x40, 0x14, 0, 0x3C, 0x400, 0x400);
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039ADB0);
-    Hud_DrawNumber(5, 0x1C, yoff + 0x24, D_8007A9F4);
-    Hud_DrawNumber(5, 0xA, yoff + 0x34, D_8007A9F5);
-    Hud_DrawNumber(5, 0x1C, yoff + 0x43, D_8007A9F6);
-    Hud_DrawNumber(5, 0x2E, yoff + 0x34, D_8007A9F7);
+    Hud_DrawNumber(5, 0x1C, yoff + 0x24, player_stats.unk24[0]);
+    Hud_DrawNumber(5, 0xA, yoff + 0x34, player_stats.unk24[1]);
+    Hud_DrawNumber(5, 0x1C, yoff + 0x43, player_stats.unk24[2]);
+    Hud_DrawNumber(5, 0x2E, yoff + 0x34, player_stats.unk24[3]);
     if (hud_element_input_timer && (hud_element_allocation_flags & 1)) {
         col = hud_element_colors[hud_selected_element_index];
         pos = (f32*)hud_element_icon_positions + hud_selected_element_index * 2;
@@ -727,22 +595,15 @@ void Hud_UpdateElementAllocation(GfxFrameData* buf, Player* pl) {
 }
 
 
-typedef struct {
-    /* 0x00 */ char unk0[0x14];
-    /* 0x14 */ Vec3f unk14;
-    /* 0x20 */ char unk20[0x84 - 0x20];
-} Struct_8007ABF0;
 
-extern s32 player_talk_npc;
-extern Struct_8007ABF0 npc_slots[];
 
 void Hud_DrawNpcTalkMarker(void) {
     s32 sx;
     s32 bob;
-    Vec3f* p;
+    Actor* p;
     u16 *angle = &hud_npc_marker_phase;
 
-    p = &npc_slots[player_talk_npc - 1].unk14;
+    p = &npc_slots[player_talk_npc - 1].actor;
     if (Camera_WorldToScreen(p->x, p->y + 14.0, p->z, &sx, &hud_npc_marker_screen_y)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
@@ -818,7 +679,7 @@ void Hud_DrawMeleeTargetMarker(u16 arg0) {
     Actor* a;
     u16 *angle = &hud_melee_marker_phase;
 
-    a = (Actor*)enemy_slots[arg0].unk2C;
+    a = &enemy_slots[arg0].actor;
     if (a->unk64->unk0 == 1) {
         y = a->unk68->unk94;
     } else if (a->unk64->unk0 == 2) {
@@ -857,7 +718,7 @@ void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
     u32 i;
     Struct_803AA6C4* e;
     f32 y;
-    Struct_803AA690* fx;
+    MagicVisualDef* fx;
 
     for (i = 0; i < 7; i++) {
         if (hud_actor_status_masks[i] & mask) {
@@ -898,14 +759,6 @@ typedef struct {
     /* 0x6 */ u16 unk6;
 } Struct_803AA628;
 
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ char unk2[0x8 - 0x2];
-    /* 0x08 */ u16 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-} Struct_80023930_fx;
 
 extern Struct_803AA628 D_803AA628[];
 
@@ -925,7 +778,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
     Struct_803AA628* e;
     s32 w;
     s32 h;
-    Struct_80023930_fx* fx;
+    EffectModel* fx;
 
     if (!(core_flags & 0x800)) {
         if (arg0->unk64->unk0 == 1) {
@@ -963,7 +816,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
     }
     for (i = 0; i < 4; i++) {
         if (s->unk44[i] != 0) {
-            fx = (Struct_80023930_fx*)((Struct_8002373C_68*)arg0->unk68)->unk44[i];
+            fx = (EffectModel*)((Struct_8002373C_68*)arg0->unk68)->unk44[i];
             fx->unkC = arg0->x;
             fx->unk14 = arg0->z;
             if (arg0->unk64->unk0 == 1) {
@@ -999,7 +852,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
 void Hud_ClearActorStatusIndicators(Actor* arg0) {
     Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->unk68;
     u32 i;
-    Struct_80023930_fx* fx;
+    EffectModel* fx;
 
     for (i = 0; i < 7; i++) {
         if (s->unk12[i] != 0) {
@@ -1008,7 +861,7 @@ void Hud_ClearActorStatusIndicators(Actor* arg0) {
     }
     for (i = 0; i < 4; i++) {
         if (s->unk44[i] != 0) {
-            fx = (Struct_80023930_fx*)s->unk44[i];
+            fx = (EffectModel*)s->unk44[i];
             fx->unk0 = 8;
             fx->unk8 &= ~1;
             s->unk44[i] = 0;
@@ -1031,29 +884,8 @@ void func_80023E04(void) {
 void func_80023E0C(void) {
 }
 
-typedef struct {
-    /* 0x00 */ char unk0[2];
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ char unk4[2];
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ char unk8[4];
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ u16 unkE;
-    /* 0x10 */ char unk10[0x26 - 0x10];
-    /* 0x26 */ u16 unk26;
-    /* 0x28 */ char unk28[2];
-    /* 0x2A */ u16 unk2A;
-} Struct_8007C028_28;
 
-typedef struct {
-    /* 0x00 */ char unk0[0x28];
-    /* 0x28 */ Struct_8007C028_28* unk28;
-    /* 0x2C */ char unk2C[0x98 - 0x2C];
-    /* 0x98 */ u16 unk98;
-} Struct_8007C028;
 
-extern Struct_8007C028* enemy_turn_current;
-extern u8** enemy_names;
 extern u8 D_8039ADB0[];
 extern u8 D_8039EC90[];
 extern HudTextureDesc D_803A86F8;
@@ -1071,7 +903,7 @@ void Hud_DrawEnemyInfoPanel(void) {
     }
     gDPPipeSync(gfx_dl_head++);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
-    if (enemy_turn_current->unk98 & 0x80) {
+    if (enemy_turn_current->battle.unk0 & 0x80) {
         Hud_DrawTextureTile(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0x10, 0x64, 0x2C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x20, 0x6E, 0x10, 0x64, 0x3C, 0x400, 0x400);
@@ -1081,10 +913,10 @@ void Hud_DrawEnemyInfoPanel(void) {
         Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0xA, 0x64, 0x2C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x1A, 0x6E, 2, 0x64, 0x4E, 0x400, 0x400);
     }
-    Hud_DrawGlyphString(4, 0x11, 0, enemy_names[enemy_turn_current->unk28->unk2]);
+    Hud_DrawGlyphString(4, 0x11, 0, ((u8 **)enemy_names)[enemy_turn_current->unk28->unk2]); /* enemy_names stores a pointer table in one s32 slot */
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039ADB0);
-    if (enemy_turn_current->unk98 & 0x80) {
+    if (enemy_turn_current->battle.unk0 & 0x80) {
         Hud_DrawNumber(3, 0x10, 0x1C, enemy_turn_current->unk28->unk6);
         Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->unk28->unkE);
         Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->unk28->unk2A);
