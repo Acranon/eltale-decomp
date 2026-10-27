@@ -5,7 +5,7 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Live source: [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c)
 - Retail assembly: [`asm/nonmatchings/ovl_intro/DC62B0/func_8020C6A8_ovl_intro.s`](../../asm/nonmatchings/ovl_intro/DC62B0/func_8020C6A8_ovl_intro.s)
 - Retail code size: `0x9d0` bytes
-- Current gap: 608 masked object words (NON_MATCHING C in the source; one extra instruction near the top shifts the rest); code 0x9D4 vs 0x9D0, frame 0xF0 exact.
+- Current gap: 609 masked object words (NON_MATCHING C in the source; one extra instruction near the top shifts the rest); code 0x9D4 vs 0x9D0, frame 0xF0 exact.
 - Specific blocker: The only differences are sw/lw v1 at sp+0x74 instead of retail sp+0x70. Uopt first assigns temp id0 to first-loop entries[index] and temp id1 to steps[index]; the later spill reuses id0.
 - Next discriminating test: Find an equivalent first-loop source that changes the temp reuse/order without changing code, saved registers or packet values.
 - C: in [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
