@@ -1,4 +1,5 @@
 #include "game/map/chest.h"
+#include "game/actor/actor.h"
 #include "game/map/chest_flag.h"
 #include "game/actor/anim.h"
 #include "game/gfx/shadow.h"
@@ -9,40 +10,6 @@
  * Original file: 140D0.c (ROM 0x140D0).
  */
 
-/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
-typedef struct Actor {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 rx;
-    /* 0x10 */ f32 ry;
-    /* 0x14 */ f32 rz;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ f32 scale;
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
-    /* 0x34 */ f32 unk34;
-    /* 0x38 */ f32 unk38;
-    /* 0x3C */ f32 unk3C;
-    /* 0x40 */ f32 unk40;
-    /* 0x44 */ f32 unk44;
-    /* 0x48 */ f32 unk48;
-    /* 0x4C */ f32 unk4C;
-    /* 0x50 */ s16 unk50;
-    /* 0x52 */ s16 unk52;
-    /* 0x54 */ u16 unk54;
-    /* 0x56 */ u16 unk56;
-    /* 0x58 */ u16 unk58;
-    /* 0x5A */ s16 unk5A;
-    /* 0x5C */ u16 unk5C;
-    /* 0x5E */ s16 unk5E;
-    /* 0x60 */ u16 unk60;
-    /* 0x62 */ u16 unk62;
-    /* 0x64 */ u8 unk64[0x8];
-} Actor; /* 0x6C bytes */
 
 /* This file's .bss, 80085290..800859B0, in address order (first declaration fixes the order). */
 Actor chest_objects[16];
@@ -123,17 +90,17 @@ void Chest_LoadForMap(void) {
         while (i != 0) {
             p->x = def->x;
             p->z = def->z;
-            p->rx = 0.0f;
-            p->rz = 0.0f;
-            p->ry = def->ry;
+            p->unkC = 0.0f;
+            p->unk14 = 0.0f;
+            p->rot = def->ry;
             Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &chest_coll);
             p->y = chest_coll.y;
-            p->unk2C = chest_coll.nx;
-            p->unk30 = chest_coll.ny;
-            p->unk34 = chest_coll.nz;
+            p->nx = chest_coll.nx;
+            p->ny = chest_coll.ny;
+            p->nz = chest_coll.nz;
             p->unk1C = def->boxAngle;
-            p->unk18 = def->boxHalfW;
-            p->unk20 = def->boxHalfD;
+            p->vx = def->boxHalfW;
+            p->vz = def->boxHalfD;
             p->unk44 = def->boxX;
             p->unk4C = def->boxZ;
             p->scale = 0.07f;
@@ -175,7 +142,7 @@ void Chest_UpdateAll(s32 arg0) {
         }
         Anim_DrawModel(0, p, &D_8010FDC4[p->unk52], arg0);
         Anim_AdvanceFrame(p->unk58, p, &D_8010FDC4[p->unk52]);
-        Shadow_Queue(p->x, p->y, p->z, p->unk2C, p->unk30, p->unk34, 6.0f);
+        Shadow_Queue(p->x, p->y, p->z, p->nx, p->ny, p->nz, 6.0f);
         n--;
         p++;
     }
@@ -190,7 +157,7 @@ Actor* Chest_FindInFront(Actor* arg0) {
 
     while (n != 0) {
         if (Chest_IsOpened(obj->unk62) == 0) {
-            d = arg0->ry - obj->unk1C;
+            d = arg0->rot - obj->unk1C;
             if (d > 3.141592653589793) {
                 d = d - 3.141592653589793;
             } else if (d < -3.141592653589793) {
@@ -211,7 +178,7 @@ Actor* Chest_FindInFront(Actor* arg0) {
                     if (dz < 0.0f) {
                         dz = -dz;
                     }
-                    if (dx < obj->unk18 && dz < obj->unk20) {
+                    if (dx < obj->vx && dz < obj->vz) {
                         break;
                     }
                 }

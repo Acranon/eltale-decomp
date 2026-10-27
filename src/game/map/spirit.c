@@ -1,18 +1,11 @@
 #include "game/map/spirit.h"
+#include "game/actor/actor.h"
 
 /*
  * Spirits: per-map placement, collected flags, the pick-up test and the sparkle particles.
  * Original file: 147A0.c (ROM 0x147A0).
  */
 
-/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
-typedef struct Actor {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 rx;
-    /* 0x10 */ f32 ry;
-} Actor;
 
 /* This file's .bss, 800859B0..80085AB0, in address order (first declaration fixes
  * the order). Splat's D_80085AA8 is Spirit_ClearCollectedFlags's loop end, &spirit_collected_flags[0x10]. */
@@ -156,7 +149,7 @@ SpiritObj* Spirit_FindInFront(Actor* arg0) {
             if (dx * dx + dz * dz < 400.0f) {
                 v.x = dx;
                 v.y = dz;
-                Math_RotateVec2(arg0->ry, &v);
+                Math_RotateVec2(arg0->rot, &v);
                 if (v.y >= 0.0f && v.x > -5.0 && v.x < 5.0) {
                     found = obj;
                     break;

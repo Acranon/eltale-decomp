@@ -1,4 +1,5 @@
 #include "game/gfx/effect.h"
+#include "game/actor/actor.h"
 #include "game/camera/camera.h"
 #include "game/map/map.h"
 
@@ -7,30 +8,6 @@
  * Original file: 1B200.c (ROM 0x1B200).
  */
 
-typedef struct {
-    /* 0x00 */ u16 type;
-    /* 0x02 */ u8 pad2[0x1A];
-    /* 0x1C */ f32 height;
-} Unk1B200DmgModel;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x94];
-    /* 0x94 */ f32 top;
-} Unk1B200DmgModel2;
-
-/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
-typedef struct Actor {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 rx;
-    /* 0x10 */ f32 ry;
-    /* 0x14 */ u8 pad14[0x10];
-    /* 0x24 */ f32 scale;
-    /* 0x28 */ u8 pad28[0x3C];
-    /* 0x64 */ Unk1B200DmgModel* model;
-    /* 0x68 */ Unk1B200DmgModel2* model2;
-} Actor;
 
 extern Gfx* gfx_dl_head;
 extern s16 D_800865CC;
@@ -161,7 +138,7 @@ void Effect_UpdateFootEmitters(void) {
                 effect_foot_particle_template.z = pos->z;
                 effect_temp_vec.x = 0.0f;
                 effect_temp_vec.y = 0.7f;
-                Math_RotateVec2(pos->ry, &effect_temp_vec);
+                Math_RotateVec2(pos->rot, &effect_temp_vec);
                 effect_foot_particle_template.unk34 = 0.2f;
                 effect_foot_particle_template.unk30 = effect_temp_vec.x;
                 effect_foot_particle_template.unk38 = effect_temp_vec.y;
@@ -411,10 +388,10 @@ void Effect_DrawFloatingNumbers(void) {
     do {
         if (d->timer) {
             actor = d->target;
-            if (actor->model->type == 0) {
-                y = actor->y + actor->model->height * actor->scale;
-            } else if (actor->model->type == 1) {
-                y = actor->model2->top;
+            if (actor->unk64->unk0 == 0) {
+                y = actor->y + actor->unk64->unk1C * actor->scale;
+            } else if (actor->unk64->unk0 == 1) {
+                y = actor->unk68->unk94;
             } else {
                 y = actor->y + 600.0 * actor->scale;
             }

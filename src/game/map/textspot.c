@@ -1,4 +1,5 @@
 #include "game/map/textspot.h"
+#include "game/actor/actor.h"
 
 /*
  * Spirits: sets a collected flag. Text spots: fixed per-map points that show a message
@@ -6,14 +7,6 @@
  * Original file: 14CF0.c (ROM 0x14CF0).
  */
 
-/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
-typedef struct Actor {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 rx;
-    /* 0x10 */ f32 ry;
-} Actor;
 
 extern u8 spirit_collected_flags[];
 extern u8 math_bit_masks[];
@@ -107,10 +100,10 @@ TextSpot* TextSpot_FindInFront(Actor* arg0) {
         if (sqrtf(dx * dx + dz * dz) < out->entry->radius) {
             textspot_local_dir.x = -dx;
             textspot_local_dir.y = -dz;
-            Math_RotateVec2(arg0->ry, &textspot_local_dir);
+            Math_RotateVec2(arg0->rot, &textspot_local_dir);
             angle = Math_Atan2(textspot_local_dir.x, textspot_local_dir.y);
             if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
-                out->unk4 = arg0->ry - angle;
+                out->unk4 = arg0->rot - angle;
                 if (out->entry->flags & 1) {
                     break;
                 }

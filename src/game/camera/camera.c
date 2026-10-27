@@ -1,4 +1,5 @@
 #include "game/camera/camera.h"
+#include "game/actor/actor.h"
 
 /*
  * Camera: per-map presets, the mode handlers (follow, fixed eye, battle, delayed turn),
@@ -8,34 +9,6 @@
 
 
 
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[0x16];
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-} Unk15150Model;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x94];
-    /* 0x94 */ f32 unk94;
-} Unk15150Model2;
-
-/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
-typedef struct Actor {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 rx;
-    /* 0x10 */ f32 ry;
-    /* 0x14 */ f32 rz;
-    /* 0x18 */ u8 pad18[0xC];
-    /* 0x24 */ f32 scale;
-    /* 0x28 */ u8 pad28[0x36];
-    /* 0x5E */ u16 unk5E;
-    /* 0x60 */ u8 pad60[4];
-    /* 0x64 */ Unk15150Model* unk64;
-    /* 0x68 */ Unk15150Model2* unk68;
-} Actor;
 
 
 
@@ -342,7 +315,7 @@ void Camera_FollowTarget(Camera *arg0)
   locked = 0;
   if ((dist < 25.0f) && (!(core_flags & 0x80)))
   {
-    a = target->ry - arg0->unk28;
+    a = target->rot - arg0->unk28;
     if (a > 3.141592653589793)
     {
       a -= 6.283185307179586;
@@ -354,7 +327,7 @@ void Camera_FollowTarget(Camera *arg0)
     }
     if ((a < 1.5707963267948966) && (a > (-1.5707963267948966)))
     {
-      arg0->orbitAngle = ((a < 0.0f) ? (1.5707963267948966) : (-1.5707963267948966)) + target->ry;
+      arg0->orbitAngle = ((a < 0.0f) ? (1.5707963267948966) : (-1.5707963267948966)) + target->rot;
     }
     arg0->flags |= 4;
     locked = 1;
@@ -362,7 +335,7 @@ void Camera_FollowTarget(Camera *arg0)
   else
     if (arg0->flags & 0x20)
   {
-    arg0->orbitAngle = target->ry + 3.141592653589793;
+    arg0->orbitAngle = target->rot + 3.141592653589793;
     if (arg0->orbitAngle > 3.141592653589793)
     {
       arg0->orbitAngle -= 6.283185307179586;
@@ -730,7 +703,7 @@ void Camera_SetTargetView(CameraPreset* arg0, Actor* arg1) {
         case 0:
             camera_temp_vec.x = 0.0f;
             camera_temp_vec.y = arg0->distance + 20.0;
-            Math_RotateVec2(arg1->ry - 3.141592653589793 + 0.39269908169872414, &camera_temp_vec);
+            Math_RotateVec2(arg1->rot - 3.141592653589793 + 0.39269908169872414, &camera_temp_vec);
             camera_state.eyeX = arg1->x - camera_temp_vec.x;
             camera_state.eyeZ = arg1->z - camera_temp_vec.y;
             camera_state.eyeY = arg1->y + arg0->eyeHeight;
