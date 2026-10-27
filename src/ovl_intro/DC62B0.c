@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Intro overlay: entry and per-frame update (boot pak check, splashes), and the
+ * scripted sprite engine (150 slots with move/clip/fade/wait effects) that plays the intro.
+ * Folder: src/game/intro/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ s32 active : 1;
     /* 0x00 */ u32 flags : 31;

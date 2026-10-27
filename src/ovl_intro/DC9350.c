@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Intro overlay: the three splash screens, the no-controller message and the pak warning screens.
+ * Folder: src/game/intro/   (proposed for round 4)
+ */
+
 #define GFX_WORDS(a, b)                    {                                          Gfx *_g = D_8007A184++;                _g->words.w0 = (a);                    _g->words.w1 = (b);                }
 
 

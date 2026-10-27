@@ -1,0 +1,19 @@
+# b09: ovl_DA4570 (src/ovl_DA4570/DA4570.c), the boot-time Controller Pak manager.
+# Core_MainThread DMAs it to 0x80100000 and calls func_801009EC (its entry) once before the scheduler starts.
+# func_8003D0F0/D554/D6B0/EDC0 are osPfsInitPak/osMotorInit/osGbpakInit/osPfsNumFiles (pfsinitpak.o, motor.o, gbpakinit.o, pfsnumfiles.o in build/eltale.map).
+# old<TAB>new<TAB>evidence
+func_801009EC_ovl_DA4570	PakMenu_Run	entry, called once by Core_MainThread after DMAing ROM DA4570..DAB5F0 to 0x80100000; returns unless a Controller Pak is in D_80092C80's port (osPfsInitPak 0 or 10) and START (0x1000) is held (or the ID needs repair); then loops a screen state machine that lists the 16 notes (osPfsFileState, osPfsFreeBlocks), deletes the chosen one (osPfsDeleteFile) and repairs the pak ID (osPfsRepairId); returns 3 when the player leaves it
+func_80100000_ovl_DA4570	PakMenu_FormatNumber	clamps a u16 to 999 and writes 3 font codes into the buffer: digit d is 0x10+d, leading zeros are 0xF (blank); used for the note size and free pages
+func_801000E4_ovl_DA4570	PakMenu_DrawChar	draws one 8x12 4bpp glyph of D_8010568C at the text cursor D_801072F0 with palette D_80107044, advances 9 px; code 1 advances 3 px, code 10 moves 13 px down (via PakMenu_SetCursor)
+func_8010022C_ovl_DA4570	PakMenu_SetCursor	stores x, y in D_801072F4/F6 and sets the text cursor D_801072F0 = framebuffer D_801072E0 + x + y*320
+func_8010028C_ovl_DA4570	PakMenu_DrawString	calls PakMenu_DrawChar for each byte until a 0 byte or the count runs out
+func_801002F0_ovl_DA4570	PakMenu_SetTextPalette	points D_80107044 (PakMenu_DrawChar's palette) at entry n of the 4-colour palettes D_8010700C
+func_80100310_ovl_DA4570	PakMenu_BlitImage	copies a w x h image into the 320-wide framebuffer at x, y through its palette: mode 5 one byte per pixel, mode 2 two 4-bit pixels per byte with index 0 transparent
+func_801004E8_ovl_DA4570	PakMenu_DrawSprites	PakMenu_BlitImage (mode 2) for each of the n {x, y, w, h, pixels, palette} records
+func_8010055C_ovl_DA4570	PakMenu_WaitFrame	writes back the D-cache, waits for a message on the scheduler queue; PRE_NMI_MSG (669, see 1130.c) blacks the screen, otherwise swaps to the other of the two framebuffers D_80105664 if a redraw is pending (D_801072DC)
+func_80100620_ovl_DA4570	PakMenu_DrawNoteRow	for list row n (+ scroll D_801072CE): note name (16 chars) and extension, its size in pages ((size+0xFF)>>8) at x 0x100, and the row number; highlight palette 3 on the cursor row in states 2..4
+func_80100854_ovl_DA4570	PakMenu_DrawFreePages	PakMenu_FormatNumber of the free-page count and draws it at (200, 173); called with D_801072D8 (osPfsFreeBlocks >> 8)
+func_8010089C_ovl_DA4570	PakMenu_DrawCursor	blits the 16x14 image D_80101FC0 at the cursor position D_801072D0/D2 that the state machine sets per selection
+func_801008F0_ovl_DA4570	PakMenu_DrawMessageBox	PakMenu_DrawScreen, then the two box sprite lists D_80104DD8 (75) and D_80105288 (22), then the message text at (0x34, 0x4E) with PakMenu_DrawText; called with each state's message D_801054xx
+func_80100944_ovl_DA4570	PakMenu_DrawScreen	draws the 235 background sprites, the free pages, the two sprites shown when the list can scroll up (D_801072CE != 0) / down (< 10), the six note rows, and sets the redraw-pending flag D_801072DC
+func_80101C80_ovl_DA4570	PakMenu_DrawText	draws a 0xFF-terminated message with the game's font bitmap D_803245A0 into the framebuffer; bytes with bit 7 are control codes (font/spacing select, newline), 0x7F is a space

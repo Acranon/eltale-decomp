@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Ending overlay data: display lists, the sprite script and animation tables, images.
+ * Folder: src/game/ending/   (proposed for round 4)
+ */
+
 /* ovl_ending .data 8020F6C0..8022BB00: display lists, credit scroll tables and images.
    A data-only file: E22690.c's .data ends at 8020F6B5 and this starts 16-aligned at 8020F6C0.
    The 8-byte Gfx after some tables and images is a gsSPEndDisplayList that follows them. */

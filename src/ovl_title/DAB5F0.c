@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Title overlay: entry, per-frame update, the phase state machine, button handling.
+ * Folder: src/game/title/   (proposed for round 4)
+ */
+
 typedef struct {
     u16 unk0;
     u16 unk2;

@@ -1,0 +1,12 @@
+# b09: ovl_title (src/ovl_title/DAB5F0.c, DAC190.c; DAEA30.c is data only), the title screen and its menu.
+# Core_RunTitleLoop DMAs it to 0x8020C0D0 and calls the entry; Gfx_BuildFrameDisplayList calls func_8020C11C every frame in state 3.
+# D_80092C86 = pressed buttons (A 0x8000, B 0x4000, Z 0x2000, START 0x1000), D_80092C81/82 = stick x/y.
+# old<TAB>new<TAB>evidence
+func_8020C0D0_ovl_title	Title_Init	overlay entry (Core_RunTitleLoop calls 0x8020C0D0 after func_800361B0 loads it): zeroes the phase D_80226D90 and screen mode D_80226DA4, sets the timer, blink step 8 and fade (D_8020F4F0/F4)
+func_8020C11C_ovl_title	Title_Update	called each frame by Gfx_BuildFrameDisplayList in state 3: runs Title_RunPhase; returns 1 when it ran out with mode 0 (core then goes to state 4, the intro), 0 when mode 0xF (an option was chosen; core starts the game by D_8007A1CC's high nibble), else 2
+func_8020C178_ovl_title	Title_RunPhase	switch on D_80226D90: 3 start delay, 4 press-START screen (5400-frame idle timeout fades to black), 5 three-way menu (7200 idle frames go back), 6/8 hand over to Title_DrawSelectionExit; returns the phase timer D_80226D94
+func_8020C7A8_ovl_title	Title_UpdateScreen	draws the screen (Title_DrawScreen) with the blinking env alpha D_80226D9C bouncing 0..255, then handles the buttons for the current mode: START leaves the press-START screen, A/START/Z confirm and B goes back (each queues func_80029A88(1 or 2, 0xFF, 0x40)); counts the phase timer down
+func_8020CBE4_ovl_title	Title_DrawSelectionExit	phase 8 (after an option was chosen): draws the screen at full alpha, counts the timer down and sets mode 0xF when it reaches 0, which Title_Update reports as 0
+func_8020CC70_ovl_title	Title_DrawScreen	builds the title display list for mode n: the 320-wide background image in 6-line strips, the logo and prompt images; in the menu modes reads the stick (edge-detected), moves the 3-way cursor D_8020F4D8 (stored as D_8007A1CC's high nibble) and the two-choice cursor D_80226DB0, draws the cursor and the message windows (func_80034C9C frames, func_80035350 text)
+func_8020EF00_ovl_title	Title_UpdateScreenFade	when a fade is requested in D_8020F4F0 (1/3 cover, 2/4 uncover, over D_8020F4F4 frames), sets up the static fade state once and steps it with Title_DrawScreenFade
+func_8020EFE4_ovl_title	Title_DrawScreenFade	steps the fade alpha by 255/frames, ends the fade (D_8020F4F0 = 0) at 0/255 or when the frames run out, and draws a full-screen fill rectangle in black (modes 1/2) or white (3/4) at that alpha

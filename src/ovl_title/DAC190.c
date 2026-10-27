@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Title overlay: draws the title screen, its menu cursors and message windows; screen fades.
+ * Folder: src/game/title/   (proposed for round 4)
+ */
+
 typedef struct {
     u16 unk0;
     u16 unk2;

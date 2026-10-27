@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Intro overlay data: display lists, the sprite script and animation tables, images.
+ * Folder: src/game/intro/   (proposed for round 4)
+ */
+
 /* ovl_intro .data 80212270..80268480: display lists, the sprite animation and layout tables,
    then the images and palettes. A data-only file, like ovl_title's DAEA30.c and ovl_ending's
    E25C80.c (the ROM can't tell it apart from DC9350.c's tail here). The 8-byte Gfx after

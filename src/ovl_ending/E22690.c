@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Ending overlay: entry and per-frame update, the same scripted sprite engine as the intro,
+ * and the scrolling, cross-fading backdrop.
+ * Folder: src/game/ending/   (proposed for round 4)
+ */
+
 extern Gfx* D_8007A184;
 extern Gfx D_8020F6C0_ovl_ending[];
 
