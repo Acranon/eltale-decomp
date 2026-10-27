@@ -281,12 +281,12 @@
 - { name: D_8022BAD0_ovl_ending, rom: 0xE42090, size: 0x20, type: u16 }     # palette, 16 colours
 
 # ovl_title .data (ROM = vram - 0x8020F1E0 + 0xDAE700)
-- { name: title_menu_cursor_tlut, rom: 0xDAEA30, size: 0x200, type: u16 }     # palette, 256 colours
-- { name: title_menu_cursor_tex, rom: 0xDAEC30, size: 0x700, type: u8 }      # texture
+- { name: title_confirm_cursor_tlut, rom: 0xDAEA30, size: 0x200, type: u16 }     # palette, 256 colours
+- { name: title_confirm_cursor_tex, rom: 0xDAEC30, size: 0x700, type: u8 }      # texture
 - { name: D_8020FE10_ovl_title, rom: 0xDAF330, size: 0x200, type: u16 }     # palette, 256 colours
 - { name: D_80210010_ovl_title, rom: 0xDAF530, size: 0x5E0, type: u8 }      # texture
-- { name: title_menu_strip_tex, rom: 0xDAFB18, size: 0x500, type: u8 }      # texture
-- { name: title_menu_strip_tlut, rom: 0xDB0020, size: 0x200, type: u16 }     # palette, 256 colours
+- { name: title_lower_strip_tex, rom: 0xDAFB18, size: 0x500, type: u8 }      # texture
+- { name: title_lower_strip_tlut, rom: 0xDB0020, size: 0x200, type: u16 }     # palette, 256 colours
 - { name: D_80210D00_ovl_title, rom: 0xDB0220, size: 0x20, type: u16 }      # palette, 16 colours
 - { name: D_80210D20_ovl_title, rom: 0xDB0240, size: 0x420, type: u8 }      # texture
 - { name: D_80211148_ovl_title, rom: 0xDB0668, size: 0x58, type: u8 }       # texture

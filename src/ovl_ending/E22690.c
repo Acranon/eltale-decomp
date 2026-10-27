@@ -109,7 +109,7 @@ s32 ending_clip_top;
 s32 ending_clip_width;
 s32 ending_clip_height;
 u32 ending_elapsed_frames;
-s32 ending_sprite_tick;
+s32 ending_sprite_spawn_count;
 s32 ending_scene_initialized;
 u32 ending_cue_entry_index;
 u32 ending_previous_cue_index;
@@ -171,7 +171,7 @@ void Ending_Init(void) {
     ending_cue_entry_index = 0;
     ending_previous_cue_index = 0;
     ending_elapsed_frames = 0;
-    ending_sprite_tick = 0;
+    ending_sprite_spawn_count = 0;
     ending_cue_frame = 0;
     ending_cue_group_index = 0;
     ending_wait_for_sprites = 0;
@@ -245,8 +245,8 @@ s32 Ending_RunSpriteScript(void) {
                                      entries[ending_cue_entry_index].unk8, entries[ending_cue_entry_index].unkA, entries[ending_cue_entry_index].unk10,
                                      entries[ending_cue_entry_index].unk12, entries[ending_cue_entry_index].unkC, entries[ending_cue_entry_index].unkE,
                                      entries[ending_cue_entry_index].unk14, entries[ending_cue_entry_index].unk16, entries[ending_cue_entry_index].unk18,
-                                     entries[ending_cue_entry_index].unk1C, steps[entries[ending_cue_entry_index].unk20].duration, ending_sprite_tick);
-            ending_sprite_tick++;
+                                     entries[ending_cue_entry_index].unk1C, steps[entries[ending_cue_entry_index].unk20].duration, ending_sprite_spawn_count);
+            ending_sprite_spawn_count++;
             if (entries[ending_cue_entry_index].unk2 == 0) {
                 entries[ending_cue_entry_index].unk24 = ending_previous_cue_index;
             } else {
@@ -1094,7 +1094,7 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
 
 /* func_8020E9C8's function statics; globals here while it is asm. */
 f32 ending_scroll_offset = 32767.0f;
-s32 ending_story_frame = 0;
+s32 ending_backdrop_frame = 0;
 f32 ending_first_fade_alpha = 0.0f;
 f32 ending_second_fade_alpha = 0.0f;
 u8 D_8020F6AC_ovl_ending = 1;
@@ -1126,10 +1126,10 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     gDPSetRenderMode(gfx_dl_head++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
     gSPDisplayList(gfx_dl_head++, D_8020F730_ovl_ending);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
-    if (ending_story_frame == 0x26AC) {
+    if (ending_backdrop_frame == 0x26AC) {
         D_8020F6AC_ovl_ending = 2;
         D_8020F6B0_ovl_ending = 1;
-    } else if (ending_story_frame == D_8022BAF8_ovl_ending) {
+    } else if (ending_backdrop_frame == D_8022BAF8_ovl_ending) {
         D_8020F6B0_ovl_ending = 2;
         Audio_StartSeqFadeOut(0x1E0);
     }
@@ -1157,7 +1157,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
         D_8020F6AC_ovl_ending = 0;
     }
     ending_first_fade_alpha = alpha;
-    if (ending_story_frame < 0x2814) {
+    if (ending_backdrop_frame < 0x2814) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
         pic = &ending_picture_defs[arg0];
@@ -1205,7 +1205,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
         }
     }
     ending_second_fade_alpha = alpha;
-    if (ending_story_frame >= 0x26AC) {
+    if (ending_backdrop_frame >= 0x26AC) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
         pic = &ending_picture_defs[arg0 + 1];
@@ -1225,13 +1225,13 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
                                 0x400, 0x400);
         }
     }
-    frame = ending_story_frame + 1;
-    ending_story_frame = frame;
+    frame = ending_backdrop_frame + 1;
+    ending_backdrop_frame = frame;
     if ((frame >= 240.0) && (frame < 0x26E8)) {
         ending_scroll_offset = scroll - (f32) width / (f32) arg1;
         return 0;
     }
-    if (ending_story_frame == 0x26E8) {
+    if (ending_backdrop_frame == 0x26E8) {
         D_8020F6B4_ovl_ending = 1;
     }
     return 0;

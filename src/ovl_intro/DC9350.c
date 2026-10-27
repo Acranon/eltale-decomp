@@ -11,12 +11,12 @@
 /* ovl_intro .data 80212250..80212270 (the rest of the slab is still asm): 250, 254,
    then the statics of func_80210140 (258/25C/260) and func_80211634 (264/268/26C).
    .bss 80277080..80277090: their statics 77080..82 and 77083..85. */
-s32 intro_prompt_fade_alpha = 0;
-s32 intro_prompt_phase = 0;
+s32 intro_splash_fade_alpha = 0;
+s32 intro_splash_phase = 0;
 
 extern Gfx *gfx_dl_head;
 extern s32 intro_phase_timer;
-extern Gfx intro_sprite_setup_dl[];
+extern Gfx intro_render_setup_dl[];
 extern u8 D_802650A0_ovl_intro[];
 extern u16 D_80267048_ovl_intro[];
 extern u8 D_80267250_ovl_intro[];
@@ -44,32 +44,32 @@ void Intro_DrawSplash2(void);
 void Intro_DrawSplash3(void);
 
 void Intro_RunSplash1(void) {
-    gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+    gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
     GFX_WORDS(0xB900031D, 0x504240);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCFA7D);
-    GFX_WORDS(0xFB000000, intro_prompt_fade_alpha & 0xFF);
+    GFX_WORDS(0xFB000000, intro_splash_fade_alpha & 0xFF);
     Intro_DrawSplash1();
     intro_phase_timer--;
-    switch (intro_prompt_phase) {
+    switch (intro_splash_phase) {
         case 0:
-            intro_prompt_fade_alpha += 16;
-            if (intro_prompt_fade_alpha >= 0x100) {
-                intro_prompt_fade_alpha = 0xFF;
-                intro_prompt_phase++;
+            intro_splash_fade_alpha += 16;
+            if (intro_splash_fade_alpha >= 0x100) {
+                intro_splash_fade_alpha = 0xFF;
+                intro_splash_phase++;
                 intro_phase_timer = 90;
             }
             break;
         case 1:
             if (intro_phase_timer == 0) {
-                intro_prompt_phase++;
+                intro_splash_phase++;
                 intro_phase_timer = 0x20;
             }
             break;
         case 2:
-            intro_prompt_fade_alpha -= 16;
-            if (intro_prompt_fade_alpha < 0) {
-                intro_prompt_fade_alpha = 0;
-                intro_prompt_phase = 0;
+            intro_splash_fade_alpha -= 16;
+            if (intro_splash_fade_alpha < 0) {
+                intro_splash_fade_alpha = 0;
+                intro_splash_phase = 0;
                 intro_phase_timer = 0;
             }
             break;
@@ -77,32 +77,32 @@ void Intro_RunSplash1(void) {
 }
 
 void Intro_RunSplash2(void) {
-    gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+    gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
     GFX_WORDS(0xB900031D, 0x504240);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCFA7D);
-    GFX_WORDS(0xFB000000, intro_prompt_fade_alpha & 0xFF);
+    GFX_WORDS(0xFB000000, intro_splash_fade_alpha & 0xFF);
     Intro_DrawSplash2();
     intro_phase_timer--;
-    switch (intro_prompt_phase) {
+    switch (intro_splash_phase) {
         case 0:
-            intro_prompt_fade_alpha += 8;
-            if (intro_prompt_fade_alpha >= 0x100) {
-                intro_prompt_fade_alpha = 0xFF;
-                intro_prompt_phase++;
+            intro_splash_fade_alpha += 8;
+            if (intro_splash_fade_alpha >= 0x100) {
+                intro_splash_fade_alpha = 0xFF;
+                intro_splash_phase++;
                 intro_phase_timer = 100;
             }
             break;
         case 1:
             if (intro_phase_timer == 0) {
-                intro_prompt_phase++;
+                intro_splash_phase++;
                 intro_phase_timer = 0x20;
             }
             break;
         case 2:
-            intro_prompt_fade_alpha -= 8;
-            if (intro_prompt_fade_alpha < 0) {
-                intro_prompt_fade_alpha = 0;
-                intro_prompt_phase = 0;
+            intro_splash_fade_alpha -= 8;
+            if (intro_splash_fade_alpha < 0) {
+                intro_splash_fade_alpha = 0;
+                intro_splash_phase = 0;
                 intro_phase_timer = 0;
             }
             break;
@@ -110,32 +110,32 @@ void Intro_RunSplash2(void) {
 }
 
 void Intro_RunSplash3(void) {
-    gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+    gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCFA7D);
     GFX_WORDS(0xB900031D, 0x504240);
-    GFX_WORDS(0xFB000000, intro_prompt_fade_alpha & 0xFF);
+    GFX_WORDS(0xFB000000, intro_splash_fade_alpha & 0xFF);
     Intro_DrawSplash3();
     intro_phase_timer--;
-    switch (intro_prompt_phase) {
+    switch (intro_splash_phase) {
         case 0:
-            intro_prompt_fade_alpha += 8;
-            if (intro_prompt_fade_alpha >= 0x100) {
-                intro_prompt_fade_alpha = 0xFF;
-                intro_prompt_phase++;
+            intro_splash_fade_alpha += 8;
+            if (intro_splash_fade_alpha >= 0x100) {
+                intro_splash_fade_alpha = 0xFF;
+                intro_splash_phase++;
                 intro_phase_timer = 120;
             }
             break;
         case 1:
             if (intro_phase_timer == 0) {
-                intro_prompt_phase++;
+                intro_splash_phase++;
                 intro_phase_timer = 0x20;
             }
             break;
         case 2:
-            intro_prompt_fade_alpha -= 8;
-            if (intro_prompt_fade_alpha < 0) {
-                intro_prompt_fade_alpha = 0;
-                intro_prompt_phase = 0;
+            intro_splash_fade_alpha -= 8;
+            if (intro_splash_fade_alpha < 0) {
+                intro_splash_fade_alpha = 0;
+                intro_splash_phase = 0;
                 intro_phase_timer = 0;
             }
             break;
@@ -206,13 +206,13 @@ s32 Intro_RunNoPakScreen(void) {
     s8 dx;
     s8 dy;
     static u8 D_80212258_ovl_intro = 0;
-    static s8 intro_prompt_a_column = 0;
-    static s8 intro_prompt_a_row = 0;
-    static s8 intro_prompt_a_prev_direction;
+    static s8 D_8021225C_ovl_intro = 0;
+    static s8 intro_nopak_choice = 0;
+    static s8 intro_nopak_prev_direction;
     static s8 D_80277081_ovl_intro;
     static s8 D_80277082_ovl_intro;
 
-    gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+    gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCF279);
     GFX_WORDS(0xB900031D, 0x504240);
@@ -228,8 +228,8 @@ s32 Intro_RunNoPakScreen(void) {
     if (input_stick_y < -20) {
         dir |= 2;
     }
-    pressed = (dir ^ intro_prompt_a_prev_direction) & dir;
-    intro_prompt_a_prev_direction = dir;
+    pressed = (dir ^ intro_nopak_prev_direction) & dir;
+    intro_nopak_prev_direction = dir;
     dx = 0;
     dy = 0;
     if (pressed & 1) {
@@ -245,18 +245,18 @@ s32 Intro_RunNoPakScreen(void) {
         dy = 1;
     }
     D_80277081_ovl_intro = dx;
-    intro_prompt_a_column += dx;
-    if (intro_prompt_a_column < 0) {
-        intro_prompt_a_column = 0;
-    } else if (intro_prompt_a_column > 1) {
-        intro_prompt_a_column = 1;
+    D_8021225C_ovl_intro += dx;
+    if (D_8021225C_ovl_intro < 0) {
+        D_8021225C_ovl_intro = 0;
+    } else if (D_8021225C_ovl_intro > 1) {
+        D_8021225C_ovl_intro = 1;
     }
     D_80277082_ovl_intro = dy;
-    intro_prompt_a_row += dy;
-    if (intro_prompt_a_row < 0) {
-        intro_prompt_a_row = 0;
-    } else if (intro_prompt_a_row > 1) {
-        intro_prompt_a_row = 1;
+    intro_nopak_choice += dy;
+    if (intro_nopak_choice < 0) {
+        intro_nopak_choice = 0;
+    } else if (intro_nopak_choice > 1) {
+        intro_nopak_choice = 1;
     }
     switch (D_80212258_ovl_intro) {
         case 0:
@@ -272,9 +272,9 @@ s32 Intro_RunNoPakScreen(void) {
             gDPPipeSync(gfx_dl_head++);
             gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_80268280_ovl_intro);
             gDPLoadTextureTile_4b(gfx_dl_head++, D_80268220_ovl_intro, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
-            gSPTextureRectangle(gfx_dl_head++, (intro_prompt_a_row * 71 + 90) << 2, 157 << 2, (intro_prompt_a_row * 71 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+            gSPTextureRectangle(gfx_dl_head++, (intro_nopak_choice * 71 + 90) << 2, 157 << 2, (intro_nopak_choice * 71 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             if (input_pressed_buttons & 0xB000) {
-                if (intro_prompt_a_row == 1) {
+                if (intro_nopak_choice == 1) {
                     D_80212258_ovl_intro = 1;
                 } else {
                     ret = 1;
@@ -302,7 +302,7 @@ s32 Intro_RunNoPakScreen(void) {
 void Intro_DrawNoControllerMessage(void) {
     s32 i;
 
-    gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+    gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCF279);
     GFX_WORDS(0xB900031D, 0x504240);
@@ -319,7 +319,7 @@ s32 Intro_RunPakFullScreen(void) {
     s32 ret = 0;
     s32 i;
 
-    gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+    gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCF279);
     GFX_WORDS(0xB900031D, 0x0F0A4000);
@@ -346,13 +346,13 @@ s32 Intro_RunPakErrorScreen(void) {
     s8 dx;
     s8 dy;
     static u8 D_80212264_ovl_intro = 0;
-    static s8 intro_prompt_b_column = 0;
-    static s8 intro_prompt_b_row = 0;
-    static s8 intro_prompt_b_prev_direction;
+    static s8 D_80212268_ovl_intro = 0;
+    static s8 intro_pak_error_choice = 0;
+    static s8 intro_pak_error_prev_direction;
     static s8 D_80277084_ovl_intro;
     static s8 D_80277085_ovl_intro;
 
-    gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+    gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCF279);
     GFX_WORDS(0xB900031D, 0x504240);
@@ -368,8 +368,8 @@ s32 Intro_RunPakErrorScreen(void) {
     if (input_stick_y < -20) {
         dir |= 2;
     }
-    pressed = (dir ^ intro_prompt_b_prev_direction) & dir;
-    intro_prompt_b_prev_direction = dir;
+    pressed = (dir ^ intro_pak_error_prev_direction) & dir;
+    intro_pak_error_prev_direction = dir;
     dx = 0;
     dy = 0;
     if (pressed & 1) {
@@ -385,18 +385,18 @@ s32 Intro_RunPakErrorScreen(void) {
         dy = 1;
     }
     D_80277084_ovl_intro = dx;
-    intro_prompt_b_column += dx;
-    if (intro_prompt_b_column < 0) {
-        intro_prompt_b_column = 0;
-    } else if (intro_prompt_b_column > 1) {
-        intro_prompt_b_column = 1;
+    D_80212268_ovl_intro += dx;
+    if (D_80212268_ovl_intro < 0) {
+        D_80212268_ovl_intro = 0;
+    } else if (D_80212268_ovl_intro > 1) {
+        D_80212268_ovl_intro = 1;
     }
     D_80277085_ovl_intro = dy;
-    intro_prompt_b_row += dy;
-    if (intro_prompt_b_row < 0) {
-        intro_prompt_b_row = 0;
-    } else if (intro_prompt_b_row > 1) {
-        intro_prompt_b_row = 1;
+    intro_pak_error_choice += dy;
+    if (intro_pak_error_choice < 0) {
+        intro_pak_error_choice = 0;
+    } else if (intro_pak_error_choice > 1) {
+        intro_pak_error_choice = 1;
     }
     switch (D_80212264_ovl_intro) {
         case 0:
@@ -412,9 +412,9 @@ s32 Intro_RunPakErrorScreen(void) {
             gDPPipeSync(gfx_dl_head++);
             gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_80268280_ovl_intro);
             gDPLoadTextureTile_4b(gfx_dl_head++, D_80268220_ovl_intro, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
-            gSPTextureRectangle(gfx_dl_head++, (intro_prompt_b_row * 74 + 90) << 2, 157 << 2, (intro_prompt_b_row * 74 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+            gSPTextureRectangle(gfx_dl_head++, (intro_pak_error_choice * 74 + 90) << 2, 157 << 2, (intro_pak_error_choice * 74 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             if (input_pressed_buttons & 0xB000) {
-                if (intro_prompt_b_row == 1) {
+                if (intro_pak_error_choice == 1) {
                     D_80212264_ovl_intro = 1;
                 } else {
                     ret = 1;

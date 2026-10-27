@@ -10,12 +10,12 @@
    The 8-byte Gfx after some images is a gsSPEndDisplayList that follows the converted texture. */
 
 /* palette, 256 colours */
-u16 title_menu_cursor_tlut[0x100] = {
-#include "assets/title_menu_cursor_tlut.inc.c"
+u16 title_confirm_cursor_tlut[0x100] = {
+#include "assets/title_confirm_cursor_tlut.inc.c"
 };
 /* texture */
-u8 title_menu_cursor_tex[0x700] = {
-#include "assets/title_menu_cursor_tex.inc.c"
+u8 title_confirm_cursor_tex[0x700] = {
+#include "assets/title_confirm_cursor_tex.inc.c"
 };
 /* palette, 256 colours */
 u16 D_8020FE10_ovl_title[0x100] = {
@@ -29,15 +29,15 @@ Gfx D_802105F0_ovl_title[1] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* texture */
-u8 title_menu_strip_tex[0x500] = {
-#include "assets/title_menu_strip_tex.inc.c"
+u8 title_lower_strip_tex[0x500] = {
+#include "assets/title_lower_strip_tex.inc.c"
 };
 Gfx D_80210AF8_ovl_title[1] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* palette, 256 colours */
-u16 title_menu_strip_tlut[0x100] = {
-#include "assets/title_menu_strip_tlut.inc.c"
+u16 title_lower_strip_tlut[0x100] = {
+#include "assets/title_lower_strip_tlut.inc.c"
 };
 /* palette, 16 colours */
 u16 D_80210D00_ovl_title[0x10] = {

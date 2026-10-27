@@ -139,7 +139,7 @@ s32 intro_clip_top;
 s32 intro_clip_width;
 s32 intro_clip_height;
 s32 intro_elapsed_frames;
-s32 intro_sprite_tick;
+s32 intro_sprite_spawn_count;
 s32 intro_scene_initialized;
 s32 intro_cue_entry_index;
 s32 intro_previous_cue_index;
@@ -152,10 +152,10 @@ Gfx *intro_saved_display_ptr;
 s32 D_80276F44_ovl_intro;
 u8 D_80276F48_ovl_intro[0x12C]; /* not referenced */
 s32 intro_fade_alpha;
-u8 intro_fade_complete;
+u8 intro_skip_requested;
 
-extern s32 intro_prompt_fade_alpha;
-extern s32 intro_prompt_phase;
+extern s32 intro_splash_fade_alpha;
+extern s32 intro_splash_phase;
 extern Unk802170E8 intro_cue_groups[];
 extern u32 intro_cue_group_count;
 extern AnimTbl intro_sprite_anim_table[];
@@ -191,7 +191,7 @@ typedef struct {
 } Unk80092E48; /* size = 0x14 */
 
 extern Gfx *gfx_dl_head;
-extern Gfx intro_sprite_setup_dl[];
+extern Gfx intro_render_setup_dl[];
 extern s8 input_primary_port;
 extern u16 input_pressed_buttons;
 extern OSMesgQueue input_si_queue;
@@ -226,12 +226,12 @@ void Intro_Init(void) {
     intro_cue_entry_index = 0;
     intro_previous_cue_index = 0;
     intro_elapsed_frames = 0;
-    intro_sprite_tick = 0;
+    intro_sprite_spawn_count = 0;
     intro_cue_frame = 0;
     intro_cue_group_index = 0;
     intro_wait_for_sprites = 0;
     intro_phase_timer = 0;
-    intro_prompt_fade_alpha = 0;
+    intro_splash_fade_alpha = 0;
     intro_scene_initialized = 0;
 }
 
@@ -303,8 +303,8 @@ s32 Intro_Update(void) {
                 Intro_RunSplash1();
                 if (intro_phase_timer == 0) {
                     intro_phase_timer = 150;
-                    intro_prompt_fade_alpha = 0;
-                    intro_prompt_phase = 0;
+                    intro_splash_fade_alpha = 0;
+                    intro_splash_phase = 0;
                     D_80212240_ovl_intro++;
                 }
                 break;
@@ -316,7 +316,7 @@ s32 Intro_Update(void) {
                     D_8021223C_ovl_intro = 1;
                 }
                 if (intro_phase_timer == 0) {
-                    intro_prompt_fade_alpha = 0;
+                    intro_splash_fade_alpha = 0;
                     if (D_8021223C_ovl_intro != 0) {
                         intro_phase_timer = 10;
                         ret = 1;
@@ -335,7 +335,7 @@ s32 Intro_Update(void) {
                     D_8021223C_ovl_intro = 1;
                 }
                 if (intro_phase_timer == 0) {
-                    intro_prompt_fade_alpha = 0;
+                    intro_splash_fade_alpha = 0;
                     if (D_8021223C_ovl_intro != 0) {
                         intro_phase_timer = 10;
                         ret = 1;
@@ -357,7 +357,7 @@ s32 Intro_Update(void) {
                 intro_display_buffer_index = (intro_display_buffer_index + 1) & 1;
                 intro_saved_display_ptr = gfx_dl_head;
                 gfx_dl_head = intro_display_list_buffers[intro_display_buffer_index];
-                gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
+                gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
                 ret = Intro_RunSpriteScript();
                 gSPEndDisplayList(gfx_dl_head);
                 gfx_dl_head = intro_saved_display_ptr;
@@ -388,7 +388,7 @@ s32 Intro_RunSpriteScript(void) {
     if (intro_scene_initialized == 0) {
         D_80276F44_ovl_intro = 0;
         intro_elapsed_frames = 0;
-        intro_fade_complete = 0;
+        intro_skip_requested = 0;
         intro_fade_alpha = 0;
         intro_scene_initialized = 1;
     }
@@ -408,8 +408,8 @@ s32 Intro_RunSpriteScript(void) {
                                      entries[intro_cue_entry_index].unk8, entries[intro_cue_entry_index].unkA, entries[intro_cue_entry_index].unk10,
                                      entries[intro_cue_entry_index].unk12, entries[intro_cue_entry_index].unkC, entries[intro_cue_entry_index].unkE,
                                      entries[intro_cue_entry_index].unk14, entries[intro_cue_entry_index].unk16, entries[intro_cue_entry_index].unk18,
-                                     entries[intro_cue_entry_index].unk1C, steps[entries[intro_cue_entry_index].unk20].unk8, intro_sprite_tick);
-            intro_sprite_tick++;
+                                     entries[intro_cue_entry_index].unk1C, steps[entries[intro_cue_entry_index].unk20].unk8, intro_sprite_spawn_count);
+            intro_sprite_spawn_count++;
             if (entries[intro_cue_entry_index].unk2 == 0) {
                 entries[intro_cue_entry_index].unk24 = intro_previous_cue_index;
             } else {
@@ -495,9 +495,9 @@ s32 Intro_RunSpriteScript(void) {
         }
     }
     if (input_pressed_buttons & 0x1000) {
-        intro_fade_complete = 1;
+        intro_skip_requested = 1;
     }
-    if (intro_fade_complete != 0) {
+    if (intro_skip_requested != 0) {
         intro_fade_alpha += 10;
         if (intro_fade_alpha >= 0x100) {
             intro_fade_alpha = 0xFF;

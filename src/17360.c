@@ -129,14 +129,14 @@ typedef struct {
 
 /* This file's .bss, 80085F90..800863F0, in address order (first declaration fixes
  * the order). Splat's D_80085F9C, D_80086370/88/A0, D_800863BC and D_800863CC are
- * fields of magic_effects[0], magic_cast_repeats[1..3], magic_temp_vec and magic_floor_result. */
+ * fields of magic_effects[0], magic_cast_repeats[1..3], magic_temp_vec and magic_coll. */
 s32 magic_cast_state; /* 1 cast running, 2 ending (magic_cast_state_timer frames left) */
 s32 magic_cast_state_timer;
 Unk80085F98 magic_effects[16];
 Unk80086358 magic_cast_repeats[4];
 Unk17360Vec2 magic_temp_vec;
 Unk8007B908_b* magic_target_enemy_rec;
-Coll17360 magic_floor_result;
+Coll17360 magic_coll;
 extern u16 magic_slot_bits[];
 extern u16 D_8007AB18;
 extern Unk8007B908 enemy_slots[];
@@ -526,8 +526,8 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
     if (p->target != NULL) {
         magic_place_handlers[def->unk26](p, (Actor17360*)arg0);
         if (def->unk14 == 2) {
-            Coll_ResolveFloorAndWalls(p->x, p->y, p->z, 0xA00, &magic_floor_result);
-            p->y = magic_floor_result.y;
+            Coll_ResolveFloorAndWalls(p->x, p->y, p->z, 0xA00, &magic_coll);
+            p->y = magic_coll.y;
         }
         Magic_CreateCastPresentation(p, p->unk24);
     } else {
@@ -851,10 +851,10 @@ void Magic_MoveHomingEffect(Unk80017F48* arg0) {
     arg0->y += arg0->vy;
     arg0->z += arg0->vz;
     if (arg0->cfg->unk14 != 0) {
-        Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &magic_floor_result);
+        Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &magic_coll);
         switch (arg0->cfg->unk14) {
             case 1:
-                if (arg0->y < magic_floor_result.y) {
+                if (arg0->y < magic_coll.y) {
                     arg0->unkA |= 1;
                     arg0->unk4 = 8;
                     arg0->vz = 0.0f;
@@ -871,7 +871,7 @@ void Magic_MoveHomingEffect(Unk80017F48* arg0) {
                 }
                 break;
             case 2:
-                arg0->y = magic_floor_result.y;
+                arg0->y = magic_coll.y;
                 break;
         }
     }
@@ -884,9 +884,9 @@ void Magic_MoveVerticalEffect(Unk80017F48* arg0) {
         }
         arg0->y += arg0->vy;
         if (arg0->cfg->unk14 == 1) {
-            Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &magic_floor_result);
-            if (arg0->y < magic_floor_result.y) {
-                arg0->y = magic_floor_result.y;
+            Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &magic_coll);
+            if (arg0->y < magic_coll.y) {
+                arg0->y = magic_coll.y;
                 arg0->unkA |= 1;
                 arg0->unk4 = 8;
                 arg0->vz = 0.0f;

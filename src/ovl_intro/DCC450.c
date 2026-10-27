@@ -87,7 +87,7 @@ extern u8 D_80258580_ovl_intro[];
 extern u16 D_80259048_ovl_intro[];
 extern u8 D_80217300_ovl_intro[];
 extern u16 D_80217100_ovl_intro[];
-Gfx intro_sprite_setup_dl[11] = {
+Gfx intro_render_setup_dl[11] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},
     {{ 0xB6000000, 0xFFFFFFFF }},
