@@ -1844,7 +1844,7 @@ void Player_StartCastSpell(Player *p, Actor *a, AnimSet *anims) {
 
     a->stats->unk8 -= D_800C186E[p->spell_input_count];
     e = &D_800C185C[(p->spell_id >> 8) & 0xF][p->spell_id & 0xFF];
-    if (e->unk18 == 2) {
+    if (e->target_select_handler_index == 2) {
         p->flags |= 4;
         anim = 0x17;
         next = 0x16;
