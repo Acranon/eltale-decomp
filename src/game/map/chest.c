@@ -3,6 +3,10 @@
 #include "game/map/chest_flag.h"
 #include "game/actor/anim.h"
 #include "game/gfx/shadow.h"
+#include "game/audio/sound.h"
+#include "game/map/map.h"
+#include "game/math/math.h"
+#include "game/npc/npc.h"
 
 /*
  * Chests: per-map placement, opened flags, the open interaction and animation, and the
@@ -20,10 +24,7 @@ CollResult chest_coll;
 u8 chest_opened_flags[0x20];
 u8 D_800859A8[8];
 
-extern u8 math_bit_masks[];
-extern s32 map_id;
-extern s32 map_subarea;
-extern AnimSet D_8010FDC4[];
+extern AnimSet D_8010FDC4[]; /* overlay data (no module defines it) */
 /* Message text around the name in Item_BuildMessage. */
 u8 item_message_prefix[8] = {
 #include "assets/item_message_prefix.inc.c"
@@ -53,11 +54,7 @@ ChestPlacement chest_map_placements[19] = {
     { 0x21, (ChestGroup*) 0x80143378 },
     { 0x09, (ChestGroup*) 0x8015F1E4 },
 };
-extern u8 text_message_buf[];
-extern u8 text_speaker_name;
-extern u8* D_803AB288[];
-
-void Sfx_Play(u8, s8, u8);
+extern u8* D_803AB288[]; /* overlay data: the item names (no module defines it) */
 
 void Chest_ClearOpenedFlags(void) {
     s32 i;
@@ -218,7 +215,7 @@ void Item_BuildMessage(s32 arg0) {
         *dst++ = *src++;
     }
     *dst = *src;
-    text_speaker_name = 0xFF;
+    text_speaker_name[0] = 0xFF;
 }
 
 u8 Chest_IsOpened(u16 arg0) {

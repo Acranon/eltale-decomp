@@ -1,5 +1,8 @@
 #include "game/map/spirit.h"
 #include "game/actor/actor.h"
+#include "game/core/main.h"
+#include "game/map/map.h"
+#include "game/math/math.h"
 
 /*
  * Spirits: per-map placement, collected flags, the pick-up test and the sparkle particles.
@@ -13,14 +16,6 @@ s32 spirit_count;
 SpiritObj spirit_objects[8];
 CollResult spirit_coll;
 u8 spirit_collected_flags[0x10];
-
-extern u8 math_bit_masks[];
-extern s32 map_id;
-extern s32 map_subarea;
-
-extern Gfx* gfx_dl_head;
-
-f32 sinf(f32);
 
 SpiritPlacement spirit_map_placements[0x2B] = {
     { 0x0, 0x0, 1, (SpiritDef*)0x80154860 },
