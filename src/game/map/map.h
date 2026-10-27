@@ -55,7 +55,12 @@ typedef struct MapGrid {
     /* 0x2A */ u8 pad2A[2];
 } MapGrid; /* 0x2C bytes */
 
-/* A map exit: a box the player walks into (Exit_CheckEnter). */
+/*
+ * A map exit: a box the player walks into (Exit_CheckEnter). Exit_SetDestination (env.c)
+ * copies dest[0..2] to exit_destination.unk0..unk8 (next map, next subarea, ...), flags to
+ * exit_destination.unkC, unk1A to unk10 and angle to unk14. env.h/env.c (h_core) and
+ * collision.c use this one type (env.h used to forward-declare it as struct ExitDef).
+ */
 typedef struct MapExit {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 z;
@@ -64,7 +69,10 @@ typedef struct MapExit {
     /* 0x10 */ f32 halfD;
     /* 0x14 */ u16 flags; /* 2: any direction; 0x10/0x20: needs / must not have the item id */
     /* 0x16 */ u16 id;
-    /* 0x18 */ u8 pad18[0xC]; /* the destination (Exit_SetDestination) */
+    /* 0x18 */ u8 pad18[2];
+    /* 0x1A */ u16 unk1A;
+    /* 0x1C */ u8 pad1C[2];
+    /* 0x1E */ u16 dest[3]; /* the destination (Exit_SetDestination): next map, next subarea, [2] */
 } MapExit; /* 0x24 bytes */
 
 /* A sub-area entry point (MapSubareaDef.entries). */
@@ -242,7 +250,7 @@ typedef struct MapObjAnimSlot {
     /* 0x04 */ s32 state;
     /* 0x08 */ s32 frame;
     /* 0x0C */ s32 type;
-    /* 0x10 */ s32 id;
+    /* 0x10 */ MapObj *obj; /* the object it moves (MapObj_UpdateAndDrawNearby looks it up) */
     /* 0x14 */ f32 x;
     /* 0x18 */ f32 z;
 } MapObjAnimSlot; /* 0x1C bytes */
@@ -283,8 +291,8 @@ void MapObj_DrawTranslucent(struct GfxFrameData *arg0);
 void MapObj_CollectCell(s32 count, u16 *ids);
 void Map_DrawBackdrop(struct GfxFrameData *arg0);
 void MapObjAnim_ClearAll(void);
-s32 MapObjAnim_Find(s32 id);
-void MapObjAnim_Start(s32 state, s32 frame, s32 type, s32 id);
+s32 MapObjAnim_Find(MapObj *obj);
+void MapObjAnim_Start(s32 state, s32 frame, s32 type, MapObj *obj);
 void MapObjAnim_UpdateAll(void);
 void MapObj_DrawBillboards(struct GfxFrameData *arg0, s32 count, s32 type, MapObj **list);
 void MapObj_EmitArcSprite(MapObj *arg0);

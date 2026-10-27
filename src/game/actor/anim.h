@@ -7,6 +7,7 @@
 
 /* The actor-model base type is Actor (game/actor/actor.h, h_actors). */
 struct Actor;
+struct GfxFrameData; /* game/core/main.h (h_core) */
 
 /* One node of a model: its keyframe track, pivot, parent and display list. */
 typedef struct AnimNode {
@@ -36,9 +37,9 @@ extern MtxF anim_billboard_mtx_scratch;
 
 void Anim_SetCurrentAndNext(struct Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5);
 void Anim_UpdateRootMotion(struct Actor *arg0, AnimSet *arg1, f32 scale);
-void Anim_DrawModel(s32 arg0, struct Actor *arg1, AnimSet *arg2, s32 arg3);
+void Anim_DrawModel(s32 flags, struct Actor *arg1, AnimSet *arg2, struct GfxFrameData *frameData);
 void Anim_DrawNode(MtxF *parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, AnimSet *set, AnimNode *anims,
-                   s32 buf);
+                   struct GfxFrameData *buf);
 void Anim_AdvanceFrame(s32 arg0, struct Actor *arg1, AnimSet *arg2);
 void Anim_ApplyPivotOffset(MtxF *arg0, AnimNode *arg1);
 

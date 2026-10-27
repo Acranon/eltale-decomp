@@ -932,7 +932,7 @@ void Effect_UpdateAndDrawModelEffects(struct GfxFrameData* arg0) {
             } else {
                 gSPClearGeometryMode(gfx_dl_head++, G_CULL_BACK);
             }
-            Effect_DrawModelEffectGeometry(p, (s32)arg0);
+            Effect_DrawModelEffectGeometry(p, arg0);
             p->unk34++;
             if (--p->unk0 == 0) {
                 if (p->unk8 & 1) {
@@ -951,7 +951,7 @@ void Effect_UpdateAndDrawModelEffects(struct GfxFrameData* arg0) {
 
 
 extern s32 anim_node_position_count;
-s32 Effect_DrawModelEffectGeometry(EffectModel* arg0, s32 arg1) {
+s32 Effect_DrawModelEffectGeometry(EffectModel* arg0, struct GfxFrameData* arg1) {
     u32 i;
     AnimNode* anims;
     s32 frame;

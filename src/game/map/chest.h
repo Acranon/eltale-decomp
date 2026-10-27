@@ -6,6 +6,7 @@
 #include "game/map/collision.h"
 
 struct Actor; /* game/actor/actor.h (h_actors): a chest is an Actor */
+struct GfxFrameData;
 
 /* One chest of a sub-area (in the map overlays). */
 typedef struct ChestDef {
@@ -51,7 +52,7 @@ extern ChestPlacement chest_map_placements[19];
 
 void Chest_ClearOpenedFlags(void);
 void Chest_LoadForMap(void);
-void Chest_UpdateAll(s32 arg0);
+void Chest_UpdateAll(struct GfxFrameData *arg0);
 struct Actor *Chest_FindInFront(struct Actor *arg0);
 void Chest_Open(struct Actor *arg0);
 void Item_BuildMessage(s32 arg0);

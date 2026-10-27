@@ -35,6 +35,6 @@ extern ColorRGBA8 fade_damage_flash[4];
 
 void Fade_Init(void);
 void Fade_UpdateAndDraw(struct GfxFrameData *arg0);
-void Fade_Start(s32 arg0, u16 arg1, ColorRGBA8 *arg2);
+void Fade_Start(s32 frames, u16 flags, ColorRGBA8 *ramp);
 
 #endif

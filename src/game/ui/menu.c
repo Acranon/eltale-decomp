@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/ui/menu.h"
 
 /*
  * Start-button menu (game state 2): four pages (stats, map, element levels, options) with
@@ -46,12 +46,6 @@ extern u16 core_game_mode;
 extern u16 input_pressed_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
-void Menu_UpdatePageSlide(void);
-void Menu_UpdateStatsPage(s32);
-void Menu_UpdateOptionsPage(s32);
-void Menu_UpdateMapPage(s32);
-void Menu_UpdateElementsPage(s32);
-void Menu_DrawBackground();
 void SaveMenu_Update(void);
 
 void Menu_Update(s32 arg0) {
@@ -112,10 +106,6 @@ void Menu_Update(s32 arg0) {
     }
 }
 
-void Menu_UpdateStatsPage(s32);
-void Menu_UpdateOptionsPage(s32);
-void Menu_UpdateMapPage(s32);
-void Menu_UpdateElementsPage(s32);
 
 void Menu_UpdatePageSlide(void) {
     s32 mode;
@@ -202,13 +192,9 @@ extern u8 D_8007AA01;
 extern u8 D_8007AA02;
 extern u8 D_8007AA03;
 extern s32 D_8007AA10;
-extern u16 player_stat_xp_costs[];
-extern s8 menu_wobble_offsets[];
 extern s8 input_stick_x;
 extern u16 input_held_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
-void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
-void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
 
 void Menu_UpdateStatsPage(s32 x) {
     s32 px;
@@ -322,7 +308,6 @@ void Menu_UpdateStatsPage(s32 x) {
 
 #ifdef NON_MATCHING
 /* context for the NON_MATCHING Menu_UpdateOptionsPage and Menu_UpdateMapPage (their data is defined below) */
-typedef struct { void *dst; u32 start; u32 end; } D2DstRom;
 typedef struct {
     /* 0x00 */ u8 unk0[0x18];
     /* 0x18 */ f32 x;
@@ -330,23 +315,8 @@ typedef struct {
     /* 0x20 */ f32 z;
 } Unk8007AA08_2B530;
 extern Unk8007AA08_2B530 player_state;
-extern s8 menu_bgm_volume_option;
 extern s8 menu_text_delay_option;
 extern s8 input_stick_y;
-extern s16 menu_options_top_row_pos[][2];
-extern s16 menu_options_bgm_row_pos[][2];
-extern f32 menu_map_cursor_x;
-extern f32 menu_map_cursor_y;
-extern s16 menu_map_spot_coords[];
-extern void *menu_map_tluts[];
-extern void *menu_map_strips[];
-extern s16 menu_map_world_scale[];
-extern s16 menu_map_origin[];
-extern D2DstRom menu_map_picture_dma[];
-extern void *menu_map_small_tluts[];
-extern void *menu_map_small_tex[];
-extern u8 menu_map_small_sizes[][3];
-extern s16 menu_map_small_pos[];
 void Dma_ReadRom(u32, void *, s32);
 void SaveMenu_SetTextDrawState(void);
 #endif
@@ -812,20 +782,15 @@ void Menu_UpdateMapPage(s32 arg0) {
 #pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_UpdateMapPage.s")
 #endif
 
-extern s8 menu_wobble_offsets[];
 extern u8 D_8007A9F4;
 extern u8 D_8007A9F5;
 extern u8 D_8007A9F6;
 extern u8 D_8007A9F7;
 extern s32 D_8007A9E0;
 extern u8 D_8007AA04;
-extern u32 player_level_exp_table[];
 extern s8 input_stick_x;
 extern u16 input_held_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
-void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
-void Menu_DrawExpGauge(s32 arg0, s32 arg1);
-void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
 
 void Menu_UpdateElementsPage(s32 x) {
     s32 p;
@@ -913,10 +878,6 @@ void Menu_UpdateElementsPage(s32 x) {
 
 #ifdef NON_MATCHING
 /* w, s, lrs and lrt are kept in registers where retail reloads them from the stack; code is equivalent */
-extern u8 *menu_sprite_tex[];
-extern u8 menu_sprite_sizes[][2];
-extern Gfx menu_sprite_opaque_dl[];
-extern Gfx menu_sprite_alpha_dl[];
 extern u16 menu_sprite_tlut[];
 
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
@@ -1026,23 +987,13 @@ void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
 #pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_DrawSprite.s")
 #endif
 
-typedef struct {
-    u16* v[4];
-} Unk4Pals;
-typedef struct {
-    u8* v[4][2];
-} Unk4x2Ptrs;
-extern Unk4Pals menu_exp_gauge_tluts;
-extern Unk4x2Ptrs menu_exp_gauge_tex;
-extern Gfx menu_sprite_opaque_dl[];
-extern Gfx menu_sprite_alpha_dl[];
 
 void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
     s32 k;
     s32 j;
     s32 d;
-    Unk4Pals pals = menu_exp_gauge_tluts;
-    Unk4x2Ptrs tex = menu_exp_gauge_tex;
+    MenuExpGaugePalettes pals = menu_exp_gauge_tluts;
+    MenuExpGaugeTextures tex = menu_exp_gauge_tex;
     s32 xr;
     s32 x;
     s32 y;
@@ -1134,23 +1085,14 @@ void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
     menu_flags &= ~0x10;
 }
 
-typedef struct {
-    s32 v[4];
-} Unk4Words;
-typedef struct {
-    u8* v[4];
-} Unk4Ptrs;
-extern Unk4Words menu_bg_strip_tex_heights;
-extern Unk4Words menu_bg_strip_heights;
-extern Unk4Ptrs menu_bg_strip_tex;
 extern u16 menu_bg_tlut[];
 
 void Menu_DrawBackground(void) {
     s32 i;
     s32 y;
-    Unk4Words texH = menu_bg_strip_tex_heights;
-    Unk4Words stripH = menu_bg_strip_heights;
-    Unk4Ptrs tex = menu_bg_strip_tex;
+    MenuFourWords texH = menu_bg_strip_tex_heights;
+    MenuFourWords stripH = menu_bg_strip_heights;
+    MenuFourPointers tex = menu_bg_strip_tex;
 
     gDPPipeSync(gfx_dl_head++);
     gDPLoadTLUT_pal256(gfx_dl_head++, menu_bg_tlut);
@@ -1173,7 +1115,6 @@ void Menu_DrawBackground(void) {
     }
 }
 
-extern u8* menu_sprite_tex[];
 extern u16 menu_sprite_tlut[];
 
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
@@ -1271,14 +1212,8 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
 }
 
 
-typedef struct { s8 a; s8 b; } Unk80060F30;
-extern Unk80060F30 menu_map_location_list[];
 extern s32 map_id;
 extern s32 map_subarea;
-extern f32 menu_map_cursor_x;
-extern f32 menu_map_cursor_y;
-extern s16 menu_map_world_scale[];
-extern s16 menu_map_origin[];
 
 
 /* ---------------------------------------------------------------------------
@@ -1288,19 +1223,7 @@ extern s16 menu_map_origin[];
  * message text and animation keyframes are assets; ROM offsets and overlay or
  * buffer addresses are written as numbers.
  */
-typedef struct { u16 unk0; s16 unk2; u16 unk4, unk6, unk8, unkA, unkC, unkE; s32 unk10, unk14; f32 unk18, unk1C, unk20; u8 unk24[4]; u8 unk28[0x10]; } D2ActorStats; /* 0x38 */
-typedef struct { u32 start; u32 end; } D2RomRange;
-typedef struct { u16 unk0; u16 unk2; f32 x; f32 y; f32 rot; } D2PosRot;
-typedef struct { u32 start; u32 end; void *unk8; void *unkC; void *unk10; } D2OvlDef;
-typedef struct { s16 unk0, unk2, unk4, unk6; f32 unk8, unkC, unk10, unk14; } D2Place; /* 0x18 */
-typedef struct { u16 unk0, unk2, unk4, unk6; f32 unk8, unkC; } D2Scale; /* 0x10 */
-typedef struct { u16 flags; u16 unk2; u32 romStart; u32 romEnd; void *dst; void *unk10[10]; void *unk38; s32 unk3C; s32 unk40; } D2MapDef; /* 0x44 */
-typedef struct { u32 start; u32 end; void *dst; } D2RomDst;
-typedef struct { void *keys; u16 count; u16 frames; s32 pad[6]; } D2Anim; /* 0x20 */
-typedef struct { Gfx *a; Gfx *b; } D2DlPair;
-typedef struct { u32 start; u32 dl; } D2SegDl;
 #ifndef NON_MATCHING /* the NON_MATCHING build declares it earlier, for Menu_UpdateMapPage */
-typedef struct { void *dst; u32 start; u32 end; } D2DstRom;
 #endif
 extern u8 D_800620A0[];
 extern u8 D_800621A8[];
@@ -1409,7 +1332,7 @@ extern u8 D_8006BBD0[];
 void *player_char_data[1] = {
     (void*)0x80206064,
 };
-D2ActorStats player_default_stats = { 0, 0, 0x0032, 0x0032, 0x000F, 0x000F, 5, 4, 0, 500, 5e+01f, 1.6e+02f, 0.07f, { 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+ActorStats player_default_stats = { 0, 0, 0x0032, 0x0032, 0x000F, 0x000F, 5, 4, 0, 500, 5e+01f, 1.6e+02f, 0.07f, { 1, 1, 1, 1 }, 0, 0, 0, 0, 0, 0, 0, 0, 0, { 0, 0, 0 } };
 u32 player_level_exp_table[100] = {
     8, 10, 13, 17, 22, 28, 35, 44, 55, 69,
     86, 106, 130, 159, 193, 234, 282, 338, 404, 481,
@@ -1430,7 +1353,7 @@ u16 player_stat_xp_costs[70] = {
     0x0022, 0x0023, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C,
     0x002D, 0x002E, 0x0030, 0x0031, 0x0032, 0x0032, 0x0032, 0x0032, 0x0032, 0x0032,
 };
-D2RomRange player_anim_rom_ranges[30] = {
+MenuRomRange player_anim_rom_ranges[30] = {
     { 0x00EF21A0, 0x00EF3770 }, { 0x00EF3770, 0x00EF5B10 }, { 0x00EF5B10, 0x00EF7EB0 },
     { 0x00EF7EB0, 0x00EFA2A0 }, { 0x00EFA2A0, 0x00EFBD30 }, { 0x00EFBD30, 0x00EFD390 },
     { 0x00EFD390, 0x00EFF280 }, { 0x00EFF280, 0x00F00D10 }, { 0x00F00D10, 0x00F027A0 },
@@ -1442,7 +1365,7 @@ D2RomRange player_anim_rom_ranges[30] = {
     { 0x00F210A0, 0x00F22AE0 }, { 0x00F22AE0, 0x00F23ED0 }, { 0x00F23ED0, 0x00F26B90 },
     { 0x00F26B90, 0x00F28740 }, { 0x00F28740, 0x00F2A2F0 }, { 0x00F2A2F0, 0x00F2C170 },
 };
-D2PosRot player_save_spawn_points[17] = {
+SaveSpawnPoint player_save_spawn_points[17] = {
     { 0x000F, 5, -2.36f, 1.23f, 1.5793f }, { 0x0010, 7, -2.36f, 1.23f, 1.5793f },
     { 0x0010, 0x000F, -2.36f, 1.23f, 1.5793f }, { 0x0012, 6, 13.31f, 16.56f, 2.43f },
     { 0x0011, 0, -7.9f, -40.5f, -1.51f }, { 0x0012, 7, -14.4f, 18.41f, 2.46f },
@@ -1456,98 +1379,98 @@ D2PosRot player_save_spawn_points[17] = {
 u32 D_80056198[2] = {
     0, 0,
 };
-D2OvlDef enemy_area_sets[6] = {
-    { 0x00A77F10, 0x00ADA190, (void*)0x80270890, (void*)0x802705F0, (void*)0x80270934 },
-    { 0x00ADA190, 0x00B61550, (void*)0x80295990, (void*)0x80295648, (void*)0x80295A6C },
-    { 0x00B61550, 0x00BBBF30, (void*)0x80269010, (void*)0x80268DA8, (void*)0x8026909C },
-    { 0x00BBBF30, 0x00C2F900, (void*)0x80281FD0, (void*)0x80281CF8, (void*)0x80282088 },
-    { 0x00C2F900, 0x00C99EF0, (void*)0x80278C10, (void*)0x80278970, (void*)0x80278CB0 },
-    { 0x00C99EF0, 0x00CC2280, (void*)0x80236A38, (void*)0x80236958, (void*)0x80236A70 },
+EnemyAreaSet enemy_area_sets[6] = {
+    { 0x00A77F10, 0x00ADA190, (void*)0x80270890, (void*)0x802705F0, (s32)0x80270934 },
+    { 0x00ADA190, 0x00B61550, (void*)0x80295990, (void*)0x80295648, (s32)0x80295A6C },
+    { 0x00B61550, 0x00BBBF30, (void*)0x80269010, (void*)0x80268DA8, (s32)0x8026909C },
+    { 0x00BBBF30, 0x00C2F900, (void*)0x80281FD0, (void*)0x80281CF8, (s32)0x80282088 },
+    { 0x00C2F900, 0x00C99EF0, (void*)0x80278C10, (void*)0x80278970, (s32)0x80278CB0 },
+    { 0x00C99EF0, 0x00CC2280, (void*)0x80236A38, (void*)0x80236958, (s32)0x80236A70 },
 };
-D2Place enemy_attack_script_0[6] = {
-    { 25, 0, 0, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
-    { 26, 0, 8, 0, 0.0f, 0.0f, -2.0f, 0.0f },
-    { 29, 1, 0, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
-    { 33, 1, 0, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
-    { 37, 1, 0, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
-    { 41, 1, 1, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
+EnemyScriptCmd enemy_attack_script_0[6] = {
+    { 25, 0, 0, { 0, 0 }, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
+    { 26, 0, 8, { 0, 0 }, 0.0f, 0.0f, -2.0f, 0.0f },
+    { 29, 1, 0, { 0, 0 }, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
+    { 33, 1, 0, { 0, 0 }, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
+    { 37, 1, 0, { 0, 0 }, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
+    { 41, 1, 1, { 0, 0 }, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
 };
-D2Place enemy_attack_script_1[1] = {
-    { 32, 2, 5, 0, 0.0f, 0.0f, 2e+02f, 0.0f },
+EnemyScriptCmd enemy_attack_script_1[1] = {
+    { 32, 2, 5, { 0, 0 }, 0.0f, 0.0f, 2e+02f, 0.0f },
 };
-D2Place enemy_attack_script_2[5] = {
-    { 30, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
-    { 34, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
-    { 38, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
-    { 42, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
-    { 46, 16, 1, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
+EnemyScriptCmd enemy_attack_script_2[5] = {
+    { 30, 16, 0, { 0, 0 }, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
+    { 34, 16, 0, { 0, 0 }, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
+    { 38, 16, 0, { 0, 0 }, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
+    { 42, 16, 0, { 0, 0 }, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
+    { 46, 16, 1, { 0, 0 }, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
 };
-D2Place enemy_attack_script_3[1] = {
-    { 25, 17, 1, 0, 0.0f, 2e+02f, 0.0f, 0.0f },
+EnemyScriptCmd enemy_attack_script_3[1] = {
+    { 25, 17, 1, { 0, 0 }, 0.0f, 2e+02f, 0.0f, 0.0f },
 };
-D2Place enemy_attack_script_5[6] = {
-    { 1, 4, 0, 0, 0.0f, 1.3e+02f, 0.0f, 0.0f },
-    { 2, 5, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 8, 5, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 14, 5, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 20, 5, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 26, 5, 1, 0, 0.0f, 0.0f, 0.0f, 0.0f },
+EnemyScriptCmd enemy_attack_script_5[6] = {
+    { 1, 4, 0, { 0, 0 }, 0.0f, 1.3e+02f, 0.0f, 0.0f },
+    { 2, 5, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 8, 5, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 14, 5, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 20, 5, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 26, 5, 1, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place enemy_attack_script_7[1] = {
-    { 23, 14, 1, 0, 0.0f, 0.0f, 0.0f, 0.0f },
+EnemyScriptCmd enemy_attack_script_7[1] = {
+    { 23, 14, 1, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place enemy_attack_script_8[5] = {
-    { 18, 6, 0, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
-    { 19, 0, 8, 0, 0.0f, 0.0f, -1.0f, 0.0f },
-    { 20, 7, 0, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
-    { 26, 7, 0, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
-    { 32, 7, 1, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
+EnemyScriptCmd enemy_attack_script_8[5] = {
+    { 18, 6, 0, { 0, 0 }, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
+    { 19, 0, 8, { 0, 0 }, 0.0f, 0.0f, -1.0f, 0.0f },
+    { 20, 7, 0, { 0, 0 }, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
+    { 26, 7, 0, { 0, 0 }, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
+    { 32, 7, 1, { 0, 0 }, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
 };
-D2Place enemy_attack_script_10[6] = {
-    { 25, 8, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 32, 9, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 38, 9, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 44, 9, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 50, 9, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 56, 9, 1, 0, 0.0f, 0.0f, 0.0f, 0.0f },
+EnemyScriptCmd enemy_attack_script_10[6] = {
+    { 25, 8, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 32, 9, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 38, 9, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 44, 9, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 50, 9, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 56, 9, 1, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place enemy_attack_script_11[4] = {
-    { 0, 10, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 4, 10, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 8, 10, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 31, 15, 3, 0, 0.0f, 0.0f, 0.0f, 0.0f },
+EnemyScriptCmd enemy_attack_script_11[4] = {
+    { 0, 10, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 4, 10, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 8, 10, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 31, 15, 3, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place enemy_attack_script_12[4] = {
-    { 1, 11, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
-    { 9, 11, 0, 0, 0.0f, 0.0f, 0.0f, 0.7853982f },
-    { 17, 11, 0, 0, 0.0f, 0.0f, 0.0f, 15.707963f },
-    { 25, 11, 1, 0, 0.0f, 0.0f, 0.0f, 3.1415927f },
+EnemyScriptCmd enemy_attack_script_12[4] = {
+    { 1, 11, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.0f },
+    { 9, 11, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 0.7853982f },
+    { 17, 11, 0, { 0, 0 }, 0.0f, 0.0f, 0.0f, 15.707963f },
+    { 25, 11, 1, { 0, 0 }, 0.0f, 0.0f, 0.0f, 3.1415927f },
 };
-D2Place enemy_attack_script_13[5] = {
-    { 35, 12, 0, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
-    { 36, 0, 8, 0, 0.0f, 0.0f, -2.0f, 0.0f },
-    { 41, 13, 0, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
-    { 47, 13, 0, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
-    { 53, 13, 1, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
+EnemyScriptCmd enemy_attack_script_13[5] = {
+    { 35, 12, 0, { 0, 0 }, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
+    { 36, 0, 8, { 0, 0 }, 0.0f, 0.0f, -2.0f, 0.0f },
+    { 41, 13, 0, { 0, 0 }, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
+    { 47, 13, 0, { 0, 0 }, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
+    { 53, 13, 1, { 0, 0 }, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
 };
-D2Place enemy_attack_script_14[2] = {
-    { 50, 18, 0, 0, 0.0f, 8e+02f, 0.0f, 0.0f },
-    { 51, 19, 1, 0, 0.0f, 8e+02f, 0.0f, 0.0f },
+EnemyScriptCmd enemy_attack_script_14[2] = {
+    { 50, 18, 0, { 0, 0 }, 0.0f, 8e+02f, 0.0f, 0.0f },
+    { 51, 19, 1, { 0, 0 }, 0.0f, 8e+02f, 0.0f, 0.0f },
 };
-D2Place enemy_attack_script_16[4] = {
-    { 38, 21, 0, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
-    { 42, 21, 0, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
-    { 46, 21, 0, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
-    { 50, 21, 1, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
+EnemyScriptCmd enemy_attack_script_16[4] = {
+    { 38, 21, 0, { 0, 0 }, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
+    { 42, 21, 0, { 0, 0 }, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
+    { 46, 21, 0, { 0, 0 }, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
+    { 50, 21, 1, { 0, 0 }, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
 };
-D2Place *enemy_attack_scripts[20] = {
+EnemyScriptCmd *enemy_attack_scripts[20] = {
     enemy_attack_script_0, enemy_attack_script_1, enemy_attack_script_2, enemy_attack_script_3, NULL,
     enemy_attack_script_5, NULL, enemy_attack_script_7, enemy_attack_script_8, NULL,
     enemy_attack_script_10, enemy_attack_script_11, enemy_attack_script_12, enemy_attack_script_13, enemy_attack_script_14,
     NULL, enemy_attack_script_16, NULL, NULL, NULL,
 };
 /* D_8005685A and D_8005685C (undefined_syms.txt) are fields of enemy_effect_defs[20]. */
-D2Scale enemy_effect_defs[22] = {
+EnemyEffectDef enemy_effect_defs[22] = {
     { 0x0046, 7, 0x000A, 0, 1.1f, 1.1f }, { 0x0047, 0x0037, 2, 0, 1.0f, 1.0f },
     { 0x0048, 7, 2, 0, 11.0f, 11.0f }, { 0x0049, 7, 0, 0, 4.0f, 4.0f },
     { 0x004F, 7, 0x0082, 0, 4.0f, 4.0f }, { 0x0050, 7, 2, 0, 6.0f, 6.0f },
@@ -1563,52 +1486,52 @@ D2Scale enemy_effect_defs[22] = {
 s32 D_80056878[2] = {
     0, 0,
 };
-D2RomRange npc_area_set_rom_ranges[7] = {
+MenuRomRange npc_area_set_rom_ranges[7] = {
     { 0x00871D10, 0x008D1960 }, { 0x008D1960, 0x00926C00 }, { 0x00926C00, 0x0095D4E0 }, { 0x0095D4E0, 0x00988580 },
     { 0x00988580, 0x009E16C0 }, { 0x009E16C0, 0x00A14190 }, { 0x00A14190, 0x00A70350 },
 };
 u8 npc_area_entry_message[0x2F8] = {
 #include "assets/npc_area_entry_message.inc.c"
 };
-D2MapDef map_area_defs[36] = {
-    { 0x0081, 0, 0x000EF280, 0x00133F20, (void*)0x8010FE00, (void*)0x8014F640, (void*)0x8014FB80, (void*)0x8014FF78, (void*)0x8015084C, (void*)0x80150290, (void*)0x80150518, (void*)0x80154810, (void*)0x801547BC, NULL, NULL, (void*)0x80154A90, 0, 5 },
-    { 1, 0, 0x00133F20, 0x00165E70, (void*)0x8010FE00, (void*)0x80140430, (void*)0x80140790, (void*)0x80140A28, (void*)0x80140F3C, (void*)0x80140C20, (void*)0x80140D10, (void*)0x80141CA0, (void*)0x80141C8C, NULL, NULL, (void*)0x80141D44, 1, 1 },
-    { 4, 0, 0x00165E70, 0x0019C1D0, (void*)0x8010FE00, (void*)0x80144464, (void*)0x80144710, (void*)0x80144858, (void*)0x80144CFC, (void*)0x80144A50, (void*)0x80144AD0, (void*)0x80145D70, (void*)0x80145D54, (void*)0x80146128, (void*)0x80146130, NULL, 1, 1 },
-    { 4, 0, 0x0019C1D0, 0x001CA8C0, (void*)0x8010FE00, (void*)0x8013C564, (void*)0x8013C870, (void*)0x8013C9F0, (void*)0x8013CEEC, (void*)0x8013CC00, (void*)0x8013CCB8, (void*)0x8013E190, (void*)0x8013E168, (void*)0x8013E460, (void*)0x8013E468, (void*)0x8013E4DC, 1, 2 },
-    { 1, 0, 0x001CA8C0, 0x00206D70, (void*)0x8010FE00, (void*)0x80149C98, (void*)0x8014A020, (void*)0x8014A3F8, (void*)0x8014AAFC, (void*)0x8014A6B0, (void*)0x8014A8C8, (void*)0x8014C1C0, (void*)0x8014C190, NULL, NULL, (void*)0x8014C2A4, 2, 3 },
-    { 4, 0, 0x00206D70, 0x00251D30, (void*)0x8010FE00, (void*)0x80157D98, (void*)0x801582C0, (void*)0x80158518, (void*)0x80158A1C, (void*)0x80158730, (void*)0x801587E8, (void*)0x8015A9C0, (void*)0x8015A99C, (void*)0x8015AD2C, (void*)0x8015AD34, (void*)0x8015ADAC, 2, 2 },
-    { 1, 0, 0x00251D30, 0x002768B0, (void*)0x8010FE00, (void*)0x80133438, (void*)0x80133720, (void*)0x80133948, (void*)0x80133DEC, (void*)0x80133B40, (void*)0x80133BC0, (void*)0x801348B0, (void*)0x80134898, NULL, NULL, (void*)0x80134974, 2, 1 },
-    { 4, 0, 0x002768B0, 0x002A8510, (void*)0x8010FE00, (void*)0x8013F1FC, (void*)0x8013F500, (void*)0x8013F6B8, (void*)0x8013FBBC, (void*)0x8013F8D0, (void*)0x8013F988, (void*)0x80141550, (void*)0x80141528, (void*)0x801419CC, (void*)0x801419D4, (void*)0x80141A4C, 3, 2 },
-    { 1, 0, 0x002A8510, 0x002F63B0, (void*)0x8010FE00, (void*)0x8015B89C, (void*)0x8015BD20, (void*)0x8015C090, (void*)0x8015C5FC, (void*)0x8015C270, (void*)0x8015C3D0, (void*)0x8015DB50, (void*)0x8015DB28, NULL, NULL, (void*)0x8015DC8C, 3, 2 },
-    { 4, 0, 0x002F63B0, 0x003457F0, (void*)0x8010FE00, (void*)0x8015A824, (void*)0x8015AE10, (void*)0x8015B230, (void*)0x8015B7AC, (void*)0x8015B4F0, (void*)0x8015B580, (void*)0x8015E870, (void*)0x8015E860, (void*)0x8015F1A8, (void*)0x8015F1B0, NULL, 4, 1 },
-    { 4, 0, 0x003457F0, 0x0036B800, (void*)0x8010FE00, (void*)0x801343D8, (void*)0x801345C0, (void*)0x80134738, (void*)0x80134CEC, (void*)0x80134920, (void*)0x80134AB8, (void*)0x80135DB0, (void*)0x80135D90, NULL, NULL, NULL, 4, 2 },
-    { 4, 0, 0x0036B800, 0x003C9490, (void*)0x8010FE00, (void*)0x80169190, (void*)0x80169610, (void*)0x80169CE8, (void*)0x8016A510, NULL, (void*)0x8016A018, (void*)0x8016D6D8, (void*)0x8016D57C, (void*)0x8016D9C4, (void*)0x8016D9DC, (void*)0x8016DA7C, 4, 8 },
-    { 4, 0, 0x003C9490, 0x003E1090, (void*)0x8010FE00, (void*)0x80125DA4, (void*)0x80126010, (void*)0x801261D4, (void*)0x801267BC, (void*)0x801264C0, (void*)0x80126588, (void*)0x80127800, (void*)0x801277CC, (void*)0x8012796C, (void*)0x80127974, (void*)0x801279EC, 5, 3 },
-    { 2, 0, 0x003F1BA0, 0x004374F0, (void*)0x801539F0, (void*)0x80194B14, (void*)0x80195480, (void*)0x80195E98, (void*)0x801967F8, (void*)0x80196108, (void*)0x80196510, (void*)0x80198F84, (void*)0x80198980, NULL, NULL, (void*)0x80199330, 0, 18 },
-    { 2, 0, 0x004374F0, 0x00487890, (void*)0x801539F0, (void*)0x8019DFA0, (void*)0x8019EC80, (void*)0x8019F7E0, (void*)0x8019FFF0, NULL, (void*)0x8019FD88, (void*)0x801A3900, (void*)0x801A3590, NULL, NULL, (void*)0x801A3D7C, 1, 16 },
-    { 2, 0, 0x00487890, 0x0049D830, (void*)0x801539F0, (void*)0x80166974, (void*)0x80167120, (void*)0x80167738, (void*)0x80167EF0, (void*)0x80167948, (void*)0x80167C98, (void*)0x801696A0, (void*)0x80169530, NULL, NULL, (void*)0x80169980, 0, 14 },
-    { 2, 0, 0x0049D830, 0x004CD2E0, (void*)0x801539F0, (void*)0x8017DA08, (void*)0x8017E510, (void*)0x8017EF80, (void*)0x8017FB58, (void*)0x8017F300, (void*)0x8017F850, (void*)0x8018302C, (void*)0x80182D34, NULL, NULL, (void*)0x8018348C, 1, 22 },
-    { 2, 0, 0x004CD2E0, 0x004E44A0, (void*)0x801539F0, (void*)0x80168D4C, (void*)0x801691F0, (void*)0x80169680, (void*)0x80169BD0, (void*)0x801697F8, (void*)0x80169AA0, (void*)0x8016A978, (void*)0x8016A75C, NULL, NULL, (void*)0x8016ABA4, 2, 8 },
-    { 2, 0, 0x004E44A0, 0x004F4E70, (void*)0x801539F0, (void*)0x801621D4, (void*)0x80162940, (void*)0x80162C10, (void*)0x801630B0, NULL, (void*)0x80162E90, (void*)0x80164180, (void*)0x801640FC, NULL, NULL, (void*)0x801643B8, 2, 8 },
-    { 2, 0, 0x004F4E70, 0x004FFFE0, (void*)0x801539F0, (void*)0x8015DE28, (void*)0x8015E010, (void*)0x8015E1A0, (void*)0x8015E468, NULL, (void*)0x8015E2E0, (void*)0x8015EA70, (void*)0x8015EA28, NULL, NULL, NULL, 2, 4 },
-    { 2, 0, 0x004FFFE0, 0x0051A6C0, (void*)0x801539F0, (void*)0x8016B158, (void*)0x8016B920, (void*)0x8016BEE8, (void*)0x8016C500, (void*)0x8016C0C8, (void*)0x8016C3A8, (void*)0x8016DE70, (void*)0x8016DD1C, NULL, NULL, (void*)0x8016E0BC, 2, 12 },
-    { 2, 0, 0x0051A6C0, 0x0056DB40, (void*)0x801539F0, (void*)0x801A2518, (void*)0x801A2CE0, (void*)0x801A34B8, (void*)0x801A3B08, NULL, (void*)0x801A3938, (void*)0x801A6A68, (void*)0x801A6644, NULL, NULL, (void*)0x801A6E68, 3, 13 },
-    { 2, 0, 0x0056DB40, 0x0059D6F0, (void*)0x801539F0, (void*)0x8017DA18, (void*)0x8017E500, (void*)0x8017F0A8, (void*)0x8017FDF8, (void*)0x8017F3D8, (void*)0x8017F9D8, (void*)0x80182FCC, (void*)0x80182D28, NULL, NULL, (void*)0x80183594, 3, 26 },
-    { 2, 0, 0x0059D6F0, 0x005D6D20, (void*)0x801539F0, (void*)0x80186F78, (void*)0x801879E0, (void*)0x801886D8, (void*)0x80189368, (void*)0x80188A08, (void*)0x80189040, (void*)0x8018C910, (void*)0x8018C644, NULL, NULL, (void*)0x8018D010, 4, 26 },
-    { 2, 0, 0x005D6D20, 0x005E99E0, (void*)0x801539F0, (void*)0x80164FB0, (void*)0x80165070, (void*)0x80165250, (void*)0x80165538, NULL, (void*)0x801653B8, (void*)0x80166464, (void*)0x801661A0, NULL, NULL, (void*)0x8016669C, 4, 3 },
-    { 2, 0, 0x005E99E0, 0x006078D0, (void*)0x801539F0, (void*)0x8016EEE0, (void*)0x8016F360, (void*)0x8016F860, (void*)0x80170018, (void*)0x8016FAC0, (void*)0x8016FD70, (void*)0x801716D0, (void*)0x8017162C, NULL, NULL, (void*)0x801718D0, 5, 10 },
-    { 0x0088, 0, 0x006078D0, 0x00665670, (void*)0x8010FE00, (void*)0x801649D8, (void*)0x80165460, (void*)0x80165A34, (void*)0x80165EB8, NULL, (void*)0x80165C38, (void*)0x8016D480, (void*)0x8016D430, (void*)0x8016DAC0, (void*)0x8016DAC8, (void*)0x8016DB98, 0, 5 },
-    { 0x0088, 0, 0x00665670, 0x006C4880, (void*)0x8010FE00, (void*)0x80168D08, (void*)0x8016A590, (void*)0x8016A668, (void*)0x8016A778, NULL, (void*)0x8016A6F0, (void*)0x8016E920, (void*)0x8016E910, (void*)0x8016EFD8, (void*)0x8016EFE0, NULL, 0, 1 },
-    { 0x0088, 0, 0x006C4880, 0x0071EB90, (void*)0x8010FE00, (void*)0x80163770, (void*)0x80164C90, (void*)0x80164D30, (void*)0x80164EE8, NULL, (void*)0x80164E68, (void*)0x80169C70, (void*)0x80169C5C, (void*)0x8016A0B4, (void*)0x8016A0BC, NULL, 0, 1 },
-    { 0x0088, 0, 0x0071EB90, 0x007428A0, (void*)0x8010FE00, (void*)0x8012FC8C, (void*)0x80130610, (void*)0x801306B0, (void*)0x80130868, NULL, (void*)0x801307E8, (void*)0x80133440, (void*)0x80133428, (void*)0x80133ACC, (void*)0x80133AD4, NULL, 0, 1 },
-    { 8, 0, 0x007428A0, 0x00785690, (void*)0x8010FE00, (void*)0x8014CFFC, (void*)0x8014D4A0, (void*)0x8014DDF4, (void*)0x8014E6C0, NULL, (void*)0x8014E370, (void*)0x80152534, (void*)0x80151E6C, (void*)0x80152A8C, (void*)0x80152AC4, (void*)0x80152BC4, 0, 16 },
-    { 8, 0, 0x00785690, 0x007C1CE0, (void*)0x8010FE00, (void*)0x801476DC, (void*)0x80147D20, (void*)0x80147F00, (void*)0x8014838C, NULL, (void*)0x80148068, (void*)0x8014BF70, (void*)0x8014BF38, (void*)0x8014C3F8, (void*)0x8014C400, NULL, 0, 3 },
-    { 8, 0, 0x007C1CE0, 0x007EF930, (void*)0x8010FE00, (void*)0x8013B150, (void*)0x8013B5F0, (void*)0x8013B7D0, (void*)0x8013BBB4, NULL, (void*)0x8013B900, (void*)0x8013D580, (void*)0x8013D550, (void*)0x8013D9A4, (void*)0x8013D9AC, (void*)0x8013DA3C, 0, 3 },
-    { 8, 0, 0x007EF930, 0x008231F0, (void*)0x8010FE00, (void*)0x80140DC4, (void*)0x80141190, (void*)0x80141370, (void*)0x80141714, NULL, (void*)0x80141468, (void*)0x80143300, (void*)0x801432C4, (void*)0x8014365C, (void*)0x80143664, NULL, 0, 3 },
-    { 8, 0, 0x008231F0, 0x00851240, (void*)0x8010FE00, (void*)0x80139374, (void*)0x80139680, (void*)0x80139ACC, (void*)0x8013A1B0, NULL, (void*)0x80139E80, (void*)0x8013D910, (void*)0x8013D854, (void*)0x8013DCE4, (void*)0x8013DD3C, (void*)0x8013DE48, 0, 11 },
-    { 0x0088, 0, 0x00851240, 0x00869620, (void*)0x8010FE00, (void*)0x801269B4, (void*)0x80127A80, (void*)0x80127AE8, (void*)0x80127C28, NULL, (void*)0x80127BA8, (void*)0x801281D0, (void*)0x801281C0, NULL, NULL, NULL, 0, 1 },
+MapAreaDef map_area_defs[36] = {
+    { 0x0081, { 0, 0 }, 0x000EF280, 0x00133F20, (void*)0x8010FE00, (void*)0x8014F640, (void*)0x8014FB80, (void*)0x8014FF78, (void*)0x8015084C, (void*)0x80150290, (void*)0x80150518, (void*)0x80154810, (void*)0x801547BC, NULL, NULL, (void*)0x80154A90, 0, { 0, 0, 0, 5 } },
+    { 1, { 0, 0 }, 0x00133F20, 0x00165E70, (void*)0x8010FE00, (void*)0x80140430, (void*)0x80140790, (void*)0x80140A28, (void*)0x80140F3C, (void*)0x80140C20, (void*)0x80140D10, (void*)0x80141CA0, (void*)0x80141C8C, NULL, NULL, (void*)0x80141D44, 1, { 0, 0, 0, 1 } },
+    { 4, { 0, 0 }, 0x00165E70, 0x0019C1D0, (void*)0x8010FE00, (void*)0x80144464, (void*)0x80144710, (void*)0x80144858, (void*)0x80144CFC, (void*)0x80144A50, (void*)0x80144AD0, (void*)0x80145D70, (void*)0x80145D54, (void*)0x80146128, (void*)0x80146130, NULL, 1, { 0, 0, 0, 1 } },
+    { 4, { 0, 0 }, 0x0019C1D0, 0x001CA8C0, (void*)0x8010FE00, (void*)0x8013C564, (void*)0x8013C870, (void*)0x8013C9F0, (void*)0x8013CEEC, (void*)0x8013CC00, (void*)0x8013CCB8, (void*)0x8013E190, (void*)0x8013E168, (void*)0x8013E460, (void*)0x8013E468, (void*)0x8013E4DC, 1, { 0, 0, 0, 2 } },
+    { 1, { 0, 0 }, 0x001CA8C0, 0x00206D70, (void*)0x8010FE00, (void*)0x80149C98, (void*)0x8014A020, (void*)0x8014A3F8, (void*)0x8014AAFC, (void*)0x8014A6B0, (void*)0x8014A8C8, (void*)0x8014C1C0, (void*)0x8014C190, NULL, NULL, (void*)0x8014C2A4, 2, { 0, 0, 0, 3 } },
+    { 4, { 0, 0 }, 0x00206D70, 0x00251D30, (void*)0x8010FE00, (void*)0x80157D98, (void*)0x801582C0, (void*)0x80158518, (void*)0x80158A1C, (void*)0x80158730, (void*)0x801587E8, (void*)0x8015A9C0, (void*)0x8015A99C, (void*)0x8015AD2C, (void*)0x8015AD34, (void*)0x8015ADAC, 2, { 0, 0, 0, 2 } },
+    { 1, { 0, 0 }, 0x00251D30, 0x002768B0, (void*)0x8010FE00, (void*)0x80133438, (void*)0x80133720, (void*)0x80133948, (void*)0x80133DEC, (void*)0x80133B40, (void*)0x80133BC0, (void*)0x801348B0, (void*)0x80134898, NULL, NULL, (void*)0x80134974, 2, { 0, 0, 0, 1 } },
+    { 4, { 0, 0 }, 0x002768B0, 0x002A8510, (void*)0x8010FE00, (void*)0x8013F1FC, (void*)0x8013F500, (void*)0x8013F6B8, (void*)0x8013FBBC, (void*)0x8013F8D0, (void*)0x8013F988, (void*)0x80141550, (void*)0x80141528, (void*)0x801419CC, (void*)0x801419D4, (void*)0x80141A4C, 3, { 0, 0, 0, 2 } },
+    { 1, { 0, 0 }, 0x002A8510, 0x002F63B0, (void*)0x8010FE00, (void*)0x8015B89C, (void*)0x8015BD20, (void*)0x8015C090, (void*)0x8015C5FC, (void*)0x8015C270, (void*)0x8015C3D0, (void*)0x8015DB50, (void*)0x8015DB28, NULL, NULL, (void*)0x8015DC8C, 3, { 0, 0, 0, 2 } },
+    { 4, { 0, 0 }, 0x002F63B0, 0x003457F0, (void*)0x8010FE00, (void*)0x8015A824, (void*)0x8015AE10, (void*)0x8015B230, (void*)0x8015B7AC, (void*)0x8015B4F0, (void*)0x8015B580, (void*)0x8015E870, (void*)0x8015E860, (void*)0x8015F1A8, (void*)0x8015F1B0, NULL, 4, { 0, 0, 0, 1 } },
+    { 4, { 0, 0 }, 0x003457F0, 0x0036B800, (void*)0x8010FE00, (void*)0x801343D8, (void*)0x801345C0, (void*)0x80134738, (void*)0x80134CEC, (void*)0x80134920, (void*)0x80134AB8, (void*)0x80135DB0, (void*)0x80135D90, NULL, NULL, NULL, 4, { 0, 0, 0, 2 } },
+    { 4, { 0, 0 }, 0x0036B800, 0x003C9490, (void*)0x8010FE00, (void*)0x80169190, (void*)0x80169610, (void*)0x80169CE8, (void*)0x8016A510, NULL, (void*)0x8016A018, (void*)0x8016D6D8, (void*)0x8016D57C, (void*)0x8016D9C4, (void*)0x8016D9DC, (void*)0x8016DA7C, 4, { 0, 0, 0, 8 } },
+    { 4, { 0, 0 }, 0x003C9490, 0x003E1090, (void*)0x8010FE00, (void*)0x80125DA4, (void*)0x80126010, (void*)0x801261D4, (void*)0x801267BC, (void*)0x801264C0, (void*)0x80126588, (void*)0x80127800, (void*)0x801277CC, (void*)0x8012796C, (void*)0x80127974, (void*)0x801279EC, 5, { 0, 0, 0, 3 } },
+    { 2, { 0, 0 }, 0x003F1BA0, 0x004374F0, (void*)0x801539F0, (void*)0x80194B14, (void*)0x80195480, (void*)0x80195E98, (void*)0x801967F8, (void*)0x80196108, (void*)0x80196510, (void*)0x80198F84, (void*)0x80198980, NULL, NULL, (void*)0x80199330, 0, { 0, 0, 0, 18 } },
+    { 2, { 0, 0 }, 0x004374F0, 0x00487890, (void*)0x801539F0, (void*)0x8019DFA0, (void*)0x8019EC80, (void*)0x8019F7E0, (void*)0x8019FFF0, NULL, (void*)0x8019FD88, (void*)0x801A3900, (void*)0x801A3590, NULL, NULL, (void*)0x801A3D7C, 1, { 0, 0, 0, 16 } },
+    { 2, { 0, 0 }, 0x00487890, 0x0049D830, (void*)0x801539F0, (void*)0x80166974, (void*)0x80167120, (void*)0x80167738, (void*)0x80167EF0, (void*)0x80167948, (void*)0x80167C98, (void*)0x801696A0, (void*)0x80169530, NULL, NULL, (void*)0x80169980, 0, { 0, 0, 0, 14 } },
+    { 2, { 0, 0 }, 0x0049D830, 0x004CD2E0, (void*)0x801539F0, (void*)0x8017DA08, (void*)0x8017E510, (void*)0x8017EF80, (void*)0x8017FB58, (void*)0x8017F300, (void*)0x8017F850, (void*)0x8018302C, (void*)0x80182D34, NULL, NULL, (void*)0x8018348C, 1, { 0, 0, 0, 22 } },
+    { 2, { 0, 0 }, 0x004CD2E0, 0x004E44A0, (void*)0x801539F0, (void*)0x80168D4C, (void*)0x801691F0, (void*)0x80169680, (void*)0x80169BD0, (void*)0x801697F8, (void*)0x80169AA0, (void*)0x8016A978, (void*)0x8016A75C, NULL, NULL, (void*)0x8016ABA4, 2, { 0, 0, 0, 8 } },
+    { 2, { 0, 0 }, 0x004E44A0, 0x004F4E70, (void*)0x801539F0, (void*)0x801621D4, (void*)0x80162940, (void*)0x80162C10, (void*)0x801630B0, NULL, (void*)0x80162E90, (void*)0x80164180, (void*)0x801640FC, NULL, NULL, (void*)0x801643B8, 2, { 0, 0, 0, 8 } },
+    { 2, { 0, 0 }, 0x004F4E70, 0x004FFFE0, (void*)0x801539F0, (void*)0x8015DE28, (void*)0x8015E010, (void*)0x8015E1A0, (void*)0x8015E468, NULL, (void*)0x8015E2E0, (void*)0x8015EA70, (void*)0x8015EA28, NULL, NULL, NULL, 2, { 0, 0, 0, 4 } },
+    { 2, { 0, 0 }, 0x004FFFE0, 0x0051A6C0, (void*)0x801539F0, (void*)0x8016B158, (void*)0x8016B920, (void*)0x8016BEE8, (void*)0x8016C500, (void*)0x8016C0C8, (void*)0x8016C3A8, (void*)0x8016DE70, (void*)0x8016DD1C, NULL, NULL, (void*)0x8016E0BC, 2, { 0, 0, 0, 12 } },
+    { 2, { 0, 0 }, 0x0051A6C0, 0x0056DB40, (void*)0x801539F0, (void*)0x801A2518, (void*)0x801A2CE0, (void*)0x801A34B8, (void*)0x801A3B08, NULL, (void*)0x801A3938, (void*)0x801A6A68, (void*)0x801A6644, NULL, NULL, (void*)0x801A6E68, 3, { 0, 0, 0, 13 } },
+    { 2, { 0, 0 }, 0x0056DB40, 0x0059D6F0, (void*)0x801539F0, (void*)0x8017DA18, (void*)0x8017E500, (void*)0x8017F0A8, (void*)0x8017FDF8, (void*)0x8017F3D8, (void*)0x8017F9D8, (void*)0x80182FCC, (void*)0x80182D28, NULL, NULL, (void*)0x80183594, 3, { 0, 0, 0, 26 } },
+    { 2, { 0, 0 }, 0x0059D6F0, 0x005D6D20, (void*)0x801539F0, (void*)0x80186F78, (void*)0x801879E0, (void*)0x801886D8, (void*)0x80189368, (void*)0x80188A08, (void*)0x80189040, (void*)0x8018C910, (void*)0x8018C644, NULL, NULL, (void*)0x8018D010, 4, { 0, 0, 0, 26 } },
+    { 2, { 0, 0 }, 0x005D6D20, 0x005E99E0, (void*)0x801539F0, (void*)0x80164FB0, (void*)0x80165070, (void*)0x80165250, (void*)0x80165538, NULL, (void*)0x801653B8, (void*)0x80166464, (void*)0x801661A0, NULL, NULL, (void*)0x8016669C, 4, { 0, 0, 0, 3 } },
+    { 2, { 0, 0 }, 0x005E99E0, 0x006078D0, (void*)0x801539F0, (void*)0x8016EEE0, (void*)0x8016F360, (void*)0x8016F860, (void*)0x80170018, (void*)0x8016FAC0, (void*)0x8016FD70, (void*)0x801716D0, (void*)0x8017162C, NULL, NULL, (void*)0x801718D0, 5, { 0, 0, 0, 10 } },
+    { 0x0088, { 0, 0 }, 0x006078D0, 0x00665670, (void*)0x8010FE00, (void*)0x801649D8, (void*)0x80165460, (void*)0x80165A34, (void*)0x80165EB8, NULL, (void*)0x80165C38, (void*)0x8016D480, (void*)0x8016D430, (void*)0x8016DAC0, (void*)0x8016DAC8, (void*)0x8016DB98, 0, { 0, 0, 0, 5 } },
+    { 0x0088, { 0, 0 }, 0x00665670, 0x006C4880, (void*)0x8010FE00, (void*)0x80168D08, (void*)0x8016A590, (void*)0x8016A668, (void*)0x8016A778, NULL, (void*)0x8016A6F0, (void*)0x8016E920, (void*)0x8016E910, (void*)0x8016EFD8, (void*)0x8016EFE0, NULL, 0, { 0, 0, 0, 1 } },
+    { 0x0088, { 0, 0 }, 0x006C4880, 0x0071EB90, (void*)0x8010FE00, (void*)0x80163770, (void*)0x80164C90, (void*)0x80164D30, (void*)0x80164EE8, NULL, (void*)0x80164E68, (void*)0x80169C70, (void*)0x80169C5C, (void*)0x8016A0B4, (void*)0x8016A0BC, NULL, 0, { 0, 0, 0, 1 } },
+    { 0x0088, { 0, 0 }, 0x0071EB90, 0x007428A0, (void*)0x8010FE00, (void*)0x8012FC8C, (void*)0x80130610, (void*)0x801306B0, (void*)0x80130868, NULL, (void*)0x801307E8, (void*)0x80133440, (void*)0x80133428, (void*)0x80133ACC, (void*)0x80133AD4, NULL, 0, { 0, 0, 0, 1 } },
+    { 8, { 0, 0 }, 0x007428A0, 0x00785690, (void*)0x8010FE00, (void*)0x8014CFFC, (void*)0x8014D4A0, (void*)0x8014DDF4, (void*)0x8014E6C0, NULL, (void*)0x8014E370, (void*)0x80152534, (void*)0x80151E6C, (void*)0x80152A8C, (void*)0x80152AC4, (void*)0x80152BC4, 0, { 0, 0, 0, 16 } },
+    { 8, { 0, 0 }, 0x00785690, 0x007C1CE0, (void*)0x8010FE00, (void*)0x801476DC, (void*)0x80147D20, (void*)0x80147F00, (void*)0x8014838C, NULL, (void*)0x80148068, (void*)0x8014BF70, (void*)0x8014BF38, (void*)0x8014C3F8, (void*)0x8014C400, NULL, 0, { 0, 0, 0, 3 } },
+    { 8, { 0, 0 }, 0x007C1CE0, 0x007EF930, (void*)0x8010FE00, (void*)0x8013B150, (void*)0x8013B5F0, (void*)0x8013B7D0, (void*)0x8013BBB4, NULL, (void*)0x8013B900, (void*)0x8013D580, (void*)0x8013D550, (void*)0x8013D9A4, (void*)0x8013D9AC, (void*)0x8013DA3C, 0, { 0, 0, 0, 3 } },
+    { 8, { 0, 0 }, 0x007EF930, 0x008231F0, (void*)0x8010FE00, (void*)0x80140DC4, (void*)0x80141190, (void*)0x80141370, (void*)0x80141714, NULL, (void*)0x80141468, (void*)0x80143300, (void*)0x801432C4, (void*)0x8014365C, (void*)0x80143664, NULL, 0, { 0, 0, 0, 3 } },
+    { 8, { 0, 0 }, 0x008231F0, 0x00851240, (void*)0x8010FE00, (void*)0x80139374, (void*)0x80139680, (void*)0x80139ACC, (void*)0x8013A1B0, NULL, (void*)0x80139E80, (void*)0x8013D910, (void*)0x8013D854, (void*)0x8013DCE4, (void*)0x8013DD3C, (void*)0x8013DE48, 0, { 0, 0, 0, 11 } },
+    { 0x0088, { 0, 0 }, 0x00851240, 0x00869620, (void*)0x8010FE00, (void*)0x801269B4, (void*)0x80127A80, (void*)0x80127AE8, (void*)0x80127C28, NULL, (void*)0x80127BA8, (void*)0x801281D0, (void*)0x801281C0, NULL, NULL, NULL, 0, { 0, 0, 0, 1 } },
 };
-D2RomDst map_extra_rom_ranges[6] = {
+MapRomRange map_extra_rom_ranges[6] = {
     { 0x000C8DE0, 0x000D0570, (void*)0x801F8000 }, { 0x000D0570, 0x000D7FE0, (void*)0x801F8000 },
     { 0x000D7FE0, 0x000DD790, (void*)0x801F8000 }, { 0x000DD790, 0x000E4D00, (void*)0x801F8000 },
     { 0x000E4D00, 0x000EBDE0, (void*)0x801F8000 }, { 0x000EBDE0, 0x000EF280, (void*)0x801F8000 },
@@ -1654,19 +1577,19 @@ s8 mapobj_cell_disc_r2[22][2] = {
 u32 mapobjanim_type23_keys[0x8F] = {
 #include "assets/mapobjanim_type23_keys.inc.c"
 };
-D2Anim mapobjanim_type23_anim = { mapobjanim_type23_keys, 0x000B, 0x0051, 0, 0, 0, 0, 0, 0 };
+MapObjAnimDef mapobjanim_type23_anim = { mapobjanim_type23_keys, 0x000B, 0x0051, 0, 0, 0, 0, 0, 0 };
 u32 D_80057A18[0xC3] = {
 #include "assets/D_80057A18.inc.c"
 };
-D2Anim D_80057D24 = { D_80057A18, 0x000F, 0x006E, 0, 0, 0, 0, 0, 0 };
+MapObjAnimDef D_80057D24 = { D_80057A18, 0x000F, 0x006E, 0, 0, 0, 0, 0, 0 };
 u32 mapobjanim_type23_odd_keys[0x8F] = {
 #include "assets/mapobjanim_type23_odd_keys.inc.c"
 };
-D2Anim mapobjanim_type23_odd_anim = { mapobjanim_type23_odd_keys, 0x000B, 0x0064, 0, 0, 0, 0, 0, 0 };
+MapObjAnimDef mapobjanim_type23_odd_anim = { mapobjanim_type23_odd_keys, 0x000B, 0x0064, 0, 0, 0, 0, 0, 0 };
 u32 mapobjanim_type4_keys[0x1A] = {
 #include "assets/mapobjanim_type4_keys.inc.c"
 };
-D2Anim mapobjanim_type4_anim = { mapobjanim_type4_keys, 2, 0x001E, 0, 0, 0, 0, 0, 0 };
+MapObjAnimDef mapobjanim_type4_anim = { mapobjanim_type4_keys, 2, 0x001E, 0, 0, 0, 0, 0, 0 };
 u32 mapobj_loop_anim0_keys[0x27] = {
 #include "assets/mapobj_loop_anim0_keys.inc.c"
 };
@@ -1679,7 +1602,7 @@ u32 mapobj_loop_anim2_keys[0x41] = {
 u32 mapobj_loop_anim3_keys[0x41] = {
 #include "assets/mapobj_loop_anim3_keys.inc.c"
 };
-D2Anim mapobj_loop_anims[4] = {
+MapObjAnimDef mapobj_loop_anims[4] = {
     { mapobj_loop_anim0_keys, 3, 0x003C, 0, 0, 0, 0, 0, 0 },
     { mapobj_loop_anim1_keys, 4, 0x003C, 0, 0, 0, 0, 0, 0 },
     { mapobj_loop_anim2_keys, 5, 0x0050, 0, 0, 0, 0, 0, 0 },
@@ -1793,7 +1716,7 @@ Gfx mapobj_kind12_quad_dl[3] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* D_8005E5AC (undefined_syms.txt) is mapobj_animtex_dls[1].b. */
-D2DlPair mapobj_animtex_dls[2] = {
+MapDlPair mapobj_animtex_dls[2] = {
     { mapobj_kind11_setup_dl, mapobj_kind11_quad_dl }, { mapobj_kind12_setup_dl, mapobj_kind12_quad_dl },
 };
 u8 *mapobj_kind11_frames[8] = {
@@ -1859,7 +1782,7 @@ Gfx mapobj_drop_sprite_dl[10] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* D_80060C4C (undefined_syms.txt) is map_backdrop_defs[0].dl. */
-D2SegDl map_backdrop_defs[8] = {
+MapBackdropDef map_backdrop_defs[8] = {
     { 0x00D86970, 0x01001300 }, { 0x00D8B170, 0x01001300 }, { 0x00D8F970, 0x01002410 }, { 0x00D92D70, 0x01003630 },
     { 0x00D96570, 0x01003630 }, { 0x00D99D70, 0x01003630 }, { 0x00D9D570, 0x01003630 }, { 0x00DA0D70, 0x01003630 },
 };
@@ -1917,7 +1840,7 @@ Gfx menu_sprite_alpha_dl[7] = {
 };
 f32 menu_map_cursor_x = -1.0f;
 f32 menu_map_cursor_y = -1.0f;
-Unk80060F30 menu_map_location_list[298] = {
+MenuMapLocation menu_map_location_list[298] = {
     { 2, 0 }, { -2, -1 }, { 0, 0 }, { 0, 1 }, { 13, 0 }, { 13, 1 }, { 13, 2 }, { 13, 3 }, { 13, 4 }, { 13, 5 },
     { 13, 6 }, { 13, 7 }, { 13, 8 }, { 13, 9 }, { 13, 10 }, { 13, 11 }, { 13, 12 }, { 13, 13 }, { 13, 14 }, { 13, 15 },
     { 13, 16 }, { 13, 17 }, { 15, 0 }, { 15, 1 }, { 15, 2 }, { 15, 3 }, { 15, 4 }, { 15, 5 }, { 15, 6 }, { 15, 7 },
@@ -1995,7 +1918,7 @@ s16 menu_map_world_scale[12] = {
 s16 menu_map_origin[12] = {
     139, 125, 124, 124, 88, 133, 88, 95, 87, 78, 60, 96,
 };
-D2DstRom menu_map_picture_dma[10] = {
+MenuPictureDma menu_map_picture_dma[10] = {
     { (void*)0x801C0000, 0x00F2FB70, 0x00F3ADD0 }, { (void*)0x801C0000, 0x00F3ADD0, 0x00F46030 },
     { (void*)0x801C0000, 0x00F46030, 0x00F51290 }, { (void*)0x801C0000, 0x00F51290, 0x00F5C4F0 },
     { (void*)0x801C0000, 0x00F5C4F0, 0x00F67750 }, { (void*)0x801C0000, 0x00F67750, 0x00F729B0 },
@@ -2029,11 +1952,11 @@ s16 menu_options_bgm_row_pos[5][2] = {
 #ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
 s32 menu_map_loaded_region = -1;
 #endif
-Unk4Pals menu_exp_gauge_tluts = { { D_80068EB0, D_8006A8F0, D_8006B4D8, D_80069A98 } };
-Unk4x2Ptrs menu_exp_gauge_tex = { { { D_800690B8, D_800695A8 }, { D_8006AAF8, D_8006AFE8 }, { D_8006B6E0, D_8006BBD0 }, { D_80069CA0, D_8006A2C8 } } };
-Unk4Words menu_bg_strip_tex_heights = { { 32, 32, 32, 24 } };
-Unk4Words menu_bg_strip_heights = { { 26, 26, 26, 20 } };
-Unk4Ptrs menu_bg_strip_tex = { { menu_bg_strip_tex_0, menu_bg_strip_tex_1, menu_bg_strip_tex_2, menu_bg_strip_tex_3 } };
+MenuExpGaugePalettes menu_exp_gauge_tluts = { { D_80068EB0, D_8006A8F0, D_8006B4D8, D_80069A98 } };
+MenuExpGaugeTextures menu_exp_gauge_tex = { { { D_800690B8, D_800695A8 }, { D_8006AAF8, D_8006AFE8 }, { D_8006B6E0, D_8006BBD0 }, { D_80069CA0, D_8006A2C8 } } };
+MenuFourWords menu_bg_strip_tex_heights = { { 32, 32, 32, 24 } };
+MenuFourWords menu_bg_strip_heights = { { 26, 26, 26, 20 } };
+MenuFourPointers menu_bg_strip_tex = { { menu_bg_strip_tex_0, menu_bg_strip_tex_1, menu_bg_strip_tex_2, menu_bg_strip_tex_3 } };
 
 void Text_DrawEncodedString(s32, s32, u8 *);
 

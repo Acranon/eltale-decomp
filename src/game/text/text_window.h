@@ -39,17 +39,17 @@ typedef struct TextWindowRect {
     /* 0x02 */ s16 unk2;
     /* 0x04 */ s16 unk4;
     /* 0x06 */ s16 unk6;
-} TextWindowRect;
+} TextWindowRect; /* 0x8 bytes */
 
 typedef struct TextChoiceRows {
     /* 0x00 */ s32 n;
     /* 0x04 */ s32 m;
     /* 0x08 */ u8 *rows[4];
-} TextChoiceRows;
+} TextChoiceRows; /* 0x18 bytes */
 
 typedef struct TextAnimSteps {
     /* 0x0 */ u8 v[8];
-} TextAnimSteps;
+} TextAnimSteps; /* 0x8 bytes */
 
 typedef struct TextTexturePointers {
     /* 0x00 */ u8 *p[5];
@@ -66,7 +66,7 @@ typedef struct TextTextureTile {
 
 typedef struct TextTextureTiles {
     /* 0x00 */ TextTextureTile e[5];
-} TextTextureTiles;
+} TextTextureTiles; /* 0x78 bytes */
 
 extern s8 text_reveal_delay_steps[8];
 extern TextWindowRect text_window_default_rects[8];
