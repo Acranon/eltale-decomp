@@ -1,3 +1,4 @@
+# r2 reviewed 2026-10-26: kept 6, renamed 0, reverted 0
 # D3 b04 animation
 # old<TAB>new<TAB>evidence
 func_800201A0	Anim_SetCurrentAndNext	Sets current and queued animation indices and frame values, resetting frame counters when requested.

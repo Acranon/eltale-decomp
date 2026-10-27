@@ -1,8 +1,9 @@
+# r2 reviewed 2026-10-26: kept 58, renamed 1, reverted 0
 # b06 D3 round 1: save menu, text, input/Pak, overlays, cutscenes
 # old<TAB>new<TAB>evidence
 func_8002FA00	SaveMenu_Init	Sets the save-menu state flags, selection, fade value, and navigation counters to initial values.
 func_8002FA6C	SaveMenu_Update	Advances the menu state and dispatches the slot list, dialog, load, save, delete, repair, or delay handler.
-func_8002FBE0	SaveMenu_DrawOperationPanel	Draws the rectangular panel and selects its message from the current operation index.
+func_8002FBE0	SaveMenu_DrawOperationPanel	Drawn while D_8008FB70 & 0x2000 (the frame before a Pak operation runs): a framed panel with message D_8006C8F8[D_8008FB73], which the menu sets per operation (1 load, 2 save, 3 delete, 4 repair, 0 the initial Pak check).
 func_8002FDB8	SaveMenu_CheckControllerPak	Initializes or repairs the selected Pak, scans game files, and selects the error or file-list state.
 func_800301DC	SaveMenu_UpdateDialog	Draws the selected message and optional two-choice prompt, then processes button and stick input to change menu state.
 func_80030D5C	SaveMenu_UpdateSlotList	Renders up to two file-slot summaries and selection arrows, then handles stick navigation and confirmation.
@@ -21,7 +22,7 @@ func_80032BF8	Text_ResetWindow	Clears one window's flags, text buffers, choice r
 func_80032D20	Text_OpenWindow	Finds a free window, copies name/message/choice data, assigns geometry and display flags, and returns its slot.
 func_80033050	Text_UpdateAndDrawWindows	Orders four windows, advances opening/closing and message/choice states, reads input, and emits their graphics.
 func_8003403C	Text_AnimateWindowSize	Draws a centered window at the current size step, increments the step, and reports completion.
-func_80034274	Text_DrawWindowContents	Draws a window's name, prepared message buffer, and optional title texture.
+func_80034274	Text_DrawWindowContents	Draws a window's visible page; when the window has a speaker name, first a name-plate texture (type 1, 40x13) and the name.
 func_80034380	Text_DrawWindowFrame	Draws a filled rectangle, shadow edges, and bright border for one text window.
 func_8003453C	Text_BuildVisiblePage	Copies encoded text into the visible buffer by row width and line count, handling page and end markers.
 func_800348B8	Text_DrawAdvanceIndicator	Animates and draws the small bottom-right marker for a waiting text window.
@@ -54,8 +55,8 @@ func_8003627C	Cutscene_StartNextScene	Advances to the next scene entry, loads it
 func_8003642C	Cutscene_UpdateScene	Applies the current camera frame and triggers the end transition near the scene's final frame.
 func_800364F4	Cutscene_EndScene	Sets continuation or exit flags according to whether the scene index has reached the last entry.
 func_80036544	Cutscene_ApplyCameraFrame	Samples a camera track at the requested frame and writes camera position and orientation.
-func_80036664	Cutscene_DrawImageCues	Starts frame-indexed image cues, draws each active textured rectangle with fade alpha, and advances cue timers.
+func_80036664	Cutscene_UpdateAndDrawImageCues	Starts the cues whose frame equals the scene frame counter, draws each active cue (CI4 image + palette) as a textured rectangle with fade-in/out alpha, counts the cue timers down and advances the frame counter.
 func_80002F40	Cutscene_StartEntry	Loads an entry's map, player, NPCs, camera, and message-sequence pointers.
 func_80003184	Cutscene_UpdateMessageSequence	Advances timed message/name pairs and reports when the sequence has finished.
-func_8000328C	Cutscene_StartAudioFadeForEntry	Starts a 64-frame audio fade when the current entry's audio marker differs from the previous entry's.
+func_8000328C	Cutscene_StartAudioFadeForEntry	Fades the BGM out over 64 (Audio_StartSeqFadeOut(0x40)) when entry arg0 is past 6 or its +0x3E word (low byte = the BGM Cutscene_StartEntry plays) differs from the previous entry's.
 func_800032E4	Cutscene_CopyMessageBuffers	Copies one message and one speaker-name buffer into the shared text-window globals.
