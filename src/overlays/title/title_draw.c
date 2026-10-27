@@ -1,16 +1,9 @@
-#include "common.h"
+#include "overlays/title/title_draw.h"
 
 /*
  * Title overlay: draws the title screen, its menu cursors and message windows; screen fades.
  * Original file: ovl_title/DAC190.c (ROM 0xDAC190).
  */
-
-typedef struct {
-    u16 unk0;
-    u16 unk2;
-    f32 unk4;
-    f32 unk8;
-} UnkStruct_8020EF00;
 
 typedef struct {
     s16 x;
@@ -412,7 +405,6 @@ s32 title_screen_fade_state = 0;
 s32 title_screen_fade_frames = 2;
 s32 D_80226DC0_ovl_title;
 
-void Title_StepAndDrawScreenFade(UnkStruct_8020EF00* arg0);
 
 void Title_UpdateScreenFade(void) {
     static UnkFade_8020F4F8 fade = { 0 };
@@ -440,11 +432,11 @@ void Title_UpdateScreenFade(void) {
                     break;
             }
         }
-        Title_StepAndDrawScreenFade((UnkStruct_8020EF00*) &fade);
+        Title_StepAndDrawScreenFade((TitleFade*) &fade);
     }
 }
 
-void Title_StepAndDrawScreenFade(UnkStruct_8020EF00* arg0) {
+void Title_StepAndDrawScreenFade(TitleFade* arg0) {
     s32 rgbColorValue;
     s32 alpha;
 
