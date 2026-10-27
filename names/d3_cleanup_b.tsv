@@ -11,7 +11,7 @@ func_80019408	Magic_ApplyEnemyStatRevealStatus	Sets status bit 0x80; Hud_DrawEne
 func_80019450	Magic_ApplyMagicHitBlockStatus	Sets status bit 0x100; Magic_UpdateEffects skips the hit handler for targets with this bit except target-select handler 2.
 func_80019498	Magic_ApplyResourceGainOnDamageStatus	Sets status bit 0x200; Player_TakeDamage and Enemy_TakeDamage add damage amount to MP/secondary resource while still reducing HP.
 func_800194E0	Magic_ApplyDefenseScaleStatus	Sets status bit 0x400 and writes ActorBattle.defense as half, three-quarters, one-and-a-half or twice base defense; damage formula reads live defense.
-D_800616B4	text_choice_order_empty_word	Text_BuildVisiblePage copies this -1 word into a four-byte choice-order union, marking each choice-row index absent before the scan.
+D_800616B4	text_choice_order_empty_word	Text_UpdateAndDrawWindows copies this -1 word into a four-byte choice-order union, marking each choice-row index absent before the scan.
 D_800616B8	text_advance_icon_diagonal_offsets	Text_DrawAdvanceIndicator copies its eight-step array and adds each value to icon x while subtracting it from icon y.
 D_800616C0	text_advance_line_widths	Text_DrawAdvanceIndicator uses each step as the width argument when drawing the advance-indicator line texture.
 D_800616C8	text_advance_line_x_offsets	Text_DrawAdvanceIndicator subtracts each step from the advance-indicator line x coordinate before drawing.
