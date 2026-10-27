@@ -1,60 +1,63 @@
+# r3b reviewed 2026-10-26: kept 74, renamed 23, reverted 2, added 2 (left D_ but read)
 # b04 round 3: data names owned by effects, battle, animation and HUD modules
 # old<TAB>new<TAB>evidence
-D_8004EE20	effect_foot_particle_template	Effect_StartFootEmitter and Effect_UpdateFootEmitters fill this descriptor, then pass it to Effect_AllocateSprite.
+D_8004EE20	effect_foot_particle_template	Effect_UpdateFootEmitters fills its position/velocity and passes it to Effect_AllocateSprite (step callback Effect_UpdateFootParticle); Player_StateMove fills and allocates it too while running.
 D_8004EE60	effect_foot_particle_scale_anim	Effect_UpdateFootParticle indexes this 12-entry table to set both sprite scale components by age.
 D_8004EE90	effect_foot_particle_alpha_anim	Effect_UpdateFootParticle uses this 12-entry table as the env-color alpha by particle age.
 D_800863F0	effect_mapobj_emitter_count	Effect_QueueMapObjEmitter increments it for each visible queued emitter; frame loops reset it.
 D_800863F4	effect_model_frame_counter	Effect_UpdateAndDrawModelEffects toggles alpha from its low bit and increments it after drawing.
-D_800863F8	effect_mapobj_previous_count	Effect_UpdateMapObjEmitters copies the current emitter count here; the queue search uses it to scan the previous buffer.
+D_800863F8	effect_mapobj_emitter_prev_count	Effect_UpdateMapObjEmitters copies effect_mapobj_emitter_count here; Effect_QueueMapObjEmitter searches that many records of the other (last frame's) buffer to keep an emitter's timer.
 D_80086400	effect_foot_emitter_slots	Eight records reset and advanced by Effect_ResetFootEmitters and Effect_UpdateFootEmitters.
-D_80086440	effect_mapobj_emitter_buffer_a	One of the two eight-entry buffers alternated by Effect_QueueMapObjEmitter via frame parity.
-D_80086500	effect_mapobj_emitter_buffer_b	The other eight-entry frame-parity buffer in Effect_QueueMapObjEmitter.
+D_80086440	effect_mapobj_emitter_buf1	8 emitter records (timer, x/y/z, size, map object): the current buffer of Effect_QueueMapObjEmitter/Effect_UpdateMapObjEmitters when gfx_frame_index is non-zero (same scheme as mapobj_spinner_buf1).
+D_80086500	effect_mapobj_emitter_buf0	the other emitter buffer, current when gfx_frame_index is 0 (see effect_mapobj_emitter_buf1).
 D_800865C0	effect_floating_number_slots	Ten timed records allocated by Effect_AddFloatingNumber and drawn by Effect_DrawFloatingNumbers.
 D_800866D8	effect_converge_emitter_slots	Eight entries reset by Effect_ResetConvergeEmitters and advanced by Effect_UpdateConvergeEmitters.
 D_80086798	effect_model_slots	Thirty-two model-effect records allocated by Effect_CreateModelEffect and drawn by Effect_UpdateAndDrawModelEffects.
 D_80087298	effect_streak_slots	Thirty-two streak records reset, spawned and drawn by the Effect_*Streak functions.
-D_80087798	effect_stat_marker_slots	Four timed actor markers activated by Effect_ActivateStatUpMarker and drawn by Effect_DrawStatUpMarkers.
-D_800877A8	effect_ring_slots	Four terrain ring records allocated by Effect_CreateTerrainRing and drawn by Effect_DrawRings.
-D_80087DF8	effect_loaded_tlut_index	Effect_UpdateAndDrawModelEffects resets it to FFFF; the texture helper reloads a TLUT only when its index changes.
-D_80087E00	effect_rotated_offset_scratch	Effect code fills this vector and passes it to Math_RotateVec2 for particle or ring positions.
-D_80087E10	effect_floor_collision_scratch	Effect_CreateTerrainRing passes it to Coll_ResolveFloorAndWalls and reads floor Y and normal.
+D_80087798	effect_stat_up_marker_slots	4 timers, one per stat: Effect_StartStatUpMarker(i) sets [i] to 25, Effect_DrawStatUpMarkers draws a marker above player_shadow_pos while non-zero and counts it down, Effect_ResetStatUpMarkers clears them.
+D_800877A8	effect_ring_slots	Four terrain ring records allocated by Effect_CreateTerrainRing (16 floor-following points), faded by Effect_FadeRing and drawn by Effect_UpdateAndDrawRings.
+D_80087DF8	effect_loaded_tlut_index	Effect_UpdateAndDrawModelEffects resets it to FFFF; Effect_ConfigureModelEffectTexture loads a TLUT (effect_model_tlut_ptrs) only when the effect's index differs.
+D_80087E00	effect_temp_vec	scratch vec2 rotated with Math_RotateVec2 and read back at once: foot-particle velocity in Effect_UpdateFootEmitters, ring point offsets in Effect_CreateTerrainRing.
+D_80087E10	effect_ring_coll	out record of Effect_CreateTerrainRing's Coll_ResolveFloorAndWalls calls (0xA00): floor y and normal per ring point, flags 0x8000 = no floor.
 D_8004EE9C	effect_mapobj_particle_template	Function-static sprite descriptor filled from a map-object emitter and passed to Effect_AllocateSprite.
 D_8004EEDC	effect_mapobj_particle_alpha_anim	Effect_UpdateMapObjParticle selects env-color alpha from this age-indexed table.
 D_8004EF0C	effect_flipbook_sprite_template	Function-static sprite descriptor filled by Effect_SpawnFlipbookSprite before allocation.
 D_8004EF4C	effect_flipbook_frame_ptrs	Effect_UpdateFlipbookSprite selects one of three frame addresses by age group.
 D_8004EF58	effect_flipbook_scale_anim	Effect_UpdateFlipbookSprite indexes the twelve scale values by particle age.
 D_8004EF88	effect_flipbook_alpha_anim	Effect_UpdateFlipbookSprite indexes the twelve alpha values by particle age.
-D_8004EF94	effect_converge_colors	Effect_UpdateConvergeParticle indexes this four-color table for sprite color.
-D_8004EFA4	effect_converge_particle_template	Effect_StartConvergeEmitter copies this descriptor before creating a sprite particle.
+D_8004EF94	effect_floating_number_colors	4 RGBA colours: Effect_DrawFloatingNumbers sets the digits' env colour from [number flags & 0xF] (flags from Effect_AddFloatingNumber).
+D_8004EFA4	effect_converge_particle_template	Effect_UpdateConvergeEmitters copies this sprite descriptor (step callback Effect_UpdateConvergeParticle), fills position/velocity/colour and allocates it.
 D_8004EFE4	effect_burst_particle_template	Effect_SpawnBurst copies this descriptor before creating burst particles.
-D_8004F024	effect_ring_lifetimes	Effect_CreateTerrainRing chooses an initial ring lifetime from this four-entry table.
+D_8004F024	effect_ring_grow_frames	Effect_CreateTerrainRing sets the ring's phase-1 length from [variant]; Effect_UpdateAndDrawRings scales the ring up by sin over that many frames, then leaves phase 1 (it stays until Effect_FadeRing).
 D_8004F02C	effect_ring_colors	Effect_DrawRings indexes these RGB entries by ring variant.
-D_8004F038	effect_ring_alpha_values	Effect_DrawRings chooses an alpha value from this table by ring state.
+D_8004F038	effect_ring_alpha_values	Effect_UpdateAndDrawRings takes the ring alpha from [frame counter & 1] (0xFF/0x96 flicker) before the grow/fade scaling.
 D_8004F03C	effect_model_tlut_ptrs	Effect_ConfigureModelEffectTexture loads the selected 256-color TLUT through these four addresses.
-D_8004F04C	effect_ring_segment_colors	Effect_DrawRings uses this five-entry RGB table for its segment env colors.
-D_8004F060	effect_sprite_setup_dl	Effect_DrawSprites emits this display list before drawing sprite effects.
+D_8004F04C	effect_stat_up_marker_colors	Effect_DrawStatUpMarkers sets marker i's env colour from [i] (i = the stat passed to Effect_StartStatUpMarker; entry 4 unused).
+D_8004F060	effect_sprite_setup_dl	Effect_UpdateAndDrawSprites calls this display list for each sprite that has no step callback (render mode/combiner setup).
 D_80087E30	effect_active_sprite_count	Effect_ResetSpritePool clears it, allocation increments it, drawing decrements it when entries expire.
 D_80087E38	effect_sprite_slots	The 256-entry sprite pool reset, allocated, and drawn by Effect_ResetSpritePool, Effect_AllocateSprite and Effect_DrawSprites.
 D_8004F0A0	effect_texture_tile_sizes	Effect_LoadSpriteTexture uses these powers of two to select tile mask dimensions.
-D_8008BE40	battle_rotated_offset_scratch	Battle camera and encounter spawning write a 2D offset here before Math_RotateVec2.
-D_8008BE4C	battle_camera_phase	Battle_UpdateTurnCamera switches on this value and advances it after its timed phase.
-D_8008BE4E	battle_camera_phase_timer	Battle_UpdateTurnCamera initializes it to 60 and decrements it to end the current camera phase.
-D_8008BE50	battle_camera_enemy_index	Battle_UpdateTurnCamera indexes D_8007B908 with this selected enemy slot.
+D_8008BE40	battle_temp_vec	scratch vec2 rotated with Math_RotateVec2 and read back at once: camera offsets in Battle_UpdateStartCamera, enemy spawn offsets in Battle_SpawnEncounterGroup.
+D_8008BE4C	battle_camera_phase	Battle_UpdateStartCamera switches on it (0: view the chosen enemy, 1: wait, then return to the player camera); set to 0 by Battle_TryStartRandomEncounter, 1 by Battle_StartBossEncounter.
+D_8008BE4E	battle_camera_phase_timer	Battle_UpdateStartCamera sets 60 after phase 0 and counts it down in phase 1; at 0 it clears battle_flags 0x200 and restores the camera preset.
+D_8008BE50	battle_camera_enemy_index	Math_Rand(enemy_count) at a random encounter (0 for a boss); Battle_UpdateStartCamera points the camera at enemy_slots[it].
 D_8008BE52	battle_flags	Battle_StartBossEncounter and Battle_TryStartRandomEncounter set it; bit 1 is tested as battle-active across player, enemy and HUD code.
 D_8008BE54	battle_turn_delay	Battle_UpdateTurnTransition decrements the delay set when combat starts or a turn ends.
 D_8008BE58	battle_turn_order_index	Battle_EndTurn advances this index through D_8007C050 to select the next living enemy.
-D_8008BE5A	battle_enemy_count	Battle setup sets it from D_8007B900; turn selection and HUD loops use it as a bound.
+D_8008BE5A	battle_enemy_count	Battle_SpawnEncounterGroup / Battle_StartBossEncounter set it from enemy_count; the turn-order loops (Battle_EndTurn, Player_FindMeleeTarget) and the drop roll use it as the bound.
 D_8008BE5C	battle_center_x	Battle setup stores encounter or boss X; rings, camera and movement use it as the combat center.
 D_8008BE60	battle_center_z	Battle setup stores encounter or boss Z; rings, camera and movement use it as the combat center.
-D_8008BE64	battle_active_enemy_x	Battle_UpdateTurnTransition copies the selected enemy X here; movement and a ring effect use it.
-D_8008BE68	battle_active_enemy_z	Battle_UpdateTurnTransition copies the selected enemy Z here; movement and a ring effect use it.
+D_8008BE64	battle_turn_origin_x	Battle_UpdateTurnTransition copies the active actor's x here at each turn start (an enemy on enemy turns, the player otherwise) and draws the turn ring around it; Player/Enemy movement is clamped to a radius around it, Player_AddTurnMoveAgilityXP measures from it.
+D_8008BE68	battle_turn_origin_z	z counterpart of battle_turn_origin_x.
 D_8008BE6C	battle_arena_radius	Battle setup assigns 100 or a boss-indexed radius; movement clamps against it and ring creation uses it.
-D_8008BF70	battle_spawned_actor_ptrs	Battle_SpawnEncounterGroup appends actor pointers and battle setup seeds entry zero.
-D_8008BF90	battle_spawned_actor_count	Battle_SpawnEncounterGroup increments this count when appending to battle_spawned_actor_ptrs.
+# r3b reverted battle_spawned_actor_ptrs: only written (Battle_StartBossEncounter, Battle_SpawnEncounterGroup, one entry per group), nothing reads it
+# r3b reverted battle_spawned_actor_count: only used as the write index of the write-only D_8008BF70
 D_8008BF94	battle_outer_ring_slot	Battle setup stores the slot returned by Effect_CreateTerrainRing and fades it at battle end.
 D_8008BF96	battle_turn_ring_slot	Battle_UpdateTurnTransition stores the ring slot around the active actor and fades it when the turn ends.
 D_8008BF98	battle_encounter_region_table	Battle_ResetState points it at the selected map encounter-region table; Battle_FindEncounterRegion reads it.
 D_8008BF9C	battle_encounter_group_table	Battle_ResetState points it at the selected map group table; Battle_SpawnEncounterGroup reads entries from it.
+D_8008BFA0	battle_saved_enemy_anim_tables	Battle_StartBossEncounter saves enemy_anim_tables here before swapping in the boss table; Battle_UpdateTurnTransition restores it when the boss battle is won.
+D_8008BFA4	battle_saved_enemy_names	Battle_StartBossEncounter saves enemy_names here before swapping in the boss names; Battle_UpdateTurnTransition restores it when the boss battle is won.
 D_8008BFA8	battle_boss_index_plus_one	Battle_StartBossEncounter copies D_8007C140 here; defeat handling and arena radius use its value minus one.
 D_8008BFAC	battle_travel_accumulator	Battle_TryStartRandomEncounter adds player travel to this float and tests it against 50.
 D_8008BFB0	battle_encounter_roll_limit	Battle_TryStartRandomEncounter raises this threshold and compares it with Math_Rand(2000).
@@ -64,7 +67,7 @@ D_8008BFC0	anim_node_world_positions	Anim_DrawNode stores up to four transformed
 D_8008BFF0	anim_node_position_count	Anim_DrawModel clears it and Anim_DrawNode increments it when saving node positions.
 D_8008BFF8	anim_billboard_mtx_scratch	Anim_DrawNode builds an aim-at-camera matrix here and converts it to an N64 matrix.
 D_8008C040	hud_npc_marker_phase	Hud_DrawNpcTalkMarker advances this angle and uses its sine for marker bobbing.
-D_8008C042	hud_element_allocation_flags	Hud_UpdateElementAllocation sets and clears bit 1 around its allocation animation.
+D_8008C042	hud_element_allocation_flags	Hud_UpdateElementAllocation sets bit 0 when a point is spent; when hud_element_input_timer then runs out it clears core_flags 8 (closes the panel) and toggles the bit off.
 D_8008C044	hud_clip_left	Hud_DrawClippedTextureRect rejects and clips rectangles against this left X bound.
 D_8008C048	hud_clip_top	Hud_DrawClippedTextureRect rejects and clips rectangles against this top Y bound.
 D_8008C04C	hud_clip_right	Hud_DrawClippedTextureRect rejects and clips rectangles against this right X bound.
@@ -73,29 +76,29 @@ D_8008C054	hud_clip_bottom	Hud_DrawClippedTextureRect rejects and clips rectangl
 D_8008C058	hud_popup_slots	Eight timed popup entries reset, allocated and drawn by the Hud_*Popup functions.
 D_8008C138	hud_element_gain_flash_timer	Hud_UpdateElementAllocation sets 30 on a gain; Hud_DrawElementLevels uses it for fade alpha.
 D_8008C13C	hud_selected_element_index	Hud_UpdateElementAllocation maps directional input to this 0..3 index and increments its level.
-D_8008C140	hud_rotated_vector_scratch	Hud_DrawCompass and Hud_StartActorStatusIndicator use this vector with Math_RotateVec2.
+D_8008C140	hud_temp_vec	scratch Vec3f: rotated with Math_RotateVec2 for the compass marker in Hud_DrawCompass; filled (x, y, 1.0) and passed to Magic_CreateVisualEffect by Hud_StartActorStatusIndicator.
 D_8008C14C	hud_chest_text_marker_phases	Hud_DrawChestMarker and Hud_DrawTextSpotMarker use the two angle elements for bobbing.
 D_8008C150	hud_melee_marker_phase	Hud_DrawMeleeTargetMarker advances this angle and uses its sine for marker bobbing.
-D_8008C152	hud_panel_transition_frame	Hud_Draw updates this frame up to 12 and draws meters or levels with its squared value.
+D_8008C152	hud_panel_transition_frame	Hud_Draw counts it up to 12 / down to 0 by hud_panel_transition_state; the meter and element panels slide out by its square; death and 1870 set 12.
 D_8008C154	hud_panel_transition_state	Hud_Draw switches this state among entering, exiting and idle as HUD panels change.
 D_8008C156	hud_hp_meter_width	Hud_DrawPlayerMeters eases this value toward current HP divided by maximum HP times 56 and draws the first bar.
 D_8008C158	hud_mp_meter_width	Hud_DrawPlayerMeters eases this value toward current MP divided by maximum MP times 56 and draws the second bar.
-D_8008C15A	hud_element_allocation_timer	Hud_UpdateElementAllocation and its draw path use this eight-frame timer for the selected element animation.
-D_8008C15C	hud_element_allocation_mode_flags	Player code sets bits 1 and 2; Hud_UpdateElementAllocation selects the corresponding display mode.
-D_8008C15E	hud_melee_hint_timer	Player code sets 30 and Hud_Draw decrements the timer while showing a timed combat hint.
-D_8008C160	hud_element_input_timer	Player code and Hud_UpdateElementAllocation set eight frames; draw code uses it for alpha and input timing.
-D_8008C162	hud_battle_message_timer	Battle/enemy code sets 60; Hud_Draw decrements it and positions a timed panel.
-D_8008C170	hud_pending_sequence_id	Core_RunGameplayLoop loads this audio sequence when channel zero is idle, then resets it to -1.
+D_8008C15A	hud_spell_input_anim_timer	Player_HandleSpellInput sets 8 when a direction is added or removed; Hud_DrawSpellInput and Hud_DrawSpellName use it for the slide/fade and the new-icon flash and count it down.
+D_8008C15C	hud_spell_input_anim_flags	Player_HandleSpellInput: bit 0 set when an input is added (Hud_DrawSpellInput flashes the new element icon), cleared on removal; bit 1 set for the first input (Hud_DrawSpellInput/Hud_DrawSpellName slide the panel in).
+D_8008C15E	hud_spell_name_timer	Player_StartCastSpell sets 30; Hud_Draw calls Hud_DrawSpellName and counts it down while non-zero.
+D_8008C160	hud_element_input_timer	set to 8 when the element-allocation panel opens (Player_Update on a spirit, Player_UpdateStatGrowth on a level-up) and after each point; Hud_UpdateElementAllocation slides/fades the panel with it and takes input only at 0.
+D_8008C162	hud_enemy_info_timer	Enemy_StateIdle sets 60 when an enemy's turn starts; Hud_Draw draws Hud_DrawEnemyInfoPanel (name, numbers) while it is non-zero in battle and counts it down, the panel slides in over the first 10 frames; cleared at battle end.
+D_8008C170	audio_pending_seq_id	Core_RunGameplayLoop: when not -1 and Audio_GetSeqState(0) == 0, Audio_LoadSeq(0, it) then -1; Hud_ResetState sets -1 (no other writer in the code).
 D_8008C174	hud_draw_origin_x	HUD draw routines set this X origin for panels, meters and clipped texture rectangles.
 D_8008C178	hud_draw_origin_y	HUD draw routines set this Y origin for panels, meters and clipped texture rectangles.
 D_8008C17C	hud_npc_marker_screen_y	Hud_DrawNpcTalkMarker writes projected screen Y here and uses it to place the marker.
 D_8008C180	hud_element_pulse_phase	Hud_DrawElementLevels advances this sine angle for the pulsing element icons.
-D_8004F2C4	hud_digit_glyph_data	Hud_DrawNumber uses this array as glyph-string input for formatted digits.
-D_8004F2CC	hud_element_colors	Hud_DrawElementLevels and Hud_UpdateElementAllocation index this four-color table by element.
-D_8004F2DC	hud_actor_status_masks	Hud_UpdateAndDrawActorStatusIndicators tests these eight bit masks against active actor statuses.
-D_8004F2EC	hud_actor_status_alt_masks	Hud_UpdateAndDrawActorStatusIndicators uses these four masks for the secondary status icon positions.
-D_8004F2F4	hud_element_unlock_masks	Hud_DrawElementLevels tests these four masks against player unlock bits.
+D_8004F2C4	hud_spell_locked_label	6-glyph string (asset): Hud_DrawSpellLabel draws it instead of the spell's name when Magic_GetSpellRestrictionFlags returns bit 4 (player's element level below the spell's requirement). 'locked' is a reading of that bit.
+D_8004F2CC	hud_element_colors	4 RGBA element colours: Hud_DrawElementLevels, Hud_DrawSpellInput and Hud_UpdateElementAllocation index it by element.
+D_8004F2DC	hud_actor_status_masks	7 status bits (+0): Hud_StartActorStatusIndicator stores an icon for the first matching mask, Hud_UpdateAndDrawActorStatusIndicators draws the icons and clears one when its status bit goes.
+D_8004F2EC	hud_actor_status_effect_masks	4 status bits: Hud_StartActorStatusIndicator starts a Magic_CreateVisualEffect on the actor for a matching status; Hud_UpdateAndDrawActorStatusIndicators keeps it on the actor and ends it when the status bit clears.
+D_8004F2F4	hud_element_max_level_masks	{0x1000..0x8000}: player_state flag bit per element, set when that element level is 50 (Player_Spawn, Hud_UpdateElementAllocation); Hud_DrawElementLevels draws a pulsing overlay on each element whose bit is set.
 D_8004F304	hud_spell_input_icon_positions	Hud_DrawSpellInput selects one of these four X/Y icon positions by recent input direction.
 D_8004F324	hud_element_icon_positions	Hud_UpdateElementAllocation selects one of these four X/Y positions by element index.
-D_8004F344	hud_element_milestone_masks	Hud_UpdateElementAllocation sets these bits when a selected element reaches level 50.
-D_8004F498	hud_number_spacing	Hud_DrawNumber indexes this table to choose spacing for formatted numeric glyphs.
+D_8004F344	hud_element_max_level_set_masks	same bits as hud_element_max_level_masks: Hud_UpdateElementAllocation ORs [element] into the player flags when the element reaches level 50 (the cap).
+D_8004F498	hud_spell_label_palettes	Hud_DrawSpellLabel passes [Magic_GetSpellRestrictionFlags result] as Hud_DrawGlyphString's palette (index into D_803A8778): 0 usable, 1 MP short, 2 otherwise.

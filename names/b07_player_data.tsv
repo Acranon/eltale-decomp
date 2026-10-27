@@ -1,3 +1,4 @@
+# r3b reviewed 2026-10-26: kept 46, renamed 0, reverted 0
 # D3 round 3: data names for b07_player (3F50, 9D50). old<TAB>new<TAB>evidence. Rules: ~/eltale-notes/D3_NAMING.md
 # Left D_ (3F50): D_8007A8F4/D_8007A8F8 (only zeroed by Player_Init, never read), D_8007A90E, D_8007A914, D_8007A924,
 #   D_8007A9B2, D_8007AB54..5C (unreferenced), D_8007A9B8 (summed from defeated enemies' def +0x14 and added to stats +0x14

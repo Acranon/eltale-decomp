@@ -1,3 +1,4 @@
+# r3b reviewed 2026-10-26: kept 105, renamed 2, reverted 0
 # D3 round 3: data names for b08 (AEA0, DAE0, E2A0). old<TAB>new<TAB>evidence. Rules: ~/eltale-notes/D3_NAMING.md
 # Left D_ (AEA0): D_8007B904, D_8007C09C, D_8007C0A0 (unreferenced).
 # Left D_ (DAE0): D_8007C0C8, D_8007C144, D_8007C274, D_8007C278 (unreferenced).
@@ -42,8 +43,8 @@ D_8004DDC8	mapobj_scrolltex_height	heights (0x40/0x20) of the mapobj_scrolltex_t
 D_8004DDD4	mapobj_wave_x_div	per wave kind (1-3) divisor: MapObj_CollectCell sets x = base x + sins(phase a + 0xA000) / D_8004DDD4[kind]
 D_8004DDE4	mapobj_wave_y_div	y counterpart: y = base y + sins(phase b) / D_8004DDE4[kind]
 D_8004DDF4	mapobj_wave_z_div	z counterpart: z = base z + sins(phase a + 0x2000) / D_8004DDF4[kind]
-D_8004DE04	mapobj_arc_sprite_tmpl	function-static SpriteObj of MapObj_EmitArcSprite (step callback MapObj_StepArcSprite): filled with the object's position, size and rotated velocity, then Effect_AllocateSprite(&it)
-D_8004DE44	mapobj_drop_sprite_tmpl	function-static SpriteObj of MapObj_EmitDropSprite (step callback MapObj_StepDropSprite): position and size from the object, then Effect_AllocateSprite(&it)
+D_8004DE04	mapobj_arc_sprite_template	function-static SpriteObj of MapObj_EmitArcSprite (step callback MapObj_StepArcSprite): filled with the object's position, size and rotated velocity, then Effect_AllocateSprite(&it)
+D_8004DE44	mapobj_drop_sprite_template	function-static SpriteObj of MapObj_EmitDropSprite (step callback MapObj_StepDropSprite): position and size from the object, then Effect_AllocateSprite(&it)
 D_8004DE84	mapobj_animtex_width	{0x10, 0x10}: texture width per anim-texture type (0x11/0x12) in MapObj_DrawAnimTexBillboards' gDPLoadTextureBlock
 D_8004DE88	mapobj_animtex_alpha	4 env alphas: MapObj_DrawAnimTexBillboards sets env alpha D_8004DE88[timer & 3]
 D_8004DE8C	map_clock_tlut_id	function-static of Map_BlendPaletteByClock: id of the map_clock_tlut_srcs palette for the current clock D_80084980, from map_clock_tlut_schedule
