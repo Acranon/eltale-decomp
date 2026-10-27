@@ -1,4 +1,5 @@
-#include "common.h"
+#include "game/map/collision.h"
+#include "game/map/map.h"
 
 /*
  * Map collision: floor height and normal from the room's triangle meshes (grid lookup),
@@ -6,123 +7,9 @@
  * Original file: 113F0.c (ROM 0x113F0).
  */
 
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 nx;
-    /* 0x10 */ f32 ny;
-    /* 0x14 */ f32 nz;
-    /* 0x18 */ u16 unk18;
-} CollResult;
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ u8 pad18[4];
-    /* 0x1C */ u16 *unk1C;
-    /* 0x20 */ u16 *unk20;
-    /* 0x24 */ u16 *unk24;
-    /* 0x28 */ u16 unk28;
-} Unk8007C28C;
-
-typedef struct {
-    /* 0x00 */ s16 x;
-    /* 0x02 */ s16 y;
-    /* 0x04 */ s16 z;
-    /* 0x06 */ s16 pad6;
-} CollVert;
-
-typedef struct {
-    /* 0x00 */ s16 v0;
-    /* 0x02 */ s16 v1;
-    /* 0x04 */ s16 v2;
-    /* 0x06 */ u16 flags;
-    /* 0x08 */ f32 nx;
-    /* 0x0C */ f32 ny;
-    /* 0x10 */ f32 nz;
-} CollTri; /* size 0x14 */
-
-typedef struct {
-    /* 0x00 */ s16 minX;
-    /* 0x02 */ s16 maxX;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ s16 minZ;
-    /* 0x0A */ s16 maxZ;
-    /* 0x0C */ u8 padC[8];
-    /* 0x14 */ CollTri *tris;
-    /* 0x18 */ u16 ntris;
-    /* 0x1C */ CollVert *verts;
-} CollMesh; /* size 0x20 */
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ f32 scale;
-    /* 0x14 */ s16 mesh;
-    /* 0x16 */ u16 unk16;
-} CollObj; /* size 0x18 */
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 z;
-} Vec2f;
-
-typedef struct {
-    /* 0x00 */ s32 start;
-    /* 0x04 */ s32 count;
-} CollRange;
-
-typedef struct {
-    /* 0x00 */ Vec2f *verts;
-    /* 0x04 */ s32 *idx;
-    /* 0x08 */ CollRange *ranges;
-    /* 0x0C */ s32 count;
-} CollWalls; /* size 0x10 */
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 z;
-    /* 0x08 */ f32 angle;
-    /* 0x0C */ f32 halfW;
-    /* 0x10 */ f32 halfD;
-    /* 0x14 */ u16 flags;
-    /* 0x16 */ u16 id;
-    /* 0x18 */ u8 pad18[0xC];
-} Unk24; /* size 0x24 */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Unk24 *list;
-    /* 0x08 */ s32 count;
-} Unk8007C288;
-
-s32 Coll_TestObjectFloor(f32, f32, u16, u16, CollResult *);
-s32 Coll_TestMeshFloor(f32, f32, f32, u16, CollMesh *, CollResult *);
-s32 Coll_RayCrossesEdge(f32, f32, f32, f32, f32, f32);
-s32 Coll_PushFromSegment(f32 *, f32 *, f32, f32, f32, f32, f32);
 f32 sqrtf(f32);
-s32 Coll_PushFromWalls(f32, f32, CollWalls *, CollResult *);
-s32 Exit_IsFacing(f32);
-s32 Exit_IsEnabled(Unk24 *);
-void Exit_SetDestination(Unk24 *);
-void Math_RotateVec2(f32, f32 *);
+void Exit_SetDestination(MapExit *);
 
-extern Unk8007C288 *map_subarea_def;
-extern Unk8007C28C *map_subarea_grid;
-extern CollObj *map_objs;
-extern CollMesh *map_obj_models;
-extern CollWalls *map_actor_walls;
-extern CollWalls *map_camera_walls;
-extern s32 map_subarea;
 /* This file's .bss, 800842F0..80084300. */
 f32 coll_push_radius;
 extern Vec2f exit_local_offset;
@@ -140,7 +27,7 @@ void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) 
     out->x = x;
     out->y = y;
     out->z = z;
-    out->unk18 = 0x8000;
+    out->flags = 0x8000;
     out->nx = 0.0f;
     out->nz = 0.0f;
     out->ny = 1.0f;
@@ -158,22 +45,22 @@ void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) 
     ix = 0;
     iz = 0;
     if (map_subarea_grid->unk28 == 0) {
-        list = map_subarea_grid->unk20;
+        list = map_subarea_grid->lists;
     } else {
-        ix = (x - map_subarea_grid->unk8) / map_subarea_grid->unk10;
-        iz = (z - map_subarea_grid->unkC) / map_subarea_grid->unk14;
-        i = map_subarea_grid->unk4 * iz + ix;
-        list = &map_subarea_grid->unk20[map_subarea_grid->unk1C[i]];
+        ix = (x - map_subarea_grid->originX) / map_subarea_grid->cellW;
+        iz = (z - map_subarea_grid->originZ) / map_subarea_grid->cellD;
+        i = map_subarea_grid->w * iz + ix;
+        list = &map_subarea_grid->lists[map_subarea_grid->cells[i]];
     }
-    if (ix >= 0 && ix < map_subarea_grid->unk4 && iz >= 0 && iz < map_subarea_grid->unk6) {
+    if (ix >= 0 && ix < map_subarea_grid->w && iz >= 0 && iz < map_subarea_grid->h) {
         for (n = *list++; n != 0; n--) {
             if (Coll_TestObjectFloor(x, z, flags, *list++, out)) {
                 return;
             }
         }
     }
-    list = map_subarea_grid->unk24;
-    for (n = map_subarea_grid->unk2; n != 0; n--) {
+    list = map_subarea_grid->alwaysList;
+    for (n = map_subarea_grid->alwaysCount; n != 0; n--) {
         if (Coll_TestObjectFloor(x, z, flags, *list++, out)) {
             return;
         }
@@ -183,8 +70,8 @@ void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) 
 s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     s32 ret;
     s32 pad;
-    CollMesh *mesh;
-    CollObj *obj;
+    MapModel *mesh;
+    MapObj *obj;
     f32 ang;
     f32 v[2];
 
@@ -193,22 +80,22 @@ s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     z -= obj->z;
     ang = obj->angle * 0.017453292519943295;
     ret = 0;
-    mesh = &map_obj_models[obj->mesh];
+    mesh = &map_obj_models[obj->model];
     if (ang != 0.0f) {
         v[0] = x;
         v[1] = z;
-        Math_RotateVec2(ang, v);
+        Math_RotateVec2(ang, (Vec2f *)v);
         x = -v[0];
         z = v[1];
     }
-    if ((obj->unk16 & 0xFF) < 0x10) {
+    if ((obj->kind & 0xFF) < 0x10) {
         ret = Coll_TestMeshFloor(x, z, obj->scale, flags, mesh, out);
         if (ret) {
             out->y += obj->y;
             if (ang != 0.0f) {
                 v[0] = out->nx;
                 v[1] = out->nz;
-                Math_RotateVec2(-ang, v);
+                Math_RotateVec2(-ang, (Vec2f *)v);
                 out->nx = -v[0];
                 out->nz = v[1];
             }
@@ -217,7 +104,7 @@ s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     return ret;
 }
 
-s32 Coll_TestMeshFloor(f32 x, f32 z, f32 scale, u16 flags, CollMesh *mesh, CollResult *out) {
+s32 Coll_TestMeshFloor(f32 x, f32 z, f32 scale, u16 flags, MapModel *mesh, CollResult *out) {
     CollTri *tri;
     s32 ret;
     CollVert *verts;
@@ -289,9 +176,9 @@ s32 Coll_TestMeshFloor(f32 x, f32 z, f32 scale, u16 flags, CollMesh *mesh, CollR
                     ay = va->y * scale;
                     if (ny != 0.0f) {
                         out->y = -((nx * x + nz * z) - (nx * ax + ny * ay + nz * az)) / ny;
-                        out->unk18 = tri->flags;
+                        out->flags = tri->flags;
                     } else {
-                        out->unk18 = tri->flags;
+                        out->flags = tri->flags;
                     }
                     out->nx = nx;
                     out->ny = ny;
@@ -440,7 +327,7 @@ s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz
 
 s32 Coll_PushFromWalls(f32 x, f32 z, CollWalls *walls, CollResult *out) {
     s32 n;
-    CollRange *range;
+    CollWallRange *range;
     s32 hit;
     s32 m;
     s32 *idx;
@@ -459,10 +346,10 @@ s32 Coll_PushFromWalls(f32 x, f32 z, CollWalls *walls, CollResult *out) {
         for (; m != 0; m--) {
             a = &walls->verts[idx[0]];
             ax = a->x;
-            az = a->z;
+            az = a->y;
             a = &walls->verts[idx[1]];
             bx = a->x;
-            bz = a->z;
+            bz = a->y;
             idx++;
             hit |= Coll_PushFromSegment(&x, &z, coll_push_radius, ax, az, bx, bz);
         }
@@ -476,23 +363,23 @@ s32 Exit_CheckEnter(f32 x, f32 z, f32 angle) {
     s32 pad;
     s32 ret = 0;
     s32 n;
-    Unk24 *p;
+    MapExit *p;
     f32 dx;
     f32 dz;
-    if (map_subarea_def->count == 0 || (battle_flags & 1)) {
+    if (map_subarea_def->exitCount == 0 || (battle_flags & 1)) {
         return 0;
     }
-    n = map_subarea_def->count;
-    for (p = map_subarea_def->list; n != 0; n--, p++) {
+    n = map_subarea_def->exitCount;
+    for (p = map_subarea_def->exits; n != 0; n--, p++) {
         if (Exit_IsEnabled(p)) {
             exit_local_offset.x = x - p->x;
-            exit_local_offset.z = z - p->z;
-            Math_RotateVec2(p->angle, &exit_local_offset.x);
+            exit_local_offset.y = z - p->z;
+            Math_RotateVec2(p->angle, &exit_local_offset);
             dx = exit_local_offset.x;
             if (dx < 0.0f) {
                 dx = -dx;
             }
-            dz = exit_local_offset.z;
+            dz = exit_local_offset.y;
             if (dz < 0.0f) {
                 dz = -dz;
             }
@@ -520,7 +407,7 @@ s32 Exit_IsFacing(f32 angle) {
     return angle < 0.39269908169872414;
 }
 
-s32 Exit_IsEnabled(Unk24 *arg0) {
+s32 Exit_IsEnabled(MapExit *arg0) {
     s32 i;
     s32 ret;
     s32 flags = arg0->flags;
