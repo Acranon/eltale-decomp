@@ -364,20 +364,20 @@ u8 menu_exp_gauge_layer_2_0_tex[0x4F0] = {
 u8 menu_exp_gauge_layer_2_1_tex[0x4F0] = {
 #include "assets/menu_exp_gauge_layer_2_1_tex.inc.c"
 };
-u8 D_8006C0C0[0x2C] = {
-#include "assets/D_8006C0C0.inc.c"
+u8 save_menu_operation_panel_message_0[0x2C] = {
+#include "assets/save_menu_operation_panel_message_0.inc.c"
 };
-u8 D_8006C0EC[0x20] = {
-#include "assets/D_8006C0EC.inc.c"
+u8 save_menu_operation_panel_message_1[0x20] = {
+#include "assets/save_menu_operation_panel_message_1.inc.c"
 };
-u8 D_8006C10C[0x1C] = {
-#include "assets/D_8006C10C.inc.c"
+u8 save_menu_operation_panel_message_2[0x1C] = {
+#include "assets/save_menu_operation_panel_message_2.inc.c"
 };
-u8 D_8006C128[0x1C] = {
-#include "assets/D_8006C128.inc.c"
+u8 save_menu_operation_panel_message_3[0x1C] = {
+#include "assets/save_menu_operation_panel_message_3.inc.c"
 };
-u8 D_8006C144[0x28] = {
-#include "assets/D_8006C144.inc.c"
+u8 save_menu_operation_panel_message_4[0x28] = {
+#include "assets/save_menu_operation_panel_message_4.inc.c"
 };
 u8 D_8006C16C[0x8] = {
 #include "assets/D_8006C16C.inc.c"
@@ -461,7 +461,7 @@ u8 D_8006C880[0x78] = {
 #include "assets/D_8006C880.inc.c"
 };
 u8 *save_menu_operation_panel_messages[5] = {
-    D_8006C0C0, D_8006C0EC, D_8006C10C, D_8006C128, D_8006C144,
+    save_menu_operation_panel_message_0, save_menu_operation_panel_message_1, save_menu_operation_panel_message_2, save_menu_operation_panel_message_3, save_menu_operation_panel_message_4,
 };
 s16 save_menu_operation_panel_rects[5][4] = {
     { 44, 107, 232, 25 }, { 79, 107, 162, 25 }, { 84, 107, 152, 25 }, { 84, 107, 152, 25 }, { 54, 107, 212, 25 },
@@ -500,61 +500,61 @@ s16 save_menu_dialog_rects[25][4] = {
 s16 save_menu_choice_cursor_positions[4][2] = {
     { 258, 163 }, { 258, 176 }, { 258, 162 }, { 258, 175 },
 };
-u8 D_8006CAD4[0x14] = {
-#include "assets/D_8006CAD4.inc.c"
+u8 save_menu_slot_map_label_0[0x14] = {
+#include "assets/save_menu_slot_map_label_0.inc.c"
 };
-u8 D_8006CAE8[0x10] = {
-#include "assets/D_8006CAE8.inc.c"
+u8 save_menu_slot_map_label_1[0x10] = {
+#include "assets/save_menu_slot_map_label_1.inc.c"
 };
-u8 D_8006CAF8[0x18] = {
-#include "assets/D_8006CAF8.inc.c"
+u8 save_menu_slot_map_label_2[0x18] = {
+#include "assets/save_menu_slot_map_label_2.inc.c"
 };
-u8 D_8006CB10[0x1C] = {
-#include "assets/D_8006CB10.inc.c"
+u8 save_menu_slot_map_label_3[0x1C] = {
+#include "assets/save_menu_slot_map_label_3.inc.c"
 };
-u8 D_8006CB2C[0x14] = {
-#include "assets/D_8006CB2C.inc.c"
+u8 save_menu_slot_map_label_4[0x14] = {
+#include "assets/save_menu_slot_map_label_4.inc.c"
 };
-u8 D_8006CB40[0x14] = {
-#include "assets/D_8006CB40.inc.c"
+u8 save_menu_slot_map_label_5[0x14] = {
+#include "assets/save_menu_slot_map_label_5.inc.c"
 };
-u8 D_8006CB54[0x14] = {
-#include "assets/D_8006CB54.inc.c"
+u8 save_menu_slot_map_label_6[0x14] = {
+#include "assets/save_menu_slot_map_label_6.inc.c"
 };
-u8 D_8006CB68[0x20] = {
-#include "assets/D_8006CB68.inc.c"
+u8 save_menu_slot_map_label_7[0x20] = {
+#include "assets/save_menu_slot_map_label_7.inc.c"
 };
-u8 D_8006CB88[0x14] = {
-#include "assets/D_8006CB88.inc.c"
+u8 save_menu_slot_map_label_8[0x14] = {
+#include "assets/save_menu_slot_map_label_8.inc.c"
 };
-u8 D_8006CB9C[0x10] = {
-#include "assets/D_8006CB9C.inc.c"
+u8 save_menu_slot_map_label_9[0x10] = {
+#include "assets/save_menu_slot_map_label_9.inc.c"
 };
-u8 D_8006CBAC[0x14] = {
-#include "assets/D_8006CBAC.inc.c"
+u8 save_menu_slot_map_label_10[0x14] = {
+#include "assets/save_menu_slot_map_label_10.inc.c"
 };
-u8 D_8006CBC0[0x18] = {
-#include "assets/D_8006CBC0.inc.c"
+u8 save_menu_slot_map_label_11[0x18] = {
+#include "assets/save_menu_slot_map_label_11.inc.c"
 };
-u8 D_8006CBD8[0x14] = {
-#include "assets/D_8006CBD8.inc.c"
+u8 save_menu_slot_map_label_12[0x14] = {
+#include "assets/save_menu_slot_map_label_12.inc.c"
 };
-u8 D_8006CBEC[0x10] = {
-#include "assets/D_8006CBEC.inc.c"
+u8 save_menu_slot_map_label_13[0x10] = {
+#include "assets/save_menu_slot_map_label_13.inc.c"
 };
-u8 D_8006CBFC[0xC] = {
-#include "assets/D_8006CBFC.inc.c"
+u8 save_menu_slot_map_label_14[0xC] = {
+#include "assets/save_menu_slot_map_label_14.inc.c"
 };
-u8 D_8006CC08[0x10] = {
-#include "assets/D_8006CC08.inc.c"
+u8 save_menu_slot_map_label_15[0x10] = {
+#include "assets/save_menu_slot_map_label_15.inc.c"
 };
-u8 D_8006CC18[0x10] = {
-#include "assets/D_8006CC18.inc.c"
+u8 save_menu_slot_map_label_16[0x10] = {
+#include "assets/save_menu_slot_map_label_16.inc.c"
 };
 u8 *save_menu_slot_map_labels[19] = {
-    D_8006CAD4, D_8006CAE8, D_8006CAF8, D_8006CB10, D_8006CB2C, D_8006CB40,
-    D_8006CB54, D_8006CB68, D_8006CB88, D_8006CB9C, D_8006CBAC, D_8006CBC0,
-    D_8006CBD8, D_8006CBEC, D_8006CBFC, D_8006CC08, D_8006CC18, NULL,
+    save_menu_slot_map_label_0, save_menu_slot_map_label_1, save_menu_slot_map_label_2, save_menu_slot_map_label_3, save_menu_slot_map_label_4, save_menu_slot_map_label_5,
+    save_menu_slot_map_label_6, save_menu_slot_map_label_7, save_menu_slot_map_label_8, save_menu_slot_map_label_9, save_menu_slot_map_label_10, save_menu_slot_map_label_11,
+    save_menu_slot_map_label_12, save_menu_slot_map_label_13, save_menu_slot_map_label_14, save_menu_slot_map_label_15, save_menu_slot_map_label_16, NULL,
     NULL,
 };
 u8 D_8006CC74 = 0;
