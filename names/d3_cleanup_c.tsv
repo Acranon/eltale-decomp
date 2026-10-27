@@ -67,3 +67,12 @@ D_80221410_ovl_ending	ending_scroll_backdrop_second_tlut	Later ending sprite cue
 D_80102030_ovl_DA4570	pak_menu_screen_frame_tlut	pak_menu_screen_sprites uses this palette for the repeated 32-pixel screen-edge sprites drawn by PakMenu_DrawSprites
 D_80102050_ovl_DA4570	pak_menu_screen_frame_main_tex	pak_menu_screen_sprites places this 32-pixel tile across top, left and bottom screen edges
 D_80102250_ovl_DA4570	pak_menu_screen_frame_right_tex	pak_menu_screen_sprites places this 32-pixel tile repeatedly on the right screen edge
+D_8020F1E4_ovl_title	title_exit_wait_frames	Title_RunPhase state 6 increments this up to two before starting the selection exit fade
+D_8020F208_ovl_title	title_frame_setup_dl	Title_UpdateScreen and Title_UpdateSelectionExit submit this state-setting display list before drawing the frame
+D_8020F260_ovl_title	title_menu_draw_setup_dl	Title_DrawScreenAndMoveCursor submits this render-mode/combine display list before any menu drawing
+D_8020F280_ovl_title	title_menu_sprite_setup_dl	Title_DrawScreenAndMoveCursor submits this render-mode/combine display list before the menu sprite display lists
+D_8020F458_ovl_title	title_cursor_combine_dl	Title_DrawScreenAndMoveCursor submits this combiner display list before drawing menu and confirmation cursors
+D_8020F470_ovl_title	title_screen_fade_combine_dl	Title_StepAndDrawScreenFade submits this combiner display list before the full-screen fade rectangle
+D_8020F718_ovl_ending	ending_sprite_default_combine_dl	Ending_UpdateAndDrawSprites selects this combiner display list when no fade flag is active
+D_8020F730_ovl_ending	ending_scroll_backdrop_combine_dl	Ending_UpdateAndDrawScrollingBackdrop submits this combiner display list before scrolling texture strips
+D_8020F748_ovl_ending	ending_sprite_fade_combine_dl	Ending_UpdateAndDrawSprites selects this combiner display list when fade flags are active, then sets env color
