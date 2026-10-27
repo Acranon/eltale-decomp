@@ -36,7 +36,7 @@ typedef struct {
     /* 0x10 */ f32 unk10;
     /* 0x14 */ f32 unk14;
     /* 0x18 */ u16 unk18;
-} Unk80085A78; // size = 0x1C (func_800107F0's result)
+} Unk80085A78; // size = 0x1C (Coll_ResolveFloorAndWalls's result)
 
 typedef struct {
     /* 0x00 */ f32 x;
@@ -96,7 +96,7 @@ typedef struct {
 } Color_147A0;
 
 /* This file's .bss, 800859B0..80085AB0, in address order (first declaration fixes
- * the order). Splat's D_80085AA8 is func_80013BA0's loop end, &D_80085A98[0x10]. */
+ * the order). Splat's D_80085AA8 is Spirit_ClearCollectedFlags's loop end, &D_80085A98[0x10]. */
 s32 D_800859B0;
 Unk800859B8 D_800859B8[8];
 Unk80085A78 D_80085A78;
@@ -108,13 +108,13 @@ extern s32 D_800842C0;
 
 extern Gfx* D_8007A184;
 
-void func_800107F0(f32, f32, f32, s32, Unk80085A78*);
-u8 func_800140B0(u16);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Unk80085A78*);
+u8 Spirit_IsCollected(u16);
 void func_800271B4(f32, Vec2f_147A0*);
 void func_8001D9A8(void*);
 s32 func_80026E90(s32);
 f32 sinf(f32);
-void func_80013FA4(Unk80013FA4Arg*);
+void Spirit_MoveSparkle(Unk80013FA4Arg*);
 
 Unk8004DFC0 D_8004DFC0[0x2B] = {
     { 0x0, 0x0, 1, (Unk147A0Def*)0x80154860 },
@@ -183,7 +183,7 @@ u8 D_8004E258[4][0x100] = {
 #include "assets/D_8004E258.inc.c"
 };
 
-void func_80013BA0(void) {
+void Spirit_ClearCollectedFlags(void) {
     s32 i;
 
     for (i = 0; i < 0x10; i++) {
@@ -191,7 +191,7 @@ void func_80013BA0(void) {
     }
 }
 
-void func_80013BD0(void) {
+void Spirit_LoadForMap(void) {
     Unk8004DFC0* entry;
     Unk147A0Def* def;
     Unk800859B8* obj;
@@ -210,10 +210,10 @@ void func_80013BD0(void) {
         i = D_800859B0;
         while (i != 0) {
             obj->unk12 = -1;
-            obj->unk10 = func_800140B0(def->unk8);
+            obj->unk10 = Spirit_IsCollected(def->unk8);
             obj->x = def->x;
             obj->z = -def->z;
-            func_800107F0(obj->x, 0.0f, obj->z, 0xA00, &D_80085A78);
+            Coll_ResolveFloorAndWalls(obj->x, 0.0f, obj->z, 0xA00, &D_80085A78);
             obj->y = D_80085A78.unk4;
             obj->unkC = 0.0f;
             obj->unk14 = def->unk8;
@@ -226,7 +226,7 @@ void func_80013BD0(void) {
     }
 }
 
-Unk800859B8* func_80013D08(Unk80013D08Arg* arg0) {
+Unk800859B8* Spirit_FindInFront(Unk80013D08Arg* arg0) {
     s32 n = D_800859B0;
     Unk800859B8* obj;
     f32 dx;
@@ -256,9 +256,9 @@ Unk800859B8* func_80013D08(Unk80013D08Arg* arg0) {
     return found;
 }
 
-void func_80013E4C(void) {
+void Spirit_SpawnSparkles(void) {
     static Unk8004E658 D_8004E658 = {
-        0x001E, 0, (void*)func_80013FA4, 0x02101000, 0, D_8004E258, D_8004E208,
+        0x001E, 0, (void*)Spirit_MoveSparkle, 0x02101000, 0, D_8004E258, D_8004E208,
         0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.3f, 0.0f, 0,
     };
     s32 n;
@@ -293,7 +293,7 @@ void func_80013E4C(void) {
 
 Color_147A0 D_8004E698[2] = { { 0x8C, 0x00, 0xFF, 0xDC }, { 0x8C, 0x00, 0xFF, 0x78 } };
 
-void func_80013FA4(Unk80013FA4Arg* arg0) {
+void Spirit_MoveSparkle(Unk80013FA4Arg* arg0) {
     f32 s;
     u8* c;
 
@@ -306,6 +306,6 @@ void func_80013FA4(Unk80013FA4Arg* arg0) {
     gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], c[3]);
 }
 
-u8 func_800140B0(u16 arg0) {
+u8 Spirit_IsCollected(u16 arg0) {
     return D_80085A98[arg0 >> 3] & D_8004F770[arg0 & 7];
 }

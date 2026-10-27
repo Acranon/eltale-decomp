@@ -299,7 +299,7 @@ extern f32 D_80085F84;
 extern s32 D_80085F60;
 extern s32 D_800842BC;
 void func_800271B4(f32, Struct_8001FF10_Pos*);
-void func_80015DB4(s32);
+void Camera_SetPreset(s32);
 
 typedef struct Actor {
     /* 0x00 */ f32 unk0;
@@ -370,7 +370,7 @@ void func_8001F36C(void) {
         case 1:
             if (--D_8008BE4E == 0) {
                 D_8008BE52 &= ~0x200;
-                func_80015DB4(D_80085F60);
+                Camera_SetPreset(D_80085F60);
                 dx = D_8008BE5C - D_8007AA08.unk18;
                 dz = D_8008BE60 - D_8007AA08.unk20;
                 ang = func_800270D0(dx, dz) + 3.141592653589793;
@@ -417,7 +417,7 @@ extern s16 D_8008C162;
 void func_8000D3CC(u16);
 void func_8000D528(s32);
 void func_8000A65C(void);
-void func_80016218(s32);
+void Camera_SetPresetDelayedTurn(s32);
 void func_8000AA28(void);
 s32 func_800200F8(void);
 void func_8002A6F4(s32, s32);
@@ -461,7 +461,7 @@ void func_8001F888(void) {
                 D_8008C162 = 0;
                 func_8001C298(D_8008BF94, D_8007AA08.unk18, D_8007AA08.unk1C, D_8007AA08.unk20);
                 func_8000A65C();
-                func_80016218(D_80085F60);
+                Camera_SetPresetDelayedTurn(D_80085F60);
                 if (D_8008BE52 & 0x100) {
                     D_8008BE52 &= ~0x100;
                 }

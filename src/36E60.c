@@ -635,7 +635,7 @@ extern Unk801D8620 D_801D8620[];
 
 void Player_Spawn(void);
 void func_8000D6A0(void);
-void func_80014550(void);
+void Camera_InitForMap(void);
 void func_8002A338(s32);
 void func_80026A00(Unk80092EDC *, f32 *, s32);
 void func_80027430(f32 (*)[4], f32, f32, f32);
@@ -673,7 +673,7 @@ void func_8003627C(void) {
     } else {
         D_8004DCA0 |= 0x10000;
     }
-    func_80014550();
+    Camera_InitForMap();
     D_80085E48.unk0 = 3;
     D_80085F50 = 35.0f;
     func_80036544(D_80092EDC, D_80092ED4);

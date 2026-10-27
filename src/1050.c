@@ -8,7 +8,7 @@
 
 void func_80036AC0(void);
 void osCreatePiManager(s32, OSMesgQueue *, OSMesg *, s32);
-void func_800004B0(void *);
+void Boot_IdleThread(void *);
 void func_80000C70(void *);
 
 /* This file's .bss, 80070D20..80077160, in address order. D_80070D20 is the
@@ -24,13 +24,13 @@ u64 D_80074080[0x3000 / sizeof(u64)];
 OSMesgQueue D_80077080;
 OSMesg D_80077098[0x32];
 
-void func_80000450(s32 arg0) {
+void Boot_Main(s32 arg0) {
     func_80036AC0();
-    osCreateThread(&D_80072D20, 1, func_800004B0, NULL, D_80074080, 1);
+    osCreateThread(&D_80072D20, 1, Boot_IdleThread, NULL, D_80074080, 1);
     osStartThread(&D_80072D20);
 }
 
-void func_800004B0(void *arg0) {
+void Boot_IdleThread(void *arg0) {
     osCreatePiManager(OS_PRIORITY_PIMGR, &D_80077080, D_80077098, 0x32);
     osCreateThread(&D_80072ED0, 6, func_80000C70, arg0, &D_80077080, 5);
     osStartThread(&D_80072ED0);

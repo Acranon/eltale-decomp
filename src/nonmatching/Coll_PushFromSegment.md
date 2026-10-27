@@ -1,9 +1,9 @@
-# func_80011034
+# Coll_PushFromSegment
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/113F0.c`](../113F0.c)
-- Retail assembly: [`asm/nonmatchings/113F0/func_80011034.s`](../../asm/nonmatchings/113F0/func_80011034.s)
+- Retail assembly: [`asm/nonmatchings/113F0/Coll_PushFromSegment.s`](../../asm/nonmatchings/113F0/Coll_PushFromSegment.s)
 - Retail code size: `0x618` bytes
 - Current gap: 164 object words; two extra instructions (0x620 vs 0x618), FP registers and stack homes.
 - Specific blocker: FP endpoint expressions take f0 and force az reload; the named variables would use retail f18/f14.
@@ -24,10 +24,10 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_80011034** (0x618 bytes)
+- **Coll_PushFromSegment** (0x618 bytes)
   - w2 s2: 113F0. Full draft written (circle vs segment push). The target frame is 0x60 with exactly 16 local slots; mine has 22 locals, so the frame is 0x80. Needs a variable-reuse layout.
   - w2 s3: Not retried this session beyond rerunning the stash drafts after the prototype fixes. C528 is at 311 words, D6A0 at 422 (register-heavy), 104C0 at 159. 11C60 has no draft file left; its asm rematerializes &D_80084988 after every call. 11EF4 is probably in the same lui-sharing (D2) family.
-  - w2 s4: 113F0, about 138 words, mostly register numbering, with the frame (96) and layout matching. The source reuses four generic f32 temps (a, b, c, d) as bbox min/max, line coefficients, endpoint deltas and sqrt result, and computes d = a * *px + b * *pz + c. Stash: func_80011034.c, plus func_80011034_perm.c, a permuter variant at about 80 words that uses semantically dubious copies.
+  - w2 s4: 113F0, about 138 words, mostly register numbering, with the frame (96) and layout matching. The source reuses four generic f32 temps (a, b, c, d) as bbox min/max, line coefficients, endpoint deltas and sqrt result, and computes d = a * *px + b * *pz + c. Stash: Coll_PushFromSegment.c, plus func_80011034_perm.c, a permuter variant at about 80 words that uses semantically dubious copies.
   - w2 s5: 113F0, 138 words. The block layout of the endpoint-distance section differs: mine is 5 instructions longer and orders the two endpoint blocks differently, and the target keeps ix/iz in f12/f16 across the bbox recheck. A no-op scan (207 variants) changed nothing. This needs a structural rewrite of that section.
   - w2 s6: 113F0, 392 against 390 words, aln 34 (was 213). Draft: stash/func_80011034_v3.c. The fixes were `ix = dx*dx + dz*dz; k = ... / sqrtf(ix);` in the final block, and in the first endpoint `dz = az; b = dz - cz;` with both pushes using `dz = dz - *pz` (this is equivalent). Remaining: (1) the endpoint `a = ax - cx` lands in f0, but the target uses f18 and keeps az in f0, so mine reloads az; (2) the final block computes dz into f0 and then does mov.s f14. A permuter run on v3 was in progress.
   - Codex D1 implementation: D1 pass: faithful cost traces distinguish named a/dz from separately promoted arithmetic expressions. Endpoint expression winsf0 over az, causing reload; final delta is separately allocatedf0 then copiedtof14. This is constrained expression priority, so declaration seeds do not fix it. Draft unchanged; detailed costs and rejected hypotheses in codex/d1-gfx/REPORT.txt.

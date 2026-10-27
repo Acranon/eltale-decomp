@@ -115,9 +115,9 @@ void func_8000D19C(s32, f32, f32, f32, Unk8007C148 *);
 u8 func_8000D398(u32);
 void func_80020428(s32, Unk8007C174 *, void *, s32);
 void func_8002099C(s32, Unk8007C174 *, void *);
-void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
+void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 void func_800201A0(Unk8007C174 *, s32, s32, s32, s32, u16);
-void func_800107F0(f32, f32, f32, u16, Unk8007C0B0 *);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, Unk8007C0B0 *);
 
 /* This file's .bss, 8007C0B0..8007C280, in address order. D_8007C0C8,
  * D_8007C144, D_8007C274 and D_8007C278 are unreferenced gaps (D_8007C148 is
@@ -160,7 +160,7 @@ extern s16 D_8007A17A;
 u16 D_8004DD50[8] = { 10, 10, 15, 20, 20, 25, 25, 0 };
 u16 D_8004DD60[8] = { 5, 5, 5, 10, 10, 15, 15, 0 };
 extern Unk8007A9D0 D_8007A9D0;
-void func_8001628C(Unk803AB820 *, Unk8007C174 *);
+void Camera_SetTargetView(Unk803AB820 *, Unk8007C174 *);
 void func_80032D20(s32);
 
 void func_8000CEE0(void) {
@@ -202,7 +202,7 @@ void func_8000CFD8(s32 arg0) {
         func_80020428(1, &p->unk2C, temp + D_8007C148.unk2C.unk52 * 0xC, arg0);
         func_8002099C(p->unk2C.unk58, &p->unk2C, temp + p->unk2C.unk52 * 0xC);
         if (*p->unk2C.unk64 != 2) {
-            func_800131F0(p->unk2C.x, p->unk2C.y, p->unk2C.z, p->unk2C.unk2C, p->unk2C.unk30, p->unk2C.unk34,
+            Shadow_Queue(p->unk2C.x, p->unk2C.y, p->unk2C.z, p->unk2C.unk2C, p->unk2C.unk30, p->unk2C.unk34,
                           p->unk2C.unk28 * p->unk2C.unk24);
         }
     }
@@ -245,7 +245,7 @@ void func_8000D19C(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
     arg4->unk11E = ((Unk803AB820 *)s1->unk64)->unkC;
     arg4->unk120 = ((Unk803AB820 *)s1->unk64)->unkE;
     arg4->unk128 = 1.0f;
-    func_800107F0(arg1, 0.0f, arg2, 0xA00, &D_8007C0B0);
+    Coll_ResolveFloorAndWalls(arg1, 0.0f, arg2, 0xA00, &D_8007C0B0);
     s1->x = D_8007C0B0.x;
     s1->y = D_8007C0B0.y;
     s1->z = D_8007C0B0.z;
@@ -293,7 +293,7 @@ void func_8000D40C(s32 arg0) {
         D_8007C0D0.y = 139.0f;
         D_8007C0D0.z = -328.0f;
     }
-    func_8001628C(&D_803AB4B0[arg0], &D_8007C0D0);
+    Camera_SetTargetView(&D_803AB4B0[arg0], &D_8007C0D0);
 }
 
 void func_8000D528(s32 arg0) {

@@ -53,7 +53,7 @@ void func_800032E4(u8 *arg0, u8 *arg1);
 void func_80009764(u16 arg0);
 void Npc_SpawnForArea(s32 arg0, s32 arg1);
 void func_8000D6A0(void);
-void func_80014550(void);
+void Camera_InitForMap(void);
 void func_80027430(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
 void func_80027834(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3, f32 *arg4, f32 *arg5, f32 *arg6);
 void func_8002A338(s32 arg0);
@@ -127,7 +127,7 @@ void func_80002F40(s32 arg0) {
     func_80009764(D_8007C288->unk12);
     Npc_SpawnForArea(entry->unk2C, entry->unk30);
     D_8007B900 = 0;
-    func_80014550();
+    Camera_InitForMap();
     D_80085E48.unk0 = 3;
     D_80085E54 = entry->unk8;
     D_80085E58 = entry->unkC;

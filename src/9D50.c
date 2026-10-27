@@ -173,7 +173,7 @@ extern f32 D_8007AA28;
 extern s32 D_8007C2A4;
 extern Unk8007C2A8 *D_8007C2A8[];
 
-void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
+void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 void func_80020428(s32, NPCObj *, AnimEntry *, s32);
 void func_8002099C(s32, NPCObj *, AnimEntry *);
 extern Gfx *D_8007A184;
@@ -217,7 +217,7 @@ typedef struct {
     /* 0x18 */ u16 flags;
 } CollResult;
 
-void func_800107F0(f32, f32, f32, u16, void *);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, void *);
 void func_800201A0(void *, s32, s32, s32, s32, u16);
 u32 func_80026E90(u32);
 void func_80028120();
@@ -365,7 +365,7 @@ void Npc_DrawAll(s32 arg0) {
             anims = (AnimEntry *)npc->def->unk10;
             func_80020428(0, obj, &anims[obj->unk52], arg0);
             func_8002099C(obj->unk58, obj, &anims[obj->unk52]);
-            func_800131F0(obj->x, obj->y, obj->z, obj->rx, obj->ry, obj->rz, 5.0f);
+            Shadow_Queue(obj->x, obj->y, obj->z, obj->rx, obj->ry, obj->rz, 5.0f);
             *list++ = obj;
             D_8007ABA8++;
         }
@@ -400,7 +400,7 @@ void Npc_SpawnForArea(NPCDef *def, s32 n) {
             npc->unk28 = 0.0f;
             npc->unk38 = def->unk28;
             npc->unk3C = 50.0f;
-            func_800107F0(npc->x, npc->y, npc->z, 0xA00, &out);
+            Coll_ResolveFloorAndWalls(npc->x, npc->y, npc->z, 0xA00, &out);
             npc->y = out.y;
             npc->nx = out.nx;
             npc->ny = out.ny;
@@ -427,7 +427,7 @@ void Npc_Move(f32 dx, f32 dz, Unk80009988 *obj) {
     obj->x += dx;
     obj->z += dz;
     D_8007AB88.x = 4.0f;
-    func_800107F0(obj->x, obj->y, obj->z, 0xA01, &D_8007AB88);
+    Coll_ResolveFloorAndWalls(obj->x, obj->y, obj->z, 0xA01, &D_8007AB88);
     obj->x = D_8007AB88.x;
     obj->y = D_8007AB88.y;
     obj->z = D_8007AB88.z;

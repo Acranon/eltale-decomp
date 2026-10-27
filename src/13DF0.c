@@ -34,7 +34,7 @@ extern Unk2000000 D_2000000;
 void func_800278C8(f32 (*mf)[4], f32, f32, f32);
 void func_80027CB4(f32 (*mf)[4], f32, f32, f32);
 
-void func_800131F0(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
+void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
     Unk84B80* p;
 
     if ((u32)D_80085280 < 0x40) {
@@ -49,7 +49,7 @@ void func_800131F0(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
     }
 }
 
-void func_80013264(Unk2000000* arg0) {
+void Shadow_DrawAll(Unk2000000* arg0) {
     s32 n = D_80085280;
     Unk84B80* p = D_80084B80;
     f32 mf[4][4];

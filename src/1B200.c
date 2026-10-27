@@ -928,7 +928,7 @@ typedef struct {
     /* 0x1C */ f32 unk1C;
 } Unk8007AA08_1B200;
 extern Unk8007AA08_1B200 D_8007AA08;
-void func_800107F0(f32, f32, f32, s32, Coll1B200*);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Coll1B200*);
 s32 func_8001C060(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     s32 i;
     Unk800877A8* p;
@@ -959,7 +959,7 @@ s32 func_8001C060(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
         func_800271B4(angle, &D_80087E00);
         pt->x = D_80087E00.x + arg1;
         pt->z = D_80087E00.y + arg3;
-        func_800107F0(pt->x, D_8007AA08.unk1C, pt->z, 0xA00, &D_80087E10);
+        Coll_ResolveFloorAndWalls(pt->x, D_8007AA08.unk1C, pt->z, 0xA00, &D_80087E10);
         if (D_80087E10.flags & 0x8000) {
             pt->y = arg2;
             n->x = 0.0f;

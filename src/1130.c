@@ -60,13 +60,13 @@ typedef struct {
     u32 firstTime;
 } NNSched;
 
-void func_80000710(NNSched *sc);
-void func_800007F4(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
-void func_80000844(NNSched *sc, NNScClient *c);
-void func_800008D0(NNSched *sc, NNScMsg *msg);
-void func_80000920(NNSched *sc);
-void func_80000AA0(NNSched *sc);
-void func_80000BD4(NNSched *sc, NNScTask *task);
+void nnScEventHandler(NNSched *sc);
+void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
+void nnScRemoveClient(NNSched *sc, NNScClient *c);
+void nnScEventBroadcast(NNSched *sc, NNScMsg *msg);
+void nnScExecuteAudio(NNSched *sc);
+void nnScExecuteGraphics(NNSched *sc);
+void nnScWaitTaskReady(NNSched *sc, NNScTask *task);
 void osSpTaskLoad(OSTask *task);
 
 /* This file's .bss, 80077160..8007A170: the three thread stacks (each passed
@@ -76,7 +76,7 @@ u64 D_80078160[0x1000 / sizeof(u64)];
 u64 D_80079160[0x1000 / sizeof(u64)];
 u16 D_8007A160;
 
-void func_80000530(NNSched *sc, u8 numFields) {
+void nnScCreateScheduler(NNSched *sc, u8 numFields) {
     sc->curGraphicsTask = 0;
     sc->curAudioTask = 0;
     sc->graphicsTaskSuspended = 0;
@@ -98,24 +98,24 @@ void func_80000530(NNSched *sc, u8 numFields) {
     osSetEventMesg(OS_EVENT_PRENMI, &sc->retraceMQ, (OSMesg)PRE_NMI_MSG);
 }
 
-void func_8000062C(NNSched *sc) {
-    osCreateThread(&sc->schedulerThread, 0x13, (void (*)(void *))func_80000710, sc, D_80078160, NN_SC_PRI);
+void nnScStartScheduler(NNSched *sc) {
+    osCreateThread(&sc->schedulerThread, 0x13, (void (*)(void *))nnScEventHandler, sc, D_80078160, NN_SC_PRI);
     osStartThread(&sc->schedulerThread);
-    osCreateThread(&sc->audioThread, 0x12, (void (*)(void *))func_80000920, sc, D_80079160, NN_SC_AUDIO_PRI);
+    osCreateThread(&sc->audioThread, 0x12, (void (*)(void *))nnScExecuteAudio, sc, D_80079160, NN_SC_AUDIO_PRI);
     osStartThread(&sc->audioThread);
-    osCreateThread(&sc->graphicsThread, 0x11, (void (*)(void *))func_80000AA0, sc, &D_8007A160, NN_SC_GRAPHICS_PRI);
+    osCreateThread(&sc->graphicsThread, 0x11, (void (*)(void *))nnScExecuteGraphics, sc, &D_8007A160, NN_SC_GRAPHICS_PRI);
     osStartThread(&sc->graphicsThread);
 }
 
-OSMesgQueue *func_800006F8(NNSched *sc) {
+OSMesgQueue *nnScGetAudioMQ(NNSched *sc) {
     return &sc->audioRequestMQ;
 }
 
-OSMesgQueue *func_80000704(NNSched *sc) {
+OSMesgQueue *nnScGetGfxMQ(NNSched *sc) {
     return &sc->graphicsRequestMQ;
 }
 
-void func_80000710(NNSched *sc) {
+void nnScEventHandler(NNSched *sc) {
     OSMesg msg = (OSMesg)0;
 
     while (1) {
@@ -123,17 +123,17 @@ void func_80000710(NNSched *sc) {
         switch ((int)msg) {
             case VIDEO_MSG:
                 D_8007A160++;
-                func_800008D0(sc, &sc->retraceMsg);
+                nnScEventBroadcast(sc, &sc->retraceMsg);
                 break;
             case PRE_NMI_MSG:
-                func_800008D0(sc, &sc->prenmiMsg);
+                nnScEventBroadcast(sc, &sc->prenmiMsg);
                 osViBlack(TRUE);
                 break;
         }
     }
 }
 
-void func_800007F4(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ) {
+void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ) {
     OSIntMask mask;
 
     mask = osSetIntMask(OS_IM_NONE);
@@ -143,7 +143,7 @@ void func_800007F4(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ) {
     osSetIntMask(mask);
 }
 
-void func_80000844(NNSched *sc, NNScClient *c) {
+void nnScRemoveClient(NNSched *sc, NNScClient *c) {
     NNScClient *client = sc->clientList;
     NNScClient *prev = 0;
     OSIntMask mask;
@@ -163,7 +163,7 @@ void func_80000844(NNSched *sc, NNScClient *c) {
     osSetIntMask(mask);
 }
 
-void func_800008D0(NNSched *sc, NNScMsg *msg) {
+void nnScEventBroadcast(NNSched *sc, NNScMsg *msg) {
     NNScClient *client;
 
     for (client = sc->clientList; client != 0; client = client->next) {
@@ -171,7 +171,7 @@ void func_800008D0(NNSched *sc, NNScMsg *msg) {
     }
 }
 
-void func_80000920(NNSched *sc) {
+void nnScExecuteAudio(NNSched *sc) {
     OSMesg msg = (OSMesg)0;
     NNScTask *task = (NNScTask *)0;
     NNScTask *gfxTask = (NNScTask *)0;
@@ -210,13 +210,13 @@ void func_80000920(NNSched *sc) {
     }
 }
 
-void func_80000AA0(NNSched *sc) {
+void nnScExecuteGraphics(NNSched *sc) {
     OSMesg msg = (OSMesg)0;
     NNScTask *task;
 
     while (1) {
         osRecvMesg(&sc->graphicsRequestMQ, (OSMesg *)&task, OS_MESG_BLOCK);
-        func_80000BD4(sc, task);
+        nnScWaitTaskReady(sc, task);
         if (sc->curAudioTask) {
             sc->graphicsTaskSuspended = task;
             osRecvMesg(&sc->waitMQ, &msg, OS_MESG_BLOCK);
@@ -242,16 +242,16 @@ void func_80000AA0(NNSched *sc) {
     }
 }
 
-void func_80000BD4(NNSched *sc, NNScTask *task) {
+void nnScWaitTaskReady(NNSched *sc, NNScTask *task) {
     OSMesg msg = (OSMesg)0;
     NNScClient client;
     void *fb = task->framebuffer;
 
     if (osViGetCurrentFramebuffer() == fb) {
         do {
-            func_800007F4(sc, &client, &sc->waitMQ);
+            nnScAddClient(sc, &client, &sc->waitMQ);
             osRecvMesg(&sc->waitMQ, &msg, OS_MESG_BLOCK);
-            func_80000844(sc, &client);
+            nnScRemoveClient(sc, &client);
         } while (osViGetCurrentFramebuffer() == fb);
     }
 }

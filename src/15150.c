@@ -194,19 +194,19 @@ extern u16 D_80092C86;
 extern s32 D_8007A180;
 extern Gfx* D_8007A184;
 extern Unk15150Dyn D_2000000;
-void func_8001668C(Vec3f_15150*);
+void Camera_UpdateSway(Vec3f_15150*);
 
 f32 func_800270D0(f32, f32);
 void func_800271B4(f32, Vec2f_15150*);
 f32 sinf(f32);
 f32 cosf(f32);
 f32 sqrtf(f32);
-void func_80014E04(Camera15150*);
-void func_80015DB4(s32);
-void func_80015494(Camera15150*);
-void func_80015810(Camera15150*);
-void func_80015878(Camera15150*);
-void func_80015AD8(Camera15150*);
+void Camera_FollowTarget(Camera15150*);
+void Camera_SetPreset(s32);
+void Camera_UpdateFixedEye(Camera15150*);
+void Camera_UpdateHeading(Camera15150*);
+void Camera_UpdateBattle(Camera15150*);
+void Camera_UpdateDelayedTurn(Camera15150*);
 
 Camera15150Preset D_8004EB70[3] = {
     { 0, 0.0f, 0.0f, 0.0f, 11.0f, 15.0f, 65.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },
@@ -214,7 +214,7 @@ Camera15150Preset D_8004EB70[3] = {
     { 0, 0.0f, 0.0f, 0.0f, 11.0f, 2e+01f, 55.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },
 };
 void (*D_8004EC18[6])(Camera15150*) = {
-    func_80014E04, func_80015494, func_80014E04, func_80015810, func_80015878, func_80015AD8,
+    Camera_FollowTarget, Camera_UpdateFixedEye, Camera_FollowTarget, Camera_UpdateHeading, Camera_UpdateBattle, Camera_UpdateDelayedTurn,
 };
 s32 D_8004EC30[7][2] = {
     { 25, 2 }, { 25, 3 }, { 25, 4 }, { 25, 5 }, { 25, 8 }, { 25, 9 }, { 12, 2 },
@@ -223,7 +223,7 @@ f32 D_8004EC68[8] = { 0.0f, -0.1f, 0.0f, -0.05f, 0.1f, -0.1f, -0.05f, 0.08f };
 f32 D_8004EC88 = 0.0f;
 f32 D_8004EC8C = 0.0f;
 
-void func_80014550(void) {
+void Camera_InitForMap(void) {
     s32 pad[2];
     Camera15150* cam = &D_80085E48;
     Vec3f_15150* pos = &D_8007AA20;
@@ -306,7 +306,7 @@ void func_80014550(void) {
     }
 }
 
-void func_80014994(Unk15150Dyn* arg0) {
+void Camera_Update(Unk15150Dyn* arg0) {
     Camera15150* cam = &D_80085E48;
     f32 a;
     s32 idx;
@@ -315,7 +315,7 @@ void func_80014994(Unk15150Dyn* arg0) {
     if ((D_8007C288->unk14 & 2) && !(D_8008BE52 & 1) && cam->mode != 3) {
         idx = (D_8007AA82 >> 1) & 7;
         if (idx != D_80085F60) {
-            func_80015DB4(idx);
+            Camera_SetPreset(idx);
         }
     }
     D_8004EC18[cam->mode](cam);
@@ -325,11 +325,11 @@ void func_80014994(Unk15150Dyn* arg0) {
         if (D_80085F60 >= D_80085C08[0]) {
             D_80085F60 = 0;
         }
-        func_80015DB4(D_80085F60);
+        Camera_SetPreset(D_80085F60);
     }
     D_80085C10.y = 0.0f;
     if (D_80085CB8[0] != 0) {
-        func_8001668C((Vec3f_15150*)&D_80085C10);
+        Camera_UpdateSway((Vec3f_15150*)&D_80085C10);
     }
     guPerspectiveF(D_80085ED0, &D_80085F88, D_80085F50, 1.3333334f, D_80085F54, D_80085F58, 1.0f);
     guLookAtReflectF(D_80085F10, &arg0->lookAt, cam->eyeX, cam->eyeY + D_80085C10.y, cam->eyeZ, cam->atX, cam->atY,
@@ -359,11 +359,11 @@ extern u16 D_80092C84;
 extern u16 D_8008BE52;
 extern f32 D_8007AA24;
 void func_80015B88(Camera15150 *arg0);
-void func_80015B94(Camera15150 *arg0, Unk15150Target *arg1);
-void func_80015C38(Camera15150 *arg0, Unk15150Target *arg1);
-f32 func_80016578(Camera15150 *arg0, f32 arg1);
-void func_800107F0(f32, f32, f32, s32, Coll15150 *);
-void func_80014E04(Camera15150 *arg0)
+void Camera_UpdateLookAt(Camera15150 *arg0, Unk15150Target *arg1);
+void Camera_OrbitTarget(Camera15150 *arg0, Unk15150Target *arg1);
+f32 Camera_RaiseOverObjects(Camera15150 *arg0, f32 arg1);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Coll15150 *);
+void Camera_FollowTarget(Camera15150 *arg0)
 {
   u8 locked;
   f32 dx;
@@ -456,9 +456,9 @@ void func_80014E04(Camera15150 *arg0)
       arg0->unk54 += 6.283185307179586;
     }
   }
-  func_80015C38(arg0, target);
+  Camera_OrbitTarget(arg0, target);
   D_80085C20.x = 4.0f;
-  func_800107F0(arg0->eyeX, arg0->eyeY, arg0->eyeZ, 0x602, &D_80085C20);
+  Coll_ResolveFloorAndWalls(arg0->eyeX, arg0->eyeY, arg0->eyeZ, 0x602, &D_80085C20);
   arg0->eyeX = D_80085C20.x;
   arg0->eyeZ = D_80085C20.z;
   if (D_80085C20.flags & 0x8000)
@@ -475,7 +475,7 @@ void func_80014E04(Camera15150 *arg0)
   {
     y = dz;
   }
-  y = func_80016578(arg0, y);
+  y = Camera_RaiseOverObjects(arg0, y);
   if ((D_8008BE52 & 1) && (y < D_8007AA24))
   {
     y = D_8007AA24;
@@ -485,7 +485,7 @@ void func_80014E04(Camera15150 *arg0)
   arg0->unk44 += ny;
   arg0->eyeY += arg0->unk44;
   arg0->unk44 *= arg0->unk74;
-  func_80015B94(arg0, target);
+  Camera_UpdateLookAt(arg0, target);
   dx = arg0->eyeX - arg0->atX;
   y = arg0->eyeY - arg0->atY;
   dz = arg0->eyeZ - arg0->atZ;
@@ -512,8 +512,8 @@ void func_80014E04(Camera15150 *arg0)
 
 
 void func_80015B88(Camera15150* arg0);
-void func_80015B94(Camera15150* arg0, Unk15150Target* arg1);
-void func_80015494(Camera15150* arg0) {
+void Camera_UpdateLookAt(Camera15150* arg0, Unk15150Target* arg1);
+void Camera_UpdateFixedEye(Camera15150* arg0) {
     f32 dx;
     f32 dy;
     f32 dz;
@@ -522,7 +522,7 @@ void func_80015494(Camera15150* arg0) {
 
     target = arg0->target;
     func_80015B88(arg0);
-    func_80015B94(arg0, target);
+    Camera_UpdateLookAt(arg0, target);
     dx = arg0->eyeX - arg0->atX;
     dy = arg0->eyeY - arg0->atY;
     dz = arg0->eyeZ - arg0->atZ;
@@ -582,7 +582,7 @@ void func_80015494(Camera15150* arg0) {
     arg0->unk2C = arg0->unk28;
 }
 
-void func_80015810(Camera15150* arg0) {
+void Camera_UpdateHeading(Camera15150* arg0) {
     f32 dx = arg0->eyeX - arg0->atX;
     f32 dz = arg0->eyeZ - arg0->atZ;
 
@@ -594,7 +594,7 @@ void func_80015810(Camera15150* arg0) {
 extern f32 D_8008BE5C;
 extern f32 D_8008BE60;
 extern u16 D_80092C86;
-void func_80015878(Camera15150* arg0) {
+void Camera_UpdateBattle(Camera15150* arg0) {
     f32 a;
 
     if (arg0->flags & 0x40) {
@@ -631,10 +631,10 @@ void func_80015878(Camera15150* arg0) {
             }
         }
     }
-    func_80014E04(arg0);
+    Camera_FollowTarget(arg0);
 }
 
-void func_80015AD8(Camera15150* arg0) {
+void Camera_UpdateDelayedTurn(Camera15150* arg0) {
     switch (D_80085F68.state) {
         case 0:
             if (--D_80085F68.timer == 0) {
@@ -652,13 +652,13 @@ void func_80015AD8(Camera15150* arg0) {
             }
             break;
     }
-    func_80014E04(arg0);
+    Camera_FollowTarget(arg0);
 }
 
 void func_80015B88(Camera15150* arg0) {
 }
 
-void func_80015B94(Camera15150* arg0, Unk15150Target* arg1) {
+void Camera_UpdateLookAt(Camera15150* arg0, Unk15150Target* arg1) {
     f32 y;
 
     arg0->atX = arg1->x;
@@ -674,7 +674,7 @@ void func_80015B94(Camera15150* arg0, Unk15150Target* arg1) {
     arg0->unk34 = arg0->unk34 * (arg0->unk74 * 0.8);
 }
 
-void func_80015C38(Camera15150* arg0, Unk15150Target* arg1) {
+void Camera_OrbitTarget(Camera15150* arg0, Unk15150Target* arg1) {
     f32 dx;
     f32 dz;
     f32 angle;
@@ -701,13 +701,13 @@ void func_80015C38(Camera15150* arg0, Unk15150Target* arg1) {
     arg0->eyeZ = arg1->z + D_80085C10.y;
 }
 
-void func_80015D78(s32 arg0) {
+void Camera_Shake(s32 arg0) {
     D_80085CAC = 15;
     D_80085CB0 = D_8004EC68[arg0 * 2];
     D_80085CB4 = D_8004EC68[arg0 * 2 + 1];
 }
 
-void func_80015DB4(s32 arg0) {
+void Camera_SetPreset(s32 arg0) {
     Camera15150* cam = &D_80085E48;
 
     D_80085F60 = arg0;
@@ -737,7 +737,7 @@ void func_80015DB4(s32 arg0) {
 
 extern f32 D_8007AA24;
 extern u16 D_8008BE52;
-void func_80015F44(s32 arg0, Unk15150Target* arg1) {
+void Camera_StartBattleFocus(s32 arg0, Unk15150Target* arg1) {
     f32 h;
 
     if (!(D_8008BE52 & 1)) {
@@ -786,8 +786,8 @@ void func_80015F44(s32 arg0, Unk15150Target* arg1) {
     }
 }
 
-void func_80016218(s32 arg0) {
-    func_80015DB4(arg0);
+void Camera_SetPresetDelayedTurn(s32 arg0) {
+    Camera_SetPreset(arg0);
     D_80085F68.state = 0;
     D_80085F68.timer = 15;
     D_80085F68.mode = D_80085E48.mode;
@@ -807,7 +807,7 @@ typedef struct {
     /* 0x14 */ f32 unk14;
     /* 0x18 */ f32 unk18;
 } Unk8001628C;
-void func_8001628C(Unk8001628C* arg0, Unk15150Target* arg1) {
+void Camera_SetTargetView(Unk8001628C* arg0, Unk15150Target* arg1) {
     D_80085E48.mode = arg0->mode;
     D_80085E48.flags = 0x40;
     D_80085E48.unk4C = arg0->unk18;
@@ -842,7 +842,7 @@ void func_8001628C(Unk8001628C* arg0, Unk15150Target* arg1) {
 
 extern f32 D_8007AA30;
 extern f32 D_80084314;
-void func_800163F4(void) {
+void Camera_TurnForExit(void) {
     f32 a;
 
     a = D_80085E48.unk28 - D_8007AA30;
@@ -873,7 +873,7 @@ void func_800163F4(void) {
     D_80085E48.flags |= 0x10;
 }
 
-f32 func_80016578(Camera15150* arg0, f32 arg1) {
+f32 Camera_RaiseOverObjects(Camera15150* arg0, f32 arg1) {
     s32 n = D_8007ABA8;
     Unk8007ABB0** p;
     Unk8007ABB0* obj;
@@ -899,7 +899,7 @@ f32 func_80016578(Camera15150* arg0, f32 arg1) {
     return arg1;
 }
 
-void func_8001668C(Vec3f_15150* arg0) {
+void Camera_UpdateSway(Vec3f_15150* arg0) {
     f32* pa;
     f32* pb;
     f32 a;

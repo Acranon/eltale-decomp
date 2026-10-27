@@ -71,7 +71,7 @@ typedef struct {
     /* 0x10 */ f32 unk10;
     /* 0x14 */ f32 unk14;
     /* 0x18 */ u16 unk18;
-} Unk80085968; // size = 0x1C (func_800107F0's result)
+} Unk80085968; // size = 0x1C (Coll_ResolveFloorAndWalls's result)
 
 typedef struct {
     /* 0x00 */ f32 x;
@@ -103,7 +103,7 @@ extern u8 D_8004F770[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
 extern Unk8010FDC4 D_8010FDC4[];
-/* Message text around the name in func_80013A50. */
+/* Message text around the name in Item_BuildMessage. */
 u8 D_8004DF00[8] = {
 #include "assets/D_8004DF00.inc.c"
 };
@@ -136,17 +136,17 @@ extern u8 D_8007B430[];
 extern u8 D_8007B8E0;
 extern u8* D_803AB288[];
 
-void func_800107F0(f32, f32, f32, s32, Unk80085968*);
-u8 func_80013B20(u16);
-void func_80013B60(u16);
-void func_800131F0(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Unk80085968*);
+u8 Chest_IsOpened(u16);
+void Chest_SetOpened(u16);
+void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
 void func_800201A0(Unk80085290*, s32, s32, s32, s32, u16);
 void func_80020428(s32, Unk80085290*, Unk8010FDC4*, s32);
 void func_8002099C(u16, Unk80085290*, Unk8010FDC4*);
 void func_800271B4(f32, Unk80085958*);
 void func_8002A7C8(u8, s8, u8);
 
-void func_800134D0(void) {
+void Chest_ClearOpenedFlags(void) {
     s32 i;
 
     for (i = 0; i < 0x20; i++) {
@@ -154,7 +154,7 @@ void func_800134D0(void) {
     }
 }
 
-void func_80013500(void) {
+void Chest_LoadForMap(void) {
     Unk8004DF1C* entry;
     Unk140D0Group* group;
     Unk140D0Def* def;
@@ -180,7 +180,7 @@ void func_80013500(void) {
             p->rx = 0.0f;
             p->rz = 0.0f;
             p->ry = def->ry;
-            func_800107F0(p->x, 0.0f, p->z, 0xA00, &D_80085968);
+            Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &D_80085968);
             p->y = D_80085968.unk4;
             p->unk2C = D_80085968.unkC;
             p->unk30 = D_80085968.unk10;
@@ -194,7 +194,7 @@ void func_80013500(void) {
             p->unk62 = def->unk20;
             p->unk50 = def->unk21;
             p->unk60 = 0;
-            if (func_80013B20(p->unk62)) {
+            if (Chest_IsOpened(p->unk62)) {
                 mode = 3;
             } else {
                 mode = 0;
@@ -209,7 +209,7 @@ void func_80013500(void) {
     }
 }
 
-void func_800136B8(s32 arg0) {
+void Chest_UpdateAll(s32 arg0) {
     s32 n;
     Unk80085290* p;
     u16 t;
@@ -229,13 +229,13 @@ void func_800136B8(s32 arg0) {
         }
         func_80020428(0, p, &D_8010FDC4[p->unk52], arg0);
         func_8002099C(p->unk58, p, &D_8010FDC4[p->unk52]);
-        func_800131F0(p->x, p->y, p->z, p->unk2C, p->unk30, p->unk34, 6.0f);
+        Shadow_Queue(p->x, p->y, p->z, p->unk2C, p->unk30, p->unk34, 6.0f);
         n--;
         p++;
     }
 }
 
-Unk80085290* func_80013808(Unk80013808Arg* arg0) {
+Unk80085290* Chest_FindInFront(Unk80013808Arg* arg0) {
     s32 n = D_80085950;
     Unk80085290* obj = D_80085290;
     f32 d;
@@ -243,7 +243,7 @@ Unk80085290* func_80013808(Unk80013808Arg* arg0) {
     f32 dz;
 
     while (n != 0) {
-        if (func_80013B20(obj->unk62) == 0) {
+        if (Chest_IsOpened(obj->unk62) == 0) {
             d = arg0->unk10 - obj->unk1C;
             if (d > 3.141592653589793) {
                 d = d - 3.141592653589793;
@@ -280,14 +280,14 @@ Unk80085290* func_80013808(Unk80013808Arg* arg0) {
     return obj;
 }
 
-void func_800139EC(Unk80085290* arg0) {
-    func_80013B60(arg0->unk62);
+void Chest_Open(Unk80085290* arg0) {
+    Chest_SetOpened(arg0->unk62);
     arg0->unk60 = 0x805B;
     func_800201A0(arg0, 1, 1, 2, 1, 1);
     func_8002A7C8(0x1A, 8, 0xFF);
 }
 
-void func_80013A50(s32 arg0) {
+void Item_BuildMessage(s32 arg0) {
     u8* src;
     u8* dst;
 
@@ -308,6 +308,6 @@ void func_80013A50(s32 arg0) {
     D_8007B8E0 = 0xFF;
 }
 
-u8 func_80013B20(u16 arg0) {
+u8 Chest_IsOpened(u16 arg0) {
     return D_80085988[arg0 >> 3] & D_8004F770[arg0 & 7];
 }

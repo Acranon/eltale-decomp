@@ -105,15 +105,15 @@ typedef struct {
     /* 0x08 */ s32 count;
 } Unk8007C288;
 
-s32 func_80010A4C(f32, f32, u16, u16, CollResult *);
-s32 func_80010BC8(f32, f32, f32, u16, CollMesh *, CollResult *);
-s32 func_80010F34(f32, f32, f32, f32, f32, f32);
-s32 func_80011034(f32 *, f32 *, f32, f32, f32, f32, f32);
+s32 Coll_TestObjectFloor(f32, f32, u16, u16, CollResult *);
+s32 Coll_TestMeshFloor(f32, f32, f32, u16, CollMesh *, CollResult *);
+s32 Coll_RayCrossesEdge(f32, f32, f32, f32, f32, f32);
+s32 Coll_PushFromSegment(f32 *, f32 *, f32, f32, f32, f32, f32);
 f32 sqrtf(f32);
-s32 func_8001164C(f32, f32, CollWalls *, CollResult *);
-s32 func_800118E4(f32);
-s32 func_80011978(Unk24 *);
-void func_80011A10(Unk24 *);
+s32 Coll_PushFromWalls(f32, f32, CollWalls *, CollResult *);
+s32 Exit_IsFacing(f32);
+s32 Exit_IsEnabled(Unk24 *);
+void Exit_SetDestination(Unk24 *);
 void func_800271B4(f32, f32 *);
 
 extern Unk8007C288 *D_8007C288;
@@ -129,7 +129,7 @@ extern Vec2f D_80084320;
 extern u16 D_8008BE52;
 extern u8 D_8008C9B8[];
 
-void func_800107F0(f32 x, f32 y, f32 z, u16 flags, CollResult *out) {
+void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) {
     u16 *list;
     s32 ix;
     s32 iz;
@@ -145,12 +145,12 @@ void func_800107F0(f32 x, f32 y, f32 z, u16 flags, CollResult *out) {
     out->nz = 0.0f;
     out->ny = 1.0f;
     if (flags & 1) {
-        if (D_8007C298 != NULL && func_8001164C(x, z, &D_8007C298[D_800842C0], out)) {
+        if (D_8007C298 != NULL && Coll_PushFromWalls(x, z, &D_8007C298[D_800842C0], out)) {
             x = out->x;
             z = out->z;
         }
     } else if (flags & 2) {
-        if (D_8007C29C != NULL && func_8001164C(x, z, &D_8007C29C[D_800842C0], out)) {
+        if (D_8007C29C != NULL && Coll_PushFromWalls(x, z, &D_8007C29C[D_800842C0], out)) {
             x = out->x;
             z = out->z;
         }
@@ -167,20 +167,20 @@ void func_800107F0(f32 x, f32 y, f32 z, u16 flags, CollResult *out) {
     }
     if (ix >= 0 && ix < D_8007C28C->unk4 && iz >= 0 && iz < D_8007C28C->unk6) {
         for (n = *list++; n != 0; n--) {
-            if (func_80010A4C(x, z, flags, *list++, out)) {
+            if (Coll_TestObjectFloor(x, z, flags, *list++, out)) {
                 return;
             }
         }
     }
     list = D_8007C28C->unk24;
     for (n = D_8007C28C->unk2; n != 0; n--) {
-        if (func_80010A4C(x, z, flags, *list++, out)) {
+        if (Coll_TestObjectFloor(x, z, flags, *list++, out)) {
             return;
         }
     }
 }
 
-s32 func_80010A4C(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
+s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     s32 ret;
     s32 pad;
     CollMesh *mesh;
@@ -202,7 +202,7 @@ s32 func_80010A4C(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
         z = v[1];
     }
     if ((obj->unk16 & 0xFF) < 0x10) {
-        ret = func_80010BC8(x, z, obj->scale, flags, mesh, out);
+        ret = Coll_TestMeshFloor(x, z, obj->scale, flags, mesh, out);
         if (ret) {
             out->y += obj->y;
             if (ang != 0.0f) {
@@ -217,7 +217,7 @@ s32 func_80010A4C(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     return ret;
 }
 
-s32 func_80010BC8(f32 x, f32 z, f32 scale, u16 flags, CollMesh *mesh, CollResult *out) {
+s32 Coll_TestMeshFloor(f32 x, f32 z, f32 scale, u16 flags, CollMesh *mesh, CollResult *out) {
     CollTri *tri;
     s32 ret;
     CollVert *verts;
@@ -278,9 +278,9 @@ s32 func_80010BC8(f32 x, f32 z, f32 scale, u16 flags, CollMesh *mesh, CollResult
                 } else {
                     if (0) {
                     }
-                    c = func_80010F34(x, z, ax, az, bx, bz);
-                    c += func_80010F34(x, z, bx, bz, cx, cz);
-                    c += func_80010F34(x, z, ax, az, cx, cz);
+                    c = Coll_RayCrossesEdge(x, z, ax, az, bx, bz);
+                    c += Coll_RayCrossesEdge(x, z, bx, bz, cx, cz);
+                    c += Coll_RayCrossesEdge(x, z, ax, az, cx, cz);
                 }
                 if (c == 1) {
                     ny = tri->ny;
@@ -305,7 +305,7 @@ s32 func_80010BC8(f32 x, f32 z, f32 scale, u16 flags, CollMesh *mesh, CollResult
     return ret;
 }
 
-s32 func_80010F34(f32 px, f32 pz, f32 ax, f32 az, f32 bx, f32 bz) {
+s32 Coll_RayCrossesEdge(f32 px, f32 pz, f32 ax, f32 az, f32 bx, f32 bz) {
     if ((az <= pz && pz < bz) || (bz <= pz && pz < az)) {
         if (ax <= px && bx < px) {
             return 1;
@@ -325,7 +325,7 @@ s32 func_80010F34(f32 px, f32 pz, f32 ax, f32 az, f32 bx, f32 bz) {
 #ifdef NON_MATCHING
 /* FP register allocation and stack homes differ, two extra instructions; code is equivalent.
  * Both endpoint cases push away from (ax, az), as retail does. */
-s32 func_80011034(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz) {
+s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz) {
     s32 ret;
     f32 a;
     f32 b;
@@ -435,10 +435,10 @@ s32 func_80011034(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz) {
     return ret;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/113F0/func_80011034.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/113F0/Coll_PushFromSegment.s")
 #endif
 
-s32 func_8001164C(f32 x, f32 z, CollWalls *walls, CollResult *out) {
+s32 Coll_PushFromWalls(f32 x, f32 z, CollWalls *walls, CollResult *out) {
     s32 n;
     CollRange *range;
     s32 hit;
@@ -464,7 +464,7 @@ s32 func_8001164C(f32 x, f32 z, CollWalls *walls, CollResult *out) {
             bx = a->x;
             bz = a->z;
             idx++;
-            hit |= func_80011034(&x, &z, D_800842F0, ax, az, bx, bz);
+            hit |= Coll_PushFromSegment(&x, &z, D_800842F0, ax, az, bx, bz);
         }
     }
     out->x = x;
@@ -472,7 +472,7 @@ s32 func_8001164C(f32 x, f32 z, CollWalls *walls, CollResult *out) {
     return hit;
 }
 
-s32 func_80011770(f32 x, f32 z, f32 angle) {
+s32 Exit_CheckEnter(f32 x, f32 z, f32 angle) {
     s32 pad;
     s32 ret = 0;
     s32 n;
@@ -484,7 +484,7 @@ s32 func_80011770(f32 x, f32 z, f32 angle) {
     }
     n = D_8007C288->count;
     for (p = D_8007C288->list; n != 0; n--, p++) {
-        if (func_80011978(p)) {
+        if (Exit_IsEnabled(p)) {
             D_80084320.x = x - p->x;
             D_80084320.z = z - p->z;
             func_800271B4(p->angle, &D_80084320.x);
@@ -497,8 +497,8 @@ s32 func_80011770(f32 x, f32 z, f32 angle) {
                 dz = -dz;
             }
             if (dx < p->halfW && dz < p->halfD) {
-                if ((p->flags & 2) || func_800118E4(angle - p->angle)) {
-                    func_80011A10(p);
+                if ((p->flags & 2) || Exit_IsFacing(angle - p->angle)) {
+                    Exit_SetDestination(p);
                     ret = 1;
                 }
                 break;
@@ -508,7 +508,7 @@ s32 func_80011770(f32 x, f32 z, f32 angle) {
     return ret;
 }
 
-s32 func_800118E4(f32 angle) {
+s32 Exit_IsFacing(f32 angle) {
     if (angle > 3.141592653589793) {
         angle -= 6.283185307179586;
     } else if (angle < -3.141592653589793) {
@@ -520,7 +520,7 @@ s32 func_800118E4(f32 angle) {
     return angle < 0.39269908169872414;
 }
 
-s32 func_80011978(Unk24 *arg0) {
+s32 Exit_IsEnabled(Unk24 *arg0) {
     s32 i;
     s32 ret;
     s32 flags = arg0->flags;

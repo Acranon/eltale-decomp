@@ -125,7 +125,7 @@ typedef struct {
     /* 0x10 */ f32 ny;
     /* 0x14 */ f32 nz;
     /* 0x18 */ u16 flags;
-} Coll17360; // size = 0x1C (func_800107F0's result)
+} Coll17360; // size = 0x1C (Coll_ResolveFloorAndWalls's result)
 
 /* This file's .bss, 80085F90..800863F0, in address order (first declaration fixes
  * the order). Splat's D_80085F9C, D_80086370/88/A0, D_800863BC and D_800863CC are
@@ -371,8 +371,8 @@ typedef struct {
     /* 0x34 */ Unk80017F48Sub* unk34;
     /* 0x38 */ u8 pad38[4];
 } Unk80017F48;
-void func_800107F0(f32, f32, f32, s32, Coll17360*);
-void func_80015D78(s32);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Coll17360*);
+void Camera_Shake(s32);
 void Magic_CreateGroundHitPresentation();
 typedef struct {
     /* 0x00 */ u8 pad0[0x22];
@@ -402,7 +402,7 @@ s32 Magic_ShouldApplyStatus();
 void Magic_StartStatusTimer();
 void func_8000CA88(Actor17360*);
 void Player_StartDodge(void);
-void func_80012B34(s32, s32, s32, u8*);
+void Env_SetSlotLightAnim(s32, s32, s32, u8*);
 void Magic_CreateHitPresentation();
 void Magic_CreateTimedPresentation();
 typedef struct {
@@ -459,7 +459,7 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
 
     sizes = D_8004ED54;
     if (arg2 == 0) {
-        func_80012B34(D_8007A1C8, 2, 8, D_800EB700);
+        Env_SetSlotLightAnim(D_8007A1C8, 2, 8, D_800EB700);
         D_80085F90 |= 1;
         D_80085F94 = 8;
     }
@@ -526,7 +526,7 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
     if (p->target != NULL) {
         D_8004EC90[def->unk26](p, (Actor17360*)arg0);
         if (def->unk14 == 2) {
-            func_800107F0(p->x, p->y, p->z, 0xA00, &D_800863C8);
+            Coll_ResolveFloorAndWalls(p->x, p->y, p->z, 0xA00, &D_800863C8);
             p->y = D_800863C8.y;
         }
         Magic_CreateCastPresentation(p, p->unk24);
@@ -767,7 +767,7 @@ void Magic_UpdateEffects(void) {
     } else if (D_80085F90 & 2) {
         if (--D_80085F94 == 0) {
             D_80085F90 = 0;
-            func_80012B34(D_8007A1C8, 2, 8, D_800EB7C0);
+            Env_SetSlotLightAnim(D_8007A1C8, 2, 8, D_800EB7C0);
         }
     }
 }
@@ -851,7 +851,7 @@ void Magic_MoveHomingEffect(Unk80017F48* arg0) {
     arg0->y += arg0->vy;
     arg0->z += arg0->vz;
     if (arg0->cfg->unk14 != 0) {
-        func_800107F0(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
+        Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
         switch (arg0->cfg->unk14) {
             case 1:
                 if (arg0->y < D_800863C8.y) {
@@ -864,7 +864,7 @@ void Magic_MoveHomingEffect(Unk80017F48* arg0) {
                         arg0->unk34->unk0 = 15;
                         arg0->unk34->unk8 &= ~1;
                     }
-                    func_80015D78(1);
+                    Camera_Shake(1);
                     if (arg0->unk30[0x10] >= 0) {
                         Magic_CreateGroundHitPresentation(arg0, arg0->target);
                     }
@@ -884,7 +884,7 @@ void Magic_MoveVerticalEffect(Unk80017F48* arg0) {
         }
         arg0->y += arg0->vy;
         if (arg0->cfg->unk14 == 1) {
-            func_800107F0(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
+            Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
             if (arg0->y < D_800863C8.y) {
                 arg0->y = D_800863C8.y;
                 arg0->unkA |= 1;
@@ -896,7 +896,7 @@ void Magic_MoveVerticalEffect(Unk80017F48* arg0) {
                     arg0->unk34->unk0 = 15;
                     arg0->unk34->unk8 &= ~1;
                 }
-                func_80015D78(1);
+                Camera_Shake(1);
                 Magic_CreateGroundHitPresentation(arg0, arg0->target);
             }
         }

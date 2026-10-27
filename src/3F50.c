@@ -210,7 +210,7 @@ typedef struct {
     f32 z;
 } Vec3f;
 
-/* collision query result (func_800107F0) */
+/* collision query result (Coll_ResolveFloorAndWalls) */
 typedef struct {
     /* 0x00 */ f32 unk0;
     /* 0x04 */ f32 unk4;
@@ -228,7 +228,7 @@ void Player_MoveWalk(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
 void Player_LoadAnim(Actor *arg0);
 void Player_AddTurnMoveAgilityXP(PlayerState *arg0);
 void Npc_EndTalk(s32 arg0);
-void func_80013A50(s32 arg0);
+void Item_BuildMessage(s32 arg0);
 void Magic_CreateCastEffect(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
 s32 func_80017AB0(void);
 void func_8001A6E4(Actor *arg0);
@@ -259,7 +259,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2);
 #else
 s32 Player_TakeDamage(s32 arg0, u16 arg1, Actor *arg2);
 #endif
-void func_80015F44(s32 arg0, Actor *arg1);
+void Camera_StartBattleFocus(s32 arg0, Actor *arg1);
 u32 func_80026E90(s32 arg0);
 f32 func_800270D0(f32 arg0, f32 arg1);
 void func_80028120(u8 *romStart, void *dest, u32 size);
@@ -430,7 +430,7 @@ extern s32 D_8007A9BC;
 extern void *D_8007A9C4;
 extern Actor *D_8007A9C8;
 extern void *D_8007A9CC;
-void func_800107F0(f32 x, f32 y, f32 z, u16 flags, void *out);
+void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
 void func_8000F50C(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
 
 void Player_Spawn(void) {
@@ -453,7 +453,7 @@ void Player_Spawn(void) {
     D_8007AA08.actor.vx = 0.0f;
     D_8007AA08.actor.unk1C = 0.0f;
     D_8007AA08.actor.vz = 0.0f;
-    func_800107F0(D_8007A98C, 0.0f, D_8007A990, 0xA00, &D_8007A928);
+    Coll_ResolveFloorAndWalls(D_8007A98C, 0.0f, D_8007A990, 0xA00, &D_8007A928);
     p->actor.y = D_8007A928.unk4;
     p->actor.unk2C = D_8007A928.unkC;
     p->actor.unk30 = D_8007A928.unk10;
@@ -596,7 +596,7 @@ void Player_SetSpawnFromSaveTable(void) {
     D_800842C0 = -1;
 }
 
-/* D_8007A9C4: func_80013D08's result */
+/* D_8007A9C4: Spirit_FindInFront's result */
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
@@ -612,7 +612,7 @@ typedef struct {
     /* 0x18 */ s32 unk18;
 } Unk8007A9CCEntry;
 
-/* D_8007A9CC: func_80014318's result */
+/* D_8007A9CC: TextSpot_FindInFront's result */
 typedef struct {
     /* 0x00 */ Unk8007A9CCEntry *entry;
 } Unk8007A9CC;
@@ -640,16 +640,16 @@ s32 Player_FindMeleeTarget(Actor *arg0);
 u16 Player_FindMeleeTarget(Actor *arg0);
 #endif
 s32 Player_FindNpcToTalk(PlayerState *arg0, Actor *arg1);
-void *func_80013D08(Actor *arg0);
-Actor *func_80013808(Actor *arg0);
-void *func_80014318(Actor *arg0);
+void *Spirit_FindInFront(Actor *arg0);
+Actor *Chest_FindInFront(Actor *arg0);
+void *TextSpot_FindInFront(Actor *arg0);
 s32 func_8000D100(void);
 void func_8000D40C(s32 arg0);
 void Npc_StartTalk(s32 idx);
-void func_800140F0(u16 arg0);
+void Spirit_SetCollected(u16 arg0);
 s32 func_80024FC4(void);
-void func_800139EC(Actor *arg0);
-void func_800144B4(void *arg0);
+void Chest_Open(Actor *arg0);
+void TextSpot_LoadMessage(void *arg0);
 s32 Player_CanAct(PlayerState *arg0, Actor *arg1);
 void func_800269B8(s32 arg0, u16 arg1, void *arg2);
 s32 Player_HandleSpellInput(PlayerState *arg0);
@@ -680,11 +680,11 @@ void Player_Update(void) {
         } else if (!(p->actor.unk60 & 1)) {
             D_8007A9C0 = Player_FindNpcToTalk(&D_8007AA08, &D_8007AA20);
             if (D_8007A9C0 == 0) {
-                D_8007A9C4 = func_80013D08(&D_8007AA20);
+                D_8007A9C4 = Spirit_FindInFront(&D_8007AA20);
                 if (D_8007A9C4 == NULL) {
-                    D_8007A9C8 = func_80013808(&D_8007AA20);
+                    D_8007A9C8 = Chest_FindInFront(&D_8007AA20);
                     if (D_8007A9C8 == NULL) {
-                        D_8007A9CC = func_80014318(&D_8007AA20);
+                        D_8007A9CC = TextSpot_FindInFront(&D_8007AA20);
                         if (D_8007A9CC == NULL) {
                             if ((D_8007A904 = func_8000D100()) != 0) {
                                 func_8000D40C(D_8007A904 - 1);
@@ -728,13 +728,13 @@ void Player_Update(void) {
                     } else {
                         D_8004DCA0 |= 8;
                         p->unk0 = 0;
-                        func_800140F0(((Unk8007A9C4 *) D_8007A9C4)->unk14);
+                        Spirit_SetCollected(((Unk8007A9C4 *) D_8007A9C4)->unk14);
                         ((Unk8007A9C4 *) D_8007A9C4)->unk10 |= 1;
                         D_8008C160 = 8;
                         func_8002A7C8(0, 1, 0xFF);
                     }
                 } else if (func_80024FC4() != 0 && D_8007A9C8 != NULL) {
-                    func_800139EC(D_8007A9C8);
+                    Chest_Open(D_8007A9C8);
                     D_8007A918.x = 0.0f;
                     D_8007A918.z = p->actor.scale * 171.0f;
                     func_800271B4(D_8007A9C8->rot, &D_8007A918);
@@ -746,7 +746,7 @@ void Player_Update(void) {
                     Player_StartOpenChest(&D_8007AA08, &D_8007AA20, (s32) cd);
                     D_8007A9C8 = NULL;
                 } else if (D_8007A9CC != NULL) {
-                    func_800144B4(D_8007A9CC);
+                    TextSpot_LoadMessage(D_8007A9CC);
                     p->unk0 = 0x11;
                     p->actor.unk60 |= 1;
                     p->actor.vz = 0.0f;
@@ -840,9 +840,9 @@ extern Unk8007A928 D_8007A928;
 extern f32 D_8007A92C;
 extern Vec3f D_8007AB48;
 extern Vec3f D_8008BFC0;
-void func_800107F0(f32 x, f32 y, f32 z, u16 flags, void *out);
-void func_80012B88(s32 arg0);
-void func_800131F0(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
+void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
+void Env_ApplyLightSlot(s32 arg0);
+void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
 void func_80020428(s32 arg0, Actor *arg1, AnimEntry *arg2, void *arg3);
 void func_8002099C(u16 arg0, Actor *arg1, AnimEntry *arg2);
 
@@ -864,7 +864,7 @@ void Player_Draw(void *arg0) {
     PlayerState *p = &D_8007AA08;
 
     gSPDisplayList(D_8007A184++, D_10000A0);
-    func_80012B88(D_8007AB60);
+    Env_ApplyLightSlot(D_8007AB60);
     if (D_8007AA08.unk0 == 0xA || p->unk0 == 0xB) {
         flag = 1;
     } else {
@@ -875,11 +875,11 @@ void Player_Draw(void *arg0) {
     func_80020428(flag, &D_8007AA20, &anims[D_8007AA72], arg0);
     func_8002099C(D_8007AA78, &D_8007AA20, &anims[D_8007AA72]);
     Player_LoadAnim(&D_8007AA20);
-    func_800107F0(D_8008BFC0.x, D_8007AA24, D_8008BFC0.z, 0xA00, &D_8007A928);
+    Coll_ResolveFloorAndWalls(D_8008BFC0.x, D_8007AA24, D_8008BFC0.z, 0xA00, &D_8007A928);
     D_8007AB48.x = D_8008BFC0.x;
     D_8007AB48.y = D_8007A92C;
     D_8007AB48.z = D_8008BFC0.z;
-    func_800131F0(D_8007AB48.x, D_8007AB48.y, D_8007AB48.z, p->actor.unk2C, p->actor.unk30, p->actor.unk34,
+    Shadow_Queue(D_8007AB48.x, D_8007AB48.y, D_8007AB48.z, p->actor.unk2C, p->actor.unk30, p->actor.unk34,
                   p->actor.unk28 * p->actor.scale);
 }
 
@@ -1313,7 +1313,7 @@ void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
         arg0->vz = D_8007A918.z;
         Player_MoveAndCollide(0xA00, arg0, arg1);
         if (arg1->unk4 == 0x20) {
-            func_80013A50(arg1->unk11C);
+            Item_BuildMessage(arg1->unk11C);
             func_80032D20(1);
             func_80025094(arg1->unk11C);
             D_8004DCA0 |= 2;
@@ -1663,7 +1663,7 @@ void Player_MoveAndCollide(u16 arg0, Actor *arg1, PlayerState *arg2) {
     dx = arg1->x + arg1->vx;
     dz = arg1->z + arg1->vz;
     D_8007A928.unk0 = arg1->unk64->unk18 * arg1->unk64->unk20;
-    func_800107F0(dx, arg1->y, dz, arg0, &D_8007A928);
+    Coll_ResolveFloorAndWalls(dx, arg1->y, dz, arg0, &D_8007A928);
     arg1->vx = D_8007A928.unk0 - arg1->x;
     arg1->vz = D_8007A928.unk8 - arg1->z;
     arg1->x = D_8007A928.unk0;
@@ -2100,7 +2100,7 @@ void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     mon = &D_8007B908[arg0->unk2];
     dx = mon[-1].actor.x - arg1->x;
     arg1->rot = func_800270D0(dx, mon[-1].actor.z - arg1->z);
-    func_80015F44(0x23, arg1);
+    Camera_StartBattleFocus(0x23, arg1);
 }
 
 s32 Player_RollMeleeHit(s32 arg0, Actor *arg1) {
@@ -2149,7 +2149,7 @@ u16 Player_CalcMeleeDamage(PlayerState *arg0) {
 }
 
 #ifdef NON_MATCHING
-void func_80015D78(s32 arg0);
+void Camera_Shake(s32 arg0);
 
 /* frame 0x50 vs 0x48: damage kept in an extra saved register, arg2 kept live (register allocation); code is equivalent */
 s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
@@ -2211,7 +2211,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
         }
         func_800201A0(&D_8007AA20, 8, 1, D_8007A910, 1, 1);
         if (dmg != 0) {
-            func_80015D78(2);
+            Camera_Shake(2);
         }
         if (d != 0) {
             func_8002A7C8(0, 0x18, 0xFF);
@@ -2353,7 +2353,7 @@ void Player_StartCastSpell(PlayerState *p, Actor *a, AnimEntry *anims) {
     a->vx = a->vz = 0.0f;
     a->unk60 |= 1;
     func_800201A0(a, anim, 1, next, 1, 1);
-    func_80015F44(0x2D, a);
+    Camera_StartBattleFocus(0x2D, a);
     D_8008C15E = 0x1E;
 }
 
@@ -2490,7 +2490,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
         func_8002A7C8(4, 0x35, 0xFF);
     }
     if (!(D_8004DCA0 & 0xA) && D_8007A9BC != 0xFF) {
-        func_80013A50(D_8007A9BC);
+        Item_BuildMessage(D_8007A9BC);
         func_80032D20(1);
         func_80025094(D_8007A9BF);
         D_8007A9BC = 0xFF;

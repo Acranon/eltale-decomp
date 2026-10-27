@@ -1,9 +1,9 @@
-# func_80011EF4
+# Env_InterpolateLighting
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/12610.c`](../12610.c)
-- Retail assembly: [`asm/nonmatchings/12610/func_80011EF4.s`](../../asm/nonmatchings/12610/func_80011EF4.s)
+- Retail assembly: [`asm/nonmatchings/12610/Env_InterpolateLighting.s`](../../asm/nonmatchings/12610/Env_InterpolateLighting.s)
 - Retail code size: `0x5f4` bytes
 - Current gap: 379 object words; 0x620 vs 0x5F4 (an 8-byte frame with one saved register where retail is a no-frame leaf).
 - Specific blocker: The 12-byte color copies are understood but a saved cursor and base rematerialization remain wrong.
@@ -24,7 +24,7 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_80011EF4** (0x5F4 bytes)
+- **Env_InterpolateLighting** (0x5F4 bytes)
   - w2 s2: 12610. Keyframe interpolation: struct Keyframe {time; Color3 amb; LightSet3 lights (0x24); FogSet fog}, with D_80084B24 as a separate symbol. The target copies 36 bytes straight-line with lui/at pointer splitting, and my struct copies come out as loops. Draft in scratch g7.c.
   - w2 s3: Not retried this session beyond rerunning the stash drafts after the prototype fixes. C528 is at 311 words, D6A0 at 422 (register-heavy), 104C0 at 159. 11C60 has no draft file left; its asm rematerializes &D_80084988 after every call. 11EF4 is probably in the same lui-sharing (D2) family.
   - w2 s4: Shared lui at across consecutive symbol accesses. In standalone tests, extern scalars, extern structs (base CSE) and locally defined scalars or statics never share a lui, so this still looks like D2 (data defined in the same file, layout-dependent). Not retried beyond those checks.

@@ -149,22 +149,22 @@ Unk8004DEF4 D_8004DEF4[1] = {
     { 0x537F, 3, 0x80 },
 };
 
-void func_80011EF4(s32, Unk80084994 *);
-void func_80012854(s32);
-void func_80012800(s32, u16 *, u16 *);
+void Env_InterpolateLighting(s32, Unk80084994 *);
+void Env_StepPaletteFade(s32);
+void Env_StartPaletteFade(s32, u16 *, u16 *);
 extern u16 D_8007C280;
 extern s32 D_8007A17C;
 extern Gfx *D_8007A184;
 extern s16 D_8007A1A0;
 extern s16 D_8007A1A2;
 
-void func_80012A60(void);
-void func_8001263C(void);
+void Env_ClearLightSlots(void);
+void Env_ComputeLightDirs(void);
 void func_80027430(f32 (*)[4], f32, f32, f32);
 void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
 void func_800277A4(Mtx *, f32, f32, f32, f32 *, f32 *, f32 *);
 extern Mtx D_80085F10;
-void func_800130F8(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
+void Env_FillLights3(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
 extern s32 D_80084B60;
 extern s32 D_80084B64;
 extern s32 D_80084B68;
@@ -175,7 +175,7 @@ extern s32 D_8007A188;
 extern s32 D_8007A18C;
 extern s32 D_8007A190;
 
-void func_80011A10(Unk80011A10Arg *arg0) {
+void Exit_SetDestination(Unk80011A10Arg *arg0) {
     D_80084318 = arg0->unk1E;
     D_80084300.unk0 = D_80084318[0];
     D_80084300.unk4 = D_80084318[1];
@@ -185,7 +185,7 @@ void func_80011A10(Unk80011A10Arg *arg0) {
     D_80084300.unk14 = arg0->unk8;
 }
 
-void func_80011A60(void) {
+void Env_InitClock(void) {
     s32 i;
 
     D_80084980 = 0x1EC3;
@@ -201,7 +201,7 @@ void func_80011A60(void) {
 
 #ifdef NON_MATCHING
 /* &D_8004DEF4 held in a register instead of separate %hi/%lo loads, temporaries rotated (register allocation); code is equivalent */
-void func_80011AE0(void) {
+void Env_InitForMap(void) {
     Unk8004DEF4 *p;
     s32 i;
     s32 n;
@@ -247,26 +247,26 @@ void func_80011AE0(void) {
         D_80084988 = 0;
         D_8008498C = e->unk0;
     }
-    func_80012A60();
+    Env_ClearLightSlots();
     D_80084338 = 0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011AE0.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/12610/Env_InitForMap.s")
 #endif
 
-void func_80011C60(void) {
+void Env_Update(void) {
     Unk8004DEF4 *p;
 
-    func_80011EF4(D_80084988, D_80084994);
+    Env_InterpolateLighting(D_80084988, D_80084994);
     if (D_8008433C != 0) {
         if (--D_8008433C < 0) {
             D_8008433C = 0;
         }
-        func_80012854(D_8008433C);
+        Env_StepPaletteFade(D_8008433C);
     } else {
         p = &D_8004DED0[D_80084330];
         if (D_80084988 >= p->unk0 && (D_80084330 != 0 || D_80084988 < D_80084334)) {
-            func_80012800(p->unk8, D_800808B0[0] + p->unk4 * 256, D_800806B0);
+            Env_StartPaletteFade(p->unk8, D_800808B0[0] + p->unk4 * 256, D_800806B0);
             if (++D_80084330 >= 4) {
                 D_80084330 = 0;
             }
@@ -295,7 +295,7 @@ void func_80011C60(void) {
     }
 }
 
-void func_80011EA0(s32 arg0) {
+void Env_SetClock(s32 arg0) {
     D_80084980 = arg0;
     if (D_80084984 <= D_80084980) {
         D_80084980 = D_80084980 - D_80084984;
@@ -308,7 +308,7 @@ void func_80011EA0(s32 arg0) {
 
 #ifdef NON_MATCHING
 /* 8-byte frame with one saved register where retail is a no-frame leaf, light pointers rematerialized differently (register allocation); code is equivalent */
-void func_80011EF4(s32 t, Unk80084994 *arg1) {
+void Env_InterpolateLighting(s32 t, Unk80084994 *arg1) {
     KeyTrack *track = (KeyTrack *) arg1;
     Keyframe *k;
     Keyframe *prev;
@@ -365,22 +365,22 @@ void func_80011EF4(s32 t, Unk80084994 *arg1) {
     fog->far = (prev->fog.far * rem + k->fog.far * off) / span;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011EF4.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/12610/Env_InterpolateLighting.s")
 #endif
 
-void func_800124E8(void) {
+void Env_PrepareFrameLighting(void) {
     Lights3 *l;
 
     l = D_8007A17C ? &D_800845C8 : &D_80084590;
-    func_8001263C();
-    func_800130F8(l, D_80084B18, D_80084B48);
+    Env_ComputeLightDirs();
+    Env_FillLights3(l, D_80084B18, D_80084B48);
     D_8007A1A0 = D_80084B78[0];
     D_8007A1A2 = D_80084B78[1];
     gSPFogPosition(D_8007A184++, D_8007A1A0, D_8007A1A2);
     gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
 }
 
-void func_8001263C(void) {
+void Env_ComputeLightDirs(void) {
     s32 pad;
     f32 x;
     f32 y;
@@ -409,7 +409,7 @@ void func_8001263C(void) {
     D_80084B48[1][2] = z;
 }
 
-void func_80012800(s32 arg0, u16 *arg1, u16 *arg2) {
+void Env_StartPaletteFade(s32 arg0, u16 *arg1, u16 *arg2) {
     u16 *dst;
     u32 i;
 
@@ -423,7 +423,7 @@ void func_80012800(s32 arg0, u16 *arg1, u16 *arg2) {
     }
 }
 
-void func_80012854(s32 arg0) {
+void Env_StepPaletteFade(s32 arg0) {
     u16 *src;
     u16 *src2;
     u16 *dst;
@@ -464,7 +464,7 @@ void func_80012854(s32 arg0) {
     }
 }
 
-void func_80012A60(void) {
+void Env_ClearLightSlots(void) {
     Unk80084998 *p = D_80084998;
     s32 i = 8;
 
@@ -475,7 +475,7 @@ void func_80012A60(void) {
     } while (i != 0);
 }
 
-s32 func_80012A90(void) {
+s32 Env_AllocLightSlot(void) {
     Unk80084998 *p = &D_80084998[7];
     s32 i = 7;
 
@@ -493,11 +493,11 @@ s32 func_80012A90(void) {
     return i;
 }
 
-void func_80012AE0(s32 arg0) {
+void Env_FreeLightSlot(s32 arg0) {
     D_80084998[arg0].unk0 = 0;
 }
 
-void func_80012B00(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
+void Env_SetSlotEnvAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
     Unk80084998 *p = &D_80084998[arg0];
 
     p->unk4 = arg1;
@@ -505,7 +505,7 @@ void func_80012B00(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
     p->unk10 = p->unk14 = arg3;
 }
 
-void func_80012B34(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
+void Env_SetSlotLightAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
     Unk80084998 *p = &D_80084998[arg0];
 
     p->unk18 = arg1;
@@ -513,11 +513,11 @@ void func_80012B34(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
     p->unk24 = p->unk28 = arg3;
 }
 
-void func_80012B68(s32 arg0, s32 *arg1) {
+void Env_SetSlotLightDirs(s32 arg0, s32 *arg1) {
     D_80084998[arg0].unk2C = arg1;
 }
 
-void func_80012B88(s32 idx) {
+void Env_ApplyLightSlot(s32 idx) {
     s32 *f;
     s32 i;
     s32 (*src)[3];
@@ -638,7 +638,7 @@ void func_80012B88(s32 idx) {
         (*cols)[2] = (*src)[2];
         cols = tmp;
     }
-    func_800130F8(l, cols, dirs);
+    Env_FillLights3(l, cols, dirs);
     gSPSetLights3(D_8007A184++, (*l));
     gDPSetFogColor(D_8007A184++, cols[3][0], cols[3][1], cols[3][2], 0xFF);
     if (D_800842B8 & 0x80) {
@@ -654,7 +654,7 @@ void func_80012B88(s32 idx) {
 }
 
 
-void func_800130F8(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]) {
+void Env_FillLights3(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]) {
     arg0->l[1].l.dir[0] = (*arg2)[0];
     arg0->l[1].l.dir[1] = (*arg2)[1];
     arg0->l[1].l.dir[2] = (*arg2)[2];

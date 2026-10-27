@@ -302,7 +302,7 @@ Unk80082020 D_80082020;
 void func_80028120();
 void func_8000F4A0(void);
 void func_8000FD54(void);
-void func_800107F0(f32, f32, f32, u16, CollResult *);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, CollResult *);
 extern Unk8007C284 D_80056BB0[];
 extern Unk80057540 D_80057540[];
 extern s32 D_80084308;
@@ -360,7 +360,7 @@ f32 sqrtf(f32);
 f32 func_800270D0(f32, f32);
 void func_80027220(f32 (*)[4], f32, f32, f32, f32, f32, f32, f32);
 void guMtxF2L(f32 (*)[4], Mtx *);
-void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
+void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 extern u8 **D_8005E5AC[];
 extern f32 D_80085E74;
 
@@ -496,7 +496,7 @@ void func_8000D6A0(void) {
     v = D_80083638;
     for (; n != 0; n--, s++) {
         if (s->unk16 & 0x8000) {
-            func_800107F0(s->x, s->y, s->z, 0xA00, &D_80082000);
+            Coll_ResolveFloorAndWalls(s->x, s->y, s->z, 0xA00, &D_80082000);
             s->y = D_80082000.y;
         }
         kind = s->unk16 & 0xFF;
@@ -1065,7 +1065,7 @@ void func_8000F740(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
                     D_8007A180++;
                     gSPDisplayList(D_8007A184++, dl2);
                     c = &D_80083638[(s32)s->angle];
-                    func_800131F0(s->x, s->y, s->z, c->x, c->y, c->z, 8.0f);
+                    Shadow_Queue(s->x, s->y, s->z, c->x, c->y, c->z, 8.0f);
                     D_8007C2A0++;
                 }
             }

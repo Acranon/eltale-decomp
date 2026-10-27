@@ -83,7 +83,7 @@ Unk8004E6A0 D_8004E6A0[0x26] = {
 };
 s32 D_8004EB60 = 0x26; /* the entry count; nothing reads it */
 /* This file's .bss, 80085AB0..80085B80, in address order (first declaration fixes
- * the order). Splat's D_80085AC8/D_80085ACC are func_80014130's D_80085AC0[0].unk8
+ * the order). Splat's D_80085AC8/D_80085ACC are TextSpot_LoadForMap's D_80085AC0[0].unk8
  * and &D_80085AC0[1]. */
 Unk80085AB0 D_80085AB0;
 s32 D_80085AB8; /* unreferenced */
@@ -99,11 +99,11 @@ f32 func_800270D0(f32, f32);
 f32 sqrtf(f32);
 void func_80028120(u8*, void*, s32);
 
-void func_800140F0(u16 arg0) {
+void Spirit_SetCollected(u16 arg0) {
     D_80085A98[arg0 >> 3] |= D_8004F770[arg0 & 7];
 }
 
-void func_80014130(void) {
+void TextSpot_LoadForMap(void) {
     Unk80085AC0* out = D_80085AC0;
     s32 i;
 
@@ -118,7 +118,7 @@ void func_80014130(void) {
     }
 }
 
-Unk80085AC0* func_80014318(Unk80014318Arg* arg0) {
+Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
     s32 n = D_80085ABC;
     Unk80085AC0* out = D_80085AC0;
     f32 dx;
@@ -156,7 +156,7 @@ Unk80085AC0* func_80014318(Unk80014318Arg* arg0) {
     return out;
 }
 
-void func_800144B4(Unk80085AC0* arg0) {
+void TextSpot_LoadMessage(Unk80085AC0* arg0) {
     func_80028120(&D_D37700[arg0->entry->unk1C], D_8007B8E0, 0x20);
     func_80028120(&D_D37700[arg0->entry->unk1E], D_8007B430, 0x200);
     if (D_8007B8E0[2] == 0xFF) {

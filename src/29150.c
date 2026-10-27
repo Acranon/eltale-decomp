@@ -247,8 +247,8 @@ extern u8 D_8004B980[];
 extern u8 D_8004BA50[];
 extern u8 D_8004CE80[];
 extern u8 D_80070A60[];
-void func_800007F4(void* sc, NNScClient* c, OSMesgQueue* msgQ);
-OSMesgQueue* func_800006F8(void* sc);
+void nnScAddClient(void* sc, NNScClient* c, OSMesgQueue* msgQ);
+OSMesgQueue* nnScGetAudioMQ(void* sc);
 Acmd* alAudioFrame(Acmd* cmdList, s32* cmdLen, s16* outBuf, s32 outLen);
 s16 n_alSeqpGetVol(ALSeqPlayer* seqp);
 void func_80029618(void);
@@ -287,8 +287,8 @@ void func_80028AAC(void* arg) {
     }
     osCreateMesgQueue(&msgQ, msgBuf, 8);
     osCreateMesgQueue(&rtnQ, rtnBuf, 8);
-    func_800007F4(arg, &client, &msgQ);
-    audioMQ = func_800006F8(arg);
+    nnScAddClient(arg, &client, &msgQ);
+    audioMQ = nnScGetAudioMQ(arg);
     while (TRUE) {
         osRecvMesg(&msgQ, (OSMesg*) &msg, OS_MESG_BLOCK);
         switch (*msg) {

@@ -239,7 +239,7 @@ typedef struct {
 } Unk8000AA74;
 
 
-void func_800107F0(f32, f32, f32, s32, CollResult *);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, CollResult *);
 
 void func_8000A5E4(void);
 Unk8000BA20 *func_8000B7A4(Enemy *, Obj *);
@@ -247,12 +247,12 @@ void func_8000BA20(Enemy *, Obj *, Unk8000BA20 *);
 extern s16 D_8008C162;
 void func_80020428(s32, Obj *, u8 *, s32);
 void func_8002099C(s32, Obj *, u8 *);
-void func_800131F0(f32, f32, f32, f32, f32, f32, f32);
+void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 extern Gfx *D_8007A184;
 void func_8000CC40(s32, s32);
 f32 func_800270D0(f32, f32);
 void func_800201A0(Obj *, s32, s32, s32, s32, u16);
-void func_80015F44(s32, Obj *);
+void Camera_StartBattleFocus(s32, Obj *);
 void func_8000BB90(Obj *, f32, f32);
 void func_8000BCA4(s32, f32, f32, Obj *, EnemyAI *);
 void func_8000BFE0(Obj *, Vec3f *);
@@ -299,7 +299,7 @@ extern f32 D_8007AA24;
 extern f32 D_8007AA28;
 extern f32 D_8007B928;
 extern f32 D_8007B92C;
-void func_80015D78(s32);
+void Camera_Shake(s32);
 void func_8000C05C(f32 *, f32 *, Obj *);
 extern f32 D_8008BE5C;
 extern f32 D_8008BE60;
@@ -402,7 +402,7 @@ void func_8000A3E4(s32 arg0) {
             func_8002099C(obj->unk58, obj, &anims[obj->unk52 * 12]);
             obj->y = y;
             if (obj->unk64->unk0 != 2 && !(obj->unk62 & 0x8000)) {
-                func_800131F0(obj->x, obj->y, obj->z, obj->unk2C, obj->unk30, obj->unk34, obj->unk28 * obj->unk24);
+                Shadow_Queue(obj->x, obj->y, obj->z, obj->unk2C, obj->unk30, obj->unk34, obj->unk28 * obj->unk24);
             }
             *list++ = obj;
             n--;
@@ -459,10 +459,10 @@ void func_8000A6D0(s32 idx, f32 x, f32 z, f32 angle, Obj *obj, Enemy *e) {
     e->unk10 = (f32)def->unkC * 0.2857 + 17.0;
     e->unk20 = e->unk24 = 0;
     D_8007C080.x = obj->unk64->unk18 * obj->unk64->unk20;
-    func_800107F0(x, 0.0f, z, 0xA01, &D_8007C080);
+    Coll_ResolveFloorAndWalls(x, 0.0f, z, 0xA01, &D_8007C080);
     if (D_8007C080.flags & 0x8000) {
         if (obj->unk64->unk0 == 0) {
-            func_800107F0(x + 0.5, 0.0f, z + 0.5, 0xA01, &D_8007C080);
+            Coll_ResolveFloorAndWalls(x + 0.5, 0.0f, z + 0.5, 0xA01, &D_8007C080);
             if (D_8007C080.flags & 0x8000) {
                 D_8007C080.y = D_8007AA08.y;
             }
@@ -896,7 +896,7 @@ void func_8000BA20(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
     obj->unk60 = 1;
     obj->angle = func_800270D0(D_8007AA08.x - obj->x, D_8007AA08.z - obj->z);
     func_800201A0(obj, arg2->unk8, 1, arg2->unkA == -1 ? 0 : arg2->unkA, 1, 1);
-    func_80015F44(arg2->unk4 + 0xF, obj);
+    Camera_StartBattleFocus(arg2->unk4 + 0xF, obj);
     if (e->unk2 == 0) {
         e->unk2 = 1;
     }
@@ -966,7 +966,7 @@ void func_8000BCA4(s32 clamp, f32 dx, f32 dz, Obj *obj, EnemyAI *ai) {
         flags = 0xA01;
     }
     D_8007C080.x = obj->unk64->unk18 * obj->unk64->unk20;
-    func_800107F0(obj->x, obj->y, obj->z, flags, &D_8007C080);
+    Coll_ResolveFloorAndWalls(obj->x, obj->y, obj->z, flags, &D_8007C080);
     obj->x = D_8007C080.x;
     obj->y = D_8007C080.y;
     obj->z = D_8007C080.z;
@@ -1272,7 +1272,7 @@ void func_8000CC78(void) {
                 Magic_CreateVisualEffect(d->unk2, d->unk4, x, y, z, obj->angle + e->unk14, t, &D_8007C070, obj);
             }
             if (e->flags & 4) {
-                func_80015D78(1);
+                Camera_Shake(1);
             }
             if (e->flags & 1) {
                 D_8007C064 = NULL;

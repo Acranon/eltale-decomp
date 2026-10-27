@@ -83,10 +83,10 @@ u64 D_8007A8A8;
 u64 D_8007A8B0;
 u64 D_8007A8B8;
 
-void func_80000530(NNSched *sc, u8 numFields);
-void func_8000062C(NNSched *sc);
-OSMesgQueue *func_80000704(NNSched *sc);
-void func_800007F4(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
+void nnScCreateScheduler(NNSched *sc, u8 numFields);
+void nnScStartScheduler(NNSched *sc);
+OSMesgQueue *nnScGetGfxMQ(NNSched *sc);
+void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
 void func_80000F4C(void);
 void func_80001084(void);
 void func_800011B8(GfxFrame *arg0);
@@ -99,9 +99,9 @@ void func_80002A8C(void);
 void func_80002BDC(void);
 void Player_Init(void);
 void func_8000CEE0(void);
-void func_80011A60(void);
-void func_800134D0(void);
-void func_80013BA0(void);
+void Env_InitClock(void);
+void Chest_ClearOpenedFlags(void);
+void Spirit_ClearCollectedFlags(void);
 void func_80024F20(void);
 void func_80028120(u8 *romStart, void *dest, u32 size);
 void func_800285C4(void);
@@ -190,7 +190,7 @@ void func_80000C70(void *arg0) {
     /* the ROM end symbols don't exist yet: ends are written start + size */
     func_80028FFC(D_E5BF60, D_E5BF60 + 0x2E10, D_E98330, D_E98330 + 0x33480, D_E5ED70);
     func_80029374(D_ECB7B0, D_ECB7B0 + 0x1CC0, D_ECD470);
-    func_80000530(&D_8007A1E0, 1);
+    nnScCreateScheduler(&D_8007A1E0, 1);
     func_800357B0();
     if (osTvType == OS_TV_NTSC) {
         osViSetMode(&D_8006CDF0);
@@ -203,20 +203,20 @@ void func_80000C70(void *arg0) {
     func_801009EC(&D_80092C90, &D_8007A254);
     osViBlack(1);
     osViSetSpecialFeatures(0x5A);
-    func_8000062C(&D_8007A1E0);
+    nnScStartScheduler(&D_8007A1E0);
     func_80028FA8(&D_8007A1E0);
     osCreateMesgQueue(&D_8007A870, D_8007A888, 8);
-    func_800007F4(&D_8007A1E0, &D_8007A868, &D_8007A870);
-    D_8007A860 = func_80000704(&D_8007A1E0);
+    nnScAddClient(&D_8007A1E0, &D_8007A868, &D_8007A870);
+    D_8007A860 = nnScGetGfxMQ(&D_8007A1E0);
     func_80001084();
 
     while (1) {
         func_8000CEE0();
-        func_800134D0();
-        func_80013BA0();
+        Chest_ClearOpenedFlags();
+        Spirit_ClearCollectedFlags();
         Player_Init();
         func_80024F20();
-        func_80011A60();
+        Env_InitClock();
         func_80035308();
         func_8002A4F0();
         func_80000F4C();
@@ -357,12 +357,12 @@ void func_8000CFD8(void *arg0);
 void func_8000DE54(void *arg0);
 void func_8000E81C(void *arg0);
 void func_8000F34C(void *arg0);
-void func_800124E8(void);
-void func_80012B88(s32 arg0);
-void func_80013264(void *arg0);
-void func_800136B8(void *arg0);
-void func_80013E4C(void);
-void func_80014994(void *arg0);
+void Env_PrepareFrameLighting(void);
+void Env_ApplyLightSlot(s32 arg0);
+void Shadow_DrawAll(void *arg0);
+void Chest_UpdateAll(void *arg0);
+void Spirit_SpawnSparkles(void);
+void Camera_Update(void *arg0);
 void func_8001A658(void *arg0);
 void func_8001DA3C(void *arg0);
 void func_80020B78(void *arg0);
@@ -408,25 +408,25 @@ void func_80001278(GfxFrame *arg0) {
     gDPSetCycleType(D_8007A184++, G_CYC_2CYCLE);
 
     if (D_8007A170 == 1 || D_8007A170 == 6 || D_8007A170 == 7) {
-        func_80014994(sub);
-        func_800124E8();
+        Camera_Update(sub);
+        Env_PrepareFrameLighting();
         if (D_8007C280 & 4) {
-            func_80012B88(D_8007A1C8);
+            Env_ApplyLightSlot(D_8007A1C8);
             func_8000F34C(sub);
         }
-        func_80012B88(D_8007A1C8);
+        Env_ApplyLightSlot(D_8007A1C8);
         func_8000DE54(sub);
         if (!(D_8004DCA0 & 0x10000)) {
             Player_Draw(sub);
         }
         Npc_DrawAll(sub);
-        func_800136B8(sub);
+        Chest_UpdateAll(sub);
         func_8000E81C(sub);
         func_8000A3E4(sub);
         func_8000CFD8(sub);
-        func_80013E4C();
-        func_80012B88(D_8007AB60);
-        func_80013264(sub);
+        Spirit_SpawnSparkles();
+        Env_ApplyLightSlot(D_8007AB60);
+        Shadow_DrawAll(sub);
         func_8001DA3C(sub);
         func_8001A658(sub);
         func_80026774(sub);
@@ -544,10 +544,10 @@ void func_80002F40(s32 arg0);
 s32 func_80003184(void);
 void func_8000328C(s32 arg0);
 void func_8000DDBC(void);
-void func_80011AE0(void);
-void func_80011C60(void);
-s32 func_80012A90(void);
-void func_800131E0(void);
+void Env_InitForMap(void);
+void Env_Update(void);
+s32 Env_AllocLightSlot(void);
+void Shadow_ClearQueue(void);
 void func_800292DC(s32 arg0);
 s32 func_80029328(s32 arg0);
 void func_8002A38C(void);
@@ -605,13 +605,13 @@ void func_8000A310(void);
 void func_8000CEF0(void);
 void func_8000D6A0(void);
 void func_8000F5DC(void);
-s32 func_80011770(f32 arg0, f32 arg1, f32 arg2);
-void func_80011EA0(s32 arg0);
-void func_80013500(void);
-void func_80013BD0(void);
-void func_80014130(void);
-void func_80014550(void);
-void func_800163F4(void);
+s32 Exit_CheckEnter(f32 arg0, f32 arg1, f32 arg2);
+void Env_SetClock(s32 arg0);
+void Chest_LoadForMap(void);
+void Spirit_LoadForMap(void);
+void TextSpot_LoadForMap(void);
+void Camera_InitForMap(void);
+void Camera_TurnForExit(void);
 void Magic_ResetEffectSystem(void);
 void Magic_UpdateEffects(void);
 void func_8001A600(void);
@@ -646,19 +646,19 @@ void func_80001944(void) {
         func_80032BB0(0);
         D_80090450 = 0;
         func_8000D6A0();
-        func_80013500();
-        func_80013BD0();
-        func_80014130();
+        Chest_LoadForMap();
+        Spirit_LoadForMap();
+        TextSpot_LoadForMap();
         func_8002F87C();
         Player_Spawn();
         Npc_InitArea();
         func_8000A2A0();
         func_8000CEF0();
-        func_80014550();
-        func_80011AE0();
-        D_8007A1C8 = func_80012A90();
-        D_8007A1C4 = func_80012A90();
-        D_8007AB60 = func_80012A90();
+        Camera_InitForMap();
+        Env_InitForMap();
+        D_8007A1C8 = Env_AllocLightSlot();
+        D_8007A1C4 = Env_AllocLightSlot();
+        D_8007AB60 = Env_AllocLightSlot();
         D_80084998[D_8007AB60].unk0 = 2;
         func_8001EE00(&D_8007AB60);
         Magic_ResetEffectSystem();
@@ -687,7 +687,7 @@ void func_80001944(void) {
         func_80035970(D_80092C80);
         D_8007A180 = 0;
         D_800863F0 = 0;
-        func_800131E0();
+        Shadow_ClearQueue();
         if (D_800842E8 & 1) {
             func_8001EE94();
         }
@@ -702,15 +702,15 @@ void func_80001944(void) {
         Player_Update();
         Npc_UpdateAll();
         Magic_UpdateEffects();
-        func_80011C60();
+        Env_Update();
         func_8000DDBC();
         func_8000F5DC();
         func_80001278(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (!(D_8004DCA0 & 0x87)) {
-            if (!(D_8007AA08.unk78 & 1) && func_80011770(D_8007AA08.x, D_8007AA08.z, D_8007AA08.rot) != 0) {
+            if (!(D_8007AA08.unk78 & 1) && Exit_CheckEnter(D_8007AA08.x, D_8007AA08.z, D_8007AA08.rot) != 0) {
                 D_8004DCA0 |= 0x80;
-                func_800163F4();
+                Camera_TurnForExit();
                 Player_StartAreaExit();
                 D_8007A178 = 0;
             } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (D_80092C86 & 0x1000) &&
@@ -735,7 +735,7 @@ void func_80001944(void) {
                     D_8007AA08.unk14->unk4 = D_8007AA08.unk14->unk6;
                     D_8007AA08.unk14->unk8 = D_8007AA08.unk14->unkA;
                     D_80084980 += 0x2328;
-                    func_80011EA0(D_80084980);
+                    Env_SetClock(D_80084980);
                     D_8007A9AC = D_800842BC;
                     D_8007A9AE = D_800842C0;
                     D_8007A9B0 = D_80084308;
@@ -798,10 +798,10 @@ void func_8000205C(void) {
         if (D_8004DCA0 & 0x40) {
             D_8007A1D0 = 0;
             func_80002F40(count++);
-            func_80011AE0();
-            D_8007A1C8 = func_80012A90();
-            D_8007A1C4 = func_80012A90();
-            D_8007AB60 = func_80012A90();
+            Env_InitForMap();
+            D_8007A1C8 = Env_AllocLightSlot();
+            D_8007A1C4 = Env_AllocLightSlot();
+            D_8007AB60 = Env_AllocLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
             func_800266D0();
             D_8008CA50 |= 8;
@@ -814,11 +814,11 @@ void func_8000205C(void) {
         func_80035970(D_80092C80);
         D_8007A180 = 0;
         D_800863F0 = 0;
-        func_800131E0();
+        Shadow_ClearQueue();
         if (func_80003184() != 0) {
             func_8000328C(count);
         }
-        func_80011C60();
+        Env_Update();
         func_8000DDBC();
         func_80001278(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
@@ -878,10 +878,10 @@ void func_800023F4(void) {
         if (D_8004DCA0 & 0x40) {
             D_8007A1D0 = 0;
             func_8003627C();
-            func_80011AE0();
-            D_8007A1C8 = func_80012A90();
-            D_8007A1C4 = func_80012A90();
-            D_8007AB60 = func_80012A90();
+            Env_InitForMap();
+            D_8007A1C8 = Env_AllocLightSlot();
+            D_8007A1C4 = Env_AllocLightSlot();
+            D_8007AB60 = Env_AllocLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
             func_800266D0();
             D_8008CA50 |= 8;
@@ -894,9 +894,9 @@ void func_800023F4(void) {
         func_80035970(D_80092C80);
         D_8007A180 = 0;
         D_800863F0 = 0;
-        func_800131E0();
+        Shadow_ClearQueue();
         func_8003642C();
-        func_80011C60();
+        Env_Update();
         func_8000DDBC();
         func_80001278(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
