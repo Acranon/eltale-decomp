@@ -71,7 +71,7 @@ void Text_OpenWindow(u8 arg0);
 u8 D_8007A8C0[0x20];
 s32 cutscene_message_wait_frames;
 s32 cutscene_messages_remaining;
-Unk8007A8E8 *D_8007A8E8;
+Unk8007A8E8 *cutscene_next_message;
 s32 D_8007A8EC;
 
 extern s32 core_flags;
@@ -108,7 +108,7 @@ void Cutscene_StartEntry(s32 arg0) {
     Unk801C14E4 *entry = &D_801C14E4[arg0];
     f32 mtx[4][4];
 
-    D_8007A8E8 = entry->unk34;
+    cutscene_next_message = entry->unk34;
     cutscene_messages_remaining = entry->unk38;
     cutscene_message_wait_frames = 0x3C;
     map_id = -1;
@@ -151,10 +151,10 @@ s32 Cutscene_UpdateMessageSequence(void) {
 
     if (cutscene_message_wait_frames == 0) {
         if (cutscene_messages_remaining != 0) {
-            Cutscene_CopyMessageBuffers(D_8007A8E8->unk0, D_8007A8E8->unk4);
-            Text_OpenWindow(D_8007A8E8->unk8);
+            Cutscene_CopyMessageBuffers(cutscene_next_message->unk0, cutscene_next_message->unk4);
+            Text_OpenWindow(cutscene_next_message->unk8);
             cutscene_message_wait_frames = 0xF;
-            D_8007A8E8++;
+            cutscene_next_message++;
             cutscene_messages_remaining--;
         } else {
             core_flags |= 0x80;

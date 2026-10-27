@@ -1176,6 +1176,7 @@ save_menu_slot_label_ptrs = 0x8006CC28;
 cutscene_image_setup_dl = 0x8006CC90;
 cutscene_message_wait_frames = 0x8007A8E0;
 cutscene_messages_remaining = 0x8007A8E4;
+cutscene_next_message = 0x8007A8E8;
 SaveMenu_Init = 0x8002FA00; // type:func
 SaveMenu_Update = 0x8002FA6C; // type:func
 SaveMenu_DrawOperationPanel = 0x8002FBE0; // type:func
