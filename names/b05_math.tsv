@@ -1,3 +1,4 @@
+# r2 reviewed 2026-10-26: kept 21, renamed 0, reverted 0
 # --- 27600: keyframe tracks (Keyframe = 9 floats + tension/continuity/bias + linear flag + frame)
 func_80026A00	Math_EvalTcbSpline	(track, out[9], frame): finds the keyframe pair around frame and writes 9 values: linear lerp, or Hermite with Kochanek-Bartels tangents from tension/continuity/bias (+0x24/+0x28/+0x2C); used by MapObjAnim_UpdateAll and actor animation
 func_80026E20	Math_HermiteBasis	(t, &h00, &h01, &h10, &h11): the four cubic Hermite basis values (1-(3t^2-2t^3), 3t^2-2t^3, t^3-2t^2+t, t^3-t^2); only Math_EvalTcbSpline calls it
@@ -6,7 +7,7 @@ func_80026E90	Math_Rand	LCG seed D_8004F778 = seed * 0x41C64E6D + 0x3039, return
 func_80026EE8	Math_Atan	arctangent of x by a 12-term continued fraction, folding |x| > 1 via pi/2 - atan(1/x); Quest 64 twin calc_arctan_in_radians
 func_80027070	Math_NormalizeVec2	scales (*a, *b) by 1 / sqrtf(a^2 + b^2)
 func_800270D0	Math_Atan2	(y, x): Math_Atan(y / x) with the +-pi quadrant fix and +-pi/2 for x == 0
-func_800271B4	Math_RotateVec2	rotates the Vec2f by angle with sinf/cosf (x' = y sin - x cos, y' = y cos + x sin); Quest 64 twin rotateCoordinatesByAngle
+func_800271B4	Math_RotateVec2	(angle, Vec2f*): x' = y sin - x cos, y' = y cos + x sin, i.e. rotates (-x, y) by angle (the game's local-to-world yaw turn; determinant -1 as written); Quest 64 twin rotateCoordinatesByAngle
 func_80027220	Math_MtxFRotScaleTrans	(mf, rx, ry, rz, scale, tx, ty, tz): rotation from the three angles times a uniform scale, translation in row 3
 func_800273C0	Math_MtxRotScaleTrans	Math_MtxFRotScaleTrans into D_8008CE60, then guMtxF2L to the Mtx
 func_80027430	Math_MtxFRotate	(mf, rx, ry, rz): same rotation as Math_MtxFRotScaleTrans, no scale, zero translation
@@ -19,5 +20,5 @@ func_800278C8	Math_MtxFAlignYToVector	(mf, x, y, z): rotation whose row 1 (the Y
 func_80027A8C	Math_MtxAlignYToVector	Math_MtxFAlignYToVector into D_8008CE60, then guMtxF2L
 func_80027ADC	Math_MtxFRotDegScaleTrans	(mf, tx, ty, tz, rx, ry, rz in degrees (x 0.017453292), sx, sy, sz): rotation like Math_MtxFRotate with each row scaled by its own factor, translation row 3
 func_80027CB4	Math_MtxFScaleAxes	multiplies rows 0/1/2 (3x3 part) of mf by the three factors
-func_80027D40	Math_MtxFMul	affine 4x4 product written to arg2 (3x3 part times 3x3 part plus translation; last column 0,0,0,1)
+func_80027D40	Math_MtxFMul	(a, b, out): out = b * a in row-vector order (b's transform applied first), 3x3 parts multiplied, translation b.t * a + a.t, last column 0,0,0,1
 func_80027FFC	Camera_WorldToScreen	(x, y, z, &sx, &sy): transforms by the view matrix D_80085F10 (built by guLookAtReflectF in 15150) and, when in front of the near distance D_80085F54, writes 320x240 screen coordinates; returns that visibility

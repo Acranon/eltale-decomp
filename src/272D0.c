@@ -1,8 +1,8 @@
 #include "common.h"
 
 /*
- * Screen fade: a full-screen quad whose colour steps through an RGBA ramp each frame
- * (Quest 64 US twin file: screen_dim).
+ * Screen fade: a full-screen quad whose colour steps through an RGBA ramp each frame, and
+ * the black top/bottom bars (flag 8) the cutscene loops turn on (Quest 64 US twin: screen_dim).
  * Folder: src/game/gfx/   (proposed for round 4)
  */
 
@@ -115,7 +115,7 @@ void Fade_Init(void) {
     }
 }
 
-void Fade_Draw(Struct_80026774* arg0) {
+void Fade_UpdateAndDraw(Struct_80026774* arg0) {
     if (D_8008CA50 & 8) {
         gSPDisplayList(D_8007A184++, D_8004F550);
     }

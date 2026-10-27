@@ -1,17 +1,18 @@
+# r2 reviewed 2026-10-26: kept 9, renamed 6, reverted 0
 # b03: src/1870.c core runtime, graphics frames, state transitions
 # old<TAB>new<TAB>evidence
-func_80000C70	Core_MainThread	Thread 6 entry from Boot_IdleThread: initializes VI and scheduler, then dispatches the persistent game-state loops.
-func_80000F4C	Core_ResetGameState	Resets scene, player/map, camera and transition flags to their startup values before state dispatch.
-func_80001084	Gfx_InitializeFrames	Loads frame resources, initializes both graphics tasks and framebuffers, then clears both 320x240 buffers.
-func_800011B8	Gfx_InitializeFrameTask	Fills one OSTask's graphics microcode, DRAM stack, output, yield buffer, queue, and framebuffer fields.
-func_80001278	Gfx_BuildFrameDisplayList	Starts the frame display list, dispatches state-specific drawing, ends/syncs it, and sets the graphics task data pointer and size.
+func_80000C70	Core_MainThread	thread 6 entry (osCreateThread in 1050.c): creates the VI manager, inits audio, scheduler, controllers, VI mode and fonts, then loops forever: resets the game (Boss/Chest/Spirit flags, player, inventory, clock, BGM, menu) and dispatches D_8007A170 to the Core_Run* loops until D_8004DCA0 bit 0x8000
+func_80000F4C	Core_ResetGameState	called at the top of each Core_MainThread pass: sets the start state D_8007A170 = 4 (intro), clears area ids to -1, the start map 0xD/0x11 and player start position/angle, and the transition flags
+func_80001084	Gfx_InitFrames	DMAs three ROM blocks (segment 1 data D_80095AF0, D_800C0000, D_8039ADB0), inits both D_80301000 frames' tasks with Gfx_InitFrameTask and their framebuffers, and clears both 320x240 framebuffers; Init (not Initialize) like the other *_Init* names
+func_800011B8	Gfx_InitFrameTask	fills one frame's OSTask: M_GFXTASK, rspboot/gfx ucode, dram stack, output and yield buffers, OS_SC_SWAPBUFFER, reply queue D_8007A870 and framebuffer
+func_80001278	Gfx_BuildFrameDisplayList	builds a frame's display list: segments, z-buffer and colour clear, then per game state draws the field (camera, map, actors, effects, fade, text, HUD, inventory), the menu (Menu_Update), or runs the title/intro/ending overlay's per-frame call and switches D_8007A170 on its return value; sets the task's data_ptr/size
 func_80001944	Core_RunGameplayLoop	While state 1, updates player/NPC/enemy/magic/environment/map, builds and submits graphics frames, and handles area exits.
-func_8000205C	Core_RunSequentialMapScenes	While state 6, advances a count-indexed map scene via func_80002F40 and sends each rendered frame; switches to state 5 after seven scenes.
-func_800023F4	Core_RunScriptedMapScenes	While state 7, initializes map/camera scenes with func_8003627C, advances them with func_8003642C, and submits frames.
-func_8000275C	Core_RunMenuLoop	While state 2, builds/submits frames drawn by the menu dispatcher func_8002A984, then handles return state.
-func_80002948	Core_RunTitleLoop	Loads the title overlay through func_800361B0 and runs its entrypoint while state 3.
-func_80002A8C	Core_RunIntroLoop	Loads the intro overlay through func_800361E8 and runs its entrypoint while state 4.
-func_80002BDC	Core_RunEndingLoop	Loads the ending overlay through func_80036220 and runs its entrypoint while state 5.
-func_80002D44	Gfx_WaitForFrameMessage	Receives from the graphics client message queue until the message's first s16 equals the requested frame marker.
-func_80002DB0	Transition_StartStateFadeIn	Selects a state-specific fully opaque color ramp and starts it with reverse traversal flag 4; frame fade then moves toward transparency.
-func_80002E74	Transition_StartStateFadeOut	Selects a state-specific increasing-alpha color ramp and starts it with forward traversal flag 2 before a state exit.
+func_8000205C	Core_RunMessageCutsceneLoop	game state 6 (set by Core_RunGameplayLoop when D_8007A172 == 4, which Boss_HandleDefeat sets for boss 7): per entry Cutscene_StartEntry(count++) and per frame Cutscene_UpdateMessageSequence (timed text windows), submits frames; after 7 entries switches to state 5 (ending)
+func_800023F4	Core_RunCameraCutsceneLoop	game state 7 (entered when the ending overlay returns 0 in Gfx_BuildFrameDisplayList): Cutscene_ResetSequence, then per scene Cutscene_StartNextScene and per frame Cutscene_UpdateScene (camera spline track), submits frames; Cutscene_EndScene ends it after 14 scenes
+func_8000275C	Core_RunMenuLoop	while state 2: builds/submits frames drawn by Menu_Update, Bgm_Update; on exit restores the save spawn if D_8008FB40 was set, Bgm_ApplyVolumeOption
+func_80002948	Core_RunTitleLoop	Overlay_LoadTitle, overlay init func_8020C0D0, then builds/submits frames while state 3 (Gfx_BuildFrameDisplayList calls the overlay's per-frame func_8020C11C)
+func_80002A8C	Core_RunIntroLoop	Overlay_LoadIntro, overlay init func_8020C0D0, then builds/submits frames while state 4 (per-frame func_8020C16C via Gfx_BuildFrameDisplayList); stops the BGM on exit
+func_80002BDC	Core_RunEndingLoop	Overlay_LoadEnding, overlay init, Fade_Init with the letterbox flag 8, BGM 0x14 after 60 frames, then builds/submits frames while state 5 (per-frame func_8020C15C)
+func_80002D44	Gfx_WaitForFrameMessage	osRecvMesg on the scheduler client queue D_8007A870 until the message's s16 equals the argument (1 = the scheduler's retrace message, 2 = a frame task's done message GfxFrameData.msg)
+func_80002DB0	Fade_StartTransitionIn	Fade_Start with flag 4 (ramp stepped backwards, from opaque to clear) on the ramp chosen by the transition style D_8007A178 (0 black, 1 grey 0xDC, 2/3 slow black/grey, 4 the 256-step ramp); called when an area or scene starts
+func_80002E74	Fade_StartTransitionOut	Fade_Start with flag 2 (hold at the end) on the increasing-alpha ramp chosen by D_8007A178, when the exit countdown D_8007A174 reaches D_8007A17A; pairs with Fade_StartTransitionIn

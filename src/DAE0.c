@@ -3,7 +3,7 @@
 /*
  * Bosses (8, one per map/sub-area in D_803AB3D0): defeated bits, the boss standing on
  * the field map (load, draw, proximity trigger, encounter start), its battle record
- * init, and the reward when one is beaten.
+ * init, and the defeat handling (stat reward, or boss 7's exit to the ending).
  * Folder: src/game/enemy/   (proposed for round 4)
  */
 
@@ -303,7 +303,7 @@ void Boss_BeginEncounter(s32 arg0) {
     Camera_SetTargetView(&D_803AB4B0[arg0], &D_8007C0D0);
 }
 
-void Boss_GiveDefeatReward(s32 arg0) {
+void Boss_HandleDefeat(s32 arg0) {
     u8 *src;
     u8 *dst;
     s32 i;

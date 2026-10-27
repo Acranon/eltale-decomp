@@ -20,9 +20,9 @@ f32 D_8008FB4C;
 s32 D_8008FB50;
 s32 D_8008FB54;
 #ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
-s32 D_8008FB58; /* only Menu_DrawOptionsPage (asm) uses it */
+s32 D_8008FB58; /* only Menu_UpdateOptionsPage (asm) uses it */
 #endif
-f32 D_8008FB5C; /* only Menu_DrawMapPage (asm) uses these two */
+f32 D_8008FB5C; /* only Menu_UpdateMapPage (asm) uses these two */
 f32 D_8008FB60;
 
 extern Gfx* D_8007A184;
@@ -46,11 +46,11 @@ extern u16 D_8007A170;
 extern u16 D_80092C86;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
-void Menu_DrawPageSlide(void);
-void Menu_DrawStatsPage(s32);
-void Menu_DrawOptionsPage(s32);
-void Menu_DrawMapPage(s32);
-void Menu_DrawElementsPage(s32);
+void Menu_UpdatePageSlide(void);
+void Menu_UpdateStatsPage(s32);
+void Menu_UpdateOptionsPage(s32);
+void Menu_UpdateMapPage(s32);
+void Menu_UpdateElementsPage(s32);
 void Menu_DrawBackground();
 void SaveMenu_Update(void);
 
@@ -62,20 +62,20 @@ void Menu_Update(s32 arg0) {
     if (D_8008FB3E & 0x4000) {
         SaveMenu_Update();
     } else if (D_8008FB3E & 0x2000) {
-        Menu_DrawPageSlide();
+        Menu_UpdatePageSlide();
     } else {
         switch ((u16)(D_8008FB3E & 3)) {
             case 0:
-                Menu_DrawStatsPage(0);
+                Menu_UpdateStatsPage(0);
                 break;
             case 1:
-                Menu_DrawMapPage(0);
+                Menu_UpdateMapPage(0);
                 break;
             case 2:
-                Menu_DrawElementsPage(0);
+                Menu_UpdateElementsPage(0);
                 break;
             case 3:
-                Menu_DrawOptionsPage(0);
+                Menu_UpdateOptionsPage(0);
                 break;
         }
     }
@@ -112,12 +112,12 @@ void Menu_Update(s32 arg0) {
     }
 }
 
-void Menu_DrawStatsPage(s32);
-void Menu_DrawOptionsPage(s32);
-void Menu_DrawMapPage(s32);
-void Menu_DrawElementsPage(s32);
+void Menu_UpdateStatsPage(s32);
+void Menu_UpdateOptionsPage(s32);
+void Menu_UpdateMapPage(s32);
+void Menu_UpdateElementsPage(s32);
 
-void Menu_DrawPageSlide(void) {
+void Menu_UpdatePageSlide(void) {
     s32 mode;
     s32 dir = 0;
     s32 d;
@@ -146,35 +146,35 @@ void Menu_DrawPageSlide(void) {
     mode = D_8008FB3E & 3;
     switch (mode) {
         case 0:
-            Menu_DrawStatsPage(a);
+            Menu_UpdateStatsPage(a);
             if (D_8008FB3E & 0x1000) {
-                Menu_DrawOptionsPage(b);
+                Menu_UpdateOptionsPage(b);
             } else {
-                Menu_DrawMapPage(b);
+                Menu_UpdateMapPage(b);
             }
             break;
         case 1:
-            Menu_DrawMapPage(a);
+            Menu_UpdateMapPage(a);
             if (D_8008FB3E & 0x1000) {
-                Menu_DrawStatsPage(b);
+                Menu_UpdateStatsPage(b);
             } else {
-                Menu_DrawElementsPage(b);
+                Menu_UpdateElementsPage(b);
             }
             break;
         case 2:
-            Menu_DrawElementsPage(a);
+            Menu_UpdateElementsPage(a);
             if (D_8008FB3E & 0x1000) {
-                Menu_DrawMapPage(b);
+                Menu_UpdateMapPage(b);
             } else {
-                Menu_DrawOptionsPage(b);
+                Menu_UpdateOptionsPage(b);
             }
             break;
         case 3:
-            Menu_DrawOptionsPage(a);
+            Menu_UpdateOptionsPage(a);
             if (D_8008FB3E & 0x1000) {
-                Menu_DrawElementsPage(b);
+                Menu_UpdateElementsPage(b);
             } else {
-                Menu_DrawStatsPage(b);
+                Menu_UpdateStatsPage(b);
             }
             break;
     }
@@ -210,7 +210,7 @@ void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
 
-void Menu_DrawStatsPage(s32 x) {
+void Menu_UpdateStatsPage(s32 x) {
     s32 px;
     s32 i;
     f32 f;
@@ -321,7 +321,7 @@ void Menu_DrawStatsPage(s32 x) {
 }
 
 #ifdef NON_MATCHING
-/* context for the NON_MATCHING Menu_DrawOptionsPage and Menu_DrawMapPage (their data is defined below) */
+/* context for the NON_MATCHING Menu_UpdateOptionsPage and Menu_UpdateMapPage (their data is defined below) */
 typedef struct { void *dst; u32 start; u32 end; } D2DstRom;
 typedef struct {
     /* 0x00 */ u8 unk0[0x18];
@@ -353,7 +353,7 @@ void SaveMenu_SetTextDrawState(void);
 
 #ifdef NON_MATCHING
 /* stack homes and register allocation differ; code is equivalent */
-void Menu_DrawOptionsPage(s32 x) {
+void Menu_UpdateOptionsPage(s32 x) {
     s32 wob;
     s32 sel;
     s32 y;
@@ -577,12 +577,12 @@ void Menu_DrawOptionsPage(s32 x) {
     D_800616B0 = 4 - D_800616B0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_DrawOptionsPage.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_UpdateOptionsPage.s")
 #endif
 
 #ifdef NON_MATCHING
 /* frame, stack homes and register allocation differ; code is equivalent */
-void Menu_DrawMapPage(s32 arg0) {
+void Menu_UpdateMapPage(s32 arg0) {
     static s32 D_800615E0 = -1; /* the retail build keeps it as the file-scope D_800615E0 */
     s32 cx;
     s32 cy;
@@ -809,7 +809,7 @@ void Menu_DrawMapPage(s32 arg0) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_DrawMapPage.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_UpdateMapPage.s")
 #endif
 
 extern s8 D_80060D64[];
@@ -827,7 +827,7 @@ void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
 void Menu_DrawExpGauge(s32 arg0, s32 arg1);
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
 
-void Menu_DrawElementsPage(s32 x) {
+void Menu_UpdateElementsPage(s32 x) {
     s32 p;
     s32 v;
     f32 f;
@@ -1299,7 +1299,7 @@ typedef struct { u32 start; u32 end; void *dst; } D2RomDst;
 typedef struct { void *keys; u16 count; u16 frames; s32 pad[6]; } D2Anim; /* 0x20 */
 typedef struct { Gfx *a; Gfx *b; } D2DlPair;
 typedef struct { u32 start; u32 dl; } D2SegDl;
-#ifndef NON_MATCHING /* the NON_MATCHING build declares it earlier, for Menu_DrawMapPage */
+#ifndef NON_MATCHING /* the NON_MATCHING build declares it earlier, for Menu_UpdateMapPage */
 typedef struct { void *dst; u32 start; u32 end; } D2DstRom;
 #endif
 extern u8 D_800620A0[];
@@ -2015,7 +2015,7 @@ u8 D_8006158C[4][3] = {
 s16 D_80061598[8] = {
     127, 112, 127, 112, 112, 112, 110, 112,
 };
-#ifndef NON_MATCHING /* Menu_DrawOptionsPage's local ids[] initializer in the NON_MATCHING C */
+#ifndef NON_MATCHING /* Menu_UpdateOptionsPage's local ids[] initializer in the NON_MATCHING C */
 u8 D_800615A8[4] = {
     0x28, 0x27, 0x26, 0,
 };
