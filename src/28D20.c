@@ -5,8 +5,8 @@
  * Folder: src/game/core/   (proposed for round 4)
  */
 
-extern OSMesgQueue D_8007A1A8;
-OSIoMesg D_8008CEA0; /* .bss 8008CEA0..8008CEC0 */
+extern OSMesgQueue dma_mesg_queue;
+OSIoMesg dma_io_msg; /* .bss 8008CEA0..8008CEC0 */
 
 void Dma_ReadRom(u8* devAddr, void* vAddr, s32 size) {
     u32 mesgSize;
@@ -20,8 +20,8 @@ void Dma_ReadRom(u8* devAddr, void* vAddr, s32 size) {
         } else {
             mesgSize = size;
         }
-        osPiStartDma(&D_8008CEA0, 0, 0, (u32) devAddr, vAddr, mesgSize, &D_8007A1A8);
-        osRecvMesg(&D_8007A1A8, NULL, 1);
+        osPiStartDma(&dma_io_msg, 0, 0, (u32) devAddr, vAddr, mesgSize, &dma_mesg_queue);
+        osRecvMesg(&dma_mesg_queue, NULL, 1);
         size -= mesgSize;
         devAddr = devAddr + mesgSize;
         vAddr = (u8*) vAddr + mesgSize;

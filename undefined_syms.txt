@@ -15,8 +15,8 @@ D_80124E00 = 0x80124E00;
 D_851F0_end = 0x851F0;
 
 /* D2: labels inside objects that src/1870.c defines (8007A170..8007A8C0). */
-D_8007A254 = D_8007A1E0 + 0x74;
-D_8007A8AC = D_8007A8A8 + 0x4;
+D_8007A254 = core_sched + 0x74;
+D_8007A8AC = core_frame_start_time + 0x4;
 D_8007A8BC = D_8007A8B8 + 0x4;
 
 /* D2: labels inside objects that src/3F50.c defines (8007A8F0..8007AB70). */
@@ -121,106 +121,106 @@ D_80081D18 = D_80081CE8 + 0x30;
 D_80081D30 = D_80081CE8 + 0x48;
 
 /* D2: labels inside objects that src/12610.c defines (80084980..80084B80):
- * D_80084B18[4][3], D_80084B48[4][3], D_80084B78[2]. */
-D_80084B1C = D_80084B18 + 0x04;
-D_80084B20 = D_80084B18 + 0x08;
-D_80084B24 = D_80084B18 + 0x0C;
-D_80084B60 = D_80084B48 + 0x18;
-D_80084B64 = D_80084B48 + 0x1C;
-D_80084B68 = D_80084B48 + 0x20;
-D_80084B6C = D_80084B48 + 0x24;
-D_80084B70 = D_80084B48 + 0x28;
-D_80084B74 = D_80084B48 + 0x2C;
-D_80084B7C = D_80084B78 + 0x04;
+ * env_light_colors[4][3], env_light_dirs[4][3], env_fog_range[2]. */
+D_80084B1C = env_light_colors + 0x04;
+D_80084B20 = env_light_colors + 0x08;
+D_80084B24 = env_light_colors + 0x0C;
+D_80084B60 = env_light_dirs + 0x18;
+D_80084B64 = env_light_dirs + 0x1C;
+D_80084B68 = env_light_dirs + 0x20;
+D_80084B6C = env_light_dirs + 0x24;
+D_80084B70 = env_light_dirs + 0x28;
+D_80084B74 = env_light_dirs + 0x2C;
+D_80084B7C = env_fog_range + 0x04;
 
 /* D2: labels inside objects that src/E2A0.c defines (8004DD70..8004DED0). */
 D_8004DD8B = D_8004DD88 + 0x3;
 /* D2: labels inside objects that src/29150.c defines (80055930..80055B40). */
-D_800559B6 = D_800559B4 + 0x2;
-D_800559C8 = D_800559C4 + 0x4;
-D_800559E4 = D_800559D4 + 0x10;
-D_800559F8 = D_800559E8 + 0x10;
-D_80055A13 = D_80055A10 + 0x3;
+D_800559B6 = audio_seq_volume_limit + 0x2;
+D_800559C8 = audio_seq_volumes + 0x4;
+D_800559E4 = sfx_channel_sound + 0x10;
+D_800559F8 = sfx_channel_timer + 0x10;
+D_80055A13 = sfx_channel_pan + 0x3;
 
 /* D2: labels inside objects that src/25B20.c defines (8008C190..8008CA50):
- * D_8008C1B8[0x800], D_8008C9B8[0x97]. */
-D_8008C9B7 = D_8008C1B8 + 0x7FF;
-D_8008C9B9 = D_8008C9B8 + 0x1;
-D_8008C9C0 = D_8008C9B8 + 0x8;
-D_8008CA4D = D_8008C9B8 + 0x95;
-D_8008CA4E = D_8008C9B8 + 0x96;
+ * item_icon_cache_tex[0x800], item_inventory[0x97]. */
+D_8008C9B7 = item_icon_cache_tex + 0x7FF;
+D_8008C9B9 = item_inventory + 0x1;
+D_8008C9C0 = item_inventory + 0x8;
+D_8008CA4D = item_inventory + 0x95;
+D_8008CA4E = item_inventory + 0x96;
 
-/* 15150.c: interior labels of D_80085B80, D_80085C10, the camera D_80085E48 and D_80085F68. */
-D_80085C00 = D_80085B80 + 0x80;
-D_80085C14 = D_80085C10 + 0x04;
-D_80085E4C = D_80085E48 + 0x04;
-D_80085E50 = D_80085E48 + 0x08;
-D_80085E54 = D_80085E48 + 0x0C;
-D_80085E58 = D_80085E48 + 0x10;
-D_80085E5C = D_80085E48 + 0x14;
-D_80085E60 = D_80085E48 + 0x18;
-D_80085E64 = D_80085E48 + 0x1C;
-D_80085E68 = D_80085E48 + 0x20;
-D_80085E6C = D_80085E48 + 0x24;
-D_80085E70 = D_80085E48 + 0x28;
-D_80085E74 = D_80085E48 + 0x2C;
-D_80085E78 = D_80085E48 + 0x30;
-D_80085E7C = D_80085E48 + 0x34;
-D_80085E80 = D_80085E48 + 0x38;
-D_80085E84 = D_80085E48 + 0x3C;
-D_80085E88 = D_80085E48 + 0x40;
-D_80085E8C = D_80085E48 + 0x44;
-D_80085E90 = D_80085E48 + 0x48;
-D_80085E94 = D_80085E48 + 0x4C;
-D_80085E98 = D_80085E48 + 0x50;
-D_80085E9C = D_80085E48 + 0x54;
-D_80085EA0 = D_80085E48 + 0x58;
-D_80085EA4 = D_80085E48 + 0x5C;
-D_80085EA8 = D_80085E48 + 0x60;
-D_80085EAC = D_80085E48 + 0x64;
-D_80085EB0 = D_80085E48 + 0x68;
-D_80085EB4 = D_80085E48 + 0x6C;
-D_80085EB8 = D_80085E48 + 0x70;
-D_80085EBC = D_80085E48 + 0x74;
-D_80085EC0 = D_80085E48 + 0x78;
-D_80085EC4 = D_80085E48 + 0x7C;
-D_80085EC8 = D_80085E48 + 0x80;
-D_80085ECC = D_80085E48 + 0x84;
-D_80085F78 = D_80085F68 + 0x10;
+/* 15150.c: interior labels of camera_saved_state, camera_temp_vec, the camera camera_state and camera_delayed_turn. */
+D_80085C00 = camera_saved_state + 0x80;
+D_80085C14 = camera_temp_vec + 0x04;
+D_80085E4C = camera_state + 0x04;
+D_80085E50 = camera_state + 0x08;
+D_80085E54 = camera_state + 0x0C;
+D_80085E58 = camera_state + 0x10;
+D_80085E5C = camera_state + 0x14;
+D_80085E60 = camera_state + 0x18;
+D_80085E64 = camera_state + 0x1C;
+D_80085E68 = camera_state + 0x20;
+D_80085E6C = camera_state + 0x24;
+D_80085E70 = camera_state + 0x28;
+D_80085E74 = camera_state + 0x2C;
+D_80085E78 = camera_state + 0x30;
+D_80085E7C = camera_state + 0x34;
+D_80085E80 = camera_state + 0x38;
+D_80085E84 = camera_state + 0x3C;
+D_80085E88 = camera_state + 0x40;
+D_80085E8C = camera_state + 0x44;
+D_80085E90 = camera_state + 0x48;
+D_80085E94 = camera_state + 0x4C;
+D_80085E98 = camera_state + 0x50;
+D_80085E9C = camera_state + 0x54;
+D_80085EA0 = camera_state + 0x58;
+D_80085EA4 = camera_state + 0x5C;
+D_80085EA8 = camera_state + 0x60;
+D_80085EAC = camera_state + 0x64;
+D_80085EB0 = camera_state + 0x68;
+D_80085EB4 = camera_state + 0x6C;
+D_80085EB8 = camera_state + 0x70;
+D_80085EBC = camera_state + 0x74;
+D_80085EC0 = camera_state + 0x78;
+D_80085EC4 = camera_state + 0x7C;
+D_80085EC8 = camera_state + 0x80;
+D_80085ECC = camera_state + 0x84;
+D_80085F78 = camera_delayed_turn + 0x10;
 
 /* D2: osViModeTable entries that src/1870.c uses (libultra/io/vitbl.c, 8006CD50). */
 D_8006CDF0 = osViModeTable + 0xA0;
 D_8006D6B0 = osViModeTable + 0x960;
 
 /* D2: labels inside objects that src/2B530.c defines (80055D40..80061650). */
-D_8005685A = D_80056718 + 0x142;
-D_8005685C = D_80056718 + 0x144;
-D_8005E51C = D_8005E508 + 0x14;
-D_8005E5AC = D_8005E5A0 + 0xC;
-D_80060C4C = D_80060C48 + 0x4;
+D_8005685A = enemy_effect_defs + 0x142;
+D_8005685C = enemy_effect_defs + 0x144;
+D_8005E51C = mapobj_kind12_setup_dl + 0x14;
+D_8005E5AC = mapobj_animtex_dls + 0xC;
+D_80060C4C = map_backdrop_defs + 0x4;
 
 /* D2: labels inside objects that src/272D0.c defines (8008CA50..8008CE60). */
-D_8008CE54 = D_8008CA58 + 0x3FC;
+D_8008CE54 = fade_grey_ramp_256 + 0x3FC;
 
 /* D2: labels inside objects that src/29150.c defines (8008CEC0..8008FAF0), used by Audio_ThreadMain. */
-D_8008F440 = D_8008F428 + 0x18;
-D_8008F7C4 = D_8008F7A8 + 0x1C;
-D_8008F960 = D_8008F7A8 + 0x1B8;
+D_8008F440 = audio_syn_config + 0x18;
+D_8008F7C4 = audio_seq_slots + 0x1C;
+D_8008F960 = audio_seq_slots + 0x1B8;
 
 /* D2: labels inside objects that src/30600.c defines (8008FB70..80090450). */
-D_8008FB81 = D_8008FB80 + 0x1;
-D_8008FBA0 = D_8008FB80 + 0x20;
-D_80090248 = D_80090228 + 0x20;
-D_80090258 = D_80090228 + 0x30;
-D_800902EF = D_80090228 + 0xC7;
+D_8008FB81 = save_menu_file_entries + 0x1;
+D_8008FBA0 = save_menu_file_entries + 0x20;
+D_80090248 = save_menu_game_state_block + 0x20;
+D_80090258 = save_menu_game_state_block + 0x30;
+D_800902EF = save_menu_game_state_block + 0xC7;
 
 /* D2: labels inside objects that src/337B0.c defines (80090450..80092C70). */
-D_800909BC = D_80090470 + 0x54C;
-D_80090E6C = D_80090470 + 0x9FC;
-D_80091868 = D_80090470 + 0x13F8;
-D_80092264 = D_80090470 + 0x1DF4;
+D_800909BC = text_window_slots + 0x54C;
+D_80090E6C = text_window_slots + 0x9FC;
+D_80091868 = text_window_slots + 0x13F8;
+D_80092264 = text_window_slots + 0x1DF4;
 
-/* D2: fields of D_80084300 (src/12610.c) that asm and other files name. */
-D_80084308 = D_80084300 + 0x8;
-D_8008430C = D_80084300 + 0xC;
-D_80084314 = D_80084300 + 0x14;
+/* D2: fields of exit_destination (src/12610.c) that asm and other files name. */
+D_80084308 = exit_destination + 0x8;
+D_8008430C = exit_destination + 0xC;
+D_80084314 = exit_destination + 0x14;

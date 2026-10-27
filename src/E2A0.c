@@ -152,21 +152,21 @@ void Math_RotateVec2(f32, f32 *);
 void Effect_AllocateSprite(SpriteObj *);
 void Math_MtxRotScaleTrans(Mtx *, f32, f32, f32, f32, f32, f32, f32);
 
-extern AnimInfo D_800579F8;
-extern AnimInfo D_80057F80;
-extern AnimInfo D_80058008;
-extern s32 D_8007A17C;
-extern Gfx *D_8007A184;
+extern AnimInfo mapobjanim_type23_anim;
+extern AnimInfo mapobjanim_type23_odd_anim;
+extern AnimInfo mapobjanim_type4_anim;
+extern s32 gfx_frame_index;
+extern Gfx *gfx_dl_head;
 
-extern u8 D_8005E9F8[];
+extern u8 mapobj_arc_sprite_tex[];
 extern u16 D_80124E00[];
-extern s32 D_8007A180;
-extern Unk80085E48 D_80085E48;
+extern s32 gfx_mtx_index;
+extern Unk80085E48 camera_state;
 extern s32 D_80084B60;
 extern s32 D_80084B64;
 extern s32 D_80084B68;
-extern Unk80084994 *D_80084994;
-extern Unk80060C48 D_80060C48[];
+extern Unk80084994 *env_area_settings;
+extern Unk80060C48 map_backdrop_defs[];
 extern MtxBuf D_2000000;
 
 typedef struct {
@@ -182,7 +182,7 @@ typedef struct {
 } Unk8005E518;
 
 extern Unk8005E518 D_8005E51C[];
-extern Unk8005E518 D_8005E5A0[];
+extern Unk8005E518 mapobj_animtex_dls[];
 
 typedef struct {
     /* 0x00 */ f32 x;
@@ -311,8 +311,8 @@ void Dma_ReadRom();
 void MapObjAnim_ClearAll(void);
 void MapObj_ClearSpinners(void);
 void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, CollResult *);
-extern Unk8007C284 D_80056BB0[];
-extern Unk80057540 D_80057540[];
+extern Unk8007C284 map_area_defs[];
+extern Unk80057540 map_extra_rom_ranges[];
 extern s32 D_80084308;
 extern f32 D_8007A98C;
 extern f32 D_8007A990;
@@ -340,7 +340,7 @@ typedef struct {
     /* 0x02 */ u16 b;
 } Unk80082048;
 
-extern u8 D_80060C88[];
+extern u8 mapobj_translucent_alpha[];
 void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
 /* The rest of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
  * holds Map_BlendPaletteByClock's static at 80082858). Nothing names 80082030..80082048
@@ -363,7 +363,7 @@ void Effect_QueueMapObjEmitter(f32, f32, f32, Unk8000FA9C *);
 void MapObj_EmitArcSprite(Unk8000FA9C *);
 void MapObj_EmitDropSprite(Unk8000FA9C *);
 void MapObj_QueueSpinner(f32, f32, f32, f32, Unk8000FA9C *);
-extern f32 D_80085F50;
+extern f32 camera_fovy;
 f32 sqrtf(f32);
 f32 Math_Atan2(f32, f32);
 void Math_MtxFRotScaleTrans(f32 (*)[4], f32, f32, f32, f32, f32, f32, f32);
@@ -378,7 +378,7 @@ typedef struct {
     /* 0x06 */ u16 id;
 } Unk8004DE98; /* size 0x8 */
 
-extern s32 D_80084980;
+extern s32 env_clock;
 
 /* This file's .data, 8004DD70..8004DED0, in source order: these tables, then
  * the static sprite descriptors of MapObj_EmitArcSprite (8004DE04) and MapObj_EmitDropSprite
@@ -415,7 +415,7 @@ void Map_LoadArea(void) {
     s32 kind;
     Unk80082048 *z;
 
-    D_8007C284 = &D_80056BB0[D_800842C4];
+    D_8007C284 = &map_area_defs[D_800842C4];
     if (D_800842BC != -1) {
         if (D_800842C4 == 11) {
             if (D_800842C0 == 2 && D_800842C8 == 0) {
@@ -454,7 +454,7 @@ void Map_LoadArea(void) {
             if (D_800842B8 & 2) {
                 Dma_ReadRom(D_851F0, D_8010FE00, D_C8DE0 - D_851F0);
             }
-            q = &((u32 *)D_80057540)[D_8007C284->unk3C * 3];
+            q = &((u32 *)map_extra_rom_ranges)[D_8007C284->unk3C * 3];
             start = *q++;
             end = *q++;
             Dma_ReadRom(start, *q, end - start);
@@ -480,16 +480,16 @@ void Map_LoadArea(void) {
     D_8007C288 = &D_8007C284->unk18[k];
     D_8007C294 = D_8007C284->unk10;
     D_8007C28C = &D_8007C284->unk14[D_8007C288->unk0];
-    D_80084994 = &D_8007C284->unk1C[D_8007C288->unk2];
+    env_area_settings = &D_8007C284->unk1C[D_8007C288->unk2];
     D_8007C290 = D_8007C28C->objs;
     D_8007C298 = D_8007C284->unk2C;
     D_8007C29C = D_8007C284->unk28;
     D_800842E8 = D_8007C288->unk14;
-    D_8007C280 = D_80084994->unk18;
-    if (D_8007C282 != D_80084994->unk1C) {
-        D_8007C282 = D_80084994->unk1C;
-        Dma_ReadRom(D_80060C48[D_8007C282].start, D_800808B0, 0x800);
-        Dma_ReadRom(D_80060C48[D_8007C282].start + 0x800, D_8007C6B0, 0x4000);
+    D_8007C280 = env_area_settings->unk18;
+    if (D_8007C282 != env_area_settings->unk1C) {
+        D_8007C282 = env_area_settings->unk1C;
+        Dma_ReadRom(map_backdrop_defs[D_8007C282].start, D_800808B0, 0x800);
+        Dma_ReadRom(map_backdrop_defs[D_8007C282].start + 0x800, D_8007C6B0, 0x4000);
     }
     if (D_80084308 != -1) {
         sp = &D_8007C288->unkC[D_80084308];
@@ -561,15 +561,15 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x18];
 } AnimInfo20; /* size 0x20 */
 
-extern CellOffset D_80057588[];
-extern CellOffset D_8005758C[];
-extern CellOffset D_800576C8[];
-extern CellOffset D_8005777C[];
-extern CellOffset D_80057790[];
-extern AnimInfo20 D_8005839C[];
+extern CellOffset mapobj_cell_single[];
+extern CellOffset mapobj_cell_disc_r7[];
+extern CellOffset mapobj_cell_disc_r5[];
+extern CellOffset mapobj_cell_square_3x3[];
+extern CellOffset mapobj_cell_disc_r2[];
+extern AnimInfo20 mapobj_loop_anims[];
 extern Gfx D_10000E8[];
-extern s16 D_8007A1A0;
-extern s16 D_8007A1A2;
+extern s16 gfx_fog_near;
+extern s16 gfx_fog_far;
 void MapObj_CollectCell(s32, u16 *);
 void MapObj_DrawSpinners(MtxBuf *);
 void Map_BlendPaletteByClock(void);
@@ -626,35 +626,35 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
     D_80081FE8 = (Unk8000FA9C *) D_80081CE8;
     *pAC = 600.0f;
     *pB0 = -1;
-    px = D_80085E48.x;
-    pz = D_80085E48.z;
+    px = camera_state.x;
+    pz = camera_state.z;
     switch (D_8007C28C->unk28) {
         case 1:
-            off = D_8005758C;
+            off = mapobj_cell_disc_r7;
             n = 0x9D;
             cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
             cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
             break;
         case 2:
-            off = D_800576C8;
+            off = mapobj_cell_disc_r5;
             n = 0x59;
             cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
             cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
             break;
         case 3:
-            off = D_8005777C;
+            off = mapobj_cell_square_3x3;
             n = 9;
             cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
             cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
             break;
         case 4:
-            off = D_80057790;
+            off = mapobj_cell_disc_r2;
             n = 0x15;
             cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
             cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
             break;
         default:
-            off = D_80057588;
+            off = mapobj_cell_single;
             cx = 0;
             cz = 0;
             n = 1;
@@ -675,8 +675,8 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
         t = D_8007C28C->unk2;
         MapObj_CollectCell(t, D_8007C28C->unk24);
     }
-    gSPDisplayList(D_8007A184++, D_10000E8);
-    gSPFogPosition(D_8007A184++, D_8007A1A0, D_8007A1A2);
+    gSPDisplayList(gfx_dl_head++, D_10000E8);
+    gSPFogPosition(gfx_dl_head++, gfx_fog_near, gfx_fog_far);
     D_8007C2A0 = 0;
     D_80081CC8 = (Unk8000FA9C **) D_80082058;
     for (n = D_80081CB0; n != 0; n--) {
@@ -687,7 +687,7 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
         z = s->z;
         rot = s->angle;
         if (flags & 0x2000) {
-            anim = &D_8005839C[(flags & 0xF00) >> 8];
+            anim = &mapobj_loop_anims[(flags & 0xF00) >> 8];
             t = flags;
             t = (t & 0xFF) + 1;
             Math_EvalTcbSpline((AnimInfo *) anim, &D_80082020, flags & 0xFF);
@@ -710,33 +710,33 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
                 rot += D_80084238[i - 1].z;
             }
         }
-        guPosition(&arg0->mtx[D_8007A180], 0.0f, rot, 0.0f, s->scale, x, y, z);
-        gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-        D_8007A180++;
-        gSPDisplayList(D_8007A184++, D_8007C294[s->timer].dl);
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, s->scale, x, y, z);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+        gfx_mtx_index++;
+        gSPDisplayList(gfx_dl_head++, D_8007C294[s->timer].dl);
         D_8007C2A0++;
     }
     D_80081CC8 = (Unk8000FA9C **) D_80082458;
     for (n = *pCB4; n != 0; n--) {
         s = *D_80081CC8++;
-        guPosition(&arg0->mtx[D_8007A180], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
-        gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-        D_8007A180++;
-        gSPDisplayList(D_8007A184++, D_8007C294[s->timer].dl);
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+        gfx_mtx_index++;
+        gSPDisplayList(gfx_dl_head++, D_8007C294[s->timer].dl);
         D_8007C2A0++;
     }
     MapObj_DrawSpinners(arg0);
     if (*pCB8 != 0) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetRenderMode(D_8007A184++, 0xC8113078, 0);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0xC8113078, 0);
         *pCD0 = (Unk8000FA9C **) D_8007C2A8;
         MapObj_DrawBillboards(arg0, *pCB8, 0, *pCD0);
         MapObj_DrawBillboards(arg0, *pCB8, 1, *pCD0);
         MapObj_DrawBillboards(arg0, *pCB8, 2, *pCD0);
         MapObj_DrawBillboards(arg0, *pCB8, 3, *pCD0);
     }
-    gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
-    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+    gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
     /* D_8004DD74 is read as four u16 pairs */
     a = D_80082048;
     b = (Unk80082048 *) D_8004DD74;
@@ -791,24 +791,24 @@ void MapObj_DrawTranslucent(MtxBuf *arg0) {
     D_80081CD4 = D_80082860;
     n = D_80081CBC;
     if (n != 0) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetRenderMode(D_8007A184++, 0x0C1849D8, 0);
-        gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80060C88[D_800842BC]);
-        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x0C1849D8, 0);
+        gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_translucent_alpha[D_800842BC]);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     }
     for (; n != 0; n--) {
         s = *D_80081CD4++;
         idx = s->timer;
-        guPosition(&arg0->mtx[D_8007A180], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
-        gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-        D_8007A180++;
-        gSPDisplayList(D_8007A184++, D_8007C294[idx].dl);
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+        gfx_mtx_index++;
+        gSPDisplayList(gfx_dl_head++, D_8007C294[idx].dl);
         D_8007C2A0++;
     }
     if (D_80081CC4 != 0) {
-        gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80060C88[D_800842BC]);
-        gDPSetRenderMode(D_8007A184++, 0xC81049D8, 0);
-        gDPSetCombine(D_8007A184++, 0x121A04, 0xFFFFFFF8);
+        gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_translucent_alpha[D_800842BC]);
+        gDPSetRenderMode(gfx_dl_head++, 0xC81049D8, 0);
+        gDPSetCombine(gfx_dl_head++, 0x121A04, 0xFFFFFFF8);
     }
     D_80081CDC = D_80083068;
     n = D_80081CC4;
@@ -817,28 +817,28 @@ void MapObj_DrawTranslucent(MtxBuf *arg0) {
         rot = s->angle;
         k = (s->unk16 & 0xFF) - 0x40;
         idx = s->timer;
-        guPosition(&arg0->mtx[D_8007A180], 0.0f, rot, 0.0f, s->scale, s->x, s->y, s->z);
-        gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-        D_8007A180++;
-        gDPLoadTextureTile(D_8007A184++, D_8004DDB4[k], G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, D_8004DDC8[k], 0, 0, 31,
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, s->scale, s->x, s->y, s->z);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+        gfx_mtx_index++;
+        gDPLoadTextureTile(gfx_dl_head++, D_8004DDB4[k], G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, D_8004DDC8[k], 0, 0, 31,
                            D_8004DDC8[k] - 1, 0, G_TX_WRAP, G_TX_WRAP, 5, (D_8004DDC8[k] == 32) ? 5 : 6, G_TX_NOLOD,
                            G_TX_NOLOD);
-        gDPSetTileSize(D_8007A184++, G_TX_RENDERTILE, 0, (t = D_8004DDB0 % 256) << 2, 32 << 2, (D_8004DDC8[k] + t) << 2);
-        gSPDisplayList(D_8007A184++, D_8007C294[idx].dl);
+        gDPSetTileSize(gfx_dl_head++, G_TX_RENDERTILE, 0, (t = D_8004DDB0 % 256) << 2, 32 << 2, (D_8004DDC8[k] + t) << 2);
+        gSPDisplayList(gfx_dl_head++, D_8007C294[idx].dl);
         D_8007C2A0++;
     }
     if (D_80081CC0 != 0) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetRenderMode(D_8007A184++, 0x0C1849D8, 0);
-        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x0C1849D8, 0);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
         D_80081CD8 = D_80082C60;
         MapObj_DrawAnimTexBillboards(arg0, D_80081CC0, 0x11, D_80081CD8);
         MapObj_DrawAnimTexBillboards(arg0, D_80081CC0, 0x12, D_80081CD8);
     }
     D_8004DD70++;
-    gDPPipeSync(D_8007A184++);
-    gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
-    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
     D_8004DDB0 += 2;
 }
 
@@ -912,11 +912,11 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
 }
 
 void Map_DrawBackdrop(MtxBuf *arg0) {
-    Math_MtxRotScaleTrans(&arg0->mtx[D_8007A180], 0.0f, 0.0f, 0.0f, 1.0f, D_80085E48.x, D_80085E48.y - 10.0f, D_80085E48.z);
-    gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-    D_8007A180++;
-    gDPSetEnvColor(D_8007A184++, D_80084B60, D_80084B64, D_80084B68, 255);
-    gSPDisplayList(D_8007A184++, D_80060C48[D_80084994->unk1C].dl);
+    Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, 0.0f, 0.0f, 1.0f, camera_state.x, camera_state.y - 10.0f, camera_state.z);
+    gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+    gfx_mtx_index++;
+    gDPSetEnvColor(gfx_dl_head++, D_80084B60, D_80084B64, D_80084B68, 255);
+    gSPDisplayList(gfx_dl_head++, map_backdrop_defs[env_area_settings->unk1C].dl);
 }
 
 void MapObjAnim_ClearAll(void) {
@@ -972,13 +972,13 @@ void MapObjAnim_Start(s32 state, s32 frame, s32 type, s32 id) {
             case 2:
             case 3:
                 if (p->type & 1) {
-                    anim = &D_80057F80;
+                    anim = &mapobjanim_type23_odd_anim;
                 } else {
-                    anim = &D_800579F8;
+                    anim = &mapobjanim_type23_anim;
                 }
                 break;
             case 4:
-                anim = &D_80058008;
+                anim = &mapobjanim_type4_anim;
                 break;
         }
         p->timer = anim->unk6 - frame + 1;
@@ -1009,13 +1009,13 @@ void MapObjAnim_UpdateAll(void) {
                         case 2:
                         case 3:
                             if (p->type & 1) {
-                                anim = &D_80057F80;
+                                anim = &mapobjanim_type23_odd_anim;
                             } else {
-                                anim = &D_800579F8;
+                                anim = &mapobjanim_type23_anim;
                             }
                             break;
                         case 4:
-                            anim = &D_80058008;
+                            anim = &mapobjanim_type4_anim;
                             break;
                     }
                     Math_EvalTcbSpline(anim, &D_80082020, p->frame++);
@@ -1048,10 +1048,10 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list
     for (; count != 0; count--) {
         s = *list++;
         if (type == s->timer) {
-            dx = s->x - D_80085E48.x;
-            dz = s->z - D_80085E48.z;
+            dx = s->x - camera_state.x;
+            dz = s->z - camera_state.z;
             if (sqrtf(dx * dx + dz * dz) < 1500.0f) {
-                a = Math_Atan2(dx, dz) - D_80085E48.angle + 3.141592653589793;
+                a = Math_Atan2(dx, dz) - camera_state.angle + 3.141592653589793;
                 if (a < -3.141592653589793) {
                     a += 6.283185307179586;
                 } else if (a > 3.141592653589793) {
@@ -1061,17 +1061,17 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list
                     a = -a;
                 }
                 a = a * 57.29577951308232;
-                if (a < D_80085F50) {
+                if (a < camera_fovy) {
                     if (first == 0) {
-                        gSPDisplayList(D_8007A184++, dl1);
+                        gSPDisplayList(gfx_dl_head++, dl1);
                         first++;
-                        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+                        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
                     }
-                    Math_MtxFRotScaleTrans(mf, 0.0f, D_80085E48.angle, 0.0f, s->scale, s->x, s->y, s->z);
-                    guMtxF2L(mf, &arg0->mtx[D_8007A180]);
-                    gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-                    D_8007A180++;
-                    gSPDisplayList(D_8007A184++, dl2);
+                    Math_MtxFRotScaleTrans(mf, 0.0f, camera_state.angle, 0.0f, s->scale, s->x, s->y, s->z);
+                    guMtxF2L(mf, &arg0->mtx[gfx_mtx_index]);
+                    gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+                    gfx_mtx_index++;
+                    gSPDisplayList(gfx_dl_head++, dl2);
                     c = &D_80083638[(s32)s->angle];
                     Shadow_Queue(s->x, s->y, s->z, c->x, c->y, c->z, 8.0f);
                     D_8007C2A0++;
@@ -1083,13 +1083,13 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list
 
 void MapObj_StepArcSprite(Particle *arg0);
 void MapObj_StepDropSprite(Particle *arg0);
-extern u8 D_80060A38[];
-extern u8 D_80060AB8[];
-extern u8 D_80060BF8[];
+extern u8 mapobj_arc_sprite_dl[];
+extern u8 mapobj_drop_sprite_tex[];
+extern u8 mapobj_drop_sprite_dl[];
 
 void MapObj_EmitArcSprite(Unk8000FA9C *arg0) {
     static SpriteObj D_8004DE04 = {
-        0x23, 0, (void *)MapObj_StepArcSprite, 0x07202000, 0, D_8005E9F8, D_80060A38,
+        0x23, 0, (void *)MapObj_StepArcSprite, 0x07202000, 0, mapobj_arc_sprite_tex, mapobj_arc_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 15.0f, 0.0f, 0,
     };
 
@@ -1104,7 +1104,7 @@ void MapObj_EmitArcSprite(Unk8000FA9C *arg0) {
         Math_RotateVec2(arg0->angle, D_80081FF0);
         D_8004DE04.unk30 = D_80081FF0[0];
         D_8004DE04.unk38 = D_80081FF0[1];
-        D_8004DE04.unk10 = &D_8005E9F8[arg0->timer << 10];
+        D_8004DE04.unk10 = &mapobj_arc_sprite_tex[arg0->timer << 10];
         Effect_AllocateSprite(&D_8004DE04);
         if (arg0->timer >= 7) {
             arg0->timer = Math_Rand(0x3C) - 0x78;
@@ -1117,12 +1117,12 @@ void MapObj_StepArcSprite(Particle *arg0) {
     arg0->y += arg0->vy;
     arg0->z += arg0->vz;
     arg0->vy -= 0.9;
-    gDPSetEnvColor(D_8007A184++, 255, 255, 255, (D_800842A8 & 1) ? 0xDC : 0x78);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, (D_800842A8 & 1) ? 0xDC : 0x78);
 }
 
 void MapObj_EmitDropSprite(Unk8000FA9C *arg0) {
     static SpriteObj D_8004DE44 = {
-        0xF, 0, (void *)MapObj_StepDropSprite, 0x00081000, 0, D_80060AB8, D_80060BF8,
+        0xF, 0, (void *)MapObj_StepDropSprite, 0x00081000, 0, mapobj_drop_sprite_tex, mapobj_drop_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0,
     };
 
@@ -1145,7 +1145,7 @@ extern Unk8004DE98 D_8004DE98[];
 void MapObj_StepDropSprite(Particle *arg0) {
     arg0->y = arg0->y + arg0->vy / 2;
     arg0->vy -= 0.2;
-    gDPSetEnvColor(D_8007A184++, 255, 255, 255, arg0->alpha * 5);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, arg0->alpha * 5);
 }
 
 void MapObj_ClearSpinners(void) {
@@ -1171,8 +1171,8 @@ void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *ar
     Unk80083470 *cur;
     s32 i;
 
-    cur = D_8007A17C ? D_80083470 : D_80083558;
-    prev = D_8007A17C ? D_80083558 : D_80083470;
+    cur = gfx_frame_index ? D_80083470 : D_80083558;
+    prev = gfx_frame_index ? D_80083558 : D_80083470;
     if (D_8007C6AC < 8) {
         cur += D_8007C6AC;
         i = D_8007C6A8;
@@ -1202,16 +1202,16 @@ void MapObj_DrawSpinners(MtxBuf *arg0) {
     Unk8000FA9C *s;
 
     D_8007C6A8 = D_8007C6AC;
-    p = D_8007A17C ? D_80083470 : D_80083558;
+    p = gfx_frame_index ? D_80083470 : D_80083558;
     i = D_8007C6A8;
     while (i--) {
         if (p->unk0 != 0) {
             s = p->unk18;
             p->unk14 -= 0.015707963267948967;
-            Math_MtxRotScaleTrans(&arg0->mtx[D_8007A180], 0.0f, p->unk10 * 0.017453292519943295, p->unk14, s->scale, s->x, s->y, s->z);
-            gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-            D_8007A180++;
-            gSPDisplayList(D_8007A184++, D_8007C294[s->timer].dl);
+            Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, p->unk10 * 0.017453292519943295, p->unk14, s->scale, s->x, s->y, s->z);
+            gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+            gfx_mtx_index++;
+            gSPDisplayList(gfx_dl_head++, D_8007C294[s->timer].dl);
             D_8007C2A0++;
         }
         p++;
@@ -1235,15 +1235,15 @@ void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C
         s = *list++;
         if (type == (s->unk16 & 0xFF)) {
             if (first == 0) {
-                gSPDisplayList(D_8007A184++, D_8005E5A0[idx].a);
+                gSPDisplayList(gfx_dl_head++, mapobj_animtex_dls[idx].a);
                 first++;
             }
-            gDPLoadTextureBlock(D_8007A184++, tex[(s->timer >> 1) & 7], G_IM_FMT_CI, G_IM_SIZ_8b, D_8004DE84[type - 0x11], 32, 0, 0, 0, 0, 0, 0, 0);
-            Math_MtxRotScaleTrans(&arg0->mtx[D_8007A180], 0.0f, D_80085E74, 0.0f, s->scale, s->x, s->y, s->z);
-            gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
-            D_8007A180++;
-            gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_8004DE88[s->timer & 3]);
-            gSPDisplayList(D_8007A184++, dl);
+            gDPLoadTextureBlock(gfx_dl_head++, tex[(s->timer >> 1) & 7], G_IM_FMT_CI, G_IM_SIZ_8b, D_8004DE84[type - 0x11], 32, 0, 0, 0, 0, 0, 0, 0);
+            Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, D_80085E74, 0.0f, s->scale, s->x, s->y, s->z);
+            gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
+            gfx_mtx_index++;
+            gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, D_8004DE88[s->timer & 3]);
+            gSPDisplayList(gfx_dl_head++, dl);
             s->timer++;
             D_8007C2A0++;
         }
@@ -1270,7 +1270,7 @@ void Map_BlendPaletteByClock(void) {
 
     p = D_8004DE98;
     while (p->id != 0xFF) {
-        if (D_80084980 >= p->start && D_80084980 < p[1].start) {
+        if (env_clock >= p->start && env_clock < p[1].start) {
             D_8004DE8C = p->id;
             break;
         }

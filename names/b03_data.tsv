@@ -1,0 +1,29 @@
+# b03 data (round 3): D_ objects defined in 1870 (prefixes as the functions that use them: core_ loop state, gfx_ frame building, fade_, dma_, title_)
+# old	new	evidence
+D_8007A170	core_game_mode	Core_MainThread runs the loop it selects (1 gameplay, 2 menu, 3 title, 4 intro, 5 ending, 6 message cutscene, 7 camera cutscene) and each Core_Run*Loop runs while it keeps its value; Gfx_BuildFrameDisplayList draws by it; Menu_Update, SaveMenu_Init, Cutscene_EndScene set it
+D_8004DCA0	core_flags	game-wide flag word the loops set and test: 0x40 reloads the area at the start of Core_RunGameplayLoop, 0x20 starts the fade-in, 0x80 runs the transition countdown, 1 runs Item_UpdateInventoryMenu, 2 Text_UpdateAndDrawWindows, 0x8000 makes Core_MainThread reinitialise (bits commented on the definition)
+D_8007A174	core_transition_timer	countdown while core_flags 0x80 is set: the loops decrement it, call Fade_StartTransitionOut when it equals core_fade_out_time and switch mode or scene at 0; set by Player_StartAreaExit, Item_UseWarp, Boss_HandleDefeat and the cutscenes
+D_8007A17A	core_fade_out_time	value of core_transition_timer at which the loops call Fade_StartTransitionOut; Core_RunGameplayLoop sets 0x12, the others set their own together with the timer
+D_8007A178	fade_transition_style	selects the fade length and curve in Fade_StartTransitionIn and Fade_StartTransitionOut (0..4); set by the loops, Player_StateHurt, Item_UseWarp and the cutscenes
+D_8007A1A8	dma_mesg_queue	created with one message in Core_MainThread; Dma_ReadRom passes it to osPiStartDma and waits on it
+D_8007A1C0	dma_mesg	the one-message buffer of dma_mesg_queue (Core_MainThread)
+D_8007A1E0	core_sched	the NNSched instance: Core_MainThread creates and starts it (nnScCreateScheduler, nnScStartScheduler), passes it to Audio_StartThread and adds the graphics client to it
+D_8007A868	gfx_sched_client	the NNScClient Core_MainThread adds to core_sched with gfx_mesg_queue
+D_8007A870	gfx_mesg_queue	queue the scheduler client receives on (retrace message 1) and each frame task reports to (Gfx_InitFrameTask task.msgQ, message 2); Gfx_WaitForFrameMessage and the loops wait on it
+D_8007A888	gfx_mesgs	the 8-message buffer of gfx_mesg_queue (Core_MainThread)
+D_8007A860	gfx_sched_mq	core_sched's graphics request queue (nnScGetGfxMQ in Core_MainThread); every loop sends its finished GfxFrame to it
+D_8007A17C	gfx_frame_index	which of the two GfxFrames (D_80301000[]) is built: Gfx_InitFrames sets 0, every loop flips it after sending a frame; Env_PrepareFrameLighting and Env_ApplyLightSlot pick their per-frame Lights3 by it
+D_8007A184	gfx_dl_head	display-list write pointer: Gfx_BuildFrameDisplayList points it at the frame's list and every draw function appends through it
+D_8007A180	gfx_mtx_index	next free Mtx in the frame's matrix array (+0xC0 of segment 2): the loops reset it each frame, each drawer that writes a matrix (Camera_Update, Shadow_DrawAll, Fade_UpdateAndDraw, Anim_DrawNode, ...) uses and increments it
+D_8007A1D0	gfx_frame_sent	0 at the start of each loop: the first frame waits only for message 1 and sets it, later frames wait for message 2 (and two retraces in the gameplay and cutscene loops)
+D_8007A1D4	gfx_dl_peak_len	Gfx_BuildFrameDisplayList keeps the largest display-list length (in Gfx) seen here
+D_8007A1D8	gfx_segment1_base	Gfx_InitFrames points it at D_80095AF0 (data DMAd from ROM 0x71920); Gfx_BuildFrameDisplayList sets it as RSP segment 1
+D_8007A188	gfx_clear_r	red of the fill colour Gfx_BuildFrameDisplayList clears the frame with in the gameplay and cutscene modes; Env_ApplyLightSlot sets it to the fog colour when D_800842B8 & 0x80, else 0
+D_8007A18C	gfx_clear_g	green of the clear colour (as gfx_clear_r)
+D_8007A190	gfx_clear_b	blue of the clear colour (as gfx_clear_r)
+D_8007A1A0	gfx_fog_near	Env_PrepareFrameLighting copies env_fog_range's near value into it and emits gSPFogPosition with it; MapObj_UpdateAndDrawNearby and Shadow_DrawAll emit gSPFogPosition from it
+D_8007A1A2	gfx_fog_far	Env_PrepareFrameLighting copies env_fog_range's far value into it (used as gfx_fog_near)
+D_8007A1C8	gfx_scene_light_slot	env light slot the gameplay and cutscene loops allocate per area; Gfx_BuildFrameDisplayList applies it before the backdrop and before the map objects and actors; Magic_CreateCastEffect and Magic_UpdateEffects set its light animation
+D_8007A8A8	core_frame_start_time	osGetTime() that Core_RunGameplayLoop stores after sending each frame; subtracted from core_frame_end_time
+D_8007A8B0	core_frame_end_time	osGetTime() that Core_RunGameplayLoop stores before waiting for the frame; minus core_frame_start_time, times 64/3000 (cycles to microseconds), goes to D_8007A8B8, which nothing reads
+D_8007A1CC	title_menu_choice	high nibble = chosen title menu item + 1: written by Title_DrawScreenAndMoveCursor, read there and by Title_RunPhase; Gfx_BuildFrameDisplayList starts gameplay (0x10) or SaveMenu_Init(0) / SaveMenu_Init(8) (0x20 / 0x30) from it; Core_ResetGameState clears it

@@ -8,42 +8,42 @@
  */
 
 /* .bss 8008FB30..8008FB70 */
-s32 D_8008FB30;
-s32 D_8008FB34;
-s32 D_8008FB38;
-u16 D_8008FB3C;
-u16 D_8008FB3E;
-s8 D_8008FB40;
-s32 D_8008FB44;
-f32 D_8008FB48;
-f32 D_8008FB4C;
-s32 D_8008FB50;
-s32 D_8008FB54;
+s32 menu_slide_right_x;
+s32 menu_slide_left_x;
+s32 menu_slide_timer;
+u16 menu_map_cursor_active;
+u16 menu_flags; /* bits 0-1 page, 0x10 TLUT loaded, 0x20 page edit mode, 0x1000 slide direction, 0x2000 slide, 0x4000 save menu, 0x8000 open */
+s8 menu_save_loaded;
+s32 menu_frame_counter;
+f32 menu_map_marker_x;
+f32 menu_map_marker_z;
+s32 menu_map_region;
+s32 menu_map_spot;
 #ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
-s32 D_8008FB58; /* only Menu_UpdateOptionsPage (asm) uses it */
+s32 menu_options_marker_x; /* only Menu_UpdateOptionsPage (asm) uses it */
 #endif
-f32 D_8008FB5C; /* only Menu_UpdateMapPage (asm) uses these two */
-f32 D_8008FB60;
+f32 menu_map_cursor_saved_x; /* only Menu_UpdateMapPage (asm) uses these two */
+f32 menu_map_cursor_saved_y;
 
-extern Gfx* D_8007A184;
-extern u16 D_8008FB70;
+extern Gfx* gfx_dl_head;
+extern u16 save_menu_flags;
 
 void Menu_Init(void) {
-    D_8008FB3E = 0x8000;
-    D_8008FB70 = 0;
-    D_8008FB3C = 0;
+    menu_flags = 0x8000;
+    save_menu_flags = 0;
+    menu_map_cursor_active = 0;
 }
 
 void Menu_ResetKeepPage(void) {
-    D_8008FB3E = (D_8008FB3E & 3) | 0x8000;
-    D_8008FB70 = 0;
-    D_8008FB3C = 0;
+    menu_flags = (menu_flags & 3) | 0x8000;
+    save_menu_flags = 0;
+    menu_map_cursor_active = 0;
 }
 
-extern Gfx* D_8007A184;
-extern Gfx D_80061770[];
-extern u16 D_8007A170;
-extern u16 D_80092C86;
+extern Gfx* gfx_dl_head;
+extern Gfx text_glyph_setup_dl[];
+extern u16 core_game_mode;
+extern u16 input_pressed_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
 void Menu_UpdatePageSlide(void);
@@ -55,16 +55,16 @@ void Menu_DrawBackground();
 void SaveMenu_Update(void);
 
 void Menu_Update(s32 arg0) {
-    gSPDisplayList(D_8007A184++, D_80061770);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     Menu_DrawBackground();
-    D_8008FB44++;
-    if (D_8008FB3E & 0x4000) {
+    menu_frame_counter++;
+    if (menu_flags & 0x4000) {
         SaveMenu_Update();
-    } else if (D_8008FB3E & 0x2000) {
+    } else if (menu_flags & 0x2000) {
         Menu_UpdatePageSlide();
     } else {
-        switch ((u16)(D_8008FB3E & 3)) {
+        switch ((u16)(menu_flags & 3)) {
             case 0:
                 Menu_UpdateStatsPage(0);
                 break;
@@ -79,34 +79,34 @@ void Menu_Update(s32 arg0) {
                 break;
         }
     }
-    D_8008FB3E &= ~0x10;
-    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
-    gDPSetBlendColor(D_8007A184++, 0, 0, 0, 1);
-    if ((D_80092C86 & 0x5000) && !(D_8008FB3E & 0x6020)) {
-        D_8008FB3E &= 0x7FFF;
+    menu_flags &= ~0x10;
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
+    gDPSetBlendColor(gfx_dl_head++, 0, 0, 0, 1);
+    if ((input_pressed_buttons & 0x5000) && !(menu_flags & 0x6020)) {
+        menu_flags &= 0x7FFF;
         Sfx_Play(0, 1, 0xFF);
     }
-    if (!(D_8008FB3E & 0x8000)) {
-        if (D_8008FB3E & 0x4000) {
-            switch ((u16)(D_8008FB3E & 0xC)) {
+    if (!(menu_flags & 0x8000)) {
+        if (menu_flags & 0x4000) {
+            switch ((u16)(menu_flags & 0xC)) {
                 case 0:
-                    if (D_8008FB70 & 0x80) {
-                        D_8007A170 = 1;
-                        D_8008FB40 = 1;
+                    if (save_menu_flags & 0x80) {
+                        core_game_mode = 1;
+                        menu_save_loaded = 1;
                     } else {
-                        D_8007A170 = 3;
-                        D_8008FB40 = 0;
+                        core_game_mode = 3;
+                        menu_save_loaded = 0;
                     }
                     break;
                 case 8:
-                    D_8007A170 = 3;
+                    core_game_mode = 3;
                     break;
                 case 4:
-                    D_8007A170 = 1;
+                    core_game_mode = 1;
                     break;
             }
         } else {
-            D_8007A170 = 1;
+            core_game_mode = 1;
         }
         Menu_ResetKeepPage();
     }
@@ -124,30 +124,30 @@ void Menu_UpdatePageSlide(void) {
     s32 a;
     s32 b;
 
-    d = D_8008FB38 * D_8008FB38 * 0.3125;
-    if (D_8008FB3E & 0x1000) {
-        D_8008FB30 = 0x140 - d;
-        D_8008FB34 = -d;
-        a = D_8008FB30;
-        b = D_8008FB34;
-        if (D_8008FB38 == 0) {
+    d = menu_slide_timer * menu_slide_timer * 0.3125;
+    if (menu_flags & 0x1000) {
+        menu_slide_right_x = 0x140 - d;
+        menu_slide_left_x = -d;
+        a = menu_slide_right_x;
+        b = menu_slide_left_x;
+        if (menu_slide_timer == 0) {
             dir = -1;
         }
     } else {
-        D_8008FB30 = d;
-        D_8008FB34 = d - 0x140;
-        a = D_8008FB34;
-        b = D_8008FB30;
-        if (D_8008FB38 == 0) {
+        menu_slide_right_x = d;
+        menu_slide_left_x = d - 0x140;
+        a = menu_slide_left_x;
+        b = menu_slide_right_x;
+        if (menu_slide_timer == 0) {
             dir = 1;
         }
     }
-    D_8008FB38--;
-    mode = D_8008FB3E & 3;
+    menu_slide_timer--;
+    mode = menu_flags & 3;
     switch (mode) {
         case 0:
             Menu_UpdateStatsPage(a);
-            if (D_8008FB3E & 0x1000) {
+            if (menu_flags & 0x1000) {
                 Menu_UpdateOptionsPage(b);
             } else {
                 Menu_UpdateMapPage(b);
@@ -155,7 +155,7 @@ void Menu_UpdatePageSlide(void) {
             break;
         case 1:
             Menu_UpdateMapPage(a);
-            if (D_8008FB3E & 0x1000) {
+            if (menu_flags & 0x1000) {
                 Menu_UpdateStatsPage(b);
             } else {
                 Menu_UpdateElementsPage(b);
@@ -163,7 +163,7 @@ void Menu_UpdatePageSlide(void) {
             break;
         case 2:
             Menu_UpdateElementsPage(a);
-            if (D_8008FB3E & 0x1000) {
+            if (menu_flags & 0x1000) {
                 Menu_UpdateMapPage(b);
             } else {
                 Menu_UpdateOptionsPage(b);
@@ -171,7 +171,7 @@ void Menu_UpdatePageSlide(void) {
             break;
         case 3:
             Menu_UpdateOptionsPage(a);
-            if (D_8008FB3E & 0x1000) {
+            if (menu_flags & 0x1000) {
                 Menu_UpdateElementsPage(b);
             } else {
                 Menu_UpdateStatsPage(b);
@@ -179,11 +179,11 @@ void Menu_UpdatePageSlide(void) {
             break;
     }
     if (dir != 0) {
-        D_8008FB3E &= ~0x2000;
-        D_8008FB3E &= ~0x1000;
+        menu_flags &= ~0x2000;
+        menu_flags &= ~0x1000;
         mode += dir;
-        D_8008FB3E &= ~3;
-        D_8008FB3E |= mode & 3;
+        menu_flags &= ~3;
+        menu_flags |= mode & 3;
     }
 }
 
@@ -202,10 +202,10 @@ extern u8 D_8007AA01;
 extern u8 D_8007AA02;
 extern u8 D_8007AA03;
 extern s32 D_8007AA10;
-extern u16 D_80055F0C[];
-extern s8 D_80060D64[];
-extern s8 D_80092C81;
-extern u16 D_80092C84;
+extern u16 player_stat_xp_costs[];
+extern s8 menu_wobble_offsets[];
+extern s8 input_stick_x;
+extern u16 input_held_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
@@ -216,8 +216,8 @@ void Menu_UpdateStatsPage(s32 x) {
     f32 f;
     s32 pad[2]; // unused locals in the original (frame size)
 
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 255, 255, 255, 255);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 255);
     Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x98);
     Menu_DrawSprite(0x37, x + 0x2B, 0xB7, 0xF0, 3);
     Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x96);
@@ -248,9 +248,9 @@ void Menu_UpdateStatsPage(s32 x) {
     Menu_DrawSprite(0x1E, x + 0x35, 0x99, 0x1C, 0xE);
     Menu_DrawSprite(5, x + 0x45, 0x1C, 8, 8);
     Menu_DrawSprite(5, x + 0xF3, 0x1C, 8, 8);
-    i = D_8008FB44;
+    i = menu_frame_counter;
     i = (i >> 2) & 0xF;
-    i = D_80060D64[i];
+    i = menu_wobble_offsets[i];
     Menu_DrawSprite(6, x + i + 0x36, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(7, x - i + 0xFB, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(0x14, x + 0x79, 0x35, 8, 0xA);
@@ -267,21 +267,21 @@ void Menu_UpdateStatsPage(s32 x) {
     Menu_DrawNumber(3, x + 0x80, 0x77, i, 0xA);
     i = D_8007A9DC;
     Menu_DrawNumber(3, x + 0x80, 0x98, i, 0xA);
-    i = D_80055F0C[D_8007AA00];
+    i = player_stat_xp_costs[D_8007AA00];
     Menu_DrawNumber(3, x + 0xDA, 0x3B, D_8007A9F8 * 100 / i, 0xA);
-    i = D_80055F0C[D_8007AA01];
+    i = player_stat_xp_costs[D_8007AA01];
     if (D_8007AA10 & 0x4000) {
         i = i * 3;
     } else {
         i = i * 4;
     }
     Menu_DrawNumber(3, x + 0xDA, 0x5C, D_8007A9FA * 100 / i, 0xA);
-    i = D_80055F0C[D_8007AA03];
+    i = player_stat_xp_costs[D_8007AA03];
     if (D_8007AA10 & 0x2000) {
         i = (f32) i * 0.8;
     }
     Menu_DrawNumber(3, x + 0xDA, 0x7D, D_8007A9FE * 100 / i, 0xA);
-    i = D_80055F0C[D_8007AA02];
+    i = player_stat_xp_costs[D_8007AA02];
     if (D_8007AA10 & 0x8000) {
         i = (f32) i * 0.8;
     }
@@ -307,14 +307,14 @@ void Menu_UpdateStatsPage(s32 x) {
     Menu_DrawSprite(0x15, x + 0xF6, 0x7D, 8, 0xA);
     Menu_DrawSprite(0x15, x + 0xF6, 0x9E, 8, 0xA);
     Menu_DrawSprite(0x1A, x + 0x77, 0x19, 0x52, 0xD);
-    if (!(D_8008FB3E & 0x2000)) {
-        if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
-            D_8008FB3E |= 0x2000;
-            D_8008FB38 = 31;
+    if (!(menu_flags & 0x2000)) {
+        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
+            menu_flags |= 0x2000;
+            menu_slide_timer = 31;
             Sfx_Play(0, 0, 0xFF);
-        } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
-            D_8008FB3E |= 0x3000;
-            D_8008FB38 = 31;
+        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
+            menu_flags |= 0x3000;
+            menu_slide_timer = 31;
             Sfx_Play(0, 0, 0xFF);
         }
     }
@@ -330,23 +330,23 @@ typedef struct {
     /* 0x20 */ f32 z;
 } Unk8007AA08_2B530;
 extern Unk8007AA08_2B530 D_8007AA08;
-extern s8 D_80060CB0;
+extern s8 menu_bgm_volume_option;
 extern s8 D_800616B0;
-extern s8 D_80092C82;
-extern s16 D_800615AC[][2];
-extern s16 D_800615CC[][2];
-extern f32 D_80060F28;
-extern f32 D_80060F2C;
-extern s16 D_80061184[];
-extern void *D_8006125C[];
-extern void *D_80061274[];
-extern s16 D_800614B4[];
-extern s16 D_800614CC[];
-extern D2DstRom D_800614E4[];
-extern void *D_8006155C[];
-extern void *D_8006156C[];
-extern u8 D_8006158C[][3];
-extern s16 D_80061598[];
+extern s8 input_stick_y;
+extern s16 menu_options_top_row_pos[][2];
+extern s16 menu_options_bgm_row_pos[][2];
+extern f32 menu_map_cursor_x;
+extern f32 menu_map_cursor_y;
+extern s16 menu_map_spot_coords[];
+extern void *menu_map_tluts[];
+extern void *menu_map_strips[];
+extern s16 menu_map_world_scale[];
+extern s16 menu_map_origin[];
+extern D2DstRom menu_map_picture_dma[];
+extern void *menu_map_small_tluts[];
+extern void *menu_map_small_tex[];
+extern u8 menu_map_small_sizes[][3];
+extern s16 menu_map_small_pos[];
 void Dma_ReadRom(u32, void *, s32);
 void SaveMenu_SetTextDrawState(void);
 #endif
@@ -357,8 +357,8 @@ void Menu_UpdateOptionsPage(s32 x) {
     s32 wob;
     s32 sel;
     s32 y;
-    u8 ids[3] = { 0x28, 0x27, 0x26 }; /* the retail build keeps these bytes as the file-scope D_800615A8 */
-    static s32 D_8008FB58; /* the retail build keeps it as the file-scope D_8008FB58 */
+    u8 ids[3] = { 0x28, 0x27, 0x26 }; /* the retail build keeps these bytes as the file-scope menu_options_marker_sprites */
+    static s32 menu_options_marker_x; /* the retail build keeps it as the file-scope menu_options_marker_x */
 
     D_800616B0 = 4 - D_800616B0;
     Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x6C);
@@ -384,9 +384,9 @@ void Menu_UpdateOptionsPage(s32 x) {
     Menu_DrawSprite(0x23, x + 0x35, 0x68, 0x2A, 0xC);
     Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
     Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
-    wob = D_8008FB44;
+    wob = menu_frame_counter;
     wob = (wob >> 2) & 0xF;
-    wob = D_80060D64[wob];
+    wob = menu_wobble_offsets[wob];
     Menu_DrawSprite(6, x + wob + 0x36, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(7, x - wob + 0xFB, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(0x21, x + 0x75, 0x18, 0x56, 0xE);
@@ -394,73 +394,73 @@ void Menu_UpdateOptionsPage(s32 x) {
     Menu_DrawSprite(0x25, x + 0x8E, 0x6D, 0x50, 3);
     Menu_DrawSprite(0x27, x + 0xB3, 0x39, 8, 0xB);
     Menu_DrawSprite(0x27, x + 0xB3, 0x67, 8, 0xB);
-    if (D_8008FB3E & 0x200) {
-        switch (D_8008FB3E & 0x100) {
+    if (menu_flags & 0x200) {
+        switch (menu_flags & 0x100) {
             case 0:
-                Menu_DrawSprite(ids[D_800615CC[D_80060CB0][1]], D_800615CC[D_80060CB0][0] + x, 0x67, 8, 0xB);
+                Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
                 break;
             case 0x100:
-                Menu_DrawSprite(ids[D_800615AC[D_800616B0][1]], D_800615AC[D_800616B0][0] + x, 0x39, 8, 0xB);
+                Menu_DrawSprite(ids[menu_options_top_row_pos[D_800616B0][1]], menu_options_top_row_pos[D_800616B0][0] + x, 0x39, 8, 0xB);
                 break;
         }
     } else {
-        Menu_DrawSprite(ids[D_800615CC[D_80060CB0][1]], D_800615CC[D_80060CB0][0] + x, 0x67, 8, 0xB);
-        Menu_DrawSprite(ids[D_800615AC[D_800616B0][1]], D_800615AC[D_800616B0][0] + x, 0x39, 8, 0xB);
+        Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
+        Menu_DrawSprite(ids[menu_options_top_row_pos[D_800616B0][1]], menu_options_top_row_pos[D_800616B0][0] + x, 0x39, 8, 0xB);
     }
-    if (D_8008FB3E & 0x2000) {
+    if (menu_flags & 0x2000) {
         D_800616B0 = 4 - D_800616B0;
         return;
     }
-    if (!(D_8008FB3E & 0x800)) {
-        if (D_80092C81 > 0x14 || (D_80092C84 & 0x10)) {
-            D_8008FB3E |= 0x2000;
-            D_8008FB38 = 0x1F;
+    if (!(menu_flags & 0x800)) {
+        if (input_stick_x > 0x14 || (input_held_buttons & 0x10)) {
+            menu_flags |= 0x2000;
+            menu_slide_timer = 0x1F;
             Sfx_Play(0, 0, 0xFF);
-        } else if (D_80092C81 < -0x14 || (D_80092C84 & 0x2000)) {
-            D_8008FB3E |= 0x3000;
-            D_8008FB38 = 0x1F;
+        } else if (input_stick_x < -0x14 || (input_held_buttons & 0x2000)) {
+            menu_flags |= 0x3000;
+            menu_slide_timer = 0x1F;
             Sfx_Play(0, 0, 0xFF);
         }
-        if (D_80092C86 & 0x8000) {
-            D_8008FB3E |= 0x820;
+        if (input_pressed_buttons & 0x8000) {
+            menu_flags |= 0x820;
             Sfx_Play(0, 1, 0xFF);
         }
     } else {
-        if ((D_80092C86 & 0x8000) && !(D_8008FB3E & 0x200)) {
-            D_8008FB3E &= ~0x920;
+        if ((input_pressed_buttons & 0x8000) && !(menu_flags & 0x200)) {
+            menu_flags &= ~0x920;
             Sfx_Play(0, 2, 0xFF);
             D_800616B0 = 4 - D_800616B0;
             return;
         }
-        wob = D_8008FB44;
+        wob = menu_frame_counter;
         wob = (wob >> 1) & 0xF;
-        wob = D_80060D64[wob];
-        sel = D_8008FB3E & 0x100;
-        if (D_8008FB3E & 0x200) {
+        wob = menu_wobble_offsets[wob];
+        sel = menu_flags & 0x100;
+        if (menu_flags & 0x200) {
             switch (sel) {
                 case 0:
-                    if (D_8008FB58 < D_800615AC[D_800616B0][0]) {
-                    } else if (D_800615AC[D_800616B0][0] < D_8008FB58) {
+                    if (menu_options_marker_x < menu_options_top_row_pos[D_800616B0][0]) {
+                    } else if (menu_options_top_row_pos[D_800616B0][0] < menu_options_marker_x) {
                     } else {
-                        D_8008FB3E &= ~0x200;
-                        D_8008FB3E &= ~0x400;
-                        sel = ids[D_800615AC[D_800616B0][1]];
-                        if (D_80092C81 < 0x14 && D_80092C81 > -0x14) {
-                            Menu_DrawSprite(sel, D_8008FB58 + x, 0x39, 8, 0xB);
+                        menu_flags &= ~0x200;
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_top_row_pos[D_800616B0][1]];
+                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
+                            Menu_DrawSprite(sel, menu_options_marker_x + x, 0x39, 8, 0xB);
                         }
                         y = 0x3A;
                         sel = 0;
                     }
                     break;
                 case 0x100:
-                    if (D_8008FB58 < D_800615CC[D_80060CB0][0]) {
-                    } else if (D_800615CC[D_80060CB0][0] < D_8008FB58) {
+                    if (menu_options_marker_x < menu_options_bgm_row_pos[menu_bgm_volume_option][0]) {
+                    } else if (menu_options_bgm_row_pos[menu_bgm_volume_option][0] < menu_options_marker_x) {
                     } else {
-                        D_8008FB3E &= ~0x200;
-                        D_8008FB3E &= ~0x400;
-                        sel = ids[D_800615CC[D_80060CB0][1]];
-                        if (D_80092C81 < 0x14 && D_80092C81 > -0x14) {
-                            Menu_DrawSprite(sel, D_8008FB58 + x, 0x67, 8, 0xB);
+                        menu_flags &= ~0x200;
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]];
+                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
+                            Menu_DrawSprite(sel, menu_options_marker_x + x, 0x67, 8, 0xB);
                         }
                         y = 0x65;
                         sel = 0x100;
@@ -468,105 +468,105 @@ void Menu_UpdateOptionsPage(s32 x) {
                     break;
             }
         }
-        if (!(D_8008FB3E & 0x200)) {
+        if (!(menu_flags & 0x200)) {
             switch (sel) {
                 case 0:
                     y = 0x3A;
-                    if (D_80092C82 < -0x1E || D_80092C82 > 0x1E) {
-                        if (!(D_8008FB3E & 0x400)) {
-                            D_8008FB3E &= ~0x100;
-                            D_8008FB3E |= 0x100;
-                            D_8008FB3E |= 0x400;
+                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_flags &= ~0x100;
+                            menu_flags |= 0x100;
+                            menu_flags |= 0x400;
                             Sfx_Play(0, 0, 0xFF);
                         }
-                    } else if (D_80092C81 < -0x14) {
-                        if (!(D_8008FB3E & 0x400)) {
-                            D_8008FB58 = D_800615AC[D_800616B0--][0];
+                    } else if (input_stick_x < -0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_top_row_pos[D_800616B0--][0];
                             if (D_800616B0 < 0) {
                                 D_800616B0 = 0;
                             }
-                            D_8008FB3E |= 0x600;
+                            menu_flags |= 0x600;
                         }
-                    } else if (D_80092C81 > 0x14) {
-                        if (!(D_8008FB3E & 0x400)) {
-                            D_8008FB58 = D_800615AC[D_800616B0++][0];
+                    } else if (input_stick_x > 0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_top_row_pos[D_800616B0++][0];
                             if (D_800616B0 > 4) {
                                 D_800616B0 = 4;
                             }
-                            D_8008FB3E |= 0x600;
+                            menu_flags |= 0x600;
                         }
                     } else {
-                        D_8008FB3E &= ~0x400;
+                        menu_flags &= ~0x400;
                     }
                     break;
                 case 0x100:
                     y = 0x65;
-                    if (D_80092C82 < -0x1E || D_80092C82 > 0x1E) {
-                        if (!(D_8008FB3E & 0x400)) {
-                            D_8008FB3E &= ~0x100;
-                            D_8008FB3E |= 0;
-                            D_8008FB3E |= 0x400;
+                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_flags &= ~0x100;
+                            menu_flags |= 0;
+                            menu_flags |= 0x400;
                             Sfx_Play(0, 0, 0xFF);
                         }
-                    } else if (D_80092C81 < -0x14) {
-                        if (!(D_8008FB3E & 0x400)) {
-                            D_8008FB58 = D_800615CC[D_80060CB0--][0];
-                            if (D_80060CB0 < 0) {
-                                D_80060CB0 = 0;
+                    } else if (input_stick_x < -0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_bgm_row_pos[menu_bgm_volume_option--][0];
+                            if (menu_bgm_volume_option < 0) {
+                                menu_bgm_volume_option = 0;
                             }
-                            D_8008FB3E |= 0x400;
-                            D_8008FB3E |= 0x200;
+                            menu_flags |= 0x400;
+                            menu_flags |= 0x200;
                         }
-                    } else if (D_80092C81 > 0x14) {
-                        if (!(D_8008FB3E & 0x400)) {
-                            D_8008FB58 = D_800615CC[D_80060CB0++][0];
-                            if (D_80060CB0 > 4) {
-                                D_80060CB0 = 4;
+                    } else if (input_stick_x > 0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_bgm_row_pos[menu_bgm_volume_option++][0];
+                            if (menu_bgm_volume_option > 4) {
+                                menu_bgm_volume_option = 4;
                             }
-                            D_8008FB3E |= 0x400;
-                            D_8008FB3E |= 0x200;
+                            menu_flags |= 0x400;
+                            menu_flags |= 0x200;
                         }
                     } else {
-                        D_8008FB3E &= ~0x400;
+                        menu_flags &= ~0x400;
                     }
                     break;
             }
         }
-        if (D_8008FB3E & 0x200) {
+        if (menu_flags & 0x200) {
             s32 pos;
 
             switch (sel) {
                 case 0:
                     y = 0x3A;
-                    pos = D_8008FB58 + x;
-                    if (D_8008FB58 < D_800615AC[D_800616B0][0]) {
-                        D_8008FB58++;
+                    pos = menu_options_marker_x + x;
+                    if (menu_options_marker_x < menu_options_top_row_pos[D_800616B0][0]) {
+                        menu_options_marker_x++;
                         pos++;
-                        sel = ids[D_800615AC[D_800616B0 - 1][1]];
-                    } else if (D_800615AC[D_800616B0][0] < D_8008FB58) {
-                        D_8008FB58--;
+                        sel = ids[menu_options_top_row_pos[D_800616B0 - 1][1]];
+                    } else if (menu_options_top_row_pos[D_800616B0][0] < menu_options_marker_x) {
+                        menu_options_marker_x--;
                         pos--;
-                        sel = ids[D_800615AC[D_800616B0 + 1][1]];
+                        sel = ids[menu_options_top_row_pos[D_800616B0 + 1][1]];
                     } else {
-                        D_8008FB3E &= ~0x400;
-                        sel = ids[D_800615AC[D_800616B0][1]];
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_top_row_pos[D_800616B0][1]];
                     }
                     Menu_DrawSprite(sel, pos, 0x39, 8, 0xB);
                     break;
                 case 0x100:
                     y = 0x65;
-                    pos = D_8008FB58 + x;
-                    if (D_8008FB58 < D_800615CC[D_80060CB0][0]) {
-                        D_8008FB58++;
+                    pos = menu_options_marker_x + x;
+                    if (menu_options_marker_x < menu_options_bgm_row_pos[menu_bgm_volume_option][0]) {
+                        menu_options_marker_x++;
                         pos++;
-                        sel = ids[D_800615CC[D_80060CB0 - 1][1]];
-                    } else if (D_800615CC[D_80060CB0][0] < D_8008FB58) {
-                        D_8008FB58--;
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option - 1][1]];
+                    } else if (menu_options_bgm_row_pos[menu_bgm_volume_option][0] < menu_options_marker_x) {
+                        menu_options_marker_x--;
                         pos--;
-                        sel = ids[D_800615CC[D_80060CB0 + 1][1]];
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option + 1][1]];
                     } else {
-                        D_8008FB3E &= ~0x400;
-                        sel = ids[D_800615CC[D_80060CB0][1]];
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]];
                     }
                     Menu_DrawSprite(sel, pos, 0x67, 8, 0xB);
                     break;
@@ -583,7 +583,7 @@ void Menu_UpdateOptionsPage(s32 x) {
 #ifdef NON_MATCHING
 /* frame, stack homes and register allocation differ; code is equivalent */
 void Menu_UpdateMapPage(s32 arg0) {
-    static s32 D_800615E0 = -1; /* the retail build keeps it as the file-scope D_800615E0 */
+    static s32 menu_map_loaded_region = -1; /* the retail build keeps it as the file-scope menu_map_loaded_region */
     s32 cx;
     s32 cy;
     s32 x;
@@ -601,11 +601,11 @@ void Menu_UpdateMapPage(s32 arg0) {
     s32 i;
 
     s = 0;
-    if (D_8008FB50 < 6) {
-        if (D_8008FB50 != D_800615E0) {
-            Dma_ReadRom(D_800614E4[D_8008FB50].start, D_800614E4[D_8008FB50].dst,
-                          D_800614E4[D_8008FB50].end - D_800614E4[D_8008FB50].start);
-            D_800615E0 = D_8008FB50;
+    if (menu_map_region < 6) {
+        if (menu_map_region != menu_map_loaded_region) {
+            Dma_ReadRom(menu_map_picture_dma[menu_map_region].start, menu_map_picture_dma[menu_map_region].dst,
+                          menu_map_picture_dma[menu_map_region].end - menu_map_picture_dma[menu_map_region].start);
+            menu_map_loaded_region = menu_map_region;
         }
         w = 0xF4;
         h = 8;
@@ -628,18 +628,18 @@ void Menu_UpdateMapPage(s32 arg0) {
             s = 0;
         }
         if (h != 0) {
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTLUT_pal256(D_8007A184++, D_8006125C[D_8008FB50]);
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_tluts[menu_map_region]);
             for (i = 0; i < 24; i++) {
                 if (i == 23) {
                     h = 1;
                 }
-                gDPLoadTextureTile(D_8007A184++, D_80061274[D_8008FB50 * 24 + i], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
+                gDPLoadTextureTile(gfx_dl_head++, menu_map_strips[menu_map_region * 24 + i], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
                                    243, h - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                    G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
                                     1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
+                gDPPipeSync(gfx_dl_head++);
                 y += h;
             }
             SaveMenu_SetTextDrawState();
@@ -656,16 +656,16 @@ void Menu_UpdateMapPage(s32 arg0) {
         Menu_DrawSprite(0x37, arg0 + 0x27, 0xD3, 0xF2, 1);
         Menu_DrawSprite(0x37, arg0 + 0x27, 0x1E, 1, 0xB3);
         Menu_DrawSprite(0x37, arg0 + 0x119, 0x1E, 1, 0xB3);
-        if (D_8008FB50 != D_800615E0) {
-            Dma_ReadRom(D_800614E4[D_8008FB50].start, D_800614E4[D_8008FB50].dst,
-                          D_800614E4[D_8008FB50].end - D_800614E4[D_8008FB50].start);
-            D_800615E0 = D_8008FB50;
+        if (menu_map_region != menu_map_loaded_region) {
+            Dma_ReadRom(menu_map_picture_dma[menu_map_region].start, menu_map_picture_dma[menu_map_region].dst,
+                          menu_map_picture_dma[menu_map_region].end - menu_map_picture_dma[menu_map_region].start);
+            menu_map_loaded_region = menu_map_region;
         }
-        n = D_8008FB50 - 6;
-        w = D_8006158C[n][0];
-        h = D_8006158C[n][1];
-        x = D_80061598[n * 2] + arg0;
-        y = D_80061598[n * 2 + 1];
+        n = menu_map_region - 6;
+        w = menu_map_small_sizes[n][0];
+        h = menu_map_small_sizes[n][1];
+        x = menu_map_small_pos[n * 2] + arg0;
+        y = menu_map_small_pos[n * 2 + 1];
         if (x < 0) {
             if (x + w < 0) {
                 h = 0;
@@ -683,53 +683,53 @@ void Menu_UpdateMapPage(s32 arg0) {
             s = 0;
         }
         if (h != 0) {
-            gDPLoadTLUT_pal256(D_8007A184++, D_8006155C[n]);
-            D_8008FB3E &= ~0x10;
-            gDPLoadTextureTile(D_8007A184++, D_8006156C[n * 2], G_IM_FMT_CI, G_IM_SIZ_8b, D_8006158C[n][0], D_8006158C[n][1], 0, 0,
-                               D_8006158C[n][0] - 1, D_8006158C[n][1] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_small_tluts[n]);
+            menu_flags &= ~0x10;
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][1], 0, 0,
+                               menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][1] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-            gDPPipeSync(D_8007A184++);
-            gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
+            gDPPipeSync(gfx_dl_head++);
+            gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
                                 1 << 10, 1 << 10);
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTextureTile(D_8007A184++, D_8006156C[n * 2 + 1], G_IM_FMT_CI, G_IM_SIZ_8b, D_8006158C[n][0], D_8006158C[n][2], 0, 0,
-                               D_8006158C[n][0] - 1, D_8006158C[n][2] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2 + 1], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][2], 0, 0,
+                               menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][2] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-            gDPPipeSync(D_8007A184++);
-            gSPTextureRectangle(D_8007A184++, x << 2, (y + D_8006158C[n][1]) << 2, (x + w) << 2, (y + h + D_8006158C[n][2]) << 2,
+            gDPPipeSync(gfx_dl_head++);
+            gSPTextureRectangle(gfx_dl_head++, x << 2, (y + menu_map_small_sizes[n][1]) << 2, (x + w) << 2, (y + h + menu_map_small_sizes[n][2]) << 2,
                                 G_TX_RENDERTILE, s, 0, 1 << 10, 1 << 10);
             SaveMenu_SetTextDrawState();
         }
     }
     Menu_DrawSprite(5, arg0 + 0x45, 0x1C, 7, 7);
     Menu_DrawSprite(5, arg0 + 0xF3, 0x1C, 7, 7);
-    n = (D_8008FB44 >> 2) & 0xF;
-    n = D_80060D64[n];
+    n = (menu_frame_counter >> 2) & 0xF;
+    n = menu_wobble_offsets[n];
     Menu_DrawSprite(6, arg0 + n + 0x36, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(7, arg0 - n + 0xFB, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
-    if (D_8008FB50 < 6) {
-        if (D_8008FB54 < 0) {
-            cx = (s32) D_8007AA08.x / D_800614B4[D_8008FB50] + D_800614CC[D_8008FB50];
-            cy = (s32) D_8007AA08.z / D_800614B4[D_8008FB50 + 6] + D_800614CC[D_8008FB50 + 6];
+    if (menu_map_region < 6) {
+        if (menu_map_spot < 0) {
+            cx = (s32) D_8007AA08.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
+            cy = (s32) D_8007AA08.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
         } else {
-            cx = D_80061184[D_8008FB50 * 18 + D_8008FB54 * 2];
-            cy = D_80061184[D_8008FB50 * 18 + D_8008FB54 * 2 + 1];
+            cx = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2];
+            cy = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2 + 1];
         }
-        if (D_8008FB44 & 0x20) {
+        if (menu_frame_counter & 0x20) {
             Menu_DrawSprite(0x2C, arg0 + cx + 0x23, cy + 0xD, 0xC, 0x10);
         }
-        if (D_8008FB54 < 0) {
-            sx = D_800614B4[D_8008FB50];
-            sy = D_800614B4[D_8008FB50 + 6];
-            px = D_800614CC[D_8008FB50];
-            py = D_800614CC[D_8008FB50 + 6];
-            if (D_80060F28 == -1.0f) {
-                D_80060F28 = cx;
-                D_80060F2C = cy;
+        if (menu_map_spot < 0) {
+            sx = menu_map_world_scale[menu_map_region];
+            sy = menu_map_world_scale[menu_map_region + 6];
+            px = menu_map_origin[menu_map_region];
+            py = menu_map_origin[menu_map_region + 6];
+            if (menu_map_cursor_x == -1.0f) {
+                menu_map_cursor_x = cx;
+                menu_map_cursor_y = cy;
             }
-            if (D_8008FB3C != 0) {
-                f = D_80092C81;
+            if (menu_map_cursor_active != 0) {
+                f = input_stick_x;
                 if (f > 0.0f) {
                     f -= 5.0f;
                     if (f < 0.0f) {
@@ -741,8 +741,8 @@ void Menu_UpdateMapPage(s32 arg0) {
                         f = 0.0f;
                     }
                 }
-                D_80060F28 += f * 0.08;
-                f = D_80092C82;
+                menu_map_cursor_x += f * 0.08;
+                f = input_stick_y;
                 if (f > 0.0f) {
                     f -= 5.0f;
                     if (f < 0.0f) {
@@ -754,55 +754,55 @@ void Menu_UpdateMapPage(s32 arg0) {
                         f = 0.0f;
                     }
                 }
-                D_80060F2C -= f * 0.08;
-                if (D_80060F28 < 6.0f) {
-                    D_80060F28 = 6.0f;
-                } else if (D_80060F28 > 236.0f) {
-                    D_80060F28 = 236.0f;
+                menu_map_cursor_y -= f * 0.08;
+                if (menu_map_cursor_x < 6.0f) {
+                    menu_map_cursor_x = 6.0f;
+                } else if (menu_map_cursor_x > 236.0f) {
+                    menu_map_cursor_x = 236.0f;
                 }
-                if (D_80060F2C < 6.0f) {
-                    D_80060F2C = 6.0f;
-                } else if (D_80060F2C > 178.0f) {
-                    D_80060F2C = 178.0f;
+                if (menu_map_cursor_y < 6.0f) {
+                    menu_map_cursor_y = 6.0f;
+                } else if (menu_map_cursor_y > 178.0f) {
+                    menu_map_cursor_y = 178.0f;
                 }
             }
-            D_8008FB48 = sx * ((s32) D_80060F28 - px);
-            D_8008FB4C = sy * ((s32) D_80060F2C - py);
+            menu_map_marker_x = sx * ((s32) menu_map_cursor_x - px);
+            menu_map_marker_z = sy * ((s32) menu_map_cursor_y - py);
             y = 0;
             h = 5;
             ox = -2;
-            if (D_8008FB3C != 0) {
+            if (menu_map_cursor_active != 0) {
                 y = -2;
                 h = 6;
             }
-            Menu_DrawSprite(0x55, arg0 + D_80060F28 + 39.0f + ox, D_80060F2C + 29.0f - 1.0f, h, 1);
-            Menu_DrawSprite(4, arg0 + D_80060F28 + 39.0f - 2.0f, D_80060F2C + 29.0f - 12.0f + y, 0xC, 0xC);
+            Menu_DrawSprite(0x55, arg0 + menu_map_cursor_x + 39.0f + ox, menu_map_cursor_y + 29.0f - 1.0f, h, 1);
+            Menu_DrawSprite(4, arg0 + menu_map_cursor_x + 39.0f - 2.0f, menu_map_cursor_y + 29.0f - 12.0f + y, 0xC, 0xC);
         }
     }
-    if (!(D_8008FB3E & 0x2000)) {
-        if (D_8008FB3C == 0) {
-            if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
-                D_8008FB3E |= 0x2000;
-                D_8008FB38 = 31;
+    if (!(menu_flags & 0x2000)) {
+        if (menu_map_cursor_active == 0) {
+            if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
+                menu_flags |= 0x2000;
+                menu_slide_timer = 31;
                 Sfx_Play(0, 0, 0xFF);
-            } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
-                D_8008FB3E |= 0x3000;
-                D_8008FB38 = 31;
+            } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
+                menu_flags |= 0x3000;
+                menu_slide_timer = 31;
                 Sfx_Play(0, 0, 0xFF);
             }
         }
-        if (D_8008FB50 < 6 && D_8008FB54 < 0) {
-            if (D_8008FB3C == 0) {
-                D_8008FB5C = D_80060F28;
-                D_8008FB60 = D_80060F2C;
+        if (menu_map_region < 6 && menu_map_spot < 0) {
+            if (menu_map_cursor_active == 0) {
+                menu_map_cursor_saved_x = menu_map_cursor_x;
+                menu_map_cursor_saved_y = menu_map_cursor_y;
             }
-            if (D_80092C86 & 0x8000) {
-                D_8008FB3C ^= 1;
-                D_8008FB3E ^= 0x20;
+            if (input_pressed_buttons & 0x8000) {
+                menu_map_cursor_active ^= 1;
+                menu_flags ^= 0x20;
                 Sfx_Play(0, 0x17, 0xFF);
-            } else if ((D_80092C86 & 0x4000) && D_8008FB3C != 0) {
-                D_80060F28 = D_8008FB5C;
-                D_80060F2C = D_8008FB60;
+            } else if ((input_pressed_buttons & 0x4000) && menu_map_cursor_active != 0) {
+                menu_map_cursor_x = menu_map_cursor_saved_x;
+                menu_map_cursor_y = menu_map_cursor_saved_y;
                 Sfx_Play(0, 0x13, 0xFF);
             }
         }
@@ -812,16 +812,16 @@ void Menu_UpdateMapPage(s32 arg0) {
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_UpdateMapPage.s")
 #endif
 
-extern s8 D_80060D64[];
+extern s8 menu_wobble_offsets[];
 extern u8 D_8007A9F4;
 extern u8 D_8007A9F5;
 extern u8 D_8007A9F6;
 extern u8 D_8007A9F7;
 extern s32 D_8007A9E0;
 extern u8 D_8007AA04;
-extern u32 D_80055D7C[];
-extern s8 D_80092C81;
-extern u16 D_80092C84;
+extern u32 player_level_exp_table[];
+extern s8 input_stick_x;
+extern u16 input_held_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
 void Menu_DrawExpGauge(s32 arg0, s32 arg1);
@@ -845,9 +845,9 @@ void Menu_UpdateElementsPage(s32 x) {
     Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x9C);
     Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
     Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
-    p = D_8008FB44;
+    p = menu_frame_counter;
     p = (p >> 2) & 0xF;
-    p = D_80060D64[p];
+    p = menu_wobble_offsets[p];
     Menu_DrawSprite(6, x + p + 0x36, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(7, x - p + 0xFB, 0x1A, 0xE, 0xB);
     Menu_DrawSprite(0x2D, x + 0x75, 0x19, 0x56, 0xD);
@@ -892,20 +892,20 @@ void Menu_UpdateElementsPage(s32 x) {
     f /= 50.0f;
     f *= 50.0f;
     Menu_DrawSprite(0x33, x + 0xA6, 0xAF, f, 3);
-    v = D_8007A9E0 * 100 / D_80055D7C[D_8007AA04];
+    v = D_8007A9E0 * 100 / player_level_exp_table[D_8007AA04];
     if (v > 100) {
         v = 100;
     }
     Menu_DrawNumber(3, x + 0x91, 0x92, v, 0xA);
     Menu_DrawExpGauge(v, x);
-    if (!(D_8008FB3E & 0x2000)) {
-        if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
-            D_8008FB3E |= 0x2000;
-            D_8008FB38 = 31;
+    if (!(menu_flags & 0x2000)) {
+        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
+            menu_flags |= 0x2000;
+            menu_slide_timer = 31;
             Sfx_Play(0, 0, 0xFF);
-        } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
-            D_8008FB3E |= 0x3000;
-            D_8008FB38 = 31;
+        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
+            menu_flags |= 0x3000;
+            menu_slide_timer = 31;
             Sfx_Play(0, 0, 0xFF);
         }
     }
@@ -913,11 +913,11 @@ void Menu_UpdateElementsPage(s32 x) {
 
 #ifdef NON_MATCHING
 /* w, s, lrs and lrt are kept in registers where retail reloads them from the stack; code is equivalent */
-extern u8 *D_80060D74[];
-extern u8 D_80060CB4[][2];
-extern Gfx D_80060ED8[];
-extern Gfx D_80060EF0[];
-extern u16 D_80061E98[];
+extern u8 *menu_sprite_tex[];
+extern u8 menu_sprite_sizes[][2];
+extern Gfx menu_sprite_opaque_dl[];
+extern Gfx menu_sprite_alpha_dl[];
+extern u16 menu_ui_tlut[];
 
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
     s32 ret;
@@ -939,9 +939,9 @@ void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
     s32 texW;
     s32 pad[2];
 
-    tex = D_80060D74[id];
-    texW = D_80060CB4[id][0];
-    texH = D_80060CB4[id][1];
+    tex = menu_sprite_tex[id];
+    texW = menu_sprite_sizes[id][0];
+    texH = menu_sprite_sizes[id][1];
     lrs = texW - 1;
     lrt = texH - 1;
     alpha = 0;
@@ -999,27 +999,27 @@ void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
         ret = -1;
     }
     if (ret >= 0) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
-        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
         if (alpha == 0) {
-            gSPDisplayList(D_8007A184++, D_80060ED8);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
         } else {
-            gSPDisplayList(D_8007A184++, D_80060EF0);
-            gDPPipeSync(D_8007A184++);
-            gDPSetEnvColor(D_8007A184++, 255, 255, 255, alpha);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
+            gDPPipeSync(gfx_dl_head++);
+            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, alpha);
         }
-        if (!(D_8008FB3E & 0x10)) {
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTLUT_pal256(D_8007A184++, D_80061E98);
-            D_8008FB3E |= 0x10;
+        if (!(menu_flags & 0x10)) {
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
+            menu_flags |= 0x10;
         }
-        gDPLoadTextureTile(D_8007A184++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
+        gDPLoadTextureTile(gfx_dl_head++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, masks, maskt, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, t, dsdx,
+        gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, t, dsdx,
                             dtdy);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
     }
 }
 #else
@@ -1032,17 +1032,17 @@ typedef struct {
 typedef struct {
     u8* v[4][2];
 } Unk4x2Ptrs;
-extern Unk4Pals D_800615E4;
-extern Unk4x2Ptrs D_800615F4;
-extern Gfx D_80060ED8[];
-extern Gfx D_80060EF0[];
+extern Unk4Pals menu_exp_gauge_tluts;
+extern Unk4x2Ptrs menu_exp_gauge_tex;
+extern Gfx menu_sprite_opaque_dl[];
+extern Gfx menu_sprite_alpha_dl[];
 
 void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
     s32 k;
     s32 j;
     s32 d;
-    Unk4Pals pals = D_800615E4;
-    Unk4x2Ptrs tex = D_800615F4;
+    Unk4Pals pals = menu_exp_gauge_tluts;
+    Unk4x2Ptrs tex = menu_exp_gauge_tex;
     s32 xr;
     s32 x;
     s32 y;
@@ -1056,18 +1056,18 @@ void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
     s32 ret;
 
     for (k = 0; k < 4; k++) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
-        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
         if (k != 1) {
-            gSPDisplayList(D_8007A184++, D_80060ED8);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
         } else {
-            gSPDisplayList(D_8007A184++, D_80060EF0);
-            gDPSetEnvColor(D_8007A184++, 255, 255, 255, 0x80);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
+            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 0x80);
         }
-        gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, pals.v[k]);
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, pals.v[k]);
         for (j = 0; j < 2; j++) {
             s[0] = 0;
             switch (k) {
@@ -1122,16 +1122,16 @@ void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
                 ret = -1;
             }
             if (ret >= 0) {
-                gDPLoadTextureTile(D_8007A184++, tex.v[k][j], G_IM_FMT_CI, G_IM_SIZ_8b, texW, texH, 0, ult, texW - 1,
+                gDPLoadTextureTile(gfx_dl_head++, tex.v[k][j], G_IM_FMT_CI, G_IM_SIZ_8b, texW, texH, 0, ult, texW - 1,
                                    texH - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                    G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h - ult) << 2, G_TX_RENDERTILE, s[0],
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h - ult) << 2, G_TX_RENDERTILE, s[0],
                                     t, 1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
+                gDPPipeSync(gfx_dl_head++);
             }
         }
     }
-    D_8008FB3E &= ~0x10;
+    menu_flags &= ~0x10;
 }
 
 typedef struct {
@@ -1140,41 +1140,41 @@ typedef struct {
 typedef struct {
     u8* v[4];
 } Unk4Ptrs;
-extern Unk4Words D_80061614;
-extern Unk4Words D_80061624;
-extern Unk4Ptrs D_80061634;
+extern Unk4Words menu_bg_strip_tex_heights;
+extern Unk4Words menu_bg_strip_heights;
+extern Unk4Ptrs menu_bg_strip_tex;
 extern u16 D_80066E88[];
 
 void Menu_DrawBackground(void) {
     s32 i;
     s32 y;
-    Unk4Words texH = D_80061614;
-    Unk4Words stripH = D_80061624;
-    Unk4Ptrs tex = D_80061634;
+    Unk4Words texH = menu_bg_strip_tex_heights;
+    Unk4Words stripH = menu_bg_strip_heights;
+    Unk4Ptrs tex = menu_bg_strip_tex;
 
-    gDPPipeSync(D_8007A184++);
-    gDPLoadTLUT_pal256(D_8007A184++, D_80066E88);
-    D_8008FB3E &= ~0x10;
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTLUT_pal256(gfx_dl_head++, D_80066E88);
+    menu_flags &= ~0x10;
     for (i = 0, y = 22; i < 4; i++) {
-        gDPLoadTextureTile(D_8007A184++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
                            G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0, 0,
+        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0, 0,
                             0x4A8, 0x4E6);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
         y += stripH.v[i];
     }
     for (i = 3, y = 120; i >= 0; i--) {
-        gDPLoadTextureTile(D_8007A184++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
                            G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0,
+        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0,
                             (texH.v[i] - 1) << 5, 0x4A8, -0x4E6);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
         y += stripH.v[i];
     }
 }
 
-extern u8* D_80060D74[];
-extern u16 D_80061E98[];
+extern u8* menu_sprite_tex[];
+extern u16 menu_ui_tlut[];
 
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     s32 i;
@@ -1207,19 +1207,19 @@ void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     }
     digits[0] = v;
     i = 0;
-    if (!(D_8008FB3E & 0x10)) {
-        gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, D_80061E98);
-        D_8008FB3E |= 0x10;
+    if (!(menu_flags & 0x10)) {
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
+        menu_flags |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {
         i += digits[n];
         if (i != 0 || n == 0) {
-            gDPLoadTextureTile(D_8007A184++, D_80060D74[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
+            gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
                                0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
-            gSPTextureRectangle(D_8007A184++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
+            gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
                                 G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-            gDPPipeSync(D_8007A184++);
+            gDPPipeSync(gfx_dl_head++);
         }
         xoff += 7;
     }
@@ -1255,30 +1255,30 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
         div /= 10;
     }
     digits[0] = v;
-    if (!(D_8008FB3E & 0x10)) {
-        gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, D_80061E98);
-        D_8008FB3E |= 0x10;
+    if (!(menu_flags & 0x10)) {
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
+        menu_flags |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {
-        gDPLoadTextureTile(D_8007A184++, D_80060D74[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
+        gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
                            0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
+        gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
                             G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
         xoff += 7;
     }
 }
 
 
 typedef struct { s8 a; s8 b; } Unk80060F30;
-extern Unk80060F30 D_80060F30[];
+extern Unk80060F30 menu_map_location_list[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
-extern f32 D_80060F28;
-extern f32 D_80060F2C;
-extern s16 D_800614B4[];
-extern s16 D_800614CC[];
+extern f32 menu_map_cursor_x;
+extern f32 menu_map_cursor_y;
+extern s16 menu_map_world_scale[];
+extern s16 menu_map_origin[];
 
 
 /* ---------------------------------------------------------------------------
@@ -1406,11 +1406,11 @@ extern u8 D_8006AFE8[];
 extern u8 D_8006B4D8[];
 extern u8 D_8006B6E0[];
 extern u8 D_8006BBD0[];
-void *D_80055D40[1] = {
+void *player_char_data[1] = {
     (void*)0x80206064,
 };
-D2ActorStats D_80055D44 = { 0, 0, 0x0032, 0x0032, 0x000F, 0x000F, 5, 4, 0, 500, 5e+01f, 1.6e+02f, 0.07f, { 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
-u32 D_80055D7C[100] = {
+D2ActorStats player_default_stats = { 0, 0, 0x0032, 0x0032, 0x000F, 0x000F, 5, 4, 0, 500, 5e+01f, 1.6e+02f, 0.07f, { 1, 1, 1, 1 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+u32 player_level_exp_table[100] = {
     8, 10, 13, 17, 22, 28, 35, 44, 55, 69,
     86, 106, 130, 159, 193, 234, 282, 338, 404, 481,
     571, 674, 793, 929, 1085, 1263, 1464, 1691, 1947, 2235,
@@ -1422,7 +1422,7 @@ u32 D_80055D7C[100] = {
     121272, 126072, 130938, 135865, 140849, 145887, 150975, 156109, 161284, 166497,
     171745, 177022, 182326, 187652, 192996, 198356, 203726, 209104, 214486, 219868,
 };
-u16 D_80055F0C[70] = {
+u16 player_stat_xp_costs[70] = {
     0x000A, 0x000B, 0x000B, 0x000B, 0x000C, 0x000C, 0x000C, 0x000D, 0x000D, 0x000D, 0x000D, 0x000E,
     0x000E, 0x000E, 0x000F, 0x000F, 0x0010, 0x0010, 0x0010, 0x0011, 0x0011, 0x0012, 0x0012, 0x0012,
     0x0013, 0x0013, 0x0014, 0x0014, 0x0015, 0x0015, 0x0016, 0x0016, 0x0017, 0x0017, 0x0018, 0x0019,
@@ -1430,7 +1430,7 @@ u16 D_80055F0C[70] = {
     0x0022, 0x0023, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C,
     0x002D, 0x002E, 0x0030, 0x0031, 0x0032, 0x0032, 0x0032, 0x0032, 0x0032, 0x0032,
 };
-D2RomRange D_80055F98[30] = {
+D2RomRange player_anim_rom_ranges[30] = {
     { 0x00EF21A0, 0x00EF3770 }, { 0x00EF3770, 0x00EF5B10 }, { 0x00EF5B10, 0x00EF7EB0 },
     { 0x00EF7EB0, 0x00EFA2A0 }, { 0x00EFA2A0, 0x00EFBD30 }, { 0x00EFBD30, 0x00EFD390 },
     { 0x00EFD390, 0x00EFF280 }, { 0x00EFF280, 0x00F00D10 }, { 0x00F00D10, 0x00F027A0 },
@@ -1442,7 +1442,7 @@ D2RomRange D_80055F98[30] = {
     { 0x00F210A0, 0x00F22AE0 }, { 0x00F22AE0, 0x00F23ED0 }, { 0x00F23ED0, 0x00F26B90 },
     { 0x00F26B90, 0x00F28740 }, { 0x00F28740, 0x00F2A2F0 }, { 0x00F2A2F0, 0x00F2C170 },
 };
-D2PosRot D_80056088[17] = {
+D2PosRot player_save_spawn_points[17] = {
     { 0x000F, 5, -2.36f, 1.23f, 1.5793f }, { 0x0010, 7, -2.36f, 1.23f, 1.5793f },
     { 0x0010, 0x000F, -2.36f, 1.23f, 1.5793f }, { 0x0012, 6, 13.31f, 16.56f, 2.43f },
     { 0x0011, 0, -7.9f, -40.5f, -1.51f }, { 0x0012, 7, -14.4f, 18.41f, 2.46f },
@@ -1456,7 +1456,7 @@ D2PosRot D_80056088[17] = {
 u32 D_80056198[2] = {
     0, 0,
 };
-D2OvlDef D_800561A0[6] = {
+D2OvlDef enemy_area_sets[6] = {
     { 0x00A77F10, 0x00ADA190, (void*)0x80270890, (void*)0x802705F0, (void*)0x80270934 },
     { 0x00ADA190, 0x00B61550, (void*)0x80295990, (void*)0x80295648, (void*)0x80295A6C },
     { 0x00B61550, 0x00BBBF30, (void*)0x80269010, (void*)0x80268DA8, (void*)0x8026909C },
@@ -1464,7 +1464,7 @@ D2OvlDef D_800561A0[6] = {
     { 0x00C2F900, 0x00C99EF0, (void*)0x80278C10, (void*)0x80278970, (void*)0x80278CB0 },
     { 0x00C99EF0, 0x00CC2280, (void*)0x80236A38, (void*)0x80236958, (void*)0x80236A70 },
 };
-D2Place D_80056218[6] = {
+D2Place enemy_attack_script_0[6] = {
     { 25, 0, 0, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
     { 26, 0, 8, 0, 0.0f, 0.0f, -2.0f, 0.0f },
     { 29, 1, 0, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
@@ -1472,20 +1472,20 @@ D2Place D_80056218[6] = {
     { 37, 1, 0, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
     { 41, 1, 1, 0, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
 };
-D2Place D_800562A8[1] = {
+D2Place enemy_attack_script_1[1] = {
     { 32, 2, 5, 0, 0.0f, 0.0f, 2e+02f, 0.0f },
 };
-D2Place D_800562C0[5] = {
+D2Place enemy_attack_script_2[5] = {
     { 30, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
     { 34, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
     { 38, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
     { 42, 16, 0, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
     { 46, 16, 1, 0, 0.0f, 1.1e+02f, 4e+01f, 0.0f },
 };
-D2Place D_80056338[1] = {
+D2Place enemy_attack_script_3[1] = {
     { 25, 17, 1, 0, 0.0f, 2e+02f, 0.0f, 0.0f },
 };
-D2Place D_80056350[6] = {
+D2Place enemy_attack_script_5[6] = {
     { 1, 4, 0, 0, 0.0f, 1.3e+02f, 0.0f, 0.0f },
     { 2, 5, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 8, 5, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
@@ -1493,17 +1493,17 @@ D2Place D_80056350[6] = {
     { 20, 5, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 26, 5, 1, 0, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place D_800563E0[1] = {
+D2Place enemy_attack_script_7[1] = {
     { 23, 14, 1, 0, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place D_800563F8[5] = {
+D2Place enemy_attack_script_8[5] = {
     { 18, 6, 0, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
     { 19, 0, 8, 0, 0.0f, 0.0f, -1.0f, 0.0f },
     { 20, 7, 0, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
     { 26, 7, 0, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
     { 32, 7, 1, 0, 0.0f, 1.6e+02f, 1.6e+02f, 0.0f },
 };
-D2Place D_80056470[6] = {
+D2Place enemy_attack_script_10[6] = {
     { 25, 8, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 32, 9, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 38, 9, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
@@ -1511,43 +1511,43 @@ D2Place D_80056470[6] = {
     { 50, 9, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 56, 9, 1, 0, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place D_80056500[4] = {
+D2Place enemy_attack_script_11[4] = {
     { 0, 10, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 4, 10, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 8, 10, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 31, 15, 3, 0, 0.0f, 0.0f, 0.0f, 0.0f },
 };
-D2Place D_80056560[4] = {
+D2Place enemy_attack_script_12[4] = {
     { 1, 11, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f },
     { 9, 11, 0, 0, 0.0f, 0.0f, 0.0f, 0.7853982f },
     { 17, 11, 0, 0, 0.0f, 0.0f, 0.0f, 15.707963f },
     { 25, 11, 1, 0, 0.0f, 0.0f, 0.0f, 3.1415927f },
 };
-D2Place D_800565C0[5] = {
+D2Place enemy_attack_script_13[5] = {
     { 35, 12, 0, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
     { 36, 0, 8, 0, 0.0f, 0.0f, -2.0f, 0.0f },
     { 41, 13, 0, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
     { 47, 13, 0, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
     { 53, 13, 1, 0, 0.0f, 1.5e+02f, 1.5e+02f, 0.0f },
 };
-D2Place D_80056638[2] = {
+D2Place enemy_attack_script_14[2] = {
     { 50, 18, 0, 0, 0.0f, 8e+02f, 0.0f, 0.0f },
     { 51, 19, 1, 0, 0.0f, 8e+02f, 0.0f, 0.0f },
 };
-D2Place D_80056668[4] = {
+D2Place enemy_attack_script_16[4] = {
     { 38, 21, 0, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
     { 42, 21, 0, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
     { 46, 21, 0, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
     { 50, 21, 1, 0, 0.0f, 3.8e+02f, 3.5e+02f, 0.0f },
 };
-D2Place *D_800566C8[20] = {
-    D_80056218, D_800562A8, D_800562C0, D_80056338, NULL,
-    D_80056350, NULL, D_800563E0, D_800563F8, NULL,
-    D_80056470, D_80056500, D_80056560, D_800565C0, D_80056638,
-    NULL, D_80056668, NULL, NULL, NULL,
+D2Place *enemy_attack_scripts[20] = {
+    enemy_attack_script_0, enemy_attack_script_1, enemy_attack_script_2, enemy_attack_script_3, NULL,
+    enemy_attack_script_5, NULL, enemy_attack_script_7, enemy_attack_script_8, NULL,
+    enemy_attack_script_10, enemy_attack_script_11, enemy_attack_script_12, enemy_attack_script_13, enemy_attack_script_14,
+    NULL, enemy_attack_script_16, NULL, NULL, NULL,
 };
-/* D_8005685A and D_8005685C (undefined_syms.txt) are fields of D_80056718[20]. */
-D2Scale D_80056718[22] = {
+/* D_8005685A and D_8005685C (undefined_syms.txt) are fields of enemy_effect_defs[20]. */
+D2Scale enemy_effect_defs[22] = {
     { 0x0046, 7, 0x000A, 0, 1.1f, 1.1f }, { 0x0047, 0x0037, 2, 0, 1.0f, 1.0f },
     { 0x0048, 7, 2, 0, 11.0f, 11.0f }, { 0x0049, 7, 0, 0, 4.0f, 4.0f },
     { 0x004F, 7, 0x0082, 0, 4.0f, 4.0f }, { 0x0050, 7, 2, 0, 6.0f, 6.0f },
@@ -1563,14 +1563,14 @@ D2Scale D_80056718[22] = {
 s32 D_80056878[2] = {
     0, 0,
 };
-D2RomRange D_80056880[7] = {
+D2RomRange npc_area_set_rom_ranges[7] = {
     { 0x00871D10, 0x008D1960 }, { 0x008D1960, 0x00926C00 }, { 0x00926C00, 0x0095D4E0 }, { 0x0095D4E0, 0x00988580 },
     { 0x00988580, 0x009E16C0 }, { 0x009E16C0, 0x00A14190 }, { 0x00A14190, 0x00A70350 },
 };
-u8 D_800568B8[0x2F8] = {
-#include "assets/D_800568B8.inc.c"
+u8 npc_area_entry_message[0x2F8] = {
+#include "assets/npc_area_entry_message.inc.c"
 };
-D2MapDef D_80056BB0[36] = {
+D2MapDef map_area_defs[36] = {
     { 0x0081, 0, 0x000EF280, 0x00133F20, (void*)0x8010FE00, (void*)0x8014F640, (void*)0x8014FB80, (void*)0x8014FF78, (void*)0x8015084C, (void*)0x80150290, (void*)0x80150518, (void*)0x80154810, (void*)0x801547BC, NULL, NULL, (void*)0x80154A90, 0, 5 },
     { 1, 0, 0x00133F20, 0x00165E70, (void*)0x8010FE00, (void*)0x80140430, (void*)0x80140790, (void*)0x80140A28, (void*)0x80140F3C, (void*)0x80140C20, (void*)0x80140D10, (void*)0x80141CA0, (void*)0x80141C8C, NULL, NULL, (void*)0x80141D44, 1, 1 },
     { 4, 0, 0x00165E70, 0x0019C1D0, (void*)0x8010FE00, (void*)0x80144464, (void*)0x80144710, (void*)0x80144858, (void*)0x80144CFC, (void*)0x80144A50, (void*)0x80144AD0, (void*)0x80145D70, (void*)0x80145D54, (void*)0x80146128, (void*)0x80146130, NULL, 1, 1 },
@@ -1608,13 +1608,13 @@ D2MapDef D_80056BB0[36] = {
     { 8, 0, 0x008231F0, 0x00851240, (void*)0x8010FE00, (void*)0x80139374, (void*)0x80139680, (void*)0x80139ACC, (void*)0x8013A1B0, NULL, (void*)0x80139E80, (void*)0x8013D910, (void*)0x8013D854, (void*)0x8013DCE4, (void*)0x8013DD3C, (void*)0x8013DE48, 0, 11 },
     { 0x0088, 0, 0x00851240, 0x00869620, (void*)0x8010FE00, (void*)0x801269B4, (void*)0x80127A80, (void*)0x80127AE8, (void*)0x80127C28, NULL, (void*)0x80127BA8, (void*)0x801281D0, (void*)0x801281C0, NULL, NULL, NULL, 0, 1 },
 };
-D2RomDst D_80057540[6] = {
+D2RomDst map_extra_rom_ranges[6] = {
     { 0x000C8DE0, 0x000D0570, (void*)0x801F8000 }, { 0x000D0570, 0x000D7FE0, (void*)0x801F8000 },
     { 0x000D7FE0, 0x000DD790, (void*)0x801F8000 }, { 0x000DD790, 0x000E4D00, (void*)0x801F8000 },
     { 0x000E4D00, 0x000EBDE0, (void*)0x801F8000 }, { 0x000EBDE0, 0x000EF280, (void*)0x801F8000 },
 };
-u32 D_80057588 = 0;
-s8 D_8005758C[158][2] = {
+u32 mapobj_cell_single = 0;
+s8 mapobj_cell_disc_r7[158][2] = {
     { -1, -7 }, { 0, -7 }, { 1, -7 }, { -3, -6 }, { -2, -6 }, { -1, -6 }, { 0, -6 }, { 1, -6 }, { 2, -6 }, { 2, -6 },
     { -4, -5 }, { -3, -5 }, { -2, -5 }, { -1, -5 }, { 0, -5 }, { 1, -5 }, { 2, -5 }, { 3, -5 }, { 4, -5 }, { -5, -4 },
     { -4, -4 }, { -3, -4 }, { -2, -4 }, { -1, -4 }, { 0, -4 }, { 1, -4 }, { 2, -4 }, { 3, -4 }, { 4, -4 }, { 5, -4 },
@@ -1632,7 +1632,7 @@ s8 D_8005758C[158][2] = {
     { -2, 5 }, { -1, 5 }, { 0, 5 }, { 1, 5 }, { 2, 5 }, { 3, 5 }, { 4, 5 }, { -3, 6 }, { -2, 6 }, { -1, 6 },
     { 0, 6 }, { 1, 6 }, { 2, 6 }, { 3, 6 }, { -1, 7 }, { 0, 7 }, { 1, 7 }, { 0, 0 },
 };
-s8 D_800576C8[90][2] = {
+s8 mapobj_cell_disc_r5[90][2] = {
     { -1, -5 }, { 0, -5 }, { 1, -5 }, { -3, -4 }, { -2, -4 }, { -1, -4 }, { 0, -4 }, { 1, -4 }, { 2, -4 }, { 3, -4 },
     { -4, -3 }, { -3, -3 }, { -2, -3 }, { -1, -3 }, { 0, -3 }, { 1, -3 }, { 2, -3 }, { 3, -3 }, { 4, -3 }, { -4, -2 },
     { -3, -2 }, { -2, -2 }, { -1, -2 }, { 0, -2 }, { 1, -2 }, { 2, -2 }, { 3, -2 }, { 4, -2 }, { -5, -1 }, { -4, -1 },
@@ -1643,122 +1643,122 @@ s8 D_800576C8[90][2] = {
     { -4, 3 }, { -3, 3 }, { -2, 3 }, { -1, 3 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 }, { 4, 3 }, { -3, 4 },
     { -2, 4 }, { -1, 4 }, { 0, 4 }, { 1, 4 }, { 2, 4 }, { 3, 4 }, { -1, 5 }, { 0, 5 }, { 1, 5 }, { 0, 0 },
 };
-s8 D_8005777C[10][2] = {
+s8 mapobj_cell_square_3x3[10][2] = {
     { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 0, 0 },
 };
-s8 D_80057790[22][2] = {
+s8 mapobj_cell_disc_r2[22][2] = {
     { -1, -2 }, { 0, -2 }, { -1, -2 }, { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, { -2, 0 }, { -1, 0 }, { 0, 0 },
     { 1, 0 }, { 2, 0 }, { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 0, 0 },
 };
 /* Animations: keyframes (assets, 0x34-byte records) and their headers. */
-u32 D_800577BC[0x8F] = {
-#include "assets/D_800577BC.inc.c"
+u32 mapobjanim_type23_keys[0x8F] = {
+#include "assets/mapobjanim_type23_keys.inc.c"
 };
-D2Anim D_800579F8 = { D_800577BC, 0x000B, 0x0051, 0, 0, 0, 0, 0, 0 };
+D2Anim mapobjanim_type23_anim = { mapobjanim_type23_keys, 0x000B, 0x0051, 0, 0, 0, 0, 0, 0 };
 u32 D_80057A18[0xC3] = {
 #include "assets/D_80057A18.inc.c"
 };
 D2Anim D_80057D24 = { D_80057A18, 0x000F, 0x006E, 0, 0, 0, 0, 0, 0 };
-u32 D_80057D44[0x8F] = {
-#include "assets/D_80057D44.inc.c"
+u32 mapobjanim_type23_odd_keys[0x8F] = {
+#include "assets/mapobjanim_type23_odd_keys.inc.c"
 };
-D2Anim D_80057F80 = { D_80057D44, 0x000B, 0x0064, 0, 0, 0, 0, 0, 0 };
-u32 D_80057FA0[0x1A] = {
-#include "assets/D_80057FA0.inc.c"
+D2Anim mapobjanim_type23_odd_anim = { mapobjanim_type23_odd_keys, 0x000B, 0x0064, 0, 0, 0, 0, 0, 0 };
+u32 mapobjanim_type4_keys[0x1A] = {
+#include "assets/mapobjanim_type4_keys.inc.c"
 };
-D2Anim D_80058008 = { D_80057FA0, 2, 0x001E, 0, 0, 0, 0, 0, 0 };
-u32 D_80058028[0x27] = {
-#include "assets/D_80058028.inc.c"
+D2Anim mapobjanim_type4_anim = { mapobjanim_type4_keys, 2, 0x001E, 0, 0, 0, 0, 0, 0 };
+u32 mapobj_loop_anim0_keys[0x27] = {
+#include "assets/mapobj_loop_anim0_keys.inc.c"
 };
-u32 D_800580C4[0x34] = {
-#include "assets/D_800580C4.inc.c"
+u32 mapobj_loop_anim1_keys[0x34] = {
+#include "assets/mapobj_loop_anim1_keys.inc.c"
 };
-u32 D_80058194[0x41] = {
-#include "assets/D_80058194.inc.c"
+u32 mapobj_loop_anim2_keys[0x41] = {
+#include "assets/mapobj_loop_anim2_keys.inc.c"
 };
-u32 D_80058298[0x41] = {
-#include "assets/D_80058298.inc.c"
+u32 mapobj_loop_anim3_keys[0x41] = {
+#include "assets/mapobj_loop_anim3_keys.inc.c"
 };
-D2Anim D_8005839C[4] = {
-    { D_80058028, 3, 0x003C, 0, 0, 0, 0, 0, 0 },
-    { D_800580C4, 4, 0x003C, 0, 0, 0, 0, 0, 0 },
-    { D_80058194, 5, 0x0050, 0, 0, 0, 0, 0, 0 },
-    { D_80058298, 5, 0x0050, 0, 0, 0, 0, 0, 0 },
+D2Anim mapobj_loop_anims[4] = {
+    { mapobj_loop_anim0_keys, 3, 0x003C, 0, 0, 0, 0, 0, 0 },
+    { mapobj_loop_anim1_keys, 4, 0x003C, 0, 0, 0, 0, 0, 0 },
+    { mapobj_loop_anim2_keys, 5, 0x0050, 0, 0, 0, 0, 0, 0 },
+    { mapobj_loop_anim3_keys, 5, 0x0050, 0, 0, 0, 0, 0, 0 },
 };
-u16 D_8005841C[0x200] = {
-#include "assets/D_8005841C.inc.c"
+u16 mapobj_kind11_tlut[0x200] = {
+#include "assets/mapobj_kind11_tlut.inc.c"
 };
-u8 D_8005881C[0x600] = {
-#include "assets/D_8005881C.inc.c"
+u8 mapobj_kind11_tex_0[0x600] = {
+#include "assets/mapobj_kind11_tex_0.inc.c"
 };
-u8 D_80058E1C[0x600] = {
-#include "assets/D_80058E1C.inc.c"
+u8 mapobj_kind11_tex_1[0x600] = {
+#include "assets/mapobj_kind11_tex_1.inc.c"
 };
-u8 D_8005941C[0x600] = {
-#include "assets/D_8005941C.inc.c"
+u8 mapobj_kind11_tex_2[0x600] = {
+#include "assets/mapobj_kind11_tex_2.inc.c"
 };
-u8 D_80059A1C[0x600] = {
-#include "assets/D_80059A1C.inc.c"
+u8 mapobj_kind11_tex_3[0x600] = {
+#include "assets/mapobj_kind11_tex_3.inc.c"
 };
-u8 D_8005A01C[0x600] = {
-#include "assets/D_8005A01C.inc.c"
+u8 mapobj_kind11_tex_4[0x600] = {
+#include "assets/mapobj_kind11_tex_4.inc.c"
 };
-u8 D_8005A61C[0x600] = {
-#include "assets/D_8005A61C.inc.c"
+u8 mapobj_kind11_tex_5[0x600] = {
+#include "assets/mapobj_kind11_tex_5.inc.c"
 };
-u8 D_8005AC1C[0x600] = {
-#include "assets/D_8005AC1C.inc.c"
+u8 mapobj_kind11_tex_6[0x600] = {
+#include "assets/mapobj_kind11_tex_6.inc.c"
 };
-u8 D_8005B21C[0x200] = {
-#include "assets/D_8005B21C.inc.c"
+u8 mapobj_kind11_tex_7[0x200] = {
+#include "assets/mapobj_kind11_tex_7.inc.c"
 };
-u16 D_8005B41C[0x200] = {
-#include "assets/D_8005B41C.inc.c"
+u16 mapobj_kind12_tlut[0x200] = {
+#include "assets/mapobj_kind12_tlut.inc.c"
 };
-u8 D_8005B81C[0x600] = {
-#include "assets/D_8005B81C.inc.c"
+u8 mapobj_kind12_tex_0[0x600] = {
+#include "assets/mapobj_kind12_tex_0.inc.c"
 };
-u8 D_8005BE1C[0x600] = {
-#include "assets/D_8005BE1C.inc.c"
+u8 mapobj_kind12_tex_1[0x600] = {
+#include "assets/mapobj_kind12_tex_1.inc.c"
 };
-u8 D_8005C41C[0x600] = {
-#include "assets/D_8005C41C.inc.c"
+u8 mapobj_kind12_tex_2[0x600] = {
+#include "assets/mapobj_kind12_tex_2.inc.c"
 };
-u8 D_8005CA1C[0x600] = {
-#include "assets/D_8005CA1C.inc.c"
+u8 mapobj_kind12_tex_3[0x600] = {
+#include "assets/mapobj_kind12_tex_3.inc.c"
 };
-u8 D_8005D01C[0x600] = {
-#include "assets/D_8005D01C.inc.c"
+u8 mapobj_kind12_tex_4[0x600] = {
+#include "assets/mapobj_kind12_tex_4.inc.c"
 };
-u8 D_8005D61C[0x600] = {
-#include "assets/D_8005D61C.inc.c"
+u8 mapobj_kind12_tex_5[0x600] = {
+#include "assets/mapobj_kind12_tex_5.inc.c"
 };
-u8 D_8005DC1C[0x600] = {
-#include "assets/D_8005DC1C.inc.c"
+u8 mapobj_kind12_tex_6[0x600] = {
+#include "assets/mapobj_kind12_tex_6.inc.c"
 };
-u8 D_8005E21C[0x200] = {
-#include "assets/D_8005E21C.inc.c"
+u8 mapobj_kind12_tex_7[0x200] = {
+#include "assets/mapobj_kind12_tex_7.inc.c"
 };
-Vtx D_8005E420[4] = {
+Vtx mapobj_kind11_vtx[4] = {
     {{ { 8, 23, 0 }, 0, { 960, 0 }, { 0, 0, 0, 0 } }},
     {{ { -8, 23, 0 }, 0, { 0, 0 }, { 0, 0, 0, 0 } }},
     {{ { 8, 0, 0 }, 0, { 960, 1984 }, { 0, 0, 0, 0 } }},
     {{ { -8, 0, 0 }, 0, { 0, 1984 }, { 0, 0, 0, 0 } }},
 };
-Vtx D_8005E460[4] = {
+Vtx mapobj_kind12_vtx[4] = {
     {{ { 8, 32, 0 }, 0, { 960, 0 }, { 0, 0, 0, 0 } }},
     {{ { -8, 32, 0 }, 0, { 0, 0 }, { 0, 0, 0, 0 } }},
     {{ { 8, 0, 0 }, 0, { 960, 1984 }, { 0, 0, 0, 0 } }},
     {{ { -8, 0, 0 }, 0, { 0, 1984 }, { 0, 0, 0, 0 } }},
 };
-Gfx D_8005E4A0[13] = {
+Gfx mapobj_kind11_setup_dl[13] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xB6000000, 0x000F3205 }},
     {{ 0xB7000000, 0x00000005 }},
     {{ 0xBA000E02, 0x00008000 }},
     {{ 0xFCFF9BFF, 0xFFFCFE38 }},
     {{ 0xBB000001, 0x80008000 }},
-    {{ 0xFD100000, (u32)D_8005841C }},
+    {{ 0xFD100000, (u32)mapobj_kind11_tlut }},
     {{ 0xE8000000, 0x00000000 }},
     {{ 0xF5000100, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
@@ -1766,15 +1766,15 @@ Gfx D_8005E4A0[13] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-/* D_8005E51C (undefined_syms.txt) is D_8005E508 + 0x14. */
-Gfx D_8005E508[13] = {
+/* D_8005E51C (undefined_syms.txt) is mapobj_kind12_setup_dl + 0x14. */
+Gfx mapobj_kind12_setup_dl[13] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xB6000000, 0x000F3205 }},
     {{ 0xB7000000, 0x00000005 }},
     {{ 0xBA000E02, 0x00008000 }},
     {{ 0xFCFF9BFF, 0xFFFCFE38 }},
     {{ 0xBB000001, 0x80008000 }},
-    {{ 0xFD100000, (u32)D_8005B41C }},
+    {{ 0xFD100000, (u32)mapobj_kind12_tlut }},
     {{ 0xE8000000, 0x00000000 }},
     {{ 0xF5000100, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
@@ -1782,44 +1782,44 @@ Gfx D_8005E508[13] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_8005E570[3] = {
-    {{ 0x0400103F, (u32)D_8005E420 }},
+Gfx mapobj_kind11_quad_dl[3] = {
+    {{ 0x0400103F, (u32)mapobj_kind11_vtx }},
     {{ 0xB1000204, 0x00020604 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_8005E588[3] = {
-    {{ 0x0400103F, (u32)D_8005E460 }},
+Gfx mapobj_kind12_quad_dl[3] = {
+    {{ 0x0400103F, (u32)mapobj_kind12_vtx }},
     {{ 0xB1000204, 0x00020604 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-/* D_8005E5AC (undefined_syms.txt) is D_8005E5A0[1].b. */
-D2DlPair D_8005E5A0[2] = {
-    { D_8005E4A0, D_8005E570 }, { D_8005E508, D_8005E588 },
+/* D_8005E5AC (undefined_syms.txt) is mapobj_animtex_dls[1].b. */
+D2DlPair mapobj_animtex_dls[2] = {
+    { mapobj_kind11_setup_dl, mapobj_kind11_quad_dl }, { mapobj_kind12_setup_dl, mapobj_kind12_quad_dl },
 };
-u8 *D_8005E5B0[8] = {
-    D_8005881C, D_80058E1C, D_8005941C, D_80059A1C,
-    D_8005A01C, D_8005A61C, D_8005AC1C, D_8005B21C,
+u8 *mapobj_kind11_frames[8] = {
+    mapobj_kind11_tex_0, mapobj_kind11_tex_1, mapobj_kind11_tex_2, mapobj_kind11_tex_3,
+    mapobj_kind11_tex_4, mapobj_kind11_tex_5, mapobj_kind11_tex_6, mapobj_kind11_tex_7,
 };
-u8 *D_8005E5D0[8] = {
-    D_8005B81C, D_8005BE1C, D_8005C41C, D_8005CA1C,
-    D_8005D01C, D_8005D61C, D_8005DC1C, D_8005E21C,
+u8 *mapobj_kind12_frames[8] = {
+    mapobj_kind12_tex_0, mapobj_kind12_tex_1, mapobj_kind12_tex_2, mapobj_kind12_tex_3,
+    mapobj_kind12_tex_4, mapobj_kind12_tex_5, mapobj_kind12_tex_6, mapobj_kind12_tex_7,
 };
-u8 **D_8005E5F0[2] = {
-    D_8005E5B0, D_8005E5D0,
+u8 **mapobj_animtex_frame_tables[2] = {
+    mapobj_kind11_frames, mapobj_kind12_frames,
 };
-u16 D_8005E5F8[0x200] = {
-#include "assets/D_8005E5F8.inc.c"
+u16 mapobj_arc_sprite_tlut[0x200] = {
+#include "assets/mapobj_arc_sprite_tlut.inc.c"
 };
-u8 D_8005E9F8[0x2000] = {
-#include "assets/D_8005E9F8.inc.c"
+u8 mapobj_arc_sprite_tex[0x2000] = {
+#include "assets/mapobj_arc_sprite_tex.inc.c"
 };
-Vtx D_800609F8[4] = {
+Vtx mapobj_arc_sprite_vtx[4] = {
     {{ { 1, 1, 1 }, 0, { 1984, 0 }, { 0, 0, 0, 0 } }},
     {{ { -1, 1, 1 }, 0, { 0, 0 }, { 0, 0, 0, 0 } }},
     {{ { 1, -1, 1 }, 0, { 1984, 1984 }, { 0, 0, 0, 0 } }},
     {{ { -1, -1, 1 }, 0, { 0, 1984 }, { 0, 0, 0, 0 } }},
 };
-Gfx D_80060A38[16] = {
+Gfx mapobj_arc_sprite_dl[16] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00100000 }},
     {{ 0xB900031D, 0x0C184A50 }},
@@ -1827,26 +1827,26 @@ Gfx D_80060A38[16] = {
     {{ 0xB7000000, 0x00000005 }},
     {{ 0xFCFF9BFF, 0xFFFCFE38 }},
     {{ 0xBB000001, 0x80008000 }},
-    {{ 0xFD100000, (u32)D_8005E5F8 }},
+    {{ 0xFD100000, (u32)mapobj_arc_sprite_tlut }},
     {{ 0xE8000000, 0x00000000 }},
     {{ 0xF5000100, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
     {{ 0xF0000000, 0x073FC000 }},
     {{ 0xE7000000, 0x00000000 }},
-    {{ 0x0400103F, (u32)D_800609F8 }},
+    {{ 0x0400103F, (u32)mapobj_arc_sprite_vtx }},
     {{ 0xB1000204, 0x00020604 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-u8 D_80060AB8[0x100] = {
-#include "assets/D_80060AB8.inc.c"
+u8 mapobj_drop_sprite_tex[0x100] = {
+#include "assets/mapobj_drop_sprite_tex.inc.c"
 };
-Vtx D_80060BB8[4] = {
+Vtx mapobj_drop_sprite_vtx[4] = {
     {{ { 1, 2, 1 }, 0, { 448, 0 }, { 0, 0, 0, 0 } }},
     {{ { -1, 2, 1 }, 0, { 0, 0 }, { 0, 0, 0, 0 } }},
     {{ { 1, -2, 1 }, 0, { 448, 960 }, { 0, 0, 0, 0 } }},
     {{ { -1, -2, 1 }, 0, { 0, 960 }, { 0, 0, 0, 0 } }},
 };
-Gfx D_80060BF8[10] = {
+Gfx mapobj_drop_sprite_dl[10] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00100000 }},
     {{ 0xB900031D, 0x0C184A50 }},
@@ -1854,21 +1854,21 @@ Gfx D_80060BF8[10] = {
     {{ 0xB7000000, 0x00000005 }},
     {{ 0xFCFF9BFF, 0xFFFCFE38 }},
     {{ 0xBB000001, 0x80008000 }},
-    {{ 0x0400103F, (u32)D_80060BB8 }},
+    {{ 0x0400103F, (u32)mapobj_drop_sprite_vtx }},
     {{ 0xB1000204, 0x00020604 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-/* D_80060C4C (undefined_syms.txt) is D_80060C48[0].dl. */
-D2SegDl D_80060C48[8] = {
+/* D_80060C4C (undefined_syms.txt) is map_backdrop_defs[0].dl. */
+D2SegDl map_backdrop_defs[8] = {
     { 0x00D86970, 0x01001300 }, { 0x00D8B170, 0x01001300 }, { 0x00D8F970, 0x01002410 }, { 0x00D92D70, 0x01003630 },
     { 0x00D96570, 0x01003630 }, { 0x00D99D70, 0x01003630 }, { 0x00D9D570, 0x01003630 }, { 0x00DA0D70, 0x01003630 },
 };
-u8 D_80060C88[40] = {
+u8 mapobj_translucent_alpha[40] = {
     0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8,
     0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0xC8, 0x78, 0x78, 0x78, 0x78, 0x78, 0x96, 0x96, 0x96, 0x78, 0x78, 0, 0, 0, 0,
 };
-s8 D_80060CB0 = 2;
-u8 D_80060CB4[88][2] = {
+s8 menu_bgm_volume_option = 2;
+u8 menu_sprite_sizes[88][2] = {
     { 0x10, 0x10 }, { 0x10, 0x0D }, { 0x10, 0x10 }, { 0x10, 0x10 }, { 0x0C, 0x0C }, { 8, 8 }, { 0x10, 0x0B }, { 0x10, 0x0B },
     { 0x0C, 0x0A }, { 0x0C, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A },
     { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A },
@@ -1881,10 +1881,10 @@ u8 D_80060CB4[88][2] = {
     { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A },
     { 8, 0x0A }, { 8, 0x0A }, { 8, 0x0A }, { 0x0C, 0x10 }, { 0x0C, 0x10 }, { 8, 1 }, { 0x1A, 9 }, { 0x1A, 9 },
 };
-s8 D_80060D64[16] = {
+s8 menu_wobble_offsets[16] = {
     -1, -2, -2, -3, -3, -3, -3, -3, -3, -3, -3, -2, -2, -1, 0, 0,
 };
-u8 *D_80060D74[89] = {
+u8 *menu_sprite_tex[89] = {
     D_800620A0, D_800621A8, D_80062280, D_80062290, D_800622A0, D_80062338,
     D_80062380, D_80062438, D_800624F0, D_80062500, D_80062510, D_80062568,
     D_800625C0, D_80062618, D_80062670, D_800626C8, D_80062720, D_80062778,
@@ -1901,12 +1901,12 @@ u8 *D_80060D74[89] = {
     D_80066698, D_800666F0, D_80066748, D_800667A0, D_800667F8, D_80066850,
     D_80066918, D_800669E0, D_800669F0, D_80066AE8, NULL,
 };
-Gfx D_80060ED8[3] = {
+Gfx menu_sprite_opaque_dl[3] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xFCFFFFFF, 0xFFFCF279 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_80060EF0[7] = {
+Gfx menu_sprite_alpha_dl[7] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xFC129A25, 0xFF37FFFF }},
     {{ 0xB8000000, 0x00000000 }},
@@ -1915,9 +1915,9 @@ Gfx D_80060EF0[7] = {
     {{ 0xFCFFFFFF, 0xFFFCF279 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-f32 D_80060F28 = -1.0f;
-f32 D_80060F2C = -1.0f;
-Unk80060F30 D_80060F30[298] = {
+f32 menu_map_cursor_x = -1.0f;
+f32 menu_map_cursor_y = -1.0f;
+Unk80060F30 menu_map_location_list[298] = {
     { 2, 0 }, { -2, -1 }, { 0, 0 }, { 0, 1 }, { 13, 0 }, { 13, 1 }, { 13, 2 }, { 13, 3 }, { 13, 4 }, { 13, 5 },
     { 13, 6 }, { 13, 7 }, { 13, 8 }, { 13, 9 }, { 13, 10 }, { 13, 11 }, { 13, 12 }, { 13, 13 }, { 13, 14 }, { 13, 15 },
     { 13, 16 }, { 13, 17 }, { 15, 0 }, { 15, 1 }, { 15, 2 }, { 15, 3 }, { 15, 4 }, { 15, 5 }, { 15, 6 }, { 15, 7 },
@@ -1949,7 +1949,7 @@ Unk80060F30 D_80060F30[298] = {
     { 14, 13 }, { 34, 0 }, { 34, 1 }, { 34, 2 }, { 34, 3 }, { 34, 4 }, { 34, 5 }, { 34, 6 }, { 34, 7 }, { 34, 8 },
     { 34, 9 }, { 34, 10 }, { 15, 13 }, { 25, 6 }, { 25, 7 }, { 25, 24 }, { 25, 25 }, { -8, -1 },
 };
-s16 D_80061184[108] = {
+s16 menu_map_spot_coords[108] = {
     150, 10, 90, 115, 143, 128, 131, 70, 98, 167, -1, -1,
     -1, -1, -1, -1, -1, -1, 150, 162, 132, 152, 70, 80,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -1960,10 +1960,10 @@ s16 D_80061184[108] = {
     -1, -1, -1, -1, -1, -1, 177, 88, 88, 98, 70, 97,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 };
-void *D_8006125C[6] = {
+void *menu_map_tluts[6] = {
     (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000,
 };
-void *D_80061274[144] = {
+void *menu_map_strips[144] = {
     (void*)0x801C0200, (void*)0x801C09A0, (void*)0x801C1140, (void*)0x801C18E0, (void*)0x801C2080, (void*)0x801C2820,
     (void*)0x801C2FC0, (void*)0x801C3760, (void*)0x801C3F00, (void*)0x801C46A0, (void*)0x801C4E40, (void*)0x801C55E0,
     (void*)0x801C5D80, (void*)0x801C6520, (void*)0x801C6CC0, (void*)0x801C7460, (void*)0x801C7C00, (void*)0x801C83A0,
@@ -1989,51 +1989,51 @@ void *D_80061274[144] = {
     (void*)0x801C5D80, (void*)0x801C6520, (void*)0x801C6CC0, (void*)0x801C7460, (void*)0x801C7C00, (void*)0x801C83A0,
     (void*)0x801C8B40, (void*)0x801C92E0, (void*)0x801C9A80, (void*)0x801CA220, (void*)0x801CA9C0, (void*)0x801CB160,
 };
-s16 D_800614B4[12] = {
+s16 menu_map_world_scale[12] = {
     26, 20, 24, 24, 34, 13, 26, 21, 23, 24, 28, 13,
 };
-s16 D_800614CC[12] = {
+s16 menu_map_origin[12] = {
     139, 125, 124, 124, 88, 133, 88, 95, 87, 78, 60, 96,
 };
-D2DstRom D_800614E4[10] = {
+D2DstRom menu_map_picture_dma[10] = {
     { (void*)0x801C0000, 0x00F2FB70, 0x00F3ADD0 }, { (void*)0x801C0000, 0x00F3ADD0, 0x00F46030 },
     { (void*)0x801C0000, 0x00F46030, 0x00F51290 }, { (void*)0x801C0000, 0x00F51290, 0x00F5C4F0 },
     { (void*)0x801C0000, 0x00F5C4F0, 0x00F67750 }, { (void*)0x801C0000, 0x00F67750, 0x00F729B0 },
     { (void*)0x801C0000, 0x00F729B0, 0x00F73050 }, { (void*)0x801C0000, 0x00F73050, 0x00F73730 },
     { (void*)0x801C0000, 0x00F73730, 0x00F73F90 }, { (void*)0x801C0000, 0x00F73F90, 0x00F74890 },
 };
-void *D_8006155C[4] = {
+void *menu_map_small_tluts[4] = {
     (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000,
 };
-void *D_8006156C[8] = {
+void *menu_map_small_tex[8] = {
     (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200,
     (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200,
 };
-u8 D_8006158C[4][3] = {
+u8 menu_map_small_sizes[4][3] = {
     { 0x41, 0x12, 0 }, { 0x41, 0x13, 0 }, { 0x60, 0x11, 0 }, { 0x63, 0x12, 0 },
 };
-s16 D_80061598[8] = {
+s16 menu_map_small_pos[8] = {
     127, 112, 127, 112, 112, 112, 110, 112,
 };
 #ifndef NON_MATCHING /* Menu_UpdateOptionsPage's local ids[] initializer in the NON_MATCHING C */
-u8 D_800615A8[4] = {
+u8 menu_options_marker_sprites[4] = {
     0x28, 0x27, 0x26, 0,
 };
 #endif
-s16 D_800615AC[8][2] = {
+s16 menu_options_top_row_pos[8][2] = {
     { 138, 0 }, { 159, 0 }, { 179, 1 }, { 199, 2 }, { 219, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
 };
-s16 D_800615CC[5][2] = {
+s16 menu_options_bgm_row_pos[5][2] = {
     { 138, 0 }, { 159, 0 }, { 179, 1 }, { 199, 2 }, { 219, 2 },
 };
 #ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
-s32 D_800615E0 = -1;
+s32 menu_map_loaded_region = -1;
 #endif
-Unk4Pals D_800615E4 = { { D_80068EB0, D_8006A8F0, D_8006B4D8, D_80069A98 } };
-Unk4x2Ptrs D_800615F4 = { { { D_800690B8, D_800695A8 }, { D_8006AAF8, D_8006AFE8 }, { D_8006B6E0, D_8006BBD0 }, { D_80069CA0, D_8006A2C8 } } };
-Unk4Words D_80061614 = { { 32, 32, 32, 24 } };
-Unk4Words D_80061624 = { { 26, 26, 26, 20 } };
-Unk4Ptrs D_80061634 = { { D_80067090, D_80067898, D_800680A0, D_800688A8 } };
+Unk4Pals menu_exp_gauge_tluts = { { D_80068EB0, D_8006A8F0, D_8006B4D8, D_80069A98 } };
+Unk4x2Ptrs menu_exp_gauge_tex = { { { D_800690B8, D_800695A8 }, { D_8006AAF8, D_8006AFE8 }, { D_8006B6E0, D_8006BBD0 }, { D_80069CA0, D_8006A2C8 } } };
+Unk4Words menu_bg_strip_tex_heights = { { 32, 32, 32, 24 } };
+Unk4Words menu_bg_strip_heights = { { 26, 26, 26, 20 } };
+Unk4Ptrs menu_bg_strip_tex = { { D_80067090, D_80067898, D_800680A0, D_800688A8 } };
 
 void Text_DrawEncodedString(s32, s32, u8 *);
 
@@ -2093,8 +2093,8 @@ void Menu_FindMapPageLocation(void) {
     s32 idx;
     f32 y;
 
-    for (i = 0; D_80060F30[i].a != -8; i++) {
-        switch (D_80060F30[i].a) {
+    for (i = 0; menu_map_location_list[i].a != -8; i++) {
+        switch (menu_map_location_list[i].a) {
             case -2:
                 i++;
                 sub++;
@@ -2105,20 +2105,20 @@ void Menu_FindMapPageLocation(void) {
                 sub = -1;
                 break;
         }
-        if (D_80060F30[i].a == D_800842BC && D_80060F30[i].b == D_800842C0) {
+        if (menu_map_location_list[i].a == D_800842BC && menu_map_location_list[i].b == D_800842C0) {
             break;
         }
     }
-    D_8008FB50 = count;
-    D_8008FB54 = sub;
-    cnt = D_8008FB50;
-    if (cnt < 6 && D_8008FB54 < 0) { idx = cnt; if (D_80060F28 == -1.0f) { D_80060F28 = 115.0f;
-            D_80060F2C = 86.0f;
+    menu_map_region = count;
+    menu_map_spot = sub;
+    cnt = menu_map_region;
+    if (cnt < 6 && menu_map_spot < 0) { idx = cnt; if (menu_map_cursor_x == -1.0f) { menu_map_cursor_x = 115.0f;
+            menu_map_cursor_y = 86.0f;
         }
-        x = D_80060F28 - D_800614CC[idx];
-        y = D_80060F2C;
-        y = y - D_800614CC[idx + 6];
-        D_8008FB48 = D_800614B4[idx] * x;
-        D_8008FB4C = D_800614B4[idx + 6] * y;
+        x = menu_map_cursor_x - menu_map_origin[idx];
+        y = menu_map_cursor_y;
+        y = y - menu_map_origin[idx + 6];
+        menu_map_marker_x = menu_map_world_scale[idx] * x;
+        menu_map_marker_z = menu_map_world_scale[idx + 6] * y;
     }
 }

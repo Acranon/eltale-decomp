@@ -176,7 +176,7 @@ extern Unk8007C2A8 *D_8007C2A8[];
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 void Anim_DrawModel(s32, NPCObj *, AnimEntry *, s32);
 void Anim_AdvanceFrame(s32, NPCObj *, AnimEntry *);
-extern Gfx *D_8007A184;
+extern Gfx *gfx_dl_head;
 extern Unk8007AA08 D_8007AA08;
 
 typedef struct {
@@ -191,7 +191,7 @@ s32 Item_CountInInventory(u8);
 void Item_AddToInventory(u8);
 u8 Boss_IsDefeated(u32);
 void Npc_LoadMessage(NPC *, s32);
-extern s32 D_8004DCA0;
+extern s32 core_flags;
 /* Message text that Npc_StartTalk hands to the text box. */
 u8 D_8004DD10[8] = {
 #include "assets/D_8004DD10.inc.c"
@@ -199,9 +199,9 @@ u8 D_8004DD10[8] = {
 u8 D_8004DD18[8] = {
 #include "assets/D_8004DD18.inc.c"
 };
-extern s32 D_8007A174;
-extern s32 D_80090454;
-extern Unk80090458 D_80090458;
+extern s32 core_transition_timer;
+extern s32 text_last_choice_index;
+extern Unk80090458 text_pending_choice_rows;
 
 void func_80009764(s32);
 void Npc_SpawnForArea(NPCDef *, s32);
@@ -231,8 +231,8 @@ extern u8 D_A77F10[];
 extern u8 D_D2E2F0[];
 extern u8 D_802A0000[];
 extern u8 D_8020E6F0[];
-extern RomRange D_80056880[];
-extern u8 D_800568B8[];
+extern RomRange npc_area_set_rom_ranges[];
+extern u8 npc_area_entry_message[];
 extern u16 D_8007A172;
 void Math_RotateVec2(f32, f32 *);
 
@@ -265,7 +265,7 @@ void Npc_InitArea(void) {
         }
         D_8007AB74 = 0;
         if (D_8007A172 == 1) {
-            Npc_SetMessage(0, D_800568B8);
+            Npc_SetMessage(0, npc_area_entry_message);
             Text_OpenWindow(1);
         }
     }
@@ -361,7 +361,7 @@ void Npc_DrawAll(s32 arg0) {
         dist = dx * dx + dz * dz;
         if (dist < 90000.0f) {
             filter = (dist < 20000.0f) ? G_TF_BILERP : G_TF_POINT;
-            gDPSetTextureFilter(D_8007A184++, filter);
+            gDPSetTextureFilter(gfx_dl_head++, filter);
             anims = (AnimEntry *)npc->def->unk10;
             Anim_DrawModel(0, obj, &anims[obj->unk52], arg0);
             Anim_AdvanceFrame(obj->unk58, obj, &anims[obj->unk52]);
@@ -376,7 +376,7 @@ void func_80009764(s32 arg0) {
     u32 start;
     u32 end;
 
-    D_8007AB70 = &D_80056880[arg0];
+    D_8007AB70 = &npc_area_set_rom_ranges[arg0];
     Dma_ReadRom(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
     Dma_ReadRom(D_A70350, D_802A0000, D_A77F10 - D_A70350);
     start = D_8007AB70->start;
@@ -561,19 +561,19 @@ void Npc_StartTalk(s32 idx) {
             } else {
                 msg = npc->def->unkA;
                 if (npc->def->u6.unk6 == 7) {
-                    D_8004DCA0 |= 0x8080;
-                    D_8007A174 = 0x16;
+                    core_flags |= 0x8080;
+                    core_transition_timer = 0x16;
                 }
             }
             Npc_LoadMessage(npc, msg);
             break;
         case 6:
             Npc_LoadMessage(npc, npc->def->unk8);
-            D_80090458.unk0 = 2;
-            D_80090458.unk8 = D_8004DD10;
-            D_80090458.unkC = D_8004DD18;
-            D_80090454 = -1;
-            D_8004DCA0 |= 0x10;
+            text_pending_choice_rows.unk0 = 2;
+            text_pending_choice_rows.unk8 = D_8004DD10;
+            text_pending_choice_rows.unkC = D_8004DD18;
+            text_last_choice_index = -1;
+            core_flags |= 0x10;
             break;
         default:
             Npc_LoadMessage(npc, npc->def->unk8);

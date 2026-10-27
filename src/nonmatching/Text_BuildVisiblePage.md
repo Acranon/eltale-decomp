@@ -31,7 +31,7 @@ Verdict: **equivalent.**
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
 - **Text_BuildVisiblePage** (0x37C bytes)
-  - w6 s3: 337B0 text wrap. Logic is complete (drafts/Text_BuildVisiblePage.c, 223/223 instructions). Uses pre-increment indexing `D_80090470[idx].unk54C[++dst] = ...unk9C[++src]`, which matches the retail address shape. Retail uses 4 saved registers with frame 72 and rows at sp+40; mine uses 5 with frame 64. Permuter (10 min) found that sharing one s32 variable for c and the copy count helps (3480 to 2330) but did not converge.
+  - w6 s3: 337B0 text wrap. Logic is complete (drafts/Text_BuildVisiblePage.c, 223/223 instructions). Uses pre-increment indexing `text_window_slots[idx].unk54C[++dst] = ...unk9C[++src]`, which matches the retail address shape. Retail uses 4 saved registers with frame 72 and rows at sp+40; mine uses 5 with frame 64. Permuter (10 min) found that sharing one s32 variable for c and the copy count helps (3480 to 2330) but did not converge.
   - w6 s4: Register pressure and constant-hoisting differences. Retail rematerializes constants and addresses where mine hoists them into s-registers. Permuter: 32D20 7375 to 4015, 35A24 5015 to 1380, only with unnatural edits. 35A24: `if ((p->unk13 = i / 256) < 2)` removes the reload.
   - w6 s5: Unchanged at struct 16 and struct 20. Line-join and operand-order variants on 35350 change nothing.
   - w6 s6: 337B0. Struct 18-20, frame 64 where retail has 72. Retail keeps rows spilled at sp+40 and tests row<rows with slt each iteration, using only 4 s-registers (0xE0 in t5, cols in ra). Mine LFTRs to rows+1 and needs s4. Loop-form variants, variable merges with pads, and 15 minutes of permuter did not help.

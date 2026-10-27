@@ -16,9 +16,9 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 
 Verdict: **equivalent.**
 
-- Read the retail asm against the C: `++D_8007C060` (u16, compared after masking with the script's `time`), the flag tests 8/2/4/1 (each reloaded as in retail), the `SpawnDef` index into the table at `D_80056718` (16-byte entries), `D_800C18D8` (10-byte entries), `D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C` (0x44 stride), the float sums with `obj->unk24`, both `Math_RotateVec2` calls, the 9 arguments of `Magic_CreateVisualEffect`, and the script cursor advancing by 0x18 or clearing.
+- Read the retail asm against the C: `++D_8007C060` (u16, compared after masking with the script's `time`), the flag tests 8/2/4/1 (each reloaded as in retail), the `SpawnDef` index into the table at `enemy_effect_defs` (16-byte entries), `D_800C18D8` (10-byte entries), `D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C` (0x44 stride), the float sums with `obj->unk24`, both `Math_RotateVec2` calls, the 9 arguments of `Magic_CreateVisualEffect`, and the script cursor advancing by 0x18 or clearing.
 - Changed from the draft: it read `D_8007C060..D_8007C06C` through an `Unk8007C060` struct laid over `&D_8007C060`; the C now uses the module's own scalars (`D_8007C060`, `D_8007C064`, `D_8007C068`, `D_8007C06C`), the objects the asm's %hi/%lo name. Same addresses, but it no longer depends on the .bss layout. Dropped the dummy label. This cost words (draft: 30).
-- Open: the spawn table is read through `(SpawnDef *)&D_80056718`, an extern typed as a different struct (same address as the asm).
+- Open: the spawn table is read through `(SpawnDef *)&enemy_effect_defs`, an extern typed as a different struct (same address as the asm).
 
 ## Prior attempts and findings
 
@@ -26,7 +26,7 @@ This is the original worker history. Treat old D1/D2 labels and old best scores 
 
 - **Enemy_RunAttackScript** (0x268 bytes)
   - w2 s2: AEA0. Frame matched with pads (stash_cc78.c). The ++ on the timer at D_8007C060 still CSEs the address (lui+addiu) in mine, while the target uses a direct lui/%lo load and a lui at store. D_8007C060 is now `extern u16` with CC40 casting to the struct. Tried statement forms, +=, and volatile.
-  - w2 s3: AEA0. The ++D_8007C060 address CSE is still unresolved. Struct-cast load/store forms and mixed forms make no difference. The target also keeps e in t6 for the early part and copies it to s1 later (live-range split). Note: D_80056718 is now a struct in AEA0.c, so the old stash needs `&((SpawnDef *)&D_80056718)[e->unk2]`.
+  - w2 s3: AEA0. The ++D_8007C060 address CSE is still unresolved. Struct-cast load/store forms and mixed forms make no difference. The target also keeps e in t6 for the early part and copies it to s1 later (live-range split). Note: enemy_effect_defs is now a struct in AEA0.c, so the old stash needs `&((SpawnDef *)&enemy_effect_defs)[e->unk2]`.
   - w2 s4: AEA0. Same no-address-CSE signature as the static family on D_8007C060/D_8007C064. Function statics reproduce it (no CSE, lui at, e in v1 then copied to s1), but these symbols are also used by an init function in AEA0.c. Probably a D2 question too.
   - w2 s5: D2-blocked (function-scope static data). Re-checked 10768: even with the value read once into a temp (t = D_8004DEC8; ... D_8004DEC8 = t + 1), IDO CSEs &D_8004DEC8 for a load plus two stores, while the target uses lui at for every access. The loop itself is the DDBC rotate pattern, so use the DDBC trick (i = N; p = D + i) for it once D2 allows the static.
   - w2 s6: Still blocked on D2 (function-scope static or same-file data for the shared-lui pairs). Not retried.

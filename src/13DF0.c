@@ -15,13 +15,13 @@ typedef struct {
     /* 0x18 */ f32 scale;
 } Unk84B80; // size = 0x1C
 
-/* This file's .bss, 80084B80..80085290 (13DE0 also uses D_80085280). */
-Unk84B80 D_80084B80[0x40];
-s32 D_80085280;
-extern Gfx* D_8007A184;
-extern s32 D_8007A180;
-extern s16 D_8007A1A0;
-extern s16 D_8007A1A2;
+/* This file's .bss, 80084B80..80085290 (13DE0 also uses shadow_count). */
+Unk84B80 shadow_queue[0x40];
+s32 shadow_count;
+extern Gfx* gfx_dl_head;
+extern s32 gfx_mtx_index;
+extern s16 gfx_fog_near;
+extern s16 gfx_fog_far;
 extern Gfx D_1000270[];
 extern Vtx D_1000230[];
 typedef struct {
@@ -37,8 +37,8 @@ void Math_MtxFScaleAxes(f32 (*mf)[4], f32, f32, f32);
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
     Unk84B80* p;
 
-    if ((u32)D_80085280 < 0x40) {
-        p = &D_80084B80[D_80085280++];
+    if ((u32)shadow_count < 0x40) {
+        p = &shadow_queue[shadow_count++];
         p->x = x;
         p->y = y;
         p->z = z;
@@ -50,13 +50,13 @@ void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
 }
 
 void Shadow_DrawAll(Unk2000000* arg0) {
-    s32 n = D_80085280;
-    Unk84B80* p = D_80084B80;
+    s32 n = shadow_count;
+    Unk84B80* p = shadow_queue;
     f32 mf[4][4];
 
     if (n != 0) {
-        gSPDisplayList(D_8007A184++, D_1000270);
-        gSPFogPosition(D_8007A184++, D_8007A1A2, D_8007A1A0);
+        gSPDisplayList(gfx_dl_head++, D_1000270);
+        gSPFogPosition(gfx_dl_head++, gfx_fog_far, gfx_fog_near);
     }
     while (n != 0) {
         Math_MtxFAlignYToVector(mf, p->rx, p->ry, p->rz);
@@ -64,11 +64,11 @@ void Shadow_DrawAll(Unk2000000* arg0) {
         mf[3][1] = p->y;
         mf[3][2] = p->z;
         Math_MtxFScaleAxes(mf, p->scale, p->scale, p->scale);
-        guMtxF2L(mf, &arg0->unkC0[D_8007A180]);
-        gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-        D_8007A180++;
-        gSPVertex(D_8007A184++, D_1000230, 4, 0);
-        gSP2Triangles(D_8007A184++, 0, 1, 2, 0, 1, 3, 2, 0);
+        guMtxF2L(mf, &arg0->unkC0[gfx_mtx_index]);
+        gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        gfx_mtx_index++;
+        gSPVertex(gfx_dl_head++, D_1000230, 4, 0);
+        gSP2Triangles(gfx_dl_head++, 0, 1, 2, 0, 1, 3, 2, 0);
         n--;
         p++;
     }

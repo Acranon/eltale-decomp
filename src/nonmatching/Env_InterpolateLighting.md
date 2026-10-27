@@ -16,8 +16,8 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 
 Verdict: **equivalent.**
 
-- Read the retail asm against the C: the `count == 1` copy (ambient from +4, three lights from +0x10..+0x30 to `D_80084B24..`, fog from +0x34/+0x38 to `D_80084B78/7C`), the keyframe search `while (t >= k->time) k++`, `span`/`off`/`rem`, and the twelve `(prev * rem + next * off) / span` signed divisions with their targets `D_80084B18..D_80084B44`, `D_80084B78`, `D_80084B7C`.
-- Changed from the draft: the lights went through `D_80084B24` (splat's interior label, an alias of `D_80084B18[1]` in undefined_syms.txt) with a `(u32)x / 1` permuter leftover; the C uses `D_80084B18[1]`, the module's object at that address. This cost words (draft: 325).
+- Read the retail asm against the C: the `count == 1` copy (ambient from +4, three lights from +0x10..+0x30 to `D_80084B24..`, fog from +0x34/+0x38 to `env_fog_range/7C`), the keyframe search `while (t >= k->time) k++`, `span`/`off`/`rem`, and the twelve `(prev * rem + next * off) / span` signed divisions with their targets `env_light_colors..D_80084B44`, `env_fog_range`, `D_80084B7C`.
+- Changed from the draft: the lights went through `D_80084B24` (splat's interior label, an alias of `env_light_colors[1]` in undefined_syms.txt) with a `(u32)x / 1` permuter leftover; the C uses `env_light_colors[1]`, the module's object at that address. This cost words (draft: 325).
 - Open: nothing.
 
 ## Prior attempts and findings
@@ -26,7 +26,7 @@ This is the original worker history. Treat old D1/D2 labels and old best scores 
 
 - **Env_InterpolateLighting** (0x5F4 bytes)
   - w2 s2: 12610. Keyframe interpolation: struct Keyframe {time; Color3 amb; LightSet3 lights (0x24); FogSet fog}, with D_80084B24 as a separate symbol. The target copies 36 bytes straight-line with lui/at pointer splitting, and my struct copies come out as loops. Draft in scratch g7.c.
-  - w2 s3: Not retried this session beyond rerunning the stash drafts after the prototype fixes. C528 is at 311 words, D6A0 at 422 (register-heavy), 104C0 at 159. 11C60 has no draft file left; its asm rematerializes &D_80084988 after every call. 11EF4 is probably in the same lui-sharing (D2) family.
+  - w2 s3: Not retried this session beyond rerunning the stash drafts after the prototype fixes. C528 is at 311 words, D6A0 at 422 (register-heavy), 104C0 at 159. 11C60 has no draft file left; its asm rematerializes &env_light_time after every call. 11EF4 is probably in the same lui-sharing (D2) family.
   - w2 s4: Shared lui at across consecutive symbol accesses. In standalone tests, extern scalars, extern structs (base CSE) and locally defined scalars or statics never share a lui, so this still looks like D2 (data defined in the same file, layout-dependent). Not retried beyond those checks.
   - w2 s5: D2-blocked. Confirmed on 11A60 and FC50: stores share one lui at for 8-byte-aligned pairs (B18/B1C, B20/B24, DE60/DE64) using sym+offset relocations. This only happens for data defined in the same file (as1 knows the alignment). An extern of any type (int array, long long, double, struct) gives base CSE instead.
   - w2 s6: Still blocked on D2 (function-scope static or same-file data for the shared-lui pairs). Not retried.

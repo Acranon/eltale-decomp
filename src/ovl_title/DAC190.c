@@ -24,7 +24,7 @@ typedef struct {
     f32 unk8;
 } UnkFade_8020F4F8;
 
-extern Gfx* D_8007A184;
+extern Gfx* gfx_dl_head;
 extern u16 D_8020FE10_ovl_title[];
 extern u8 D_80210010_ovl_title[];
 extern u8 D_80210D20_ovl_title[];
@@ -135,13 +135,13 @@ s32 D_8020F488_ovl_title[18] = {
     0x00000081, 0x000000A0, 0x00000036, 0x00000000, 0x00000037, 0x0000000C,
     0x000000CB, 0x000000A0, 0x0000006D, 0x00000000, 0x00000042, 0x0000000C,
 };
-#define GFX_WORDS(a, b) { Gfx *_g = D_8007A184++; _g->words.w0 = (a); _g->words.w1 = (b); }
+#define GFX_WORDS(a, b) { Gfx *_g = gfx_dl_head++; _g->words.w0 = (a); _g->words.w1 = (b); }
 
 
-extern u8 D_8007A1CC;
-extern s8 D_80092C81;
-extern s8 D_80092C82;
-extern u16 D_80061850[];
+extern u8 title_menu_choice;
+extern s8 input_stick_x;
+extern s8 input_stick_y;
+extern u16 text_font_tlut[];
 extern u16 D_8020F510_ovl_title[];
 extern u8 D_8020F710_ovl_title[];
 extern u8 D_802105F8_ovl_title[];
@@ -193,8 +193,8 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
     if (D_8020F200_ovl_title == 0) {
         D_8020F4D0_ovl_title = 0;
         D_80226DB0_ovl_title = 0;
-        if (D_8007A1CC & 0xF0) {
-            D_8020F4D8_ovl_title = ((D_8007A1CC >> 4) & 0xF) - 1;
+        if (title_menu_choice & 0xF0) {
+            D_8020F4D8_ovl_title = ((title_menu_choice >> 4) & 0xF) - 1;
         } else {
             D_8020F4D8_ovl_title = 0;
         }
@@ -202,44 +202,44 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         D_8020F200_ovl_title = 1;
     }
 
-    gSPDisplayList(D_8007A184++, D_8020F260_ovl_title);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gSPDisplayList(gfx_dl_head++, D_8020F260_ovl_title);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     GFX_WORDS(0xB900031D, 0x504240);
-    gDPPipeSync(D_8007A184++);
-    gDPLoadTLUT_pal256(D_8007A184++, D_802150F0_ovl_title);
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTLUT_pal256(gfx_dl_head++, D_802150F0_ovl_title);
     for (i = 0; i < 37; i++) {
-        gDPLoadTextureTile(D_8007A184++, D_802152F0_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 320, 0, 0, i * 6, 319, i * 6 + 5, 0, 0, 0, 0, 0, 0, 0);
-        gSPTextureRectangle(D_8007A184++, 0 << 2, (i * 6) << 2, 320 << 2, (i * 6 + 6) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 1 << 10, 1 << 10);
+        gDPLoadTextureTile(gfx_dl_head++, D_802152F0_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 320, 0, 0, i * 6, 319, i * 6 + 5, 0, 0, 0, 0, 0, 0, 0);
+        gSPTextureRectangle(gfx_dl_head++, 0 << 2, (i * 6) << 2, 320 << 2, (i * 6 + 6) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 1 << 10, 1 << 10);
     }
-    gDPLoadTextureTile(D_8007A184++, D_802152F0_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 320, 0, 0, i * 6, 319, i * 6 + 1, 0, 0, 0, 0, 0, 0, 0);
-    gSPTextureRectangle(D_8007A184++, 0 << 2, (i * 6) << 2, 320 << 2, (i * 6 + 2) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 1 << 10, 1 << 10);
+    gDPLoadTextureTile(gfx_dl_head++, D_802152F0_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 320, 0, 0, i * 6, 319, i * 6 + 1, 0, 0, 0, 0, 0, 0, 0);
+    gSPTextureRectangle(gfx_dl_head++, 0 << 2, (i * 6) << 2, 320 << 2, (i * 6 + 2) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 1 << 10, 1 << 10);
 
-    gDPPipeSync(D_8007A184++);
-    gDPLoadTLUT_pal256(D_8007A184++, D_80211550_ovl_title);
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTLUT_pal256(gfx_dl_head++, D_80211550_ovl_title);
     for (i = 0; i < 7; i++) {
-        gDPLoadTextureTile(D_8007A184++, D_80211750_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 194, 0, 0, i * 10, 193, i * 10 + 9, 0, 0, 0, 0, 0, 0, 0);
-        gSPTextureRectangle(D_8007A184++, 63 << 2, (i * 10 + 69) << 2, 257 << 2, (i * 10 + 79) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
+        gDPLoadTextureTile(gfx_dl_head++, D_80211750_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 194, 0, 0, i * 10, 193, i * 10 + 9, 0, 0, 0, 0, 0, 0, 0);
+        gSPTextureRectangle(gfx_dl_head++, 63 << 2, (i * 10 + 69) << 2, 257 << 2, (i * 10 + 79) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
     }
-    gDPLoadTextureTile(D_8007A184++, D_80211750_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 194, 0, 0, i * 10, 193, i * 10 + 5, 0, 0, 0, 0, 0, 0, 0);
-    gSPTextureRectangle(D_8007A184++, 63 << 2, (i * 10 + 69) << 2, 257 << 2, (i * 10 + 75) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
+    gDPLoadTextureTile(gfx_dl_head++, D_80211750_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 194, 0, 0, i * 10, 193, i * 10 + 5, 0, 0, 0, 0, 0, 0, 0);
+    gSPTextureRectangle(gfx_dl_head++, 63 << 2, (i * 10 + 69) << 2, 257 << 2, (i * 10 + 75) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
 
-    gDPPipeSync(D_8007A184++);
-    gDPLoadTLUT_pal16(D_8007A184++, 0, D_80210B00_ovl_title);
-    gDPLoadTextureTile_4b(D_8007A184++, D_802105F8_ovl_title, G_IM_FMT_CI, 160, 0, 0, 0, 146, 9, 0, 0, 0, 0, 0, 0, 0);
-    gSPTextureRectangle(D_8007A184++, 85 << 2, 178 << 2, 232 << 2, 188 << 2, G_TX_RENDERTILE, 0, 0 << 5, 1 << 10, 1 << 10);
-    gDPLoadTextureTile_4b(D_8007A184++, D_802105F8_ovl_title, G_IM_FMT_CI, 160, 0, 0, 10, 146, 15, 0, 0, 0, 0, 0, 0, 0);
-    gSPTextureRectangle(D_8007A184++, 85 << 2, 188 << 2, 232 << 2, 194 << 2, G_TX_RENDERTILE, 0, 10 << 5, 1 << 10, 1 << 10);
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_80210B00_ovl_title);
+    gDPLoadTextureTile_4b(gfx_dl_head++, D_802105F8_ovl_title, G_IM_FMT_CI, 160, 0, 0, 0, 146, 9, 0, 0, 0, 0, 0, 0, 0);
+    gSPTextureRectangle(gfx_dl_head++, 85 << 2, 178 << 2, 232 << 2, 188 << 2, G_TX_RENDERTILE, 0, 0 << 5, 1 << 10, 1 << 10);
+    gDPLoadTextureTile_4b(gfx_dl_head++, D_802105F8_ovl_title, G_IM_FMT_CI, 160, 0, 0, 10, 146, 15, 0, 0, 0, 0, 0, 0, 0);
+    gSPTextureRectangle(gfx_dl_head++, 85 << 2, 188 << 2, 232 << 2, 194 << 2, G_TX_RENDERTILE, 0, 10 << 5, 1 << 10, 1 << 10);
 
     held = 0;
-    if (D_80092C81 > 20) {
+    if (input_stick_x > 20) {
         held = 8;
-    } else if (D_80092C81 < -20) {
+    } else if (input_stick_x < -20) {
         held = 4;
     }
-    if (D_80092C82 > 20) {
+    if (input_stick_y > 20) {
         held |= 1;
     }
-    if (D_80092C82 < -20) {
+    if (input_stick_y < -20) {
         held |= 2;
     }
     D_80226DB9 = 0;
@@ -263,7 +263,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         case 0:
         case 1:
             if (arg0 < 2) {
-                gSPDisplayList(D_8007A184++, D_8020F3B0_ovl_title);
+                gSPDisplayList(gfx_dl_head++, D_8020F3B0_ovl_title);
             }
             break;
         case 2:
@@ -286,8 +286,8 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                 if (D_80226DBA != 0) {
                     Sfx_Enqueue(0, 0xFF, 0x40);
                 }
-                D_8007A1CC &= 0xF;
-                D_8007A1CC |= (D_8020F4D8_ovl_title + 1) << 4;
+                title_menu_choice &= 0xF;
+                title_menu_choice |= (D_8020F4D8_ovl_title + 1) << 4;
             }
         case 6:
         case 7:
@@ -313,16 +313,16 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         case 13:
         case 14:
         case 15:
-            gSPDisplayList(D_8007A184++, D_8020F280_ovl_title);
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTLUT_pal16(D_8007A184++, 0, D_80210D00_ovl_title);
-            gSPDisplayList(D_8007A184++, D_8020F2A8_ovl_title);
-            gSPDisplayList(D_8007A184++, D_8020F300_ovl_title);
-            gSPDisplayList(D_8007A184++, D_8020F358_ovl_title);
+            gSPDisplayList(gfx_dl_head++, D_8020F280_ovl_title);
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_80210D00_ovl_title);
+            gSPDisplayList(gfx_dl_head++, D_8020F2A8_ovl_title);
+            gSPDisplayList(gfx_dl_head++, D_8020F300_ovl_title);
+            gSPDisplayList(gfx_dl_head++, D_8020F358_ovl_title);
             if (arg0 == 3 || arg0 == 5) {
-                gDPPipeSync(D_8007A184++);
+                gDPPipeSync(gfx_dl_head++);
                 GFX_WORDS(0xB900031D, 0x504240);
-                gSPDisplayList(D_8007A184++, D_8020F458_ovl_title);
+                gSPDisplayList(gfx_dl_head++, D_8020F458_ovl_title);
             }
             if (++D_8020F4D0_ovl_title >= 32) {
                 D_8020F4D0_ovl_title = 0;
@@ -332,10 +332,10 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
             } else {
                 blink = D_8020F4D0_ovl_title / 4;
             }
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTLUT_pal16(D_8007A184++, 0, D_802111A8_ovl_title);
-            gDPLoadTextureTile_4b(D_8007A184++, D_80211148_ovl_title, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
-            gSPTextureRectangle(D_8007A184++, D_8020F4DC_ovl_title[D_8020F4D8_ovl_title].x << 2, D_8020F4DC_ovl_title[D_8020F4D8_ovl_title].y << 2,
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_802111A8_ovl_title);
+            gDPLoadTextureTile_4b(gfx_dl_head++, D_80211148_ovl_title, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
+            gSPTextureRectangle(gfx_dl_head++, D_8020F4DC_ovl_title[D_8020F4D8_ovl_title].x << 2, D_8020F4DC_ovl_title[D_8020F4D8_ovl_title].y << 2,
                                 (D_8020F4DC_ovl_title[D_8020F4D8_ovl_title].x + 11) << 2, (D_8020F4DC_ovl_title[D_8020F4D8_ovl_title].y + 11) << 2,
                                 G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             if (arg0 == 6 || arg0 == 7 || arg0 == 8 || arg0 == 9 || arg0 == 10 || arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
@@ -350,58 +350,58 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                 } else if (arg0 == 10) {
                     D_80226DBC = D_8021150C_ovl_title;
                 }
-                gDPPipeSync(D_8007A184++);
-                gDPLoadTLUT_pal256(D_8007A184++, D_80061850);
-                gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
+                gDPPipeSync(gfx_dl_head++);
+                gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
+                gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, 255);
                 Text_DrawTexturedRect(0, 0x3E, 0x28, 0xC4, 0x67);
                 Text_DrawTexturedRect(3, 0x102, 0x2A, 2, 0x67);
                 Text_DrawTexturedRect(3, 0x40, 0x8F, 0xC4, 2);
-                gDPPipeSync(D_8007A184++);
+                gDPPipeSync(gfx_dl_head++);
                 Text_DrawTexturedRect(3, 0x3E, 0x28, 0xC4, 1);
                 Text_DrawTexturedRect(3, 0x3E, 0x8E, 0xC4, 1);
                 Text_DrawTexturedRect(3, 0x3E, 0x28, 1, 0x67);
                 Text_DrawTexturedRect(3, 0x101, 0x28, 1, 0x67);
-                gDPPipeSync(D_8007A184++);
-                gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+                gDPPipeSync(gfx_dl_head++);
+                gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
                 GFX_WORDS(0xB900031D, 0x504240);
-                gDPLoadTLUT_pal256(D_8007A184++, D_80226AF8_ovl_title);
-                gDPPipeSync(D_8007A184++);
-                gDPLoadTextureTile(D_8007A184++, D_80226D00_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
-                gSPTextureRectangle(D_8007A184++, 64 << 2, 42 << 2, 256 << 2, 43 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
-                gDPLoadTextureTile(D_8007A184++, D_80226D00_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
-                gSPTextureRectangle(D_8007A184++, 64 << 2, 42 << 2, 65 << 2, 140 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
-                gDPLoadTextureTile(D_8007A184++, D_80226D18_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
-                gSPTextureRectangle(D_8007A184++, 64 << 2, 141 << 2, 256 << 2, 142 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
-                gDPLoadTextureTile(D_8007A184++, D_80226D18_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
-                gSPTextureRectangle(D_8007A184++, 256 << 2, 42 << 2, 257 << 2, 142 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
-                gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
+                gDPLoadTLUT_pal256(gfx_dl_head++, D_80226AF8_ovl_title);
+                gDPPipeSync(gfx_dl_head++);
+                gDPLoadTextureTile(gfx_dl_head++, D_80226D00_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gSPTextureRectangle(gfx_dl_head++, 64 << 2, 42 << 2, 256 << 2, 43 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                gDPPipeSync(gfx_dl_head++);
+                gDPLoadTextureTile(gfx_dl_head++, D_80226D00_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gSPTextureRectangle(gfx_dl_head++, 64 << 2, 42 << 2, 65 << 2, 140 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                gDPPipeSync(gfx_dl_head++);
+                gDPLoadTextureTile(gfx_dl_head++, D_80226D18_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gSPTextureRectangle(gfx_dl_head++, 64 << 2, 141 << 2, 256 << 2, 142 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                gDPPipeSync(gfx_dl_head++);
+                gDPLoadTextureTile(gfx_dl_head++, D_80226D18_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gSPTextureRectangle(gfx_dl_head++, 256 << 2, 42 << 2, 257 << 2, 142 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                gDPPipeSync(gfx_dl_head++);
+                gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, 255);
                 Text_DrawEncodedString(0x44, 0x2E, D_80226DBC);
                 if (arg0 == 8 || arg0 == 7 || arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
                     Text_DrawEncodedString(0x94, 0x73, D_80211540_ovl_title);
                     Text_DrawEncodedString(0x94, 0x80, D_80211548_ovl_title);
                     if (arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
-                        gDPPipeSync(D_8007A184++);
+                        gDPPipeSync(gfx_dl_head++);
                         GFX_WORDS(0xB900031D, 0x504240);
-                        gSPDisplayList(D_8007A184++, D_8020F458_ovl_title);
-                        gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80226DB4_ovl_title);
+                        gSPDisplayList(gfx_dl_head++, D_8020F458_ovl_title);
+                        gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, D_80226DB4_ovl_title);
                     }
-                    gDPPipeSync(D_8007A184++);
-                    gSPDisplayList(D_8007A184++, D_8020F458_ovl_title);
-                    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+                    gDPPipeSync(gfx_dl_head++);
+                    gSPDisplayList(gfx_dl_head++, D_8020F458_ovl_title);
+                    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
                     GFX_WORDS(0xB900031D, 0x504240);
-                    gDPLoadTLUT_pal256(D_8007A184++, D_8020F510_ovl_title);
-                    gDPLoadTextureTile(D_8007A184++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 100, 0, 113, 9, 0, 0, 0, 0, 0, 0, 0);
-                    gSPTextureRectangle(D_8007A184++, (blink + 123) << 2, (D_80226DB0_ovl_title * 13 + 118) << 2, (blink + 137) << 2, (D_80226DB0_ovl_title * 13 + 128) << 2, G_TX_RENDERTILE, 100 << 5, 0, 1 << 10, 1 << 10);
-                    gDPLoadTextureTile(D_8007A184++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 51, 0, 57, 6, 0, 0, 0, 0, 0, 0, 0);
-                    gSPTextureRectangle(D_8007A184++, 114 << 2, (D_80226DB0_ovl_title * 13 + 120) << 2, 121 << 2, (D_80226DB0_ovl_title * 13 + 127) << 2, G_TX_RENDERTILE, 51 << 5, 0, 1 << 10, 1 << 10);
-                    gDPLoadTextureTile(D_8007A184++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 72, 0, 85, 13, 0, 0, 0, 0, 0, 0, 0);
-                    gSPTextureRectangle(D_8007A184++, (blink + 122) << 2, (D_80226DB0_ovl_title * 13 + 116) << 2, (blink + 136) << 2, (D_80226DB0_ovl_title * 13 + 130) << 2, G_TX_RENDERTILE, 72 << 5, 0, 1 << 10, 1 << 10);
-                    gDPLoadTextureTile(D_8007A184++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 22, 0, 28, 6, 0, 0, 0, 0, 0, 0, 0);
-                    gSPTextureRectangle(D_8007A184++, 114 << 2, (D_80226DB0_ovl_title * 13 + 118) << 2, 121 << 2, (D_80226DB0_ovl_title * 13 + 125) << 2, G_TX_RENDERTILE, 22 << 5, 0, 1 << 10, 1 << 10);
+                    gDPLoadTLUT_pal256(gfx_dl_head++, D_8020F510_ovl_title);
+                    gDPLoadTextureTile(gfx_dl_head++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 100, 0, 113, 9, 0, 0, 0, 0, 0, 0, 0);
+                    gSPTextureRectangle(gfx_dl_head++, (blink + 123) << 2, (D_80226DB0_ovl_title * 13 + 118) << 2, (blink + 137) << 2, (D_80226DB0_ovl_title * 13 + 128) << 2, G_TX_RENDERTILE, 100 << 5, 0, 1 << 10, 1 << 10);
+                    gDPLoadTextureTile(gfx_dl_head++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 51, 0, 57, 6, 0, 0, 0, 0, 0, 0, 0);
+                    gSPTextureRectangle(gfx_dl_head++, 114 << 2, (D_80226DB0_ovl_title * 13 + 120) << 2, 121 << 2, (D_80226DB0_ovl_title * 13 + 127) << 2, G_TX_RENDERTILE, 51 << 5, 0, 1 << 10, 1 << 10);
+                    gDPLoadTextureTile(gfx_dl_head++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 72, 0, 85, 13, 0, 0, 0, 0, 0, 0, 0);
+                    gSPTextureRectangle(gfx_dl_head++, (blink + 122) << 2, (D_80226DB0_ovl_title * 13 + 116) << 2, (blink + 136) << 2, (D_80226DB0_ovl_title * 13 + 130) << 2, G_TX_RENDERTILE, 72 << 5, 0, 1 << 10, 1 << 10);
+                    gDPLoadTextureTile(gfx_dl_head++, D_8020F710_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 128, 0, 22, 0, 28, 6, 0, 0, 0, 0, 0, 0, 0);
+                    gSPTextureRectangle(gfx_dl_head++, 114 << 2, (D_80226DB0_ovl_title * 13 + 118) << 2, 121 << 2, (D_80226DB0_ovl_title * 13 + 125) << 2, G_TX_RENDERTILE, 22 << 5, 0, 1 << 10, 1 << 10);
                 }
             }
             break;
@@ -490,11 +490,11 @@ void Title_StepAndDrawScreenFade(UnkStruct_8020EF00* arg0) {
     }
 
     alpha = arg0->unk8;
-    gDPPipeSync(D_8007A184++);
-    gDPSetPrimColor(D_8007A184++, 0, 0, rgbColorValue, rgbColorValue, rgbColorValue, alpha);
-    gDPSetRenderMode(D_8007A184++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-    gSPDisplayList(D_8007A184++, D_8020F470_ovl_title);
-    gDPFillRectangle(D_8007A184++, 0, 0, 336, 960);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetPrimColor(gfx_dl_head++, 0, 0, rgbColorValue, rgbColorValue, rgbColorValue, alpha);
+    gDPSetRenderMode(gfx_dl_head++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+    gSPDisplayList(gfx_dl_head++, D_8020F470_ovl_title);
+    gDPFillRectangle(gfx_dl_head++, 0, 0, 336, 960);
 
     D_80226DC0_ovl_title = rgbColorValue;
 }

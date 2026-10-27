@@ -47,7 +47,7 @@ typedef struct {
 } Struct_8001DA3C;
 
 extern Mtx D_2000000[];
-Gfx D_8004F060[8] = {
+Gfx effect_sprite_setup_dl[8] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00100000 }},
     {{ 0xB900031D, 0x0C184A50 }},
@@ -57,12 +57,12 @@ Gfx D_8004F060[8] = {
     {{ 0xBB000001, 0x80008000 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-extern s32 D_8007A180;
-extern Gfx* D_8007A184;
-extern Struct_80085E48 D_80085E48;
+extern s32 gfx_mtx_index;
+extern Gfx* gfx_dl_head;
+extern Struct_80085E48 camera_state;
 /* This file's .bss, 80087E30..8008BE40. */
-s32 D_80087E30;
-Struct_80087E38 D_80087E38[0x100];
+s32 effect_active_sprite_count;
+Struct_80087E38 effect_sprite_slots[0x100];
 
 void Effect_LoadSpriteTexture(u8, u8*, s32, s32, u8, u8);
 void Math_MtxFRotate(MtxF*, f32, f32, f32);
@@ -74,18 +74,18 @@ void Effect_ResetSpritePool(void) {
     s32 var_v1;
     Struct_80087E38* var_v0;
 
-    var_v0 = D_80087E38;
+    var_v0 = effect_sprite_slots;
     var_v1 = 0x100;
     while (var_v1 > 0) {
         var_v0->unk0 = 0;
         var_v0++;
         var_v1--;
     }
-    D_80087E30 = 0;
+    effect_active_sprite_count = 0;
 }
 
 Struct_80087E38* Effect_AllocateSprite(Struct_80087E38* arg0) {
-    Struct_80087E38* ret = D_80087E38;
+    Struct_80087E38* ret = effect_sprite_slots;
     u32 i = 0x100;
 
     while ((i > 0) && (ret->unk0 != 0)) {
@@ -95,7 +95,7 @@ Struct_80087E38* Effect_AllocateSprite(Struct_80087E38* arg0) {
 
     if (i != 0) {
         *ret = *arg0;
-        D_80087E30++;
+        effect_active_sprite_count++;
     } else {
         ret = NULL;
     }
@@ -109,9 +109,9 @@ void Effect_UpdateAndDrawSprites(Struct_8001DA3C* arg0) {
     MtxF spB4;
     MtxF sp74;
 
-    i = D_80087E30;
+    i = effect_active_sprite_count;
     tex = NULL;
-    dust = D_80087E38;
+    dust = effect_sprite_slots;
     while (i != 0) {
         if (dust->unk0 != 0) {
             dust->unk0--;
@@ -122,7 +122,7 @@ void Effect_UpdateAndDrawSprites(Struct_8001DA3C* arg0) {
             if (dust->unk4 != NULL) {
                 ((void (*)(Struct_80087E38*)) dust->unk4)(dust);
             } else {
-                gSPDisplayList(D_8007A184++, D_8004F060);
+                gSPDisplayList(gfx_dl_head++, effect_sprite_setup_dl);
             }
             if (dust->unk2 & 1) {
                 Math_MtxFAlignYToVector(&spB4, dust->unk30, dust->unk34, dust->unk38);
@@ -131,21 +131,21 @@ void Effect_UpdateAndDrawSprites(Struct_8001DA3C* arg0) {
                 spB4.mf[3][2] = dust->unk20;
                 Math_MtxFScaleAxes(&spB4, dust->unk28, dust->unk28, dust->unk28);
             } else {
-                Math_MtxFAimAt(&spB4, dust->unk18, dust->unk1C, dust->unk20, D_80085E48.unkC, D_80085E48.unk10, D_80085E48.unk14);
+                Math_MtxFAimAt(&spB4, dust->unk18, dust->unk1C, dust->unk20, camera_state.unkC, camera_state.unk10, camera_state.unk14);
                 if (dust->unk24 != 0.0f) {
                     Math_MtxFRotate(&sp74, 0.0f, 0.0f, dust->unk24);
                     guMtxCatF((f32 (*)[4]) &sp74, (f32 (*)[4]) &spB4, (f32 (*)[4]) &spB4);
                 }
                 Math_MtxFScaleAxes(&spB4, dust->unk28, dust->unk2C, 1.0f);
             }
-            if (D_8007A180 < 0x1E6) {
-                guMtxF2L((f32 (*)[4]) &spB4, &arg0->unkC0[D_8007A180]);
-                gSPMatrix(D_8007A184++, &D_2000000[D_8007A180 + 3].m[0][0], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-                D_8007A180++;
-                gSPDisplayList(D_8007A184++, dust->unk14);
+            if (gfx_mtx_index < 0x1E6) {
+                guMtxF2L((f32 (*)[4]) &spB4, &arg0->unkC0[gfx_mtx_index]);
+                gSPMatrix(gfx_dl_head++, &D_2000000[gfx_mtx_index + 3].m[0][0], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+                gfx_mtx_index++;
+                gSPDisplayList(gfx_dl_head++, dust->unk14);
             }
             if (dust->unk0 == 0) {
-                D_80087E30 -= 1;
+                effect_active_sprite_count -= 1;
             }
             i--;
         }
@@ -153,64 +153,64 @@ void Effect_UpdateAndDrawSprites(Struct_8001DA3C* arg0) {
     }
 }
 
-u8 D_8004F0A0[8] = { 2, 4, 8, 16, 32, 64, 128, 0 };
+u8 effect_texture_tile_sizes[8] = { 2, 4, 8, 16, 32, 64, 128, 0 };
 
 void Effect_LoadSpriteTexture(u8 fmt, u8* timg, s32 width, s32 height, u8 cms, u8 cmt) {
     u8 masks;
     u8 maskt;
 
     for (masks = 0; masks < 7U; masks++) {
-        if (D_8004F0A0[masks] >= width) {
+        if (effect_texture_tile_sizes[masks] >= width) {
             break;
         }
     }
     masks++;
     for (maskt = 0; maskt < 7U; maskt++) {
-        if (D_8004F0A0[maskt] >= height) {
+        if (effect_texture_tile_sizes[maskt] >= height) {
             break;
         }
     }
     maskt++;
     switch (fmt) {
         case 0:
-            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, 0, cms, cmt, masks,
+            gDPLoadTextureBlock(gfx_dl_head++, timg, G_IM_FMT_RGBA, G_IM_SIZ_16b, width, height, 0, cms, cmt, masks,
                                 maskt, G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             break;
         case 1:
-            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_RGBA, G_IM_SIZ_32b, width, height, 0, cms, cmt, masks,
+            gDPLoadTextureBlock(gfx_dl_head++, timg, G_IM_FMT_RGBA, G_IM_SIZ_32b, width, height, 0, cms, cmt, masks,
                                 maskt, G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             break;
         case 2:
-            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_I, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
+            gDPLoadTextureBlock(gfx_dl_head++, timg, G_IM_FMT_I, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
                                 maskt, G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             break;
         case 3:
-            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_IA, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
+            gDPLoadTextureBlock(gfx_dl_head++, timg, G_IM_FMT_IA, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
                                 maskt, G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             break;
         case 4:
-            gDPLoadTextureBlock_4b(D_8007A184++, timg, G_IM_FMT_I, width, height, 0, cms, cmt, masks, maskt,
+            gDPLoadTextureBlock_4b(gfx_dl_head++, timg, G_IM_FMT_I, width, height, 0, cms, cmt, masks, maskt,
                                    G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             break;
         case 5:
-            gDPLoadTextureBlock_4b(D_8007A184++, timg, G_IM_FMT_IA, width, height, 0, cms, cmt, masks, maskt,
+            gDPLoadTextureBlock_4b(gfx_dl_head++, timg, G_IM_FMT_IA, width, height, 0, cms, cmt, masks, maskt,
                                    G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             break;
         case 6:
-            gDPLoadTextureBlock_4b(D_8007A184++, timg, G_IM_FMT_CI, width, height, 0, cms, cmt, masks, maskt,
+            gDPLoadTextureBlock_4b(gfx_dl_head++, timg, G_IM_FMT_CI, width, height, 0, cms, cmt, masks, maskt,
                                    G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
             break;
         case 7:
-            gDPLoadTextureBlock(D_8007A184++, timg, G_IM_FMT_CI, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
+            gDPLoadTextureBlock(gfx_dl_head++, timg, G_IM_FMT_CI, G_IM_SIZ_8b, width, height, 0, cms, cmt, masks,
                                 maskt, G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
             break;
     }
 }

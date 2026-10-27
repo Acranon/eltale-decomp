@@ -69,15 +69,15 @@ void Text_OpenWindow(u8 arg0);
 /* This file's .bss, 8007A8C0..8007A8F0, in address order. D_8007A8C0 and
  * D_8007A8EC are unreferenced gaps (D_8007A8C0 could as well be 1870.c's tail). */
 u8 D_8007A8C0[0x20];
-s32 D_8007A8E0;
-s32 D_8007A8E4;
+s32 cutscene_message_wait_frames;
+s32 cutscene_messages_remaining;
 Unk8007A8E8 *D_8007A8E8;
 s32 D_8007A8EC;
 
-extern s32 D_8004DCA0;
-extern s32 D_8007A174;
-extern u16 D_8007A178;
-extern s16 D_8007A17A;
+extern s32 core_flags;
+extern s32 core_transition_timer;
+extern u16 fade_transition_style;
+extern s16 core_fade_out_time;
 extern f32 D_8007A98C;
 extern f32 D_8007A990;
 extern f32 D_8007A994;
@@ -93,15 +93,15 @@ extern s32 D_800842BC;
 extern s32 D_800842C4;
 extern s32 D_800842C8;
 extern s32 D_80084308;
-extern Unk80085E48 D_80085E48;
+extern Unk80085E48 camera_state;
 extern f32 D_80085E54;
 extern f32 D_80085E58;
 extern f32 D_80085E5C;
 extern f32 D_80085E60;
 extern f32 D_80085E64;
 extern f32 D_80085E68;
-extern f32 D_80085F50;
-extern s32 D_80090450;
+extern f32 camera_fovy;
+extern s32 text_active_window_count;
 extern Unk801C14E4 D_801C14E4[];
 
 void Cutscene_StartEntry(s32 arg0) {
@@ -109,13 +109,13 @@ void Cutscene_StartEntry(s32 arg0) {
     f32 mtx[4][4];
 
     D_8007A8E8 = entry->unk34;
-    D_8007A8E4 = entry->unk38;
-    D_8007A8E0 = 0x3C;
+    cutscene_messages_remaining = entry->unk38;
+    cutscene_message_wait_frames = 0x3C;
     D_800842BC = -1;
     D_800842C4 = entry->unk0;
     D_800842C8 = entry->unk4;
     Text_ResetAllWindows(0, arg0);
-    D_80090450 = 0;
+    text_active_window_count = 0;
     D_80084308 = -1;
     Map_LoadArea();
     D_8007A98C = entry->unk20;
@@ -126,46 +126,46 @@ void Cutscene_StartEntry(s32 arg0) {
     D_8007A9D0.unk4 = D_8007A9D0.unk6;
     Player_Spawn();
     if (!(entry->unk3C & 1)) {
-        D_8004DCA0 |= 0x10000;
+        core_flags |= 0x10000;
     }
     D_8007ABA4 = 0;
     func_80009764(D_8007C288->unk12);
     Npc_SpawnForArea(entry->unk2C, entry->unk30);
     D_8007B900 = 0;
     Camera_InitForMap();
-    D_80085E48.unk0 = 3;
+    camera_state.unk0 = 3;
     D_80085E54 = entry->unk8;
     D_80085E58 = entry->unkC;
     D_80085E5C = entry->unk10;
     Math_MtxFRotate(mtx, -entry->unk14 * 0.017453292519943295, -entry->unk18 * 0.017453292519943295, 0.0f);
     Math_MtxFMulVecNegZ(mtx, 0.0f, 0.0f, -100.0f, &D_80085E60, &D_80085E64, &D_80085E68);
-    D_80085E48.unk18 = D_80085E48.unk18 + D_80085E48.unkC;
-    D_80085E48.unk1C = D_80085E48.unk1C + D_80085E48.unk10;
-    D_80085E48.unk20 = D_80085E48.unk14 - D_80085E48.unk20;
-    D_80085F50 = entry->unk1C;
+    camera_state.unk18 = camera_state.unk18 + camera_state.unkC;
+    camera_state.unk1C = camera_state.unk1C + camera_state.unk10;
+    camera_state.unk20 = camera_state.unk14 - camera_state.unk20;
+    camera_fovy = entry->unk1C;
     Bgm_Play(((s8 *)&entry->unk3E)[1]);
 }
 
 s32 Cutscene_UpdateMessageSequence(void) {
     s32 ret = 0;
 
-    if (D_8007A8E0 == 0) {
-        if (D_8007A8E4 != 0) {
+    if (cutscene_message_wait_frames == 0) {
+        if (cutscene_messages_remaining != 0) {
             Cutscene_CopyMessageBuffers(D_8007A8E8->unk0, D_8007A8E8->unk4);
             Text_OpenWindow(D_8007A8E8->unk8);
-            D_8007A8E0 = 0xF;
+            cutscene_message_wait_frames = 0xF;
             D_8007A8E8++;
-            D_8007A8E4--;
+            cutscene_messages_remaining--;
         } else {
-            D_8004DCA0 |= 0x80;
-            D_8007A174 = 0x31;
-            D_8007A178 = 2;
-            D_8007A17A = 0x2F;
-            D_8007A8E0 = 0x32;
+            core_flags |= 0x80;
+            core_transition_timer = 0x31;
+            fade_transition_style = 2;
+            core_fade_out_time = 0x2F;
+            cutscene_message_wait_frames = 0x32;
             ret = 1;
         }
-    } else if (D_80090450 == 0) {
-        D_8007A8E0--;
+    } else if (text_active_window_count == 0) {
+        cutscene_message_wait_frames--;
     }
     return ret;
 }

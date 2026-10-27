@@ -1,0 +1,105 @@
+# b01_core data (round 3): D_ objects defined in 1050, 1130, 113F0, 12610, 13DF0, 140D0, 147A0, 14CF0, 15150 (13DE0 and 14760 define none)
+# old	new	evidence
+# --- 1050: boot
+D_80070D20	boot_stack	the entry code (asm/1000.s) clears bss from its address and sets sp to its end (80072D20) before jumping to Boot_Main
+D_80072D20	boot_idle_thread	the OSThread Boot_Main creates (id 1) for Boot_IdleThread and starts
+D_80073080	boot_idle_thread_stack	0x1000-byte stack whose end Boot_Main passes as the sp of the Boot_IdleThread thread
+D_80072ED0	boot_main_thread	the OSThread Boot_IdleThread creates (id 6, priority 5) for Core_MainThread and starts
+D_80074080	boot_main_thread_stack	0x3000-byte stack whose end Boot_IdleThread passes as the sp of the Core_MainThread thread
+D_80077080	boot_pi_mesg_queue	the message queue Boot_IdleThread passes to osCreatePiManager
+D_80077098	boot_pi_mesgs	the 0x32-entry OSMesg buffer Boot_IdleThread passes to osCreatePiManager with boot_pi_mesg_queue
+# --- 1130: nnSc scheduler (prefix from the nnSc* function names)
+D_80077160	nnsc_stack	0x1000-byte stack whose end nnScStartScheduler passes as the sp of the nnScEventHandler thread (id 0x13)
+D_80078160	nnsc_audio_stack	0x1000-byte stack whose end nnScStartScheduler passes as the sp of the nnScExecuteAudio thread (id 0x12)
+D_80079160	nnsc_graphics_stack	0x1000-byte stack whose end nnScStartScheduler passes as the sp of the nnScExecuteGraphics thread (id 0x11)
+D_8007A160	nnsc_retrace_count	nnScEventHandler increments it on every VIDEO_MSG (retrace); the 1870 gameplay and cutscene loops wait until it reaches 2 before sending a frame, then reset it to 0
+# --- 113F0: collision
+D_800842F0	coll_push_radius	Coll_ResolveFloorAndWalls saves the caller's out->x here on entry, before overwriting out; Coll_PushFromWalls passes it as the radius r of Coll_PushFromSegment (callers preset out->x, e.g. Camera_FollowTarget sets 4.0)
+# --- 12610: exits
+D_80084300	exit_destination	Exit_SetDestination fills it from the entered exit (3 destination words, flags +0xC, object index +0x10, +0x14); Core_RunGameplayLoop copies +0/+4 to the next map and sub-area ids, Player_StartAreaExit reads the flags; Item_UseWarp and Player_StateHurt also write it
+D_80084318	exit_destination_src	Exit_SetDestination points it at the exit record's 3 destination halfwords (+0x1E) and copies them into exit_destination
+D_80084320	exit_local_offset	Exit_CheckEnter stores the position minus the exit's centre, rotates it by the exit angle and compares |x|, |z| with the exit's half sizes
+# --- 12610: world clock, day phases, palette fade
+D_80084980	env_clock	time of day: Env_InitClock sets 0x1EC3, Env_Update increments it and wraps it at env_day_length, Env_SetClock sets it, Env_InitForMap picks the day phase from it, Map_BlendPaletteByClock compares it with its keys
+D_80084984	env_day_length	period of env_clock: Env_InitClock sets 0x6978; Env_Update and Env_SetClock subtract it and increment env_day_count when env_clock reaches it
+D_80084990	env_day_count	Env_InitClock sets 1; incremented (capped) each time env_clock wraps in Env_Update and Env_SetClock; saved and restored by SaveMenu_CaptureGameState/RestoreGameState and drawn as a 3-digit number in the save list
+D_80084992	env_play_time	Env_Update increments it (cap 59939) once every 1501 updates; Core_ResetGameState clears it; saved in the save entry and drawn by the save menu split by 60 into two fields (3 and 2 digits)
+D_80084338	env_play_time_ticks	Env_Update counts it up to 1501, then resets it and increments env_play_time; Env_InitForMap clears it
+D_80084988	env_light_time	time fed to Env_InterpolateLighting and the light-direction rotation: equals env_clock when the area flag D_8007C280 & 2 is set, else its own counter wrapping at env_light_period (Env_InitForMap, Env_Update)
+D_8008498C	env_light_period	wrap point of env_light_time: env_day_length in clock areas, else the time of the area track's last keyframe (Env_InitForMap); Env_ComputeLightDirs divides env_light_time by it into an angle
+D_80084994	env_area_settings	pointer Map_LoadArea sets to the area's entry: its keyframe track (frames, count) drives Env_InterpolateLighting, +8 and +0xC..+0x14 give a fixed light direction (Env_ComputeLightDirs), +0x18 the area flags and +0x1C the backdrop index (Map_LoadArea, Map_DrawBackdrop)
+D_8004DED0	env_day_phases	day-phase table {start time, palette index, fade length}, 3 entries followed by env_day_phase_last: Env_Update starts Env_StartPaletteFade to the phase's palette (D_800808B0[index]) when env_light_time reaches its start
+D_8004DEF4	env_day_phase_last	4th and last entry of env_day_phases (splat names it separately): Env_InitForMap walks back from it to find the current phase and copies its start time to env_last_phase_start
+D_80084330	env_next_phase	index into env_day_phases of the next phase: Env_InitForMap sets it to the phase after the current one, Env_Update advances it (mod 4) each time it starts that phase's palette fade
+D_80084334	env_last_phase_start	Env_InitForMap copies the last phase's start time here; Env_Update starts phase 0 again only while env_light_time is below it (after the wrap)
+D_8008433C	env_palette_fade_timer	Env_StartPaletteFade sets it to the fade length; Env_Update counts it down to 0 and calls Env_StepPaletteFade with it each frame
+D_80084340	env_palette_fade_length	fade length stored by Env_StartPaletteFade; Env_StepPaletteFade divides by it to blend env_palette_fade_start toward env_palette_fade_target
+D_80084344	env_palette_fade_target	Env_StartPaletteFade's source palette (arg1); Env_StepPaletteFade's result equals it when the timer is 0
+D_80084348	env_palette_fade_dest	Env_StartPaletteFade's destination palette (arg2, D_800806B0 from Env_Update); Env_StepPaletteFade writes the blended 256 colours to it
+D_80084350	env_palette_fade_start	256 RGBA5551 colours: Env_StartPaletteFade copies the destination palette here; Env_StepPaletteFade blends from it
+# --- 12610: lighting and fog
+D_80084550	env_light_rot_mtx	Env_ComputeLightDirs builds a rotation by an angle from env_light_time into it and transforms (0, 90, 50) by it to get light direction 0
+D_80084B18	env_light_colors	4 RGB triples, [0] ambient and [1..3] the light colours: Env_InterpolateLighting writes them from the keyframe track, Env_PrepareFrameLighting and Env_ApplyLightSlot build Lights3 from them
+D_80084B48	env_light_dirs	light directions (3 ints each): Env_ComputeLightDirs writes [0] (rotating, the area's fixed one, or -89,89,20) and [1] (view-transformed); passed to Env_FillLights3
+D_80084B78	env_fog_range	FogSet {near, far}: Env_InterpolateLighting writes it; Env_PrepareFrameLighting copies it to gfx_fog_near and gfx_fog_far and emits gSPFogPosition
+D_80084590	env_lights_frame0	the Lights3 Env_PrepareFrameLighting fills when gfx_frame_index is 0
+D_800845C8	env_lights_frame1	the Lights3 Env_PrepareFrameLighting fills when gfx_frame_index is 1
+D_80084998	env_light_slots	8 light slots (0x30 each): Env_ClearLightSlots, Env_AllocateLightSlot and Env_FreeLightSlot manage +0 (in use), Env_SetSlotEnvAnim/LightAnim/LightDirs set their animations, Env_ApplyLightSlot runs them
+D_80084600	env_slot_lights_frame0	per-slot Lights3 that Env_ApplyLightSlot fills and loads when gfx_frame_index is 0
+D_800847C0	env_slot_lights_frame1	per-slot Lights3 that Env_ApplyLightSlot fills and loads when gfx_frame_index is 1
+# --- 13DF0: shadows
+D_80084B80	shadow_queue	0x40 entries: Shadow_Queue appends one per call, Shadow_DrawAll draws the first shadow_count of them
+D_80085280	shadow_count	entries in shadow_queue: Shadow_ClearQueue zeroes it, Shadow_Queue increments it (up to 0x40), Shadow_DrawAll reads it
+# --- 140D0/14760: chests
+D_80085290	chest_objects	16 chest instances (0x6C each): Chest_LoadForMap fills them from the map's placements, Chest_UpdateAll animates and draws them, Chest_FindInFront searches them
+D_80085950	chest_count	number of chest_objects in use: set by Chest_LoadForMap (0 when the map has none), loop count of Chest_UpdateAll and Chest_FindInFront
+D_80085958	chest_local_offset	Chest_FindInFront stores the player-to-chest offset here, rotates it by the chest angle and compares |x|, |z| with the chest's half sizes
+D_80085968	chest_floor_result	the Coll_ResolveFloorAndWalls result Chest_LoadForMap uses to set each chest's y and floor normal
+D_80085988	chest_opened_flags	0x20-byte bitset: Chest_ClearOpenedFlags zeroes it, Chest_SetOpened sets and Chest_IsOpened tests bit n; saved and restored by SaveMenu_CaptureGameState/RestoreGameState
+D_8004DF1C	chest_map_placements	19 {map id, placement groups} entries: Chest_LoadForMap finds the current map (D_800842BC) and takes group [sub-area D_800842C0]
+D_8004DF00	item_message_prefix	text bytes (0xFF-terminated) Item_BuildMessage copies before the item name
+D_8004DF08	item_message_suffix	text bytes (0xFF-terminated) Item_BuildMessage copies after the item name
+# --- 147A0/14CF0: spirits (prefix from Spirit_*; "spirit" and "sparkle" are round 1's readings)
+D_800859B8	spirit_objects	8 spirit instances: Spirit_LoadForMap fills them from the map's placements, Spirit_FindInFront and Spirit_SpawnSparkles walk them
+D_800859B0	spirit_count	number of spirit_objects in use: set by Spirit_LoadForMap (0 when none), loop count of Spirit_FindInFront and Spirit_SpawnSparkles
+D_80085A78	spirit_floor_result	the Coll_ResolveFloorAndWalls result Spirit_LoadForMap uses to set each spirit's y
+D_80085A98	spirit_collected_flags	0x10-byte bitset: Spirit_ClearCollectedFlags zeroes it, Spirit_SetCollected sets and Spirit_IsCollected tests bit n; saved and restored by the save menu
+D_8004DFC0	spirit_map_placements	0x2B {map id, sub-area, count, defs} entries: Spirit_LoadForMap takes the one matching D_800842BC and D_800842C0
+D_8004E658	spirit_sparkle_template	function-scope static of Spirit_SpawnSparkles: the sprite record (Spirit_MoveSparkle callback, texture, display list) it fills with a position and texture frame and passes to Effect_AllocateSprite
+D_8004E258	spirit_sparkle_tex	4 textures of 0x100 bytes (asset): Spirit_SpawnSparkles puts frame [counter / 2] into the sprite's texture field (+0x10), which Effect_UpdateAndDrawSprites loads
+D_8004E208	spirit_sparkle_dl	the display list of spirit_sparkle_template (+0x14): sets render state, loads the quad spirit_sparkle_vtx and draws it
+D_8004E1C8	spirit_sparkle_vtx	the 4-vertex quad spirit_sparkle_dl loads
+D_8004E698	spirit_sparkle_colors	2 RGBA colours: Spirit_MoveSparkle sets the env colour from entry [sprite id & 1]
+# --- 14CF0: text spots
+D_8004E6A0	textspot_table	0x26 entries {map id, sub-area, x, z, angle, radius, flags, 2 ROM message offsets}: TextSpot_LoadForMap collects the current map's entries, TextSpot_FindInFront tests them, TextSpot_LoadMessage DMAs their messages
+D_80085AC0	textspot_list	16 records {entry, angle, flag} that TextSpot_LoadForMap fills for the current map; TextSpot_FindInFront returns one of them
+D_80085ABC	textspot_count	number of textspot_list records: zeroed and counted by TextSpot_LoadForMap, loop count of TextSpot_FindInFront
+D_80085AB0	textspot_local_dir	TextSpot_FindInFront rotates the player/spot offset here and takes Math_Atan2 of it for its two facing tests
+# --- 15150: camera
+D_80085E48	camera_state	the camera (mode, flags, eye, look-at, target, ...): Camera_InitForMap sets it up, Camera_Update runs camera_mode_handlers[mode] on it and builds the view from its eye and look-at; map, effect and billboard code read its eye
+D_80085B80	camera_saved_state	copy of camera_state that Camera_StartBattleFocus saves before switching to the focus view; Camera_UpdateBattle restores it when the focus timer ends, Camera_SetPreset takes its target
+D_80085C40	camera_focus_target	target record Camera_StartBattleFocus fills from the focused actor (position, scale, model) and sets as camera_state's target
+D_8004EC18	camera_mode_handlers	6 handlers Camera_Update calls by camera_state.mode: FollowTarget, UpdateFixedEye, FollowTarget, UpdateHeading, UpdateBattle, UpdateDelayedTurn
+D_80085F64	camera_presets	pointer to the current sub-area's preset array (D_8007C284->unk24[sub-area]) or camera_default_presets; read by Camera_InitForMap and Camera_SetPreset
+D_80085C08	camera_preset_count	[0] is the number of presets in camera_presets (1 for the defaults); Camera_Update cycles camera_preset_index below it on input bit 0x20
+D_80085F60	camera_preset_index	current preset: set by Camera_SetPreset, from the player state in Camera_InitForMap, advanced (mod camera_preset_count) by Camera_Update; the battle code passes it back to Camera_SetPreset
+D_8004EB70	camera_default_presets	3 presets Camera_InitForMap uses when the area has no preset set
+D_80085F68	camera_delayed_turn	{state, timer, saved mode, saved flags, ...}: Camera_SetPresetDelayedTurn fills it and switches to mode 5; Camera_UpdateDelayedTurn counts it down and restores the mode and flags
+D_80085F84	camera_battle_angle_offset	added to the battle heading in Camera_UpdateBattle and stepped there by 45 degrees on input bit 0x20; cleared by Camera_InitForMap and Battle_UpdateStartCamera
+D_80085C20	camera_eye_coll	Coll_ResolveFloorAndWalls result for the eye in Camera_FollowTarget (x preset to 4.0, the push radius); the eye's x, z and y are taken from it
+D_80085C10	camera_temp_vec	scratch 2D vector the camera functions rotate with Math_RotateVec2 for eye offsets; Camera_Update also takes the eye-height oscillation from its y
+D_80085CAC	camera_shake_timer	Camera_Shake sets 15; Camera_Update applies the shake translation while it is non-zero and counts it down
+D_80085CB0	camera_shake_x	Camera_Shake sets it from camera_shake_offsets; Camera_Update translates the projection by it and multiplies it by -0.8 each frame
+D_80085CB4	camera_shake_y	as camera_shake_x, for the y translation
+D_8004EC68	camera_shake_offsets	4 {x, y} pairs; Camera_Shake(n) loads pair n into camera_shake_x and camera_shake_y
+D_80085CB8	camera_height_osc_enabled	[0] is set by Camera_InitForMap when the map and sub-area are in camera_height_osc_areas; Camera_Update runs Camera_UpdateHeightOscillation only when it is set (the other 99 words are unused)
+D_8004EC30	camera_height_osc_areas	7 {map id, sub-area} pairs Camera_InitForMap compares with D_800842BC and D_800842C0 to set camera_height_osc_enabled
+D_8004EC88	camera_height_osc_phase_a	phase Camera_UpdateHeightOscillation advances by 0.026 per call (wrapped at 2 pi) and adds to phase b for its sine
+D_8004EC8C	camera_height_osc_phase_b	phase Camera_UpdateHeightOscillation advances by 0.0157 per call (wrapped at 2 pi) and adds to phase a for its sine
+D_80085ED0	camera_proj_mtx	float matrix Camera_Update builds with guPerspectiveF and converts into the frame's projection Mtx
+D_80085F10	camera_view_mtx	float matrix Camera_Update builds with guLookAtReflectF and converts into the frame's view Mtx; Env_ComputeLightDirs and Camera_WorldToScreen transform by it
+D_80085F50	camera_fovy	the fovy argument of guPerspectiveF in Camera_Update, in degrees (Camera_Update takes tan of it x pi/360); set from the presets and by the cutscenes
+D_80085F54	camera_near	the near argument of guPerspectiveF in Camera_Update; set from the presets; Camera_WorldToScreen tests z against -near
+D_80085F58	camera_far	the far argument of guPerspectiveF in Camera_Update; set from the presets
+D_80085F5C	camera_tan_half_fovy	Camera_Update stores sin(a) / cos(a) for a = camera_fovy / 2 in radians; Camera_WorldToScreen scales by it
+D_80085F88	camera_persp_norm	the perspNorm guPerspectiveF returns in Camera_Update, emitted with gSPPerspNormalize
