@@ -1,9 +1,9 @@
-# func_80007FD8
+# Player_TakeDamage
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/3F50.c`](../3F50.c)
-- Retail assembly: [`asm/nonmatchings/3F50/func_80007FD8.s`](../../asm/nonmatchings/3F50/func_80007FD8.s)
+- Retail assembly: [`asm/nonmatchings/3F50/Player_TakeDamage.s`](../../asm/nonmatchings/3F50/Player_TakeDamage.s)
 - Retail code size: `0x4a4` bytes
 - Current gap: 235 object words; length exact, frame 0x50 vs 0x48 (damage copy in a second saved register, arg2 kept in its home).
 - Specific blocker: Damage gets an extra saved lifetime and the argument pointer stays live instead of reloading its home.
@@ -24,7 +24,7 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_80007FD8** (0x4A4 bytes)
+- **Player_TakeDamage** (0x4A4 bytes)
   - w1 s2: One family, not attempted in full. Retail never puts the D_8007AA08 address in a register: three stores in a row share one 'lui at' with %lo(sym+off) (sh %lo(D_8007AA08)(at); sh %lo(D_8007AA0C)(at)). IDO -O2 -g3 always gives la+offset for 2 or more accesses in a block, whether the variable is a struct, array, extern, static, defined or volatile. -O1 gives the shared-at form but nothing else matches at -O1. A low -Olimit is not it either: 6D24 (size 29) is optimized while 73E8 (22) is not. Cracking this would unlock about 8 functions. Drafts for 47F8 and 73E8 are in drafts/.
   - w1 s3: All the same root cause. Retail never puts a global's address in a register when it has only a few uses: it uses lui per access, or one shared 'lui at' with several %lo(sym+off) stores. Our IDO 5.3 at -O2 -g3 always does la+offset for 2 or more uses: a scalar read-modify-write X|=3, a load plus store (7A38: D_8004DCF8), or struct fields. Things I tested that all still gave la: extern, defined, static, initialized, common, defined after use, volatile, array, 8-aligned struct, struct size 0x100-0x8000, goto/label, address-taken local, call via pointer, -mips1, -O3, -G 8 (gives gp-rel), -Olimit (which disables uopt, so no beql either). Separately, as1 shares 'lui at' only for the same symbol when it is DEFINED in the file (at -O1 a defined struct shares, an extern never does). Separate defined variables do not share. A repo-wide scan found 24 functions with the shared-at pattern, all GLOBAL_ASM, in 12610, 147A0, 30600, E2A0, 1B200, 15150, AEA0, DAE0, 1870, 3F50, ovl_title and libultra. Quest 64 also has all of these as asm. I think this is a compiler or flag difference from retail, not a C trick. Worth checking at lead level whether another IDO version or build (e.g. 7.1) gives the retail form for 847C.
   - w1 s4: These need D2 (defining data in C) before they can match. Each one has 'lui at' shared across several %lo stores or loads: AA08/AA0C, AA50/AA54, AA08/AA0A/AA0C. I tested this (t14.c in the scratchpad): as1 shares one lui only when the symbol is DEFINED in the same .c file. An extern never shares, even for the two halves of a u64. So in retail, the D_8007AA08 player-state block (AA08..AA8C) is defined in 3F50.c. The address-CSE problem is still unsolved on top of that. NEW LEVER: uopt's -kpicopt optimisation is what puts global addresses into registers. Pass it straight to cc: '-nokpicopt' turns the address CSE off completely (lui on every access, like retail). But -nokpicopt breaks about 20 of the already-matched 3F50 functions, which depend on the CSE, and it still does not give retail's scheduling (847C 41 words, 7A38 14 words). So retail is plain kpicopt with some other trigger I could not find. Also ruled out: -O3 compiled for real (older -O3 tests may have gone through asm-processor's -O3->-O2 swap), block-scope extern, K&R definitions, pointer-cast forms, static or defined+initialised variables, address taken. I probed uopt options through -Wo: only noPalias, loopunroll, O1, Olimit, kpicopt/nokpicopt and g0..g3 are recognised. I tried to fetch IDO 7.1 to test it, but the permission classifier blocked downloading the compiler.

@@ -633,7 +633,7 @@ Gfx D_8006CC90[14] = {
 };
 extern Unk801D8620 D_801D8620[];
 
-void func_80003494(void);
+void Player_Spawn(void);
 void func_8000D6A0(void);
 void func_80014550(void);
 void func_8002A338(s32);
@@ -669,7 +669,7 @@ void func_8003627C(void) {
         D_8007A998 = 0x108;
         D_8007A9D0.unk4 = D_8007A9D0.unk6;
         D_8007AA0E = 0;
-        func_80003494();
+        Player_Spawn();
     } else {
         D_8004DCA0 |= 0x10000;
     }

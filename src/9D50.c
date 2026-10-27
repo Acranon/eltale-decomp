@@ -190,9 +190,9 @@ f32 func_800270D0(f32, f32);
 s32 func_80024FF0(u8);
 void func_80025094(u8);
 u8 func_8000D398(u32);
-void func_8000A0F8(NPC *, s32);
+void Npc_LoadMessage(NPC *, s32);
 extern s32 D_8004DCA0;
-/* Message text that func_80009DDC hands to the text box. */
+/* Message text that Npc_StartTalk hands to the text box. */
 u8 D_8004DD10[8] = {
 #include "assets/D_8004DD10.inc.c"
 };
@@ -204,9 +204,9 @@ extern s32 D_80090454;
 extern Unk80090458 D_80090458;
 
 void func_80009764(s32);
-void func_800097F8(NPCDef *, s32);
-void func_80009A54(f32 *, f32 *, Unk80009988 *);
-void func_8000A1D0(s32, u8 *);
+void Npc_SpawnForArea(NPCDef *, s32);
+void Npc_PushOutOfObjects(f32 *, f32 *, Unk80009988 *);
+void Npc_SetMessage(s32, u8 *);
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
@@ -247,13 +247,13 @@ typedef struct {
     /* 0x70 */ u8 pad70[0x10];
     /* 0x80 */ NPCDef *def;
 } NPC2; /* size 0x84 */
-void func_80009988(f32, f32, Unk80009988 *);
+void Npc_Move(f32, f32, Unk80009988 *);
 extern Unk8007C284 *D_8007C284;
 extern Unk8007C288 *D_8007C288;
 extern s32 D_800842C0;
 extern u16 D_800842E8;
 
-void func_80009150(void) {
+void Npc_InitArea(void) {
     NPCList *list;
 
     D_8007ABA4 = 0;
@@ -261,17 +261,17 @@ void func_80009150(void) {
         func_80009764(D_8007C288->unk12);
         list = D_8007C284->npcs;
         if (list != NULL) {
-            func_800097F8(list->defs, list->count);
+            Npc_SpawnForArea(list->defs, list->count);
         }
         D_8007AB74 = 0;
         if (D_8007A172 == 1) {
-            func_8000A1D0(0, D_800568B8);
+            Npc_SetMessage(0, D_800568B8);
             func_80032D20(1);
         }
     }
 }
 
-void func_800091E0(void) {
+void Npc_UpdateAll(void) {
     NPC *npc;
     s32 i;
     NPCObj *obj;
@@ -308,7 +308,7 @@ void func_800091E0(void) {
                 D_8007AB78[0] = 0.0f;
                 D_8007AB78[1] = 0.4f;
                 func_800271B4(obj->angle, D_8007AB78);
-                func_80009988(D_8007AB78[0], D_8007AB78[1], (Unk80009988 *)obj);
+                Npc_Move(D_8007AB78[0], D_8007AB78[1], (Unk80009988 *)obj);
                 if (--npc->timer == 0) {
                     npc->state = 0;
                     npc->timer = npc->def->unk10->unk2;
@@ -339,7 +339,7 @@ void func_800091E0(void) {
     }
 }
 
-void func_80009594(s32 arg0) {
+void Npc_DrawAll(s32 arg0) {
     NPC *npc;
     s32 i;
     NPCObj **list;
@@ -384,7 +384,7 @@ void func_80009764(s32 arg0) {
     func_80028120(start, D_8020E6F0, end - start);
 }
 
-void func_800097F8(NPCDef *def, s32 n) {
+void Npc_SpawnForArea(NPCDef *def, s32 n) {
     NPC *npc = D_8007ABF0;
     CollResult out;
 
@@ -420,8 +420,8 @@ void func_800097F8(NPCDef *def, s32 n) {
     }
 }
 
-void func_80009988(f32 dx, f32 dz, Unk80009988 *obj) {
-    func_80009A54(&dx, &dz, obj);
+void Npc_Move(f32 dx, f32 dz, Unk80009988 *obj) {
+    Npc_PushOutOfObjects(&dx, &dz, obj);
     obj->unk18 = dx;
     obj->unk20 = dz;
     obj->x += dx;
@@ -436,7 +436,7 @@ void func_80009988(f32 dx, f32 dz, Unk80009988 *obj) {
     obj->nz = D_8007AB88.nz;
 }
 
-void func_80009A54(f32 *dx, f32 *dz, Unk80009988 *obj) {
+void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Unk80009988 *obj) {
     f32 nx;
     f32 nz;
     f32 ddx;
@@ -513,7 +513,7 @@ void func_80009A54(f32 *dx, f32 *dz, Unk80009988 *obj) {
     }
 }
 
-void func_80009DDC(s32 idx) {
+void Npc_StartTalk(s32 idx) {
     s32 pad;
     s32 found;
     NPC *npc = &D_8007ABF0[idx];
@@ -549,7 +549,7 @@ void func_80009DDC(s32 idx) {
                 found = 1;
                 msg = npc->def->unkA;
             }
-            func_8000A0F8(npc, msg);
+            Npc_LoadMessage(npc, msg);
             if (found == 0) {
                 func_80025094(npc->def->u6.b.unk7);
                 D_8007AA08.unk8 |= 0x40;
@@ -565,10 +565,10 @@ void func_80009DDC(s32 idx) {
                     D_8007A174 = 0x16;
                 }
             }
-            func_8000A0F8(npc, msg);
+            Npc_LoadMessage(npc, msg);
             break;
         case 6:
-            func_8000A0F8(npc, npc->def->unk8);
+            Npc_LoadMessage(npc, npc->def->unk8);
             D_80090458.unk0 = 2;
             D_80090458.unk8 = D_8004DD10;
             D_80090458.unkC = D_8004DD18;
@@ -576,12 +576,12 @@ void func_80009DDC(s32 idx) {
             D_8004DCA0 |= 0x10;
             break;
         default:
-            func_8000A0F8(npc, npc->def->unk8);
+            Npc_LoadMessage(npc, npc->def->unk8);
             break;
     }
 }
 
-void func_8000A040(s32 idx) {
+void Npc_EndTalk(s32 idx) {
     NPC *npc = &D_8007ABF0[idx];
 
     if (npc->def->unk4 == 2) {
@@ -597,7 +597,7 @@ void func_8000A040(s32 idx) {
     }
 }
 
-void func_8000A0F8(NPC *npc, s32 arg1) {
+void Npc_LoadMessage(NPC *npc, s32 arg1) {
     s32 i;
 
     func_80028120(arg1 + (u32)D_D2E2F0, D_8007B430, 0x4B0);
@@ -610,7 +610,7 @@ void func_8000A0F8(NPC *npc, s32 arg1) {
     }
 }
 
-void func_8000A1D0(s32 arg0, u8 *arg1) {
+void Npc_SetMessage(s32 arg0, u8 *arg1) {
     s32 i;
     u8 *dst;
     NPC *npc;

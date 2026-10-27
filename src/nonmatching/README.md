@@ -21,8 +21,8 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`func_80033050`](func_80033050.md) | `src/337B0.c`, C under `NON_MATCHING` | 18 object words; length exact, frame exact |
 | [`func_8003453C`](func_8003453C.md) | `src/337B0.c`, C under `NON_MATCHING` | 221 object words; length exact, frame 0x40 vs 0x48 |
 | [`func_80034C9C`](func_80034C9C.md) | `src/337B0.c`, C under `NON_MATCHING` | 92 object words; code 0x404 vs 0x400, frame 0xE0 vs 0xD8 |
-| [`func_80007A8C`](func_80007A8C.md) | `src/3F50.c`, C under `NON_MATCHING` | 5 object words |
-| [`func_80007FD8`](func_80007FD8.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
+| [`Player_FindMeleeTarget`](Player_FindMeleeTarget.md) | `src/3F50.c`, C under `NON_MATCHING` | 5 object words |
+| [`Player_TakeDamage`](Player_TakeDamage.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
 | [`func_8000CC78`](func_8000CC78.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
 | [`func_8000DE54`](func_8000DE54.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
 | [`func_801009EC_ovl_DA4570`](func_801009EC_ovl_DA4570.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |

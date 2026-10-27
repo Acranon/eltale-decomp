@@ -119,7 +119,7 @@ extern f32 D_8007C184;
 extern u8 D_803ABA58[];
 extern u8 D_803AC3F8[];
 
-void func_800047F8(void);
+void Player_InitBattle(void);
 void func_8000A95C(void);
 void func_8000CC30(void);
 void func_8000D19C(s32, f32, f32, f32, Struct_8007B908*);
@@ -204,7 +204,7 @@ void func_8001EE94(void) {
                         } else {
                             D_8008BE58 = D_8008BE5A - 1;
                         }
-                        func_800047F8();
+                        Player_InitBattle();
                         func_8002430C();
                         D_8008BE6C = 100.0f;
                         D_8008BF94 = func_8001C060(0, D_8008BE5C, D_8007AA08.unk1C, D_8008BE60, D_8008BE6C * 1.04);
@@ -255,7 +255,7 @@ void func_8001F164(void) {
         v = 0x29;
     }
     func_8002A6B8(v);
-    func_800047F8();
+    Player_InitBattle();
     func_8002430C();
     D_8008BE6C = D_8004F2A0[D_8008BFA8 - 1];
     D_8008BF94 = func_8001C060(0, D_8008BE5C, D_8007C178, D_8008BE60, D_8008BE6C * 1.04);

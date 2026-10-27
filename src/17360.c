@@ -234,11 +234,11 @@ extern Unk8007C288* D_8007C288;
 extern u8 D_8004EDB0[];
 extern s32 D_8004EDBC[];
 extern s32 D_8004EDEC[];
-s32 func_80007E04(s32, Actor17360*);
+s32 Player_RollMeleeHit(s32, Actor17360*);
 s32 func_8000C3FC(Actor17360*, Actor17360*);
 s32 func_8000CAB8(Actor17360*);
 s32 func_8000C528(s32, u16, s32, u16, s32);
-void func_80007FD8(u16, u16, s32);
+void Player_TakeDamage(u16, u16, s32);
 void func_80023D28(Actor17360*);
 u32 func_80026E90(u32);
 f32 sqrtf(f32);
@@ -401,7 +401,7 @@ s32 Magic_GetHitOutcome();
 s32 Magic_ShouldApplyStatus();
 void Magic_StartStatusTimer();
 void func_8000CA88(Actor17360*);
-void func_8000847C(void);
+void Player_StartDodge(void);
 void func_80012B34(s32, s32, s32, u8*);
 void Magic_CreateHitPresentation();
 void Magic_CreateTimedPresentation();
@@ -707,7 +707,7 @@ void Magic_UpdateEffects(void) {
                         } else if (a->unk5E & 1) {
                             func_8000CA88(a);
                         } else {
-                            func_8000847C();
+                            Player_StartDodge();
                         }
                     } else {
                         D_8004ECDC[p->cfg->unk10](p, a);
@@ -1078,7 +1078,7 @@ void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
             func_800269B8(4, 0, D_8004F760);
             flag = 0x4000;
         }
-        func_80007FD8(dmg, arg0->cfg->unk2 | flag, (s32)arg0->unk24);
+        Player_TakeDamage(dmg, arg0->cfg->unk2 | flag, (s32)arg0->unk24);
     }
 }
 
@@ -1172,7 +1172,7 @@ void Magic_ApplyZeroDamageHit(Unk17360Cam* arg0, Actor17360* arg1) {
             func_8000C528(func_8000CAB8(arg1), 0, 0, 4, arg0->unk24);
             D_8007AA1C->unk2A++;
         } else {
-            func_80007FD8(0, 4, arg0->unk24);
+            Player_TakeDamage(0, 4, arg0->unk24);
         }
     }
 }
@@ -1203,7 +1203,7 @@ void Magic_RemoveEnemyOrDamagePlayer(Unk17360Cam* arg0, Actor17360* arg1) {
             func_8002433C(arg1);
         }
     } else {
-        func_80007FD8(arg1->unk64->unk4 * 4, 4, arg0->unk24);
+        Player_TakeDamage(arg1->unk64->unk4 * 4, 4, arg0->unk24);
     }
 }
 
@@ -1876,7 +1876,7 @@ s32 Magic_GetHitOutcome(Unk8001A3EC* arg0, Actor17360* arg1) {
         if (ret != 0) {
             if (arg1 != arg0->unk24) {
                 if (arg1->unk5E & 1) {
-                    ret = func_80007E04(func_8000CAB8(arg1), arg0->unk24);
+                    ret = Player_RollMeleeHit(func_8000CAB8(arg1), arg0->unk24);
                 } else {
                     ret = func_8000C3FC(arg0->unk24, arg1);
                 }

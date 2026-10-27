@@ -316,11 +316,11 @@ typedef struct {
 void Magic_CreateCastEffect(Obj *, s32, s32, s32);
 s32 func_8000C3FC(Obj *obj);
 u16 func_8000C48C(Enemy *arg0);
-s32 func_80007FD8(u16, s32, Obj *);
+s32 Player_TakeDamage(u16, s32, Obj *);
 void func_8001BE2C(f32, f32, f32);
 void func_8001AE24(Obj *, s32, s32);
 void func_8002373C(Obj *, u16, u16, s16);
-void func_8000847C(void);
+void Player_StartDodge(void);
 extern f32 D_8007C074;
 extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
@@ -690,7 +690,7 @@ void func_8000B0D8(Obj *obj, Enemy *e, AnimDef *anims) {
                         if (e->flags & 0x20) {
                             atk = 0xC004;
                         }
-                        n = func_80007FD8(n, atk, obj);
+                        n = Player_TakeDamage(n, atk, obj);
                         D_8007C070.x = 0.0f;
                         D_8007C070.y = 2.0f * (obj->unk64->unk18 * obj->unk24);
                         func_800271B4(obj->angle, &D_8007C070);
@@ -705,7 +705,7 @@ void func_8000B0D8(Obj *obj, Enemy *e, AnimDef *anims) {
                             func_8002373C(obj, 2, 1, 30);
                         }
                     } else {
-                        func_8000847C();
+                        Player_StartDodge();
                         D_8007AA08.unk14->unk2C++;
                     }
                     e->flags |= 8;

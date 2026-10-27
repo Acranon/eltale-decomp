@@ -97,7 +97,7 @@ void func_8000275C(void);
 void func_80002948(void);
 void func_80002A8C(void);
 void func_80002BDC(void);
-void func_80003350(void);
+void Player_Init(void);
 void func_8000CEE0(void);
 void func_80011A60(void);
 void func_800134D0(void);
@@ -214,7 +214,7 @@ void func_80000C70(void *arg0) {
         func_8000CEE0();
         func_800134D0();
         func_80013BA0();
-        func_80003350();
+        Player_Init();
         func_80024F20();
         func_80011A60();
         func_80035308();
@@ -350,8 +350,8 @@ extern u8 D_1000010[];
 extern u8 D_2000000[];
 extern u16 D_802DA800[];
 
-void func_8000464C(void *arg0);
-void func_80009594(void *arg0);
+void Player_Draw(void *arg0);
+void Npc_DrawAll(void *arg0);
 void func_8000A3E4(void *arg0);
 void func_8000CFD8(void *arg0);
 void func_8000DE54(void *arg0);
@@ -417,9 +417,9 @@ void func_80001278(GfxFrame *arg0) {
         func_80012B88(D_8007A1C8);
         func_8000DE54(sub);
         if (!(D_8004DCA0 & 0x10000)) {
-            func_8000464C(sub);
+            Player_Draw(sub);
         }
-        func_80009594(sub);
+        Npc_DrawAll(sub);
         func_800136B8(sub);
         func_8000E81C(sub);
         func_8000A3E4(sub);
@@ -510,7 +510,7 @@ extern s8 D_8008FB40;
 extern s8 D_80092C80;
 extern u16 D_8008CA50;
 void func_80002D44(s16 arg0);
-void func_80003B20(void);
+void Player_SetSpawnFromSaveTable(void);
 void func_8002A558(void);
 void func_8002A6B8(s32 arg0);
 void func_8002A6F4(s32 arg0, s32 arg1);
@@ -594,12 +594,12 @@ extern s32 D_8008C170;
 extern s32 D_80090450;
 extern u16 D_80092C84;
 extern u16 D_80092C86;
-void func_80003494(void);
-void func_80003B20(void);
-void func_80003BE0(void);
-void func_800073E8(void);
-void func_80009150(void);
-void func_800091E0(void);
+void Player_Spawn(void);
+void Player_SetSpawnFromSaveTable(void);
+void Player_Update(void);
+void Player_StartAreaExit(void);
+void Npc_InitArea(void);
+void Npc_UpdateAll(void);
 void func_8000A2A0(void);
 void func_8000A310(void);
 void func_8000CEF0(void);
@@ -641,7 +641,7 @@ void func_80001944(void) {
         if (D_8004DCA0 & 0x800) {
             D_800842BC = (u16)D_8007A9AC;
             D_800842C0 = D_8007A9AE;
-            func_80003B20();
+            Player_SetSpawnFromSaveTable();
         }
         func_80032BB0(0);
         D_80090450 = 0;
@@ -650,8 +650,8 @@ void func_80001944(void) {
         func_80013BD0();
         func_80014130();
         func_8002F87C();
-        func_80003494();
-        func_80009150();
+        Player_Spawn();
+        Npc_InitArea();
         func_8000A2A0();
         func_8000CEF0();
         func_80014550();
@@ -699,8 +699,8 @@ void func_80001944(void) {
                 func_8000A310();
             }
         }
-        func_80003BE0();
-        func_800091E0();
+        Player_Update();
+        Npc_UpdateAll();
         Magic_UpdateEffects();
         func_80011C60();
         func_8000DDBC();
@@ -711,7 +711,7 @@ void func_80001944(void) {
             if (!(D_8007AA08.unk78 & 1) && func_80011770(D_8007AA08.x, D_8007AA08.z, D_8007AA08.rot) != 0) {
                 D_8004DCA0 |= 0x80;
                 func_800163F4();
-                func_800073E8();
+                Player_StartAreaExit();
                 D_8007A178 = 0;
             } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (D_80092C86 & 0x1000) &&
                        !(D_8008BE52 & 1) && !(D_80092C84 & 0x2000) && !(D_8004DCA0 & 1)) {
@@ -967,7 +967,7 @@ void func_8000275C(void) {
         }
     }
     if (D_8008FB40 != 0) {
-        func_80003B20();
+        Player_SetSpawnFromSaveTable();
         D_8007A172 = 2;
         D_8004DCA0 &= ~0x400;
     }

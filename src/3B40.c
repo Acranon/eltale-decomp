@@ -48,10 +48,10 @@ typedef struct {
     /* 0x12 */ u16 unk12;
 } Unk8007C288;
 
-void func_80003494(void);
+void Player_Spawn(void);
 void func_800032E4(u8 *arg0, u8 *arg1);
 void func_80009764(u16 arg0);
-void func_800097F8(s32 arg0, s32 arg1);
+void Npc_SpawnForArea(s32 arg0, s32 arg1);
 void func_8000D6A0(void);
 void func_80014550(void);
 void func_80027430(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
@@ -119,13 +119,13 @@ void func_80002F40(s32 arg0) {
     D_8007A998 = 0x108;
     D_8007AA0E = 0;
     D_8007A9D0.unk4 = D_8007A9D0.unk6;
-    func_80003494();
+    Player_Spawn();
     if (!(entry->unk3C & 1)) {
         D_8004DCA0 |= 0x10000;
     }
     D_8007ABA4 = 0;
     func_80009764(D_8007C288->unk12);
-    func_800097F8(entry->unk2C, entry->unk30);
+    Npc_SpawnForArea(entry->unk2C, entry->unk30);
     D_8007B900 = 0;
     func_80014550();
     D_80085E48.unk0 = 3;

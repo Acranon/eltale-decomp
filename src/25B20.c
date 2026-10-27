@@ -38,7 +38,7 @@ extern u8 D_803AC460[];
 extern Struct_803AAAA0 D_803AAAA0[];
 
 void func_80028120(void*, void*, s32);
-void func_800079B4(u8);
+void Player_StartUseItem(u8);
 void Magic_CreateCastEffect(s32, s32, s32, s32);
 
 typedef struct {
@@ -218,7 +218,7 @@ s32 func_800250D8(u8 arg0) {
         ret = D_8004F4A0[item->unk2](D_8007AA20, item, arg0);
     }
     if (ret) {
-        func_800079B4(arg0);
+        Player_StartUseItem(arg0);
     }
     return ret;
 }
