@@ -455,15 +455,8 @@ s32 D_8007A944;
 u8 D_8007A948[0x40]; /* not referenced; the next label is 8007A988 */
 
 
-/* H2b: labels inside player_state.actor (aliases in undefined_syms.txt). Player_Draw addresses
- * these fields as their own symbols in retail: through player_state.actor uopt shares one
- * player_state base register and the code differs (GUIDE.md: the player code mixes forms). */
-extern Actor D_8007AA20; /* player_state.actor */
-extern f32 D_8007AA24; /* player_state.actor.y */
-extern s16 D_8007AA70; /* player_state.actor.unk50 */
-extern s16 D_8007AA72; /* player_state.actor.unk52 */
-extern u16 D_8007AA78; /* player_state.actor.unk58 */
-
+/* Player_Draw reads player_state.actor through its labels (D_8007AA20.., player.h): retail
+ * addresses them as their own symbols. */
 void Player_Draw(struct GfxFrameData *arg0) {
     s32 flag;
     s32 pad[2];

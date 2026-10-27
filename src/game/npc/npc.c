@@ -35,10 +35,8 @@ Npc npc_slots[16];
 u8 text_message_buf[0x4B0];
 u8 text_speaker_name[0x20];
 
-/* H2b: labels inside player_state (aliases in undefined_syms.txt). Npc_PushOutOfObjects
- * addresses these fields as their own symbols in retail, like Enemy_ResolveCollisions. */
-extern f32 D_8007AA20; /* player_state.actor.x */
-extern f32 D_8007AA28; /* player_state.actor.z */
+/* Npc_PushOutOfObjects reads player_state.actor.x/z through their labels (D_8007AA20.x,
+ * D_8007AA28, player.h): retail addresses them as their own symbols. */
 
 /* Message text that Npc_StartTalk hands to the text box. */
 u8 npc_rest_choice_row0[8] = {
@@ -270,7 +268,7 @@ void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Actor *obj) {
             hit = 1;
             ddx *= d;
             ddz *= d;
-            *dx = D_8007AA20 + ddx - obj->x;
+            *dx = D_8007AA20.x + ddx - obj->x;
             *dz = D_8007AA28 + ddz - obj->z;
         }
     }

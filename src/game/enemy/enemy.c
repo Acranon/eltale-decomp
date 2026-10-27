@@ -63,13 +63,8 @@ typedef struct {
 
 extern u8 D_8020E6F0[]; /* the area enemy set buffer Enemy_LoadAreaSet reads into (no C object) */
 
-/* H2b: labels inside player_state (aliases in undefined_syms.txt). Enemy_ChooseAttack and
- * Enemy_ResolveCollisions address these fields as their own symbols in retail: through
- * player_state.actor uopt shares one player_state base register and the code differs.
- * (player.h cannot declare them yet: hud.c has its own D_8007AA20 view.) */
-extern f32 D_8007AA20; /* player_state.actor.x */
-extern f32 D_8007AA28; /* player_state.actor.z */
-extern ActorStats *D_8007AA84; /* player_state.actor.unk64 */
+/* Enemy_ChooseAttack and Enemy_ResolveCollisions read some player_state fields through their
+ * labels (D_8007AA20.., player.h): retail addresses them as their own symbols. */
 /* H2b: labels inside enemy_effect_defs[20] (undefined_syms.txt); Enemy_SpawnDeathEffects reads
  * them as their own symbols in retail, not off the enemy_effect_defs base it uses for unk0/8/C */
 extern u16 D_8005685A; /* enemy_effect_defs[20].unk2 */
@@ -760,7 +755,7 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Actor *obj) {
             hit = 1;
             ddx *= d;
             ddz *= d;
-            *dx = D_8007AA20 + ddx - obj->x;
+            *dx = D_8007AA20.x + ddx - obj->x;
             *dz = D_8007AA28 + ddz - obj->z;
         }
     }

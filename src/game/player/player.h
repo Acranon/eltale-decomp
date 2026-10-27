@@ -107,6 +107,18 @@ extern s32 D_8007AB58;
 extern s32 D_8007AB5C;
 extern s32 player_light_slot;
 
+/* Labels inside player_state (aliases in undefined_syms.txt). Some retail functions address
+ * these fields as their own symbols: through player_state.actor uopt shares one player_state
+ * base register between them and the code differs. Use them only where that is so
+ * (Player_Draw, Enemy_ChooseAttack, Enemy_ResolveCollisions, Npc_PushOutOfObjects). */
+extern Actor D_8007AA20; /* player_state.actor */
+extern f32 D_8007AA24; /* player_state.actor.y */
+extern f32 D_8007AA28; /* player_state.actor.z */
+extern s16 D_8007AA70; /* player_state.actor.unk50 */
+extern s16 D_8007AA72; /* player_state.actor.unk52 */
+extern u16 D_8007AA78; /* player_state.actor.unk58 */
+extern ActorStats *D_8007AA84; /* player_state.actor.unk64 */
+
 /* .data */
 extern PlayerStateFunc player_state_handlers[18];
 extern s32 player_melee_damage_scale[4];
