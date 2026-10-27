@@ -1,4 +1,6 @@
 #include "game/text/text.h"
+#include "game/core/dma.h"
+#include "game/core/main.h"
 
 /*
  * Encoded text and font rendering: string copying, font DMA, and glyph drawing.
@@ -9,9 +11,7 @@ extern u8 D_D3A8B0[];
 extern u8 D_D3A930[];
 extern u8 D_80332D30[];
 extern u8 D_803245A0[];
-void Dma_ReadRom(void *romStart, void *vram, s32 size);
 
-extern Gfx *gfx_dl_head;
 /* This file's .data, 80061760..80061810. */
 TextFontMetrics text_font_metrics[1] = {
     { 10, 13, 10, 14 },

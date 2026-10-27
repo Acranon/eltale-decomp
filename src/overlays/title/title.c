@@ -1,17 +1,15 @@
 #include "overlays/title/title.h"
+#include "game/audio/audio.h"
+#include "game/core/main.h"
+#include "game/event/cutscene.h"
+#include "game/input/input.h"
+#include "overlays/title/title_draw.h"
 
 /*
  * Title overlay: entry, per-frame update, the phase state machine, button handling.
  * Original file: ovl_title/DAB5F0.c (ROM 0xDAB5F0).
  */
 
-extern Gfx* gfx_dl_head;
-extern u16 input_pressed_buttons;
-extern s32 D_8020F1E0_ovl_title;
-extern Gfx D_8020F208_ovl_title[];
-extern Gfx D_8020F470_ovl_title[];
-extern s32 title_screen_fade_state;
-extern s32 title_screen_fade_frames;
 /* .bss 80226D90..80226DB0 */
 s32 title_flow_state;
 s32 title_state_timer;
@@ -19,12 +17,7 @@ s32 D_80226D98_ovl_title;
 s32 title_pulse_alpha; /* black overlay alpha, 0..255 */
 s32 title_pulse_step;
 s32 title_menu_state;
-extern s8 title_confirmation_row;
-extern s32 title_confirm_cursor_alpha;
-extern s32 D_80226DC0_ovl_title;
 
-void Sfx_Enqueue(s32, s32, s32);
-void Title_DrawScreenAndMoveCursor(s32);
 
 void Title_Init(void) {
     title_flow_state = 0;
@@ -50,11 +43,6 @@ s32 Title_Update(void) {
     return 2;
 }
 
-extern s8 D_8006CC80[0x10];
-extern u8 title_menu_choice;
-extern s8 input_stick_x;
-extern s8 input_stick_y;
-void Title_UpdateScreenFade(void);
 
 
 /* .data 8020F1E0..8020F200: D_8020F1E0, then func_8020C178's statics F1E4..F1F0. */

@@ -1,4 +1,8 @@
 #include "overlays/intro/intro_screens.h"
+#include "game/core/main.h"
+#include "game/input/input.h"
+#include "overlays/intro/intro.h"
+#include "overlays/intro/intro_data.h"
 
 /*
  * Intro overlay: the three splash screens, the no-controller message and the pak warning screens.
@@ -14,30 +18,6 @@
 s32 intro_splash_fade_alpha = 0;
 s32 intro_splash_phase = 0;
 
-extern Gfx *gfx_dl_head;
-extern s32 intro_phase_timer;
-extern Gfx intro_render_setup_dl[];
-extern u8 D_802650A0_ovl_intro[];
-extern u16 D_80267048_ovl_intro[];
-extern u8 D_80267250_ovl_intro[];
-extern u16 D_80268018_ovl_intro[];
-extern u8 D_80260490_ovl_intro[];
-extern u8 D_80264740_ovl_intro[];
-extern u16 D_80264E98_ovl_intro[];
-extern u16 D_802615A8_ovl_intro[];
-extern u16 D_80260288_ovl_intro[];
-extern u8 D_8025D500_ovl_intro[];
-extern u16 input_pressed_buttons;
-extern s8 input_stick_x;
-extern s8 input_stick_y;
-extern u16 D_80264538_ovl_intro[];
-extern u8 D_802617B0_ovl_intro[];
-extern u16 D_80268280_ovl_intro[];
-extern u8 D_80268220_ovl_intro[];
-extern u16 D_8025D2F8_ovl_intro[];
-extern u8 D_8025C1E0_ovl_intro[];
-extern u16 D_8025BFD8_ovl_intro[];
-extern u8 D_80259250_ovl_intro[];
 
 
 void Intro_RunSplash1(void) {
