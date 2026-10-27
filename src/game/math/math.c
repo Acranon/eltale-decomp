@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/math/math.h"
 
 /*
  * Math: the random number generator, arctangent, 2D vector helpers, float matrix builders
@@ -8,15 +8,6 @@
 
 #define PI 3.141592653589793
 #define SQ(x) ((x) * (x))
-
-typedef struct {
-    f32 mf[4][4];
-} MtxF;
-
-typedef struct {
-    f32 x;
-    f32 y;
-} Vec2f;
 
 /* This file's .data, 8004F770..8004F780: a bit table (used by other files),
  * the random seed, and Math_MtxFRotDegScaleTrans's static degrees-to-radians factor
@@ -28,12 +19,6 @@ MtxF math_scratch_mtxf; /* .bss 8008CE60..8008CEA0 */
 extern MtxF camera_view_mtx;
 extern f32 camera_near;
 extern f32 camera_tan_half_fovy;
-
-f32 Math_Atan(f32 x);
-void Math_MtxFRotScaleTrans(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7);
-void Math_MtxFRotate(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3);
-void Math_MtxFAimAt(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6);
-void Math_MtxFAlignYToVector(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3);
 
 u32 Math_Rand(u32 max) {
     if (max != 0) {

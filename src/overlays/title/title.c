@@ -1,16 +1,9 @@
-#include "common.h"
+#include "overlays/title/title.h"
 
 /*
  * Title overlay: entry, per-frame update, the phase state machine, button handling.
  * Original file: ovl_title/DAB5F0.c (ROM 0xDAB5F0).
  */
-
-typedef struct {
-    u16 unk0;
-    u16 unk2;
-    f32 unk4;
-    f32 unk8;
-} UnkStruct_8020EF00;
 
 extern Gfx* gfx_dl_head;
 extern u16 input_pressed_buttons;
@@ -31,7 +24,6 @@ extern s32 title_confirm_cursor_alpha;
 extern s32 D_80226DC0_ovl_title;
 
 void Sfx_Enqueue(s32, s32, s32);
-s32 Title_RunPhase(void);
 void Title_DrawScreenAndMoveCursor(s32);
 
 void Title_Init(void) {
@@ -62,8 +54,6 @@ extern u8 D_8006CC80;
 extern u8 title_menu_choice;
 extern s8 input_stick_x;
 extern s8 input_stick_y;
-void Title_UpdateScreen(void);
-void Title_UpdateSelectionExit(void);
 void Title_UpdateScreenFade(void);
 
 

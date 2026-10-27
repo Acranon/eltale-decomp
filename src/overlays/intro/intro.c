@@ -1,105 +1,10 @@
-#include "common.h"
+#include "overlays/intro/intro.h"
 
 /*
  * Intro overlay: entry and per-frame update (boot pak check, splashes), and the
  * scripted sprite engine (150 slots with move/clip/fade/wait effects) that plays the intro.
  * Original file: ovl_intro/DC62B0.c (ROM 0xDC62B0).
  */
-
-typedef struct {
-    /* 0x00 */ s32 active : 1;
-    /* 0x00 */ u32 flags : 31;
-} SpriteFlags;
-
-typedef union {
-    SpriteFlags b;
-    s32 w;
-} SpriteFlagsU;
-
-typedef struct {
-    /* 0x00 */ SpriteFlagsU unk0;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ s16 unk8;
-    /* 0x0A */ s16 unkA;
-    /* 0x0C */ s16 unkC;
-    /* 0x0E */ s16 unkE;
-    /* 0x10 */ s16 unk10;
-    /* 0x12 */ s16 unk12;
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ s16 unk24;
-    /* 0x26 */ s16 unk26;
-    /* 0x28 */ s16 unk28;
-    /* 0x2A */ s16 unk2A;
-    /* 0x2C */ s16 unk2C;
-    /* 0x2E */ s16 unk2E;
-    /* 0x30 */ s16 unk30;
-    /* 0x32 */ u16 unk32;
-    /* 0x34 */ s16 unk34;
-    /* 0x38 */ s32 unk38;
-    /* 0x3C */ s32 unk3C;
-    /* 0x40 */ f32 unk40;
-    /* 0x44 */ f32 unk44;
-    /* 0x48 */ f32 unk48;
-    /* 0x4C */ u16 unk4C;
-    /* 0x4E */ s16 unk4E;
-} IntroSprite; /* size = 0x50 */
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s16 unk8;
-    /* 0x0A */ s16 unkA;
-    /* 0x0C */ s16 unkC;
-    /* 0x0E */ s16 unkE;
-    /* 0x10 */ s16 unk10;
-    /* 0x12 */ s16 unk12;
-    /* 0x14 */ s16 unk14;
-    /* 0x16 */ s16 unk16;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s16 unk20;
-    /* 0x22 */ s16 unk22;
-    /* 0x24 */ u16 unk24;
-} Unk28; /* size = 0x28 */
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ s32 unk8;
-} AnimFrame; /* size = 0xC */
-
-typedef struct {
-    /* 0x00 */ AnimFrame *unk0;
-    /* 0x04 */ u32 unk4;
-} AnimTbl;
-
-typedef struct {
-    /* 0x00 */ Unk28 *unk0;
-    /* 0x04 */ u32 unk4;
-} Unk802170E8;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s32 unk20;
-    /* 0x24 */ s32 unk24;
-    /* 0x28 */ s32 unk28;
-    /* 0x2C */ s32 unk2C;
-    /* 0x30 */ s32 unk30;
-    /* 0x34 */ s32 unk34;
-} IntroRect; /* size = 0x38 */
 
 typedef struct {
     /* 0x00 */ u32 key;
@@ -156,34 +61,15 @@ u8 intro_skip_requested;
 
 extern s32 intro_splash_fade_alpha;
 extern s32 intro_splash_phase;
-extern Unk802170E8 intro_cue_groups[];
+extern IntroCueGroup intro_cue_groups[];
 extern u32 intro_cue_group_count;
-extern AnimTbl intro_sprite_anim_table[];
+extern IntroAnim intro_sprite_anim_table[];
 extern Gfx D_802122E0_ovl_intro[];
 extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
-void Intro_UpdateAndDrawSprites(s32);
 void Audio_StartSeqFadeOut(s32);
-s32 Intro_CountActiveSprites();
-s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx);
-void Intro_SpawnSprite(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
-                             s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13);
-void Intro_ClearSprite(s32 idx);
-s16 Intro_FindFreeSprite(void);
-void Intro_SetClipAnchor(s32 idx);
-void Intro_SetMoveTarget(s32 idx, s32 arg1, s32 arg2);
-void Intro_ResetWait(s32 idx);
 extern Gfx D_802122C8_ovl_intro[];
-s32 Intro_StepClipGrow(s32 idx, s32 flags, IntroRect *r);
-s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r);
-s32 Intro_StepAlphaFade(s32 idx, s32 arg1);
-s32 Intro_StepBrightnessFade(s32 idx, s32 arg1);
-s32 Intro_StepMoveXY(s32 idx, s32 flags);
-s32 Intro_StepMoveX(s32 idx, s32 flags);
-s32 Intro_StepMoveY(s32 idx, s32 flags);
-s32 Intro_StepWait(s32 idx);
 
-void Intro_ClearAllSprites(void);
 
 typedef struct {
     /* 0x00 */ s16 unk0;
@@ -208,7 +94,6 @@ s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 void func_8003D8EC(char *, ...);
 void Sfx_Enqueue(s32, s32, s32);
 void Bgm_Play(s32);
-s32 Intro_RunSpriteScript(void);
 void Intro_RunSplash1(void);
 void Intro_RunSplash2(void);
 void Intro_RunSplash3(void);
@@ -371,14 +256,14 @@ s32 Intro_Update(void) {
 #ifdef NON_MATCHING
 /* D_80276F44 is the module's global (the original's function static), so its address is kept in a register; v1 spill at sp+0x74 vs 0x70; code is equivalent */
 s32 Intro_RunSpriteScript(void) {
-    Unk28* entries;
-    AnimFrame* steps;
+    IntroSpriteCue* entries;
+    IntroAnimStep* steps;
     u32 listIdx;
     IntroSprite* obj;
     s32 slot;
     s32 dx;
     s32 dy;
-    Unk28 *new_var;
+    IntroSpriteCue *new_var;
     s32 i;
     s32 j;
     s32 flags;

@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/audio/audio.h"
 
 /*
  * Audio driver: synthesizer init and sample DMA cache, the audio thread (nnSc client),
@@ -6,28 +6,6 @@
  * 5-channel sound-effect script interpreter and request queue.
  * Original file: 29150.c (ROM 0x29150).
  */
-
-typedef struct {
-    ALLink node;
-    s32 startAddr;
-    u32 lastFrame;
-    char* ptr;
-} AMDMABuffer;
-
-typedef struct {
-    u8 initialized;
-    AMDMABuffer* firstUsed;
-    AMDMABuffer* firstFree;
-} AMDMAState;
-
-typedef struct {
-    /* 0x000 */ ALSeqpConfig config;
-    /* 0x01C */ ALCSPlayer player;
-    /* 0x098 */ ALCSeq seq;
-    /* 0x190 */ u8* seqData;
-    /* 0x194 */ s32 seqNo;
-    /* 0x198 */ s32 unk198;
-} SeqSlot; /* size = 0x19C */
 
 /* .bss 8008CEC0..8008FAF0 */
 OSThread audio_thread;
@@ -83,28 +61,12 @@ ALSeqFile* audio_seq_file = NULL;
 s32 audio_dma_count = 0;
 u32 audio_frame_count = 0;
 
-void Audio_ThreadMain(void*);
 void alCSeqNew(ALCSeq*, u8*);
 
-extern s32* sfx_scripts[];
-extern s32 audio_seq_fade_out_step;
-extern s32 audio_seq_fade_in_step;
-extern u32 sfx_queue_ids[8];
-extern s32 sfx_queue_volumes[8];
-extern s32 sfx_queue_pans[8];
-extern s32 sfx_queue_read;
-extern s32 sfx_queue_write;
-extern s32 audio_seq_volume_limit;
-extern s32 audio_active_seq_slot;
-extern s32 audio_seq_volumes[2];
-extern s32 sfx_channel_sound[5];
 extern s32 D_800559E4;
-extern s32 sfx_channel_timer[5];
 extern s32 D_800559F8;
 
 void alSndpNew(ALSndPlayer*, ALSndpConfig*);
-void Audio_StopSound(s32 id);
-void Audio_StartSeqRequest();
 
 void Audio_DmaReadRom(u32 devAddr, void* vAddr, s32 nbytes) {
     OSIoMesg sp28;
@@ -114,7 +76,6 @@ void Audio_DmaReadRom(u32 devAddr, void* vAddr, s32 nbytes) {
     osRecvMesg(&audio_rom_read_queue, NULL, 1);
 }
 
-ALDMAproc Audio_DmaNew(AMDMAState** state);
 
 void Audio_Init(void) {
     alHeapInit(&audio_heap, D_80332DB0, 0x68000);
@@ -249,7 +210,6 @@ typedef struct SCTask_s {
     OSMesg msg;
 } NNScTask;
 
-extern s32 D_8008F758;
 extern u8 D_8004B980[];
 extern u8 D_8004BA50[];
 extern u8 D_8004CE80[];
@@ -258,7 +218,6 @@ void nnScAddClient(void* sc, NNScClient* c, OSMesgQueue* msgQ);
 OSMesgQueue* nnScGetAudioMQ(void* sc);
 Acmd* alAudioFrame(Acmd* cmdList, s32* cmdLen, s16* outBuf, s32 outLen);
 s16 n_alSeqpGetVol(ALSeqPlayer* seqp);
-void Audio_UpdateFrame(void);
 
 void Audio_ThreadMain(void* arg) {
     OSMesgQueue msgQ;
@@ -586,11 +545,6 @@ void Audio_GetSoundState(s32 id) {
     alSndpGetState(&audio_sound_player);
 }
 
-extern s32 audio_pending_seq_request;
-void Sfx_ProcessQueue(void);
-void Sfx_StepScript(void);
-void Audio_StepSeqFadeOut(void);
-void Audio_StepSeqFadeIn(void);
 
 void Audio_UpdateFrame(void) {
     for (sfx_cur_channel = 0; sfx_cur_channel < 5; sfx_cur_channel++) {
@@ -642,17 +596,16 @@ void Sfx_SelectScript(s32 arg0) {
     sfx_script_pos = sfx_scripts[0];
 }
 
-s32 func_80029834(void) {
+/* Takes the request argument: the code leaves a0 untouched for Audio_StartSeqRequest (H1;
+ * it was written with no parameter and a no-argument call). */
+s32 func_80029834(s32 arg0) {
     if (audio_seq_fade_out_step != 0 || audio_seq_fade_in_step != 0) {
         return 1;
     }
-    Audio_StartSeqRequest();
+    Audio_StartSeqRequest(arg0);
     return 0;
 }
 
-extern s32 audio_pending_seq_request;
-extern s32 audio_loaded_seq;
-s32 Audio_LoadSeqsOrStop(s32 seqNo);
 
 void Audio_StartSeqRequest(s32 arg0) {
     s32 seq;
@@ -726,8 +679,6 @@ end:
     }
 }
 
-extern s32 sfx_channel_volume_factor[5];
-extern s32 sfx_channel_pan[5];
 
 void Sfx_ProcessQueue(void) {
     s32 i;

@@ -1,4 +1,4 @@
-#include "common.h"
+#include "overlays/pakmenu/pakmenu.h"
 
 /*
  * Boot-time Controller Pak manager (overlay at 0x80100000, run once by Core_MainThread
@@ -7,39 +7,6 @@
  * Original file: ovl_DA4570/DA4570.c (ROM 0xDA4570).
  */
 
-typedef struct {
-    s16 x;
-    s16 y;
-    u8 w;
-    u8 h;
-    char unk6[2];
-    u8* pixels;
-    u16* palette;
-} UnkStruct_801004E8;
-
-typedef struct {
-    s32 width;
-    s32 height;
-    s32 advance;
-    s32 lineHeight;
-} UnkFont_8010566C;
-
-typedef struct {
-    u32 unk0;
-    u32 unk4;
-    u16 unk8;
-    u8 unkA;
-    char unkB[3];
-    u8 name[18];
-} UnkStruct_80107080;
-
-extern u16 pak_menu_cursor_tlut[];
-extern u8 pak_menu_cursor_tex[];
-extern UnkStruct_801004E8 pak_menu_screen_sprites[];
-extern UnkStruct_801004E8 pak_menu_message_window_sprites[];
-extern UnkStruct_801004E8 pak_menu_message_lower_window_sprites[];
-extern UnkStruct_801004E8 pak_menu_previous_rows_sprite[];
-extern UnkStruct_801004E8 pak_menu_more_rows_sprite[];
 extern u8 D_803245A0[];
 
 /* .data 80101FA0..80107050: images, palettes, sprite tables, message text, then the font. */
@@ -247,7 +214,7 @@ u16 D_80103E98_ovl_DA4570[0x10] = {
 u8 D_80103EB8_ovl_DA4570[0x70] = {
 #include "assets/D_80103EB8_ovl_DA4570.inc.c"
 };
-UnkStruct_801004E8 pak_menu_screen_sprites[235] = {
+PakMenuSprite pak_menu_screen_sprites[235] = {
     { 23, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
     { 55, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
     { 87, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
@@ -484,7 +451,7 @@ UnkStruct_801004E8 pak_menu_screen_sprites[235] = {
     { 60, 190, 0x70, 0x2, { 0 }, (u8*) D_80103EB8_ovl_DA4570, (u16*) D_80103E98_ovl_DA4570 },
     { 160, 190, 0x70, 0x2, { 0 }, (u8*) D_80103EB8_ovl_DA4570, (u16*) D_80103E98_ovl_DA4570 },
 };
-UnkStruct_801004E8 pak_menu_message_window_sprites[75] = {
+PakMenuSprite pak_menu_message_window_sprites[75] = {
     { 44, 72, 0x10, 0x10, { 0 }, (u8*) D_80102AC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 60, 72, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 76, 72, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
@@ -561,7 +528,7 @@ UnkStruct_801004E8 pak_menu_message_window_sprites[75] = {
     { 252, 136, 0x10, 0x10, { 0 }, (u8*) D_80102E40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 268, 136, 0x10, 0x10, { 0 }, (u8*) D_80102EC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
 };
-UnkStruct_801004E8 pak_menu_message_lower_window_sprites[22] = {
+PakMenuSprite pak_menu_message_lower_window_sprites[22] = {
     { 76, 158, 0x10, 0x10, { 0 }, (u8*) D_80102AC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 92, 158, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 108, 158, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
@@ -585,10 +552,10 @@ UnkStruct_801004E8 pak_menu_message_lower_window_sprites[22] = {
     { 220, 174, 0x10, 0x10, { 0 }, (u8*) D_80102E40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 236, 174, 0x10, 0x10, { 0 }, (u8*) D_80102EC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
 };
-UnkStruct_801004E8 pak_menu_previous_rows_sprite[1] = {
+PakMenuSprite pak_menu_previous_rows_sprite[1] = {
     { 22, 88, 0x10, 0x16, { 0 }, (u8*) D_80102F60_ovl_DA4570, (u16*) D_80102F40_ovl_DA4570 },
 };
-UnkStruct_801004E8 pak_menu_more_rows_sprite[1] = {
+PakMenuSprite pak_menu_more_rows_sprite[1] = {
     { 22, 144, 0x10, 0x16, { 0 }, (u8*) D_80102FD8_ovl_DA4570, (u16*) D_80102F40_ovl_DA4570 },
 };
 /* message text */
@@ -617,7 +584,7 @@ u8 D_80105608_ovl_DA4570[0x58] = {
 };
 s32 pak_menu_framebuffer_index = 0;
 u16* pak_menu_framebuffers[2] = { (u16*) 0x80200000, (u16*) 0x80225800 };
-UnkFont_8010566C pak_menu_font_metrics[1] = { { 10, 13, 10, 14 } };
+TextFontMetrics pak_menu_font_metrics[1] = { { 10, 13, 10, 14 } };
 u16 D_8010567C_ovl_DA4570[8] = {
 #include "assets/D_8010567C_ovl_DA4570.inc.c"
 };
@@ -632,7 +599,7 @@ u16 pak_menu_font_tluts[28] = {
 u16* pak_menu_active_font_tlut = &pak_menu_font_tluts[4];
 /* func_80101C80's two statics follow at 80107048/4C */
 /* .bss 80107080..80107300 */
-UnkStruct_80107080 pak_menu_note_states[16];
+PakMenuNoteState pak_menu_note_states[16];
 s32 pak_menu_max_glyph_code;
 s32 D_80107284_ovl_DA4570;
 s32 pak_menu_note_errors[16];
@@ -654,17 +621,6 @@ u16* pak_menu_text_pixel_cursor;
 s16 pak_menu_text_x;
 s16 pak_menu_text_y;
 
-void PakMenu_FormatNumber(u16 arg0, u8* arg1);
-void PakMenu_DrawChar(s32 arg0);
-void PakMenu_SetCursor(s16 arg0, s16 arg1);
-void PakMenu_DrawString(u8* arg0, s32 arg1);
-void PakMenu_SetTextPalette(s32 arg0);
-void PakMenu_BlitImage(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palette, u8 mode);
-void PakMenu_DrawSprites(UnkStruct_801004E8* arg0, s32 arg1);
-void PakMenu_DrawNoteRow(s32 arg0);
-void PakMenu_DrawFreePages(u16 arg0);
-void PakMenu_DrawScreen(void);
-void PakMenu_DrawText(s32 x, s32 y, u8* str);
 
 #ifdef NON_MATCHING
 extern u8 input_connected_port_bits;
@@ -674,9 +630,6 @@ s32 func_8003D0F0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D554(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D6B0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003EDC0(OSPfs*, s32*, s32*);
-void PakMenu_WaitFrame(void);
-void PakMenu_DrawCursor(void);
-void PakMenu_DrawMessageBox(u8* arg0);
 #endif
 
 void PakMenu_FormatNumber(u16 arg0, u8* arg1) {
@@ -783,7 +736,7 @@ void PakMenu_BlitImage(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palette, u8 
     }
 }
 
-void PakMenu_DrawSprites(UnkStruct_801004E8* arg0, s32 arg1) {
+void PakMenu_DrawSprites(PakMenuSprite* arg0, s32 arg1) {
     s32 i;
 
     for (i = 0; i < arg1; i++) {
@@ -909,7 +862,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
     s32 i;
     u16 held;
     u16 cur;
-    UnkStruct_80107080* file;
+    PakMenuNoteState* file;
 
     pak_menu_si_queue = mq;
     pak_menu_vi_queue = arg1;
@@ -1462,7 +1415,7 @@ void PakMenu_DrawText(s32 x, s32 y, u8* str) {
     s32 rowOff = 0;
     s32 curX = x;
     s32 curY = y;
-    UnkFont_8010566C* f;
+    TextFontMetrics* f;
     u16* dst;
     u8* src;
     s32 rows;
@@ -1493,7 +1446,7 @@ void PakMenu_DrawText(s32 x, s32 y, u8* str) {
                     switch (arg) {
                         case 0:
                             curX = x;
-                            curY += pak_menu_font_metrics[font].lineHeight;
+                            curY += pak_menu_font_metrics[font].line_height;
                             break;
                         case 30:
                             break;

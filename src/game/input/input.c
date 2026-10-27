@@ -1,21 +1,9 @@
-#include "common.h"
+#include "game/input/input.h"
 
 /*
  * Controller polling and Controller Pak file discovery and operations.
  * Original file: 363B0.c (ROM 0x363B0).
  */
-
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s8 unk2[16];
-    /* 0x12 */ s8 unk12;
-    /* 0x13 */ u8 unk13;
-} Unk80092E48; /* size = 0x14 */
-
-typedef struct {
-    u8 b[4];
-
-} Ext4;
 
 /* .bss 80092C80..80092ED0 */
 s8 input_primary_port;
@@ -26,7 +14,7 @@ u16 input_pressed_buttons; /* button down edges for the selected controller */
 u16 input_previous_button_inverse;
 OSMesgQueue input_si_queue;
 OSPfs pak_port_states[4];
-Unk80092E48 pak_game_file_scans[4];
+PakFileScan pak_game_file_scans[4];
 u8 input_connected_port_bits;
 OSContStatus input_controller_statuses[4];
 OSMesg input_si_mesg;
@@ -35,8 +23,8 @@ OSContPad input_pad_states[4];
  * unreferenced digit string, and the two ext_name values. */
 u8 pak_game_name[16] = "SxbQx";
 char D_80061820[] = "012345678901234567890123456789";
-Ext4 pak_allocate_extension_template = { { 0, 0, 0, 0 } };
-Ext4 pak_delete_extension_template = { { 0, 0, 0, 0 } };
+PakExtName pak_allocate_extension_template = { { 0, 0, 0, 0 } };
+PakExtName pak_delete_extension_template = { { 0, 0, 0, 0 } };
 
 s32 osContInit();
 s32 osPfsFreeBlocks();
@@ -46,7 +34,6 @@ s32 func_8003D0F0();
 s32 osPfsRepairId();
 s32 func_8003EDC0();
 s32 osPfsFileState();
-s32 Pak_CompareNameBytes();
 s32 osPfsFreeBlocks();
 
 s32 Input_InitControllers(void) {
@@ -221,7 +208,7 @@ u8 func_80035CC8(s32 arg0) {
 u8 Pak_AllocateGameFile(s32 arg0, u8 arg1) {
     u8 unused[4];
     s32 file_no;
-    Ext4 ext;
+    PakExtName ext;
     s32 ret;
 
     ext = pak_allocate_extension_template;
@@ -239,7 +226,7 @@ u8 Pak_AllocateGameFile(s32 arg0, u8 arg1) {
 
 u8 Pak_DeleteGameFile(s32 arg0, u8 arg1) {
     u8 unused[4];
-    Ext4 ext;
+    PakExtName ext;
 
     ext = pak_delete_extension_template;
     ext.b[0] = arg1;

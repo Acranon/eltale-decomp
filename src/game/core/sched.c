@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/core/sched.h"
 
 /*
  * Nintendo's nnSc scheduler sample (retrace/pre-NMI broadcast, audio and graphics task
@@ -6,67 +6,6 @@
  * Original file: 1130.c (ROM 0x1130).
  */
 
-#define NN_SC_SWAPBUFFER 0x0040
-#define NN_SC_RETRACE_MSG 1
-#define NN_SC_PRE_NMI_MSG 3
-#define NN_SC_MAX_MESGS 8
-#define NN_SC_PRI 120
-#define NN_SC_AUDIO_PRI 110
-#define NN_SC_GRAPHICS_PRI 100
-#define VIDEO_MSG 666
-#define RSP_DONE_MSG 667
-#define RDP_DONE_MSG 668
-#define PRE_NMI_MSG 669
-
-typedef short NNScMsg;
-
-typedef struct SCClient_s {
-    struct SCClient_s *next;
-    OSMesgQueue *msgQ;
-} NNScClient;
-
-typedef struct SCTask_s {
-    struct SCTask_s *next;
-    u32 state;
-    u32 flags;
-    void *framebuffer;
-    OSTask list;
-    OSMesgQueue *msgQ;
-    OSMesg msg;
-} NNScTask;
-
-typedef struct {
-    NNScMsg retraceMsg;
-    NNScMsg prenmiMsg;
-    OSMesgQueue audioRequestMQ;
-    OSMesg audioRequestBuf[NN_SC_MAX_MESGS];
-    OSMesgQueue graphicsRequestMQ;
-    OSMesg graphicsRequestBuf[NN_SC_MAX_MESGS];
-    OSMesgQueue retraceMQ;
-    OSMesg retraceMsgBuf[NN_SC_MAX_MESGS];
-    OSMesgQueue rspMQ;
-    OSMesg rspMsgBuf[NN_SC_MAX_MESGS];
-    OSMesgQueue rdpMQ;
-    OSMesg rdpMsgBuf[NN_SC_MAX_MESGS];
-    OSMesgQueue waitMQ;
-    OSMesg waitMsgBuf[NN_SC_MAX_MESGS];
-    OSThread schedulerThread;
-    OSThread audioThread;
-    OSThread graphicsThread;
-    NNScClient *clientList;
-    NNScTask *curGraphicsTask;
-    NNScTask *curAudioTask;
-    NNScTask *graphicsTaskSuspended;
-    u32 firstTime;
-} NNSched;
-
-void nnScEventHandler(NNSched *sc);
-void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
-void nnScRemoveClient(NNSched *sc, NNScClient *c);
-void nnScEventBroadcast(NNSched *sc, NNScMsg *msg);
-void nnScExecuteAudio(NNSched *sc);
-void nnScExecuteGraphics(NNSched *sc);
-void nnScWaitTaskReady(NNSched *sc, NNScTask *task);
 void osSpTaskLoad(OSTask *task);
 
 /* This file's .bss, 80077160..8007A170: the three thread stacks (each passed

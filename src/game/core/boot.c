@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/core/boot.h"
 
 /*
  * Boot: the entry point's first C function and the idle thread, which starts the PI
@@ -8,7 +8,6 @@
 
 void func_80036AC0(void);
 void osCreatePiManager(s32, OSMesgQueue *, OSMesg *, s32);
-void Boot_IdleThread(void *);
 void Core_MainThread(void *);
 
 /* This file's .bss, 80070D20..80077160, in address order. boot_stack is the

@@ -1,0 +1,133 @@
+#ifndef GAME_ENV_ENV_H
+#define GAME_ENV_ENV_H
+
+#include "common.h"
+#include "game/math/math.h"
+
+/* An exit record (h_world's type; see D3_HINTS.md). */
+struct ExitDef;
+
+/* Where the current exit leads: Exit_SetDestination fills it from the exit record; the
+ * gameplay loop takes the next map from unk0 and the next subarea from unk4. */
+typedef struct ExitDestination {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u16 unkC;
+    /* 0x0E */ u16 unkE;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ f32 unk14;
+} ExitDestination; /* 0x18 bytes */
+
+/* An RGB triple of the lighting track (ambient or one light), 0..255 per channel. */
+typedef struct EnvColor {
+    /* 0x00 */ s32 r;
+    /* 0x04 */ s32 g;
+    /* 0x08 */ s32 b;
+} EnvColor; /* 0xC bytes */
+
+typedef struct EnvFogRange {
+    /* 0x00 */ s32 near;
+    /* 0x04 */ s32 far;
+} EnvFogRange; /* 0x8 bytes */
+
+/* One key of an area's lighting track (Env_InterpolateLighting). */
+typedef struct EnvKeyframe {
+    /* 0x00 */ s32 time;
+    /* 0x04 */ EnvColor amb;
+    /* 0x10 */ EnvColor lights[3];
+    /* 0x34 */ EnvFogRange fog;
+} EnvKeyframe; /* 0x3C bytes */
+
+/* A subarea's environment record (map_area_def->unk1C[]); env_area_settings points at the
+ * current one. unk8 set: unkC..unk14 are the light direction. */
+typedef struct EnvAreaSettings {
+    /* 0x00 */ EnvKeyframe *frames;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ u16 unk18;
+    /* 0x1A */ u8 unk1A[2];
+    /* 0x1C */ s32 unk1C;
+} EnvAreaSettings; /* 0x20 bytes */
+
+/* A light slot (Env_AllocateLightSlot): env colour animation (unk4..unk14), light colour
+ * animation (unk18..unk28) and light directions (unk2C). */
+typedef struct EnvLightSlot {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 *unk10;
+    /* 0x14 */ s32 *unk14;
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 *unk24;
+    /* 0x28 */ s32 *unk28;
+    /* 0x2C */ s32 *unk2C;
+} EnvLightSlot; /* 0x30 bytes */
+
+/* A day phase: start time (env_clock), backdrop palette index, palette fade length. */
+typedef struct EnvDayPhase {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+} EnvDayPhase; /* 0xC bytes */
+
+/* .bss 80084300..80084B80, in address order (the order of these declarations fixes it). */
+extern ExitDestination exit_destination;
+extern u16 *exit_destination_src;
+extern Vec2f exit_local_offset;
+extern u8 D_80084328[8];
+extern s32 env_next_phase;
+extern s32 env_last_phase_start;
+extern u16 env_play_time_ticks;
+extern s32 env_palette_fade_timer;
+extern s32 env_palette_fade_length;
+extern u16 *env_palette_fade_target;
+extern u16 *env_palette_fade_dest;
+extern u16 env_palette_fade_start[0x100];
+extern f32 env_light_rot_mtx[4][4];
+extern Lights3 env_lights_frame0;
+extern Lights3 env_lights_frame1;
+extern Lights3 env_slot_lights_frame0[8];
+extern Lights3 env_slot_lights_frame1[8];
+extern s32 env_clock;
+extern s32 env_day_length;
+extern s32 env_light_time;
+extern s32 env_light_period;
+extern u16 env_day_count;
+extern u16 env_play_time;
+extern EnvAreaSettings *env_area_settings;
+extern EnvLightSlot env_light_slots[8];
+extern s32 env_light_colors[4][3];
+extern s32 env_light_dirs[4][3];
+extern s32 env_fog_range[2];
+
+/* .data */
+extern EnvDayPhase env_day_phases[3];
+extern EnvDayPhase env_day_phase_last[1];
+
+void Exit_SetDestination(struct ExitDef *arg0);
+void Env_InitClock(void);
+void Env_InitForMap(void);
+void Env_Update(void);
+void Env_SetClock(s32 arg0);
+void Env_InterpolateLighting(s32 t, EnvAreaSettings *arg1);
+void Env_PrepareFrameLighting(void);
+void Env_ComputeLightDirs(void);
+void Env_StartPaletteFade(s32 arg0, u16 *arg1, u16 *arg2);
+void Env_StepPaletteFade(s32 arg0);
+void Env_ClearLightSlots(void);
+s32 Env_AllocateLightSlot(void);
+void Env_FreeLightSlot(s32 arg0);
+void Env_SetSlotEnvAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3);
+void Env_SetSlotLightAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3);
+void Env_SetSlotLightDirs(s32 arg0, s32 *arg1);
+void Env_ApplyLightSlot(s32 idx);
+void Env_FillLights3(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
+
+#endif

@@ -1,4 +1,4 @@
-#include "common.h"
+#include "overlays/title/title_data.h"
 
 /*
  * Title overlay data: the title screen's images, palettes and message text.

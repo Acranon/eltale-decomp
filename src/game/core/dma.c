@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/core/dma.h"
 
 /*
  * Blocking ROM-to-RAM DMA, and integer-to-digit-string conversion for the game's text encoding.
