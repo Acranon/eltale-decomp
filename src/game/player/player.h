@@ -8,6 +8,8 @@ struct Vec3f;
 struct GfxFrameData; /* game/core/main.h */
 struct CollResult;
 struct AnimSet;
+struct SpiritObj; /* game/map/spirit.h */
+struct TextSpot; /* game/map/textspot.h */
 
 /* player_state: the player's state machine around its Actor. */
 typedef struct Player {
@@ -94,9 +96,9 @@ extern s32 player_battle_exp;
 extern s32 D_8007A9B8;
 extern s32 player_battle_drop_item;
 extern s32 player_talk_npc;
-extern void *player_front_spirit;
+extern struct SpiritObj *player_front_spirit;
 extern Actor *player_front_chest;
-extern void *player_front_text_spot;
+extern struct TextSpot *player_front_text_spot;
 extern ActorStats player_stats;
 extern Player player_state;
 extern struct Vec3f player_shadow_pos;
@@ -119,21 +121,21 @@ void Player_StateMove(Actor *a, Player *p, PlayerAnimTable *cd);
 void Player_StateWait(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateBrake(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateHurt(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
-void Player_StateDying(Actor *arg0, Player *arg1, s32 arg2);
+void Player_StateDying(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateTalk(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateAutoWalk(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd);
 void Player_StateCastSpell(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
-void Player_StateWalkToExitObject(Actor *arg0, Player *arg1, s32 arg2);
-void Player_StateAnimMove(Actor *arg0, Player *arg1, s32 arg2);
-void Player_StateOpenChest(Actor *arg0, Player *arg1, s32 arg2);
+void Player_StateWalkToExitObject(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
+void Player_StateAnimMove(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
+void Player_StateOpenChest(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateUseItem(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateBattleWon(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_StateExamine(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
 void Player_MoveIdle(f32 arg0, f32 arg1, Actor *arg2, Player *arg3);
 void Player_MoveWalk(f32 sx, f32 sz, Actor *a, Player *p);
 void Player_MoveRun(f32 sx, f32 sz, Actor *a, Player *p);
-void Player_GetAnimMotion(Actor *arg0, s32 arg1, struct Vec3f *arg2);
+void Player_GetAnimMotion(Actor *arg0, struct AnimSet *arg1, struct Vec3f *arg2);
 void func_80006A50(void); /* empty */
 void Player_MoveAndCollide(u16 arg0, Actor *arg1, Player *arg2);
 s32 Player_FindNpcToTalk(Player *arg0, Actor *arg1);
