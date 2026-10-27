@@ -74,8 +74,8 @@ extern u8** D_800C03D8[];
 extern u8 D_8004F2C4[];
 extern u8 D_8004F498[];
 
-u32 func_800167B0(u16, s32);
-s32 func_800168F0(u32, u16);
+u32 Magic_LookupSpellSequence(u16, s32);
+s32 Magic_GetSpellRestrictionFlags(u32, u16);
 s32 func_800281F0(s32, u8*, u16);
 void func_80024694(s32, s32, s32, u8*);
 s32 func_80024904(u8*);
@@ -168,7 +168,7 @@ extern u16 D_8004F2EC[];
 extern Struct_803AA690 D_803AA690[];
 extern Struct_803AA6C4 D_803AA6C4[];
 
-s32 func_80019820(u16, u16, f32, f32, f32, f32, Struct_803AA690*, Vec3f_216E0*, Struct_8002373C*);
+s32 Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AA690*, Vec3f_216E0*, Struct_8002373C*);
 
 void func_80020AE0(void) {
     D_8008C168 = 0;
@@ -930,7 +930,7 @@ void func_8002373C(Struct_8002373C* arg0, u16 mask, u16 idx, s16 val) {
             } else {
                 y = arg0->unk4;
             }
-            s->unk44[i] = func_80019820(e->unk2, e->unk4, arg0->unk0, y, arg0->unk8, 0.0f, fx, &D_8008C140, arg0);
+            s->unk44[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->unk0, y, arg0->unk8, 0.0f, fx, &D_8008C140, arg0);
             return;
         }
     }
@@ -1216,8 +1216,8 @@ void func_800245D0(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4) {
     u8* str;
     u32 tmp;
 
-    id = func_800167B0(arg3, (s32)arg2);
-    flags = func_800168F0(id, arg4);
+    id = Magic_LookupSpellSequence(arg3, (s32)arg2);
+    flags = Magic_GetSpellRestrictionFlags(id, arg4);
     tmp = (id >> 8) & 0xF;
     id &= 0xFF;
     str = D_800C03D8[tmp][id];

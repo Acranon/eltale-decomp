@@ -102,7 +102,7 @@ typedef struct {
 extern Struct_8007B908 D_8007B908[];
 extern u16 D_8007C050[];
 
-void func_8001A1A4(Vec3f*);
+void Magic_TickActorStatuses(Vec3f*);
 void func_8001C298(u16, f32, f32, f32);
 
 
@@ -500,7 +500,7 @@ void func_8001FC14(Vec3f* arg0) {
     s32 max; s32 id;
     Struct_8007B908* e;
 
-    func_8001A1A4(arg0);
+    Magic_TickActorStatuses(arg0);
     if (D_8008BE52 & 1) {
         if (!(D_8008BE52 & 2)) {
             n = D_8008BE5A;

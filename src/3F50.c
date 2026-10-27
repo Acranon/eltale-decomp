@@ -222,7 +222,7 @@ void func_80007A38(Actor *arg0);
 void func_80008970(PlayerState *arg0);
 void func_8000A040(s32 arg0);
 void func_80013A50(s32 arg0);
-void func_800169B8(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
+void Magic_CreateCastEffect(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
 s32 func_80017AB0(void);
 void func_8001A6E4(Actor *arg0);
 void func_8001FC14(Actor *arg0);
@@ -1232,7 +1232,7 @@ void func_8000571C(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     arg0->vx = 0.0f;
     if (arg1->unk124 != 0) {
         if (--arg1->unk124 == 0) {
-            func_800169B8(arg0, arg1->unk122, 0, (arg1->unk8 & 0x10000) ? 0x10 : 0);
+            Magic_CreateCastEffect(arg0, arg1->unk122, 0, (arg1->unk8 & 0x10000) ? 0x10 : 0);
         }
     } else if (--arg1->unk4 == 0) {
         if (func_80017AB0() != 0) {
@@ -2260,8 +2260,8 @@ extern s16 D_8008C15A;
 extern u16 D_8008C15C;
 extern u16 D_80092C86;
 
-s32 func_800168F0(s32 arg0, u16 arg1);
-s32 func_800167B0(u16 count, u8 *seq);
+s32 Magic_GetSpellRestrictionFlags(s32 arg0, u16 arg1);
+s32 Magic_LookupSpellSequence(u16 count, u8 *seq);
 s32 func_800085D8(PlayerState *arg0) {
     s32 dir;
     s32 pad;
@@ -2283,7 +2283,7 @@ s32 func_800085D8(PlayerState *arg0) {
         }
         arg0->unk11D[arg0->unk120] = dir;
         arg0->unk120++;
-        if (func_800168F0(func_800167B0(arg0->unk120, arg0->unk11D), arg0->unk14->unk8) & 5) {
+        if (Magic_GetSpellRestrictionFlags(Magic_LookupSpellSequence(arg0->unk120, arg0->unk11D), arg0->unk14->unk8) & 5) {
             sfx = 0x13;
             arg0->unk120--;
         } else if (!(D_8004DCA0 & 4)) {
@@ -2303,8 +2303,8 @@ s32 func_800085D8(PlayerState *arg0) {
             }
         }
     } else if (arg0->unk120 && (D_80092C86 & 0xA000)) {
-        arg0->unk122 = func_800167B0(arg0->unk120, arg0->unk11D);
-        if (func_800168F0(arg0->unk122, arg0->unk14->unk8) == 0) {
+        arg0->unk122 = Magic_LookupSpellSequence(arg0->unk120, arg0->unk11D);
+        if (Magic_GetSpellRestrictionFlags(arg0->unk122, arg0->unk14->unk8) == 0) {
             D_8004DCA0 &= ~4;
             ret = 1;
         }

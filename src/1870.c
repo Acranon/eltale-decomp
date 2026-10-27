@@ -612,8 +612,8 @@ void func_80013BD0(void);
 void func_80014130(void);
 void func_80014550(void);
 void func_800163F4(void);
-void func_80016760(void);
-void func_80017630(void);
+void Magic_ResetEffectSystem(void);
+void Magic_UpdateEffects(void);
 void func_8001A600(void);
 void func_8001D970(void);
 void func_8001EE00(s32 *arg0);
@@ -661,7 +661,7 @@ void func_80001944(void) {
         D_8007AB60 = func_80012A90();
         D_80084998[D_8007AB60].unk0 = 2;
         func_8001EE00(&D_8007AB60);
-        func_80016760();
+        Magic_ResetEffectSystem();
         func_8001A600();
         func_8001D970();
         func_800266D0();
@@ -701,7 +701,7 @@ void func_80001944(void) {
         }
         func_80003BE0();
         func_800091E0();
-        func_80017630();
+        Magic_UpdateEffects();
         func_80011C60();
         func_8000DDBC();
         func_8000F5DC();

@@ -258,7 +258,7 @@ void func_8000BCA4(s32, f32, f32, Obj *, EnemyAI *);
 void func_8000BFE0(Obj *, Vec3f *);
 void func_8000CAE8(Obj *);
 void func_8000CC78(void);
-void func_80019820(u16, u16, f32, f32, f32, f32, Unk800C18D8 *, Vec3f *, Obj *);
+void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Unk800C18D8 *, Vec3f *, Obj *);
 void func_8001B3FC(s32, s32, f32, f32, f32, f32);
 void func_8001FC14(Obj *);
 void func_80020214(Obj *, u8 *, f32, Vec3f *);
@@ -313,7 +313,7 @@ typedef struct {
     /* 0x04 */ u8 pad4[8];
 } AnimDef; /* size 0xC */
 
-void func_800169B8(Obj *, s32, s32, s32);
+void Magic_CreateCastEffect(Obj *, s32, s32, s32);
 s32 func_8000C3FC(Obj *obj);
 u16 func_8000C48C(Enemy *arg0);
 s32 func_80007FD8(u16, s32, Obj *);
@@ -751,7 +751,7 @@ void func_8000B508(Obj *obj, Enemy *e, AnimDef *anims) {
             }
             e->unk2--;
             if (e->unk2 == 0) {
-                func_800169B8(obj, e->unk1C->unk0 & ~0x8000, 0, 0);
+                Magic_CreateCastEffect(obj, e->unk1C->unk0 & ~0x8000, 0, 0);
                 a = e->unk1C;
                 e->unk6++;
                 if (a->unkA == -1) {
@@ -1199,7 +1199,7 @@ void func_8000CAE8(Obj *obj) {
     } else {
         y = obj->y + obj->unk64->unk1C * 0.5 * obj->unk24;
     }
-    func_80019820(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &D_8007C070, obj);
+    Magic_CreateVisualEffect(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &D_8007C070, obj);
     func_8001B3FC(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
                   obj->unk64->unk18 * obj->unk24 * 3.6);
 }
@@ -1269,7 +1269,7 @@ void func_8000CC78(void) {
                 } else {
                     D_8007C070.z = obj->unk28;
                 }
-                func_80019820(d->unk2, d->unk4, x, y, z, obj->angle + e->unk14, t, &D_8007C070, obj);
+                Magic_CreateVisualEffect(d->unk2, d->unk4, x, y, z, obj->angle + e->unk14, t, &D_8007C070, obj);
             }
             if (e->flags & 4) {
                 func_80015D78(1);
