@@ -7,11 +7,11 @@
 /* An exit record: map.h's MapExit (h_world). */
 struct MapExit;
 
-/* Where the current exit leads: Exit_SetDestination fills it from the exit record (or the
- * player's respawn point, Player_*): the gameplay loop takes the next map and subarea,
- * the player spawns at entry (-1: none) facing angle; flags are the exit's flags (bits 8..11
- * the arrival kind, Player_StartAreaEntry) and mapObj the door object it opens
- * (map_objs[mapObj]). */
+/* Where the current exit leads: Exit_SetDestination fills it from the exit record (the
+ * player code also writes a respawn point into map/subarea/entry; entry -1: a save spawn
+ * point). The gameplay loop takes the next map and subarea; Player_StartAreaExit uses
+ * flags (the exit's flags; bits 8..11 the exit kind), angle (the player's heading for the
+ * walk out) and mapObj (the door object, map_objs[mapObj]). */
 typedef struct ExitDestination {
     /* 0x00 */ s32 map;
     /* 0x04 */ s32 subarea;
