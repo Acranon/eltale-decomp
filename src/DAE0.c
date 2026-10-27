@@ -1,5 +1,12 @@
 #include "common.h"
 
+/*
+ * Bosses (8, one per map/sub-area in D_803AB3D0): defeated bits, the boss standing on
+ * the field map (load, draw, proximity trigger, encounter start), its battle record
+ * init, and the reward when one is beaten.
+ * Folder: src/game/enemy/   (proposed for round 4)
+ */
+
 typedef struct {
     f32 x;
     f32 y;

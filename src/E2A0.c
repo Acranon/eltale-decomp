@@ -1,5 +1,13 @@
 #include "common.h"
 
+/*
+ * Field map: area loading (ROM blocks, area/sub-area tables, map objects), drawing the
+ * map objects in the grid cells around the camera (opaque, translucent, billboards,
+ * spinning and texture-animated objects, sprite emitters), animated-object slots,
+ * the nearest ambient sound, colour-table blends/cycles.
+ * Folder: src/game/map/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ s32 timer;
     /* 0x04 */ s32 state;
