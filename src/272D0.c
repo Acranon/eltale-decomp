@@ -17,7 +17,7 @@ extern s32 D_8007A180;
 extern Gfx* D_8007A184;
 typedef struct { u8 r, g, b, a; } Color_RGBA8;
 /* .bss 8008CA50..8008CE60 */
-u16 D_8008CA50;
+u16 D_8008CA50; /* bit 0 quad on, 1 hold at the end, 2 step the ramp backwards, 3 letterbox bars */
 u8 D_8008CA58[0x100][4];
 s32 D_8008CE58;
 Color_RGBA8* D_8008CE5C;

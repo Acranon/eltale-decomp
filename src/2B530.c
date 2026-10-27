@@ -12,7 +12,7 @@ s32 D_8008FB30;
 s32 D_8008FB34;
 s32 D_8008FB38;
 u16 D_8008FB3C;
-u16 D_8008FB3E;
+u16 D_8008FB3E; /* bits 0-1 page, 0x10 TLUT loaded, 0x20 page edit mode, 0x1000 slide direction, 0x2000 slide, 0x4000 save menu, 0x8000 open */
 s8 D_8008FB40;
 s32 D_8008FB44;
 f32 D_8008FB48;

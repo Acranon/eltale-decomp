@@ -1,0 +1,232 @@
+# b05 data names (round 3, 2026-10-26). Objects defined in 25B20, 272D0, 27A90, 28D20, 29150, 2B0F0, 2B530 (27600 defines none).
+# Stay D_: D_8008C1A8/AC (unreferenced), D_8008F088 (two 0x40 heap blocks Audio_Init allocates, never read), D_8008F4C0 (count Audio_InitSoundPlayer writes, never read), D_8008F758 (alAudioFrame's cmdLen out-param, never read), D_8008FAE0/E4 (last queue index the two Sfx_Enqueue* write, never read), D_80056198/D_80056878 (unreferenced zero words), D_80057D24 and its keys D_80057A18 (anim header nothing references).
+# --- 25B20: items and the inventory menu
+D_8008C9B8	item_inventory	the 0x96 inventory item ids (+1 terminator byte), 0xFF = empty: Item_InitInventory fills it with 0xFF, Item_AddToInventory writes the first 0xFF slot, Item_Count*/Item_HasInventoryRoom read it, Item_UpdateInventoryMenu lists and removes from it, SaveMenu_Capture/RestoreGameState copy it
+D_8008C19C	item_menu_scroll	index of the first inventory slot shown by Item_UpdateInventoryMenu (list = &item_inventory[scroll]); the stick moves it when the cursor passes the 8-icon window; zeroed by Item_InitInventory
+D_8008C1A0	item_menu_cursor	cursor column 0..7 inside the visible window: Item_UpdateInventoryMenu draws the highlight at x = cursor * 0x44 + 0x1D4 and uses item_inventory[scroll + cursor] for the name, text and Item_TryUse
+D_8008C1A4	item_menu_stick_accum	Item_UpdateInventoryMenu adds the stick x (dead zone 5) each frame and moves the cursor when it passes +-250, reset on direction change or no input
+D_8008C1B0	item_icon_cache_ids	8 item ids whose icons are loaded in item_icon_cache_tex (0xFF = free, set by Item_InitInventory); Item_UpdateInventoryMenu reuses a matching slot or DMAs the icon into a free one
+D_8008C1B8	item_icon_cache_tex	8 x 0x100-byte CI8 16x16 icon textures: Item_UpdateInventoryMenu DMAs ROM D_D384B0 + 0x400 + id*0x100 into slot k and draws it with gDPLoadTextureBlock
+D_8004F4C0	item_menu_bob_phase	Item_UpdateInventoryMenu adds 0x300 per frame; sins(phase) moves the cursor sprite up/down and sins(2*phase) the scroll arrows
+D_8008C190	item_effect_scale	Vec3f passed as the scale argument (arg7: x/y factors, z) of Magic_CreateVisualEffect by Item_UseRestore and Item_UseWarp; x/y copied from D_803AB36C[n] +8/+0xC, z = 1
+D_8004F4A0	item_can_use_handlers	function table indexed by the item record's kind (+2): Item_CanUseNever/Restore/Warp/Spell; called by Item_TryUse
+D_8004F4B0	item_use_handlers	function table indexed by the item record's kind (+2): Item_UseNothing/Restore/Warp/Spell; called by Item_ApplyEffect
+# --- 272D0: screen fade. Fade_Start(frames, flags, ramp): the quad's colour is *fade_ramp_ptr, stepped +1 per frame (-1 with flag 4)
+D_8008CA50	fade_flags	Fade_UpdateAndDraw: bit 0 draw the fade quad (cleared when the count ends unless bit 1), bit 1 hold at the end, bit 2 step the ramp backwards, bit 3 draw the letterbox bars (set by the cutscene/ending loops); written by Fade_Start/Fade_Init
+D_8008CE58	fade_frames_left	frame count set by Fade_Start; Fade_UpdateAndDraw steps the ramp and decrements it while nonzero
+D_8008CE5C	fade_ramp_ptr	current Color_RGBA8 of the fade: Fade_Start sets it to the ramp, Fade_UpdateAndDraw sets the env colour from it (opaque render mode when a == 0xFF) and moves it by one entry per frame
+D_8008CA58	fade_grey_ramp_256	256 colours built by Fade_Init (grey 0xDC, alpha i*255/256); Fade_StartTransitionOut style 4 runs it forward for 0xFF frames, Fade_StartTransitionIn style 4 backward from its last entry (alias D_8008CE54)
+D_8004F4D0	fade_quad_vtx	4 vertices +-160 x +-120 at z -100, drawn by fade_quad_dl
+D_8004F510	fade_quad_dl	display list drawing fade_quad_vtx as two triangles; Fade_UpdateAndDraw calls it after setting the env colour
+D_8004F550	fade_letterbox_dl	two black fill rectangles (y 0..40 and 200..239); Fade_UpdateAndDraw draws it while fade_flags bit 3
+D_8004F5A0	fade_black_ramp	black, alpha 0x10..0x50: start of the style 0 ramp (16 steps to fade_black_ramp_end; Fade_StartTransitionOut style 0, 0xF frames); Player_Update fades 6 frames from it when the inventory opens
+D_8004F5B4	fade_black_ramp_dim	black, alpha 0x60..0xF0, the continuation of fade_black_ramp; its first entry (0x60) is where the 6-frame inventory-open fade holds, and the close fade (Item_UpdateInventoryMenu, Player_Update: Fade_Start(6, 4, it)) steps back from it
+D_8004F5DC	fade_black_ramp_end	opaque black after fade_black_ramp_dim; Fade_StartTransitionIn style 0 steps backwards from it for 0x10 frames
+D_8004F5E0	fade_grey_ramp	grey 0xDC, alpha 0x10..0xF0: Fade_StartTransitionOut style 1 (0xF frames)
+D_8004F61C	fade_grey_ramp_end	opaque grey after fade_grey_ramp; Fade_StartTransitionIn style 1 steps back from it for 0x10 frames
+D_8004F620	fade_black_ramp_slow	black, alpha 0x08..0xF8 in 31 steps: Fade_StartTransitionOut style 2 (0x1F frames)
+D_8004F69C	fade_black_ramp_slow_end	9 opaque black entries after fade_black_ramp_slow; Fade_StartTransitionIn style 2 steps back from the first for 0x20 frames
+D_8004F6C0	fade_grey_ramp_slow	grey 0xDC, alpha 0x08..0xF8 in 31 steps: Fade_StartTransitionOut style 3 (0x1F frames)
+D_8004F73C	fade_grey_ramp_slow_end	9 opaque grey entries after fade_grey_ramp_slow; Fade_StartTransitionIn style 3 steps back from the first for 0x20 frames
+D_8004F760	fade_damage_flash	4 grey colours (alpha 0x96, 0, 0x64, 0x20) run for 4 frames (Fade_Start(4, 0, it)) by Player_CalcMeleeDamage, Enemy_CalcAttackDamage and Magic_ApplyEffectDamage
+# --- 27A90: math
+D_8004F770	math_bit_masks	{1, 2, 4, ..., 0x80}: bit for index & 7 in Chest_IsOpened/SetOpened, Spirit_IsCollected/SetCollected, Boss_IsDefeated/SetDefeated
+D_8004F778	math_rand_seed	LCG state of Math_Rand (seed * 0x41C64E6D + 0x3039), initial 0x9B0
+D_8008CE60	math_scratch_mtxf	MtxF that Math_MtxRotScaleTrans/Rotate/AimAt/AlignYToVector build into before guMtxF2L
+# --- 28D20
+D_8008CEA0	dma_io_msg	the OSIoMesg Dma_ReadRom passes to each osPiStartDma
+# --- 29150: audio driver
+D_8008CEC0	audio_thread	OSThread created and started by Audio_StartThread (id 5, Audio_ThreadMain)
+D_8008D070	audio_thread_stack	0x2000 bytes just below the stack top &audio_heap that Audio_StartThread passes to osCreateThread; nothing else touches it
+D_8008F070	audio_heap	ALHeap: alHeapInit over D_80332DB0 (0x68000) in Audio_Init; every audio alHeapAlloc and the synth/player configs use it
+D_8008F080	audio_cmd_lists	two 0x8000 Acmd buffers (Audio_Init); Audio_ThreadMain builds the frame's alAudioFrame list in [D_8005593C] and submits it as the task
+D_8008F090	audio_output_buffers	three 0x8000 sample buffers (Audio_Init); Audio_ThreadMain renders into one and passes it to osAiSetNextBuffer
+D_8008F0A0	audio_dma_queue	message queue (1 slot, audio_dma_msg) for the osPiStartDma of Audio_DmaCallback
+D_8008F0D0	audio_dma_msg	message storage of audio_dma_queue (osCreateMesgQueue in Audio_Init)
+D_8008F0B8	audio_rom_read_queue	message queue (1 slot, audio_rom_read_msg) Audio_DmaReadRom starts its DMA on and waits on
+D_8008F0D4	audio_rom_read_msg	message storage of audio_rom_read_queue (osCreateMesgQueue in Audio_Init)
+D_8008F0D8	audio_dma_io_msgs	32 OSIoMesg, one per DMA Audio_DmaCallback starts in a frame (index audio_dma_count)
+D_8008F3D8	audio_globals	ALGlobals passed to alInit by Audio_Init
+D_8008F428	audio_syn_config	ALSynConfig Audio_Init fills (16 voices, dmaproc Audio_DmaNew, heap) for alInit; Audio_ThreadMain reads outputRate for the frame size
+D_8008F450	audio_sound_player	ALSndPlayer created by Audio_InitSoundPlayer (alSndpNew); Audio_Play/Stop/GetSoundState and Sfx_StepScript (pitch, volume, pan) drive it
+D_8008F4A8	audio_sound_player_config	ALSndpConfig for alSndpNew (0x50 sounds, 0x20 events, audio_heap)
+D_8008F4B8	audio_sound_bank	bank 0 of the sound bank file (audio_sound_bank_file->bankArray[0]), Audio_InitSoundPlayer
+D_8008F4B4	audio_sound_inst	instrument 0 of audio_sound_bank; Audio_InitSoundPlayer allocates one sound per entry of its soundArray
+D_8008F4BC	audio_sound_ids	ALSndId per sound of audio_sound_inst (alSndpAllocate); Audio_PlaySound/StopSound/Sfx_StepScript select a sound by its index
+D_8008F4C8	audio_dma_state	AMDMAState of the DMA buffer cache (initialized, firstUsed, firstFree): Audio_DmaNew links the free list, Audio_DmaCallback takes buffers, Audio_FreeOldDmaBuffers returns them
+D_8008F4D8	audio_dma_buffers	the 32 AMDMABuffer (0x500 bytes each) Audio_DmaNew links into audio_dma_state's free list
+D_8008F7A8	audio_seq_slots	the two sequence slots (ALCSPlayer, config, 0x8000 seq buffer, seq number): Audio_InitSeqPlayers creates them, Audio_LoadSeq/PlaySeq/StopSeq and the fades use them
+D_80055928	audio_seq_bank_file	ALBankFile read from ROM by Audio_InitSeqPlayers; its bank 0 is set on both sequence players
+D_8005592C	audio_sound_bank_file	ALBankFile read from ROM by Audio_InitSoundPlayer; audio_sound_bank = its bank 0
+D_80055930	audio_seq_file	ALSeqFile header + seqArray read by Audio_LoadSeqFileHeader; Audio_LoadSeq takes offset/len of seqArray[seqNo]
+D_80055934	audio_dma_count	DMAs started this frame: Audio_DmaCallback uses it as the audio_dma_io_msgs index and increments it, Audio_FreeOldDmaBuffers resets it
+D_80055938	audio_frame_count	incremented each frame by Audio_FreeOldDmaBuffers; Audio_DmaCallback stamps buffers with it, buffers older than 2 frames are freed
+D_800559B4	audio_seq_volume_limit	sequence volume target: Audio_SetSeqVolume sets vol * 128 + 0x7F on both players; the fade-in stops at it, the fade-out clamps to it
+D_800559B8	audio_active_seq_slot	the sequence slot (0 or 1) the fades act on; Audio_StartSeqRequest sets 1 for request 1, else 0
+D_800559BC	audio_pending_seq_request	request Audio_StartSeqRequest keeps (0xFF = none) while it must wait for players to stop; Audio_UpdateFrame retries it each frame
+D_800559C0	audio_loaded_seq	sequence number last started in slot 0 (0xFF = none); Audio_StartSeqRequest skips Audio_LoadSeqsOrStop when the request equals it
+D_800559C4	audio_seq_volumes	current volume of each sequence slot; Audio_StartSeqRequest, the fade steps and Audio_SetSeqVolume write it and set the player volume from it
+D_800559CC	audio_seq_fade_out_step	per-frame decrement set by Audio_StartSeqFadeOut (0x8000 / frames); Audio_UpdateFrame runs Audio_StepSeqFadeOut while nonzero
+D_800559D0	audio_seq_fade_in_step	per-frame increment (0x100) set by Audio_StartSeqRequest for fade-in requests (>= 0x50); Audio_UpdateFrame runs Audio_StepSeqFadeIn while nonzero
+D_8004F780	sfx_pitch_table	73 pitch ratios: Sfx_StepScript calls alSndpSetPitch(audio_sound_player, table[script word])
+D_8004F8A4	sfx_script_data	the sound scripts (asset): sfx_scripts points into it; Sfx_StepScript reads duration, pitch index, volume and pan words and the 0xFFFD/0xFFFE/0xFFFF codes
+D_80055A24	sfx_scripts	70 pointers into sfx_script_data, one per sound id; Sfx_SelectScript loads [id] (ids 0..0x46, else 0) into sfx_script_pos
+D_8005594C	sfx_queue_ids	8-entry ring of requested sound ids (0xFF = empty): Sfx_Enqueue* write at sfx_queue_write, Sfx_ProcessQueue takes one at sfx_queue_read
+D_8005596C	sfx_queue_volumes	volume factor per ring entry (Sfx_Enqueue arg1); Sfx_ProcessQueue copies it to the channel's sfx_channel_volume_factor
+D_8005598C	sfx_queue_pans	pan per ring entry (Sfx_Enqueue arg2, 0x40 default); Sfx_ProcessQueue copies it to sfx_channel_pan
+D_800559AC	sfx_queue_read	read index of the sound ring (0..7), advanced by Sfx_ProcessQueue
+D_800559B0	sfx_queue_write	write index of the sound ring (0..7), advanced by Sfx_Enqueue and Sfx_EnqueueDefault
+D_800559D4	sfx_channel_sound	sound id playing on each of the 5 script channels (0xFF = none): Sfx_ProcessQueue assigns it, Sfx_StepScript/Sfx_StopAllChannels/Sfx_StopChannel4 stop it
+D_800559E8	sfx_channel_timer	frames until each channel's next script step: Sfx_StepScript sets it from the script's duration word, Audio_UpdateFrame counts it down and steps at 0
+D_800559FC	sfx_channel_volume_factor	per-channel volume factor from the request (0 = use the script volume as is); Sfx_StepScript multiplies it by the script volume >> 8
+D_80055A10	sfx_channel_pan	per-channel pan from the request; Sfx_StepScript uses the script's pan only while it is 0x40, else sets this one
+D_8008F768	sfx_channel_volume_word	last volume word of each channel's script; Sfx_StepScript reuses it (>> 8, times the factor) when the step has no volume (0xFFFF)
+D_8008F764	sfx_cur_channel	channel (0..4) Sfx_StepScript works on: Audio_UpdateFrame loops it over the channels, Sfx_ProcessQueue picks it for a new request
+D_8008F75C	sfx_script_pos	script pointer of the current channel: Sfx_SelectScript sets it, Sfx_StepScript reads and advances it, then saves it in the channel's sfx_chN_script_pos
+D_8008F760	sfx_script_loop_pos	loop mark of the current channel: Sfx_StepScript sets it at 0xFFFD and jumps back to it at 0xFFFE, saved per channel in sfx_chN_loop_pos
+D_8008F77C	sfx_ch0_script_pos	channel 0's saved sfx_script_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F780	sfx_ch1_script_pos	channel 1's saved sfx_script_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F784	sfx_ch2_script_pos	channel 2's saved sfx_script_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F788	sfx_ch3_script_pos	channel 3's saved sfx_script_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F78C	sfx_ch4_script_pos	channel 4's saved sfx_script_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F790	sfx_ch0_loop_pos	channel 0's saved sfx_script_loop_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F794	sfx_ch1_loop_pos	channel 1's saved sfx_script_loop_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F798	sfx_ch2_loop_pos	channel 2's saved sfx_script_loop_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F79C	sfx_ch3_loop_pos	channel 3's saved sfx_script_loop_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+D_8008F7A0	sfx_ch4_loop_pos	channel 4's saved sfx_script_loop_pos (Sfx_StepScript stores, Audio_UpdateFrame restores)
+# --- 2B0F0: BGM and sound requests
+D_8008FAF0	bgm_current	BGM now playing (-1 = none): Bgm_Update sets it from bgm_next and loads/plays it; Bgm_Play* compare requests with it; Core_RunMenuLoop waits for it to become -1
+D_8008FAF1	bgm_next	BGM requested by Bgm_Play/PlayDelayed/PlayForMap; Bgm_Update moves it to bgm_current once the old sequence has stopped
+D_8008FAF2	bgm_flags	Bgm_Update: bit 0 change requested (waits bgm_change_delay), bit 1 stop the current sequence, bit 2 wait for it to stop, then start bgm_next
+D_8008FAF6	bgm_change_delay	frames Bgm_Update waits before acting on a change request; set by Bgm_PlayDelayed/Bgm_PlayForMap
+D_8008FAF4	sfx_master_volume	scales every sound: Sfx_Play/Sfx_PlayIfAudible volume = sfx_volumes[id] * vol * this >> 16; 0xFF from Bgm_Init, 0 in Core_RunCameraCutsceneLoop
+D_8008FAF8	sfx_delayed	16 delayed-sound slots (frames, id, volume): Sfx_Play fills a free one when delay != 0, Bgm_Update counts them down and calls Sfx_Enqueue at 0; cleared by Bgm_Init
+D_80055B40	bgm_map_table	72 (map, submap or -1 for any, bgm) entries searched by Bgm_PlayForMap
+D_80055CF0	bgm_volume_levels	sequence volume (0, 0x78, 0xB4, 0xDC, 0xFF) for each value 0..4 of menu_bgm_volume_option; Bgm_ApplyVolumeOption passes it to Audio_SetSeqVolume
+D_80055CF8	sfx_volumes	per-sound-id base volume (mostly 0xFA) used by Sfx_Play and Sfx_PlayIfAudible
+# --- 2B530: start menu (game state 2)
+D_8008FB3E	menu_flags	bits 0-1 page (0 stats, 1 map, 2 elements, 3 options), 0x10 menu TLUT loaded (Menu_DrawSprite/Number), 0x20 a page is in edit/cursor mode (blocks B/Start from closing the menu), 0x100-0x800 options-page edit state, 0x1000 slide direction, 0x2000 page slide, 0x4000 save menu (SaveMenu_Init), 0x8000 menu open; Menu_Init sets 0x8000
+D_8008FB44	menu_frame_counter	incremented by Menu_Update every frame; the pages use (counter >> 2) & 0xF into menu_wobble_offsets and bit 0x20 to blink the map marker
+D_80060D64	menu_wobble_offsets	16 small x offsets (0..-3..0) indexed by menu_frame_counter; the pages move the left/right arrow sprites 6/7 by +-offset; SaveMenu_UpdateSlotList reads it the same way
+D_8008FB38	menu_slide_timer	frames left of the page slide: set to 31 by the pages when the stick/button starts a slide, Menu_UpdatePageSlide decrements it (offset timer^2 * 0.3125) and switches the page at 0
+D_8008FB30	menu_slide_right_x	x of the page on the right during Menu_UpdatePageSlide (320 - d or d)
+D_8008FB34	menu_slide_left_x	x of the page on the left during Menu_UpdatePageSlide (-d or d - 320)
+D_8008FB40	menu_save_loaded	set by Menu_Update when the save menu closes after a file was loaded (SaveMenu_LoadSelectedFile sets D_8008FB70 bit 0x80); Core_RunMenuLoop then calls Player_SetSpawnFromSaveTable
+D_80060CB0	menu_bgm_volume_option	BGM volume option 0..4 (default 2): Menu_UpdateOptionsPage moves it on the lower row, Bgm_ApplyVolumeOption looks up bgm_volume_levels with it, the save menu saves/restores it
+D_8008FB58	menu_options_marker_x	x of the moving option marker: Menu_UpdateOptionsPage sets it from the old position and steps it 1 px per frame towards the new one
+D_800615A8	menu_options_marker_sprites	sprite ids 0x28, 0x27, 0x26 chosen by column [1] of the option position tables (retail keeps Menu_UpdateOptionsPage's local ids[] here)
+D_800615AC	menu_options_top_row_pos	(x, marker sprite index) for each value of the upper option row (D_800616B0, y 0x39) in Menu_UpdateOptionsPage
+D_800615CC	menu_options_bgm_row_pos	(x, marker sprite index) for each value 0..4 of menu_bgm_volume_option (row y 0x67) in Menu_UpdateOptionsPage
+D_80060CB4	menu_sprite_sizes	texture width/height of each menu sprite id; Menu_DrawSprite loads the tile with them
+D_80060D74	menu_sprite_tex	CI8 texture of each menu sprite id: Menu_DrawSprite draws [id], Menu_DrawNumber/ZeroPad [pal + digit]
+D_80060ED8	menu_sprite_opaque_dl	combine-mode display list Menu_DrawSprite (alpha 0) and Menu_DrawExpGauge (layers other than 1) call before a sprite
+D_80060EF0	menu_sprite_alpha_dl	combine-mode display list Menu_DrawSprite (alpha != 0) and Menu_DrawExpGauge (layer 1) call before setting the env alpha
+D_800615E4	menu_exp_gauge_tluts	the 4 layer palettes Menu_DrawExpGauge loads (copied to a local)
+D_800615F4	menu_exp_gauge_tex	4 layers x 2 column textures Menu_DrawExpGauge draws (copied to a local)
+D_80061634	menu_bg_strip_tex	the 4 CI8 64-wide textures Menu_DrawBackground draws as strips (top half, then mirrored)
+D_80061614	menu_bg_strip_tex_heights	texture height of each menu_bg_strip_tex (32, 32, 32, 24), Menu_DrawBackground
+D_80061624	menu_bg_strip_heights	screen height of each background strip (26, 26, 26, 20), Menu_DrawBackground
+D_8008FB50	menu_map_region	map page region set by Menu_FindMapPageLocation (count of -1 markers in menu_map_location_list): < 6 a full map picture, >= 6 a small one; Hud_DrawCompass reads it
+D_8008FB54	menu_map_spot	spot inside the region (count of -2 markers, -1 = none) set by Menu_FindMapPageLocation; >= 0 places the player marker at menu_map_spot_coords instead of the player's position
+D_80060F30	menu_map_location_list	(map, submap) list Menu_FindMapPageLocation scans for D_800842BC/C0: -1 starts a region, -2 a spot, -8 ends
+D_8006125C	menu_map_tluts	palette address per full-map region (all 0x801C0000, the DMA destination); Menu_UpdateMapPage loads it
+D_80061274	menu_map_strips	24 texture strip addresses (244 wide, 8 rows) per full-map region; Menu_UpdateMapPage draws [region * 24 + i]
+D_800614E4	menu_map_picture_dma	(RAM 0x801C0000, ROM start, end) per region; Menu_UpdateMapPage DMAs it (Dma_ReadRom) when the region changes
+D_800615E0	menu_map_loaded_region	region whose picture was last DMA'd (initial -1); Menu_UpdateMapPage reloads when menu_map_region differs (a function static in the NON_MATCHING C)
+D_8006155C	menu_map_small_tluts	palette address per small region (region - 6), Menu_UpdateMapPage
+D_8006156C	menu_map_small_tex	two texture halves per small region (region - 6), Menu_UpdateMapPage draws them one above the other
+D_8006158C	menu_map_small_sizes	(width, top height, bottom height) per small region, Menu_UpdateMapPage
+D_80061598	menu_map_small_pos	(x, y) screen position per small region, Menu_UpdateMapPage
+D_800614B4	menu_map_world_scale	world units per map pixel per full-map region: [region] for x, [region + 6] for z; Menu_UpdateMapPage and Menu_FindMapPageLocation convert positions with it
+D_800614CC	menu_map_origin	map pixel of world 0 per full-map region: [region] x, [region + 6] y; same users as menu_map_world_scale
+D_80061184	menu_map_spot_coords	(x, y) map coordinates for up to 9 spots per region ([region * 18 + spot * 2]); Menu_UpdateMapPage draws the player marker there when menu_map_spot >= 0
+D_80060F28	menu_map_cursor_x	map-page cursor x (6..236, -1 = unset): Menu_UpdateMapPage moves it with the stick while menu_map_cursor_active and draws the cursor; Menu_FindMapPageLocation sets 115 if unset
+D_80060F2C	menu_map_cursor_y	map-page cursor y (6..178), as menu_map_cursor_x (Menu_FindMapPageLocation sets 86 if unset)
+D_8008FB3C	menu_map_cursor_active	toggled by A on the map page (Menu_UpdateMapPage): while set the stick moves the cursor instead of sliding the page and B restores the saved position
+D_8008FB5C	menu_map_cursor_saved_x	menu_map_cursor_x saved while the cursor is inactive; B restores it (Menu_UpdateMapPage)
+D_8008FB60	menu_map_cursor_saved_y	menu_map_cursor_y saved while the cursor is inactive; B restores it (Menu_UpdateMapPage)
+D_8008FB48	menu_map_marker_x	world x of the map cursor (menu_map_world_scale * (cursor_x - origin)), written by Menu_UpdateMapPage/Menu_FindMapPageLocation; Hud_DrawCompass points from the player to it
+D_8008FB4C	menu_map_marker_z	world z of the map cursor, as menu_map_marker_x (Hud_DrawCompass)
+# --- 2B530 .data used by the player (3F50)
+D_80055D40	player_char_data	pointer table indexed by the actor's unk50 (one entry, 0x80206064 inside the block Player_Init DMAs to 0x80206000); Player_Spawn, Player_Update, Player_Draw, Player_TakeDamage and others read the per-character data from it
+D_80055D44	player_default_stats	stats record Player_Init copies into D_8007A9D0 (HP 50/50, MP 15/15, ...)
+D_80055D7C	player_level_exp_table	100 exp thresholds indexed by level (+0x34): Player_UpdateStatGrowth levels up when exp (+0x10) reaches it, Menu_UpdateElementsPage shows exp as % of it
+D_80055F0C	player_stat_xp_costs	70 XP costs indexed by each stat's growth count (+0x30..+0x33): Player_UpdateStatGrowth raises HP/MP/agility/defense when their XP reaches it, Menu_UpdateStatsPage shows XP as % of it
+D_80055F98	player_anim_rom_ranges	(ROM start, end) per animation id; Player_LoadAnim DMAs [actor.unk52] to 0x80200000
+D_80056088	player_save_spawn_points	17 (map, submap, x, z, rot) entries Player_SetSpawnFromSaveTable looks up (Q64 gSaveSpawnLocationTbl, Rainchus dump.toml)
+# --- 2B530 .data used by enemies (AEA0)
+D_800561A0	enemy_area_sets	(ROM start, end, three RAM pointers) per area set: Enemy_LoadAreaSet picks [area->unk12], takes the anim table D_8007C048 and D_8007C04C from it and DMAs the range to D_8020E6F0
+D_800566C8	enemy_attack_scripts	20 attack script pointers (NULL = none) indexed by attack id; Enemy_StartAttackScript starts [id] for Enemy_RunAttackScript
+D_80056218	enemy_attack_script_0	entry 0 of enemy_attack_scripts: (frame, effect def, flags, ..., offsets) steps run by Enemy_RunAttackScript, flag 1 on the last
+D_800562A8	enemy_attack_script_1	entry 1 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_800562C0	enemy_attack_script_2	entry 2 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056338	enemy_attack_script_3	entry 3 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056350	enemy_attack_script_5	entry 5 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_800563E0	enemy_attack_script_7	entry 7 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_800563F8	enemy_attack_script_8	entry 8 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056470	enemy_attack_script_10	entry 10 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056500	enemy_attack_script_11	entry 11 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056560	enemy_attack_script_12	entry 12 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_800565C0	enemy_attack_script_13	entry 13 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056638	enemy_attack_script_14	entry 14 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056668	enemy_attack_script_16	entry 16 of enemy_attack_scripts (steps for Enemy_RunAttackScript)
+D_80056718	enemy_effect_defs	22 (effect template index into D_800C18D8, two Magic_CreateVisualEffect ids, x/y scale) records: Enemy_RunAttackScript uses [step->unk2], Enemy_SpawnDeathEffects entry 20
+# --- 2B530 .data used by NPC/area loading (9D50)
+D_80056880	npc_area_set_rom_ranges	(ROM start, end) per area set: func_80009764 (called by Npc_InitArea and 3B40 on area entry) DMAs [area->unk12] to D_8020E6F0, the buffer Enemy_LoadAreaSet uses in battle
+D_800568B8	npc_area_entry_message	message (asset) Npc_InitArea shows with Npc_SetMessage(0, it) + Text_OpenWindow(1) when D_8007A172 == 1 (set by Core_ResetGameState)
+# --- 2B530 .data used by the map (E2A0)
+D_80056BB0	map_area_defs	36 area records (flags, ROM block and its RAM destination, sub-area/object tables, ...): Map_LoadArea makes [D_800842C4] the current D_8007C284
+D_80057540	map_extra_rom_ranges	(ROM start, end, RAM 0x801F8000) records: Map_LoadArea DMAs [area->unk3C] when the area flags & 7
+D_80060C48	map_backdrop_defs	(ROM start, display list) per backdrop id: Map_LoadArea DMAs 0x800 + 0x4000 bytes from the start when the id changes, Map_DrawBackdrop calls the list
+D_8005758C	mapobj_cell_disc_r7	157 (dx, dz) grid offsets forming a disc of radius 7; MapObj_UpdateAndDrawNearby collects those cells around the camera when the grid mode (unk28) is 1
+D_800576C8	mapobj_cell_disc_r5	89 (dx, dz) offsets, disc of radius 5: grid mode 2 of MapObj_UpdateAndDrawNearby
+D_8005777C	mapobj_cell_square_3x3	9 (dx, dz) offsets, the 3x3 block: grid mode 3 of MapObj_UpdateAndDrawNearby
+D_80057790	mapobj_cell_disc_r2	21 (dx, dz) offsets around the centre, radius 2 (the second entry repeats (-1,-2) where (1,-2) would complete the disc): grid mode 4 of MapObj_UpdateAndDrawNearby
+D_80057588	mapobj_cell_single	the single (0, 0) offset MapObj_UpdateAndDrawNearby uses for any other grid mode (cell 0 only)
+D_8005839C	mapobj_loop_anims	4 keyframe tracks: MapObj_UpdateAndDrawNearby samples [flags bits 8-11] for objects with flag 0x2000, frame in flags & 0xFF restarting at 0 at the track's end
+D_80058028	mapobj_loop_anim0_keys	keyframes (asset) of mapobj_loop_anims[0]
+D_800580C4	mapobj_loop_anim1_keys	keyframes (asset) of mapobj_loop_anims[1]
+D_80058194	mapobj_loop_anim2_keys	keyframes (asset) of mapobj_loop_anims[2]
+D_80058298	mapobj_loop_anim3_keys	keyframes (asset) of mapobj_loop_anims[3]
+D_800579F8	mapobjanim_type23_anim	keyframe track MapObjAnim_Start/UpdateAll run for objects of type bits 8-11 = 2 or 3 with type bit 0 clear
+D_800577BC	mapobjanim_type23_keys	keyframes (asset) of mapobjanim_type23_anim
+D_80057F80	mapobjanim_type23_odd_anim	keyframe track MapObjAnim_Start/UpdateAll run for type bits 8-11 = 2 or 3 with type bit 0 set
+D_80057D44	mapobjanim_type23_odd_keys	keyframes (asset) of mapobjanim_type23_odd_anim
+D_80058008	mapobjanim_type4_anim	keyframe track MapObjAnim_Start/UpdateAll run for type bits 8-11 = 4
+D_80057FA0	mapobjanim_type4_keys	keyframes (asset) of mapobjanim_type4_anim
+D_80060C88	mapobj_translucent_alpha	env alpha per map id (D_800842BC) MapObj_DrawTranslucent sets for the alpha-blended objects
+D_8005E5A0	mapobj_animtex_dls	(setup list, quad list) for kind 0x11 and 0x12 objects: MapObj_DrawAnimTexBillboards calls [type - 0x11].a once, then the quad list through the alias D_8005E51C
+D_8005E5F0	mapobj_animtex_frame_tables	the two 8-frame texture tables (kind 0x11, 0x12) MapObj_DrawAnimTexBillboards picks through the alias D_8005E5AC
+D_8005E4A0	mapobj_kind11_setup_dl	setup list for kind 0x11 animated billboards: render state and the TLUT mapobj_kind11_tlut (mapobj_animtex_dls[0].a)
+D_8005841C	mapobj_kind11_tlut	palette loaded by mapobj_kind11_setup_dl
+D_8005E420	mapobj_kind11_vtx	16 x 23 quad drawn by mapobj_kind11_quad_dl
+D_8005E570	mapobj_kind11_quad_dl	draws mapobj_kind11_vtx (mapobj_animtex_dls[0].b)
+D_8005E5B0	mapobj_kind11_frames	the 8 texture frames of kind 0x11 (mapobj_animtex_frame_tables[0]), chosen by (timer >> 1) & 7
+D_8005881C	mapobj_kind11_tex_0	frame 0 of mapobj_kind11_frames
+D_80058E1C	mapobj_kind11_tex_1	frame 1 of mapobj_kind11_frames
+D_8005941C	mapobj_kind11_tex_2	frame 2 of mapobj_kind11_frames
+D_80059A1C	mapobj_kind11_tex_3	frame 3 of mapobj_kind11_frames
+D_8005A01C	mapobj_kind11_tex_4	frame 4 of mapobj_kind11_frames
+D_8005A61C	mapobj_kind11_tex_5	frame 5 of mapobj_kind11_frames
+D_8005AC1C	mapobj_kind11_tex_6	frame 6 of mapobj_kind11_frames
+D_8005B21C	mapobj_kind11_tex_7	frame 7 of mapobj_kind11_frames
+D_8005E508	mapobj_kind12_setup_dl	setup list for kind 0x12 animated billboards: render state and the TLUT mapobj_kind12_tlut (mapobj_animtex_dls[1].a)
+D_8005B41C	mapobj_kind12_tlut	palette loaded by mapobj_kind12_setup_dl
+D_8005E460	mapobj_kind12_vtx	16 x 32 quad drawn by mapobj_kind12_quad_dl
+D_8005E588	mapobj_kind12_quad_dl	draws mapobj_kind12_vtx (mapobj_animtex_dls[1].b)
+D_8005E5D0	mapobj_kind12_frames	the 8 texture frames of kind 0x12 (mapobj_animtex_frame_tables[1]), chosen by (timer >> 1) & 7
+D_8005B81C	mapobj_kind12_tex_0	frame 0 of mapobj_kind12_frames
+D_8005BE1C	mapobj_kind12_tex_1	frame 1 of mapobj_kind12_frames
+D_8005C41C	mapobj_kind12_tex_2	frame 2 of mapobj_kind12_frames
+D_8005CA1C	mapobj_kind12_tex_3	frame 3 of mapobj_kind12_frames
+D_8005D01C	mapobj_kind12_tex_4	frame 4 of mapobj_kind12_frames
+D_8005D61C	mapobj_kind12_tex_5	frame 5 of mapobj_kind12_frames
+D_8005DC1C	mapobj_kind12_tex_6	frame 6 of mapobj_kind12_frames
+D_8005E21C	mapobj_kind12_tex_7	frame 7 of mapobj_kind12_frames
+D_8005E9F8	mapobj_arc_sprite_tex	8 frames of 0x400 bytes: MapObj_EmitArcSprite gives each sprite frame [timer] (timer << 10) with mapobj_arc_sprite_dl
+D_8005E5F8	mapobj_arc_sprite_tlut	palette loaded by mapobj_arc_sprite_dl
+D_800609F8	mapobj_arc_sprite_vtx	unit quad drawn by mapobj_arc_sprite_dl
+D_80060A38	mapobj_arc_sprite_dl	render setup, TLUT mapobj_arc_sprite_tlut and quad mapobj_arc_sprite_vtx; the display list of MapObj_EmitArcSprite's sprite descriptor
+D_80060AB8	mapobj_drop_sprite_tex	texture of MapObj_EmitDropSprite's sprite descriptor
+D_80060BB8	mapobj_drop_sprite_vtx	1 x 2 quad drawn by mapobj_drop_sprite_dl
+D_80060BF8	mapobj_drop_sprite_dl	render setup and quad mapobj_drop_sprite_vtx; the display list of MapObj_EmitDropSprite's sprite descriptor
