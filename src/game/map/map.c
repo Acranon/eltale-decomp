@@ -88,7 +88,9 @@ extern u8 mapobj_drop_sprite_dl[];
  * .bss order (first declaration; IDO sorts by declaration number mod 256, later blocks first on
  * a tie), and Map_BlendPaletteByClock's static map_clock_blend_len only lands at 80082858
  * (after mapobj_noanim_list) if few declarations sit between those externs and the static:
- * keep new declarations above this include. Margin: about 2 more or 3 fewer. */
+ * keep new declarations above this include (margin: about 2 more or 3 fewer). The extern block
+ * also must not cross a multiple of 256 declarations: about 24 more declarations above this
+ * include still work, env.h's are too many (so the EnvAreaSettings view stays local). */
 #include "game/map/map.h"
 
 void Effect_QueueMapObjEmitter(f32, f32, f32, MapObj *);
