@@ -195,8 +195,8 @@ extern u8 D_8006CC74;
 extern u8 D_8006CC78;
 extern u8 D_8006CC7C;
 
-s32 func_80035A24(s32);
-s32 func_8003609C(s32);
+s32 Pak_ScanGameFiles(s32);
+s32 Pak_ClassifyError(s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 void func_8003D8EC(char *, ...);
@@ -244,7 +244,7 @@ s32 func_8020C16C_ovl_intro(void) {
     if (D_8006CC7C == 0) {
         switch (D_80212238_ovl_intro) {
             case 0:
-                err = func_8003609C(func_80035A24(D_80092C80));
+                err = Pak_ClassifyError(Pak_ScanGameFiles(D_80092C80));
                 func_8003D8EC("pack_status = %d\n", err);
                 if (err != -1 && err != -2 && err != -3) {
                     if (D_80092E48[D_80092C80].unk0 & 0x2000) {

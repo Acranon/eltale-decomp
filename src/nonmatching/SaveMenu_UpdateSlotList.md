@@ -1,9 +1,9 @@
-# func_80030D5C
+# SaveMenu_UpdateSlotList
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/30600.c`](../30600.c)
-- Retail assembly: [`asm/nonmatchings/30600/func_80030D5C.s`](../../asm/nonmatchings/30600/func_80030D5C.s)
+- Retail assembly: [`asm/nonmatchings/30600/SaveMenu_UpdateSlotList.s`](../../asm/nonmatchings/30600/SaveMenu_UpdateSlotList.s)
 - Retail code size: `0xdcc` bytes
 - Current gap: 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact. Retail keeps the `~7` mask in s1 (`and`) where the C uses `andi 0xFFF8`, and spills the wobble value around the arrow calls; stack homes and registers differ.
 - Specific blocker: 14-byte copy is known; pointer homes and late flag/cursor lifetimes differ.
@@ -26,9 +26,9 @@ Verdict: **equivalent** (one note).
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_80030D5C** (0xE50 bytes)
+- **SaveMenu_UpdateSlotList** (0xE50 bytes)
   - w6 s3: Not drafted (917 and 1052 instructions, -g3, several jump tables, same stack-slot problems as 800301DC). 80030D5C uses a 14-byte local copy of D_80061650 at sp+0x38 and indexes D_8008FBA8 entries by sp5C (0x68 stride).
-  - w6 s4: 30600, 883 instructions, drafted for the first time: d5c3.c / drafts/func_80030D5C.c. It needs header changes, applied by hook scratchpad/w6/h5c.py: Unk8007A9D0 gets named fields (u16 unk4, unk8; u8 unk24..27; still 0x38 bytes), Bytes14 struct for the 14-byte copy of D_80061650 (a struct copy gives the retail lw/lw/lw/lhu), D_8008FB7B becomes u8, plus externs/prototypes. Frame 96 matches. Struct about 47 of 883. Left: p is register-then-spill in mine but memory-resident from its definition in retail; flag (second use, the cursor offset) is the reverse; one constant-store scheduling difference in block 2. Permuter 25 min: 6335 to 4950.
+  - w6 s4: 30600, 883 instructions, drafted for the first time: d5c3.c / drafts/SaveMenu_UpdateSlotList.c. It needs header changes, applied by hook scratchpad/w6/h5c.py: Unk8007A9D0 gets named fields (u16 unk4, unk8; u8 unk24..27; still 0x38 bytes), Bytes14 struct for the 14-byte copy of D_80061650 (a struct copy gives the retail lw/lw/lw/lhu), D_8008FB7B becomes u8, plus externs/prototypes. Frame 96 matches. Struct about 47 of 883. Left: p is register-then-spill in mine but memory-resident from its definition in retail; flag (second use, the cursor offset) is the reverse; one constant-store scheduling difference in block 2. Permuter 25 min: 6335 to 4950.
   - w6 s5: Needs one more named local between n and color and one between buf and p (retail homes are 0x5C, 0x58, 0x54, 0x50, 0x4C, 0x48, buf at 0x38, 0x34, 0x30), but adding them grows mine to 104 because mine has an extra reserved spill slot. Register allocation has to come closer first.
   - w6 s6: 30600. The old draft needs hook h5c.py (Bytes14 etc.) and is around 690 words off. Retail homes are idx 92, flag 88, 84, n 80, X 76, color 72, buf 56, Y 52, p 48, spill 44. There is no home for the e pointer, so retail has no e local; removing it is right. Even with padX/padY and no e, mine puts the spill at 48 with an empty slot at 52, which makes the frame 104 instead of 96.
   - Codex D1 implementation: D1 pass: valid storage-layout lead reduces697 to315 raw instruction words. Code remains3508 vs3532 bytes (24 short); do not include migrated rodata in code-size comparisons. Persistent pointer and color as one-element local arrays, removing e, and idx-before-pointer increment improve prefix. Draft codex-ui/round2/30D5C.best.c and full replay; still GLOBAL_ASM.

@@ -54,7 +54,7 @@ typedef struct {
 } Unk8007C288;
 
 void Player_Spawn(void);
-void func_800032E4(u8 *arg0, u8 *arg1);
+void Cutscene_CopyMessageBuffers(u8 *arg0, u8 *arg1);
 void func_80009764(u16 arg0);
 void Npc_SpawnForArea(s32 arg0, s32 arg1);
 void Map_LoadArea(void);
@@ -63,8 +63,8 @@ void func_80027430(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
 void func_80027834(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3, f32 *arg4, f32 *arg5, f32 *arg6);
 void func_8002A338(s32 arg0);
 void func_8002A6B8(s8 arg0);
-void func_80032BB0(s32 arg0, s32 arg1);
-void func_80032D20(u8 arg0);
+void Text_ResetAllWindows(s32 arg0, s32 arg1);
+void Text_OpenWindow(u8 arg0);
 
 /* This file's .bss, 8007A8C0..8007A8F0, in address order. D_8007A8C0 and
  * D_8007A8EC are unreferenced gaps (D_8007A8C0 could as well be 1870.c's tail). */
@@ -104,7 +104,7 @@ extern f32 D_80085F50;
 extern s32 D_80090450;
 extern Unk801C14E4 D_801C14E4[];
 
-void func_80002F40(s32 arg0) {
+void Cutscene_StartEntry(s32 arg0) {
     Unk801C14E4 *entry = &D_801C14E4[arg0];
     f32 mtx[4][4];
 
@@ -114,7 +114,7 @@ void func_80002F40(s32 arg0) {
     D_800842BC = -1;
     D_800842C4 = entry->unk0;
     D_800842C8 = entry->unk4;
-    func_80032BB0(0, arg0);
+    Text_ResetAllWindows(0, arg0);
     D_80090450 = 0;
     D_80084308 = -1;
     Map_LoadArea();
@@ -146,13 +146,13 @@ void func_80002F40(s32 arg0) {
     func_8002A6B8(((s8 *)&entry->unk3E)[1]);
 }
 
-s32 func_80003184(void) {
+s32 Cutscene_UpdateMessageSequence(void) {
     s32 ret = 0;
 
     if (D_8007A8E0 == 0) {
         if (D_8007A8E4 != 0) {
-            func_800032E4(D_8007A8E8->unk0, D_8007A8E8->unk4);
-            func_80032D20(D_8007A8E8->unk8);
+            Cutscene_CopyMessageBuffers(D_8007A8E8->unk0, D_8007A8E8->unk4);
+            Text_OpenWindow(D_8007A8E8->unk8);
             D_8007A8E0 = 0xF;
             D_8007A8E8++;
             D_8007A8E4--;
@@ -170,7 +170,7 @@ s32 func_80003184(void) {
     return ret;
 }
 
-void func_8000328C(u32 arg0) {
+void Cutscene_StartAudioFadeForEntry(u32 arg0) {
     Unk801C14E4 *entry;
 
     if (arg0 > 6) {
@@ -183,7 +183,7 @@ void func_8000328C(u32 arg0) {
     }
 }
 
-void func_800032E4(u8 *arg0, u8 *arg1) {
+void Cutscene_CopyMessageBuffers(u8 *arg0, u8 *arg1) {
     s32 i;
     u8 *dst;
 

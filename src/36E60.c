@@ -645,15 +645,15 @@ void func_8002A338(s32);
 void func_80026A00(Unk80092EDC *, f32 *, s32);
 void func_80027430(f32 (*)[4], f32, f32, f32);
 void func_80027834(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
-void func_80032BB0(s32, Unk80092EDC **);
-void func_80036544(Unk80092EDC *arg0, s32 frame);
+void Text_ResetAllWindows(s32, Unk80092EDC **);
+void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame);
 
-void func_80036260(void) {
+void Cutscene_ResetSequence(void) {
     D_80092ED0 = 0;
     D_80084980 = 0x34BC;
 }
 
-void func_8003627C(void) {
+void Cutscene_StartNextScene(void) {
     Unk801D8620 *e = &D_801D8620[D_80092ED0++];
     s32 i;
 
@@ -663,7 +663,7 @@ void func_8003627C(void) {
     D_800842BC = -1;
     D_800842C4 = e->unk0;
     D_800842C8 = e->unk4;
-    func_80032BB0(0, &D_80092EDC);
+    Text_ResetAllWindows(0, &D_80092EDC);
     D_80090450 = 0;
     D_80084308 = -1;
     Map_LoadArea();
@@ -681,7 +681,7 @@ void func_8003627C(void) {
     Camera_InitForMap();
     D_80085E48.unk0 = 3;
     D_80085F50 = 35.0f;
-    func_80036544(D_80092EDC, D_80092ED4);
+    Cutscene_ApplyCameraFrame(D_80092EDC, D_80092ED4);
     D_8007ABA4 = 0;
     D_8007B900 = 0;
     D_80092EE0 = 0;
@@ -691,8 +691,8 @@ void func_8003627C(void) {
     }
 }
 
-void func_8003642C(void) {
-    func_80036544(D_80092EDC, D_80092ED4++);
+void Cutscene_UpdateScene(void) {
+    Cutscene_ApplyCameraFrame(D_80092EDC, D_80092ED4++);
     if (D_80092ED8 - D_80092ED4 == 0x31) {
         if (!(D_8004DCA0 & 0x80)) {
             D_8004DCA0 |= 0x80;
@@ -709,7 +709,7 @@ void func_8003642C(void) {
     }
 }
 
-void func_800364F4(void) {
+void Cutscene_EndScene(void) {
     if (D_80092ED0 < 14) {
         D_8004DCA0 |= 0x60;
     } else {
@@ -718,7 +718,7 @@ void func_800364F4(void) {
     }
 }
 
-void func_80036544(Unk80092EDC *arg0, s32 frame) {
+void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame) {
     f32 buf[9];
     f32 m[4][4];
 
@@ -736,7 +736,7 @@ void func_80036544(Unk80092EDC *arg0, s32 frame) {
     D_80085E48.unk20 = D_80085E48.unk14 - D_80085E48.unk20;
 }
 
-void func_80036664(void) {
+void Cutscene_DrawImageCues(void) {
     Cue *cue;
     Unk80092EE8 *slot;
     s32 n;

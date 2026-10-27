@@ -16,11 +16,11 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`func_8002B844`](func_8002B844.md) | `src/2B530.c`, C under `NON_MATCHING` | 112 object words; length and frame (0x48) exact |
 | [`func_8002C598`](func_8002C598.md) | `src/2B530.c`, C under `NON_MATCHING` | 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120 |
 | [`func_8002DECC`](func_8002DECC.md) | `src/2B530.c`, C under `NON_MATCHING` | 328 object words; code 0x55C vs 0x560, frame 0xD8 exact |
-| [`func_80030D5C`](func_80030D5C.md) | `src/30600.c`, C under `NON_MATCHING` | 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact |
-| [`func_80031E10`](func_80031E10.md) | `src/30600.c`, C under `NON_MATCHING` | 20 register words; length and frame (0x40) exact |
-| [`func_80033050`](func_80033050.md) | `src/337B0.c`, C under `NON_MATCHING` | 18 object words; length exact, frame exact |
-| [`func_8003453C`](func_8003453C.md) | `src/337B0.c`, C under `NON_MATCHING` | 221 object words; length exact, frame 0x40 vs 0x48 |
-| [`func_80034C9C`](func_80034C9C.md) | `src/337B0.c`, C under `NON_MATCHING` | 92 object words; code 0x404 vs 0x400, frame 0xE0 vs 0xD8 |
+| [`SaveMenu_UpdateSlotList`](SaveMenu_UpdateSlotList.md) | `src/30600.c`, C under `NON_MATCHING` | 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact |
+| [`SaveMenu_SaveSelectedFile`](SaveMenu_SaveSelectedFile.md) | `src/30600.c`, C under `NON_MATCHING` | 20 register words; length and frame (0x40) exact |
+| [`Text_UpdateAndDrawWindows`](Text_UpdateAndDrawWindows.md) | `src/337B0.c`, C under `NON_MATCHING` | 18 object words; length exact, frame exact |
+| [`Text_BuildVisiblePage`](Text_BuildVisiblePage.md) | `src/337B0.c`, C under `NON_MATCHING` | 221 object words; length exact, frame 0x40 vs 0x48 |
+| [`Text_DrawTexturedRect`](Text_DrawTexturedRect.md) | `src/337B0.c`, C under `NON_MATCHING` | 92 object words; code 0x404 vs 0x400, frame 0xE0 vs 0xD8 |
 | [`Player_FindMeleeTarget`](Player_FindMeleeTarget.md) | `src/3F50.c`, C under `NON_MATCHING` | 5 object words |
 | [`Player_TakeDamage`](Player_TakeDamage.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
 | [`Enemy_RunAttackScript`](Enemy_RunAttackScript.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |

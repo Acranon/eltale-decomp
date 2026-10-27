@@ -160,8 +160,8 @@ extern u8 D_80226D00_ovl_title[];
 extern u8 D_80226D18_ovl_title[];
 
 void func_80029A88(s32, s32, s32);
-void func_80034C9C(s32, s32, s32, s32, s32);
-void func_80035350(s32, s32, u8*);
+void Text_DrawTexturedRect(s32, s32, s32, s32, s32);
+void Text_DrawEncodedString(s32, s32, u8*);
 
 
 /* .bss 80226DB0..80226DD0: DB0 and DB4 are shared with DAB5F0.c */
@@ -348,14 +348,14 @@ void func_8020CC70_ovl_title(s32 arg0) {
                 gDPPipeSync(D_8007A184++);
                 gDPLoadTLUT_pal256(D_8007A184++, D_80061850);
                 gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
-                func_80034C9C(0, 0x3E, 0x28, 0xC4, 0x67);
-                func_80034C9C(3, 0x102, 0x2A, 2, 0x67);
-                func_80034C9C(3, 0x40, 0x8F, 0xC4, 2);
+                Text_DrawTexturedRect(0, 0x3E, 0x28, 0xC4, 0x67);
+                Text_DrawTexturedRect(3, 0x102, 0x2A, 2, 0x67);
+                Text_DrawTexturedRect(3, 0x40, 0x8F, 0xC4, 2);
                 gDPPipeSync(D_8007A184++);
-                func_80034C9C(3, 0x3E, 0x28, 0xC4, 1);
-                func_80034C9C(3, 0x3E, 0x8E, 0xC4, 1);
-                func_80034C9C(3, 0x3E, 0x28, 1, 0x67);
-                func_80034C9C(3, 0x101, 0x28, 1, 0x67);
+                Text_DrawTexturedRect(3, 0x3E, 0x28, 0xC4, 1);
+                Text_DrawTexturedRect(3, 0x3E, 0x8E, 0xC4, 1);
+                Text_DrawTexturedRect(3, 0x3E, 0x28, 1, 0x67);
+                Text_DrawTexturedRect(3, 0x101, 0x28, 1, 0x67);
                 gDPPipeSync(D_8007A184++);
                 gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
                 GFX_WORDS(0xB900031D, 0x504240);
@@ -374,10 +374,10 @@ void func_8020CC70_ovl_title(s32 arg0) {
                 gSPTextureRectangle(D_8007A184++, 256 << 2, 42 << 2, 257 << 2, 142 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                 gDPPipeSync(D_8007A184++);
                 gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
-                func_80035350(0x44, 0x2E, D_80226DBC);
+                Text_DrawEncodedString(0x44, 0x2E, D_80226DBC);
                 if (arg0 == 8 || arg0 == 7 || arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
-                    func_80035350(0x94, 0x73, D_80211540_ovl_title);
-                    func_80035350(0x94, 0x80, D_80211548_ovl_title);
+                    Text_DrawEncodedString(0x94, 0x73, D_80211540_ovl_title);
+                    Text_DrawEncodedString(0x94, 0x80, D_80211548_ovl_title);
                     if (arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
                         gDPPipeSync(D_8007A184++);
                         GFX_WORDS(0xB900031D, 0x504240);

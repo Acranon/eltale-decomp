@@ -242,7 +242,7 @@ void func_800271B4(f32 arg0, Vec2f *arg1);
 void func_8002A338(s32 arg0);
 void func_8002A6B8(s32 arg0);
 void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
-s32 func_80032D20(s32 arg0);
+s32 Text_OpenWindow(s32 arg0);
 s32 Player_RollMeleeHit(s32 arg0, Actor *arg1);
 u16 Player_CalcMeleeDamage(PlayerState *arg0);
 void Player_MoveIdle(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
@@ -720,7 +720,7 @@ void Player_Update(void) {
                     p->actor.unkC = 0.0f;
                     Anim_SetCurrentAndNext(&D_8007AA20, D_8007A910, 1, D_8007A910, 1, 1);
                     Npc_StartTalk(D_8007A9C0);
-                    func_80032D20(D_8008C17C < 70 ? 0 : 1);
+                    Text_OpenWindow(D_8008C17C < 70 ? 0 : 1);
                     D_8004DCA0 |= 2;
                 } else if (D_8007A9C4 != NULL) {
                     s = p->unk14->unk24;
@@ -995,7 +995,7 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
     if (p->unk8 & 1) {
         if (D_8007A908 != 0) {
             if (--D_8007A908 == 0) {
-                func_80032D20(0);
+                Text_OpenWindow(0);
             }
         } else if (D_80090450 == 0) {
             p->unk8 &= ~1;
@@ -1314,7 +1314,7 @@ void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
         Player_MoveAndCollide(0xA00, arg0, arg1);
         if (arg1->unk4 == 0x20) {
             Item_BuildMessage(arg1->unk11C);
-            func_80032D20(1);
+            Text_OpenWindow(1);
             func_80025094(arg1->unk11C);
             D_8004DCA0 |= 2;
             func_8002A7C8(0, 0x3B, 0xFF);
@@ -1411,7 +1411,7 @@ void Player_StateExamine(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     }
     if (arg1->unk4 != 0) {
         if (--arg1->unk4 == 0) {
-            func_80032D20(1);
+            Text_OpenWindow(1);
             D_8004DCA0 |= 2;
         }
     } else if (D_80090450 == 0) {
@@ -2491,7 +2491,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
     }
     if (!(D_8004DCA0 & 0xA) && D_8007A9BC != 0xFF) {
         Item_BuildMessage(D_8007A9BC);
-        func_80032D20(1);
+        Text_OpenWindow(1);
         func_80025094(D_8007A9BF);
         D_8007A9BC = 0xFF;
         p->unk8 |= 2;

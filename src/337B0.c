@@ -15,7 +15,7 @@ typedef struct {
     /* 0x00E */ u8 unkE;
     /* 0x00F */ u8 unkF;
 #ifdef NON_MATCHING
-    /* func_80033050 reads these with lb/lhu/lb (the matched functions only store
+    /* Text_UpdateAndDrawWindows reads these with lb/lhu/lb (the matched functions only store
        them or compile the same with these widths) */
     /* 0x010 */ s8 unk10;
     /* 0x012 */ u16 unk12;
@@ -110,10 +110,10 @@ u16 D_80092C62;
 extern s8 D_80092C81;
 extern s8 D_80092C82;
 
-void func_80032BF8(s32 arg0, u8 arg1);
-void func_80034C9C(s32, s32, s32, s32, s32);
-void func_80035350(s32, s32, u8 *);
-void func_8003521C(void);
+void Text_ResetWindow(s32 arg0, u8 arg1);
+void Text_DrawTexturedRect(s32, s32, s32, s32, s32);
+void Text_DrawEncodedString(s32, s32, u8 *);
+void Text_ResetStickAdvanceTimer(void);
 
 #ifdef NON_MATCHING
 typedef union {
@@ -126,25 +126,25 @@ extern Gfx D_80061770[];
 extern u16 D_80092C86;
 extern u8 D_8008FB78;
 void func_8002A7C8(u8, s8, u8);
-s32 func_8003403C(s32);
-void func_80034380(s32);
-void func_8003453C(s32);
-void func_800348B8(s32);
-void func_80034B30(s32);
-void func_80034274(s32);
-s32 func_8003522C(void);
-s32 func_80032D20(s32);
+s32 Text_AnimateWindowSize(s32);
+void Text_DrawWindowFrame(s32);
+void Text_BuildVisiblePage(s32);
+void Text_DrawAdvanceIndicator(s32);
+void Text_MeasureChoiceWindow(s32);
+void Text_DrawWindowContents(s32);
+s32 Text_IsStickAdvanceHeld(void);
+s32 Text_OpenWindow(s32);
 #endif
 
-void func_80032BB0(s32 arg0) {
+void Text_ResetAllWindows(s32 arg0) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        func_80032BF8(i, 0);
+        Text_ResetWindow(i, 0);
     }
 }
 
-void func_80032BF8(s32 arg0, u8 arg1) {
+void Text_ResetWindow(s32 arg0, u8 arg1) {
     s32 i;
     s32 j;
 
@@ -179,7 +179,7 @@ void func_80032BF8(s32 arg0, u8 arg1) {
     }
 }
 
-s32 func_80032D20(s32 arg0) {
+s32 Text_OpenWindow(s32 arg0) {
     s32 ret = -1;
     s32 i;
     s32 j;
@@ -256,7 +256,7 @@ s32 func_80032D20(s32 arg0) {
 
 #ifdef NON_MATCHING
 /* 18 words: D_800616B0, the text cursor index and 0xE7000000 sit in other registers (allocation only); code is equivalent */
-void func_80033050(void) {
+void Text_UpdateAndDrawWindows(void) {
     Gfx *gfx;
     s32 w;
     s32 idx;
@@ -298,12 +298,12 @@ void func_80033050(void) {
         idx = order.v[w];
         if (idx >= 0) {
             if (D_80090470[idx].unk0 & 0x10000000) {
-                if (func_8003403C(idx) < 0) {
+                if (Text_AnimateWindowSize(idx) < 0) {
                     D_80090470[idx].unk0 &= ~0x10000000;
                     D_80090470[idx].unk0 |= 0xA8000000;
                 }
             } else if (D_80090470[idx].unk0 & 0x01000000) {
-                if (func_8003403C(idx) < 0) {
+                if (Text_AnimateWindowSize(idx) < 0) {
                     D_80090470[idx].unk0 = 0;
                     for (j = 0; j < 4; j++) {
                         if ((c = D_80090470[j].unk0 & 7) != 0) {
@@ -314,14 +314,14 @@ void func_80033050(void) {
                                 D_80090470[j].unk0 &= ~0x400000;
                                 D_80090470[j].unk0 |= 0x80000000;
                                 if (D_80090470[idx].unk0 & 0x80000) {
-                                    func_80032BF8(j, 1);
+                                    Text_ResetWindow(j, 1);
                                     D_80090470[j].unk0 |= 0x01000000;
                                     D_80090470[j].unk0 &= ~0x80000000;
                                 }
                             }
                         }
                     }
-                    func_80032BF8(idx, 0);
+                    Text_ResetWindow(idx, 0);
                     D_80090450--;
                     if (n <= 0) {
                         D_8004DCA0 &= ~2;
@@ -329,14 +329,14 @@ void func_80033050(void) {
                 }
             } else {
                 if (D_80090470[idx].unk0 & 0x20000000) {
-                    func_80034380(idx);
+                    Text_DrawWindowFrame(idx);
                     if (D_80090470[idx].unk0 & 0x40000000) {
                         gDPPipeSync(D_8007A184++);
                         gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
                         x = D_80090470[idx].unk4 + 12;
                         y = D_80090470[idx].unk6 + 6;
                         for (i = 0; i < D_80090470[idx].unk38; i++) {
-                            func_80035350(x, y, D_80090470[idx].unk3C[i]);
+                            Text_DrawEncodedString(x, y, D_80090470[idx].unk3C[i]);
                             y += 13;
                         }
                         if (D_80090470[idx].unk0 & 0x80000000) {
@@ -347,7 +347,7 @@ void func_80033050(void) {
                                 } else {
                                     D_80090454 = D_80090470[idx].unk15;
                                 }
-                                func_80032BF8(idx, 1);
+                                Text_ResetWindow(idx, 1);
                                 D_80090470[idx].unk0 |= 0x01000000;
                             } else {
                                 if (D_80092C82 > 20) {
@@ -378,7 +378,7 @@ void func_80033050(void) {
                                 y = D_80090470[idx].unk6 + D_80090470[idx].unk15 * 13 + 2;
                                 gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
                                 gDPLoadTLUT_pal256(D_8007A184++, D_80061850);
-                                func_80034C9C(4, x, y, 12, 12);
+                                Text_DrawTexturedRect(4, x, y, 12, 12);
                             }
                         }
                     } else if (D_80090470[idx].unk0 & 0x80000000) {
@@ -439,7 +439,7 @@ void func_80033050(void) {
                                             case 0xF2:
                                                 D_80090470[idx].unk0 |= 0x400000;
                                                 flagD4 = 1;
-                                                func_80034B30(idx);
+                                                Text_MeasureChoiceWindow(idx);
                                                 D_80090470[idx].unk0 |= 0x40000;
                                                 break;
                                             case 0xF0:
@@ -450,7 +450,7 @@ void func_80033050(void) {
                                             case 0xFF:
                                                 D_80090470[idx].unk0 |= 0x02000000;
                                                 D_80090470[idx].unk0 &= ~0x08000000;
-                                                func_8003521C();
+                                                Text_ResetStickAdvanceTimer();
                                                 break;
                                             case 0xE1:
                                             case 0xE2:
@@ -538,7 +538,7 @@ void func_80033050(void) {
                                     switch (D_80090470[idx].unk9C[j - 1]) {
                                         case 0xF2:
                                             D_80090470[idx].unk0 |= 0x400000;
-                                            func_80034B30(idx);
+                                            Text_MeasureChoiceWindow(idx);
                                             flagD4 = 1;
                                             D_80090470[idx].unk0 |= 0x40000;
                                             break;
@@ -548,42 +548,42 @@ void func_80033050(void) {
                                         case 0xFF:
                                             D_80090470[idx].unk0 |= 0x02000000;
                                             D_80090470[idx].unk0 &= ~0x08000000;
-                                            func_8003521C();
+                                            Text_ResetStickAdvanceTimer();
                                             break;
                                     }
                                     D_80090470[idx].unk0 &= ~0x100000;
                                 }
                             }
-                            func_8003453C(idx);
-                            func_80034274(idx);
+                            Text_BuildVisiblePage(idx);
+                            Text_DrawWindowContents(idx);
                         } else if (D_80090470[idx].unk0 & 0x02000000) {
-                            if ((D_80092C86 & 0xA000) || func_8003522C() != 0) {
-                                func_80032BF8(idx, 1);
+                            if ((D_80092C86 & 0xA000) || Text_IsStickAdvanceHeld() != 0) {
+                                Text_ResetWindow(idx, 1);
                                 D_80090470[idx].unk0 |= 0x01000000;
                             } else {
                                 if (D_80090470[idx].unk0 & 0x40000) {
                                     D_80090470[idx].unk0 &= ~0x40000;
-                                    func_80032BF8(idx, 1);
+                                    Text_ResetWindow(idx, 1);
                                     D_80090470[idx].unk0 |= 0x01000000;
                                 }
-                                func_80034274(idx);
+                                Text_DrawWindowContents(idx);
                             }
                         }
                     } else {
-                        func_80034274(idx);
+                        Text_DrawWindowContents(idx);
                     }
                 }
                 if (flagD8) {
-                    func_800348B8(idx);
+                    Text_DrawAdvanceIndicator(idx);
                 }
             }
         }
     }
     if (flagD4) {
         if (D_80090470[idx].unk0 & 0x80000) {
-            func_80032D20(-3);
+            Text_OpenWindow(-3);
         } else {
-            func_80032D20(-1);
+            Text_OpenWindow(-1);
         }
     }
     gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
@@ -592,10 +592,10 @@ void func_80033050(void) {
     gfx = D_8007A184++; gfx->words.w0 = 0xE7000000; gfx->words.w1 = 0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80033050.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/337B0/Text_UpdateAndDrawWindows.s")
 #endif
 
-s32 func_8003403C(s32 idx) {
+s32 Text_AnimateWindowSize(s32 idx) {
     Unk80090470 *p = &D_80090470[idx];
     s32 ret;
     s32 ww;
@@ -624,13 +624,13 @@ s32 func_8003403C(s32 idx) {
     }
     x = cx - (ww >> 1);
     y = cy - (hh >> 1);
-    func_80034C9C(0, x, y, ww, hh);
-    func_80034C9C(3, x + ww, y + 3, 3, hh);
-    func_80034C9C(3, x + 3, y + hh, ww, 3);
-    func_80034C9C(3, x, y, ww, 1);
-    func_80034C9C(3, x, y + hh - 1, ww, 1);
-    func_80034C9C(3, x, y, 1, hh);
-    func_80034C9C(3, x + ww - 1, y, 1, hh);
+    Text_DrawTexturedRect(0, x, y, ww, hh);
+    Text_DrawTexturedRect(3, x + ww, y + 3, 3, hh);
+    Text_DrawTexturedRect(3, x + 3, y + hh, ww, 3);
+    Text_DrawTexturedRect(3, x, y, ww, 1);
+    Text_DrawTexturedRect(3, x, y + hh - 1, ww, 1);
+    Text_DrawTexturedRect(3, x, y, 1, hh);
+    Text_DrawTexturedRect(3, x + ww - 1, y, 1, hh);
     p->unkC++;
     if (p->unkC > steps) {
         ret = -1;
@@ -638,7 +638,7 @@ s32 func_8003403C(s32 idx) {
     return ret;
 }
 
-void func_80034274(s32 arg0) {
+void Text_DrawWindowContents(s32 arg0) {
     s32 x;
     s32 y;
 
@@ -647,23 +647,23 @@ void func_80034274(s32 arg0) {
     if (D_80090470[arg0].unk17[0] != 0xFF) {
         x = D_80090470[arg0].unk4;
         y = D_80090470[arg0].unk6;
-        func_80034C9C(1, x + 27, y + 4, 40, 13);
+        Text_DrawTexturedRect(1, x + 27, y + 4, 40, 13);
         x = D_80090470[arg0].unk4;
         y = D_80090470[arg0].unk6;
-        func_80035350(x + 73, y + 4, D_80090470[arg0].unk17);
+        Text_DrawEncodedString(x + 73, y + 4, D_80090470[arg0].unk17);
         x = D_80090470[arg0].unk4;
         y = D_80090470[arg0].unk6;
-        func_80035350(x + 10, y + 20, D_80090470[arg0].unk54C);
+        Text_DrawEncodedString(x + 10, y + 20, D_80090470[arg0].unk54C);
     } else {
         x = D_80090470[arg0].unk4;
         x = x + 10;
         y = D_80090470[arg0].unk6;
         y = y + 12;
-        func_80035350(x, y, D_80090470[arg0].unk54C);
+        Text_DrawEncodedString(x, y, D_80090470[arg0].unk54C);
     }
 }
 
-void func_80034380(s32 idx) {
+void Text_DrawWindowFrame(s32 idx) {
     Unk80090470 *p;
     s32 x;
     s32 y;
@@ -671,22 +671,22 @@ void func_80034380(s32 idx) {
     gDPPipeSync(D_8007A184++);
     gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
     p = &D_80090470[idx];
-    func_80034C9C(0, p->unk4, p->unk6, p->unk8, p->unkA);
-    func_80034C9C(3, p->unk8 + p->unk4, p->unk6 + 2, 2, p->unkA);
-    func_80034C9C(3, p->unk4 + 2, p->unkA + p->unk6, p->unk8, 2);
+    Text_DrawTexturedRect(0, p->unk4, p->unk6, p->unk8, p->unkA);
+    Text_DrawTexturedRect(3, p->unk8 + p->unk4, p->unk6 + 2, 2, p->unkA);
+    Text_DrawTexturedRect(3, p->unk4 + 2, p->unkA + p->unk6, p->unk8, 2);
     gDPPipeSync(D_8007A184++);
     gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
     x = p->unk4;
     y = p->unk6;
-    func_80034C9C(3, x, y, p->unk8, 1);
-    func_80034C9C(3, x, p->unkA + y - 1, p->unk8, 1);
-    func_80034C9C(3, x, y, 1, p->unkA);
-    func_80034C9C(3, p->unk8 + x - 1, y, 1, p->unkA);
+    Text_DrawTexturedRect(3, x, y, p->unk8, 1);
+    Text_DrawTexturedRect(3, x, p->unkA + y - 1, p->unk8, 1);
+    Text_DrawTexturedRect(3, x, y, 1, p->unkA);
+    Text_DrawTexturedRect(3, p->unk8 + x - 1, y, 1, p->unkA);
 }
 
 #ifdef NON_MATCHING
 /* frame 0x40 vs 0x48, one more saved register, row loop tested as row != rows + 1; code is equivalent */
-void func_8003453C(s32 idx) {
+void Text_BuildVisiblePage(s32 idx) {
     Unk80090470 *p = &D_80090470[idx];
     s32 cols = (p->unk8 - 20) / 10 + 1;
     s32 rows = (p->unkA - 20) / 13;
@@ -749,15 +749,15 @@ void func_8003453C(s32 idx) {
         } else {
             p->unk0 |= 0x2000000;
             p->unk0 &= ~0x8000000;
-            func_8003521C();
+            Text_ResetStickAdvanceTimer();
         }
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_8003453C.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/337B0/Text_BuildVisiblePage.s")
 #endif
 
-void func_800348B8(s32 idx) {
+void Text_DrawAdvanceIndicator(s32 idx) {
     s32 x;
     s32 y;
     s32 i;
@@ -776,15 +776,15 @@ void func_800348B8(s32 idx) {
     x = D_80090470[idx].unk4 + D_80090470[idx].unk8 - 11;
     y = D_80090470[idx].unk6 + D_80090470[idx].unkA - 3;
     x -= c.v[i];
-    func_80034C9C(3, x, y, b.v[i], 1);
+    Text_DrawTexturedRect(3, x, y, b.v[i], 1);
     x = D_80090470[idx].unk4 + D_80090470[idx].unk8 - 12;
     y = D_80090470[idx].unk6 + D_80090470[idx].unkA - 15;
     x = a.v[i] + x;
     y -= a.v[i];
-    func_80034C9C(2, x, y, 12, 12);
+    Text_DrawTexturedRect(2, x, y, 12, 12);
 }
 
-void func_80034B30(s32 arg0) {
+void Text_MeasureChoiceWindow(s32 arg0) {
     s32 max = 0;
     s32 n = D_80090470[arg0].unk38;
     s32 i;
@@ -808,7 +808,7 @@ void func_80034B30(s32 arg0) {
     D_800616A8.unk4 = max * 10 + 24;
 }
 
-s32 func_80034C18(s32 arg0, s32 arg1) {
+s32 Text_FindWindow(s32 arg0, s32 arg1) {
     s32 ret = -1;
     s32 i;
 
@@ -832,7 +832,7 @@ s32 func_80034C18(s32 arg0, s32 arg1) {
 
 #ifdef NON_MATCHING
 /* frame 0xE0 vs 0xD8, type == 0 tested as &tex.p[type] == &tex.p[0], one dead _g home store missing; code is equivalent */
-void func_80034C9C(s32 type, s32 x, s32 y, s32 w, s32 h)
+void Text_DrawTexturedRect(s32 type, s32 x, s32 y, s32 w, s32 h)
 {
   u32 new_var;
   Gfx *new_var2;
@@ -860,28 +860,28 @@ void func_80034C9C(s32 type, s32 x, s32 y, s32 w, s32 h)
 
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/337B0/func_80034C9C.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/337B0/Text_DrawTexturedRect.s")
 #endif
 
-void func_8003509C(s32 x, s32 y, s32 w, s32 h) {
+void Text_DrawFramedRect(s32 x, s32 y, s32 w, s32 h) {
     gDPPipeSync(D_8007A184++);
     gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
-    func_80034C9C(0, x, y, w, h);
-    func_80034C9C(3, x + w, y + 2, 2, h);
-    func_80034C9C(3, x + 2, y + h, w, 2);
+    Text_DrawTexturedRect(0, x, y, w, h);
+    Text_DrawTexturedRect(3, x + w, y + 2, 2, h);
+    Text_DrawTexturedRect(3, x + 2, y + h, w, 2);
     gDPPipeSync(D_8007A184++);
     gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
-    func_80034C9C(3, x, y, w, 1);
-    func_80034C9C(3, x, y + h - 1, w, 1);
-    func_80034C9C(3, x, y, 1, h);
-    func_80034C9C(3, x + w - 1, y, 1, h);
+    Text_DrawTexturedRect(3, x, y, w, 1);
+    Text_DrawTexturedRect(3, x, y + h - 1, w, 1);
+    Text_DrawTexturedRect(3, x, y, 1, h);
+    Text_DrawTexturedRect(3, x + w - 1, y, 1, h);
 }
 
-void func_8003521C(void) {
+void Text_ResetStickAdvanceTimer(void) {
     D_80092C62 = 0;
 }
 
-s32 func_8003522C(void) {
+s32 Text_IsStickAdvanceHeld(void) {
     s32 ret = 0;
     u32 sum;
 

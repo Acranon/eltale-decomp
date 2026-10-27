@@ -168,7 +168,7 @@ u16 D_8004DD50[8] = { 10, 10, 15, 20, 20, 25, 25, 0 };
 u16 D_8004DD60[8] = { 5, 5, 5, 10, 10, 15, 15, 0 };
 extern Unk8007A9D0 D_8007A9D0;
 void Camera_SetTargetView(Unk803AB820 *, Unk8007C174 *);
-void func_80032D20(s32);
+void Text_OpenWindow(s32);
 
 void Boss_ClearDefeated(void) {
     D_8007C13C[0] = 0;
@@ -319,7 +319,7 @@ void Boss_GiveDefeatReward(s32 arg0) {
         for (i = 0x4B0; i != 0; i--) {
             *dst++ = *src++;
         }
-        func_80032D20(1);
+        Text_OpenWindow(1);
         D_8007AA08.unk8 |= 0x10;
         D_8004DCA0 |= 0x80;
         D_8007A174 = 0x40;

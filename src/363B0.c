@@ -46,10 +46,10 @@ s32 func_8003D0F0();
 s32 osPfsRepairId();
 s32 func_8003EDC0();
 s32 osPfsFileState();
-s32 func_800360F8();
+s32 Pak_CompareNameBytes();
 s32 osPfsFreeBlocks();
 
-s32 func_800357B0(void) {
+s32 Input_InitializeControllers(void) {
     s32 pad[2];
     s32 ret = 0;
     s32 count;
@@ -101,7 +101,7 @@ s32 func_800357B0(void) {
     return ret;
 }
 
-void func_80035970(s32 cont) {
+void Input_ReadController(s32 cont) {
     OSContPad *pad;
     u16 button;
 
@@ -119,7 +119,7 @@ void func_80035970(s32 cont) {
     D_80092C88 = ~button;
 }
 
-s32 func_80035A24(s32 cont) {
+s32 Pak_ScanGameFiles(s32 cont) {
     s32 i;
     s32 pad1;
     OSPfs *pfs;
@@ -154,7 +154,7 @@ s32 func_80035A24(s32 cont) {
         err = osPfsFileState(pfs, i, &st);
         if (err == 0) {
             if (st.game_code == 0x4E45544A && st.company_code == 0x3943) {
-                if (func_800360F8(D_80061810, st.game_name, 16) == 0) {
+                if (Pak_CompareNameBytes(D_80061810, st.game_name, 16) == 0) {
                     found++;
                     D_80092E48[cont].unk2[i] = ((u8 *) st.ext_name)[0];
                     D_80092E48[cont].unk0 |= 0x4000;
@@ -218,7 +218,7 @@ u8 func_80035CC8(s32 arg0) {
     return arg0;
 }
 
-u8 func_80035D58(s32 arg0, u8 arg1) {
+u8 Pak_AllocateGameFile(s32 arg0, u8 arg1) {
     u8 unused[4];
     s32 file_no;
     Ext4 ext;
@@ -237,7 +237,7 @@ u8 func_80035D58(s32 arg0, u8 arg1) {
     return ret;
 }
 
-u8 func_80035E24(s32 arg0, u8 arg1) {
+u8 Pak_DeleteGameFile(s32 arg0, u8 arg1) {
     u8 unused[4];
     Ext4 ext;
 
@@ -246,11 +246,11 @@ u8 func_80035E24(s32 arg0, u8 arg1) {
     return osPfsDeleteFile(&D_80092CA8[arg0], 0x3943, 0x4E45544A, D_80061810, &ext);
 }
 
-void func_80035EA8(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
+void Pak_ReadFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
     osPfsReadWriteFile(&D_80092CA8[arg0], file_no, 0, offset, nbytes, buf);
 }
 
-s32 func_80035F0C(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
+s32 Pak_WriteFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
     s32 ret;
     s32 bytes;
 
@@ -261,7 +261,7 @@ s32 func_80035F0C(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
     return osPfsReadWriteFile(&D_80092CA8[arg0], file_no, 1, offset, nbytes, buf);
 }
 
-s32 func_80035F94(s32 arg0, s32 arg1) {
+s32 Pak_TryRepair(s32 arg0, s32 arg1) {
     s32 err;
     s32 cont = D_80092C80;
 
@@ -284,7 +284,7 @@ s32 func_80035F94(s32 arg0, s32 arg1) {
     return err;
 }
 
-s32 func_8003609C(s32 arg0) {
+s32 Pak_ClassifyError(s32 arg0) {
     s32 ret;
 
     switch (arg0) {
@@ -312,7 +312,7 @@ s32 func_8003609C(s32 arg0) {
     return ret;
 }
 
-s32 func_800360F8(u8 *a, u8 *b, s32 n) {
+s32 Pak_CompareNameBytes(u8 *a, u8 *b, s32 n) {
     do {
         if (*a++ != *b++) {
             break;
@@ -325,11 +325,11 @@ void func_80036124(void) {
     func_8003EDC0();
 }
 
-void func_80036144(OSMesgQueue *mq) {
+void Input_StartControllerQuery(OSMesgQueue *mq) {
     osContStartQuery(mq);
 }
 
-void func_80036164(OSContStatus *status) {
+void Input_GetControllerQuery(OSContStatus *status) {
     osContGetQuery(status);
 }
 

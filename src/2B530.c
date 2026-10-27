@@ -45,7 +45,7 @@ void func_8002B844(s32);
 void func_8002C598(s32);
 void func_8002D7CC(s32);
 void func_8002E9DC();
-void func_8002FA6C(void);
+void SaveMenu_Update(void);
 
 void func_8002A984(s32 arg0) {
     gSPDisplayList(D_8007A184++, D_80061770);
@@ -53,7 +53,7 @@ void func_8002A984(s32 arg0) {
     func_8002E9DC();
     D_8008FB44++;
     if (D_8008FB3E & 0x4000) {
-        func_8002FA6C();
+        SaveMenu_Update();
     } else if (D_8008FB3E & 0x2000) {
         func_8002AC1C();
     } else {
@@ -341,7 +341,7 @@ extern void *D_8006156C[];
 extern u8 D_8006158C[][3];
 extern s16 D_80061598[];
 void func_80028120(u32, void *, s32);
-void func_800324F4(void);
+void SaveMenu_SetTextDrawState(void);
 #endif
 
 #ifdef NON_MATCHING
@@ -635,7 +635,7 @@ void func_8002C598(s32 arg0) {
                 gDPPipeSync(D_8007A184++);
                 y += h;
             }
-            func_800324F4();
+            SaveMenu_SetTextDrawState();
         }
     } else {
         func_8002DECC(0, arg0 + 0x28, 0x1E, 0xF0, 0xB4);
@@ -691,7 +691,7 @@ void func_8002C598(s32 arg0) {
             gDPPipeSync(D_8007A184++);
             gSPTextureRectangle(D_8007A184++, x << 2, (y + D_8006158C[n][1]) << 2, (x + w) << 2, (y + h + D_8006158C[n][2]) << 2,
                                 G_TX_RENDERTILE, s, 0, 1 << 10, 1 << 10);
-            func_800324F4();
+            SaveMenu_SetTextDrawState();
         }
     }
     func_8002DECC(5, arg0 + 0x45, 0x1C, 7, 7);
@@ -2028,7 +2028,7 @@ Unk4Words D_80061614 = { { 32, 32, 32, 24 } };
 Unk4Words D_80061624 = { { 26, 26, 26, 20 } };
 Unk4Ptrs D_80061634 = { { D_80067090, D_80067898, D_800680A0, D_800688A8 } };
 
-void func_80035350(s32, s32, u8 *);
+void Text_DrawEncodedString(s32, s32, u8 *);
 
 
 
@@ -2070,7 +2070,7 @@ void func_8002F6D8(s32 ndigits, s32 x, s32 y, u32 value) {
         i += digits[n];
         if (i != 0 || n == 0) {
             msg[3] = digits[n];
-            func_80035350(x, y, msg);
+            Text_DrawEncodedString(x, y, msg);
         }
         x += 10;
     }

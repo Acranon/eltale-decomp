@@ -221,7 +221,7 @@ void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, void *);
 void Anim_SetCurrentAndNext(void *, s32, s32, s32, s32, u16);
 u32 func_80026E90(u32);
 void func_80028120();
-void func_80032D20(s32);
+void Text_OpenWindow(s32);
 void func_8020C0D0(void);
 
 extern u8 D_86F6F0[];
@@ -266,7 +266,7 @@ void Npc_InitArea(void) {
         D_8007AB74 = 0;
         if (D_8007A172 == 1) {
             Npc_SetMessage(0, D_800568B8);
-            func_80032D20(1);
+            Text_OpenWindow(1);
         }
     }
 }

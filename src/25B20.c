@@ -255,7 +255,7 @@ s32 func_80025228(u16 arg0) {
 #ifdef NON_MATCHING
 /* stack homes, saved registers and frame differ; code is equivalent */
 void func_80026430(s32, s32, s32, s32);
-void func_80035350(s32, s32, void*);
+void Text_DrawEncodedString(s32, s32, void*);
 void func_800269B8(s32, s32, void*);
 extern Gfx* D_8007A184;
 extern s8 D_80092C81;
@@ -425,8 +425,8 @@ void func_80025318(void) {
             }
         }
         gSPDisplayList(D_8007A184++, D_1000388);
-        func_80035350(0x77, 0x48, D_803AB288[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
-        func_80035350(0x4E, 0x5A, D_803AB2F0[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
+        Text_DrawEncodedString(0x77, 0x48, D_803AB288[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
+        Text_DrawEncodedString(0x4E, 0x5A, D_803AB2F0[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
         if ((D_80092C86 & 0xA000) && func_800250D8(D_8008C9B8[D_8008C19C + D_8008C1A0])) {
             p = &D_8008C9B8[D_8008C19C + D_8008C1A0];
             for (n = 0x95 - D_8008C19C - D_8008C1A0; n != 0; n--) {

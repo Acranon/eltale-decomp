@@ -30,7 +30,7 @@ typedef struct {
 } Unk80090228; /* size = 0xC8 */
 
 #ifdef NON_MATCHING
-/* the fields func_80030D5C reads (same size and alignment as the retail-build view) */
+/* the fields SaveMenu_UpdateSlotList reads (same size and alignment as the retail-build view) */
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ u16 unk4;
@@ -95,7 +95,7 @@ u8 D_8008FB78;
 s8 D_8008FB79;
 s8 D_8008FB7A;
 #ifdef NON_MATCHING
-u8 D_8008FB7B; /* func_80030D5C reads it with lbu */
+u8 D_8008FB7B; /* SaveMenu_UpdateSlotList reads it with lbu */
 #else
 s8 D_8008FB7B;
 #endif
@@ -103,7 +103,7 @@ u8 D_8008FB7C;
 Unk8008FB80 D_8008FB80[17];
 Unk8008FBA8 D_8008FBA8[16];
 Unk80090228 D_80090228;
-Unk8008FBA8 D_800902F0; /* func_80035EA8 reads 0x80 bytes into it */
+Unk8008FBA8 D_800902F0; /* Pak_ReadFile reads 0x80 bytes into it */
 u8 D_80090358[0x18];    /* the rest of that 0x80-byte buffer: unreferenced */
 u8 D_80090370[0xE0];
 
@@ -141,35 +141,35 @@ extern u8 D_80090258[];
 extern u8 D_800902EF[];
 extern s8 D_80092C80;
 
-void func_8002FBE0(void);
-void func_8002FDB8(void);
-void func_800301DC(void);
-void func_80030D5C(s32);
-void func_80031B28(void);
-void func_80031B68(void);
-void func_80031C9C(void);
-void func_80031E10(void);
-void func_80032134(void);
-void func_80032558(void);
-void func_800327BC(s32);
-void func_800329B0(s32);
+void SaveMenu_DrawOperationPanel(void);
+void SaveMenu_CheckControllerPak(void);
+void SaveMenu_UpdateDialog(void);
+void SaveMenu_UpdateSlotList(s32);
+void SaveMenu_UpdateDelay(void);
+void SaveMenu_DeleteSelectedFile(void);
+void SaveMenu_LoadSelectedFile(void);
+void SaveMenu_SaveSelectedFile(void);
+void SaveMenu_RepairPak(void);
+void SaveMenu_DrawBackground(void);
+void SaveMenu_CaptureGameState(s32);
+void SaveMenu_RestoreGameState(s32);
 void func_8002DECC(s32, s32, s32, s32, s32);
-void func_80035350(s32, s32, u8 *);
-void func_800324F4(void);
-s8 func_80035D58(s32, u8);
-u8 func_80035E24(s32, u8);
-s32 func_80035F0C(s32, s32, s32, s32, void *);
-s32 func_80035EA8(s32, s32, s32, s32, u8 *);
-s32 func_80035F94(s32, s32);
-s32 func_8003609C(s32);
+void Text_DrawEncodedString(s32, s32, u8 *);
+void SaveMenu_SetTextDrawState(void);
+s8 Pak_AllocateGameFile(s32, u8);
+u8 Pak_DeleteGameFile(s32, u8);
+s32 Pak_WriteFile(s32, s32, s32, s32, void *);
+s32 Pak_ReadFile(s32, s32, s32, s32, u8 *);
+s32 Pak_TryRepair(s32, s32);
+s32 Pak_ClassifyError(s32);
 void func_8003D8EC(const char *, ...);
 extern OSMesgQueue D_80092C90;
 extern OSPfs D_80092CA8[4];
 s32 func_8003D0F0(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
-s32 func_80035A24(s32);
-void func_8003226C(void);
+s32 Pak_ScanGameFiles(s32);
+void SaveMenu_RefreshFileList(void);
 extern s16 D_8006C9FC[][4];
 extern u8 *D_8006C934[];
 extern u8 *D_8006C998[];
@@ -187,7 +187,7 @@ void func_8002F2E4(s32, s32, s32, u32, s32);
 void func_8002F6D8(s32, s32, s32, u32);
 #endif
 
-void func_8002FA00(s32 arg0) {
+void SaveMenu_Init(s32 arg0) {
     D_8007A170 = 2;
     D_8008FB3E = D_8008FB3E | arg0 | 0x4000;
     D_8008FB70 = 0x1000;
@@ -199,11 +199,11 @@ void func_8002FA00(s32 arg0) {
     D_8008FB7C = 0;
 }
 
-void func_8002FA6C(void) {
-    func_80032558();
+void SaveMenu_Update(void) {
+    SaveMenu_DrawBackground();
     if (!(D_8008FB70 & 0x4000)) {
         if (D_8008FB70 & 0x2000) {
-            func_8002FDB8();
+            SaveMenu_CheckControllerPak();
             D_8008FB70 |= 0x4000;
             D_8008FB70 &= ~0x2000;
             D_8008FB7C = 0;
@@ -215,37 +215,37 @@ void func_8002FA6C(void) {
     if (D_8008FB70 & 0x4000) {
         switch (D_8008FB70 & 7) {
             case 5:
-                func_800301DC();
+                SaveMenu_UpdateDialog();
                 break;
             case 0:
-                func_80030D5C(0);
+                SaveMenu_UpdateSlotList(0);
                 break;
             case 4:
-                func_80031B68();
+                SaveMenu_DeleteSelectedFile();
                 break;
             case 2:
-                func_80031C9C();
+                SaveMenu_LoadSelectedFile();
                 break;
             case 3:
-                func_80031E10();
+                SaveMenu_SaveSelectedFile();
                 break;
             case 1:
-                func_80032134();
+                SaveMenu_RepairPak();
                 break;
             case 6:
-                func_80031B28();
+                SaveMenu_UpdateDelay();
                 break;
         }
     }
     if (D_8008FB70 & 0x2000) {
-        func_8002FBE0();
+        SaveMenu_DrawOperationPanel();
     }
     if (D_8008FB70 & 0x8000) {
         D_8008FB3E &= 0x7FFF;
     }
 }
 
-void func_8002FBE0(void) {
+void SaveMenu_DrawOperationPanel(void) {
     u8 unused[4];
     s16 *r = D_8006C90C[D_8008FB73];
     s16 x = r[0];
@@ -264,11 +264,11 @@ void func_8002FBE0(void) {
     func_8002DECC(0x38, x + 1, y + 2, 1, h - 4);
     func_8002DECC(0x39, x + 1, y + h - 2, w - 2, 1);
     func_8002DECC(0x39, x + w - 2, y + 1, 1, h - 3);
-    func_80035350(x + 6, y + 6, D_8006C8F8[D_8008FB73]);
-    func_800324F4();
+    Text_DrawEncodedString(x + 6, y + 6, D_8006C8F8[D_8008FB73]);
+    SaveMenu_SetTextDrawState();
 }
 
-void func_8002FDB8(void) {
+void SaveMenu_CheckControllerPak(void) {
     s32 mode = D_8008FB3E & 0xC;
     s32 err;
     Unk80092E48 *p;
@@ -289,11 +289,11 @@ void func_8002FDB8(void) {
         D_8008FB70 &= ~0x1000;
     }
     if (err == 0) {
-        err = func_80035A24(D_80092C80);
+        err = Pak_ScanGameFiles(D_80092C80);
     }
     if (err != 0) {
         D_8008FB74 = err;
-        if (-func_8003609C(err) == 1) {
+        if (-Pak_ClassifyError(err) == 1) {
             if (mode == 4) {
                 D_8008FB72 = 13;
                 D_8008FB79 = 10;
@@ -337,7 +337,7 @@ void func_8002FDB8(void) {
         } else if (D_8008FB7C != 0 && ((p = &D_80092E48[D_80092C80])->unk13 < 2 || p->unk0 & 0x2000)) {
             D_8008FB72 = 24;
             D_8008FB79 = 10;
-            func_8003226C();
+            SaveMenu_RefreshFileList();
             D_8008FB70 &= 0xFFF8;
             D_8008FB70 |= 5;
             D_8008FB7A = 0;
@@ -355,7 +355,7 @@ void func_8002FDB8(void) {
             D_8008FB70 |= 5;
             return;
         }
-        func_8003226C();
+        SaveMenu_RefreshFileList();
         D_8008FB70 &= 0xFFF8;
         D_8008FB70 |= 0;
         D_8008FB7A = 0;
@@ -363,7 +363,7 @@ void func_8002FDB8(void) {
     }
 }
 
-void func_800301DC(void) {
+void SaveMenu_UpdateDialog(void) {
     s32 x;
     s32 y;
     s32 w;
@@ -371,7 +371,7 @@ void func_800301DC(void) {
     u8 *msg;
 
     if (D_8008FB72 == 4 || D_8008FB72 == 5 || D_8008FB72 == 22 || D_8008FB72 == 23) {
-        func_80030D5C(1);
+        SaveMenu_UpdateSlotList(1);
     }
     x = D_8006C9FC[D_8008FB72][0];
     y = D_8006C9FC[D_8008FB72][1];
@@ -393,8 +393,8 @@ void func_800301DC(void) {
     func_8002DECC(0x38, x + 1, y + 2, 1, h - 4);
     func_8002DECC(0x39, x + 1, y + h - 2, w - 2, 1);
     func_8002DECC(0x39, x + w - 2, y + 1, 1, h - 3);
-    func_80035350(x + 6, y + 6, msg);
-    func_800324F4();
+    Text_DrawEncodedString(x + 6, y + 6, msg);
+    SaveMenu_SetTextDrawState();
     if (D_8008FB79 >= 0) {
         D_8008FB79--;
     }
@@ -511,14 +511,14 @@ void func_800301DC(void) {
         func_8002DECC(0x39, x + w - 2, y + 1, 1, h - 3);
         if (D_8008FB70 & 0x10) {
             msg = D_8006C934[1];
-            func_80035350(x + 6, y + 6, msg);
-            func_80035350(x + 6, y + 19, D_8006C934[0]);
+            Text_DrawEncodedString(x + 6, y + 6, msg);
+            Text_DrawEncodedString(x + 6, y + 19, D_8006C934[0]);
         } else {
             msg = D_8006C934[2];
-            func_80035350(x + 6, y + 6, msg);
-            func_80035350(x + 6, y + 19, D_8006C934[3]);
+            Text_DrawEncodedString(x + 6, y + 6, msg);
+            Text_DrawEncodedString(x + 6, y + 19, D_8006C934[3]);
         }
-        func_800324F4();
+        SaveMenu_SetTextDrawState();
         if (D_8008FB79 < 0) {
             if (D_80092C82 < -20 || D_80092C82 > 20) {
                 if (!(D_8008FB70 & 8)) {
@@ -529,7 +529,7 @@ void func_800301DC(void) {
             } else {
                 D_8008FB70 &= ~8;
             }
-            func_800324F4();
+            SaveMenu_SetTextDrawState();
             if (D_8008FB70 & 0x10) {
                 func_8002DECC(4, D_8006CAC4[D_8008FB78 + 2][0], D_8006CAC4[D_8008FB78 + 2][1], 12, 12);
             } else {
@@ -562,7 +562,7 @@ void func_800301DC(void) {
                             D_8008FB70 |= 1;
                             break;
                         case 21:
-                            func_8003226C();
+                            SaveMenu_RefreshFileList();
                             D_8008FB70 &= 0xFFF8;
                             D_8008FB70 |= 0;
                             break;
@@ -651,7 +651,7 @@ void func_800301DC(void) {
     }
 }
 
-/* .data 80061650..80061660: func_80030D5C's local message (an initialized u8[14]
+/* .data 80061650..80061660: SaveMenu_UpdateSlotList's local message (an initialized u8[14]
  * that IDO copies to the stack); becomes its initializer when the function is C. */
 #ifdef NON_MATCHING
 Bytes14 D_80061650 = { {
@@ -665,7 +665,7 @@ u8 D_80061650[0xE] = {
 
 #ifdef NON_MATCHING
 /* stack homes and flag/cursor lifetimes differ (code 0x18 bytes short); code is equivalent */
-void func_80030D5C(s32 arg0) {
+void SaveMenu_UpdateSlotList(s32 arg0) {
     s32 idx;
     s32 flag;
     s32 secs;
@@ -768,8 +768,8 @@ void func_80030D5C(s32 arg0) {
                     n = 0xF;
                     break;
             }
-            func_80035350(0x51, 0x48, D_8006CC28[n]);
-            func_800324F4();
+            Text_DrawEncodedString(0x51, 0x48, D_8006CC28[n]);
+            SaveMenu_SetTextDrawState();
             n = 0;
             secs = D_8008FBA8[idx].unk38;
             while (secs >= 60) {
@@ -784,9 +784,9 @@ void func_80030D5C(s32 arg0) {
         }
     } else {
         flag = 1;
-        func_80035350(0x82, 0x33, buf.b);
+        Text_DrawEncodedString(0x82, 0x33, buf.b);
     }
-    func_800324F4();
+    SaveMenu_SetTextDrawState();
     idx++;
     ptr[0]++;
     if (ptr[0]->unk0 != -1 && flag == 0) {
@@ -870,8 +870,8 @@ void func_80030D5C(s32 arg0) {
                         n = 0xF;
                         break;
                 }
-                func_80035350(0x51, 0x96, D_8006CC28[n]);
-                func_800324F4();
+                Text_DrawEncodedString(0x51, 0x96, D_8006CC28[n]);
+                SaveMenu_SetTextDrawState();
                 n = 0;
                 secs = D_8008FBA8[idx].unk38;
                 while (secs >= 60) {
@@ -885,10 +885,10 @@ void func_80030D5C(s32 arg0) {
                 func_8002F6D8(3, 0xC0, 0xA6, D_8008FBA8[idx].unk0.unk8);
             }
         } else {
-            func_80035350(0x82, 0x7F, buf.b);
+            Text_DrawEncodedString(0x82, 0x7F, buf.b);
         }
     }
-    func_800324F4();
+    SaveMenu_SetTextDrawState();
     flag = D_80060D64[(D_8008FB44 >> 2) & 0xF];
     if (D_8008FB7A >= 2) {
         func_8002DECC(5, 0x38, 0x4D, 7, 7);
@@ -987,10 +987,10 @@ void func_80030D5C(s32 arg0) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/30600/func_80030D5C.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/30600/SaveMenu_UpdateSlotList.s")
 #endif
 
-void func_80031B28(void) {
+void SaveMenu_UpdateDelay(void) {
     D_8008FB79--;
     if (D_8008FB79 < 0) {
         D_8008FB70 &= 0xFFF8;
@@ -998,12 +998,12 @@ void func_80031B28(void) {
     }
 }
 
-void func_80031B68(void) {
-    s32 err = func_80035E24(D_80092C80, D_8008FB81[D_8008FB7A * 2]);
+void SaveMenu_DeleteSelectedFile(void) {
+    s32 err = Pak_DeleteGameFile(D_80092C80, D_8008FB81[D_8008FB7A * 2]);
 
     if (err != 0) {
         D_8008FB74 = err;
-        switch (-func_8003609C(err)) {
+        switch (-Pak_ClassifyError(err)) {
             case 1:
                 D_8008FB72 = 8;
                 D_8008FB79 = 10;
@@ -1030,13 +1030,13 @@ void func_80031B68(void) {
     }
 }
 
-void func_80031C9C(void) {
-    s32 err = func_80035EA8(D_80092C80, D_8008FB80[D_8008FB7A].unk0, 0x80, 0xE0, D_80090370);
+void SaveMenu_LoadSelectedFile(void) {
+    s32 err = Pak_ReadFile(D_80092C80, D_8008FB80[D_8008FB7A].unk0, 0x80, 0xE0, D_80090370);
 
     D_80090228 = *(Unk80090228 *)D_80090370;
     if (err != 0) {
         D_8008FB74 = err;
-        switch (-func_8003609C(err)) {
+        switch (-Pak_ClassifyError(err)) {
             case 1:
                 D_8008FB72 = 8;
                 D_8008FB79 = 10;
@@ -1054,7 +1054,7 @@ void func_80031C9C(void) {
         D_8008FB70 |= 5;
         D_8008FB70 &= ~0x2000;
     } else {
-        func_800329B0(D_8008FB7A);
+        SaveMenu_RestoreGameState(D_8008FB7A);
         D_8008FB70 |= 0x80;
         D_8008FB70 |= 0x8000;
     }
@@ -1062,7 +1062,7 @@ void func_80031C9C(void) {
 
 #ifdef NON_MATCHING
 /* register-only: index/pointer a3/t0 colouring differs; code is equivalent */
-void func_80031E10(void) {
+void SaveMenu_SaveSelectedFile(void) {
     s32 err;
     s32 n;
     s32 id;
@@ -1098,22 +1098,22 @@ void func_80031E10(void) {
         if (idx + 1 < 16) {
             p[1].unk1 = -2;
         }
-        err = func_80035D58(cont, n);
+        err = Pak_AllocateGameFile(cont, n);
         if (err >= 0) {
             idx = D_8008FB7A;
             D_8008FB80[idx].unk0 = err;
         } else {
             idx = D_8008FB7A;
         }
-        func_800327BC(idx);
+        SaveMenu_CaptureGameState(idx);
     } else {
-        func_800327BC(idx);
+        SaveMenu_CaptureGameState(idx);
     }
     id = D_8008FB7A;
-    err = func_80035F0C(D_80092C80, D_8008FB80[id].unk0, 0, 0x80, &D_8008FBA8[id]);
+    err = Pak_WriteFile(D_80092C80, D_8008FB80[id].unk0, 0, 0x80, &D_8008FBA8[id]);
     if (err != 0) {
         D_8008FB74 = err;
-        switch (-func_8003609C(err)) {
+        switch (-Pak_ClassifyError(err)) {
             case 1:
                 D_8008FB72 = 13;
                 D_8008FB79 = 10;
@@ -1132,10 +1132,10 @@ void func_80031E10(void) {
         D_8008FB70 &= ~0x2000;
         return;
     }
-    err = func_80035F0C(D_80092C80, D_8008FB80[D_8008FB7A].unk0, 0x80, 0xE0, &D_80090228);
+    err = Pak_WriteFile(D_80092C80, D_8008FB80[D_8008FB7A].unk0, 0x80, 0xE0, &D_80090228);
     if (err != 0) {
         D_8008FB74 = err;
-        switch (-func_8003609C(err)) {
+        switch (-Pak_ClassifyError(err)) {
             case 1:
                 D_8008FB72 = 13;
                 D_8008FB79 = 10;
@@ -1161,17 +1161,17 @@ void func_80031E10(void) {
     D_8008FB79 = 10;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/30600/func_80031E10.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/30600/SaveMenu_SaveSelectedFile.s")
 #endif
 
-void func_80032134(void) {
+void SaveMenu_RepairPak(void) {
     s32 err;
 
     func_8003D8EC("Repair Info %d %d\n", D_8008FB7A, D_8008FB74);
-    err = func_80035F94(D_8008FB80[D_8008FB7A].unk0, D_8008FB74);
+    err = Pak_TryRepair(D_8008FB80[D_8008FB7A].unk0, D_8008FB74);
     if (err != 0) {
         D_8008FB74 = err;
-        switch (-func_8003609C(err)) {
+        switch (-Pak_ClassifyError(err)) {
             case 1:
                 D_8008FB72 = 8;
                 D_8008FB79 = 10;
@@ -1197,7 +1197,7 @@ void func_80032134(void) {
     }
 }
 
-void func_8003226C(void) {
+void SaveMenu_RefreshFileList(void) {
     Unk8008FB80 *p;
     s32 cont;
     s32 n;
@@ -1231,11 +1231,11 @@ void func_8003226C(void) {
     for (i = 0; i < 16; i++) {
         if (D_8008FB80[i].unk0 >= 0) {
             e = &D_8008FBA8[i];
-            ret = func_80035EA8(D_80092C80, D_8008FB80[i].unk0, 0, 0x80, (u8 *)&D_800902F0);
+            ret = Pak_ReadFile(D_80092C80, D_8008FB80[i].unk0, 0, 0x80, (u8 *)&D_800902F0);
             *e = D_800902F0;
             if (ret != 0) {
                 D_8008FB74 = err;
-                err = -func_8003609C(err);
+                err = -Pak_ClassifyError(err);
                 if (err == 1) {
                     D_8008FB72 = 8;
                     D_8008FB79 = 10;
@@ -1252,13 +1252,13 @@ void func_8003226C(void) {
     }
 }
 
-void func_800324F4(void) {
+void SaveMenu_SetTextDrawState(void) {
     gSPDisplayList(D_8007A184++, D_80061770);
     gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
     D_8008FB3E &= ~0x10;
 }
 
-void func_80032558(void) {
+void SaveMenu_DrawBackground(void) {
     func_8002DECC(0, 0x3C, 0x22, 0xC8, 0xAB);
     func_8002DECC(0x37, 0x3F, 0xCE, 0xC8, 3);
     func_8002DECC(0x37, 0x105, 0x28, 2, 0xA9);
@@ -1282,7 +1282,7 @@ void func_80032558(void) {
     func_8002DECC(0x47, 0xA2, 0xA6, 0x18, 0xE);
 }
 
-void func_800327BC(s32 arg0) {
+void SaveMenu_CaptureGameState(s32 arg0) {
     Unk8008FBA8 *e = &D_8008FBA8[arg0];
     u8 *d;
     u8 *s;
@@ -1327,7 +1327,7 @@ void func_800327BC(s32 arg0) {
     }
 }
 
-void func_800329B0(s32 arg0) {
+void SaveMenu_RestoreGameState(s32 arg0) {
     Unk8008FBA8 *e = &D_8008FBA8[arg0];
     u8 *d;
     u8 *s;

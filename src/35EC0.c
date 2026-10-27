@@ -49,7 +49,7 @@ Gfx D_80061770[20] = {
 s32 D_80092C70;
 s32 D_80092C74;
 
-void func_800352C0(u8 *dst, u8 *src) {
+void Text_CopyTerminatedBytes(u8 *dst, u8 *src) {
     s32 i = 0;
 
     while (src[i] != 0xFF) {
@@ -59,12 +59,12 @@ void func_800352C0(u8 *dst, u8 *src) {
     dst[i] = 0xFF;
 }
 
-void func_80035308(void) {
+void Text_LoadFontAssets(void) {
     func_80028120(D_D3A8B0, D_80332D30, 0x80);
     func_80028120(D_D3A930, D_803245A0, 0xE790);
 }
 
-void func_80035350(s32 x0, s32 y0, u8 *str) {
+void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
     s32 x = x0;
     s32 y = y0;
     s32 c;
