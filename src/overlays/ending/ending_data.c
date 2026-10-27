@@ -1,4 +1,4 @@
-#include "common.h"
+#include "overlays/ending/ending_data.h"
 
 /*
  * Ending overlay data: display lists, the sprite script and animation tables, images.
@@ -9,42 +9,9 @@
    A data-only file: E22690.c's .data ends at 8020F6B5 and this starts 16-aligned at 8020F6C0.
    The 8-byte Gfx after some tables and images is a gsSPEndDisplayList that follows them. */
 
-typedef struct {
-    u32 flags;
-    s16 x;
-    s16 y;
-    s32 duration;
-} UnkStep_8020F880;
 
-typedef struct {
-    UnkStep_8020F880* steps;
-    u32 count;
-} UnkAnim_8020F880;
 
-typedef struct {
-    u16 unk0;
-    s16 unk2;
-    s32 unk4;
-    s16 unk8;
-    s16 unkA;
-    s16 unkC;
-    s16 unkE;
-    s16 unk10;
-    s16 unk12;
-    s16 unk14;
-    s16 unk16;
-    s32 unk18;
-    s32 unk1C;
-    s16 unk20;
-    s16 unk22;
-    u16 unk24;
-    char unk26[2];
-} UnkStruct_802107F0_inner;
 
-typedef struct {
-    UnkStruct_802107F0_inner* unk0;
-    u32 unk4;
-} UnkStruct_802107F0;
 
 extern u8 D_80210A10_ovl_ending[];
 extern u16 D_80210810_ovl_ending[];
@@ -79,57 +46,57 @@ Gfx D_8020F748_ovl_ending[3] = {
     {{ 0xFC129A25, 0xFF37FFFF }},
     {{ 0xB8000000, 0x00000000 }},
 };
-UnkStep_8020F880 D_8020F760_ovl_ending[3] = {
+EndingAnimStep D_8020F760_ovl_ending[3] = {
     { 0x00800010, 0, 0, 360 },
     { 0x00801000, 0, 0, 2280 },
     { 0x00800020, 0, 0, 360 },
 };
-UnkStep_8020F880 D_8020F784_ovl_ending[3] = {
+EndingAnimStep D_8020F784_ovl_ending[3] = {
     { 0x00008010, 0, 170, 120 },
     { 0x00008000, 0, -240, 2790 },
     { 0x00008020, 0, -262, 120 },
 };
-UnkStep_8020F880 D_8020F7A8_ovl_ending[4] = {
+EndingAnimStep D_8020F7A8_ovl_ending[4] = {
     { 0x00800010, 0, 0, 360 },
     { 0x00801000, 0, 0, 390 },
     { 0x00800020, 0, 0, 180 },
     { 0x10000000, 0, 0, 300 },
 };
-UnkStep_8020F880 D_8020F7D8_ovl_ending[3] = {
+EndingAnimStep D_8020F7D8_ovl_ending[3] = {
     { 0x00000010, 0, 0, 60 },
     { 0x00001000, 0, 0, 180 },
     { 0x00000020, 0, 0, 60 },
 };
-UnkStep_8020F880 D_8020F7FC_ovl_ending[3] = {
+EndingAnimStep D_8020F7FC_ovl_ending[3] = {
     { 0x00000010, 0, 0, 180 },
     { 0x00001000, 0, 0, 4680 },
     { 0x00000020, 0, 0, 180 },
 };
-UnkStep_8020F880 D_8020F820_ovl_ending[3] = {
+EndingAnimStep D_8020F820_ovl_ending[3] = {
     { 0x00000010, 0, 0, 120 },
     { 0x00001000, 0, 0, 180 },
     { 0x00000020, 0, 0, 120 },
 };
-UnkStep_8020F880 D_8020F844_ovl_ending[3] = {
+EndingAnimStep D_8020F844_ovl_ending[3] = {
     { 0x00000010, 0, 0, 90 },
     { 0x00001000, 0, 0, 300 },
     { 0x00000020, 0, 0, 600 },
 };
-UnkStep_8020F880 D_8020F868_ovl_ending[2] = {
+EndingAnimStep D_8020F868_ovl_ending[2] = {
     { 0x00000010, 0, 0, 180 },
     { 0x00000020, 0, 0, 180 },
 };
-UnkAnim_8020F880 ending_sprite_anim_table[8] = {
-    { (UnkStep_8020F880*) D_8020F760_ovl_ending, 0x3 },
-    { (UnkStep_8020F880*) D_8020F784_ovl_ending, 0x3 },
-    { (UnkStep_8020F880*) D_8020F7A8_ovl_ending, 0x4 },
-    { (UnkStep_8020F880*) D_8020F7D8_ovl_ending, 0x3 },
-    { (UnkStep_8020F880*) D_8020F7FC_ovl_ending, 0x3 },
-    { (UnkStep_8020F880*) D_8020F820_ovl_ending, 0x3 },
-    { (UnkStep_8020F880*) D_8020F844_ovl_ending, 0x3 },
-    { (UnkStep_8020F880*) D_8020F868_ovl_ending, 0x2 },
+EndingAnim ending_sprite_anim_table[8] = {
+    { (EndingAnimStep*) D_8020F760_ovl_ending, 0x3 },
+    { (EndingAnimStep*) D_8020F784_ovl_ending, 0x3 },
+    { (EndingAnimStep*) D_8020F7A8_ovl_ending, 0x4 },
+    { (EndingAnimStep*) D_8020F7D8_ovl_ending, 0x3 },
+    { (EndingAnimStep*) D_8020F7FC_ovl_ending, 0x3 },
+    { (EndingAnimStep*) D_8020F820_ovl_ending, 0x3 },
+    { (EndingAnimStep*) D_8020F844_ovl_ending, 0x3 },
+    { (EndingAnimStep*) D_8020F868_ovl_ending, 0x2 },
 };
-UnkStruct_802107F0_inner D_8020F8C0_ovl_ending[97] = {
+EndingSpriteCue D_8020F8C0_ovl_ending[97] = {
     { 0x0, 1, 0x08000000, 8, 30, 304, 6, 0, 0, 304, 224, (s32) D_80210A10_ovl_ending, (s32) D_80210810_ovl_ending, 0, -1, 0x0, { 0 } },
     { 0x0, 0, 0x08000000, 8, 36, 304, 6, 0, 6, 304, 224, (s32) D_80210A10_ovl_ending, (s32) D_80210810_ovl_ending, 0, -1, 0x0, { 0 } },
     { 0x0, 0, 0x08000000, 8, 42, 304, 6, 0, 12, 304, 224, (s32) D_80210A10_ovl_ending, (s32) D_80210810_ovl_ending, 0, -1, 0x0, { 0 } },
@@ -232,8 +199,8 @@ Gfx D_802107E8_ovl_ending[1] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* D_802107F4_ovl_ending is ending_cue_groups + 0x4 */
-UnkStruct_802107F0 ending_cue_groups[1] = {
-    { (UnkStruct_802107F0_inner*) D_8020F8C0_ovl_ending, 0x61 },
+EndingCueGroup ending_cue_groups[1] = {
+    { (EndingSpriteCue*) D_8020F8C0_ovl_ending, 0x61 },
 };
 u32 ending_cue_group_count = 0x00000001;
 /* not referenced by name */
