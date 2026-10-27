@@ -1215,7 +1215,76 @@ void func_8000CC40(s32 arg0, s32 arg1) {
     ((Unk8007C060 *)&D_8007C060)->unkC = &D_8007B908[0].obj;
 }
 
+#ifdef NON_MATCHING
+/* &D_8007C060 kept in a register for the ++ shifts the temporaries by one (register allocation); code is equivalent */
+void func_8000CC78(void) {
+    SpawnScript *e;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 s;
+    u16 m;
+    s32 pad2;
+    Obj *obj;
+    s32 pad3;
+    s32 pad4;
+    SpawnDef *d;
+    Unk800C18D8 *t;
+    Enemy *en = D_8007B908;
+
+    if (D_8007C064 != NULL) {
+        e = D_8007C064;
+        if (e->time < ++D_8007C060) {
+            obj = D_8007C06C;
+            if (e->flags & 8) {
+                D_8007C070.x = e->unk8;
+                D_8007C070.y = e->unk10;
+                func_800271B4(obj->angle, &D_8007C070);
+                en->unk20 = D_8007C070.x;
+                en->unk24 = D_8007C070.y;
+            } else {
+                d = &((SpawnDef *) &D_80056718)[e->unk2];
+                t = &D_800C18D8[d->unk0];
+                D_8007C070.x = e->unk8;
+                D_8007C070.y = e->unk10;
+                func_800271B4(obj->angle + e->unk14, &D_8007C070);
+                if (e->flags & 2) {
+                    x = D_8007AA20;
+                    y = D_8007AA24;
+                    z = D_8007AA28;
+                } else {
+                    x = obj->x;
+                    y = obj->y;
+                    z = obj->z;
+                }
+                s = obj->unk24;
+                x += D_8007C070.x * s;
+                y += e->unkC * s;
+                z += D_8007C070.y * s;
+                D_8007C070.x = d->unk8;
+                D_8007C070.y = d->unkC;
+                m = D_8007C068->unk1C->unk0;
+                if (m & 0x8000) {
+                    D_8007C070.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C;
+                } else {
+                    D_8007C070.z = obj->unk28;
+                }
+                func_80019820(d->unk2, d->unk4, x, y, z, obj->angle + e->unk14, t, &D_8007C070, obj);
+            }
+            if (e->flags & 4) {
+                func_80015D78(1);
+            }
+            if (e->flags & 1) {
+                D_8007C064 = NULL;
+            } else {
+                D_8007C064++;
+            }
+        }
+    }
+}
+#else
 #pragma GLOBAL_ASM("asm/nonmatchings/AEA0/func_8000CC78.s")
+#endif
 
 /* .data 8004DD20..8004DD50 */
 typedef void (*Fn8004DD20)(Obj*, Enemy*, u8*);
