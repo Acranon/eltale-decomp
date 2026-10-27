@@ -59,8 +59,25 @@ def text_files(root: Path):
     yield root / "assets.yaml"
 
 
-def sym_line(old: str, new: str) -> str:
+# Overlay folders and their splat segments, for names whose old form has no _ovl_ suffix
+# (a function-scope static is declared as plain D_XXXXXXXX in the overlay's C).
+OVERLAY_SEGMENTS = {"pakmenu": "ovl_DA4570", "title": "ovl_title", "intro": "ovl_intro", "ending": "ovl_ending"}
+
+
+def overlay_segment(files, names):
+    """The segment of the overlay whose sources mention one of `names`, if any."""
+    for p, t in files.items():
+        parts = p.parts
+        if "overlays" in parts and parts.index("overlays") + 1 < len(parts):
+            seg = OVERLAY_SEGMENTS.get(parts[parts.index("overlays") + 1])
+            if seg and any(re.search(r'\b' + re.escape(n) + r'\b', t) for n in names):
+                return seg
+    return None
+
+
+def sym_line(old: str, new: str, seg_override=None) -> str:
     kind, addr, seg = OLD_RE.match(old).groups()
+    seg = seg or seg_override
     attrs = (["type:func"] if kind == "func" else []) + ([f"segment:{seg}"] if seg else [])
     return f"{new} = 0x{addr};" + (" // " + " ".join(attrs) if attrs else "")
 
@@ -99,6 +116,11 @@ def apply(root: Path) -> int:
     syms = sym_path.read_text(encoding="utf-8")
     head, _, section = syms.partition(SECTION)
     have = applied(section)
+    # a suffix-less old name whose line got its overlay segment inferred is still that name
+    for key in list(have):
+        base = re.sub(r'_ovl_\w+$', '', key)
+        if base != key and base in want and key not in want:
+            have[base] = have.pop(key)
 
     table = {}  # current name in the source -> wanted name
     for old in set(want) | set(have):
@@ -125,9 +147,16 @@ def apply(root: Path) -> int:
             if stem in table:
                 p.rename(p.with_name(table[stem] + p.name[len(stem):]))
 
-    lines = [sym_line(old, new) for old, new in want.items()]
+    if table:
+        files = {p: p.read_text(encoding="utf-8", errors="surrogateescape") for p in text_files(root)}
     order = {old: i for i, (_, old, _) in enumerate(rows)}
-    lines = [sym_line(old, want[old]) for old in sorted(want, key=order.get)]
+    lines = []
+    for old in sorted(want, key=order.get):
+        kind, addr, seg = OLD_RE.match(old).groups()
+        infer = None
+        if not seg and int(addr, 16) >= 0x80100000:
+            infer = overlay_segment(files, [want[old], old])
+        lines.append(sym_line(old, want[old], infer))
     new_syms = head.rstrip("\n") + "\n\n" + SECTION + "\n" + "\n".join(lines) + "\n"
     if new_syms != syms:
         sym_path.write_text(new_syms, encoding="utf-8")
