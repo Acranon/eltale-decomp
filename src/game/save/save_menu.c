@@ -1,12 +1,19 @@
 #include "game/save/save_menu.h"
+#include "game/audio/sound.h"
+#include "game/core/main.h"
+#include "game/enemy/boss.h"
+#include "game/env/env.h"
+#include "game/event/cutscene.h"
+#include "game/input/input.h"
+#include "game/item/item.h"
+#include "game/map/chest.h"
+#include "game/map/map.h"
+#include "game/map/spirit.h"
+#include "game/player/player.h"
+#include "game/text/text.h"
+#include "game/text/text_window.h"
+#include "game/ui/menu.h"
 
-/* Local Controller Pak scan view; the input header's prototypes are reconciled in H2. */
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s8 unk2[16];
-    /* 0x12 */ s8 unk12;
-    /* 0x13 */ u8 unk13;
-} Unk80092E48; /* 0x14 bytes */
 
 /*
  * Controller Pak save/load menu: file discovery, UI states, and game-state
@@ -35,70 +42,13 @@ SaveHeader save_menu_header_read_scratch; /* Pak_ReadFile reads 0x80 bytes into 
 u8 D_80090358[0x18];    /* the rest of that 0x80-byte buffer: unreferenced */
 u8 save_menu_state_read_scratch[0xE0];
 
-extern s32 core_flags;
-extern s8 menu_bgm_volume_option;
-extern s8 menu_text_delay_option;
-extern u16 player_respawn_map;
-extern u16 player_respawn_subarea;
-extern u16 player_respawn_entry;
-extern ActorStats player_stats;
-extern u8 boss_defeated_bits[];
-extern s32 map_id;
-extern s32 map_subarea;
-extern s32 map_flag4_return_map;
-extern s32 map_flag4_return_subarea;
-extern s32 map_flag4_return_entry;
-extern s32 map_flag8_return_map;
-extern s32 map_flag8_return_subarea;
-extern s32 map_flag8_return_entry;
-extern u16 env_day_count;
-extern u16 env_play_time;
-extern u8 chest_opened_flags[];
-extern u8 spirit_collected_flags[];
-extern u8 item_inventory[];
-extern Unk80092E48 pak_game_file_scans[];
-extern Gfx text_glyph_setup_dl[];
-extern s16 core_game_mode;
-extern Gfx *gfx_dl_head;
-extern u16 menu_flags;
-extern s16 save_menu_operation_panel_rects[][4];
-extern u8 *save_menu_operation_panel_messages[];
-extern u8 D_8008FB81[];
-extern u8 D_80090248[];
-extern u8 D_80090258[];
-extern u8 D_800902EF[];
-extern s8 input_primary_port;
 
-void Menu_DrawSprite(s32, s32, s32, s32, s32);
-void Text_DrawEncodedString(s32, s32, u8 *);
-s8 Pak_AllocateGameFile(s32, u8);
-u8 Pak_DeleteGameFile(s32, u8);
-s32 Pak_WriteFile(s32, s32, s32, s32, void *);
-s32 Pak_ReadFile(s32, s32, s32, s32, u8 *);
-s32 Pak_TryRepair(s32, s32);
-s32 Pak_ClassifyError(s32);
 void func_8003D8EC(const char *, ...);
-extern OSMesgQueue input_si_queue;
-extern OSPfs pak_port_states[4];
 s32 func_8003D0F0(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
-s32 Pak_ScanGameFiles(s32);
-extern s16 save_menu_dialog_rects[][4];
-extern u8 *save_menu_dialog_messages_save[];
-extern u8 *save_menu_dialog_messages_load_delete[];
-extern s16 save_menu_choice_cursor_positions[][2];
-extern s8 input_stick_y;
-extern u16 input_pressed_buttons;
-void Sfx_Play(s32, s32, s32);
 
 #ifdef NON_MATCHING
-extern u8 *save_menu_slot_map_labels[];
-extern s8 menu_wobble_offsets[];
-extern s32 menu_frame_counter;
-void Menu_DrawNumber(s32, s32, s32, u32, s32);
-void Menu_DrawNumberZeroPad(s32, s32, s32, u32, s32);
-void Menu_PrintNumber(s32, s32, s32, u32);
 #endif
 
 void SaveMenu_Init(s32 arg0) {
@@ -185,7 +135,7 @@ void SaveMenu_DrawOperationPanel(void) {
 void SaveMenu_CheckControllerPak(void) {
     s32 mode = menu_flags & 0xC;
     s32 err;
-    Unk80092E48 *p;
+    PakFileScan *p;
 
     if (save_menu_flags & 0x1000) {
         err = func_8003D0F0(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port);
@@ -913,7 +863,7 @@ void SaveMenu_UpdateDelay(void) {
 }
 
 void SaveMenu_DeleteSelectedFile(void) {
-    s32 err = Pak_DeleteGameFile(input_primary_port, D_8008FB81[save_menu_selected_slot * 2]);
+    s32 err = Pak_DeleteGameFile(input_primary_port, (u8)save_menu_file_entries[save_menu_selected_slot].unk1);
 
     if (err != 0) {
         save_menu_pak_error = err;
@@ -940,7 +890,7 @@ void SaveMenu_DeleteSelectedFile(void) {
         save_menu_flags &= ~0x2000;
         save_menu_dialog_index = 22;
         save_menu_delay_frames = 10;
-        ((s8 *)D_8008FB81)[save_menu_selected_slot * 2] = -1;
+        save_menu_file_entries[save_menu_selected_slot].unk1 = -1;
     }
 }
 
@@ -1227,15 +1177,15 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     for (s = chest_opened_flags, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
         *d++ = *s++;
     }
-    d = D_80090248;
+    d = save_menu_game_state_block.unk20.b;
     for (s = spirit_collected_flags, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
         *d++ = *s++;
     }
-    d = D_80090258;
+    d = save_menu_game_state_block.unk30.b;
     for (s = item_inventory, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
         *d++ = *s++;
     }
-    d = D_800902EF;
+    d = save_menu_game_state_block.unkC7.b;
     for (s = boss_defeated_bits, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
         *d++ = *s++;
     }
@@ -1269,15 +1219,15 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     for (s = save_menu_game_state_block.unk0.b, d = chest_opened_flags, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
         *d++ = *s++;
     }
-    s = D_80090248;
+    s = save_menu_game_state_block.unk20.b;
     for (d = spirit_collected_flags, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
         *d++ = *s++;
     }
-    s = D_80090258;
+    s = save_menu_game_state_block.unk30.b;
     for (d = item_inventory, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
         *d++ = *s++;
     }
-    s = D_800902EF;
+    s = save_menu_game_state_block.unkC7.b;
     for (d = boss_defeated_bits, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
         *d++ = *s++;
     }

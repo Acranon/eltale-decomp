@@ -1,12 +1,44 @@
 #include "game/core/main.h"
+#include "game/core/dma.h"
+#include "game/core/overlay_load.h"
+#include "game/audio/audio.h"
+#include "game/audio/sound.h"
+#include "game/input/input.h"
+#include "game/env/env.h"
+#include "game/math/math.h"
+#include "game/camera/camera.h"
+#include "game/map/map.h"
+#include "game/map/collision.h"
+#include "game/map/chest.h"
+#include "game/map/spirit.h"
+#include "game/map/textspot.h"
+#include "game/actor/actor.h"
+#include "game/actor/anim.h"
+#include "game/player/player.h"
+#include "game/npc/npc.h"
+#include "game/enemy/enemy.h"
+#include "game/enemy/boss.h"
+#include "game/battle/battle.h"
+#include "game/magic/magic.h"
+#include "game/gfx/shadow.h"
+#include "game/gfx/shadow_reset.h"
+#include "game/gfx/effect.h"
+#include "game/gfx/sprite_effect.h"
+#include "game/gfx/fade.h"
+#include "game/item/item.h"
+#include "game/ui/hud.h"
+#include "game/ui/menu.h"
+#include "game/save/save_menu.h"
+#include "game/text/text.h"
+#include "game/text/text_window.h"
+#include "game/event/cutscene.h"
+#include "game/event/scene.h"
 
 /*
  * Main runtime: game-state loops, graphics frame setup and submission,
  * plus the transition fades (style fade_transition_style).
  * Original file: 1870.c (ROM 0x1870).
  */
-
-#define OS_SC_SWAPBUFFER 0x0040
 
 /* This file's .bss, 8007A170..8007A8C0, in address order (see 3F50.c's block
  * for IDO's ordering rules). nnsc_retrace_count just before it (the retrace counter
@@ -54,27 +86,17 @@ u64 core_frame_start_time;
 u64 core_frame_end_time;
 u64 D_8007A8B8;
 
-void nnScCreateScheduler(NNSched *sc, u8 numFields);
-void nnScStartScheduler(NNSched *sc);
-OSMesgQueue *nnScGetGfxMQ(NNSched *sc);
-void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
-void Player_Init(void);
-void Boss_ClearDefeated(void);
-void Env_InitClock(void);
-void Chest_ClearOpenedFlags(void);
-void Spirit_ClearCollectedFlags(void);
-void Item_InitInventory(void);
-void Dma_ReadRom(u8 *romStart, void *dest, u32 size);
-void Audio_Init(void);
-void Audio_StartThread(NNSched *sc);
-void Audio_InitSeqPlayers(u8 *arg0, u8 *arg1, u8 *arg2, u8 *arg3, u8 *arg4);
-void Audio_InitSoundPlayer(u8 *arg0, u8 *arg1, u8 *arg2);
-void Bgm_Init(void);
-void Menu_Init(void);
-void Text_LoadFontAssets(void);
-void Input_InitControllers(void);
-void osCreateViManager(OSPri pri);
-void func_801009EC(OSMesgQueue *arg0, OSMesgQueue *arg1);
+/* Not declared by any module header (H2b):
+ * - the PakMenu overlay's entry (PakMenu_Run, ovl_DA4570 at 0x80100000) and the title,
+ *   intro and ending overlays' entry and per-frame functions, called by address: the
+ *   three overlays share 0x8020C0D0 (overlay_load.c);
+ * - ROM addresses (linker symbols), the RSP microcode (SDK binaries), segment symbols
+ *   and the fixed RAM buffers (segment 1 data, framebuffers, depth buffer, RSP stacks). */
+s32 func_801009EC(OSMesgQueue *mq, OSMesgQueue *arg1); /* PakMenu_Run */
+void func_8020C0D0(void);  /* Title_Init / Intro_Init / Ending_Init */
+s32 func_8020C11C(void);   /* Title_Update */
+s32 func_8020C15C(void);   /* Ending_Update */
+s32 func_8020C16C(void);   /* Intro_Update */
 
 extern u8 D_71920[];
 extern u8 D_753F0[];
@@ -83,6 +105,8 @@ extern u8 D_D74AC0[];
 extern u8 D_D86170[];
 extern u8 D_DA4570[];
 extern u8 D_DAB5F0[];
+extern u8 D_E420D0[];
+extern u8 D_E43780[];
 extern u8 D_E5BF60[];
 extern u8 D_E5ED70[];
 extern u8 D_E98330[];
@@ -92,39 +116,15 @@ extern u8 D_ECD470[];
 extern u64 D_8004B980[]; /* rspboot text */
 extern u64 D_8004BA50[]; /* gfx ucode text (= rspboot end) */
 extern u64 D_80070260[]; /* gfx ucode data */
-/* Bits seen in this file: 1 run Item_UpdateInventoryMenu, 2 run Text_UpdateAndDrawWindows,
- * 0x20 fade in at loop start, 0x40 load the area at loop start, 0x80 transition countdown,
- * 0x100 start the map's BGM, 0x200 stop sequence 0 at loop end, 0x4000 hide the HUD,
- * 0x8000 leave the mode loop and reinitialise, 0x10000 don't draw the player. */
-s32 core_flags = 0;
-extern OSViMode D_8006CDF0;
-extern OSViMode D_8006D6B0;
-extern OSMesgQueue D_8007A254;
-extern f32 player_spawn_x;
-extern f32 player_spawn_z;
-extern f32 player_spawn_rot;
-extern s32 player_spawn_type;
-extern s16 player_respawn_map;
-extern u16 player_respawn_subarea;
-extern s16 player_respawn_entry;
-extern s16 D_8007AA0E;
-extern u16 map_backdrop_id;
-extern s32 map_id;
-extern u32 map_next_id;
-extern s32 map_next_subarea;
-extern s32 map_flag4_return_map;
-extern s32 map_flag8_return_map;
-extern s32 D_80084308;
-extern s16 env_play_time;
-extern f32 D_80085ECC;
-extern s16 hud_panel_transition_frame;
-extern u16 hud_panel_transition_state;
-extern s16 hud_hp_meter_width;
-extern s16 hud_mp_meter_width[];
-extern OSMesgQueue input_si_queue;
+
+extern u8 D_1000010[];
+extern GfxFrameData D_2000000; /* the current frame's data, through segment 2 */
+
 extern u8 D_80095AF0[];
 extern u8 D_800C0000[];
 extern u8 D_80100000[];
+extern u8 D_801C0000[];
+extern u16 D_802DA800[];
 extern u64 D_80300000[];
 extern u64 D_80300400[];
 extern GfxFrame D_80301000[2];
@@ -133,6 +133,12 @@ extern u64 D_803245A0[];
 extern u8 D_8039ADB0[];
 extern u16 D_803B5000[];
 extern u16 D_803DA800[];
+
+/* Bits seen in this file: 1 run Item_UpdateInventoryMenu, 2 run Text_UpdateAndDrawWindows,
+ * 0x20 fade in at loop start, 0x40 load the area at loop start, 0x80 transition countdown,
+ * 0x100 start the map's BGM, 0x200 stop sequence 0 at loop end, 0x4000 hide the HUD,
+ * 0x8000 leave the mode loop and reinitialise, 0x10000 don't draw the player. */
+s32 core_flags = 0;
 
 void Core_MainThread(void *arg0) {
     osCreateViManager(0xFE);
@@ -144,14 +150,14 @@ void Core_MainThread(void *arg0) {
     nnScCreateScheduler(&core_sched, 1);
     Input_InitControllers();
     if (osTvType == OS_TV_NTSC) {
-        osViSetMode(&D_8006CDF0);
+        osViSetMode(&osViModeTable[OS_VI_NTSC_LAN1]);
     } else {
-        osViSetMode(&D_8006D6B0);
+        osViSetMode(&osViModeTable[OS_VI_MPAL_LAN1]);
     }
     osViBlack(1);
     Dma_ReadRom(D_DA4570, D_80100000, D_DAB5F0 - D_DA4570);
     Text_LoadFontAssets();
-    func_801009EC(&input_si_queue, &D_8007A254);
+    func_801009EC(&input_si_queue, &core_sched.retraceMQ);
     osViBlack(1);
     osViSetSpecialFeatures(0x5A);
     nnScStartScheduler(&core_sched);
@@ -214,11 +220,11 @@ void Core_ResetGameState(void) {
     map_flag4_return_map = -1;
     map_flag8_return_map = -1;
     map_backdrop_id = 0xFFFF;
-    D_80085ECC = 0.0f;
+    camera_state.unk84 = 0.0f;
     env_play_time = 0;
     map_next_id = 0xD;
     map_next_subarea = 0x11;
-    D_80084308 = -1;
+    exit_destination.entry = -1;
     player_respawn_map = 0xD;
     player_respawn_subarea = 0x11;
     player_respawn_entry = 0;
@@ -226,10 +232,10 @@ void Core_ResetGameState(void) {
     player_spawn_z = 0.0f;
     player_spawn_rot = 1.5707964f;
     player_spawn_type = 0x108;
-    D_8007AA0E = 0;
+    player_state.unk6 = 0;
     hud_panel_transition_state = 1;
     hud_panel_transition_frame = 0xC;
-    hud_mp_meter_width[0] *= 0;
+    hud_mp_meter_width *= 0;
     hud_hp_meter_width = 0;
     D_8007A172 = 1;
     fade_transition_style = 0;
@@ -281,45 +287,13 @@ void Gfx_InitFrameTask(GfxFrame *arg0) {
     arg0->task.list.t.yield_data_ptr = D_80300400;
     arg0->task.list.t.yield_data_size = OS_YIELD_DATA_SIZE;
     arg0->task.next = NULL;
-    arg0->task.flags = OS_SC_SWAPBUFFER;
+    arg0->task.flags = NN_SC_SWAPBUFFER;
     arg0->task.msgQ = &gfx_mesg_queue;
     arg0->task.msg = &arg0->data.msg;
     arg0->task.framebuffer = arg0->data.framebuffer;
 }
 
-extern s32 player_light_slot;
-extern u16 map_env_flags;
 s32 D_8004DCA4 = 0;
-extern s8 D_8006CC80;
-extern u8 D_1000010[];
-extern u8 D_2000000[];
-extern u16 D_802DA800[];
-
-void Player_Draw(void *arg0);
-void Npc_DrawAll(void *arg0);
-void Enemy_DrawAll(void *arg0);
-void Boss_Draw(void *arg0);
-void MapObj_UpdateAndDrawNearby(void *arg0);
-void MapObj_DrawTranslucent(void *arg0);
-void Map_DrawBackdrop(void *arg0);
-void Env_PrepareFrameLighting(void);
-void Env_ApplyLightSlot(s32 arg0);
-void Shadow_DrawAll(void *arg0);
-void Chest_UpdateAll(void *arg0);
-void Spirit_SpawnSparkles(void);
-void Camera_Update(void *arg0);
-void Effect_UpdateAndDrawAll(void *arg0);
-void Effect_UpdateAndDrawSprites(void *arg0);
-void Hud_Draw(void *arg0);
-void Item_UpdateInventoryMenu(void);
-void Fade_UpdateAndDraw(void *arg0);
-void Menu_Update(void *arg0);
-void SaveMenu_Init(s32 arg0);
-void Text_UpdateAndDrawWindows(void);
-void Cutscene_UpdateAndDrawImageCues(void);
-s32 func_8020C11C(void);
-s32 func_8020C15C(void);
-s32 func_8020C16C(void);
 
 void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
     s32 count;
@@ -417,15 +391,15 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
     } else if (core_game_mode == 4) {
         switch (func_8020C16C()) {
             case 0:
-                D_8006CC80 = 0;
+                D_8006CC80[0] = 0;
                 core_game_mode = 3;
                 break;
             case 1:
-                D_8006CC80 = one;
+                D_8006CC80[0] = one;
                 core_game_mode = 3;
                 break;
             default:
-                D_8006CC80 = 0;
+                D_8006CC80[0] = 0;
         }
     } else if (core_game_mode == 5) {
         count = func_8020C15C();
@@ -436,7 +410,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
     }
     gDPFullSync(gfx_dl_head++);
     gSPEndDisplayList(gfx_dl_head++);
-    osWritebackDCache(D_2000000, 0xDA70);
+    osWritebackDCache(&D_2000000, 0xDA70);
 
     count = gfx_dl_head - arg0->data.dl;
     if (gfx_dl_peak_len < count) {
@@ -448,121 +422,6 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
     arg0->task.list.t.data_size = (gfx_dl_head - sub->dl) * sizeof(Gfx);
 }
 
-extern s8 bgm_current;
-extern s8 menu_save_loaded;
-extern s8 input_primary_port;
-extern u16 fade_flags;
-void Player_SetSpawnFromSaveTable(void);
-void Bgm_Update(void);
-void Bgm_Play(s32 arg0);
-void Bgm_PlayDelayed(s32 arg0, s32 arg1);
-void Bgm_ApplyVolumeOption(void);
-void Input_ReadController(s8 arg0);
-void Overlay_LoadTitle(void);
-void Overlay_LoadIntro(void);
-void Overlay_LoadEnding(void);
-void Fade_Init(void);
-void func_8020C0D0(void);
-
-typedef struct {
-    s32 unk0;
-    u8 unk4[0x2C];
-} Unk80084998;
-
-extern s32 env_clock;
-extern Unk80084998 env_light_slots[];
-extern s32 effect_mapobj_emitter_count;
-extern s8 sfx_master_volume;
-extern u8 D_801C0000[];
-extern u8 D_E420D0[];
-extern u8 D_E43780[];
-void Cutscene_StartEntry(s32 arg0);
-s32 Cutscene_UpdateMessageSequence(void);
-void Cutscene_StartAudioFadeForEntry(s32 arg0);
-void Map_StartFrame(void);
-void Env_InitForMap(void);
-void Env_Update(void);
-s32 Env_AllocateLightSlot(void);
-void Shadow_ClearQueue(void);
-void Audio_StopSeq(s32 arg0);
-s32 Audio_GetSeqState(s32 arg0);
-void Sfx_StopAllChannels(void);
-void Cutscene_ResetSequence(void);
-void Cutscene_StartNextScene(void);
-void Cutscene_UpdateScene(void);
-void Cutscene_EndScene(void);
-
-typedef struct {
-    /* 0x0 */ u8 unk0[0x4];
-    /* 0x4 */ u16 unk4;
-    /* 0x6 */ u16 unk6;
-    /* 0x8 */ u16 unk8;
-    /* 0xA */ u16 unkA;
-} PlayerStateSub14;
-
-typedef struct {
-    /* 0x00 */ u8 unk0[0x14];
-    /* 0x14 */ PlayerStateSub14 *unk14;
-    /* 0x18 */ f32 x;
-    /* 0x1C */ f32 y;
-    /* 0x20 */ f32 z;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 rot;
-    /* 0x2C */ u8 unk2C[0x78 - 0x2C];
-    /* 0x78 */ u16 unk78;
-} PlayerState;
-
-typedef struct {
-    s32 unk0;
-    s32 unk4;
-} Unk80084300;
-
-extern PlayerState player_state;
-extern u8 D_8007AA20[];
-extern s32 map_subarea;
-extern u16 map_subarea_flags;
-extern Unk80084300 exit_destination;
-extern u16 battle_flags;
-extern s32 audio_pending_seq_id;
-extern s32 text_active_window_count;
-extern u16 input_held_buttons;
-extern u16 input_pressed_buttons;
-void Player_Spawn(void);
-void Player_SetSpawnFromSaveTable(void);
-void Player_Update(void);
-void Player_StartAreaExit(void);
-void Npc_InitArea(void);
-void Npc_UpdateAll(void);
-void Enemy_InitForArea(void);
-void Enemy_UpdateAll(void);
-void Boss_LoadForArea(void);
-void Map_LoadArea(void);
-void MapObjAnim_UpdateAll(void);
-s32 Exit_CheckEnter(f32 arg0, f32 arg1, f32 arg2);
-void Env_SetClock(s32 arg0);
-void Chest_LoadForMap(void);
-void Spirit_LoadForMap(void);
-void TextSpot_LoadForMap(void);
-void Camera_InitForMap(void);
-void Camera_TurnForExit(void);
-void Magic_ResetEffectSystem(void);
-void Magic_UpdateEffects(void);
-void Effect_ResetAll(void);
-void Effect_ResetSpritePool(void);
-void Battle_ResetState(s32 *arg0);
-void Battle_TryStartRandomEncounter(void);
-void Battle_UpdateStartCamera(void);
-void Battle_UpdateTurnTransition(void);
-void Anim_SetCurrentAndNext(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
-void Hud_ResetState(void);
-void Audio_LoadSeq(s32 arg0, s32 arg1);
-void Audio_PlaySeq(s32 arg0);
-void Bgm_PlayForMap(s32 arg0, s32 arg1, s32 arg2);
-void Sfx_Play(s32 arg0, s32 arg1, s32 arg2);
-void Menu_FindMapPageLocation(void);
-void SaveMenu_Init(s32 arg0);
-void Text_ResetAllWindows(s32 arg0);
-
 void Core_RunGameplayLoop(void) {
     OSMesg msg;
     GfxFrame *frame;
@@ -572,7 +431,7 @@ void Core_RunGameplayLoop(void) {
     msg = NULL;
     if (core_flags & 0x40) {
         if (core_flags & 0x800) {
-            map_id = (u16)player_respawn_map;
+            map_id = player_respawn_map;
             map_subarea = player_respawn_subarea;
             Player_SetSpawnFromSaveTable();
         }
@@ -593,7 +452,7 @@ void Core_RunGameplayLoop(void) {
         D_8007A1C4 = Env_AllocateLightSlot();
         player_light_slot = Env_AllocateLightSlot();
         env_light_slots[player_light_slot].unk0 = 2;
-        Battle_ResetState(&player_light_slot);
+        Battle_ResetState();
         Magic_ResetEffectSystem();
         Effect_ResetAll();
         Effect_ResetSpritePool();
@@ -602,7 +461,7 @@ void Core_RunGameplayLoop(void) {
         core_flags &= ~0x840;
     }
     if (core_flags & 0x400) {
-        Anim_SetCurrentAndNext(D_8007AA20, 0, 1, 0, 1, 1);
+        Anim_SetCurrentAndNext(&player_state.actor, 0, 1, 0, 1, 1);
     }
     if (core_flags & 0x20) {
         core_flags &= ~0x20;
@@ -641,12 +500,12 @@ void Core_RunGameplayLoop(void) {
         Gfx_BuildFrameDisplayList(&D_80301000[gfx_frame_index]);
         frame = &D_80301000[gfx_frame_index];
         if (!(core_flags & 0x87)) {
-            if (!(player_state.unk78 & 1) && Exit_CheckEnter(player_state.x, player_state.z, player_state.rot) != 0) {
+            if (!(player_state.actor.unk60 & 1) && Exit_CheckEnter(player_state.actor.x, player_state.actor.z, player_state.actor.rot) != 0) {
                 core_flags |= 0x80;
                 Camera_TurnForExit();
                 Player_StartAreaExit();
                 fade_transition_style = 0;
-            } else if (!(core_flags & 0x1000) && !(player_state.unk78 & 1) && (input_pressed_buttons & 0x1000) &&
+            } else if (!(core_flags & 0x1000) && !(player_state.actor.unk60 & 1) && (input_pressed_buttons & 0x1000) &&
                        !(battle_flags & 1) && !(input_held_buttons & 0x2000) && !(core_flags & 1)) {
                 core_game_mode = 2;
                 Sfx_Play(0, 1, 0xFF);
@@ -662,8 +521,8 @@ void Core_RunGameplayLoop(void) {
                 if (!(core_flags & 0x400)) {
                     core_flags |= 0x40;
                 }
-                map_next_id = exit_destination.unk0;
-                map_next_subarea = exit_destination.unk4;
+                map_next_id = exit_destination.map;
+                map_next_subarea = exit_destination.subarea;
                 if (core_flags & 0x400) {
                     player_state.unk14->unk4 = player_state.unk14->unk6;
                     player_state.unk14->unk8 = player_state.unk14->unkA;
@@ -671,7 +530,7 @@ void Core_RunGameplayLoop(void) {
                     Env_SetClock(env_clock);
                     player_respawn_map = map_id;
                     player_respawn_subarea = map_subarea;
-                    player_respawn_entry = D_80084308;
+                    player_respawn_entry = exit_destination.entry;
                     fade_transition_style = 2;
                 }
                 core_flags |= 0x100;
@@ -984,19 +843,6 @@ void Core_RunEndingLoop(void) {
     Gfx_WaitForFrameMessage(2);
 }
 
-void Fade_Start(s32 arg0, s32 arg1, void *arg2);
-
-extern u8 fade_black_ramp[];
-extern u8 fade_black_ramp_end[];
-extern u8 fade_grey_ramp[];
-extern u8 fade_grey_ramp_end[];
-extern u8 fade_black_ramp_slow[];
-extern u8 fade_black_ramp_slow_end[];
-extern u8 fade_grey_ramp_slow[];
-extern u8 fade_grey_ramp_slow_end[];
-extern u8 fade_grey_ramp_256[];
-extern u8 D_8008CE54[];
-
 void Gfx_WaitForFrameMessage(s16 arg0) {
     OSMesg msg = NULL;
 
@@ -1020,7 +866,9 @@ void Fade_StartTransitionIn(void) {
             Fade_Start(0x20, 4, fade_grey_ramp_slow_end);
             break;
         case 4:
-            Fade_Start(0x100, 4, D_8008CE54);
+            /* H2b: fade.h declares fade_grey_ramp_256 as u8[0x100][4]; its last entry read as a
+             * ColorRGBA8 (see D3_HINTS: it is a ColorRGBA8[0x100]) */
+            Fade_Start(0x100, 4, (ColorRGBA8 *)fade_grey_ramp_256[0xFF]);
             break;
     }
 }
@@ -1040,7 +888,7 @@ void Fade_StartTransitionOut(void) {
             Fade_Start(0x1F, 2, fade_grey_ramp_slow);
             break;
         case 4:
-            Fade_Start(0xFF, 2, fade_grey_ramp_256);
+            Fade_Start(0xFF, 2, (ColorRGBA8 *)fade_grey_ramp_256); /* H2b: as above */
             break;
     }
 }

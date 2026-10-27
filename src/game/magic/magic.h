@@ -157,6 +157,10 @@ extern u8 magic_status_chances[12];
 extern s32 magic_status_time_range_other[12];
 extern s32 magic_status_time_range_self[12];
 
+/* The spell data block: fixed addresses in a block read from ROM (no C module defines it). */
+extern SpellDef *D_800C185C[]; /* per group (element): its SpellDef rows */
+extern MagicVisualDef D_800C18D8[]; /* visual effects (SpellFxDef stage indices) */
+
 void Magic_ResetEffectSystem(void);
 s32 Magic_LookupSpellSequence(u16 n, u8 *arg1);
 s32 Magic_GetSpellRestrictionFlags(u32 arg0, u16 arg1);

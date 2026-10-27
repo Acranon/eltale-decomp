@@ -54,9 +54,9 @@ typedef struct EnemyDef {
 typedef struct EnemyAreaSet {
     /* 0x00 */ u8 *start; /* ROM range DMA'd by Enemy_LoadAreaSet (Dma_ReadRom devAddr) */
     /* 0x04 */ u8 *end;
-    /* 0x08 */ u8 **unk8; /* -> enemy_anim_tables */
+    /* 0x08 */ struct AnimSet **unk8; /* -> enemy_anim_tables */
     /* 0x0C */ EnemyDef *unkC;
-    /* 0x10 */ s32 unk10; /* -> enemy_names */
+    /* 0x10 */ u8 **unk10; /* -> enemy_names */
 } EnemyAreaSet; /* 0x14 bytes */
 
 /* One step of an enemy attack script (enemy_attack_scripts, Enemy_RunAttackScript). */
@@ -91,7 +91,7 @@ typedef struct Enemy {
     /* 0x098 */ ActorBattle battle; /* actor.unk68 points here */
 } Enemy; /* 0x130 bytes */
 
-typedef void (*EnemyStateFunc)(Actor *, Enemy *, u8 *);
+typedef void (*EnemyStateFunc)(Actor *, Enemy *, struct AnimSet *);
 
 /* .bss 8007B900..8007C0B0, in address order (unreferenced gaps included) */
 extern s32 enemy_count;
@@ -100,8 +100,8 @@ extern Enemy enemy_slots[6];
 extern Enemy *enemy_turn_current;
 extern s32 enemy_drawn_count;
 extern Actor *enemy_drawn_list[6];
-extern u8 **enemy_anim_tables;
-extern s32 enemy_names;
+extern struct AnimSet **enemy_anim_tables; /* per anim set index (Actor.unk50): the AnimSet table */
+extern u8 **enemy_names; /* name strings, indexed by EnemyDef.unk2 (hud.c) */
 extern u16 enemy_turn_order[6];
 extern EnemyAreaSet *enemy_area_set;
 extern u16 enemy_script_time;
@@ -127,8 +127,8 @@ void Enemy_SortTurnOrder(void);
 void Enemy_StartTurn(void);
 void Enemy_StateIdle(Actor *obj, Enemy *e, struct AnimSet *arg2);
 void Enemy_StateApproach(Actor *obj, Enemy *e, struct AnimSet *arg2);
-void Enemy_StateHurt(Actor *obj, Enemy *ai, s32 arg2);
-void Enemy_StateFacePlayer(Actor *obj, Enemy *ai, s32 arg2);
+void Enemy_StateHurt(Actor *obj, Enemy *ai, struct AnimSet *arg2);
+void Enemy_StateFacePlayer(Actor *obj, Enemy *ai, struct AnimSet *arg2);
 void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, struct AnimSet *anims);
 void Enemy_StateCastSpell(Actor *obj, Enemy *e, struct AnimSet *anims);
 EnemyAttack *Enemy_ChooseAttack(Enemy *e, Actor *obj);
