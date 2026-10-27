@@ -246,7 +246,12 @@ void func_80006040(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
 void func_8000665C(f32 sx, f32 sz, Actor *a, PlayerState *p);
 void func_80007320(PlayerState *arg0, Actor *arg1);
 void func_80008A40(PlayerState *arg0, Actor *arg1);
+#ifdef NON_MATCHING
+/* retail: the damage argument is masked with 0xFFFF on entry */
+s32 func_80007FD8(u16 dmg, u16 arg1, Actor *arg2);
+#else
 s32 func_80007FD8(s32 arg0, u16 arg1, Actor *arg2);
+#endif
 void func_80015F44(s32 arg0, Actor *arg1);
 u32 func_80026E90(s32 arg0);
 f32 func_800270D0(f32 arg0, f32 arg1);
@@ -621,7 +626,12 @@ extern s16 D_8008C160;
 extern u8 D_8004F5A0[];
 extern u8 D_8004F5B4[];
 extern void (*D_8004DCB0[])(Actor *, PlayerState *, CharData *);
+#ifdef NON_MATCHING
+/* retail returns the unmasked index + 1 in v0 */
+s32 func_80007A8C(Actor *arg0);
+#else
 u16 func_80007A8C(Actor *arg0);
+#endif
 s32 func_80006D24(PlayerState *arg0, Actor *arg1);
 void *func_80013D08(Actor *arg0);
 Actor *func_80013808(Actor *arg0);
@@ -2009,7 +2019,67 @@ void func_80007A38(Actor *arg0) {
 extern u16 D_8007C050[];
 extern u16 D_8008BE5A;
 
+#ifdef NON_MATCHING
+/* -1 and 0x130 swapped between s5/s7, one addu operand order (register allocation tie); code is equivalent */
+s32 func_80007A8C(Actor *arg0) {
+    Monster *m;
+    s32 ret;
+    u16 *idx;
+    u32 i;
+    f32 radius;
+    Actor *a;
+    ActorStats *stats;
+    f32 dx;
+    f32 dz;
+    f32 r;
+    f32 dist;
+
+    radius = arg0->unk64->unk18 * arg0->scale;
+    ret = 0;
+    idx = D_8007C050;
+    i = 0;
+    for (; i < D_8008BE5A; i++, idx++) {
+        m = D_8007B908 + *idx;
+        a = &m->actor;
+        if (m->actor.unk50 != -1) {
+            dx = a->x - arg0->x;
+            dz = a->z - arg0->z;
+            dist = sqrtf(dx * dx + dz * dz);
+            r = a->unk64->unk18 * a->scale;
+            if (dist < radius + r + 10.0) {
+                D_8007A918.x = dx;
+                D_8007A918.z = dz;
+                stats = a->unk64;
+                if (stats->unk0 == 1) {
+                    dx = a->unk68->unk94 - arg0->y;
+                    dz = 2.0 * stats->unk18;
+                } else if (stats->unk0 == 2) {
+                    dz = 0.0f;
+                    dx = 0.0f;
+                } else {
+                    dz = stats->unk1C;
+                    dx = a->y - arg0->y;
+                }
+                if (dx < 0.0f) {
+                    dx = -dx;
+                }
+                dx -= dz * a->scale + arg0->unk64->unk1C * arg0->scale;
+                if (dx <= 0.0f) {
+                    func_800271B4(arg0->rot, &D_8007A918);
+                    r = r * 1.5;
+                    if (D_8007A918.z >= 0.0f && -r < D_8007A918.x && D_8007A918.x < r) {
+                        ret = *idx + 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+#else
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007A8C.s")
+#endif
 
 void func_80007D30(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     Monster *mon;
@@ -2071,7 +2141,80 @@ u16 func_80007EAC(PlayerState *arg0) {
     return val;
 }
 
+#ifdef NON_MATCHING
+void func_80015D78(s32 arg0);
+
+/* frame 0x50 vs 0x48: damage kept in an extra saved register, arg2 kept live (register allocation); code is equivalent */
+s32 func_80007FD8(u16 dmg, u16 arg1, Actor *arg2) {
+    PlayerState *p = &D_8007AA08;
+    CharData *cd;
+    f32 angle;
+    s32 d;
+    s32 flags;
+
+    if (p->unk0 != 6) {
+        cd = D_80055D40[p->actor.unk50];
+        if (dmg != 0) {
+            if (arg1 & 0x8000) {
+                angle = func_800270D0(arg2->x - D_8007AA20.x, arg2->z - D_8007AA20.z) - D_8007AA20.rot;
+                if (angle > 3.141592653589793) {
+                    angle -= 6.283185307179586;
+                } else if (angle < -3.141592653589793) {
+                    angle += 6.283185307179586;
+                }
+                if (angle < 0.0f) {
+                    angle = -angle;
+                }
+                if (angle > 2.356194490192345) {
+                    dmg += dmg >> 1;
+                }
+            }
+            dmg = dmg * ((f32) arg2->unk68->unk84 / (f32) (arg2->unk68->unk84 + p->unk10C));
+            dmg += func_80026E90((u32) (sqrtf(dmg) * 0.75 + 1.0));
+            if (dmg == 0) {
+                dmg++;
+            }
+            d = dmg;
+            if (p->actor.unk64->unk4 < dmg) {
+                p->actor.unk64->unk4 = 0;
+            } else {
+                p->actor.unk64->unk4 -= d;
+            }
+            if (p->unk84 & 0x200) {
+                p->actor.unk64->unk8 += d;
+                if (p->actor.unk64->unkA < p->actor.unk64->unk8) {
+                    p->actor.unk64->unk8 = p->actor.unk64->unkA;
+                }
+                func_8002373C(&D_8007AA20, 0x200, 2, 0x1E);
+            }
+            flags = 0;
+            p->unk14->unk28++;
+            p->unk14->unk2E++;
+            if (arg1 & 0x4000) {
+                flags = 0x8003;
+            }
+            func_8001AE24(&D_8007AA20, flags, d);
+        }
+        p->unk0 = 5;
+        p->unk4 = *(s16 *) ((u8 *) cd + 0x62); /* CharData field 0x62 (lh) */
+        D_8007AA20.unk60 |= 1;
+        d = arg1 & 0x8000;
+        if (arg1 & 4) {
+            D_8007AA20.unk60 |= 2;
+        }
+        func_800201A0(&D_8007AA20, 8, 1, D_8007A910, 1, 1);
+        if (dmg != 0) {
+            func_80015D78(2);
+        }
+        if (d != 0) {
+            func_8002A7C8(0, 0x18, 0xFF);
+        }
+    }
+    return dmg;
+}
+#else
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/func_80007FD8.s")
+#endif
 
 /* these are fields of D_8007AA08; some functions use them by their own names */
 extern u16 D_8007AA0C;    /* .unk4 */
