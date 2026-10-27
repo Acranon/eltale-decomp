@@ -11,7 +11,7 @@ extern GfxFrameData D_2000000; /* segment 2 (no module defines it) */
 
 /* .bss 8008CA50..8008CE60 */
 u16 fade_flags; /* bit 0 quad on, 1 hold at the end, 2 step the ramp backwards, 3 letterbox bars */
-u8 fade_grey_ramp_256[0x100][4];
+ColorRGBA8 fade_grey_ramp_256[0x100];
 s32 fade_frames_left;
 ColorRGBA8* fade_ramp_ptr;
 
@@ -101,10 +101,10 @@ void Fade_Init(void) {
     fade_flags = 0;
     fade_frames_left = 0;
     for (i = 0; i < 0x100; i++) {
-        fade_grey_ramp_256[i][0] = 0xDC;
-        fade_grey_ramp_256[i][1] = 0xDC;
-        fade_grey_ramp_256[i][2] = 0xDC;
-        fade_grey_ramp_256[i][3] = (i * 0xFF) >> 8;
+        fade_grey_ramp_256[i].r = 0xDC;
+        fade_grey_ramp_256[i].g = 0xDC;
+        fade_grey_ramp_256[i].b = 0xDC;
+        fade_grey_ramp_256[i].a = (i * 0xFF) >> 8;
     }
 }
 
