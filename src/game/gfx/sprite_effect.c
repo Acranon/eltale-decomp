@@ -8,7 +8,6 @@
  * Original file: 1E570.c (ROM 0x1E570).
  */
 
-extern GfxFrameData D_2000000; /* segment 2 (no module defines it) */
 
 Gfx effect_sprite_setup_dl[8] = {
     {{ 0xE7000000, 0x00000000 }},

@@ -179,22 +179,6 @@ void Menu_UpdatePageSlide(void) {
     }
 }
 
-extern u16 D_8007A9D4;
-extern u16 D_8007A9D6;
-extern u16 D_8007A9D8;
-extern u16 D_8007A9DA;
-extern u16 D_8007A9DC;
-extern u16 D_8007A9DE;
-extern u16 D_8007A9F8;
-extern u16 D_8007A9FA;
-extern u16 D_8007A9FC;
-extern u16 D_8007A9FE;
-extern u8 D_8007AA00;
-extern u8 D_8007AA01;
-extern u8 D_8007AA02;
-extern u8 D_8007AA03;
-extern s32 D_8007AA10;
-
 void Menu_UpdateStatsPage(s32 x) {
     s32 px;
     s32 i;
@@ -770,13 +754,6 @@ void Menu_UpdateMapPage(s32 arg0) {
 #pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_UpdateMapPage.s")
 #endif
 
-extern u8 D_8007A9F4;
-extern u8 D_8007A9F5;
-extern u8 D_8007A9F6;
-extern u8 D_8007A9F7;
-extern s32 D_8007A9E0;
-extern u8 D_8007AA04;
-
 void Menu_UpdateElementsPage(s32 x) {
     s32 p;
     s32 v;
@@ -1230,16 +1207,16 @@ u16 player_stat_xp_costs[70] = {
     0x002D, 0x002E, 0x0030, 0x0031, 0x0032, 0x0032, 0x0032, 0x0032, 0x0032, 0x0032,
 };
 MenuRomRange player_anim_rom_ranges[30] = {
-    { 0x00EF21A0, 0x00EF3770 }, { 0x00EF3770, 0x00EF5B10 }, { 0x00EF5B10, 0x00EF7EB0 },
-    { 0x00EF7EB0, 0x00EFA2A0 }, { 0x00EFA2A0, 0x00EFBD30 }, { 0x00EFBD30, 0x00EFD390 },
-    { 0x00EFD390, 0x00EFF280 }, { 0x00EFF280, 0x00F00D10 }, { 0x00F00D10, 0x00F027A0 },
-    { 0x00F027A0, 0x00F05F50 }, { 0x00F05F50, 0x00F07D40 }, { 0x00F07D40, 0x00F09E30 },
-    { 0x00F2C170, 0x00F2D120 }, { 0x00F2D120, 0x00F2E9F0 }, { 0x00F2E9F0, 0x00F2FB70 },
-    { 0x00F09E30, 0x00F0C1D0 }, { 0x00F0C1D0, 0x00F10A60 }, { 0x00F10A60, 0x00F11FF0 },
-    { 0x00F11FF0, 0x00F143E0 }, { 0x00F143E0, 0x00F15770 }, { 0x00F15770, 0x00F192D0 },
-    { 0x00F192D0, 0x00F1DBD0 }, { 0x00F1DBD0, 0x00F1F660 }, { 0x00F1F660, 0x00F210A0 },
-    { 0x00F210A0, 0x00F22AE0 }, { 0x00F22AE0, 0x00F23ED0 }, { 0x00F23ED0, 0x00F26B90 },
-    { 0x00F26B90, 0x00F28740 }, { 0x00F28740, 0x00F2A2F0 }, { 0x00F2A2F0, 0x00F2C170 },
+    { (u8 *)0x00EF21A0, (u8 *)0x00EF3770 }, { (u8 *)0x00EF3770, (u8 *)0x00EF5B10 }, { (u8 *)0x00EF5B10, (u8 *)0x00EF7EB0 },
+    { (u8 *)0x00EF7EB0, (u8 *)0x00EFA2A0 }, { (u8 *)0x00EFA2A0, (u8 *)0x00EFBD30 }, { (u8 *)0x00EFBD30, (u8 *)0x00EFD390 },
+    { (u8 *)0x00EFD390, (u8 *)0x00EFF280 }, { (u8 *)0x00EFF280, (u8 *)0x00F00D10 }, { (u8 *)0x00F00D10, (u8 *)0x00F027A0 },
+    { (u8 *)0x00F027A0, (u8 *)0x00F05F50 }, { (u8 *)0x00F05F50, (u8 *)0x00F07D40 }, { (u8 *)0x00F07D40, (u8 *)0x00F09E30 },
+    { (u8 *)0x00F2C170, (u8 *)0x00F2D120 }, { (u8 *)0x00F2D120, (u8 *)0x00F2E9F0 }, { (u8 *)0x00F2E9F0, (u8 *)0x00F2FB70 },
+    { (u8 *)0x00F09E30, (u8 *)0x00F0C1D0 }, { (u8 *)0x00F0C1D0, (u8 *)0x00F10A60 }, { (u8 *)0x00F10A60, (u8 *)0x00F11FF0 },
+    { (u8 *)0x00F11FF0, (u8 *)0x00F143E0 }, { (u8 *)0x00F143E0, (u8 *)0x00F15770 }, { (u8 *)0x00F15770, (u8 *)0x00F192D0 },
+    { (u8 *)0x00F192D0, (u8 *)0x00F1DBD0 }, { (u8 *)0x00F1DBD0, (u8 *)0x00F1F660 }, { (u8 *)0x00F1F660, (u8 *)0x00F210A0 },
+    { (u8 *)0x00F210A0, (u8 *)0x00F22AE0 }, { (u8 *)0x00F22AE0, (u8 *)0x00F23ED0 }, { (u8 *)0x00F23ED0, (u8 *)0x00F26B90 },
+    { (u8 *)0x00F26B90, (u8 *)0x00F28740 }, { (u8 *)0x00F28740, (u8 *)0x00F2A2F0 }, { (u8 *)0x00F2A2F0, (u8 *)0x00F2C170 },
 };
 SaveSpawnPoint player_save_spawn_points[17] = {
     { 0x000F, 5, -2.36f, 1.23f, 1.5793f }, { 0x0010, 7, -2.36f, 1.23f, 1.5793f },
@@ -1256,12 +1233,12 @@ u32 D_80056198[2] = {
     0, 0,
 };
 EnemyAreaSet enemy_area_sets[6] = {
-    { (u8 *)0x00A77F10, (u8 *)0x00ADA190, (void*)0x80270890, (void*)0x802705F0, (s32)0x80270934 },
-    { (u8 *)0x00ADA190, (u8 *)0x00B61550, (void*)0x80295990, (void*)0x80295648, (s32)0x80295A6C },
-    { (u8 *)0x00B61550, (u8 *)0x00BBBF30, (void*)0x80269010, (void*)0x80268DA8, (s32)0x8026909C },
-    { (u8 *)0x00BBBF30, (u8 *)0x00C2F900, (void*)0x80281FD0, (void*)0x80281CF8, (s32)0x80282088 },
-    { (u8 *)0x00C2F900, (u8 *)0x00C99EF0, (void*)0x80278C10, (void*)0x80278970, (s32)0x80278CB0 },
-    { (u8 *)0x00C99EF0, (u8 *)0x00CC2280, (void*)0x80236A38, (void*)0x80236958, (s32)0x80236A70 },
+    { (u8 *)0x00A77F10, (u8 *)0x00ADA190, (AnimSet **)0x80270890, (EnemyDef *)0x802705F0, (u8 **)0x80270934 },
+    { (u8 *)0x00ADA190, (u8 *)0x00B61550, (AnimSet **)0x80295990, (EnemyDef *)0x80295648, (u8 **)0x80295A6C },
+    { (u8 *)0x00B61550, (u8 *)0x00BBBF30, (AnimSet **)0x80269010, (EnemyDef *)0x80268DA8, (u8 **)0x8026909C },
+    { (u8 *)0x00BBBF30, (u8 *)0x00C2F900, (AnimSet **)0x80281FD0, (EnemyDef *)0x80281CF8, (u8 **)0x80282088 },
+    { (u8 *)0x00C2F900, (u8 *)0x00C99EF0, (AnimSet **)0x80278C10, (EnemyDef *)0x80278970, (u8 **)0x80278CB0 },
+    { (u8 *)0x00C99EF0, (u8 *)0x00CC2280, (AnimSet **)0x80236A38, (EnemyDef *)0x80236958, (u8 **)0x80236A70 },
 };
 EnemyScriptCmd enemy_attack_script_0[6] = {
     { 25, 0, 0, { 0, 0 }, 0.0f, 1.9e+02f, 2e+02f, 0.0f },
@@ -1363,8 +1340,8 @@ s32 D_80056878[2] = {
     0, 0,
 };
 MenuRomRange npc_area_set_rom_ranges[7] = {
-    { 0x00871D10, 0x008D1960 }, { 0x008D1960, 0x00926C00 }, { 0x00926C00, 0x0095D4E0 }, { 0x0095D4E0, 0x00988580 },
-    { 0x00988580, 0x009E16C0 }, { 0x009E16C0, 0x00A14190 }, { 0x00A14190, 0x00A70350 },
+    { (u8 *)0x00871D10, (u8 *)0x008D1960 }, { (u8 *)0x008D1960, (u8 *)0x00926C00 }, { (u8 *)0x00926C00, (u8 *)0x0095D4E0 }, { (u8 *)0x0095D4E0, (u8 *)0x00988580 },
+    { (u8 *)0x00988580, (u8 *)0x009E16C0 }, { (u8 *)0x009E16C0, (u8 *)0x00A14190 }, { (u8 *)0x00A14190, (u8 *)0x00A70350 },
 };
 u8 npc_area_entry_message[0x2F8] = {
 #include "assets/npc_area_entry_message.inc.c"
@@ -1450,23 +1427,24 @@ CellOffset mapobj_cell_disc_r2[22] = {
     { -1, -2 }, { 0, -2 }, { -1, -2 }, { -2, -1 }, { -1, -1 }, { 0, -1 }, { 1, -1 }, { 2, -1 }, { -2, 0 }, { -1, 0 }, { 0, 0 },
     { 1, 0 }, { 2, 0 }, { -2, 1 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 }, { -1, 2 }, { 0, 2 }, { 1, 2 }, { 0, 0 },
 };
-/* Animations: keyframes (assets, 0x34-byte records) and their headers. */
+/* Animations: keyframes (assets, 0x34-byte Keyframe records kept as raw words, hence the
+ * (Keyframe *) casts) and their AnimNode headers (map.c evaluates their tracks). */
 u32 mapobjanim_type23_keys[0x8F] = {
 #include "assets/mapobjanim_type23_keys.inc.c"
 };
-MapObjAnimDef mapobjanim_type23_anim = { mapobjanim_type23_keys, 0x000B, 0x0051, 0, 0, 0, 0, 0, 0 };
+AnimNode mapobjanim_type23_anim = { { (Keyframe *)mapobjanim_type23_keys, 0x000B, 0x0051 } };
 u32 D_80057A18[0xC3] = {
 #include "assets/D_80057A18.inc.c"
 };
-MapObjAnimDef D_80057D24 = { D_80057A18, 0x000F, 0x006E, 0, 0, 0, 0, 0, 0 };
+AnimNode D_80057D24 = { { (Keyframe *)D_80057A18, 0x000F, 0x006E } };
 u32 mapobjanim_type23_odd_keys[0x8F] = {
 #include "assets/mapobjanim_type23_odd_keys.inc.c"
 };
-MapObjAnimDef mapobjanim_type23_odd_anim = { mapobjanim_type23_odd_keys, 0x000B, 0x0064, 0, 0, 0, 0, 0, 0 };
+AnimNode mapobjanim_type23_odd_anim = { { (Keyframe *)mapobjanim_type23_odd_keys, 0x000B, 0x0064 } };
 u32 mapobjanim_type4_keys[0x1A] = {
 #include "assets/mapobjanim_type4_keys.inc.c"
 };
-MapObjAnimDef mapobjanim_type4_anim = { mapobjanim_type4_keys, 2, 0x001E, 0, 0, 0, 0, 0, 0 };
+AnimNode mapobjanim_type4_anim = { { (Keyframe *)mapobjanim_type4_keys, 2, 0x001E } };
 u32 mapobj_loop_anim0_keys[0x27] = {
 #include "assets/mapobj_loop_anim0_keys.inc.c"
 };
@@ -1479,11 +1457,11 @@ u32 mapobj_loop_anim2_keys[0x41] = {
 u32 mapobj_loop_anim3_keys[0x41] = {
 #include "assets/mapobj_loop_anim3_keys.inc.c"
 };
-MapObjAnimDef mapobj_loop_anims[4] = {
-    { mapobj_loop_anim0_keys, 3, 0x003C, 0, 0, 0, 0, 0, 0 },
-    { mapobj_loop_anim1_keys, 4, 0x003C, 0, 0, 0, 0, 0, 0 },
-    { mapobj_loop_anim2_keys, 5, 0x0050, 0, 0, 0, 0, 0, 0 },
-    { mapobj_loop_anim3_keys, 5, 0x0050, 0, 0, 0, 0, 0, 0 },
+AnimNode mapobj_loop_anims[4] = {
+    { { (Keyframe *)mapobj_loop_anim0_keys, 3, 0x003C } },
+    { { (Keyframe *)mapobj_loop_anim1_keys, 4, 0x003C } },
+    { { (Keyframe *)mapobj_loop_anim2_keys, 5, 0x0050 } },
+    { { (Keyframe *)mapobj_loop_anim3_keys, 5, 0x0050 } },
 };
 u16 mapobj_kind11_tlut[0x200] = {
 #include "assets/mapobj_kind11_tlut.inc.c"

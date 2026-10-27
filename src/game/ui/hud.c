@@ -122,7 +122,6 @@ void Hud_ResetState(void) {
 
 
 
-extern GfxFrameData D_2000000;
 extern Gfx D_803A8788[];
 
 struct Struct_80021030;

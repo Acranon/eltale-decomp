@@ -41,11 +41,6 @@ CameraDelayedTurn camera_delayed_turn;
 f32 camera_battle_angle_offset;
 u16 camera_persp_norm;
 
-/* Not defined by a module: the two graphics frames at a fixed address (main.c uses them
- * too) and segment 2. */
-extern GfxFrame D_80301000[2];
-extern GfxFrameData D_2000000;
-
 CameraPreset camera_default_presets[3] = {
     { 0, 0.0f, 0.0f, 0.0f, 11.0f, 15.0f, 65.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },
     { 0, 0.0f, 0.0f, 0.0f, 11.0f, 72.0f, 144.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },

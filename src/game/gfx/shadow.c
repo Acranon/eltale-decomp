@@ -14,7 +14,6 @@ s32 shadow_count;
 /* Segment symbols (no module defines them). */
 extern Gfx D_1000270[];
 extern Vtx D_1000230[];
-extern GfxFrameData D_2000000;
 
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
     ShadowEntry* p;

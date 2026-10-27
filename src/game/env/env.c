@@ -55,13 +55,6 @@ EnvDayPhase env_day_phase_last[1] = {
     { 0x537F, 3, 0x80 },
 };
 
-extern s32 D_80084B60;
-extern s32 D_80084B64;
-extern s32 D_80084B68;
-extern s32 D_80084B6C;
-extern s32 D_80084B70;
-extern s32 D_80084B74;
-
 void Exit_SetDestination(MapExit *arg0) {
     exit_destination_src = arg0->dest;
     exit_destination.map = exit_destination_src[0];

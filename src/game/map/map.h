@@ -9,6 +9,9 @@ struct GfxFrameData;
 struct EnvAreaSettings; /* game/env/env.h (h_core) */
 struct CameraPresetSet; /* game/camera/camera.h */
 struct EffectSprite; /* game/gfx/sprite_effect.h */
+struct EncounterRegionList; /* game/battle/battle.h */
+struct EncounterGroupTable; /* game/battle/battle.h */
+struct NpcList; /* game/npc/npc.h */
 
 /* A placed map object (MapGrid.objs, map_objs). */
 typedef struct MapObj {
@@ -120,9 +123,9 @@ typedef struct MapAreaDef {
     /* 0x24 */ struct CameraPresetSet *cameraPresets; /* per sub-area, or NULL */
     /* 0x28 */ CollWalls *cameraWalls; /* per sub-area */
     /* 0x2C */ CollWalls *actorWalls; /* per sub-area */
-    /* 0x30 */ void *unk30; /* battle.c's view */
-    /* 0x34 */ void *unk34; /* battle.c's view */
-    /* 0x38 */ void *unk38; /* the area's NPC list (npc.c's view) */
+    /* 0x30 */ struct EncounterRegionList *unk30; /* per sub-area, or NULL (Battle_ResetState) */
+    /* 0x34 */ struct EncounterGroupTable *unk34; /* per sub-area (Battle_ResetState) */
+    /* 0x38 */ struct NpcList *unk38; /* the area's NPC list, or NULL (Npc_InitArea) */
     /* 0x3C */ s32 unk3C; /* index into map_extra_rom_ranges */
     /* 0x40 */ u8 pad40[4];
 } MapAreaDef; /* 0x44 bytes */

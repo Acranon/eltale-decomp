@@ -108,6 +108,15 @@ extern EnvAreaSettings *env_area_settings;
 extern EnvLightSlot env_light_slots[8];
 extern s32 env_light_colors[4][3];
 extern s32 env_light_dirs[4][3];
+/* Labels of env_light_dirs[2][0..2] and [3][0..2] (aliases in undefined_syms.txt): env.c,
+ * map.c and effect.c address them as their own symbols (each its own lui in retail; through
+ * env_light_dirs[n][i] they would share one base). */
+extern s32 D_80084B60;
+extern s32 D_80084B64;
+extern s32 D_80084B68;
+extern s32 D_80084B6C;
+extern s32 D_80084B70;
+extern s32 D_80084B74;
 extern s32 env_fog_range[2];
 
 /* .data */

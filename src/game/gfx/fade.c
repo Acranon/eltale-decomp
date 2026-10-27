@@ -7,8 +7,6 @@
  * Original file: 272D0.c (ROM 0x272D0).
  */
 
-extern GfxFrameData D_2000000; /* segment 2 (no module defines it) */
-
 /* .bss 8008CA50..8008CE60 */
 u16 fade_flags; /* bit 0 quad on, 1 hold at the end, 2 step the ramp backwards, 3 letterbox bars */
 ColorRGBA8 fade_grey_ramp_256[0x100];

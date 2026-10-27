@@ -124,8 +124,6 @@ void Anim_DrawModel(s32 flags, Actor* arg1, AnimSet* arg2, struct GfxFrameData* 
     }
 }
 
-extern GfxFrameData D_2000000; /* segment 2 (no module defines it) */
-
 void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, AnimSet* set,
                    AnimNode* anims, struct GfxFrameData* buf) {
     s32 fr;

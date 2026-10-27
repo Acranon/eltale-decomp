@@ -62,7 +62,7 @@ void Npc_InitArea(void) {
     npc_count = 0;
     if (!(map_subarea_flags & 1)) {
         func_80009764(map_subarea_def->unk12);
-        list = (NpcList *)map_area_def->unk38; /* H2b: map.h types MapAreaDef 0x38 as void * (D3_HINTS.md) */
+        list = map_area_def->unk38;
         if (list != NULL) {
             Npc_SpawnForArea(list->defs, list->count);
         }
@@ -176,15 +176,15 @@ void Npc_DrawAll(struct GfxFrameData *arg0) {
 }
 
 void func_80009764(s32 arg0) {
-    u32 start;
-    u32 end;
+    u8 *start;
+    u8 *end;
 
     npc_area_set_rom_range = &npc_area_set_rom_ranges[arg0];
     Dma_ReadRom(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
     Dma_ReadRom(D_A70350, D_802A0000, D_A77F10 - D_A70350);
     start = npc_area_set_rom_range->start;
     end = npc_area_set_rom_range->end;
-    Dma_ReadRom((u8 *)start, D_8020E6F0, end - start); /* start: a ROM address */
+    Dma_ReadRom(start, D_8020E6F0, end - start);
 }
 
 void Npc_SpawnForArea(NpcDef *def, s32 n) {

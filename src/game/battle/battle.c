@@ -51,10 +51,8 @@ void Battle_ResetState(void) {
     battle_encounter_roll_limit = 0;
     if (map_subarea_flags & 1) {
         if (map_area_def->unk30 != NULL) {
-            /* H2b: map.h types MapAreaDef 0x30/0x34 as void *; they are the per-sub-area
-             * EncounterRegionList / EncounterGroupTable arrays (D3_HINTS.md) */
-            battle_encounter_region_table = &((EncounterRegionList*)map_area_def->unk30)[map_subarea];
-            battle_encounter_group_table = &((EncounterGroupTable*)map_area_def->unk34)[map_subarea];
+            battle_encounter_region_table = &map_area_def->unk30[map_subarea];
+            battle_encounter_group_table = &map_area_def->unk34[map_subarea];
             return;
         }
         battle_encounter_region_table = NULL;

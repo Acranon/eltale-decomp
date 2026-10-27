@@ -65,10 +65,8 @@ extern u8 D_8020E6F0[]; /* the area enemy set buffer Enemy_LoadAreaSet reads int
 
 /* Enemy_ChooseAttack and Enemy_ResolveCollisions read some player_state fields through their
  * labels (D_8007AA20.., player.h): retail addresses them as their own symbols. */
-/* H2b: labels inside enemy_effect_defs[20] (undefined_syms.txt); Enemy_SpawnDeathEffects reads
- * them as their own symbols in retail, not off the enemy_effect_defs base it uses for unk0/8/C */
-extern u16 D_8005685A; /* enemy_effect_defs[20].unk2 */
-extern u16 D_8005685C; /* enemy_effect_defs[20].unk4 */
+/* Enemy_SpawnDeathEffects reads enemy_effect_defs[20].unk2/.unk4 through their labels
+ * D_8005685A/C (menu.h): retail addresses them as their own symbols. */
 
 void Enemy_InitForArea(void) {
     s32 i;
@@ -929,7 +927,7 @@ void Enemy_SpawnDeathEffects(Actor *obj) {
 
     enemy_temp_vec.x = enemy_effect_defs[20].unk8;
     enemy_temp_vec.y = enemy_effect_defs[20].unkC;
-    t = &D_800C18D8[(s16)enemy_effect_defs[20].unk0]; /* H2b: retail loads it signed (lh); menu.h has EnemyEffectDef.unk0 as u16 (D3_HINTS.md) */
+    t = &D_800C18D8[enemy_effect_defs[20].unk0];
     enemy_temp_vec.z = obj->unk28;
     if (obj->unk64->unk0 == 1) {
         y = obj->unk68->unk94;

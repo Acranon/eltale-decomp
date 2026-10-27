@@ -118,7 +118,6 @@ extern u64 D_8004BA50[]; /* gfx ucode text (= rspboot end) */
 extern u64 D_80070260[]; /* gfx ucode data */
 
 extern u8 D_1000010[];
-extern GfxFrameData D_2000000; /* the current frame's data, through segment 2 */
 
 extern u8 D_80095AF0[];
 extern u8 D_800C0000[];
@@ -127,7 +126,6 @@ extern u8 D_801C0000[];
 extern u16 D_802DA800[];
 extern u64 D_80300000[];
 extern u64 D_80300400[];
-extern GfxFrame D_80301000[2];
 extern u64 D_8031C5A0[];
 extern u64 D_803245A0[];
 extern u8 D_8039ADB0[];

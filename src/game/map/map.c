@@ -1,6 +1,5 @@
 #include "game/actor/anim.h"
 #include "game/audio/sound.h"
-#include "game/core/dma.h"
 #include "game/core/main.h"
 #include "game/env/env.h"
 #include "game/gfx/effect.h"
@@ -16,23 +15,19 @@
  * Original file: E2A0.c (ROM 0xE2A0).
  */
 
-/* Not defined by a module: segment 2, and env_light_dirs[2][0..2] (env.c) through its interior
- * labels (undefined_syms.txt): H2b: retail loads each with its own lui, as separate symbols. */
-extern GfxFrameData D_2000000;
-extern s32 D_80084B60;
-extern s32 D_80084B64;
-extern s32 D_80084B68;
-
-/* map.h comes after the headers and externs above on purpose (.bss order). Its .bss externs fix
- * this file's .bss order (first declaration; IDO sorts by declaration number mod 256, later
- * blocks first on a tie), and Map_BlendPaletteByClock's static map_clock_blend_len only lands at
- * 80082858 (after mapobj_noanim_list) if the number of declarations (typedefs, tags, used
- * externs) between map.h's externs and the static stays as it is now: measured margin 3 more
- * or 2 fewer. That is why menu.h (which includes map.h) and camera.h come right after map.h and
- * the four externs above sit before it. Above map.h about 96 more declarations still work. */
+/* map.h comes after the headers above on purpose (.bss order). Its .bss externs fix this file's
+ * .bss order (first declaration; IDO sorts by declaration number mod 256, later blocks first on
+ * a tie), and Map_BlendPaletteByClock's static map_clock_blend_len only lands at 80082858 (after
+ * mapobj_noanim_list) if the number of declarations (typedefs, tags, used externs) between
+ * map.h's externs and the static stays as it is now: measured margin 2 more or 2 fewer (a
+ * tagged struct typedef counts 2). That is why menu.h (which includes map.h), camera.h and
+ * dma.h come right after map.h: H2c dropped menu.h's MapObjAnimDef (2 fewer) and moved dma.h
+ * here from the top (2 more) to keep the margin centred. Above map.h about 96 more
+ * declarations still work. */
 #include "game/map/map.h"
 #include "game/ui/menu.h"
 #include "game/camera/camera.h"
+#include "game/core/dma.h"
 
 /* Not defined by a module: overlay data, ROM addresses and fixed RAM addresses. */
 extern u16 D_80124E00[];
@@ -421,7 +416,7 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
         z = s->z;
         rot = s->angle;
         if (flags & 0x2000) {
-            anim = (AnimNode *)&mapobj_loop_anims[(flags & 0xF00) >> 8]; /* H2b: menu.h types it MapObjAnimDef */
+            anim = &mapobj_loop_anims[(flags & 0xF00) >> 8];
             t = flags;
             t = (t & 0xFF) + 1;
             Math_EvalTcbSpline(&anim->track, (f32 *)&mapobj_spline_out, flags & 0xFF);
@@ -706,13 +701,13 @@ void MapObjAnim_Start(s32 state, s32 frame, s32 type, MapObj *obj) {
             case 2:
             case 3:
                 if (p->type & 1) {
-                    anim = (AnimNode *)&mapobjanim_type23_odd_anim; /* H2b: menu.h types it MapObjAnimDef */
+                    anim = &mapobjanim_type23_odd_anim;
                 } else {
-                    anim = (AnimNode *)&mapobjanim_type23_anim; /* H2b: menu.h types it MapObjAnimDef */
+                    anim = &mapobjanim_type23_anim;
                 }
                 break;
             case 4:
-                anim = (AnimNode *)&mapobjanim_type4_anim; /* H2b: menu.h types it MapObjAnimDef */
+                anim = &mapobjanim_type4_anim;
                 break;
         }
         p->timer = anim->track.last - frame + 1;
@@ -743,13 +738,13 @@ void MapObjAnim_UpdateAll(void) {
                         case 2:
                         case 3:
                             if (p->type & 1) {
-                                anim = (AnimNode *)&mapobjanim_type23_odd_anim; /* H2b: menu.h types it MapObjAnimDef */
+                                anim = &mapobjanim_type23_odd_anim;
                             } else {
-                                anim = (AnimNode *)&mapobjanim_type23_anim; /* H2b: menu.h types it MapObjAnimDef */
+                                anim = &mapobjanim_type23_anim;
                             }
                             break;
                         case 4:
-                            anim = (AnimNode *)&mapobjanim_type4_anim; /* H2b: menu.h types it MapObjAnimDef */
+                            anim = &mapobjanim_type4_anim;
                             break;
                     }
                     Math_EvalTcbSpline(&anim->track, (f32 *)&mapobj_spline_out, p->frame++);

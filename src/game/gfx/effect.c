@@ -14,20 +14,14 @@
  * Original file: 1B200.c (ROM 0x1B200).
  */
 
-/* Not defined by a module: overlay data at fixed addresses and segment 2. */
+/* Not defined by a module: overlay data at fixed addresses. */
 extern u8 D_800EB5E4[][4];
 extern AnimSet D_800EB2B4[];
 extern u8 D_800CADA8[][4];
 extern EffectTexAnim D_800DA0F0[];
 extern Gfx D_800EB6D0[];
-extern GfxFrameData D_2000000;
 extern Gfx D_800EB880[];
 extern Gfx D_800EB8E8[];
-/* H2b: env_light_dirs[3][0..2] (env.c), read through its interior labels (undefined_syms.txt):
- * retail loads each with its own lui; env_light_dirs[3][i] shares one base (65 words differ). */
-extern s32 D_80084B6C;
-extern s32 D_80084B70;
-extern s32 D_80084B74;
 
 /* This file's .bss, 800863F0..80087E30 (in address order; first declaration
  * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds effect_stat_up_marker_slots (Effect_ResetStatUpMarkers shares a lui between its pairs only when it

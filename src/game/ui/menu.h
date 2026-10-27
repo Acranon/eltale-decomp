@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "game/actor/actor.h"
+#include "game/actor/anim.h"
 #include "game/enemy/enemy.h"
 #include "game/map/map.h"
 
@@ -15,8 +16,8 @@ typedef struct MenuPictureDma {
 } MenuPictureDma; /* 0xC bytes */
 
 typedef struct MenuRomRange {
-    /* 0x00 */ u32 start;
-    /* 0x04 */ u32 end;
+    /* 0x00 */ u8 *start; /* ROM addresses (Dma_ReadRom devAddr) */
+    /* 0x04 */ u8 *end;
 } MenuRomRange; /* 0x8 bytes */
 
 typedef struct SaveSpawnPoint {
@@ -28,20 +29,13 @@ typedef struct SaveSpawnPoint {
 } SaveSpawnPoint; /* 0x10 bytes */
 
 typedef struct EnemyEffectDef {
-    /* 0x00 */ u16 unk0;
+    /* 0x00 */ s16 unk0; /* index into D_800C18D8 (MagicVisualDef, magic.h); read with lh */
     /* 0x02 */ u16 unk2;
     /* 0x04 */ u16 unk4;
     /* 0x06 */ u16 unk6;
     /* 0x08 */ f32 unk8;
     /* 0x0C */ f32 unkC;
 } EnemyEffectDef; /* 0x10 bytes */
-
-typedef struct MapObjAnimDef {
-    /* 0x00 */ void *keys;
-    /* 0x04 */ u16 count;
-    /* 0x06 */ u16 frames;
-    /* 0x08 */ s32 pad[6];
-} MapObjAnimDef; /* 0x20 bytes */
 
 typedef struct MenuMapLocation {
     /* 0x00 */ s8 a;
@@ -98,6 +92,10 @@ extern EnemyScriptCmd enemy_attack_script_14[2];
 extern EnemyScriptCmd enemy_attack_script_16[4];
 extern EnemyScriptCmd *enemy_attack_scripts[20];
 extern EnemyEffectDef enemy_effect_defs[22];
+/* Labels of enemy_effect_defs[20].unk2/.unk4 (undefined_syms.txt): Enemy_SpawnDeathEffects
+ * reads them as their own symbols in retail. */
+extern u16 D_8005685A;
+extern u16 D_8005685C;
 extern s32 D_80056878[2];
 extern MenuRomRange npc_area_set_rom_ranges[7];
 extern u8 npc_area_entry_message[0x2F8];
@@ -109,18 +107,18 @@ extern CellOffset mapobj_cell_disc_r5[90];
 extern CellOffset mapobj_cell_square_3x3[10];
 extern CellOffset mapobj_cell_disc_r2[22];
 extern u32 mapobjanim_type23_keys[0x8F];
-extern MapObjAnimDef mapobjanim_type23_anim;
+extern AnimNode mapobjanim_type23_anim;
 extern u32 D_80057A18[0xC3];
-extern MapObjAnimDef D_80057D24;
+extern AnimNode D_80057D24;
 extern u32 mapobjanim_type23_odd_keys[0x8F];
-extern MapObjAnimDef mapobjanim_type23_odd_anim;
+extern AnimNode mapobjanim_type23_odd_anim;
 extern u32 mapobjanim_type4_keys[0x1A];
-extern MapObjAnimDef mapobjanim_type4_anim;
+extern AnimNode mapobjanim_type4_anim;
 extern u32 mapobj_loop_anim0_keys[0x27];
 extern u32 mapobj_loop_anim1_keys[0x34];
 extern u32 mapobj_loop_anim2_keys[0x41];
 extern u32 mapobj_loop_anim3_keys[0x41];
-extern MapObjAnimDef mapobj_loop_anims[4];
+extern AnimNode mapobj_loop_anims[4];
 extern u16 mapobj_kind11_tlut[0x200];
 extern u8 mapobj_kind11_tex_0[0x600];
 extern u8 mapobj_kind11_tex_1[0x600];

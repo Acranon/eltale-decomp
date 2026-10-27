@@ -65,8 +65,8 @@ void Boss_ClearDefeated(void) {
 }
 
 void Boss_LoadForArea(void) {
-    s32 start;
-    s32 end;
+    u8 *start;
+    u8 *end;
     s32 i;
     s32 size;
     Unk803AB3D0 *p;
@@ -79,7 +79,7 @@ void Boss_LoadForArea(void) {
                 start = D_803AB390[p->unk4].start;
                 end = D_803AB390[p->unk4].end;
                 size = end - start;
-                Dma_ReadRom((u8 *)start, D_802A7BC0, size); /* start: a ROM address */
+                Dma_ReadRom(start, D_802A7BC0, size);
                 Boss_Spawn(i, p->unkC, p->unk10, p->unk14, &boss_field_record);
                 boss_field_index = i + 1;
             }

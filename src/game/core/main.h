@@ -65,6 +65,11 @@ extern u64 core_frame_start_time;
 extern u64 core_frame_end_time;
 extern u64 D_8007A8B8;
 
+/* Not defined by a module: the two graphics frames at a fixed address, and the current
+ * frame's data through segment 2. */
+extern GfxFrame D_80301000[2];
+extern GfxFrameData D_2000000;
+
 /* .data */
 extern s32 core_flags;
 extern s32 D_8004DCA4;

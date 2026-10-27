@@ -1543,7 +1543,7 @@ void Player_LoadAnim(Actor *arg0) {
     if (player_loaded_anim != arg0->unk52) {
         player_loaded_anim = arg0->unk52;
         r = &player_anim_rom_ranges[player_loaded_anim];
-        Dma_ReadRom((u8 *)r->start, (void *) 0x80200000, (u8 *)r->end - (u8 *)r->start); /* start: a ROM address */
+        Dma_ReadRom(r->start, (void *) 0x80200000, r->end - r->start);
     }
 }
 
