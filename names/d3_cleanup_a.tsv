@@ -1,0 +1,7 @@
+# D3 final cleanup A: names supported by code; unresolved raw names documented in D3_CLEANUP_A.md
+func_80029834	Audio_TryStartSeqRequest	returns 1 without requesting when either sequence fade step is active; otherwise calls Audio_StartSeqRequest(arg0) and returns 0 (audio.c)
+func_80010768	Map_RotateHalfwordBuffer	map.c rotates 201 halfwords in D_80081AB0 by one, copying the last to the front and shifting the rest; the buffer purpose remains unknown
+D_8005593C	audio_task_index	Audio_ThreadMain selects one of two NNScTask and audio_cmd_lists entries with it, then toggles it by xor 1 each retrace
+D_80055940	audio_output_frame_index	Audio_ThreadMain increments it each retrace and uses value modulo 3 to select audio_output_buffers and sample-count slot
+D_80055944	audio_output_sample_counts	Audio_ThreadMain computes each output buffer sample count, passes it to alAudioFrame, then sends count times four bytes to osAiSetNextBuffer
+D_8004DEC8	map_halfword_rotation_counter	Map_RotateHalfwordBuffer reads it; negative values advance toward zero, nonnegative values rotate D_80081AB0 and reset it to zero
