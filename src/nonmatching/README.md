@@ -13,8 +13,8 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`Env_InterpolateLighting`](Env_InterpolateLighting.md) | `src/12610.c`, C under `NON_MATCHING` | 379 object words; retail no-frame leaf |
 | [`Hud_DrawSpellName`](Hud_DrawSpellName.md) | `src/216E0.c`, C under `NON_MATCHING` | 72 register words; instruction sequence exact apart from one `sll` scheduled after the dead `sw id` instead of before |
 | [`Item_UpdateInventoryMenu`](Item_UpdateInventoryMenu.md) | `src/25B20.c`, C under `NON_MATCHING` | 742 object words; code 0xCF8 vs 0xD28, frame 0x148 exact |
-| [`Menu_DrawOptionsPage`](Menu_DrawOptionsPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 112 object words; length and frame (0x48) exact |
-| [`Menu_DrawMapPage`](Menu_DrawMapPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120 |
+| [`Menu_UpdateOptionsPage`](Menu_UpdateOptionsPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 112 object words; length and frame (0x48) exact |
+| [`Menu_UpdateMapPage`](Menu_UpdateMapPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120 |
 | [`Menu_DrawSprite`](Menu_DrawSprite.md) | `src/2B530.c`, C under `NON_MATCHING` | 328 object words; code 0x55C vs 0x560, frame 0xD8 exact |
 | [`SaveMenu_UpdateSlotList`](SaveMenu_UpdateSlotList.md) | `src/30600.c`, C under `NON_MATCHING` | 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact |
 | [`SaveMenu_SaveSelectedFile`](SaveMenu_SaveSelectedFile.md) | `src/30600.c`, C under `NON_MATCHING` | 20 register words; length and frame (0x40) exact |
@@ -24,7 +24,7 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`Player_FindMeleeTarget`](Player_FindMeleeTarget.md) | `src/3F50.c`, C under `NON_MATCHING` | 5 object words |
 | [`Player_TakeDamage`](Player_TakeDamage.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
 | [`Enemy_RunAttackScript`](Enemy_RunAttackScript.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
-| [`MapObj_DrawNearby`](MapObj_DrawNearby.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
+| [`MapObj_UpdateAndDrawNearby`](MapObj_UpdateAndDrawNearby.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
 | [`PakMenu_Run`](PakMenu_Run.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
 | [`Ending_DrawSprites`](Ending_DrawSprites.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
 | [`Ending_DrawScrollingBackdrop`](Ending_DrawScrollingBackdrop.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |

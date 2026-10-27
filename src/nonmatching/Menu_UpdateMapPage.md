@@ -1,9 +1,9 @@
-# Menu_DrawMapPage
+# Menu_UpdateMapPage
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/2B530.c`](../2B530.c)
-- Retail assembly: [`asm/nonmatchings/2B530/Menu_DrawMapPage.s`](../../asm/nonmatchings/2B530/Menu_DrawMapPage.s)
+- Retail assembly: [`asm/nonmatchings/2B530/Menu_UpdateMapPage.s`](../../asm/nonmatchings/2B530/Menu_UpdateMapPage.s)
 - Retail code size: `0x1234` bytes
 - Current gap: 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120. Retail hoists the four scale/offset loads into registers and has fewer named homes; most words differ from the frame offsets.
 - Specific blocker: Private static and following data can be placed exactly, but draft code is 0x44 bytes short with extra homes.
@@ -25,7 +25,7 @@ Verdict: **equivalent after one fix.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **Menu_DrawMapPage** (0x1234 bytes)
+- **Menu_UpdateMapPage** (0x1234 bytes)
   - w5 s2: Only skimmed, no real attempt: large menu/cursor logic (853 and 1167 instructions). B844 copies a 3-byte local array from D_800615A8.
   - w5 s3: Looked at only (1167 instructions, m2c output in c598_m2c.txt). Probably blocked on D2: D_8008FB5C and D_8008FB60 (bss) and D_800615E0 (.data, -1) are used only here, which points to function statics, as in B844.
   - w5 s4: Previously untried. It is blocked on D2: D_800615E0 must be a function static (`static s32 D_800615E0 = -1;`). With an extern, IDO CSEs its address into s0 across the Dma_ReadRom call. With the static, that part matches (tested, not committed). The draft is good for D2: w5s4/c/C598_e0.c and C598_d2.c (noreg 130-132 of 1165 instructions). Structure is known: two map branches (24 strips of 244x8 in branch 1; two halves from D_8006158C/98/5C/6C in branch 2), wobble, cursor, input tail. Also found: the 4 scale/offset loads (D_800614B4/CC[n], [n+6]) are hoisted before `if (D_80060F28 == -1.0f)`, which reproduces only with 4 new named locals. The frame (0x120) then needs 4 fewer locals elsewhere. The -2 in the first cursor call is a variable (`ox = -2`), not a literal. Each gDP macro's `_g` block local takes a stack slot under -g3.

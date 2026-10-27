@@ -420,7 +420,7 @@ extern s32 D_800842BC;
 extern s16 D_8008C162;
 
 void Boss_SetDefeated(u16);
-void Boss_GiveDefeatReward(s32);
+void Boss_HandleDefeat(s32);
 void Enemy_RemoveAll(void);
 void Camera_SetPresetDelayedTurn(s32);
 void Enemy_StartTurn(void);
@@ -450,7 +450,7 @@ void Battle_UpdateTurnTransition(void) {
                 done = 1;
                 if (D_8008BE52 & 0x100) {
                     Boss_SetDefeated(D_8008BFA8 - 1);
-                    Boss_GiveDefeatReward(D_8008BFA8 - 1);
+                    Boss_HandleDefeat(D_8008BFA8 - 1);
                     D_8007C048 = D_8008BFA0;
                     D_8007C04C = D_8008BFA4;
                 }

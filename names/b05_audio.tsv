@@ -1,3 +1,4 @@
+# r2 reviewed 2026-10-26: kept 39, renamed 0, reverted 0
 # --- 29150: audio driver. The DMA cache follows Nintendo's audiomgr sample (AMDMAState/AMDMABuffer); the sample's own names are not used, so these are behaviour names
 func_80028550	Audio_DmaReadRom	(rom, ram, size): one osPiStartDma on the audio queue D_8008F0B8 and waits; used by the sequence/bank loaders
 func_800285C4	Audio_Init	called from Core_MainThread: alHeapInit 0x68000 at D_80332DB0, allocates the command lists and output buffers, sets the 22050 Hz synth config (dmaproc Audio_DmaNew) and calls alInit
@@ -21,14 +22,14 @@ func_800297F4	Sfx_SelectScript	(id): sets the script pointer D_8008F75C to D_800
 func_80029880	Audio_StartSeqRequest	(req): 1 = play slot 1 at full volume; >= 0x50 = play seq req-0x50 in slot 0 fading in (step 0x100); else play seq req in slot 0 at full volume; keeps the request pending in D_800559BC while Audio_LoadSeqsOrStop must stop players first
 func_80029A38	Sfx_EnqueueDefault	(id): Sfx_Enqueue with volume factor 0 (script volume) and pan 0x40 into the 8-entry ring D_8005594C/6C/8C; uncalled
 func_80029A88	Sfx_Enqueue	(id, volume factor, pan): writes the request to the 8-entry ring D_8005594C/D_8005596C/D_8005598C at D_800559B0; Sfx_Play and the overlays call it
-func_80029AD4	Sfx_ProcessQueue	takes one request from the ring: scripts whose first word is nonzero go to channel 4 (replacing its sound), others to channel (index & 3), stopping duplicates; Audio_PlaySound, then the first Sfx_StepScript
+func_80029AD4	Sfx_ProcessQueue	takes one request from the ring: scripts whose first word is nonzero go to channel 4 (replacing its sound), others to channel (new read index & 3), stopping the same sound on other channels; Audio_PlaySound, then the first Sfx_StepScript
 func_80029D10	Sfx_StepScript	runs one step of the current channel's script: 0xFFFF stops the sound, 0xFFFD/0xFFFE mark/jump back for loops, then duration, pitch (D_8004F780), volume (scaled by the request factor) and pan; saves the script pointers per channel
 func_8002A118	Audio_StepSeqFadeOut	lowers the active player's volume D_800559C4[D_800559B8] by D_800559CC; below 0 stops that player and ends the fade
 func_8002A1F8	Audio_StepSeqFadeIn	raises the active player's volume by D_800559D0 up to the limit D_800559B4, then ends the fade
 func_8002A2AC	Audio_LoadSeqsOrStop	(seqNo): if the active player is stopped, Audio_LoadSeq(0, seqNo) and Audio_LoadSeq(1, 1), returns 0; else stops both players and returns 1
 func_8002A338	Audio_StartSeqFadeOut	(frames): unless a fade runs (returns 1), sets the fade-out step D_800559CC = 0x8000 / frames and returns 0; called by Player_StateTalk, the overlays and others
 func_8002A38C	Sfx_StopAllChannels	stops the sound of each of the 5 script channels and clears their timers and ids; called by the Core_Run* loops
-func_8002A410	Sfx_StopChannel4	stops channel 4's sound (D_800559D4[4]) and clears its timer; MapObj_DrawNearby calls it when the map's distance sound ends
+func_8002A410	Sfx_StopChannel4	stops channel 4's sound (D_800559D4[4]) and clears its timer; MapObj_UpdateAndDrawNearby calls it when the map's distance sound ends
 func_8002A458	Audio_SetSeqVolume	(vol 0..255): unless a fade runs (returns 1), sets the limit D_800559B4 = vol * 128 + 0x7F on both sequence players and returns 0
 # --- 2B0F0: BGM and sound requests (Quest 64 US twin file: bgm.c)
 func_8002A4F0	Bgm_Init	called from Core_MainThread: clears the BGM flags/delay, current and next BGM = -1, sound volume D_8008FAF4 = 0xFF, the 16 delayed-sound slots
@@ -37,5 +38,5 @@ func_8002A6B8	Bgm_Play	(bgm): if different from the current D_8008FAF0, stores i
 func_8002A6F4	Bgm_PlayDelayed	(bgm, delay): as Bgm_Play, with the change delay D_8008FAF6 in frames
 func_8002A744	Bgm_PlayForMap	(map, submap, delay): looks up D_80055B40 (map, submap or -1 for any) and requests its BGM like Bgm_PlayDelayed; Core_RunGameplayLoop, Player_StateBattleWon
 func_8002A7C8	Sfx_Play	(delay, id, vol): volume = per-sound D_80055CF8[id] * vol * D_8008FAF4 >> 16; delay 0 calls Sfx_Enqueue(id, volume, 0x40), else stores it in a free delayed slot; called from 66 places with sound ids
-func_8002A890	Sfx_PlayIfAudible	(id, vol): same volume formula as Sfx_Play, Sfx_Enqueue only when the result is nonzero; MapObj_DrawNearby plays the map's distance sound with it
-func_8002A900	Bgm_ApplyVolumeOption	Audio_SetSeqVolume(D_80055CF0[D_80060CB0]): D_80060CB0 is the 0..4 option row on Menu_DrawOptionsPage (saved by 30600)
+func_8002A890	Sfx_PlayIfAudible	(id, vol): same volume formula as Sfx_Play, Sfx_Enqueue only when the result is nonzero; MapObj_UpdateAndDrawNearby plays the map's distance sound with it
+func_8002A900	Bgm_ApplyVolumeOption	Audio_SetSeqVolume(D_80055CF0[D_80060CB0]): D_80060CB0 is the 0..4 option row on Menu_UpdateOptionsPage (saved by 30600)
