@@ -355,7 +355,7 @@ void Npc_StartTalk(s32 idx) {
             Npc_LoadMessage(npc, msg);
             if (found == 0) {
                 Item_AddToInventory(npc->def->u6.b.unk7);
-                player_state.unk8 |= 0x40;
+                player_state.flags |= 0x40;
             }
             break;
         case 5:

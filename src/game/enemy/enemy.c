@@ -417,7 +417,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
             if (!(player_state.actor.animFlags & 2) && !(e->flags & 8)) {
                 dx = player_state.actor.x - obj->x;
                 dz = player_state.actor.z - obj->z;
-                d = sqrtf(dx * dx + dz * dz) - player_state.actor.scale * player_state.unk14->unk18;
+                d = sqrtf(dx * dx + dz * dz) - player_state.actor.scale * player_state.stats->unk18;
                 if (d < e->unk1C->unk14 * obj->scale) {
                     if (Enemy_RollHitOnPlayer(obj) != 0) {
                         n = Enemy_CalcAttackDamage(e);
@@ -441,7 +441,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
                         }
                     } else {
                         Player_StartMissReaction();
-                        player_state.unk14->unk2C++;
+                        player_state.stats->unk2C++;
                     }
                     e->flags |= 8;
                 }

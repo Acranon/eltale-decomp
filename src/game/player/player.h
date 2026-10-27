@@ -13,20 +13,20 @@ struct TextSpot; /* game/map/textspot.h */
 
 /* player_state: the player's state machine around its Actor. */
 typedef struct Player {
-    /* 0x000 */ u16 unk0; /* state, index into player_state_handlers */
-    /* 0x002 */ u16 unk2; /* melee target: enemy_slots index + 1 */
-    /* 0x004 */ u16 unk4; /* state timer */
+    /* 0x000 */ u16 state; /* state, index into player_state_handlers */
+    /* 0x002 */ u16 melee_target_plus_one; /* melee target: enemy_slots index + 1 */
+    /* 0x004 */ u16 state_timer; /* state timer */
     /* 0x006 */ u16 unk6;
-    /* 0x008 */ s32 unk8; /* flags */
+    /* 0x008 */ s32 flags; /* flags */
     /* 0x00C */ f32 unkC;
     /* 0x010 */ s32 unk10;
-    /* 0x014 */ ActorStats *unk14; /* &player_stats (Player_Init) */
+    /* 0x014 */ ActorStats *stats; /* &player_stats (Player_Init) */
     /* 0x018 */ Actor actor;
     /* 0x084 */ ActorBattle battle; /* actor.unk68 points here */
-    /* 0x11C */ u8 unk11C; /* item id (chest, use item) */
-    /* 0x11D */ u8 unk11D[3]; /* spell input directions */
-    /* 0x120 */ u16 unk120; /* spell input count */
-    /* 0x122 */ u16 unk122; /* spell id (Magic_LookupSpellSequence) */
+    /* 0x11C */ u8 item_id; /* item id (chest, use item) */
+    /* 0x11D */ u8 spell_input_dirs[3]; /* spell input directions */
+    /* 0x120 */ u16 spell_input_count; /* spell input count */
+    /* 0x122 */ u16 spell_id; /* spell id (Magic_LookupSpellSequence) */
     /* 0x124 */ u16 unk124;
     /* 0x126 */ u16 unk126;
     /* 0x128 */ u16 unk128;
@@ -121,7 +121,7 @@ extern ActorStats *D_8007AA84; /* player_state.actor.stats */
 
 /* Labels inside player_stats and player_state (aliases in undefined_syms.txt) that the menu's
  * stats and elements pages address as their own symbols (through player_stats.x /
- * player_state.unk8 the code differs: Menu_UpdateStatsPage, Menu_UpdateElementsPage). */
+ * player_state.flags the code differs: Menu_UpdateStatsPage, Menu_UpdateElementsPage). */
 extern u16 D_8007A9D4; /* player_stats.unk4 */
 extern u16 D_8007A9D6; /* player_stats.unk6 */
 extern u16 D_8007A9D8; /* player_stats.unk8 */
@@ -142,7 +142,7 @@ extern u8 D_8007AA01; /* player_stats.unk31 */
 extern u8 D_8007AA02; /* player_stats.unk32 */
 extern u8 D_8007AA03; /* player_stats.unk33 */
 extern u8 D_8007AA04; /* player_stats.unk34 */
-extern s32 D_8007AA10; /* player_state.unk8 */
+extern s32 D_8007AA10; /* player_state.flags */
 
 /* .data */
 extern PlayerStateFunc player_state_handlers[18];

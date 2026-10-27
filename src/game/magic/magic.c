@@ -95,7 +95,7 @@ s32 Magic_GetSpellRestrictionFlags(u32 arg0, u16 arg1) {
     s32 grp = (arg0 >> 8) & 0xF;
     arg0 &= 0xFF;
     rec = &D_800C185C[grp][arg0];
-    if (player_state.unk14->unk24[grp] < rec->unk0) {
+    if (player_state.stats->unk24[grp] < rec->unk0) {
         flags = 4;
     }
     if (!(((battle_flags & 1) ? 1 : 2) & rec->unk2)) {
@@ -680,15 +680,15 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
         dmg >>= 1;
     }
     if (arg1->typeFlags & 1) {
-        if (player_state.unk8 & 0x1000) {
-            if (Math_Rand((player_state.unk8 & 0x10000) ? 4 : 0x20) == 0) {
+        if (player_state.flags & 0x1000) {
+            if (Math_Rand((player_state.flags & 0x10000) ? 4 : 0x20) == 0) {
                 dmg += (dmg + 1) >> 1;
                 Fade_Start(4, 0, fade_damage_flash);
                 flag = 0x4000;
             }
         }
         if (Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), dmg, arg0->cfg->unk6[0], arg0->cfg->unk2 | flag, arg0->unk24) != 0) {
-            player_state.unk14->unk2A++;
+            player_state.stats->unk2A++;
         }
     } else {
         if (Math_Rand(0x20) == 0) {
@@ -713,14 +713,14 @@ void Magic_HealTarget(MagicEffect* arg0, Actor* arg1) {
             magic_target_enemy_rec->unkA = arg1->stats->unk6;
         }
     } else {
-        amt = (player_state.unk14->unk24[arg0->cfg->unk6[0]] >> 1) + arg1->stats->unk6 * arg0->cfg->unkC / 100;
+        amt = (player_state.stats->unk24[arg0->cfg->unk6[0]] >> 1) + arg1->stats->unk6 * arg0->cfg->unkC / 100;
         amt += Math_Rand(amt >> 2);
         if (arg1->stats->unk4 != arg1->stats->unk6) {
             arg1->stats->unk4 += amt;
             if (arg1->stats->unk4 > arg1->stats->unk6) {
                 arg1->stats->unk4 = arg1->stats->unk6;
             }
-            player_state.unk14->unk2A++;
+            player_state.stats->unk2A++;
         }
     }
     Effect_AddFloatingNumber(arg1, 1, amt);
@@ -740,7 +740,7 @@ void Magic_TransferTargetResource(MagicEffect* arg0, Actor* arg1) {
             if (pl->stats->unk8 > pl->stats->unkA) {
                 pl->stats->unk8 = pl->stats->unkA;
             }
-            player_state.unk14->unk2A++;
+            player_state.stats->unk2A++;
         }
     } else {
         amt = (arg1->stats->unk8 * 11 + 63) >> 6;
@@ -760,7 +760,7 @@ void func_80018968(s32 arg0, Actor* arg1) {
         enemy_count--;
     } else if (!(battle_flags & 0x100)) {
         battle_flags |= 0x10;
-        player_state.unk14->unk2A++;
+        player_state.stats->unk2A++;
     } else {
         Hud_ShowActorPopup(arg1);
     }
@@ -773,7 +773,7 @@ void func_800189F0(s32 arg0, Actor* arg1) {
         exit_destination.entry = map_flag4_return_entry;
         player_spawn_type = 0x108;
         player_state.unk6 = 0;
-        player_state.unk14->unk2A++;
+        player_state.stats->unk2A++;
         core_flags |= 0x80;
         core_transition_timer = 0x1E;
     }
@@ -783,7 +783,7 @@ void Magic_ApplyZeroDamageHit(MagicEffect* arg0, Actor* arg1) {
     if (arg0->cfg->unk18 != 2) {
         if (arg1->typeFlags & 1) {
             Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), 0, 0, 4, arg0->unk24);
-            player_state.unk14->unk2A++;
+            player_state.stats->unk2A++;
         } else {
             Player_TakeDamage(0, 4, arg0->unk24);
         }
@@ -798,7 +798,7 @@ void func_80018B40(s32 arg0, Actor* arg1) {
         exit_destination.entry = map_flag8_return_entry;
         player_spawn_type = 0x108;
         player_state.unk6 = 0;
-        player_state.unk14->unk2A++;
+        player_state.stats->unk2A++;
         core_flags |= 0x80;
         core_transition_timer = 0x1E;
     }
@@ -811,7 +811,7 @@ void Magic_RemoveEnemyOrDamagePlayer(MagicEffect* arg0, Actor* arg1) {
             arg1->animSetIndex = -1;
             arg1->animFlags &= ~1;
             enemy_count--;
-            player_state.unk14->unk2A++;
+            player_state.stats->unk2A++;
         } else {
             Hud_ShowActorPopup(arg1);
         }
@@ -831,7 +831,7 @@ void Magic_ClearActorStatuses(s32 arg0, Actor* arg1) {
         arg1->battle->unk86 = arg1->stats->unkC;
         arg1->battle->unk90 = 1.0f;
         if (!(arg1->typeFlags & 1)) {
-            player_state.unk14->unk2A++;
+            player_state.stats->unk2A++;
         }
     }
 }
@@ -1349,7 +1349,7 @@ s32 Magic_ShouldApplyStatus(MagicEffect* arg0, Actor* arg1, s32 arg2) {
     } else if (arg1->typeFlags & 1) {
         ret = Math_Rand(64) < magic_status_chances[arg2];
     } else {
-        n = (player_state.unk8 & 0x8000) ? 28 : 32;
+        n = (player_state.flags & 0x8000) ? 28 : 32;
         ret = Math_Rand(n) < magic_status_chances[arg2];
     }
     return ret;
