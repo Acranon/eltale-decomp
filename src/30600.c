@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Controller Pak save/load menu: file discovery, UI states, and game-state
+ * capture and restoration.
+ * Folder: src/game/save/
+ */
+
 typedef struct {
     u8 b[0x20];
 } Bytes20;

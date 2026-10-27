@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Text windows: slot lifecycle, message and choice layout, input, and drawing.
+ * Folder: src/game/text/
+ */
+
 typedef struct {
     /* 0x000 */ s32 unk0;
     /* 0x004 */ s16 unk4;

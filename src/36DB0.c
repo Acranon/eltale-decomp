@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Load the title, intro, and ending ROM overlays into the shared overlay region.
+ * Folder: src/game/core/
+ */
+
 extern u8 D_DAB5F0[];
 extern u8 D_DC62B0[];
 extern u8 D_E22690[];

@@ -1,0 +1,61 @@
+# b06 D3 round 1: save menu, text, input/Pak, overlays, cutscenes
+# old<TAB>new<TAB>evidence
+func_8002FA00	SaveMenu_Init	Sets the save-menu state flags, selection, fade value, and navigation counters to initial values.
+func_8002FA6C	SaveMenu_Update	Advances the menu state and dispatches the slot list, dialog, load, save, delete, repair, or delay handler.
+func_8002FBE0	SaveMenu_DrawOperationPanel	Draws the rectangular panel and selects its message from the current operation index.
+func_8002FDB8	SaveMenu_CheckControllerPak	Initializes or repairs the selected Pak, scans game files, and selects the error or file-list state.
+func_800301DC	SaveMenu_UpdateDialog	Draws the selected message and optional two-choice prompt, then processes button and stick input to change menu state.
+func_80030D5C	SaveMenu_UpdateSlotList	Renders up to two file-slot summaries and selection arrows, then handles stick navigation and confirmation.
+func_80031B28	SaveMenu_UpdateDelay	Decrements the menu delay counter and returns to state zero when it expires.
+func_80031B68	SaveMenu_DeleteSelectedFile	Calls the Pak file-delete routine for the selected slot and chooses success or error message state.
+func_80031C9C	SaveMenu_LoadSelectedFile	Reads the selected Pak file into save buffers and restores game state on success.
+func_80031E10	SaveMenu_SaveSelectedFile	Allocates a Pak file when the slot is empty, captures game state, writes both save blocks, and sets a result message.
+func_80032134	SaveMenu_RepairPak	Calls the Pak repair routine for the selected file error and updates success or failure state.
+func_8003226C	SaveMenu_RefreshFileList	Rebuilds the file-slot list from scanned Pak entries and reads each game save header.
+func_800324F4	SaveMenu_SetTextDrawState	Appends the text display list, enables RGBA16 texture LUT, and clears the menu draw-state flag.
+func_80032558	SaveMenu_DrawBackground	Draws the fixed menu background frame and divider rectangles.
+func_800327BC	SaveMenu_CaptureGameState	Copies current player, map, inventory, and related globals into the selected save record and auxiliary buffer.
+func_800329B0	SaveMenu_RestoreGameState	Copies the selected save record and auxiliary buffer back into player, map, inventory, and related globals.
+func_80032BB0	Text_ResetAllWindows	Calls the window-reset routine for each of the four window slots.
+func_80032BF8	Text_ResetWindow	Clears one window's flags, text buffers, choice rows, cursor, and animation state.
+func_80032D20	Text_OpenWindow	Finds a free window, copies name/message/choice data, assigns geometry and display flags, and returns its slot.
+func_80033050	Text_UpdateAndDrawWindows	Orders four windows, advances opening/closing and message/choice states, reads input, and emits their graphics.
+func_8003403C	Text_AnimateWindowSize	Draws a centered window at the current size step, increments the step, and reports completion.
+func_80034274	Text_DrawWindowContents	Draws a window's name, prepared message buffer, and optional title texture.
+func_80034380	Text_DrawWindowFrame	Draws a filled rectangle, shadow edges, and bright border for one text window.
+func_8003453C	Text_BuildVisiblePage	Copies encoded text into the visible buffer by row width and line count, handling page and end markers.
+func_800348B8	Text_DrawAdvanceIndicator	Animates and draws the small bottom-right marker for a waiting text window.
+func_80034B30	Text_MeasureChoiceWindow	Sets choice-window dimensions from the number of rows and longest visible row.
+func_80034C18	Text_FindWindow	Returns the window slot matching a requested type or stack-order value, or -1.
+func_80034C9C	Text_DrawTexturedRect	Loads a texture and palette by type and emits a textured rectangle at the requested bounds.
+func_8003509C	Text_DrawFramedRect	Draws a filled rectangle with shadow and border through the textured-rectangle helper.
+func_8003521C	Text_ResetStickAdvanceTimer	Zeros the analog-stick hold counter used by the text-window update.
+func_8003522C	Text_IsStickAdvanceHeld	Returns true after the enabled stick input exceeds its magnitude threshold for five frames.
+func_800352C0	Text_CopyTerminatedBytes	Copies bytes until the 0xFF terminator and writes the terminator to the destination.
+func_80035308	Text_LoadFontAssets	DMAs the font palette and glyph data from ROM to their rendering buffers.
+func_80035350	Text_DrawEncodedString	Parses 0xFF-terminated glyph and control bytes and emits textured glyph rectangles at X/Y.
+func_800357B0	Input_InitializeControllers	Creates the SI message queue, initializes four controllers, chooses the first usable port, and returns connection state.
+func_80035970	Input_ReadController	Reads the chosen controller and updates buttons, stick axes, and newly pressed button bits.
+func_80035A24	Pak_ScanGameFiles	Initializes a selected Pak, enumerates its 16 files, identifies matching game files, and records free blocks.
+func_80035D58	Pak_AllocateGameFile	Calls osPfsAllocateFile for the game's company/code/name and records the returned file number.
+func_80035E24	Pak_DeleteGameFile	Calls osPfsDeleteFile using the game's company/code/name and selected extension byte.
+func_80035EA8	Pak_ReadFile	Calls osPfsReadWriteFile in read mode for the selected Pak, file, offset, and byte count.
+func_80035F0C	Pak_WriteFile	Checks free blocks and calls osPfsReadWriteFile in write mode for the selected file.
+func_80035F94	Pak_TryRepair	On Pak error 10 attempts reinitialization and osPfsRepairId, otherwise rechecks the file system.
+func_8003609C	Pak_ClassifyError	Maps raw Pak error codes to six negative categories used by the save-menu state machine.
+func_800360F8	Pak_CompareNameBytes	Compares two byte strings for the requested length; Pak_ScanGameFiles uses it on game_name.
+func_80036144	Input_StartControllerQuery	Forwards the message queue to osContStartQuery.
+func_80036164	Input_GetControllerQuery	Forwards a status buffer to osContGetQuery.
+func_800361B0	Overlay_LoadTitle	DMAs the title overlay ROM span beginning at D_DAB5F0 into the shared overlay address.
+func_800361E8	Overlay_LoadIntro	DMAs the intro overlay ROM span beginning at D_DC62B0 into the shared overlay address.
+func_80036220	Overlay_LoadEnding	DMAs the ending overlay ROM span beginning at D_E22690 into the shared overlay address.
+func_80036260	Cutscene_ResetSequence	Zeros the scene sequence index and initializes its frame counter.
+func_8003627C	Cutscene_StartNextScene	Advances to the next scene entry, loads its map/player/camera, and resets visual cue slots.
+func_8003642C	Cutscene_UpdateScene	Applies the current camera frame and triggers the end transition near the scene's final frame.
+func_800364F4	Cutscene_EndScene	Sets continuation or exit flags according to whether the scene index has reached the last entry.
+func_80036544	Cutscene_ApplyCameraFrame	Samples a camera track at the requested frame and writes camera position and orientation.
+func_80036664	Cutscene_DrawImageCues	Starts frame-indexed image cues, draws each active textured rectangle with fade alpha, and advances cue timers.
+func_80002F40	Cutscene_StartEntry	Loads an entry's map, player, NPCs, camera, and message-sequence pointers.
+func_80003184	Cutscene_UpdateMessageSequence	Advances timed message/name pairs and reports when the sequence has finished.
+func_8000328C	Cutscene_StartAudioFadeForEntry	Starts a 64-frame audio fade when the current entry's audio marker differs from the previous entry's.
+func_800032E4	Cutscene_CopyMessageBuffers	Copies one message and one speaker-name buffer into the shared text-window globals.

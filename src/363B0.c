@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Controller polling and Controller Pak file discovery and operations.
+ * Folder: src/game/input/
+ */
+
 typedef struct {
     /* 0x00 */ s16 unk0;
     /* 0x02 */ s8 unk2[16];

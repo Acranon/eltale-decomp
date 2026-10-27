@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Scripted scene entry setup, timed messages, and transition audio.
+ * Folder: src/game/event/
+ */
+
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;

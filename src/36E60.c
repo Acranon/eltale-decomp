@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Cutscene scene sequencing, camera tracks, and timed image cue drawing.
+ * Folder: src/game/event/
+ */
+
 typedef struct {
     /* 0x00 */ u8 pad0[6];
     /* 0x06 */ u16 unk6;

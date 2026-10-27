@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Encoded text and font rendering: string copying, font DMA, and glyph drawing.
+ * Folder: src/game/text/
+ */
+
 extern u8 D_D3A8B0[];
 extern u8 D_D3A930[];
 extern u8 D_80332D30[];
