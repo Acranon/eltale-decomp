@@ -6,8 +6,6 @@
  * Original file: 1130.c (ROM 0x1130).
  */
 
-void osSpTaskLoad(OSTask *task);
-
 /* This file's .bss, 80077160..8007A170: the three thread stacks (each passed
  * by its top, the end of the array) and the retrace counter nnsc_retrace_count, which
  * the game loops in 1870.c wait on and reset. */

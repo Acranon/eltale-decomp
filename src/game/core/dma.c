@@ -1,11 +1,11 @@
 #include "game/core/dma.h"
+#include "game/core/main.h"
 
 /*
  * Blocking ROM-to-RAM DMA, and integer-to-digit-string conversion for the game's text encoding.
  * Original file: 28D20.c (ROM 0x28D20).
  */
 
-extern OSMesgQueue dma_mesg_queue;
 OSIoMesg dma_io_mesg; /* .bss 8008CEA0..8008CEC0 */
 
 void Dma_ReadRom(u8* devAddr, void* vAddr, s32 size) {

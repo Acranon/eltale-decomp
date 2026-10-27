@@ -1,4 +1,6 @@
 #include "game/audio/sound.h"
+#include "game/audio/audio.h"
+#include "game/ui/menu.h"
 
 /*
  * Music and sound requests: BGM change with delay (per map/submap table), the BGM volume
@@ -39,14 +41,6 @@ u8 sfx_volumes[72] = {
     0xC8, 0xFA, 0xFA, 0xFA, 0xFA, 0xB4, 0xFA, 0xFA, 0xFA, 0xC8, 0xFA, 0xC8, 0xC8, 0xC8, 0xC8, 0xFA,
     0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0, 0,
 };
-extern s8 menu_bgm_volume_option;
-
-void Audio_LoadSeq(s32 slot, s32 seqNo);
-s32 Audio_PlaySeq(s32 slot);
-void Audio_StopSeq(s32 slot);
-s32 Audio_GetSeqState(s32 slot);
-void Sfx_Enqueue(s32 arg0, s32 arg1, s32 arg2);
-s32 Audio_SetSeqVolume(s32 vol);
 
 void Bgm_Init(void) {
     s32 i;
