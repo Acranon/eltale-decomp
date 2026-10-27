@@ -87,11 +87,11 @@ void Npc_UpdateAll(void) {
         obj = &npc->actor;
         switch (npc->state) {
             case 0:
-                if (npc->def->unk4 == 2) {
+                if (npc->def->movement_kind == 2) {
                     if (--npc->timer == 0) {
                         if (npc_walking_count < 3) {
                             npc->state = 1;
-                            npc->timer = (Math_Rand(2) + 1) * (npc->def->unk10 + 1)->length;
+                            npc->timer = (Math_Rand(2) + 1) * (npc->def->anim_sets + 1)->length;
                             Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
                             dx = npc->homeX - obj->x;
                             dz = npc->homeZ - obj->z;
@@ -102,7 +102,7 @@ void Npc_UpdateAll(void) {
                             }
                             npc_walking_count++;
                         } else {
-                            npc->timer = (Math_Rand(2) + 1) * npc->def->unk10->length;
+                            npc->timer = (Math_Rand(2) + 1) * npc->def->anim_sets->length;
                         }
                     }
                 }
@@ -114,7 +114,7 @@ void Npc_UpdateAll(void) {
                 Npc_Move(npc_walk_step.x, npc_walk_step.y, obj);
                 if (--npc->timer == 0) {
                     npc->state = 0;
-                    npc->timer = npc->def->unk10->length;
+                    npc->timer = npc->def->anim_sets->length;
                     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
                     npc_walking_count--;
                 }
@@ -122,18 +122,18 @@ void Npc_UpdateAll(void) {
             case 2:
                 if (npc->timer != 0) {
                     npc->timer--;
-                    obj->rot += npc->unk10 / 15.0f;
+                    obj->rot += npc->turn_delta / 15.0f;
                     if (npc->timer == 0) {
-                        Anim_SetCurrentAndNext(obj, npc->def->unk18, 1, npc->def->unk18, 1, 1);
+                        Anim_SetCurrentAndNext(obj, npc->def->talk_anim_index, 1, npc->def->talk_anim_index, 1, 1);
                     }
                 }
                 break;
             case 3:
                 npc->timer--;
-                obj->rot -= npc->unk10 / 15.0f;
+                obj->rot -= npc->turn_delta / 15.0f;
                 if (npc->timer == 0) {
                     npc->state = 0;
-                    npc->timer = npc->def->unk10->length;
+                    npc->timer = npc->def->anim_sets->length;
                     obj->rot = npc->homeAngle;
                     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
                 }
@@ -165,7 +165,7 @@ void Npc_DrawAll(struct GfxFrameData *arg0) {
         if (dist < 90000.0f) {
             filter = (dist < 20000.0f) ? G_TF_BILERP : G_TF_POINT;
             gDPSetTextureFilter(gfx_dl_head++, filter);
-            anims = npc->def->unk10;
+            anims = npc->def->anim_sets;
             Anim_DrawModel(0, obj, &anims[obj->animIndex], arg0);
             Anim_AdvanceFrame(obj->animStep, obj, &anims[obj->animIndex]);
             Shadow_Queue(obj->x, obj->y, obj->z, obj->nx, obj->ny, obj->nz, 5.0f);
@@ -201,7 +201,7 @@ void Npc_SpawnForArea(NpcDef *def, s32 n) {
             npc->actor.rot = def->angle;
             npc->actor.rotX = 0.0f;
             npc->actor.rotZ = 0.0f;
-            npc->actor.scale = def->unk28;
+            npc->actor.scale = def->scale;
             npc->actor.unk28 = 50.0f;
             Coll_ResolveFloorAndWalls(npc->actor.x, npc->actor.y, npc->actor.z, 0xA00, &out);
             npc->actor.y = out.y;
@@ -339,31 +339,31 @@ void Npc_StartTalk(s32 idx) {
         if (angle > 3.141592653589793) {
             angle -= 6.283185307179586;
         }
-        npc->unk10 = angle;
+        npc->turn_delta = angle;
         npc->timer = 15;
         Anim_SetCurrentAndNext(&npc->actor, 1, 1, 1, 1, 1);
     }
-    switch (npc->def->unk2) {
+    switch (npc->def->talk_kind) {
         case 2:
-            if (Item_CountInInventory(npc->def->u6.b.unk7) == 0) {
+            if (Item_CountInInventory(npc->def->u6.b.item_id) == 0) {
                 found = 0;
-                msg = npc->def->unk8;
+                msg = npc->def->message_offset;
             } else {
                 found = 1;
-                msg = npc->def->unkA;
+                msg = npc->def->alternate_message_offset;
             }
             Npc_LoadMessage(npc, msg);
             if (found == 0) {
-                Item_AddToInventory(npc->def->u6.b.unk7);
+                Item_AddToInventory(npc->def->u6.b.item_id);
                 player_state.flags |= 0x40;
             }
             break;
         case 5:
-            if (Boss_IsDefeated(npc->def->u6.unk6) == 0) {
-                msg = npc->def->unk8;
+            if (Boss_IsDefeated(npc->def->u6.boss_index) == 0) {
+                msg = npc->def->message_offset;
             } else {
-                msg = npc->def->unkA;
-                if (npc->def->u6.unk6 == 7) {
+                msg = npc->def->alternate_message_offset;
+                if (npc->def->u6.boss_index == 7) {
                     core_flags |= 0x8080;
                     core_transition_timer = 0x16;
                 }
@@ -371,7 +371,7 @@ void Npc_StartTalk(s32 idx) {
             Npc_LoadMessage(npc, msg);
             break;
         case 6:
-            Npc_LoadMessage(npc, npc->def->unk8);
+            Npc_LoadMessage(npc, npc->def->message_offset);
             text_pending_choice_rows.n = 2;
             text_pending_choice_rows.rows[0] = npc_rest_choice_row0;
             text_pending_choice_rows.rows[1] = npc_rest_choice_row1;
@@ -379,7 +379,7 @@ void Npc_StartTalk(s32 idx) {
             core_flags |= 0x10;
             break;
         default:
-            Npc_LoadMessage(npc, npc->def->unk8);
+            Npc_LoadMessage(npc, npc->def->message_offset);
             break;
     }
 }
@@ -387,12 +387,12 @@ void Npc_StartTalk(s32 idx) {
 void Npc_EndTalk(s32 idx) {
     Npc *npc = &npc_slots[idx];
 
-    if (npc->def->unk4 == 2) {
+    if (npc->def->movement_kind == 2) {
         npc->state = 0;
         npc->timer = Math_Rand(30) + 30;
     } else if (npc->def->flags & 2) {
         npc->state = 0;
-        npc->timer = npc->def->unk10->length;
+        npc->timer = npc->def->anim_sets->length;
     } else {
         npc->state = 3;
         npc->timer = 15;

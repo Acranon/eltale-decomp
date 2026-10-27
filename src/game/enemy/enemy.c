@@ -54,11 +54,11 @@ s32 D_8007C0A0[4];
 
 /* enemy_script_time..enemy_script_obj as Enemy_StartAttackScript writes them */
 typedef struct {
-    /* 0x00 */ u16 unk0;
+    /* 0x00 */ u16 time;
     /* 0x02 */ u8 pad2[2];
-    /* 0x04 */ EnemyScriptCmd *unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ Actor *unkC;
+    /* 0x04 */ EnemyScriptCmd *cmd;
+    /* 0x08 */ s32 enemy_ptr;
+    /* 0x0C */ Actor *actor;
 } Unk8007C060;
 
 extern u8 D_8020E6F0[]; /* the area enemy set buffer Enemy_LoadAreaSet reads into (no C object) */
@@ -944,10 +944,10 @@ void Enemy_ClearAttackScript(void) {
 }
 
 void Enemy_StartAttackScript(s32 arg0, s32 arg1) {
-    ((Unk8007C060 *)&enemy_script_time)->unk0 = 0;
-    ((Unk8007C060 *)&enemy_script_time)->unk4 = enemy_attack_scripts[arg0];
-    ((Unk8007C060 *)&enemy_script_time)->unk8 = arg1;
-    ((Unk8007C060 *)&enemy_script_time)->unkC = &enemy_slots[0].actor;
+    ((Unk8007C060 *)&enemy_script_time)->time = 0;
+    ((Unk8007C060 *)&enemy_script_time)->cmd = enemy_attack_scripts[arg0];
+    ((Unk8007C060 *)&enemy_script_time)->enemy_ptr = arg1;
+    ((Unk8007C060 *)&enemy_script_time)->actor = &enemy_slots[0].actor;
 }
 
 #ifdef NON_MATCHING
@@ -972,17 +972,17 @@ void Enemy_RunAttackScript(void) {
         if (e->time < ++enemy_script_time) {
             obj = enemy_script_obj;
             if (e->flags & 8) {
-                enemy_temp_vec.x = e->unk8;
-                enemy_temp_vec.y = e->unk10;
+                enemy_temp_vec.x = e->offset_x;
+                enemy_temp_vec.y = e->offset_z;
                 Math_RotateVec2(obj->rot, (Vec2f *)&enemy_temp_vec);
                 en->unk20 = enemy_temp_vec.x;
                 en->unk24 = enemy_temp_vec.y;
             } else {
-                d = &enemy_effect_defs[e->unk2];
+                d = &enemy_effect_defs[e->effect_def_index];
                 t = &D_800C18D8[d->visual_def_index];
-                enemy_temp_vec.x = e->unk8;
-                enemy_temp_vec.y = e->unk10;
-                Math_RotateVec2(obj->rot + e->unk14, (Vec2f *)&enemy_temp_vec);
+                enemy_temp_vec.x = e->offset_x;
+                enemy_temp_vec.y = e->offset_z;
+                Math_RotateVec2(obj->rot + e->yaw_offset, (Vec2f *)&enemy_temp_vec);
                 if (e->flags & 2) {
                     x = player_state.actor.x;
                     y = player_state.actor.y;
@@ -994,7 +994,7 @@ void Enemy_RunAttackScript(void) {
                 }
                 s = obj->scale;
                 x += enemy_temp_vec.x * s;
-                y += e->unkC * s;
+                y += e->offset_y * s;
                 z += enemy_temp_vec.y * s;
                 enemy_temp_vec.x = d->scale_x;
                 enemy_temp_vec.y = d->scale_y;
@@ -1004,7 +1004,7 @@ void Enemy_RunAttackScript(void) {
                 } else {
                     enemy_temp_vec.z = obj->unk28;
                 }
-                Magic_CreateVisualEffect(d->color_index, d->flags, x, y, z, obj->rot + e->unk14, t, &enemy_temp_vec, obj);
+                Magic_CreateVisualEffect(d->color_index, d->flags, x, y, z, obj->rot + e->yaw_offset, t, &enemy_temp_vec, obj);
             }
             if (e->flags & 4) {
                 Camera_Shake(1);

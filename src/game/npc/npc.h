@@ -13,27 +13,27 @@ struct MenuRomRange; /* game/ui/menu.h */
 /* An NPC definition record (the area's NPC list, NpcList). */
 typedef struct NpcDef {
     /* 0x00 */ u16 area; /* compared with map_subarea */
-    /* 0x02 */ u16 unk2; /* talk kind (Npc_StartTalk) */
-    /* 0x04 */ u8 unk4; /* 2: wanders */
+    /* 0x02 */ u16 talk_kind; /* talk kind (Npc_StartTalk) */
+    /* 0x04 */ u8 movement_kind; /* 2: wanders */
     /* 0x05 */ u8 flags;
     union {
-        /* 0x06 */ u16 unk6;
+        /* 0x06 */ u16 boss_index;
         struct {
             /* 0x06 */ u8 unk6_hi;
-            /* 0x07 */ u8 unk7;
+            /* 0x07 */ u8 item_id;
         } b;
     } u6;
-    /* 0x08 */ u16 unk8; /* message offset */
-    /* 0x0A */ u16 unkA; /* other message offset */
+    /* 0x08 */ u16 message_offset; /* message offset */
+    /* 0x0A */ u16 alternate_message_offset; /* other message offset */
     /* 0x0C */ u8 padC[4];
-    /* 0x10 */ struct AnimSet *unk10; /* anim set table */
+    /* 0x10 */ struct AnimSet *anim_sets; /* anim set table */
     /* 0x14 */ u8 *name;
-    /* 0x18 */ u16 unk18;
+    /* 0x18 */ u16 talk_anim_index;
     /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ f32 x;
     /* 0x20 */ f32 z;
     /* 0x24 */ f32 angle;
-    /* 0x28 */ f32 unk28; /* copied to Actor.scale */
+    /* 0x28 */ f32 scale; /* copied to Actor.scale */
 } NpcDef; /* 0x2C bytes */
 
 /* An area's NPC list (MapAreaDef's npcs). */
@@ -50,7 +50,7 @@ typedef struct Npc {
     /* 0x04 */ f32 homeX;
     /* 0x08 */ f32 homeZ;
     /* 0x0C */ f32 homeAngle;
-    /* 0x10 */ f32 unk10; /* turn to the player, per 15 frames */
+    /* 0x10 */ f32 turn_delta; /* turn to the player, per 15 frames */
     /* 0x14 */ Actor actor;
     /* 0x80 */ NpcDef *def;
 } Npc; /* 0x84 bytes */

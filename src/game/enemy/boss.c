@@ -25,13 +25,13 @@
 
 /* One boss placement (D_803AB3D0). */
 typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
+    /* 0x00 */ u16 map_id;
+    /* 0x02 */ u16 subarea;
+    /* 0x04 */ u16 rom_range_index;
     /* 0x06 */ u8 pad6[6];
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
+    /* 0x0C */ f32 x;
+    /* 0x10 */ f32 z;
+    /* 0x14 */ f32 angle;
 } Unk803AB3D0; /* size 0x18 */
 
 /* This file's .bss, 8007C0B0..8007C280, in address order (first declared in boss.h).
@@ -74,13 +74,13 @@ void Boss_LoadForArea(void) {
     boss_field_index = 0;
     for (i = 0; i < 8; i++) {
         p = &D_803AB3D0[i];
-        if (map_id == p->unk0 && map_subarea == p->unk2) {
+        if (map_id == p->map_id && map_subarea == p->subarea) {
             if (Boss_IsDefeated(i) == 0) {
-                start = D_803AB390[p->unk4].start;
-                end = D_803AB390[p->unk4].end;
+                start = D_803AB390[p->rom_range_index].start;
+                end = D_803AB390[p->rom_range_index].end;
                 size = end - start;
                 Dma_ReadRom(start, D_802A7BC0, size);
-                Boss_Spawn(i, p->unkC, p->unk10, p->unk14, &boss_field_record);
+                Boss_Spawn(i, p->x, p->z, p->angle, &boss_field_record);
                 boss_field_index = i + 1;
             }
             return;

@@ -62,13 +62,13 @@ typedef struct EnemyAreaSet {
 /* One step of an enemy attack script (enemy_attack_scripts, Enemy_RunAttackScript). */
 typedef struct EnemyScriptCmd {
     /* 0x00 */ u16 time;
-    /* 0x02 */ u16 unk2;
+    /* 0x02 */ u16 effect_def_index;
     /* 0x04 */ u16 flags; /* 1: last, 2: at the player, 4: camera shake, 8: offset enemy_slots[0].unk20/unk24 */
     /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
+    /* 0x08 */ f32 offset_x;
+    /* 0x0C */ f32 offset_y;
+    /* 0x10 */ f32 offset_z;
+    /* 0x14 */ f32 yaw_offset;
 } EnemyScriptCmd; /* 0x18 bytes */
 
 /* One enemy_slots entry (also boss_field_record). */

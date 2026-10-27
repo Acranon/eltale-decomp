@@ -697,7 +697,7 @@ void Player_StateTalk(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
         core_flags &= ~2;
         if (core_flags & 0x10) {
             core_flags &= ~0x10;
-            if (npc_slots[player_talk_npc].def->unk2 == 6 && text_last_choice_index == 0) {
+            if (npc_slots[player_talk_npc].def->talk_kind == 6 && text_last_choice_index == 0) {
                 core_flags |= 0x480;
                 core_transition_timer = 0x23;
                 core_fade_out_time = 0x1E;
