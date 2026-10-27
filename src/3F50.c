@@ -431,7 +431,7 @@ extern void *D_8007A9C4;
 extern Actor *D_8007A9C8;
 extern void *D_8007A9CC;
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
-void func_8000F50C(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
+void MapObjAnim_Start(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
 
 void Player_Spawn(void) {
     s32 n;
@@ -507,7 +507,7 @@ void Player_Spawn(void) {
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 func_80020214(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
-                func_8000F50C(1, (u16) p->actor.unk54, D_8007A998, pos);
+                MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
                 func_8002A7C8(n, 8, 0xFF);
                 break;
             case 3:
@@ -521,7 +521,7 @@ void Player_Spawn(void) {
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 func_80020214(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
-                func_8000F50C(1, (u16) p->actor.unk54, D_8007A998, pos);
+                MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
                 func_8002A7C8(5, 0x21, 0xFF);
                 func_8002A7C8(0xF, 0x21, 0xFF);
                 break;
@@ -643,8 +643,8 @@ s32 Player_FindNpcToTalk(PlayerState *arg0, Actor *arg1);
 void *Spirit_FindInFront(Actor *arg0);
 Actor *Chest_FindInFront(Actor *arg0);
 void *TextSpot_FindInFront(Actor *arg0);
-s32 func_8000D100(void);
-void func_8000D40C(s32 arg0);
+s32 Boss_CheckPlayerNear(void);
+void Boss_BeginEncounter(s32 arg0);
 void Npc_StartTalk(s32 idx);
 void Spirit_SetCollected(u16 arg0);
 s32 func_80024FC4(void);
@@ -686,8 +686,8 @@ void Player_Update(void) {
                     if (D_8007A9C8 == NULL) {
                         D_8007A9CC = TextSpot_FindInFront(&D_8007AA20);
                         if (D_8007A9CC == NULL) {
-                            if ((D_8007A904 = func_8000D100()) != 0) {
-                                func_8000D40C(D_8007A904 - 1);
+                            if ((D_8007A904 = Boss_CheckPlayerNear()) != 0) {
+                                Boss_BeginEncounter(D_8007A904 - 1);
                                 D_8007A908 = 0x1E;
                                 D_8004DCA0 |= 2;
                                 p->unk8 |= 1;
@@ -1157,12 +1157,12 @@ void Player_StateAutoWalk(Actor *arg0, PlayerState *arg1, CharData *arg2) {
 }
 
 extern s32 D_80085E4C;
-void func_8000CA88(Actor *arg0);
+void Enemy_PlayMissEffect(Actor *arg0);
 void func_8001AE24(Actor *arg0, s32 arg1, s32 arg2);
 void func_8001BE2C(f32 x, f32 y, f32 z);
 void func_8002373C(Actor *arg0, u16 arg1, u16 arg2, s16 arg3);
 
-u16 func_8000C528(s32 target, u16 dmg, u16 elem, u16 flags, Actor *arg4);
+u16 Enemy_TakeDamage(s32 target, u16 dmg, u16 elem, u16 flags, Actor *arg4);
 void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
     u16 dmg;
     s32 flags;
@@ -1181,7 +1181,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
                 flags = 0xC004;
                 p->unk8 &= ~0x400;
             }
-            dmg = func_8000C528(p->unk2 - 1, dmg, (p->unk122 >> 8) & 0xF, flags, a);
+            dmg = Enemy_TakeDamage(p->unk2 - 1, dmg, (p->unk122 >> 8) & 0xF, flags, a);
             if (dmg != 0) {
                 a->unk64->unk8++;
                 if (a->unk64->unkA < a->unk64->unk8) {
@@ -1204,7 +1204,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
             }
             p->unk14->unk28++;
         } else {
-            func_8000CA88(&D_8007B908[p->unk2 - 1].actor);
+            Enemy_PlayMissEffect(&D_8007B908[p->unk2 - 1].actor);
         }
         if (D_8007B908[p->unk2 - 1].unkA == 0) {
             p->unk8 &= ~0x100;
@@ -1855,7 +1855,7 @@ extern f32 D_8007AB34;
 extern f32 D_8007AB38;
 extern Unk8007C290 *D_8007C290;
 void Player_StartObjectExit(PlayerState *arg0, Actor *arg1);
-void func_8000F50C(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
+void MapObjAnim_Start(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
 
 void Player_StartAreaExit(void) {
     PlayerState *p = &D_8007AA08;
@@ -1904,7 +1904,7 @@ void Player_StartAreaExit(void) {
             break;
         case 4:
             pos = &D_8007C290[D_80084300.unk10];
-            func_8000F50C(1, 0, D_80084300.unkC, pos);
+            MapObjAnim_Start(1, 0, D_80084300.unkC, pos);
             p->unk0 = 3;
             p->unk4 = 0x1E;
             p->unk6 = 0;
@@ -1923,7 +1923,7 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
     s16 n;
 
     pos = &D_8007C290[D_80084300.unk10];
-    func_8000F50C(0, 0, D_80084300.unkC, pos);
+    MapObjAnim_Start(0, 0, D_80084300.unkC, pos);
     hi = D_80084300.unkC >> 8;
     if ((hi & 0xF) == 3) {
         arg0->unk6 = 0;

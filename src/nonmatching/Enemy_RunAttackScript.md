@@ -1,9 +1,9 @@
-# func_8000CC78
+# Enemy_RunAttackScript
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/AEA0.c`](../AEA0.c)
-- Retail assembly: [`asm/nonmatchings/AEA0/func_8000CC78.s`](../../asm/nonmatchings/AEA0/func_8000CC78.s)
+- Retail assembly: [`asm/nonmatchings/AEA0/Enemy_RunAttackScript.s`](../../asm/nonmatchings/AEA0/Enemy_RunAttackScript.s)
 - Retail code size: `0x264` bytes
 - Current gap: 78 object words; frame 0x68 exact (a CSE'd &D_8007C060 for the ++ shifts the temporaries by one).
 - Specific blocker: A label fixes FP call timing; d->unk0 uses t6 instead of t7 and m/hi/low/row still occupy wrong GPRs.
@@ -24,7 +24,7 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_8000CC78** (0x268 bytes)
+- **Enemy_RunAttackScript** (0x268 bytes)
   - w2 s2: AEA0. Frame matched with pads (stash_cc78.c). The ++ on the timer at D_8007C060 still CSEs the address (lui+addiu) in mine, while the target uses a direct lui/%lo load and a lui at store. D_8007C060 is now `extern u16` with CC40 casting to the struct. Tried statement forms, +=, and volatile.
   - w2 s3: AEA0. The ++D_8007C060 address CSE is still unresolved. Struct-cast load/store forms and mixed forms make no difference. The target also keeps e in t6 for the early part and copies it to s1 later (live-range split). Note: D_80056718 is now a struct in AEA0.c, so the old stash needs `&((SpawnDef *)&D_80056718)[e->unk2]`.
   - w2 s4: AEA0. Same no-address-CSE signature as the static family on D_8007C060/D_8007C064. Function statics reproduce it (no CSE, lui at, e in v1 then copied to s1), but these symbols are also used by an init function in AEA0.c. Probably a D2 question too.

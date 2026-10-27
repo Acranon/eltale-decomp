@@ -634,7 +634,7 @@ Gfx D_8006CC90[14] = {
 extern Unk801D8620 D_801D8620[];
 
 void Player_Spawn(void);
-void func_8000D6A0(void);
+void Map_LoadArea(void);
 void Camera_InitForMap(void);
 void func_8002A338(s32);
 void func_80026A00(Unk80092EDC *, f32 *, s32);
@@ -661,7 +661,7 @@ void func_8003627C(void) {
     func_80032BB0(0, &D_80092EDC);
     D_80090450 = 0;
     D_80084308 = -1;
-    func_8000D6A0();
+    Map_LoadArea();
     if (e->unk8 & 1) {
         D_8007A98C = e->unkC;
         D_8007A990 = e->unk10;

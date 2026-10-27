@@ -189,7 +189,7 @@ typedef struct {
 f32 func_800270D0(f32, f32);
 s32 func_80024FF0(u8);
 void func_80025094(u8);
-u8 func_8000D398(u32);
+u8 Boss_IsDefeated(u32);
 void Npc_LoadMessage(NPC *, s32);
 extern s32 D_8004DCA0;
 /* Message text that Npc_StartTalk hands to the text box. */
@@ -556,7 +556,7 @@ void Npc_StartTalk(s32 idx) {
             }
             break;
         case 5:
-            if (func_8000D398(npc->def->u6.unk6) == 0) {
+            if (Boss_IsDefeated(npc->def->u6.unk6) == 0) {
                 msg = npc->def->unk8;
             } else {
                 msg = npc->def->unkA;

@@ -23,8 +23,8 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`func_80034C9C`](func_80034C9C.md) | `src/337B0.c`, C under `NON_MATCHING` | 92 object words; code 0x404 vs 0x400, frame 0xE0 vs 0xD8 |
 | [`Player_FindMeleeTarget`](Player_FindMeleeTarget.md) | `src/3F50.c`, C under `NON_MATCHING` | 5 object words |
 | [`Player_TakeDamage`](Player_TakeDamage.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
-| [`func_8000CC78`](func_8000CC78.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
-| [`func_8000DE54`](func_8000DE54.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
+| [`Enemy_RunAttackScript`](Enemy_RunAttackScript.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
+| [`MapObj_DrawNearby`](MapObj_DrawNearby.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
 | [`func_801009EC_ovl_DA4570`](func_801009EC_ovl_DA4570.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
 | [`func_8020D98C_ovl_ending`](func_8020D98C_ovl_ending.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
 | [`func_8020E9C8_ovl_ending`](func_8020E9C8_ovl_ending.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |

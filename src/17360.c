@@ -235,9 +235,9 @@ extern u8 D_8004EDB0[];
 extern s32 D_8004EDBC[];
 extern s32 D_8004EDEC[];
 s32 Player_RollMeleeHit(s32, Actor17360*);
-s32 func_8000C3FC(Actor17360*, Actor17360*);
-s32 func_8000CAB8(Actor17360*);
-s32 func_8000C528(s32, u16, s32, u16, s32);
+s32 Enemy_RollHitOnPlayer(Actor17360*, Actor17360*);
+s32 Enemy_GetSlotIndex(Actor17360*);
+s32 Enemy_TakeDamage(s32, u16, s32, u16, s32);
 void Player_TakeDamage(u16, u16, s32);
 void func_80023D28(Actor17360*);
 u32 func_80026E90(u32);
@@ -400,7 +400,7 @@ void Magic_MarkActorHitBySlot(s32, Actor17360*);
 s32 Magic_GetHitOutcome();
 s32 Magic_ShouldApplyStatus();
 void Magic_StartStatusTimer();
-void func_8000CA88(Actor17360*);
+void Enemy_PlayMissEffect(Actor17360*);
 void Player_StartDodge(void);
 void Env_SetSlotLightAnim(s32, s32, s32, u8*);
 void Magic_CreateHitPresentation();
@@ -705,7 +705,7 @@ void Magic_UpdateEffects(void) {
                         if (a == p->unk24) {
                             func_8002433C(p->unk24);
                         } else if (a->unk5E & 1) {
-                            func_8000CA88(a);
+                            Enemy_PlayMissEffect(a);
                         } else {
                             Player_StartDodge();
                         }
@@ -1069,7 +1069,7 @@ void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
                 flag = 0x4000;
             }
         }
-        if (func_8000C528(func_8000CAB8(arg1), dmg, arg0->cfg->unk6, arg0->cfg->unk2 | flag, (s32)arg0->unk24) != 0) {
+        if (Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), dmg, arg0->cfg->unk6, arg0->cfg->unk2 | flag, (s32)arg0->unk24) != 0) {
             D_8007AA1C->unk2A++;
         }
     } else {
@@ -1092,7 +1092,7 @@ void Magic_HealTarget(Unk80018480* arg0, Actor17360* arg1) {
     s32 pad;
 
     if (arg1->unk5E & 1) {
-        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
         amt = arg1->unk64->unk6 * arg0->cfg->unkC / 100;
         amt += func_80026E90(amt >> 2);
         ((Unk8001860CRec*)D_800863C4)->unkA += amt;
@@ -1119,7 +1119,7 @@ void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
 
     pl = (Actor17360*)D_8007AA20;
     if (arg1->unk5E & 1) {
-        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
         amt = (D_800863C4->unkC * 11 + 63) >> 6;
         D_800863C4->unkC -= amt;
         if (D_8007AA08.unk7C->unk8 != D_8007AA08.unk7C->unkA) {
@@ -1132,7 +1132,7 @@ void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
     } else {
         amt = (arg1->unk64->unk8 * 11 + 63) >> 6;
         arg1->unk64->unk8 -= amt;
-        D_800863C4 = (Unk8007B908_b*)&D_8007B908[func_8000CAB8(arg1)];
+        D_800863C4 = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
         D_800863C4->unkC += amt;
         if (D_800863C4->unkC > arg0->unk24->unk64->unkA) {
             D_800863C4->unkC = arg0->unk24->unk64->unkA;
@@ -1169,7 +1169,7 @@ void func_800189F0(s32 arg0, Actor17360* arg1) {
 void Magic_ApplyZeroDamageHit(Unk17360Cam* arg0, Actor17360* arg1) {
     if (arg0->cfg->unk18 != 2) {
         if (arg1->unk5E & 1) {
-            func_8000C528(func_8000CAB8(arg1), 0, 0, 4, arg0->unk24);
+            Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), 0, 0, 4, arg0->unk24);
             D_8007AA1C->unk2A++;
         } else {
             Player_TakeDamage(0, 4, arg0->unk24);
@@ -1211,7 +1211,7 @@ void Magic_ClearActorStatuses(s32 arg0, Actor17360* arg1) {
     if (arg1->unk68->unk0 != 0) {
         arg1->unk68->unk0 = 0;
         if (arg1->unk5E & 1) {
-            func_8000CAB8(arg1);
+            Enemy_GetSlotIndex(arg1);
         }
         arg1->unk68->unk8A = 0x10;
         arg1->unk68->unk88 = arg1->unk64->unkE;
@@ -1461,7 +1461,7 @@ u16 Magic_CalculateEffectDamage(Unk80018480Cfg* arg0, Actor17360* arg1) {
     s32 i;
 
     if (arg1->unk5E & 1) {
-        lv = ((Unk800195FCRec*)D_8007B908)[func_8000CAB8(arg1)].unk28->unk2A;
+        lv = ((Unk800195FCRec*)D_8007B908)[Enemy_GetSlotIndex(arg1)].unk28->unk2A;
     } else {
         p = &D_8004ED90[arg0->unk6 * 2];
         lv = D_8007A9D0.stats[arg0->unk6];
@@ -1876,9 +1876,9 @@ s32 Magic_GetHitOutcome(Unk8001A3EC* arg0, Actor17360* arg1) {
         if (ret != 0) {
             if (arg1 != arg0->unk24) {
                 if (arg1->unk5E & 1) {
-                    ret = Player_RollMeleeHit(func_8000CAB8(arg1), arg0->unk24);
+                    ret = Player_RollMeleeHit(Enemy_GetSlotIndex(arg1), arg0->unk24);
                 } else {
-                    ret = func_8000C3FC(arg0->unk24, arg1);
+                    ret = Enemy_RollHitOnPlayer(arg0->unk24, arg1);
                 }
             }
             ret++;

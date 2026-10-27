@@ -118,8 +118,8 @@ typedef struct {
 
 f32 sqrtf(f32);
 void func_80028120();
-void func_8000D19C(s32, f32, f32, f32, Unk8007C148 *);
-u8 func_8000D398(u32);
+void Boss_Spawn(s32, f32, f32, f32, Unk8007C148 *);
+u8 Boss_IsDefeated(u32);
 void func_80020428(s32, Unk8007C174 *, void *, s32);
 void func_8002099C(s32, Unk8007C174 *, void *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
@@ -170,11 +170,11 @@ extern Unk8007A9D0 D_8007A9D0;
 void Camera_SetTargetView(Unk803AB820 *, Unk8007C174 *);
 void func_80032D20(s32);
 
-void func_8000CEE0(void) {
+void Boss_ClearDefeated(void) {
     D_8007C13C[0] = 0;
 }
 
-void func_8000CEF0(void) {
+void Boss_LoadForArea(void) {
     s32 start;
     s32 end;
     s32 i;
@@ -185,12 +185,12 @@ void func_8000CEF0(void) {
     for (i = 0; i < 8; i++) {
         p = &D_803AB3D0[i];
         if (D_800842BC == p->unk0 && D_800842C0 == p->unk2) {
-            if (func_8000D398(i) == 0) {
+            if (Boss_IsDefeated(i) == 0) {
                 start = D_803AB390[p->unk4].start;
                 end = D_803AB390[p->unk4].end;
                 size = end - start;
                 func_80028120(start, D_802A7BC0, size);
-                func_8000D19C(i, p->unkC, p->unk10, p->unk14, &D_8007C148);
+                Boss_Spawn(i, p->unkC, p->unk10, p->unk14, &D_8007C148);
                 D_8007C140 = i + 1;
             }
             return;
@@ -198,7 +198,7 @@ void func_8000CEF0(void) {
     }
 }
 
-void func_8000CFD8(s32 arg0) {
+void Boss_Draw(s32 arg0) {
     Unk8007C148 *p = &D_8007C148;
     s32 pad;
     u8 *temp;
@@ -215,7 +215,7 @@ void func_8000CFD8(s32 arg0) {
     }
 }
 
-s32 func_8000D100(void) {
+s32 Boss_CheckPlayerNear(void) {
     s32 ret = 0;
     f32 dx;
     f32 dz;
@@ -230,7 +230,7 @@ s32 func_8000D100(void) {
     return ret;
 }
 
-void func_8000D19C(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
+void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
     Unk803AB820 *s2 = &D_803AB820[arg0];
     Unk8007C174 *s1 = &arg4->unk2C;
     s16 flags;
@@ -271,15 +271,15 @@ void func_8000D19C(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
     }
 }
 
-u8 func_8000D398(u32 arg0) {
+u8 Boss_IsDefeated(u32 arg0) {
     return D_8007C13C[arg0 >> 3] & D_8004F770[arg0 & 7];
 }
 
-void func_8000D3CC(u16 arg0) {
+void Boss_SetDefeated(u16 arg0) {
     D_8007C13C[arg0 >> 3] |= D_8004F770[arg0 & 7];
 }
 
-void func_8000D40C(s32 arg0) {
+void Boss_BeginEncounter(s32 arg0) {
     u8 *src;
     u8 *dst;
     s32 i;
@@ -303,7 +303,7 @@ void func_8000D40C(s32 arg0) {
     Camera_SetTargetView(&D_803AB4B0[arg0], &D_8007C0D0);
 }
 
-void func_8000D528(s32 arg0) {
+void Boss_GiveDefeatReward(s32 arg0) {
     u8 *src;
     u8 *dst;
     s32 i;

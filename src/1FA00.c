@@ -120,9 +120,9 @@ extern u8 D_803ABA58[];
 extern u8 D_803AC3F8[];
 
 void Player_InitBattle(void);
-void func_8000A95C(void);
-void func_8000CC30(void);
-void func_8000D19C(s32, f32, f32, f32, Struct_8007B908*);
+void Enemy_SortTurnOrder(void);
+void Enemy_ClearAttackScript(void);
+void Boss_Spawn(s32, f32, f32, f32, Struct_8007B908*);
 s16 func_8001C060(u16, f32, f32, f32, f32);
 void func_8002430C(void);
 void func_8002A6B8(s8);
@@ -238,11 +238,11 @@ void func_8001F164(void) {
     D_8008BFA8 = D_8007C140;
     D_8007C048 = D_803ABA58;
     D_8007C04C = D_803AC3F8;
-    func_8000D19C(D_8007C140 - 1, D_8008BE5C, D_8008BE60, D_8007C184, D_8007B908);
-    func_8000CC30();
+    Boss_Spawn(D_8007C140 - 1, D_8008BE5C, D_8008BE60, D_8007C184, D_8007B908);
+    Enemy_ClearAttackScript();
     D_8007C140 = 0;
     D_8008BE5A = D_8007B900 = 1;
-    func_8000A95C();
+    Enemy_SortTurnOrder();
     D_8008BF90 = 1;
     D_8008BF70[0] = D_8007B908[0].unk2C;
     D_8008BE4C = 1;
@@ -414,11 +414,11 @@ extern s32 D_80085F60;
 extern s32 D_800842BC;
 extern s16 D_8008C162;
 
-void func_8000D3CC(u16);
-void func_8000D528(s32);
-void func_8000A65C(void);
+void Boss_SetDefeated(u16);
+void Boss_GiveDefeatReward(s32);
+void Enemy_RemoveAll(void);
 void Camera_SetPresetDelayedTurn(s32);
-void func_8000AA28(void);
+void Enemy_StartTurn(void);
 s32 func_800200F8(void);
 void func_8002A6F4(s32, s32);
 void func_8002A744(s32, s32, s32);
@@ -444,8 +444,8 @@ void func_8001F888(void) {
                 D_8008BE52 |= 8;
                 done = 1;
                 if (D_8008BE52 & 0x100) {
-                    func_8000D3CC(D_8008BFA8 - 1);
-                    func_8000D528(D_8008BFA8 - 1);
+                    Boss_SetDefeated(D_8008BFA8 - 1);
+                    Boss_GiveDefeatReward(D_8008BFA8 - 1);
                     D_8007C048 = D_8008BFA0;
                     D_8007C04C = D_8008BFA4;
                 }
@@ -460,7 +460,7 @@ void func_8001F888(void) {
                 D_8008BE52 &= ~1;
                 D_8008C162 = 0;
                 func_8001C298(D_8008BF94, D_8007AA08.unk18, D_8007AA08.unk1C, D_8007AA08.unk20);
-                func_8000A65C();
+                Enemy_RemoveAll();
                 Camera_SetPresetDelayedTurn(D_80085F60);
                 if (D_8008BE52 & 0x100) {
                     D_8008BE52 &= ~0x100;
@@ -474,7 +474,7 @@ void func_8001F888(void) {
             }
             D_8008BE52 &= ~4;
             if (D_8008BE52 & 2) {
-                func_8000AA28();
+                Enemy_StartTurn();
             }
             D_8008BE64 = a->unk0;
             D_8008BE68 = a->unk8;
@@ -586,7 +586,7 @@ Struct_8001FE08* func_8001FE08(f32 x, f32 y) {
 }
 
 void func_800271B4(f32, Struct_8001FF10_Pos*);
-void func_8000A6D0(s32, f32, f32, f32, void*, Struct_8007B908*);
+void Enemy_Spawn(s32, f32, f32, f32, void*, Struct_8007B908*);
 
 void func_8001FF10(f32 x, f32 y, f32 z, u16* list) {
     Struct_8001FF10_8* e;
@@ -620,7 +620,7 @@ void func_8001FF10(f32 x, f32 y, f32 z, u16* list) {
             D_8008BE40.unk0 = pos->unk0;
             D_8008BE40.unk4 = pos->unk4;
             func_800271B4(z, &D_8008BE40);
-            func_8000A6D0(p->unk0, x + D_8008BE40.unk0, y + D_8008BE40.unk4, z, &actor->unk2C, actor);
+            Enemy_Spawn(p->unk0, x + D_8008BE40.unk0, y + D_8008BE40.unk4, z, &actor->unk2C, actor);
             cnt--;
             actor++;
             pos++;
@@ -628,7 +628,7 @@ void func_8001FF10(f32 x, f32 y, f32 z, u16* list) {
         n--;
         p++;
     }
-    func_8000A95C();
+    Enemy_SortTurnOrder();
     D_8008BE5A = D_8007B900;
 }
 

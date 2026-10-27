@@ -11,7 +11,7 @@ osAppNMIBuffer = 0x8000031C;
 /* Buffers past the end of bss that the code addresses directly. */
 D_80124E00 = 0x80124E00;
 
-/* Second name for a ROM address that is both one block's end and the next block's start (func_8000D6A0 uses both). */
+/* Second name for a ROM address that is both one block's end and the next block's start (Map_LoadArea uses both). */
 D_851F0_end = 0x851F0;
 
 /* D2: labels inside objects that src/1870.c defines (8007A170..8007A8C0). */

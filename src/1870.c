@@ -98,7 +98,7 @@ void func_80002948(void);
 void func_80002A8C(void);
 void func_80002BDC(void);
 void Player_Init(void);
-void func_8000CEE0(void);
+void Boss_ClearDefeated(void);
 void Env_InitClock(void);
 void Chest_ClearOpenedFlags(void);
 void Spirit_ClearCollectedFlags(void);
@@ -211,7 +211,7 @@ void func_80000C70(void *arg0) {
     func_80001084();
 
     while (1) {
-        func_8000CEE0();
+        Boss_ClearDefeated();
         Chest_ClearOpenedFlags();
         Spirit_ClearCollectedFlags();
         Player_Init();
@@ -352,11 +352,11 @@ extern u16 D_802DA800[];
 
 void Player_Draw(void *arg0);
 void Npc_DrawAll(void *arg0);
-void func_8000A3E4(void *arg0);
-void func_8000CFD8(void *arg0);
-void func_8000DE54(void *arg0);
-void func_8000E81C(void *arg0);
-void func_8000F34C(void *arg0);
+void Enemy_DrawAll(void *arg0);
+void Boss_Draw(void *arg0);
+void MapObj_DrawNearby(void *arg0);
+void MapObj_DrawTranslucent(void *arg0);
+void Map_DrawSky(void *arg0);
 void Env_PrepareFrameLighting(void);
 void Env_ApplyLightSlot(s32 arg0);
 void Shadow_DrawAll(void *arg0);
@@ -412,18 +412,18 @@ void func_80001278(GfxFrame *arg0) {
         Env_PrepareFrameLighting();
         if (D_8007C280 & 4) {
             Env_ApplyLightSlot(D_8007A1C8);
-            func_8000F34C(sub);
+            Map_DrawSky(sub);
         }
         Env_ApplyLightSlot(D_8007A1C8);
-        func_8000DE54(sub);
+        MapObj_DrawNearby(sub);
         if (!(D_8004DCA0 & 0x10000)) {
             Player_Draw(sub);
         }
         Npc_DrawAll(sub);
         Chest_UpdateAll(sub);
-        func_8000E81C(sub);
-        func_8000A3E4(sub);
-        func_8000CFD8(sub);
+        MapObj_DrawTranslucent(sub);
+        Enemy_DrawAll(sub);
+        Boss_Draw(sub);
         Spirit_SpawnSparkles();
         Env_ApplyLightSlot(D_8007AB60);
         Shadow_DrawAll(sub);
@@ -543,7 +543,7 @@ void func_80002E74(void);
 void func_80002F40(s32 arg0);
 s32 func_80003184(void);
 void func_8000328C(s32 arg0);
-void func_8000DDBC(void);
+void Map_StartFrame(void);
 void Env_InitForMap(void);
 void Env_Update(void);
 s32 Env_AllocLightSlot(void);
@@ -600,11 +600,11 @@ void Player_Update(void);
 void Player_StartAreaExit(void);
 void Npc_InitArea(void);
 void Npc_UpdateAll(void);
-void func_8000A2A0(void);
-void func_8000A310(void);
-void func_8000CEF0(void);
-void func_8000D6A0(void);
-void func_8000F5DC(void);
+void Enemy_InitForArea(void);
+void Enemy_UpdateAll(void);
+void Boss_LoadForArea(void);
+void Map_LoadArea(void);
+void MapObjAnim_UpdateAll(void);
 s32 Exit_CheckEnter(f32 arg0, f32 arg1, f32 arg2);
 void Env_SetClock(s32 arg0);
 void Chest_LoadForMap(void);
@@ -645,15 +645,15 @@ void func_80001944(void) {
         }
         func_80032BB0(0);
         D_80090450 = 0;
-        func_8000D6A0();
+        Map_LoadArea();
         Chest_LoadForMap();
         Spirit_LoadForMap();
         TextSpot_LoadForMap();
         func_8002F87C();
         Player_Spawn();
         Npc_InitArea();
-        func_8000A2A0();
-        func_8000CEF0();
+        Enemy_InitForArea();
+        Boss_LoadForArea();
         Camera_InitForMap();
         Env_InitForMap();
         D_8007A1C8 = Env_AllocLightSlot();
@@ -696,15 +696,15 @@ void func_80001944(void) {
                 func_8001F36C();
             } else {
                 func_8001F888();
-                func_8000A310();
+                Enemy_UpdateAll();
             }
         }
         Player_Update();
         Npc_UpdateAll();
         Magic_UpdateEffects();
         Env_Update();
-        func_8000DDBC();
-        func_8000F5DC();
+        Map_StartFrame();
+        MapObjAnim_UpdateAll();
         func_80001278(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (!(D_8004DCA0 & 0x87)) {
@@ -819,7 +819,7 @@ void func_8000205C(void) {
             func_8000328C(count);
         }
         Env_Update();
-        func_8000DDBC();
+        Map_StartFrame();
         func_80001278(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8004DCA0 & 0x80) {
@@ -897,7 +897,7 @@ void func_800023F4(void) {
         Shadow_ClearQueue();
         func_8003642C();
         Env_Update();
-        func_8000DDBC();
+        Map_StartFrame();
         func_80001278(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8004DCA0 & 0x80) {

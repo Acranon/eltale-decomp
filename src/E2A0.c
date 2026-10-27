@@ -308,8 +308,8 @@ s32 D_8008201C;
 Unk80082020 D_80082020;
 
 void func_80028120();
-void func_8000F4A0(void);
-void func_8000FD54(void);
+void MapObjAnim_ClearAll(void);
+void MapObj_ClearSpinners(void);
 void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, CollResult *);
 extern Unk8007C284 D_80056BB0[];
 extern Unk80057540 D_80057540[];
@@ -341,17 +341,17 @@ typedef struct {
 } Unk80082048;
 
 extern u8 D_80060C88[];
-void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
+void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list);
 /* The rest of this file's .bss, 80082030..80082860 (the 16-byte-aligned run that
- * holds func_800104C0's static at 80082858). Nothing names 80082030..80082048
- * (splat's D_80082030 is func_8000D6A0's loop end), so it is a placeholder. */
+ * holds Map_BlendPaletteByClock's static at 80082858). Nothing names 80082030..80082048
+ * (splat's D_80082030 is Map_LoadArea's loop end), so it is a placeholder. */
 u8 D_80082030[0x18];
 Unk80082048 D_80082048[4];
 u16 D_80082058[0x200];
 u16 D_80082458[0x200];
 /* Declared after the definitions above: IDO orders a file's .bss by declaration
  * number mod 256 (later blocks first on a tie), and these declarations keep
- * func_800104C0's static D_80082858 after D_80082458. */
+ * Map_BlendPaletteByClock's static D_80082858 after D_80082458. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ f32 x;
@@ -360,9 +360,9 @@ typedef struct {
 } Unk8007AA08;
 extern Unk8007AA08 D_8007AA08;
 void func_8001A948(f32, f32, f32, Unk8000FA9C *);
-void func_8000FA9C(Unk8000FA9C *);
-void func_8000FC50(Unk8000FA9C *);
-void func_8000FDA8(f32, f32, f32, f32, Unk8000FA9C *);
+void MapObj_EmitArcSprite(Unk8000FA9C *);
+void MapObj_EmitDropSprite(Unk8000FA9C *);
+void MapObj_QueueSpinner(f32, f32, f32, f32, Unk8000FA9C *);
 extern f32 D_80085F50;
 f32 sqrtf(f32);
 f32 func_800270D0(f32, f32);
@@ -381,10 +381,10 @@ typedef struct {
 extern s32 D_80084980;
 
 /* This file's .data, 8004DD70..8004DED0, in source order: these tables, then
- * the static sprite descriptors of func_8000FA9C (8004DE04) and func_8000FC50
- * (8004DE44), then the tables defined after func_8000FC50. IDO stores a
+ * the static sprite descriptors of MapObj_EmitArcSprite (8004DE04) and MapObj_EmitDropSprite
+ * (8004DE44), then the tables defined after MapObj_EmitDropSprite. IDO stores a
  * function-static descriptor's fields with lui/%lo (sharing the lui inside a
- * 16-byte line), which both functions need. D_8004DD8B (func_8000DE54's asm
+ * 16-byte line), which both functions need. D_8004DD8B (MapObj_DrawNearby's asm
  * name for D_8004DD88 + 3) is an alias in undefined_syms.txt. */
 u16 D_8004DD70 = 0;
 s32 D_8004DD74[4] = { 0x00000000, 0x01600160, 0x01600160, 0x01600100 };
@@ -400,7 +400,7 @@ f32 D_8004DDD4[4] = { 0.0f, 5000.0f, 1000.0f, 3000.0f };
 f32 D_8004DDE4[4] = { 0.0f, 30000.0f, 30000.0f, 48000.0f };
 f32 D_8004DDF4[4] = { 0.0f, 1000.0f, 5000.0f, 3000.0f };
 
-void func_8000D6A0(void) {
+void Map_LoadArea(void) {
     u32 *q;
     u32 start;
     u32 end;
@@ -530,12 +530,12 @@ void func_8000D6A0(void) {
         D_80081CE8[i] = D_8004DD98;
     }
     D_80081CE0 = 1;
-    func_8000F4A0();
-    func_8000FD54();
+    MapObjAnim_ClearAll();
+    MapObj_ClearSpinners();
     D_800842B4 = -1;
 }
 
-void func_8000DDBC(void) {
+void Map_StartFrame(void) {
     s32 i;
     s32 tmp;
     u16 *p;
@@ -570,17 +570,17 @@ extern AnimInfo20 D_8005839C[];
 extern Gfx D_10000E8[];
 extern s16 D_8007A1A0;
 extern s16 D_8007A1A2;
-void func_8000EEA8(s32, u16 *);
-void func_8000FF18(MtxBuf *);
-void func_800104C0(void);
+void MapObj_CollectCell(s32, u16 *);
+void MapObj_DrawSpinners(MtxBuf *);
+void Map_BlendPaletteByClock(void);
 void func_80010768(void);
 void func_8002A410(void);
 void func_8002A890(s8, u8);
-s32 func_8000F4C8(s32);
-void func_8000F740(MtxBuf *, s32, s32, Unk8000FA9C **);
+s32 MapObjAnim_Find(s32);
+void MapObj_DrawBillboards(MtxBuf *, s32, s32, Unk8000FA9C **);
 
 /* &D_80082058 kept in a saved register instead of rematerialized, 8 bytes short, register allocation; code is equivalent */
-void func_8000DE54(MtxBuf *arg0) {
+void MapObj_DrawNearby(MtxBuf *arg0) {
     CellOffset *off;
     s32 n;
     s32 cx;
@@ -668,12 +668,12 @@ void func_8000DE54(MtxBuf *arg0) {
             idx = D_8007C28C->w * gz + gx;
             list = &D_8007C28C->lists[D_8007C28C->cells[idx]];
             t = *list;
-            func_8000EEA8(t, list + 1);
+            MapObj_CollectCell(t, list + 1);
         }
     }
     if (D_8007C28C->unk2 != 0) {
         t = D_8007C28C->unk2;
-        func_8000EEA8(t, D_8007C28C->unk24);
+        MapObj_CollectCell(t, D_8007C28C->unk24);
     }
     gSPDisplayList(D_8007A184++, D_10000E8);
     gSPFogPosition(D_8007A184++, D_8007A1A0, D_8007A1A2);
@@ -700,7 +700,7 @@ void func_8000DE54(MtxBuf *arg0) {
             }
             s->unk16 = (s->unk16 & 0xFF00) | flags;
         } else if (flags & 0x100) {
-            i = func_8000F4C8((s32) s);
+            i = MapObjAnim_Find((s32) s);
             if (i != 0) {
                 D_80081FF0[1] = 0.0f;
                 D_80081FF0[0] = D_80084238[i - 1].x;
@@ -725,15 +725,15 @@ void func_8000DE54(MtxBuf *arg0) {
         gSPDisplayList(D_8007A184++, D_8007C294[s->timer].dl);
         D_8007C2A0++;
     }
-    func_8000FF18(arg0);
+    MapObj_DrawSpinners(arg0);
     if (*pCB8 != 0) {
         gDPPipeSync(D_8007A184++);
         gDPSetRenderMode(D_8007A184++, 0xC8113078, 0);
         *pCD0 = (Unk8000FA9C **) D_8007C2A8;
-        func_8000F740(arg0, *pCB8, 0, *pCD0);
-        func_8000F740(arg0, *pCB8, 1, *pCD0);
-        func_8000F740(arg0, *pCB8, 2, *pCD0);
-        func_8000F740(arg0, *pCB8, 3, *pCD0);
+        MapObj_DrawBillboards(arg0, *pCB8, 0, *pCD0);
+        MapObj_DrawBillboards(arg0, *pCB8, 1, *pCD0);
+        MapObj_DrawBillboards(arg0, *pCB8, 2, *pCD0);
+        MapObj_DrawBillboards(arg0, *pCB8, 3, *pCD0);
     }
     gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
     gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
@@ -753,7 +753,7 @@ void func_8000DE54(MtxBuf *arg0) {
         }
     }
     D_80081CE0 = 0;
-    func_800104C0();
+    Map_BlendPaletteByClock();
     func_80010768();
     if (D_800842B0 == -1) {
         if (D_800842B4 != D_800842B0) {
@@ -777,10 +777,10 @@ void func_8000DE54(MtxBuf *arg0) {
     D_800842B4 = D_800842B0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/func_8000DE54.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/MapObj_DrawNearby.s")
 #endif
 
-void func_8000E81C(MtxBuf *arg0) {
+void MapObj_DrawTranslucent(MtxBuf *arg0) {
     Unk8000FA9C *s;
     s32 n;
     s32 k;
@@ -832,8 +832,8 @@ void func_8000E81C(MtxBuf *arg0) {
         gDPSetRenderMode(D_8007A184++, 0x0C1849D8, 0);
         gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
         D_80081CD8 = D_80082C60;
-        func_80010104(arg0, D_80081CC0, 0x11, D_80081CD8);
-        func_80010104(arg0, D_80081CC0, 0x12, D_80081CD8);
+        MapObj_DrawAnimTexBillboards(arg0, D_80081CC0, 0x11, D_80081CD8);
+        MapObj_DrawAnimTexBillboards(arg0, D_80081CC0, 0x12, D_80081CD8);
     }
     D_8004DD70++;
     gDPPipeSync(D_8007A184++);
@@ -842,7 +842,7 @@ void func_8000E81C(MtxBuf *arg0) {
     D_8004DDB0 += 2;
 }
 
-void func_8000EEA8(s32 count, u16 *ids) {
+void MapObj_CollectCell(s32 count, u16 *ids) {
     Unk8000FA9C *s;
     f32 dx;
     f32 dy;
@@ -899,11 +899,11 @@ void func_8000EEA8(s32 count, u16 *ids) {
         } else if (kind == 0x81) {
             func_8001A948(s->x, s->y, s->z, s);
         } else if (kind == 0x83) {
-            func_8000FA9C(s);
+            MapObj_EmitArcSprite(s);
         } else if (kind == 0x84) {
-            func_8000FC50(s);
+            MapObj_EmitDropSprite(s);
         } else if (kind == 0x82) {
-            func_8000FDA8(s->x, s->y, s->z, s->angle, s);
+            MapObj_QueueSpinner(s->x, s->y, s->z, s->angle, s);
         } else if (kind >= 0x40 && kind < 0x46) {
             *D_80081CDC++ = s;
             D_80081CC4++;
@@ -911,7 +911,7 @@ void func_8000EEA8(s32 count, u16 *ids) {
     }
 }
 
-void func_8000F34C(MtxBuf *arg0) {
+void Map_DrawSky(MtxBuf *arg0) {
     func_800273C0(&arg0->mtx[D_8007A180], 0.0f, 0.0f, 0.0f, 1.0f, D_80085E48.x, D_80085E48.y - 10.0f, D_80085E48.z);
     gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
     D_8007A180++;
@@ -919,7 +919,7 @@ void func_8000F34C(MtxBuf *arg0) {
     gSPDisplayList(D_8007A184++, D_80060C48[D_80084994->unk1C].dl);
 }
 
-void func_8000F4A0(void) {
+void MapObjAnim_ClearAll(void) {
     Unk80084238 *p = D_80084238;
     u32 i = 4;
 
@@ -929,7 +929,7 @@ void func_8000F4A0(void) {
     }
 }
 
-s32 func_8000F4C8(s32 id) {
+s32 MapObjAnim_Find(s32 id) {
     Unk80084238 *p;
     s32 i;
 
@@ -944,7 +944,7 @@ s32 func_8000F4C8(s32 id) {
     return i;
 }
 
-void func_8000F50C(s32 state, s32 frame, s32 type, s32 id) {
+void MapObjAnim_Start(s32 state, s32 frame, s32 type, s32 id) {
     Unk80084238 *p;
     s32 i;
     AnimInfo *anim;
@@ -987,7 +987,7 @@ void func_8000F50C(s32 state, s32 frame, s32 type, s32 id) {
     }
 }
 
-void func_8000F5DC(void) {
+void MapObjAnim_UpdateAll(void) {
     Unk80084238 *p;
     s32 i;
     AnimInfo *anim;
@@ -1029,7 +1029,7 @@ void func_8000F5DC(void) {
     } while (i != 0);
 }
 
-void func_8000F740(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
+void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
     Unk8000FA9C *s;
     f32 dx;
     f32 dz;
@@ -1081,15 +1081,15 @@ void func_8000F740(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
     }
 }
 
-void func_8000FBB4(Particle *arg0);
-void func_8000FCE0(Particle *arg0);
+void MapObj_StepArcSprite(Particle *arg0);
+void MapObj_StepDropSprite(Particle *arg0);
 extern u8 D_80060A38[];
 extern u8 D_80060AB8[];
 extern u8 D_80060BF8[];
 
-void func_8000FA9C(Unk8000FA9C *arg0) {
+void MapObj_EmitArcSprite(Unk8000FA9C *arg0) {
     static SpriteObj D_8004DE04 = {
-        0x23, 0, (void *)func_8000FBB4, 0x07202000, 0, D_8005E9F8, D_80060A38,
+        0x23, 0, (void *)MapObj_StepArcSprite, 0x07202000, 0, D_8005E9F8, D_80060A38,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 15.0f, 0.0f, 0,
     };
 
@@ -1112,7 +1112,7 @@ void func_8000FA9C(Unk8000FA9C *arg0) {
     }
 }
 
-void func_8000FBB4(Particle *arg0) {
+void MapObj_StepArcSprite(Particle *arg0) {
     arg0->x += arg0->vx;
     arg0->y += arg0->vy;
     arg0->z += arg0->vz;
@@ -1120,9 +1120,9 @@ void func_8000FBB4(Particle *arg0) {
     gDPSetEnvColor(D_8007A184++, 255, 255, 255, (D_800842A8 & 1) ? 0xDC : 0x78);
 }
 
-void func_8000FC50(Unk8000FA9C *arg0) {
+void MapObj_EmitDropSprite(Unk8000FA9C *arg0) {
     static SpriteObj D_8004DE44 = {
-        0xF, 0, (void *)func_8000FCE0, 0x00081000, 0, D_80060AB8, D_80060BF8,
+        0xF, 0, (void *)MapObj_StepDropSprite, 0x00081000, 0, D_80060AB8, D_80060BF8,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0,
     };
 
@@ -1142,13 +1142,13 @@ u16 D_8004DE84[2] = { 0x10, 0x10 };
 u8 D_8004DE88[4] = { 0x82, 0xDC, 0x78, 0xF0 };
 extern Unk8004DE98 D_8004DE98[];
 
-void func_8000FCE0(Particle *arg0) {
+void MapObj_StepDropSprite(Particle *arg0) {
     arg0->y = arg0->y + arg0->vy / 2;
     arg0->vy -= 0.2;
     gDPSetEnvColor(D_8007A184++, 255, 255, 255, arg0->alpha * 5);
 }
 
-void func_8000FD54(void) {
+void MapObj_ClearSpinners(void) {
     s32 i;
     Unk80083470 *q;
     Unk80083470 *p;
@@ -1166,7 +1166,7 @@ void func_8000FD54(void) {
     } while (i != 0);
 }
 
-void func_8000FDA8(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *arg4) {
+void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *arg4) {
     Unk80083470 *prev;
     Unk80083470 *cur;
     s32 i;
@@ -1196,7 +1196,7 @@ void func_8000FDA8(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *arg4) {
     }
 }
 
-void func_8000FF18(MtxBuf *arg0) {
+void MapObj_DrawSpinners(MtxBuf *arg0) {
     Unk80083470 *p;
     u32 i;
     Unk8000FA9C *s;
@@ -1218,7 +1218,7 @@ void func_8000FF18(MtxBuf *arg0) {
     }
 }
 
-void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
+void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
     s32 pad1;
     s32 idx;
     s32 pad;
@@ -1250,7 +1250,7 @@ void func_80010104(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list) {
     }
 }
 
-void func_800104C0(void) {
+void Map_BlendPaletteByClock(void) {
     static s32 D_8004DE8C = 0;
     static s32 D_8004DE90 = 1;
     static s32 D_8004DE94 = 1;
@@ -1307,7 +1307,7 @@ void func_800104C0(void) {
     D_8004DE94 = D_8004DE8C;
 }
 
-/* func_800104C0's statics come first, then these. */
+/* Map_BlendPaletteByClock's statics come first, then these. */
 Unk8004DE98 D_8004DE98[6] = {
     { 0, 0x1C, 2 }, { 0x15F9, 0x80, 0 }, { 0x4F1A, 0x1C, 1 },
     { 0x6513, 0x1C, 2 }, { 0x6977, 0x1C, 2 }, { 0x6979, 0xFF, 0xFF },

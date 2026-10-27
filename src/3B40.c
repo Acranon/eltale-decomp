@@ -52,7 +52,7 @@ void Player_Spawn(void);
 void func_800032E4(u8 *arg0, u8 *arg1);
 void func_80009764(u16 arg0);
 void Npc_SpawnForArea(s32 arg0, s32 arg1);
-void func_8000D6A0(void);
+void Map_LoadArea(void);
 void Camera_InitForMap(void);
 void func_80027430(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
 void func_80027834(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3, f32 *arg4, f32 *arg5, f32 *arg6);
@@ -112,7 +112,7 @@ void func_80002F40(s32 arg0) {
     func_80032BB0(0, arg0);
     D_80090450 = 0;
     D_80084308 = -1;
-    func_8000D6A0();
+    Map_LoadArea();
     D_8007A98C = entry->unk20;
     D_8007A990 = entry->unk24;
     D_8007A994 = entry->unk28;
