@@ -14,20 +14,20 @@ typedef struct {
 
 extern Gfx* gfx_dl_head;
 extern u16 input_pressed_buttons;
-extern s32 D_8020F1E0_ovl_title;
+extern s32 title_idle_sequence_state;
 extern Gfx D_8020F208_ovl_title[];
 extern Gfx D_8020F470_ovl_title[];
-extern s32 D_8020F4F0_ovl_title;
-extern s32 D_8020F4F4_ovl_title;
+extern s32 title_screen_fade_state;
+extern s32 title_screen_fade_frames;
 /* .bss 80226D90..80226DB0 */
-s32 D_80226D90_ovl_title;
-s32 D_80226D94_ovl_title;
+s32 title_flow_state;
+s32 title_state_timer;
 s32 D_80226D98_ovl_title;
-s32 D_80226D9C_ovl_title; /* black overlay alpha, 0..255 */
-s32 D_80226DA0_ovl_title;
-s32 D_80226DA4_ovl_title;
-extern s8 D_80226DB0_ovl_title;
-extern s32 D_80226DB4_ovl_title;
+s32 title_fade_alpha; /* black overlay alpha, 0..255 */
+s32 title_fade_step;
+s32 title_menu_state;
+extern s8 title_confirmation_row;
+extern s32 title_overlay_fade_alpha;
 extern s32 D_80226DC0_ovl_title;
 
 void Sfx_Enqueue(s32, s32, s32);
@@ -35,23 +35,23 @@ s32 Title_RunPhase(void);
 void Title_DrawScreenAndMoveCursor(s32);
 
 void Title_Init(void) {
-    D_80226D90_ovl_title = 0;
-    D_80226DA4_ovl_title = 0;
-    D_8020F4F4_ovl_title = 1;
-    D_8020F4F0_ovl_title = 0;
-    D_80226D94_ovl_title = 1;
-    D_80226D9C_ovl_title = 0;
-    D_80226DA0_ovl_title = 8;
+    title_flow_state = 0;
+    title_menu_state = 0;
+    title_screen_fade_frames = 1;
+    title_screen_fade_state = 0;
+    title_state_timer = 1;
+    title_fade_alpha = 0;
+    title_fade_step = 8;
     D_80226D98_ovl_title = 0;
 }
 
 s32 Title_Update(void) {
     if (Title_RunPhase() == 0) {
-        if (D_80226DA4_ovl_title == 0) {
+        if (title_menu_state == 0) {
             return 1;
         }
-        if (D_80226DA4_ovl_title == 0xF) {
-            D_80226DA4_ovl_title = 0;
+        if (title_menu_state == 0xF) {
+            title_menu_state = 0;
             return 0;
         }
     }
@@ -68,66 +68,66 @@ void Title_UpdateScreenFade(void);
 
 
 /* .data 8020F1E0..8020F200: D_8020F1E0, then func_8020C178's statics F1E4..F1F0. */
-s32 D_8020F1E0_ovl_title = 0;
+s32 title_idle_sequence_state = 0;
 
 s32 Title_RunPhase(void) {
     static u8 D_8020F1E4_ovl_title = 0;
-    static u32 D_8020F1E8_ovl_title = 0;
+    static u32 title_elapsed_frames = 0;
     static u16 D_8020F1EC_ovl_title = 0;
     static u8 D_8020F1F0_ovl_title = 0;
 
     if (D_8020F1F0_ovl_title == 0) {
-        D_80226D90_ovl_title = 3;
-        D_80226D94_ovl_title = 1;
-        D_80226DA4_ovl_title = 0;
+        title_flow_state = 3;
+        title_state_timer = 1;
+        title_menu_state = 0;
         D_8006CC80 = 0;
         D_8020F1F0_ovl_title++;
     }
 
-    switch (D_80226D90_ovl_title) {
+    switch (title_flow_state) {
         case 3:
-            D_80226D94_ovl_title = D_80226D94_ovl_title - 1;
-            if (D_80226D94_ovl_title == 0) {
-                D_80226D94_ovl_title = 0x1518;
-                D_80226D90_ovl_title++;
-                D_8020F4F4_ovl_title = 0x14;
-                D_8020F4F0_ovl_title = 2;
+            title_state_timer = title_state_timer - 1;
+            if (title_state_timer == 0) {
+                title_state_timer = 0x1518;
+                title_flow_state++;
+                title_screen_fade_frames = 0x14;
+                title_screen_fade_state = 2;
             }
             break;
         case 4:
             Title_UpdateScreen();
-            if (D_8020F4F0_ovl_title == 2) {
+            if (title_screen_fade_state == 2) {
                 Title_UpdateScreenFade();
             }
-            if ((D_80226D94_ovl_title == 0) && (D_80226DA4_ovl_title == 0) && (D_8020F1E0_ovl_title == 0)) {
-                D_8020F1E0_ovl_title = 1;
-                D_8020F4F4_ovl_title = 0x3C;
-                D_8020F4F0_ovl_title = 1;
-                D_80226D94_ovl_title = 0x3C;
+            if ((title_state_timer == 0) && (title_menu_state == 0) && (title_idle_sequence_state == 0)) {
+                title_idle_sequence_state = 1;
+                title_screen_fade_frames = 0x3C;
+                title_screen_fade_state = 1;
+                title_state_timer = 0x3C;
             }
-            if (D_8020F1E0_ovl_title == 1) {
+            if (title_idle_sequence_state == 1) {
                 Title_UpdateScreenFade();
-                if (D_8020F4F0_ovl_title == 0) {
-                    D_80226D9C_ovl_title = 0;
-                    D_80226DA0_ovl_title = 8;
-                    D_80226D94_ovl_title = 0;
-                    D_80226D90_ovl_title = 0;
-                    D_8020F1E0_ovl_title = 0;
-                    D_80226DA4_ovl_title = 0;
+                if (title_screen_fade_state == 0) {
+                    title_fade_alpha = 0;
+                    title_fade_step = 8;
+                    title_state_timer = 0;
+                    title_flow_state = 0;
+                    title_idle_sequence_state = 0;
+                    title_menu_state = 0;
                 }
             }
-            if ((D_80226D94_ovl_title == 0) && (D_80226DA4_ovl_title == 1)) {
-                D_80226DA4_ovl_title = 2;
-                D_80226D94_ovl_title = 2;
-                D_80226D90_ovl_title++;
+            if ((title_state_timer == 0) && (title_menu_state == 1)) {
+                title_menu_state = 2;
+                title_state_timer = 2;
+                title_flow_state++;
             }
             break;
         case 5:
             Title_UpdateScreen();
             if (D_8020F1EC_ovl_title == 0) {
-                D_8020F1E8_ovl_title++;
+                title_elapsed_frames++;
             } else {
-                D_8020F1E8_ovl_title = 0;
+                title_elapsed_frames = 0;
             }
             if (!(input_pressed_buttons & 0xF000) && (input_stick_x >= -0x13) && (input_stick_x < 0x14) && (input_stick_y >= -0x13) &&
                 (input_stick_y < 0x14)) {
@@ -135,41 +135,41 @@ s32 Title_RunPhase(void) {
             } else {
                 D_8020F1EC_ovl_title = 1;
             }
-            if (D_8020F1E8_ovl_title >= 0x1C21U) {
+            if (title_elapsed_frames >= 0x1C21U) {
                 D_8020F1EC_ovl_title = 0;
-                D_80226DA4_ovl_title = 4;
-                D_8020F1E0_ovl_title = 1;
-                D_80226D94_ovl_title = 2;
-                D_8020F1E8_ovl_title = 0;
+                title_menu_state = 4;
+                title_idle_sequence_state = 1;
+                title_state_timer = 2;
+                title_elapsed_frames = 0;
             }
-            if (D_8020F1E0_ovl_title == 0) {
-                D_80226D94_ovl_title = 0x14;
+            if (title_idle_sequence_state == 0) {
+                title_state_timer = 0x14;
             }
-            if ((D_80226D94_ovl_title == 0) && ((D_80226DA4_ovl_title == 3) || (D_80226DA4_ovl_title == 4))) {
-                if (D_80226DA4_ovl_title == 4) {
-                    D_8020F1E0_ovl_title = 2;
-                    D_8020F4F4_ovl_title = 0x3C;
-                    D_8020F4F0_ovl_title = 1;
+            if ((title_state_timer == 0) && ((title_menu_state == 3) || (title_menu_state == 4))) {
+                if (title_menu_state == 4) {
+                    title_idle_sequence_state = 2;
+                    title_screen_fade_frames = 0x3C;
+                    title_screen_fade_state = 1;
                 }
-                D_80226D94_ovl_title = 0x3C;
-                if (D_80226DA4_ovl_title == 3) {
-                    D_80226DA4_ovl_title = 5;
-                    D_80226D90_ovl_title += 1;
-                    D_80226D9C_ovl_title = 0xFF;
-                    D_80226DA0_ovl_title = 0;
-                    D_8020F1E0_ovl_title = 0;
+                title_state_timer = 0x3C;
+                if (title_menu_state == 3) {
+                    title_menu_state = 5;
+                    title_flow_state += 1;
+                    title_fade_alpha = 0xFF;
+                    title_fade_step = 0;
+                    title_idle_sequence_state = 0;
                 }
             }
-            if (D_8020F1E0_ovl_title == 2) {
+            if (title_idle_sequence_state == 2) {
                 Title_UpdateScreenFade();
-                if (D_8020F4F0_ovl_title == 0) {
-                    D_80226D9C_ovl_title = 0;
-                    D_80226DA0_ovl_title = 8;
-                    D_80226D94_ovl_title = 0;
+                if (title_screen_fade_state == 0) {
+                    title_fade_alpha = 0;
+                    title_fade_step = 8;
+                    title_state_timer = 0;
                     D_80226D98_ovl_title = 0;
-                    D_80226D90_ovl_title = 3;
-                    D_80226DA4_ovl_title = 0;
-                    D_8020F1E0_ovl_title = 0;
+                    title_flow_state = 3;
+                    title_menu_state = 0;
+                    title_idle_sequence_state = 0;
                 }
             }
             break;
@@ -178,62 +178,62 @@ s32 Title_RunPhase(void) {
             if (D_8020F1E4_ovl_title < 2) {
                 D_8020F1E4_ovl_title++;
             } else if ((title_menu_choice & 0xF0) == 0x10) {
-                D_80226D90_ovl_title = 8;
-                D_8020F4F4_ovl_title = 0x3C;
-                D_8020F4F0_ovl_title = 1;
+                title_flow_state = 8;
+                title_screen_fade_frames = 0x3C;
+                title_screen_fade_state = 1;
             } else {
-                D_80226D90_ovl_title = 8;
-                D_8020F4F4_ovl_title = 0x3C;
-                D_8020F4F0_ovl_title = 1;
+                title_flow_state = 8;
+                title_screen_fade_frames = 0x3C;
+                title_screen_fade_state = 1;
             }
             break;
         case 7:
             Title_UpdateScreen();
-            if (D_8020F1E0_ovl_title == 0) {
-                D_80226D94_ovl_title = 0x14;
+            if (title_idle_sequence_state == 0) {
+                title_state_timer = 0x14;
             }
-            if (D_80226DA4_ovl_title == 2) {
-                D_80226D90_ovl_title = 5;
+            if (title_menu_state == 2) {
+                title_flow_state = 5;
             }
-            if ((D_80226D94_ovl_title == 0) && ((D_80226DA4_ovl_title == 0xB) || (D_80226DA4_ovl_title == 0xC) || (D_80226DA4_ovl_title == 0xD) ||
-                                      (D_80226DA4_ovl_title == 0xE) || (D_80226DA4_ovl_title == 9) || (D_80226DA4_ovl_title == 0xA))) {
-                if (D_80226DA4_ovl_title == 9) {
-                    D_80226D94_ovl_title = 0xA;
-                    D_80226D90_ovl_title = 5;
-                    D_8020F1E0_ovl_title = 0;
-                    D_80226DA4_ovl_title = 2;
+            if ((title_state_timer == 0) && ((title_menu_state == 0xB) || (title_menu_state == 0xC) || (title_menu_state == 0xD) ||
+                                      (title_menu_state == 0xE) || (title_menu_state == 9) || (title_menu_state == 0xA))) {
+                if (title_menu_state == 9) {
+                    title_state_timer = 0xA;
+                    title_flow_state = 5;
+                    title_idle_sequence_state = 0;
+                    title_menu_state = 2;
                 }
-                if (D_80226DA4_ovl_title == 0xA) {
-                    D_80226D94_ovl_title = 0xA;
-                    D_80226D90_ovl_title = 5;
-                    D_8020F1E0_ovl_title = 0;
-                    D_80226DA4_ovl_title = 2;
+                if (title_menu_state == 0xA) {
+                    title_state_timer = 0xA;
+                    title_flow_state = 5;
+                    title_idle_sequence_state = 0;
+                    title_menu_state = 2;
                 }
-                if (D_80226DA4_ovl_title == 0xC) {
-                    D_80226D94_ovl_title = 5;
-                    D_80226DA4_ovl_title = 9;
-                    D_8020F1E0_ovl_title = 0;
+                if (title_menu_state == 0xC) {
+                    title_state_timer = 5;
+                    title_menu_state = 9;
+                    title_idle_sequence_state = 0;
                 }
-                if (D_80226DA4_ovl_title == 0xB) {
-                    D_80226D94_ovl_title = 0x3C;
-                    D_80226D90_ovl_title += 1;
-                    D_80226DA4_ovl_title = 0xF;
-                    D_80226D9C_ovl_title = 0;
-                    D_80226DA0_ovl_title = 0x100;
-                    D_8020F4F4_ovl_title = 0x3C;
-                    D_8020F4F0_ovl_title = 1;
-                    D_8020F1E0_ovl_title = 0;
+                if (title_menu_state == 0xB) {
+                    title_state_timer = 0x3C;
+                    title_flow_state += 1;
+                    title_menu_state = 0xF;
+                    title_fade_alpha = 0;
+                    title_fade_step = 0x100;
+                    title_screen_fade_frames = 0x3C;
+                    title_screen_fade_state = 1;
+                    title_idle_sequence_state = 0;
                 }
-                if (D_80226DA4_ovl_title == 0xD) {
-                    D_80226D94_ovl_title = 5;
-                    D_80226DA4_ovl_title = 0xA;
-                    D_8020F1E0_ovl_title = 0;
+                if (title_menu_state == 0xD) {
+                    title_state_timer = 5;
+                    title_menu_state = 0xA;
+                    title_idle_sequence_state = 0;
                 }
-                if (D_80226DA4_ovl_title == 0xE) {
-                    D_80226D94_ovl_title = 0xA;
-                    D_80226D90_ovl_title = 5;
-                    D_80226DA4_ovl_title = 2;
-                    D_8020F1E0_ovl_title = 0;
+                if (title_menu_state == 0xE) {
+                    title_state_timer = 0xA;
+                    title_flow_state = 5;
+                    title_menu_state = 2;
+                    title_idle_sequence_state = 0;
                 }
             }
             break;
@@ -242,106 +242,106 @@ s32 Title_RunPhase(void) {
             Title_UpdateScreenFade();
             break;
     }
-    if (D_80226D94_ovl_title == 0) {
+    if (title_state_timer == 0) {
         D_8020F1EC_ovl_title = 0;
-        D_8020F1E8_ovl_title = 0;
+        title_elapsed_frames = 0;
     }
-    return D_80226D94_ovl_title;
+    return title_state_timer;
 }
 
 void Title_UpdateScreen(void) {
     s32 var_v0;
 
     gSPDisplayList(gfx_dl_head++, D_8020F208_ovl_title);
-    gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, D_80226D9C_ovl_title);
+    gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, title_fade_alpha);
 
-    Title_DrawScreenAndMoveCursor((u32)D_80226DA4_ovl_title);
-    D_80226D9C_ovl_title += D_80226DA0_ovl_title;
-    if (D_80226D9C_ovl_title >= 0x100) {
-        D_80226D9C_ovl_title = 0xFF;
-        D_80226DA0_ovl_title = -D_80226DA0_ovl_title;
-    } else if (D_80226D9C_ovl_title < 0) {
-        D_80226D9C_ovl_title = 0;
-        D_80226D9C_ovl_title = 0;
-        D_80226DA0_ovl_title = -D_80226DA0_ovl_title;
+    Title_DrawScreenAndMoveCursor((u32)title_menu_state);
+    title_fade_alpha += title_fade_step;
+    if (title_fade_alpha >= 0x100) {
+        title_fade_alpha = 0xFF;
+        title_fade_step = -title_fade_step;
+    } else if (title_fade_alpha < 0) {
+        title_fade_alpha = 0;
+        title_fade_alpha = 0;
+        title_fade_step = -title_fade_step;
     }
-    D_80226DB4_ovl_title = D_80226D9C_ovl_title;
-    if (D_8020F4F0_ovl_title == 0) {
-        if ((D_80226DA4_ovl_title == 0) && (input_pressed_buttons & 0x1000)) {
+    title_overlay_fade_alpha = title_fade_alpha;
+    if (title_screen_fade_state == 0) {
+        if ((title_menu_state == 0) && (input_pressed_buttons & 0x1000)) {
             Sfx_Enqueue(1, 0xFF, 0x40);
-            D_80226D9C_ovl_title = 0;
-            D_80226DA0_ovl_title = 0x80;
-            D_80226DA4_ovl_title = 1;
-            D_80226D94_ovl_title = 0x3C;
-        } else if (D_80226DA4_ovl_title == 2) {
+            title_fade_alpha = 0;
+            title_fade_step = 0x80;
+            title_menu_state = 1;
+            title_state_timer = 0x3C;
+        } else if (title_menu_state == 2) {
             if (input_pressed_buttons & 0xB000) {
                 Sfx_Enqueue(1, 0xFF, 0x40);
-                D_80226D9C_ovl_title = 0;
-                D_80226DA0_ovl_title = 0x80;
-                D_80226DA4_ovl_title = 3;
-                D_80226D94_ovl_title = 0x3C;
-                D_8020F1E0_ovl_title = 1;
+                title_fade_alpha = 0;
+                title_fade_step = 0x80;
+                title_menu_state = 3;
+                title_state_timer = 0x3C;
+                title_idle_sequence_state = 1;
             } else if (input_pressed_buttons & 0x4000) {
                 Sfx_Enqueue(2, 0xFF, 0x40);
-                D_80226D9C_ovl_title = 0xFF;
-                D_80226DA0_ovl_title = 0x80;
-                D_80226DA4_ovl_title = 4;
-                D_80226D94_ovl_title = 2;
-                D_8020F1E0_ovl_title = 1;
+                title_fade_alpha = 0xFF;
+                title_fade_step = 0x80;
+                title_menu_state = 4;
+                title_state_timer = 2;
+                title_idle_sequence_state = 1;
             }
-        } else if ((D_80226DA4_ovl_title == 8) || (D_80226DA4_ovl_title == 7)) {
+        } else if ((title_menu_state == 8) || (title_menu_state == 7)) {
             if (input_pressed_buttons & 0xB000) {
                 Sfx_Enqueue(1, 0xFF, 0x40);
-                D_80226D9C_ovl_title = 0;
-                D_80226DA0_ovl_title = 0x80;
-                D_8020F1E0_ovl_title = 1;
-                D_80226D94_ovl_title = 0x3C;
-                if (D_80226DB0_ovl_title == 0) {
-                    if (D_80226DA4_ovl_title == 8) {
-                        D_80226DA4_ovl_title = 0xB;
+                title_fade_alpha = 0;
+                title_fade_step = 0x80;
+                title_idle_sequence_state = 1;
+                title_state_timer = 0x3C;
+                if (title_confirmation_row == 0) {
+                    if (title_menu_state == 8) {
+                        title_menu_state = 0xB;
                     } else {
-                        D_80226DA4_ovl_title = 0xD;
+                        title_menu_state = 0xD;
                     }
-                } else if (D_80226DA4_ovl_title == 8) {
-                    D_80226DA4_ovl_title = 0xC;
+                } else if (title_menu_state == 8) {
+                    title_menu_state = 0xC;
                 } else {
-                    D_80226DA4_ovl_title = 0xE;
+                    title_menu_state = 0xE;
                 }
             } else if (input_pressed_buttons & 0x4000) {
                 Sfx_Enqueue(2, 0xFF, 0x40);
-                D_80226D9C_ovl_title = 0xFF;
-                D_80226DA0_ovl_title = 0x80;
-                D_80226DA4_ovl_title = 2;
-                D_80226D94_ovl_title = 2;
-                D_8020F1E0_ovl_title = 1;
+                title_fade_alpha = 0xFF;
+                title_fade_step = 0x80;
+                title_menu_state = 2;
+                title_state_timer = 2;
+                title_idle_sequence_state = 1;
             }
-        } else if (D_80226DA4_ovl_title == 6) {
+        } else if (title_menu_state == 6) {
             if (input_pressed_buttons & 0xF000) {
                 Sfx_Enqueue(2, 0xFF, 0x40);
-                D_80226D9C_ovl_title = 0xFF;
-                D_80226DA0_ovl_title = 0x80;
-                D_80226DA4_ovl_title = 2;
-                D_80226D94_ovl_title = 2;
+                title_fade_alpha = 0xFF;
+                title_fade_step = 0x80;
+                title_menu_state = 2;
+                title_state_timer = 2;
             }
-        } else if (D_80226DA4_ovl_title == 9) {
+        } else if (title_menu_state == 9) {
             if (input_pressed_buttons & 0xB000) {
                 Sfx_Enqueue(1, 0xFF, 0x40);
-                D_8020F1E0_ovl_title = 1;
+                title_idle_sequence_state = 1;
             }
-        } else if ((D_80226DA4_ovl_title == 0xA) && (input_pressed_buttons & 0xB000)) {
+        } else if ((title_menu_state == 0xA) && (input_pressed_buttons & 0xB000)) {
             Sfx_Enqueue(1, 0xFF, 0x40);
-            D_8020F1E0_ovl_title = 1;
+            title_idle_sequence_state = 1;
         }
     }
-    D_80226D94_ovl_title -= 1;
+    title_state_timer -= 1;
 }
 
 void Title_UpdateSelectionExit(void) {
     gSPDisplayList(gfx_dl_head++, D_8020F208_ovl_title);
     gDPSetEnvColor(gfx_dl_head++, 0x00, 0x00, 0x00, 0xFF);
 
-    Title_DrawScreenAndMoveCursor(D_80226DA4_ovl_title);
-    if (--D_80226D94_ovl_title == 0) {
-        D_80226DA4_ovl_title = 0xF;
+    Title_DrawScreenAndMoveCursor(title_menu_state);
+    if (--title_state_timer == 0) {
+        title_menu_state = 0xF;
     }
 }

@@ -131,34 +131,34 @@ typedef struct {
 
 /* ovl_intro .data 80212230..80212250 (80212250.. is DC9350.c's): 230, then
    func_8020C16C's statics 234..240. */
-s32 D_80212230_ovl_intro = 0;
+s32 intro_phase_timer = 0;
 
 /* ovl_intro .bss 802684B0..80277080 (80277080.. is DC9350.c's). */
-s32 D_802684B0_ovl_intro; /* sprite clip left, screen pixels */
-s32 D_802684B4_ovl_intro;
-s32 D_802684B8_ovl_intro;
-s32 D_802684BC_ovl_intro;
-s32 D_802684C0_ovl_intro;
-s32 D_802684C4_ovl_intro;
-s32 D_802684C8_ovl_intro;
-s32 D_802684CC_ovl_intro;
-s32 D_802684D0_ovl_intro;
-s32 D_802684D4_ovl_intro; /* current sprite-script frame */
-s32 D_802684D8_ovl_intro;
-s32 D_802684DC_ovl_intro;
-IntroSprite D_802684E0_ovl_intro[150];
-Gfx D_8026B3C0_ovl_intro[2][0xBB8];
-Gfx *D_80276F40_ovl_intro;
+s32 intro_clip_left; /* sprite clip left, screen pixels */
+s32 intro_clip_top;
+s32 intro_clip_width;
+s32 intro_clip_height;
+s32 intro_elapsed_frames;
+s32 intro_sprite_tick;
+s32 intro_scene_initialized;
+s32 intro_cue_entry_index;
+s32 intro_previous_cue_index;
+s32 intro_cue_frame; /* current sprite-script frame */
+s32 intro_cue_group_index;
+s32 intro_wait_for_sprites;
+IntroSprite intro_sprite_slots[150];
+Gfx intro_display_list_buffers[2][0xBB8];
+Gfx *intro_saved_display_ptr;
 s32 D_80276F44_ovl_intro;
 u8 D_80276F48_ovl_intro[0x12C]; /* not referenced */
-s32 D_80277074_ovl_intro;
-u8 D_80277078_ovl_intro;
+s32 intro_fade_alpha;
+u8 intro_fade_complete;
 
-extern s32 D_80212250_ovl_intro;
-extern s32 D_80212254_ovl_intro;
-extern Unk802170E8 D_802170E8_ovl_intro[];
-extern u32 D_802170F0_ovl_intro;
-extern AnimTbl D_80212810_ovl_intro[];
+extern s32 intro_prompt_fade_alpha;
+extern s32 intro_prompt_phase;
+extern Unk802170E8 intro_cue_groups[];
+extern u32 intro_cue_group_count;
+extern AnimTbl intro_sprite_anim_table[];
 extern Gfx D_802122E0_ovl_intro[];
 extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
@@ -191,7 +191,7 @@ typedef struct {
 } Unk80092E48; /* size = 0x14 */
 
 extern Gfx *gfx_dl_head;
-extern Gfx D_80212270_ovl_intro[];
+extern Gfx intro_sprite_setup_dl[];
 extern s8 input_primary_port;
 extern u16 input_pressed_buttons;
 extern OSMesgQueue input_si_queue;
@@ -219,26 +219,26 @@ s32 Intro_RunPakErrorScreen(void);
 
 void Intro_Init(void) {
     Intro_ClearAllSprites();
-    D_802684B0_ovl_intro = 10;
-    D_802684B4_ovl_intro = 1;
-    D_802684B8_ovl_intro = 300;
-    D_802684BC_ovl_intro = 223;
-    D_802684CC_ovl_intro = 0;
-    D_802684D0_ovl_intro = 0;
-    D_802684C0_ovl_intro = 0;
-    D_802684C4_ovl_intro = 0;
-    D_802684D4_ovl_intro = 0;
-    D_802684D8_ovl_intro = 0;
-    D_802684DC_ovl_intro = 0;
-    D_80212230_ovl_intro = 0;
-    D_80212250_ovl_intro = 0;
-    D_802684C8_ovl_intro = 0;
+    intro_clip_left = 10;
+    intro_clip_top = 1;
+    intro_clip_width = 300;
+    intro_clip_height = 223;
+    intro_cue_entry_index = 0;
+    intro_previous_cue_index = 0;
+    intro_elapsed_frames = 0;
+    intro_sprite_tick = 0;
+    intro_cue_frame = 0;
+    intro_cue_group_index = 0;
+    intro_wait_for_sprites = 0;
+    intro_phase_timer = 0;
+    intro_prompt_fade_alpha = 0;
+    intro_scene_initialized = 0;
 }
 
 s32 Intro_Update(void) {
     s32 ret;
     s32 err;
-    static s32 D_80212234_ovl_intro = 0;
+    static s32 intro_display_buffer_index = 0;
     static u8 D_80212238_ovl_intro = 0;
     static u8 D_8021223C_ovl_intro = 0;
     static s32 D_80212240_ovl_intro = 1;
@@ -301,10 +301,10 @@ s32 Intro_Update(void) {
         switch (D_80212240_ovl_intro) {
             case 0:
                 Intro_RunSplash1();
-                if (D_80212230_ovl_intro == 0) {
-                    D_80212230_ovl_intro = 150;
-                    D_80212250_ovl_intro = 0;
-                    D_80212254_ovl_intro = 0;
+                if (intro_phase_timer == 0) {
+                    intro_phase_timer = 150;
+                    intro_prompt_fade_alpha = 0;
+                    intro_prompt_phase = 0;
                     D_80212240_ovl_intro++;
                 }
                 break;
@@ -312,16 +312,16 @@ s32 Intro_Update(void) {
                 Intro_RunSplash2();
                 if (input_pressed_buttons & 0x1000) {
                     Sfx_Enqueue(1, 0xFF, 0x40);
-                    D_80212230_ovl_intro = 0;
+                    intro_phase_timer = 0;
                     D_8021223C_ovl_intro = 1;
                 }
-                if (D_80212230_ovl_intro == 0) {
-                    D_80212250_ovl_intro = 0;
+                if (intro_phase_timer == 0) {
+                    intro_prompt_fade_alpha = 0;
                     if (D_8021223C_ovl_intro != 0) {
-                        D_80212230_ovl_intro = 10;
+                        intro_phase_timer = 10;
                         ret = 1;
                     } else {
-                        D_80212230_ovl_intro = 150;
+                        intro_phase_timer = 150;
                         D_80212240_ovl_intro++;
                     }
                     D_8021223C_ovl_intro = 0;
@@ -331,37 +331,37 @@ s32 Intro_Update(void) {
                 Intro_RunSplash3();
                 if (input_pressed_buttons & 0x1000) {
                     Sfx_Enqueue(1, 0xFF, 0x40);
-                    D_80212230_ovl_intro = 0;
+                    intro_phase_timer = 0;
                     D_8021223C_ovl_intro = 1;
                 }
-                if (D_80212230_ovl_intro == 0) {
-                    D_80212250_ovl_intro = 0;
+                if (intro_phase_timer == 0) {
+                    intro_prompt_fade_alpha = 0;
                     if (D_8021223C_ovl_intro != 0) {
-                        D_80212230_ovl_intro = 10;
+                        intro_phase_timer = 10;
                         ret = 1;
                     } else {
-                        D_80212230_ovl_intro = 45;
+                        intro_phase_timer = 45;
                         D_80212240_ovl_intro++;
                     }
                     D_8021223C_ovl_intro = 0;
                 }
                 break;
             case 3:
-                if (--D_80212230_ovl_intro == 0) {
+                if (--intro_phase_timer == 0) {
                     D_80212240_ovl_intro++;
                     Bgm_Play(0x1B);
                 }
                 break;
             case 4:
                 D_8006CC74 = 0xFF;
-                D_80212234_ovl_intro = (D_80212234_ovl_intro + 1) & 1;
-                D_80276F40_ovl_intro = gfx_dl_head;
-                gfx_dl_head = D_8026B3C0_ovl_intro[D_80212234_ovl_intro];
-                gSPDisplayList(gfx_dl_head++, D_80212270_ovl_intro);
+                intro_display_buffer_index = (intro_display_buffer_index + 1) & 1;
+                intro_saved_display_ptr = gfx_dl_head;
+                gfx_dl_head = intro_display_list_buffers[intro_display_buffer_index];
+                gSPDisplayList(gfx_dl_head++, intro_sprite_setup_dl);
                 ret = Intro_RunSpriteScript();
                 gSPEndDisplayList(gfx_dl_head);
-                gfx_dl_head = D_80276F40_ovl_intro;
-                gSPDisplayList(gfx_dl_head++, D_8026B3C0_ovl_intro[D_80212234_ovl_intro]);
+                gfx_dl_head = intro_saved_display_ptr;
+                gSPDisplayList(gfx_dl_head++, intro_display_list_buffers[intro_display_buffer_index]);
                 break;
         }
     }
@@ -383,90 +383,90 @@ s32 Intro_RunSpriteScript(void) {
     s32 j;
     s32 flags;
     Gfx *g;
-    if (D_80277074_ovl_intro) {}
+    if (intro_fade_alpha) {}
 
-    if (D_802684C8_ovl_intro == 0) {
+    if (intro_scene_initialized == 0) {
         D_80276F44_ovl_intro = 0;
-        D_802684C0_ovl_intro = 0;
-        D_80277078_ovl_intro = 0;
-        D_80277074_ovl_intro = 0;
-        D_802684C8_ovl_intro = 1;
+        intro_elapsed_frames = 0;
+        intro_fade_complete = 0;
+        intro_fade_alpha = 0;
+        intro_scene_initialized = 1;
     }
-    D_802684C0_ovl_intro++;
+    intro_elapsed_frames++;
     D_80276F44_ovl_intro++;
-    D_802684D4_ovl_intro++;
-    if ((D_802684D4_ovl_intro >= D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0[D_802684CC_ovl_intro].unk2) &&
-        (D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0[D_802684CC_ovl_intro].unk22 == -1) && (D_802684DC_ovl_intro == 0)) {
+    intro_cue_frame++;
+    if ((intro_cue_frame >= intro_cue_groups[intro_cue_group_index].unk0[intro_cue_entry_index].unk2) &&
+        (intro_cue_groups[intro_cue_group_index].unk0[intro_cue_entry_index].unk22 == -1) && (intro_wait_for_sprites == 0)) {
         do {
             slot = Intro_FindFreeSprite();
             if (slot != -1) {
-            entries = D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0;
-            entries[D_802684CC_ovl_intro].unk20 = 0;
-            entries[D_802684CC_ovl_intro].unk22 = slot;
-            steps = D_80212810_ovl_intro[entries[D_802684CC_ovl_intro].unk0].unk0;
-            Intro_SpawnSprite(slot, 0x80000000 | entries[D_802684CC_ovl_intro].unk4 | steps[entries[D_802684CC_ovl_intro].unk20].unk0,
-                                     entries[D_802684CC_ovl_intro].unk8, entries[D_802684CC_ovl_intro].unkA, entries[D_802684CC_ovl_intro].unk10,
-                                     entries[D_802684CC_ovl_intro].unk12, entries[D_802684CC_ovl_intro].unkC, entries[D_802684CC_ovl_intro].unkE,
-                                     entries[D_802684CC_ovl_intro].unk14, entries[D_802684CC_ovl_intro].unk16, entries[D_802684CC_ovl_intro].unk18,
-                                     entries[D_802684CC_ovl_intro].unk1C, steps[entries[D_802684CC_ovl_intro].unk20].unk8, D_802684C4_ovl_intro);
-            D_802684C4_ovl_intro++;
-            if (entries[D_802684CC_ovl_intro].unk2 == 0) {
-                entries[D_802684CC_ovl_intro].unk24 = D_802684D0_ovl_intro;
+            entries = intro_cue_groups[intro_cue_group_index].unk0;
+            entries[intro_cue_entry_index].unk20 = 0;
+            entries[intro_cue_entry_index].unk22 = slot;
+            steps = intro_sprite_anim_table[entries[intro_cue_entry_index].unk0].unk0;
+            Intro_SpawnSprite(slot, 0x80000000 | entries[intro_cue_entry_index].unk4 | steps[entries[intro_cue_entry_index].unk20].unk0,
+                                     entries[intro_cue_entry_index].unk8, entries[intro_cue_entry_index].unkA, entries[intro_cue_entry_index].unk10,
+                                     entries[intro_cue_entry_index].unk12, entries[intro_cue_entry_index].unkC, entries[intro_cue_entry_index].unkE,
+                                     entries[intro_cue_entry_index].unk14, entries[intro_cue_entry_index].unk16, entries[intro_cue_entry_index].unk18,
+                                     entries[intro_cue_entry_index].unk1C, steps[entries[intro_cue_entry_index].unk20].unk8, intro_sprite_tick);
+            intro_sprite_tick++;
+            if (entries[intro_cue_entry_index].unk2 == 0) {
+                entries[intro_cue_entry_index].unk24 = intro_previous_cue_index;
             } else {
-                D_802684D0_ovl_intro = D_802684CC_ovl_intro;
+                intro_previous_cue_index = intro_cue_entry_index;
             }
-            if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0xC800) {
-                if (entries[D_802684CC_ovl_intro].unk2 == 0) {
-                    dx = entries[D_802684CC_ovl_intro].unk8 - entries[D_802684D0_ovl_intro].unk8;
-                    dy = entries[D_802684CC_ovl_intro].unkA - entries[D_802684D0_ovl_intro].unkA;
+            if (steps[entries[intro_cue_entry_index].unk20].unk0 & 0xC800) {
+                if (entries[intro_cue_entry_index].unk2 == 0) {
+                    dx = entries[intro_cue_entry_index].unk8 - entries[intro_previous_cue_index].unk8;
+                    dy = entries[intro_cue_entry_index].unkA - entries[intro_previous_cue_index].unkA;
                 } else {
                     dx = 0;
                     dy = 0;
                 }
-                Intro_SetMoveTarget(slot, steps[entries[D_802684CC_ovl_intro].unk20].unk4 + dx, steps[entries[D_802684CC_ovl_intro].unk20].unk6 + dy);
+                Intro_SetMoveTarget(slot, steps[entries[intro_cue_entry_index].unk20].unk4 + dx, steps[entries[intro_cue_entry_index].unk20].unk6 + dy);
             }
-            if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0x1000) {
+            if (steps[entries[intro_cue_entry_index].unk20].unk0 & 0x1000) {
                 Intro_ResetWait(slot);
             }
-            if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0x60000000) {
+            if (steps[entries[intro_cue_entry_index].unk20].unk0 & 0x60000000) {
                 Intro_SetClipAnchor(slot);
             }
-            D_802684CC_ovl_intro++;
-            if (D_802684CC_ovl_intro >= D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk4) {
-                D_802684CC_ovl_intro = 0;
-                D_802684DC_ovl_intro = 1;
-                D_802684D4_ovl_intro = 0;
+            intro_cue_entry_index++;
+            if (intro_cue_entry_index >= intro_cue_groups[intro_cue_group_index].unk4) {
+                intro_cue_entry_index = 0;
+                intro_wait_for_sprites = 1;
+                intro_cue_frame = 0;
                 break;
             }
-            D_802684D4_ovl_intro = 0;
+            intro_cue_frame = 0;
             } else {
                 break;
             }
-        } while (entries[D_802684CC_ovl_intro].unk2 == 0);
+        } while (entries[intro_cue_entry_index].unk2 == 0);
     }
-    if (D_802684C0_ovl_intro == 0x1E00) {
+    if (intro_elapsed_frames == 0x1E00) {
         Audio_StartSeqFadeOut(0x5A);
     }
     Intro_UpdateAndDrawSprites(1);
     Intro_UpdateAndDrawSprites(0);
-    for (i = 0, obj = D_802684E0_ovl_intro; i < 150; i++, obj++) {
+    for (i = 0, obj = intro_sprite_slots; i < 150; i++, obj++) {
         if (i) {
         }
         if (obj->unk0.w & 0x80000000) {
             j = Intro_FindSpriteScriptEntry(i, &listIdx);
             if (j != -1) {
                 flags = obj->unk0.w;
-                entries = D_802170E8_ovl_intro[listIdx].unk0;
-                steps = D_80212810_ovl_intro[entries[j].unk0].unk0;
+                entries = intro_cue_groups[listIdx].unk0;
+                steps = intro_sprite_anim_table[entries[j].unk0].unk0;
                 if (flags & 0x800000) {
                     flags &= ~0x800000;
                 }
                 if (!(steps[entries[j].unk20].unk0 & flags)) {
-                    if (D_802684D8_ovl_intro) {
+                    if (intro_cue_group_index) {
                     }
                     new_var = entries;
                     entries[j].unk20++;
-                    if (new_var[j].unk20 >= D_80212810_ovl_intro[new_var[j].unk0].unk4) {
+                    if (new_var[j].unk20 >= intro_sprite_anim_table[new_var[j].unk0].unk4) {
                         Intro_ClearSprite(i);
                         entries[j].unk22 = -1;
                     } else {
@@ -495,32 +495,32 @@ s32 Intro_RunSpriteScript(void) {
         }
     }
     if (input_pressed_buttons & 0x1000) {
-        D_80277078_ovl_intro = 1;
+        intro_fade_complete = 1;
     }
-    if (D_80277078_ovl_intro != 0) {
-        D_80277074_ovl_intro += 10;
-        if (D_80277074_ovl_intro >= 0x100) {
-            D_80277074_ovl_intro = 0xFF;
+    if (intro_fade_complete != 0) {
+        intro_fade_alpha += 10;
+        if (intro_fade_alpha >= 0x100) {
+            intro_fade_alpha = 0xFF;
         }
         g = gfx_dl_head++; g->words.w0 = _SHIFTL(G_RDPPIPESYNC, 24, 8); g->words.w1 = 0;
         g = gfx_dl_head++; g->words.w0 = (_SHIFTL(G_DL, 24, 8) | _SHIFTL(G_DL_PUSH, 16, 8)); g->words.w1 = (u32)D_802122E0_ovl_intro;
         g = gfx_dl_head++; g->words.w0 = (_SHIFTL(G_SETOTHERMODE_H,24,8) | _SHIFTL(G_MDSFT_TEXTLUT,8,8) | _SHIFTL(2,0,8)); g->words.w1 = G_TT_RGBA16;
         gDPSetRenderMode(gfx_dl_head++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
-        gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, D_80277074_ovl_intro);
+        gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, intro_fade_alpha);
         gDPLoadTLUT_pal256(gfx_dl_head++, D_80217A80_ovl_intro);
         for (i = 0; i < 40; i++) {
             gDPLoadTextureTile(gfx_dl_head++, D_80217C80_ovl_intro, G_IM_FMT_CI, G_IM_SIZ_8b, 320, 6, 0, 0, 319, 5, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(gfx_dl_head++, 0, (i * 6) << 2, 320 << 2, (i * 6 + 6) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
         }
-        if (D_80277074_ovl_intro >= 0xFF) {
+        if (intro_fade_alpha >= 0xFF) {
             return 1;
         }
     }
-    if ((Intro_CountActiveSprites() == 0) && (D_802684DC_ovl_intro != 0)) {
-        D_802684DC_ovl_intro = 0;
-        D_802684D8_ovl_intro++;
-        if (D_802684D8_ovl_intro >= D_802170F0_ovl_intro) {
-            D_802684D8_ovl_intro = 0;
+    if ((Intro_CountActiveSprites() == 0) && (intro_wait_for_sprites != 0)) {
+        intro_wait_for_sprites = 0;
+        intro_cue_group_index++;
+        if (intro_cue_group_index >= intro_cue_group_count) {
+            intro_cue_group_index = 0;
             return 0;
         }
     }
@@ -534,9 +534,9 @@ s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx) {
     u32 i;
     u32 j;
 
-    for (i = 0; i < D_802170F0_ovl_intro; i++) {
-        for (j = 0; j < D_802170E8_ovl_intro[i].unk4; j++) {
-            if (id == D_802170E8_ovl_intro[i].unk0[j].unk22) {
+    for (i = 0; i < intro_cue_group_count; i++) {
+        for (j = 0; j < intro_cue_groups[i].unk4; j++) {
+            if (id == intro_cue_groups[i].unk0[j].unk22) {
                 *outIdx = i;
                 return j;
             }
@@ -547,7 +547,7 @@ s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx) {
 
 void Intro_SpawnSprite(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
                              s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
 
     p->unk0.w = flags;
     p->unk4 = x;
@@ -581,7 +581,7 @@ void Intro_SpawnSprite(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16
 
 void Intro_ClearAllSprites(void) {
     s32 i;
-    IntroSprite *p = D_802684E0_ovl_intro;
+    IntroSprite *p = intro_sprite_slots;
 
     for (i = 0; i < 150; i++, p++) {
         p->unk0.w = 0;
@@ -616,7 +616,7 @@ void Intro_ClearAllSprites(void) {
 }
 
 void Intro_ClearSprite(s32 idx) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
 
     p->unk0.w = 0;
     p->unk4 = 0;
@@ -650,7 +650,7 @@ void Intro_ClearSprite(s32 idx) {
 
 s32 Intro_CountFreeSprites(s32 n) {
     s32 i;
-    IntroSprite *p = D_802684E0_ovl_intro;
+    IntroSprite *p = intro_sprite_slots;
 
     n = 0;
     for (i = 0; i < 150; i++, p++) {
@@ -663,7 +663,7 @@ s32 Intro_CountFreeSprites(s32 n) {
 
 s32 Intro_CountActiveSprites(s32 n) {
     s32 i;
-    IntroSprite *p = D_802684E0_ovl_intro;
+    IntroSprite *p = intro_sprite_slots;
 
     n = 0;
     for (i = 0; i < 150; i++, p++) {
@@ -676,7 +676,7 @@ s32 Intro_CountActiveSprites(s32 n) {
 
 s16 Intro_FindFreeSprite(void) {
     s32 i;
-    IntroSprite *p = D_802684E0_ovl_intro;
+    IntroSprite *p = intro_sprite_slots;
 
     for (i = 0; i < 150; i++, p++) {
         if (!(p->unk0.w & 0x80000000)) {
@@ -693,7 +693,7 @@ s32 Intro_StepClipGrow(s32 arg0, s32 arg1, IntroRect* arg2) {
     s32 y;
     s32 flag;
 
-    temp_v1 = &D_802684E0_ovl_intro[arg0];
+    temp_v1 = &intro_sprite_slots[arg0];
     if (!(temp_v1->unk0.w & 0x80000000)) {
         return 0xFF;
     }
@@ -733,7 +733,7 @@ s32 Intro_StepClipGrow(s32 arg0, s32 arg1, IntroRect* arg2) {
 }
 
 s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r) {
-    IntroSprite *s = &D_802684E0_ovl_intro[idx];
+    IntroSprite *s = &intro_sprite_slots[idx];
     IntroSprite *p;
     s32 v;
 
@@ -775,14 +775,14 @@ s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r) {
 }
 
 void Intro_SetClipAnchor(s32 idx) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
 
     p->unk2E = p->unk4 + p->unk8;
     p->unk30 = p->unk6 + p->unkA;
 }
 
 s32 Intro_StepAlphaFade(s32 idx, s32 arg1) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
     f32 step;
 
     if (!(p->unk0.w & 0x80000000)) {
@@ -813,7 +813,7 @@ s32 Intro_StepAlphaFade(s32 idx, s32 arg1) {
 }
 
 s32 Intro_StepBrightnessFade(s32 idx, s32 arg1) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
     f32 step;
 
     if (!(p->unk0.w & 0x80000000)) {
@@ -844,7 +844,7 @@ s32 Intro_StepBrightnessFade(s32 idx, s32 arg1) {
 }
 
 s32 Intro_StepMoveXY(s32 idx, s32 flags) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
     f32 step;
     s32 tx;
     s32 ty;
@@ -922,7 +922,7 @@ s32 Intro_StepMoveXY(s32 idx, s32 flags) {
 }
 
 void Intro_SetMoveTarget(s32 idx, s32 arg1, s32 arg2) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
 
     p->unk2A = arg1;
     p->unk2C = arg2;
@@ -931,7 +931,7 @@ void Intro_SetMoveTarget(s32 idx, s32 arg1, s32 arg2) {
 }
 
 s32 Intro_StepMoveX(s32 idx, s32 flags) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
     f32 step;
     s32 t;
     s32 d;
@@ -981,7 +981,7 @@ s32 Intro_StepMoveX(s32 idx, s32 flags) {
 }
 
 s32 Intro_StepMoveY(s32 idx, s32 flags) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
     f32 step;
     s32 t;
     s32 d;
@@ -1031,7 +1031,7 @@ s32 Intro_StepMoveY(s32 idx, s32 flags) {
 }
 
 s32 Intro_StepWait(s32 idx) {
-    IntroSprite *p = &D_802684E0_ovl_intro[idx];
+    IntroSprite *p = &intro_sprite_slots[idx];
 
     p->unk34++;
     if (p->unk34 >= p->unk38) {
@@ -1041,7 +1041,7 @@ s32 Intro_StepWait(s32 idx) {
 }
 
 void Intro_ResetWait(s32 idx) {
-    D_802684E0_ovl_intro[idx].unk34 = 0;
+    intro_sprite_slots[idx].unk34 = 0;
 }
 
 #ifdef NON_MATCHING
@@ -1061,7 +1061,7 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
     SortEnt ents[150];
     SortEnt tmp;
 
-    for (i = 0, p = D_802684E0_ovl_intro; i < 150; i++, p++) {
+    for (i = 0, p = intro_sprite_slots; i < 150; i++, p++) {
         ents[i].idx = i;
         ents[i].key = p->unk3C;
     }
@@ -1079,7 +1079,7 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
     gDPSetTextureFilter(gfx_dl_head++, G_TF_POINT);
     for (k = 0; k < 150; k++) {
         idx = ents[k].idx;
-        p = &D_802684E0_ovl_intro[idx];
+        p = &intro_sprite_slots[idx];
         changed = 0;
         fade = 0;
         if (p->unk0.w & 0x80000000) {
@@ -1156,37 +1156,37 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
             p->unk0.w = flags;
             continue;
         }
-        if (r.unk0 < D_802684B0_ovl_intro && r.unk4 < D_802684B4_ovl_intro && D_802684B0_ovl_intro + D_802684B8_ovl_intro < r.unk0 + r.unk10 &&
-            D_802684B4_ovl_intro + D_802684BC_ovl_intro < r.unk4 + r.unk14) {
+        if (r.unk0 < intro_clip_left && r.unk4 < intro_clip_top && intro_clip_left + intro_clip_width < r.unk0 + r.unk10 &&
+            intro_clip_top + intro_clip_height < r.unk4 + r.unk14) {
             p->unk0.w = flags;
             continue;
         }
-        if (r.unk0 + r.unk10 < D_802684B0_ovl_intro || r.unk4 + r.unk14 < D_802684B4_ovl_intro) {
+        if (r.unk0 + r.unk10 < intro_clip_left || r.unk4 + r.unk14 < intro_clip_top) {
             p->unk0.w = flags;
             continue;
         }
-        if (D_802684B0_ovl_intro + D_802684B8_ovl_intro < r.unk0 || D_802684B4_ovl_intro + D_802684BC_ovl_intro < r.unk4) {
+        if (intro_clip_left + intro_clip_width < r.unk0 || intro_clip_top + intro_clip_height < r.unk4) {
             p->unk0.w = flags;
             continue;
         }
         {
-            if (D_802684B0_ovl_intro + D_802684B8_ovl_intro < r.unk0 + r.unk10) {
-                r.unk10 = D_802684B0_ovl_intro + D_802684B8_ovl_intro - r.unk0;
+            if (intro_clip_left + intro_clip_width < r.unk0 + r.unk10) {
+                r.unk10 = intro_clip_left + intro_clip_width - r.unk0;
             }
-            if (D_802684B4_ovl_intro + D_802684BC_ovl_intro < r.unk4 + r.unk14) {
-                r.unk14 = D_802684B4_ovl_intro + D_802684BC_ovl_intro - r.unk4;
+            if (intro_clip_top + intro_clip_height < r.unk4 + r.unk14) {
+                r.unk14 = intro_clip_top + intro_clip_height - r.unk4;
             }
-            if (r.unk0 < D_802684B0_ovl_intro) {
-                r.unk10 = r.unk10 + r.unk0 - D_802684B0_ovl_intro;
+            if (r.unk0 < intro_clip_left) {
+                r.unk10 = r.unk10 + r.unk0 - intro_clip_left;
                 r.unk8 = p->unkC;
-                r.unk28 = ((D_802684B0_ovl_intro - r.unk0) << 5) + r.unk28;
-                r.unk0 = D_802684B0_ovl_intro;
+                r.unk28 = ((intro_clip_left - r.unk0) << 5) + r.unk28;
+                r.unk0 = intro_clip_left;
             }
-            if (p->unk6 < D_802684B4_ovl_intro) {
-                r.unk14 = r.unk14 + r.unk4 - D_802684B4_ovl_intro;
+            if (p->unk6 < intro_clip_top) {
+                r.unk14 = r.unk14 + r.unk4 - intro_clip_top;
                 r.unkC = p->unkE;
-                r.unk2C = ((D_802684B4_ovl_intro - r.unk4) << 5) + r.unk2C;
-                r.unk4 = D_802684B4_ovl_intro;
+                r.unk2C = ((intro_clip_top - r.unk4) << 5) + r.unk2C;
+                r.unk4 = intro_clip_top;
             }
             if (fade == 0) {
                 r.unk34 = 0xFF;

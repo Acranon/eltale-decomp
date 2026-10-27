@@ -7,7 +7,7 @@
  */
 
 extern Gfx* gfx_dl_head;
-extern Gfx D_8020F6C0_ovl_ending[];
+extern Gfx ending_sprite_setup_dl[];
 
 s32 Ending_RunSpriteScript(void);
 
@@ -104,29 +104,29 @@ typedef struct {
 } UnkStruct_802107F0;
 
 /* ovl_ending .bss 8022BB10..80238660: all of it is this file's (source order). */
-s32 D_8022BB10_ovl_ending; /* sprite clip left, screen pixels */
-s32 D_8022BB14_ovl_ending;
-s32 D_8022BB18_ovl_ending;
-s32 D_8022BB1C_ovl_ending;
-u32 D_8022BB20_ovl_ending;
-s32 D_8022BB24_ovl_ending;
-s32 D_8022BB28_ovl_ending;
-u32 D_8022BB2C_ovl_ending;
-u32 D_8022BB30_ovl_ending;
-s32 D_8022BB34_ovl_ending; /* current sprite-script frame */
-UnkStruct_8022BB38 D_8022BB38_ovl_ending[150];
-Gfx D_8022EA18_ovl_ending[2][2500];
-Gfx* D_80238658_ovl_ending;
+s32 ending_clip_left; /* sprite clip left, screen pixels */
+s32 ending_clip_top;
+s32 ending_clip_width;
+s32 ending_clip_height;
+u32 ending_elapsed_frames;
+s32 ending_sprite_tick;
+s32 ending_scene_initialized;
+u32 ending_cue_entry_index;
+u32 ending_previous_cue_index;
+s32 ending_cue_frame; /* current sprite-script frame */
+UnkStruct_8022BB38 ending_sprite_slots[150];
+Gfx ending_display_list_buffers[2][2500];
+Gfx* ending_saved_display_ptr;
 /* 8023865C..80238660: func_8020C254's static */
 
 /* ovl_ending .data 8020F690..8020F6C0 (8020F6C0.. is E25C80.c's). */
-u32 D_8020F690_ovl_ending = 0;
-s32 D_8020F694_ovl_ending = 0;
-s32 D_8020F698_ovl_ending = 0;
+u32 ending_cue_group_index = 0;
+s32 ending_wait_for_sprites = 0;
+s32 ending_display_buffer_index = 0;
 
-extern UnkStruct_802107F0 D_802107F0_ovl_ending[];
-extern u32 D_802107F8_ovl_ending;
-extern UnkAnim_8020F880 D_8020F880_ovl_ending[];
+extern UnkStruct_802107F0 ending_cue_groups[];
+extern u32 ending_cue_group_count;
+extern UnkAnim_8020F880 ending_sprite_anim_table[];
 extern Gfx D_8020F718_ovl_ending[];
 extern Gfx D_8020F748_ovl_ending[];
 
@@ -154,7 +154,7 @@ typedef struct {
 } UnkPic_80210800;
 
 extern Gfx D_8020F730_ovl_ending[];
-extern UnkPic_80210800 D_80210800_ovl_ending[];
+extern UnkPic_80210800 ending_picture_defs[];
 extern f32 D_8022BAF0_ovl_ending;
 extern f64 D_8022BAF8_ovl_ending;
 void Audio_StartSeqFadeOut(s32);
@@ -164,37 +164,37 @@ void Ending_ClearAllSprites(void);
 
 void Ending_Init(void) {
     Ending_ClearAllSprites();
-    D_8022BB10_ovl_ending = 0xA;
-    D_8022BB14_ovl_ending = 1;
-    D_8022BB18_ovl_ending = 0x12C;
-    D_8022BB1C_ovl_ending = 0xDF;
-    D_8022BB2C_ovl_ending = 0;
-    D_8022BB30_ovl_ending = 0;
-    D_8022BB20_ovl_ending = 0;
-    D_8022BB24_ovl_ending = 0;
-    D_8022BB34_ovl_ending = 0;
-    D_8020F690_ovl_ending = 0;
-    D_8020F694_ovl_ending = 0;
-    D_8022BB28_ovl_ending = 0;
+    ending_clip_left = 0xA;
+    ending_clip_top = 1;
+    ending_clip_width = 0x12C;
+    ending_clip_height = 0xDF;
+    ending_cue_entry_index = 0;
+    ending_previous_cue_index = 0;
+    ending_elapsed_frames = 0;
+    ending_sprite_tick = 0;
+    ending_cue_frame = 0;
+    ending_cue_group_index = 0;
+    ending_wait_for_sprites = 0;
+    ending_scene_initialized = 0;
 }
 
 s32 Ending_Update(void) {
     s32 idx;
     s32 ret;
 
-    idx = (D_8020F698_ovl_ending + 1) & 1;
-    D_80238658_ovl_ending = gfx_dl_head;
-    gfx_dl_head = D_8022EA18_ovl_ending[idx];
-    gSPDisplayList(gfx_dl_head++, D_8020F6C0_ovl_ending);
+    idx = (ending_display_buffer_index + 1) & 1;
+    ending_saved_display_ptr = gfx_dl_head;
+    gfx_dl_head = ending_display_list_buffers[idx];
+    gSPDisplayList(gfx_dl_head++, ending_sprite_setup_dl);
     // D_8020F698 is a function static in the original: IDO does not keep its address
     // in a register. Until D2 moves the data into C, write it through the neighbouring
     // symbol so this extern's address is not CSE'd either.
-    (&D_8020F694_ovl_ending)[1] = idx;
+    (&ending_wait_for_sprites)[1] = idx;
     ret = Ending_RunSpriteScript();
-    idx = D_8020F698_ovl_ending;
+    idx = ending_display_buffer_index;
     gSPEndDisplayList(gfx_dl_head++);
-    gfx_dl_head = D_80238658_ovl_ending;
-    gSPDisplayList(gfx_dl_head++, D_8022EA18_ovl_ending[idx]);
+    gfx_dl_head = ending_saved_display_ptr;
+    gSPDisplayList(gfx_dl_head++, ending_display_list_buffers[idx]);
     return ret;
 }
 
@@ -222,86 +222,86 @@ s32 Ending_RunSpriteScript(void) {
     s32 flags;
     static s32 D_8023865C_ovl_ending;
 
-    if (D_8022BB28_ovl_ending == 0) {
+    if (ending_scene_initialized == 0) {
         D_8023865C_ovl_ending = 0;
-        D_8022BB20_ovl_ending = 0;
-        D_8022BB28_ovl_ending = 1;
+        ending_elapsed_frames = 0;
+        ending_scene_initialized = 1;
     }
-    D_8022BB20_ovl_ending++;
+    ending_elapsed_frames++;
     D_8023865C_ovl_ending++;
-    D_8022BB34_ovl_ending++;
-    if ((D_8022BB34_ovl_ending >= D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0[D_8022BB2C_ovl_ending].unk2) &&
-        (D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0[D_8022BB2C_ovl_ending].unk22 == -1) && (D_8020F694_ovl_ending == 0)) {
+    ending_cue_frame++;
+    if ((ending_cue_frame >= ending_cue_groups[ending_cue_group_index].unk0[ending_cue_entry_index].unk2) &&
+        (ending_cue_groups[ending_cue_group_index].unk0[ending_cue_entry_index].unk22 == -1) && (ending_wait_for_sprites == 0)) {
         do {
             slot = Ending_FindFreeSprite();
             if (slot == -1) {
                 break;
             }
-            entries = D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0;
-            entries[D_8022BB2C_ovl_ending].unk20 = 0;
-            entries[D_8022BB2C_ovl_ending].unk22 = slot;
-            steps = D_8020F880_ovl_ending[entries[D_8022BB2C_ovl_ending].unk0].steps;
-            Ending_SpawnSprite(slot, 0x80000000 | entries[D_8022BB2C_ovl_ending].unk4 | steps[entries[D_8022BB2C_ovl_ending].unk20].flags,
-                                     entries[D_8022BB2C_ovl_ending].unk8, entries[D_8022BB2C_ovl_ending].unkA, entries[D_8022BB2C_ovl_ending].unk10,
-                                     entries[D_8022BB2C_ovl_ending].unk12, entries[D_8022BB2C_ovl_ending].unkC, entries[D_8022BB2C_ovl_ending].unkE,
-                                     entries[D_8022BB2C_ovl_ending].unk14, entries[D_8022BB2C_ovl_ending].unk16, entries[D_8022BB2C_ovl_ending].unk18,
-                                     entries[D_8022BB2C_ovl_ending].unk1C, steps[entries[D_8022BB2C_ovl_ending].unk20].duration, D_8022BB24_ovl_ending);
-            D_8022BB24_ovl_ending++;
-            if (entries[D_8022BB2C_ovl_ending].unk2 == 0) {
-                entries[D_8022BB2C_ovl_ending].unk24 = D_8022BB30_ovl_ending;
+            entries = ending_cue_groups[ending_cue_group_index].unk0;
+            entries[ending_cue_entry_index].unk20 = 0;
+            entries[ending_cue_entry_index].unk22 = slot;
+            steps = ending_sprite_anim_table[entries[ending_cue_entry_index].unk0].steps;
+            Ending_SpawnSprite(slot, 0x80000000 | entries[ending_cue_entry_index].unk4 | steps[entries[ending_cue_entry_index].unk20].flags,
+                                     entries[ending_cue_entry_index].unk8, entries[ending_cue_entry_index].unkA, entries[ending_cue_entry_index].unk10,
+                                     entries[ending_cue_entry_index].unk12, entries[ending_cue_entry_index].unkC, entries[ending_cue_entry_index].unkE,
+                                     entries[ending_cue_entry_index].unk14, entries[ending_cue_entry_index].unk16, entries[ending_cue_entry_index].unk18,
+                                     entries[ending_cue_entry_index].unk1C, steps[entries[ending_cue_entry_index].unk20].duration, ending_sprite_tick);
+            ending_sprite_tick++;
+            if (entries[ending_cue_entry_index].unk2 == 0) {
+                entries[ending_cue_entry_index].unk24 = ending_previous_cue_index;
             } else {
-                D_8022BB30_ovl_ending = D_8022BB2C_ovl_ending;
+                ending_previous_cue_index = ending_cue_entry_index;
             }
-            if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0xC800) {
-                if (entries[D_8022BB2C_ovl_ending].unk2 == 0) {
-                    dx = entries[D_8022BB2C_ovl_ending].unk8 - entries[D_8022BB30_ovl_ending].unk8;
-                    dy = entries[D_8022BB2C_ovl_ending].unkA - entries[D_8022BB30_ovl_ending].unkA;
+            if (steps[entries[ending_cue_entry_index].unk20].flags & 0xC800) {
+                if (entries[ending_cue_entry_index].unk2 == 0) {
+                    dx = entries[ending_cue_entry_index].unk8 - entries[ending_previous_cue_index].unk8;
+                    dy = entries[ending_cue_entry_index].unkA - entries[ending_previous_cue_index].unkA;
                 } else {
                     dx = 0;
                     dy = 0;
                 }
-                Ending_SetMoveTarget(slot, steps[entries[D_8022BB2C_ovl_ending].unk20].x + dx, steps[entries[D_8022BB2C_ovl_ending].unk20].y + dy);
+                Ending_SetMoveTarget(slot, steps[entries[ending_cue_entry_index].unk20].x + dx, steps[entries[ending_cue_entry_index].unk20].y + dy);
             }
-            if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0x1000) {
+            if (steps[entries[ending_cue_entry_index].unk20].flags & 0x1000) {
                 Ending_ResetWait(slot);
             }
-            if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0x60000000) {
+            if (steps[entries[ending_cue_entry_index].unk20].flags & 0x60000000) {
                 Ending_SetClipAnchor(slot);
             }
-            D_8022BB2C_ovl_ending++;
-            if (D_8022BB2C_ovl_ending >= D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk4) {
-                D_8022BB2C_ovl_ending = 0;
-                D_8020F694_ovl_ending = 1;
-                D_8022BB34_ovl_ending = 0;
+            ending_cue_entry_index++;
+            if (ending_cue_entry_index >= ending_cue_groups[ending_cue_group_index].unk4) {
+                ending_cue_entry_index = 0;
+                ending_wait_for_sprites = 1;
+                ending_cue_frame = 0;
                 break;
             }
-            D_8022BB34_ovl_ending = 0;
-        } while (entries[D_8022BB2C_ovl_ending].unk2 == 0);
+            ending_cue_frame = 0;
+        } while (entries[ending_cue_entry_index].unk2 == 0);
     }
     Ending_UpdateAndDrawSprites(1);
-    if (D_8022BB20_ovl_ending >= 0xF78) {
+    if (ending_elapsed_frames >= 0xF78) {
         Ending_UpdateAndDrawScrollingBackdrop(1, 0x4C2);
     }
     Ending_UpdateAndDrawSprites(0);
-    for (i = 0, obj = D_8022BB38_ovl_ending; i < 150; i++, obj++) {
+    for (i = 0, obj = ending_sprite_slots; i < 150; i++, obj++) {
         if (i) {
         }
         if (obj->unk0 & 0x80000000) {
             j = Ending_FindSpriteScriptEntry(i, &listIdx);
             if (j != -1) {
                 flags = obj->unk0;
-                entries = D_802107F0_ovl_ending[listIdx].unk0;
-                steps = D_8020F880_ovl_ending[entries[j].unk0].steps;
+                entries = ending_cue_groups[listIdx].unk0;
+                steps = ending_sprite_anim_table[entries[j].unk0].steps;
                 if (flags & 0x800000) {
                     flags &= ~0x800000;
                 }
                 if (!(steps[entries[j].unk20].flags & flags)) {
                     // Fake: an empty use of D_8020F690 here stops IDO keeping its address in a
                     // register for the increment at the end of the function (found by the permuter).
-                    if (D_8020F690_ovl_ending) {
+                    if (ending_cue_group_index) {
                     }
                     entries[j].unk20++;
-                    if (entries[j].unk20 >= D_8020F880_ovl_ending[entries[j].unk0].count) {
+                    if (entries[j].unk20 >= ending_sprite_anim_table[entries[j].unk0].count) {
                         Ending_ClearSprite(i);
                         entries[j].unk22 = -1;
                     } else {
@@ -329,11 +329,11 @@ s32 Ending_RunSpriteScript(void) {
             }
         }
     }
-    if ((Ending_CountActiveSprites() == 0) && (D_8020F694_ovl_ending != 0)) {
-        D_8020F694_ovl_ending = 0;
-        D_8020F690_ovl_ending++;
-        if (D_8020F690_ovl_ending >= D_802107F8_ovl_ending) {
-            D_8020F690_ovl_ending = 0;
+    if ((Ending_CountActiveSprites() == 0) && (ending_wait_for_sprites != 0)) {
+        ending_wait_for_sprites = 0;
+        ending_cue_group_index++;
+        if (ending_cue_group_index >= ending_cue_group_count) {
+            ending_cue_group_index = 0;
             return 0;
         }
     }
@@ -343,9 +343,9 @@ s32 Ending_RunSpriteScript(void) {
 s32 Ending_FindSpriteScriptEntry(s32 arg0, u32* arg1) {
     u32 i, j;
 
-    for (i = 0; i < D_802107F8_ovl_ending; i++) {
-        for (j = 0; j < D_802107F0_ovl_ending[i].unk4; j++) {
-            if (arg0 == D_802107F0_ovl_ending[i].unk0[j].unk22) {
+    for (i = 0; i < ending_cue_group_count; i++) {
+        for (j = 0; j < ending_cue_groups[i].unk4; j++) {
+            if (arg0 == ending_cue_groups[i].unk0[j].unk22) {
                 *arg1 = i;
                 return j;
             }
@@ -358,7 +358,7 @@ s32 Ending_FindSpriteScriptEntry(s32 arg0, u32* arg1) {
 void Ending_SpawnSprite(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38_ovl_ending[arg0];
+    temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk0 = arg1;
     temp_v0->unk4 = arg2;
     temp_v0->unk6 = arg3;
@@ -391,7 +391,7 @@ void Ending_SpawnSprite(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 ar
 
 void Ending_ClearAllSprites(void) {
     s32 i;
-    UnkStruct_8022BB38* temp_v0 = D_8022BB38_ovl_ending;
+    UnkStruct_8022BB38* temp_v0 = ending_sprite_slots;
 
     for (i = 0; i < 150; i++, temp_v0++) {
         temp_v0->unk0 = 0;
@@ -428,7 +428,7 @@ void Ending_ClearAllSprites(void) {
 void Ending_ClearSprite(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38_ovl_ending[arg0];
+    temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk0 = 0;
     temp_v0->unk4 = 0;
     temp_v0->unk6 = 0;
@@ -461,7 +461,7 @@ void Ending_ClearSprite(s32 arg0) {
 
 s32 Ending_CountFreeSprites(void) {
     s32 count;
-    UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
+    UnkStruct_8022BB38* ptr = ending_sprite_slots;
     s32 i = 0;
 
     count = 0;
@@ -477,7 +477,7 @@ s32 Ending_CountFreeSprites(void) {
 
 s32 Ending_CountActiveSprites(void) {
     s32 count;
-    UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
+    UnkStruct_8022BB38* ptr = ending_sprite_slots;
     s32 i = 0;
 
     count = 0;
@@ -492,7 +492,7 @@ s32 Ending_CountActiveSprites(void) {
 }
 
 s16 Ending_FindFreeSprite(void) {
-    UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
+    UnkStruct_8022BB38* ptr = ending_sprite_slots;
     s32 i = 0;
 
     while (i < 150) {
@@ -512,7 +512,7 @@ s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     s32 y;
     s32 flag;
 
-    temp_v1 = &D_8022BB38_ovl_ending[arg0];
+    temp_v1 = &ending_sprite_slots[arg0];
     // Fake (permuter): a dead read of x here gives v the register retail uses.
     v = x;
     if (!(temp_v1->unk0 & 0x80000000)) {
@@ -561,7 +561,7 @@ s32 Ending_StepClipShrink(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     s16 y;
     s32 flag;
 
-    temp_v1 = &D_8022BB38_ovl_ending[arg0];
+    temp_v1 = &ending_sprite_slots[arg0];
     if (!(temp_v1->unk0 & 0x80000000)) {
         return 0xFF;
     }
@@ -602,7 +602,7 @@ s32 Ending_StepClipShrink(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
 void Ending_SetClipAnchor(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38_ovl_ending[arg0];
+    temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk2E = temp_v0->unk4 + temp_v0->unk8;
     temp_v0->unk30 = temp_v0->unk6 + temp_v0->unkA;
 }
@@ -611,7 +611,7 @@ s32 Ending_StepAlphaFade(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v0;
     f32 step;
 
-    temp_v0 = &D_8022BB38_ovl_ending[arg0];
+    temp_v0 = &ending_sprite_slots[arg0];
     if (!(temp_v0->unk0 & 0x80000000)) {
         return 0;
     }
@@ -643,7 +643,7 @@ s32 Ending_StepBrightnessFade(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v0;
     f32 step;
 
-    temp_v0 = &D_8022BB38_ovl_ending[arg0];
+    temp_v0 = &ending_sprite_slots[arg0];
     if (!(temp_v0->unk0 & 0x80000000)) {
         return 0;
     }
@@ -680,7 +680,7 @@ s32 Ending_StepMoveXY(s32 arg0, s32 arg1) {
     s32 deltaX;
     s32 deltaY;
 
-    temp_v1 = &D_8022BB38_ovl_ending[arg0];
+    temp_v1 = &ending_sprite_slots[arg0];
     if (!(arg1 & 0x80000000)) {
         return 0;
     }
@@ -753,7 +753,7 @@ s32 Ending_StepMoveXY(s32 arg0, s32 arg1) {
 void Ending_SetMoveTarget(s32 arg0, s32 arg1, s32 arg2) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38_ovl_ending[arg0];
+    temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk2A = (s16) arg1;
     temp_v0->unk2C = (s16) arg2;
     temp_v0->unk26 = temp_v0->unk4;
@@ -770,7 +770,7 @@ s32 Ending_StepMoveX(s32 arg0, s32 arg1) {
     if (!(arg1 & 0x80000000)) {
         return 0xFF;
     }
-    temp_v1 = &D_8022BB38_ovl_ending[arg0];
+    temp_v1 = &ending_sprite_slots[arg0];
     temp_v1->unk24++;
     step = ((f32) temp_v1->unk2A - (f32) temp_v1->unk26) / (f32) temp_v1->unk38;
     if (step < 0) {
@@ -822,7 +822,7 @@ s32 Ending_StepMoveY(s32 arg0, s32 arg1) {
     if (!(arg1 & 0x80000000)) {
         return 0xFF;
     }
-    temp_v1 = &D_8022BB38_ovl_ending[arg0];
+    temp_v1 = &ending_sprite_slots[arg0];
     temp_v1->unk24++;
     step = ((f32) temp_v1->unk2C - (f32) temp_v1->unk28) / (f32) temp_v1->unk38;
     if (step < 0) {
@@ -867,7 +867,7 @@ s32 Ending_StepMoveY(s32 arg0, s32 arg1) {
 s32 Ending_StepWait(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
-    temp_v0 = &D_8022BB38_ovl_ending[arg0];
+    temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk34 += 1;
     if (temp_v0->unk34 >= temp_v0->unk38) {
         return 0xFF;
@@ -876,7 +876,7 @@ s32 Ending_StepWait(s32 arg0) {
 }
 
 void Ending_ResetWait(s32 arg0) {
-    D_8022BB38_ovl_ending[arg0].unk34 = 0;
+    ending_sprite_slots[arg0].unk34 = 0;
 }
 
 s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
@@ -902,7 +902,7 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
 
     for (i = 0; i < 150; i++) {
         list[i].idx = i;
-        list[i].key = D_8022BB38_ovl_ending[i].unk3C;
+        list[i].key = ending_sprite_slots[i].unk3C;
     }
     for (i = 0; i < 149; i++) {
         for (j = 0; j < 149 - i; j++) {
@@ -918,7 +918,7 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     for (entry = list; entry != &list[150]; entry++) {
         idx = entry->idx;
-        obj = &D_8022BB38_ovl_ending[idx];
+        obj = &ending_sprite_slots[idx];
         fadeDone = 0;
         fade = 0;
         if (!(obj->unk0 & 0x80000000)) {
@@ -999,37 +999,37 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
             obj->unk0 = flags;
             continue;
         }
-        if ((rect.unk0 < D_8022BB10_ovl_ending) && (rect.unk4 < D_8022BB14_ovl_ending) && (D_8022BB10_ovl_ending + D_8022BB18_ovl_ending < rect.unk0 + rect.unk10) &&
-            (D_8022BB14_ovl_ending + D_8022BB1C_ovl_ending < rect.unk4 + rect.unk14)) {
+        if ((rect.unk0 < ending_clip_left) && (rect.unk4 < ending_clip_top) && (ending_clip_left + ending_clip_width < rect.unk0 + rect.unk10) &&
+            (ending_clip_top + ending_clip_height < rect.unk4 + rect.unk14)) {
             obj->unk0 = flags;
             continue;
         }
-        if ((rect.unk0 + rect.unk10 < D_8022BB10_ovl_ending) || (rect.unk4 + rect.unk14 < D_8022BB14_ovl_ending)) {
+        if ((rect.unk0 + rect.unk10 < ending_clip_left) || (rect.unk4 + rect.unk14 < ending_clip_top)) {
             obj->unk0 = flags;
             continue;
         }
-        if ((D_8022BB10_ovl_ending + D_8022BB18_ovl_ending < rect.unk0) || (D_8022BB14_ovl_ending + D_8022BB1C_ovl_ending < rect.unk4)) {
+        if ((ending_clip_left + ending_clip_width < rect.unk0) || (ending_clip_top + ending_clip_height < rect.unk4)) {
             obj->unk0 = flags;
             continue;
         }
         {
-            if (D_8022BB10_ovl_ending + D_8022BB18_ovl_ending < rect.unk0 + rect.unk10) {
-                rect.unk10 = D_8022BB10_ovl_ending + D_8022BB18_ovl_ending - rect.unk0;
+            if (ending_clip_left + ending_clip_width < rect.unk0 + rect.unk10) {
+                rect.unk10 = ending_clip_left + ending_clip_width - rect.unk0;
             }
-            if (D_8022BB14_ovl_ending + D_8022BB1C_ovl_ending < rect.unk4 + rect.unk14) {
-                rect.unk14 = D_8022BB14_ovl_ending + D_8022BB1C_ovl_ending - rect.unk4;
+            if (ending_clip_top + ending_clip_height < rect.unk4 + rect.unk14) {
+                rect.unk14 = ending_clip_top + ending_clip_height - rect.unk4;
             }
-            if (rect.unk0 < D_8022BB10_ovl_ending) {
-                rect.unk10 = rect.unk10 + rect.unk0 - D_8022BB10_ovl_ending;
+            if (rect.unk0 < ending_clip_left) {
+                rect.unk10 = rect.unk10 + rect.unk0 - ending_clip_left;
                 rect.s = obj->unkC;
-                rect.sfrac = ((D_8022BB10_ovl_ending - rect.unk0) << 5) + rect.sfrac;
-                rect.unk0 = D_8022BB10_ovl_ending;
+                rect.sfrac = ((ending_clip_left - rect.unk0) << 5) + rect.sfrac;
+                rect.unk0 = ending_clip_left;
             }
-            if (obj->unk6 < D_8022BB14_ovl_ending) {
-                rect.unk14 = rect.unk14 + rect.unk4 - D_8022BB14_ovl_ending;
+            if (obj->unk6 < ending_clip_top) {
+                rect.unk14 = rect.unk14 + rect.unk4 - ending_clip_top;
                 rect.t = obj->unkE;
-                rect.tfrac = ((D_8022BB14_ovl_ending - rect.unk4) << 5) + rect.tfrac;
-                rect.unk4 = D_8022BB14_ovl_ending;
+                rect.tfrac = ((ending_clip_top - rect.unk4) << 5) + rect.tfrac;
+                rect.unk4 = ending_clip_top;
             }
             if (fade == 0) {
                 rect.prim = 0xFF;
@@ -1093,10 +1093,10 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
 #endif
 
 /* func_8020E9C8's function statics; globals here while it is asm. */
-f32 D_8020F69C_ovl_ending = 32767.0f;
-s32 D_8020F6A0_ovl_ending = 0;
-f32 D_8020F6A4_ovl_ending = 0.0f;
-f32 D_8020F6A8_ovl_ending = 0.0f;
+f32 ending_scroll_offset = 32767.0f;
+s32 ending_story_frame = 0;
+f32 ending_first_fade_alpha = 0.0f;
+f32 ending_second_fade_alpha = 0.0f;
 u8 D_8020F6AC_ovl_ending = 1;
 u8 D_8020F6B0_ovl_ending = 0;
 u8 D_8020F6B4_ovl_ending = 0;
@@ -1115,7 +1115,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     s32 frame;
 
     if (arg0 == 0) {
-        D_8020F69C_ovl_ending = D_8022BAF0_ovl_ending;
+        ending_scroll_offset = D_8022BAF0_ovl_ending;
         D_8020F6B4_ovl_ending = 0;
         return 0;
     }
@@ -1126,10 +1126,10 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     gDPSetRenderMode(gfx_dl_head++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
     gSPDisplayList(gfx_dl_head++, D_8020F730_ovl_ending);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
-    if (D_8020F6A0_ovl_ending == 0x26AC) {
+    if (ending_story_frame == 0x26AC) {
         D_8020F6AC_ovl_ending = 2;
         D_8020F6B0_ovl_ending = 1;
-    } else if (D_8020F6A0_ovl_ending == D_8022BAF8_ovl_ending) {
+    } else if (ending_story_frame == D_8022BAF8_ovl_ending) {
         D_8020F6B0_ovl_ending = 2;
         Audio_StartSeqFadeOut(0x1E0);
     }
@@ -1148,7 +1148,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
             delta = 0.0f;
             break;
     }
-    alpha = D_8020F6A4_ovl_ending + delta;
+    alpha = ending_first_fade_alpha + delta;
     if (alpha > 255.0f) {
         alpha = 255.0f;
         D_8020F6AC_ovl_ending = 0;
@@ -1156,16 +1156,16 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
         alpha = 0.0f;
         D_8020F6AC_ovl_ending = 0;
     }
-    D_8020F6A4_ovl_ending = alpha;
-    if (D_8020F6A0_ovl_ending < 0x2814) {
+    ending_first_fade_alpha = alpha;
+    if (ending_story_frame < 0x2814) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
-        pic = &D_80210800_ovl_ending[arg0];
+        pic = &ending_picture_defs[arg0];
         width = pic->width;
         img = pic->img;
         gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);
-        D_8020F6A4_ovl_ending = alpha;
-        x = (s32) D_8020F69C_ovl_ending % width;
+        ending_first_fade_alpha = alpha;
+        x = (s32) ending_scroll_offset % width;
         for (y = 0; y < 222; y += 6) {
             gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
                                0, 0);
@@ -1178,7 +1178,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
         }
     }
 
-    scroll = D_8020F69C_ovl_ending;
+    scroll = ending_scroll_offset;
     switch (D_8020F6B0_ovl_ending) {
         case 0:
             delta = 0.0f;
@@ -1193,7 +1193,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
             delta = 0.0f;
             break;
     }
-    alpha = D_8020F6A8_ovl_ending + delta;
+    alpha = ending_second_fade_alpha + delta;
     if (alpha > 255.0f) {
         alpha = 255.0f;
         D_8020F6B0_ovl_ending = 0;
@@ -1204,15 +1204,15 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
             D_8020F6B4_ovl_ending = 2;
         }
     }
-    D_8020F6A8_ovl_ending = alpha;
-    if (D_8020F6A0_ovl_ending >= 0x26AC) {
+    ending_second_fade_alpha = alpha;
+    if (ending_story_frame >= 0x26AC) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
-        pic = &D_80210800_ovl_ending[arg0 + 1];
+        pic = &ending_picture_defs[arg0 + 1];
         width = pic->width;
         img = pic->img;
         gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);
-        D_8020F6A8_ovl_ending = alpha;
+        ending_second_fade_alpha = alpha;
         x = (s32) scroll % width;
         for (y = 0; y < 222; y += 6) {
             gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
@@ -1225,13 +1225,13 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
                                 0x400, 0x400);
         }
     }
-    frame = D_8020F6A0_ovl_ending + 1;
-    D_8020F6A0_ovl_ending = frame;
+    frame = ending_story_frame + 1;
+    ending_story_frame = frame;
     if ((frame >= 240.0) && (frame < 0x26E8)) {
-        D_8020F69C_ovl_ending = scroll - (f32) width / (f32) arg1;
+        ending_scroll_offset = scroll - (f32) width / (f32) arg1;
         return 0;
     }
-    if (D_8020F6A0_ovl_ending == 0x26E8) {
+    if (ending_story_frame == 0x26E8) {
         D_8020F6B4_ovl_ending = 1;
     }
     return 0;

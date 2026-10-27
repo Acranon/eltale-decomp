@@ -51,7 +51,7 @@ extern u16 D_80210810_ovl_ending[];
 extern u8 D_80221618_ovl_ending[];
 extern u16 D_8022BAD0_ovl_ending[];
 extern u16 D_80221410_ovl_ending[];
-Gfx D_8020F6C0_ovl_ending[11] = {
+Gfx ending_sprite_setup_dl[11] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},
     {{ 0xB6000000, 0xFFFFFFFF }},
@@ -119,7 +119,7 @@ UnkStep_8020F880 D_8020F868_ovl_ending[2] = {
     { 0x00000010, 0, 0, 180 },
     { 0x00000020, 0, 0, 180 },
 };
-UnkAnim_8020F880 D_8020F880_ovl_ending[8] = {
+UnkAnim_8020F880 ending_sprite_anim_table[8] = {
     { (UnkStep_8020F880*) D_8020F760_ovl_ending, 0x3 },
     { (UnkStep_8020F880*) D_8020F784_ovl_ending, 0x3 },
     { (UnkStep_8020F880*) D_8020F7A8_ovl_ending, 0x4 },
@@ -231,14 +231,14 @@ UnkStruct_802107F0_inner D_8020F8C0_ovl_ending[97] = {
 Gfx D_802107E8_ovl_ending[1] = {
     {{ 0xB8000000, 0x00000000 }},
 };
-/* D_802107F4_ovl_ending is D_802107F0_ovl_ending + 0x4 */
-UnkStruct_802107F0 D_802107F0_ovl_ending[1] = {
+/* D_802107F4_ovl_ending is ending_cue_groups + 0x4 */
+UnkStruct_802107F0 ending_cue_groups[1] = {
     { (UnkStruct_802107F0_inner*) D_8020F8C0_ovl_ending, 0x61 },
 };
-u32 D_802107F8_ovl_ending = 0x00000001;
+u32 ending_cue_group_count = 0x00000001;
 /* not referenced by name */
 u32 D_802107FC_ovl_ending[1] = { 0x00000008 };
-u32 D_80210800_ovl_ending[4] = {
+u32 ending_picture_defs[4] = {
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 /* palette, 256 colours */

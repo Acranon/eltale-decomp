@@ -87,7 +87,7 @@ extern u8 D_80258580_ovl_intro[];
 extern u16 D_80259048_ovl_intro[];
 extern u8 D_80217300_ovl_intro[];
 extern u16 D_80217100_ovl_intro[];
-Gfx D_80212270_ovl_intro[11] = {
+Gfx intro_sprite_setup_dl[11] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},
     {{ 0xB6000000, 0xFFFFFFFF }},
@@ -291,7 +291,7 @@ AnimFrame D_802127EC_ovl_intro[3] = {
     { 0x00001000, 0, 0, 306 },
     { 0x00000020, 0, 0, 120 },
 };
-AnimTbl D_80212810_ovl_intro[36] = {
+AnimTbl intro_sprite_anim_table[36] = {
     { (AnimFrame*) D_80212300_ovl_intro, 0x3 },
     { (AnimFrame*) D_80212324_ovl_intro, 0x4 },
     { (AnimFrame*) D_80212354_ovl_intro, 0x3 },
@@ -790,10 +790,10 @@ Unk28 D_80212930_ovl_intro[459] = {
     { 0x1E, 0, 0x08000000, 228, 69, 15, 76, 165, 0, 194, 76, (s32) D_80218800_ovl_intro, (s32) D_80218600_ovl_intro, 0, -1, 0x0 },
     { 0x1E, 0, 0x08000000, 243, 69, 14, 76, 180, 0, 194, 76, (s32) D_80218800_ovl_intro, (s32) D_80218600_ovl_intro, 0, -1, 0x0 },
 };
-Unk802170E8 D_802170E8_ovl_intro[1] = {
+Unk802170E8 intro_cue_groups[1] = {
     { (Unk28*) D_80212930_ovl_intro, 0x1CB },
 };
-u32 D_802170F0_ovl_intro = 0x00000001;
+u32 intro_cue_group_count = 0x00000001;
 /* not referenced by name */
 u32 D_802170F4_ovl_intro[3] = { 0x00000024, 0x00000000, 0x00000000 };
 /* palette, 256 colours */

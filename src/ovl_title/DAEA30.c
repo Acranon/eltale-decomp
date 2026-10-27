@@ -10,12 +10,12 @@
    The 8-byte Gfx after some images is a gsSPEndDisplayList that follows the converted texture. */
 
 /* palette, 256 colours */
-u16 D_8020F510_ovl_title[0x100] = {
-#include "assets/D_8020F510_ovl_title.inc.c"
+u16 title_menu_cursor_tlut[0x100] = {
+#include "assets/title_menu_cursor_tlut.inc.c"
 };
 /* texture */
-u8 D_8020F710_ovl_title[0x700] = {
-#include "assets/D_8020F710_ovl_title.inc.c"
+u8 title_menu_cursor_tex[0x700] = {
+#include "assets/title_menu_cursor_tex.inc.c"
 };
 /* palette, 256 colours */
 u16 D_8020FE10_ovl_title[0x100] = {
@@ -29,15 +29,15 @@ Gfx D_802105F0_ovl_title[1] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* texture */
-u8 D_802105F8_ovl_title[0x500] = {
-#include "assets/D_802105F8_ovl_title.inc.c"
+u8 title_menu_strip_tex[0x500] = {
+#include "assets/title_menu_strip_tex.inc.c"
 };
 Gfx D_80210AF8_ovl_title[1] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 /* palette, 256 colours */
-u16 D_80210B00_ovl_title[0x100] = {
-#include "assets/D_80210B00_ovl_title.inc.c"
+u16 title_menu_strip_tlut[0x100] = {
+#include "assets/title_menu_strip_tlut.inc.c"
 };
 /* palette, 16 colours */
 u16 D_80210D00_ovl_title[0x10] = {
@@ -90,20 +90,20 @@ u8 D_80211548_ovl_title[0x8] = {
 #include "assets/D_80211548_ovl_title.inc.c"
 };
 /* palette, 256 colours */
-u16 D_80211550_ovl_title[0x100] = {
-#include "assets/D_80211550_ovl_title.inc.c"
+u16 title_center_image_tlut[0x100] = {
+#include "assets/title_center_image_tlut.inc.c"
 };
 /* texture */
-u8 D_80211750_ovl_title[0x39A0] = {
-#include "assets/D_80211750_ovl_title.inc.c"
+u8 title_center_image_tex[0x39A0] = {
+#include "assets/title_center_image_tex.inc.c"
 };
 /* palette, 256 colours */
-u16 D_802150F0_ovl_title[0x100] = {
-#include "assets/D_802150F0_ovl_title.inc.c"
+u16 title_background_tlut[0x100] = {
+#include "assets/title_background_tlut.inc.c"
 };
 /* texture */
-u8 D_802152F0_ovl_title[0x11800] = {
-#include "assets/D_802152F0_ovl_title.inc.c"
+u8 title_background_tex[0x11800] = {
+#include "assets/title_background_tex.inc.c"
 };
 Gfx D_80226AF0_ovl_title[1] = {
     {{ 0xB8000000, 0x00000000 }},

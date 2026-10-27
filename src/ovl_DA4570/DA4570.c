@@ -33,23 +33,23 @@ typedef struct {
     u8 name[18];
 } UnkStruct_80107080;
 
-extern u16 D_80101FA0_ovl_DA4570[];
-extern u8 D_80101FC0_ovl_DA4570[];
-extern UnkStruct_801004E8 D_80103F28_ovl_DA4570[];
-extern UnkStruct_801004E8 D_80104DD8_ovl_DA4570[];
-extern UnkStruct_801004E8 D_80105288_ovl_DA4570[];
-extern UnkStruct_801004E8 D_801053E8_ovl_DA4570[];
-extern UnkStruct_801004E8 D_801053F8_ovl_DA4570[];
+extern u16 pak_menu_cursor_tlut[];
+extern u8 pak_menu_cursor_tex[];
+extern UnkStruct_801004E8 pak_menu_screen_sprites[];
+extern UnkStruct_801004E8 pak_menu_message_frame_sprites[];
+extern UnkStruct_801004E8 pak_menu_message_detail_sprites[];
+extern UnkStruct_801004E8 pak_menu_previous_rows_sprite[];
+extern UnkStruct_801004E8 pak_menu_more_rows_sprite[];
 extern u8 D_803245A0[];
 
 /* .data 80101FA0..80107050: images, palettes, sprite tables, message text, then the font. */
 /* palette, 16 colours */
-u16 D_80101FA0_ovl_DA4570[0x10] = {
-#include "assets/D_80101FA0_ovl_DA4570.inc.c"
+u16 pak_menu_cursor_tlut[0x10] = {
+#include "assets/pak_menu_cursor_tlut.inc.c"
 };
 /* texture */
-u8 D_80101FC0_ovl_DA4570[0x70] = {
-#include "assets/D_80101FC0_ovl_DA4570.inc.c"
+u8 pak_menu_cursor_tex[0x70] = {
+#include "assets/pak_menu_cursor_tex.inc.c"
 };
 /* palette, 16 colours */
 u16 D_80102030_ovl_DA4570[0x10] = {
@@ -247,7 +247,7 @@ u16 D_80103E98_ovl_DA4570[0x10] = {
 u8 D_80103EB8_ovl_DA4570[0x70] = {
 #include "assets/D_80103EB8_ovl_DA4570.inc.c"
 };
-UnkStruct_801004E8 D_80103F28_ovl_DA4570[235] = {
+UnkStruct_801004E8 pak_menu_screen_sprites[235] = {
     { 23, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
     { 55, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
     { 87, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
@@ -484,7 +484,7 @@ UnkStruct_801004E8 D_80103F28_ovl_DA4570[235] = {
     { 60, 190, 0x70, 0x2, { 0 }, (u8*) D_80103EB8_ovl_DA4570, (u16*) D_80103E98_ovl_DA4570 },
     { 160, 190, 0x70, 0x2, { 0 }, (u8*) D_80103EB8_ovl_DA4570, (u16*) D_80103E98_ovl_DA4570 },
 };
-UnkStruct_801004E8 D_80104DD8_ovl_DA4570[75] = {
+UnkStruct_801004E8 pak_menu_message_frame_sprites[75] = {
     { 44, 72, 0x10, 0x10, { 0 }, (u8*) D_80102AC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 60, 72, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 76, 72, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
@@ -561,7 +561,7 @@ UnkStruct_801004E8 D_80104DD8_ovl_DA4570[75] = {
     { 252, 136, 0x10, 0x10, { 0 }, (u8*) D_80102E40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 268, 136, 0x10, 0x10, { 0 }, (u8*) D_80102EC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
 };
-UnkStruct_801004E8 D_80105288_ovl_DA4570[22] = {
+UnkStruct_801004E8 pak_menu_message_detail_sprites[22] = {
     { 76, 158, 0x10, 0x10, { 0 }, (u8*) D_80102AC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 92, 158, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 108, 158, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
@@ -585,10 +585,10 @@ UnkStruct_801004E8 D_80105288_ovl_DA4570[22] = {
     { 220, 174, 0x10, 0x10, { 0 }, (u8*) D_80102E40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 236, 174, 0x10, 0x10, { 0 }, (u8*) D_80102EC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
 };
-UnkStruct_801004E8 D_801053E8_ovl_DA4570[1] = {
+UnkStruct_801004E8 pak_menu_previous_rows_sprite[1] = {
     { 22, 88, 0x10, 0x16, { 0 }, (u8*) D_80102F60_ovl_DA4570, (u16*) D_80102F40_ovl_DA4570 },
 };
-UnkStruct_801004E8 D_801053F8_ovl_DA4570[1] = {
+UnkStruct_801004E8 pak_menu_more_rows_sprite[1] = {
     { 22, 144, 0x10, 0x16, { 0 }, (u8*) D_80102FD8_ovl_DA4570, (u16*) D_80102F40_ovl_DA4570 },
 };
 /* message text */
@@ -615,44 +615,44 @@ u8 D_80105578_ovl_DA4570[0x90] = {
 u8 D_80105608_ovl_DA4570[0x58] = {
 #include "assets/D_80105608_ovl_DA4570.inc.c"
 };
-s32 D_80105660_ovl_DA4570 = 0;
-u16* D_80105664_ovl_DA4570[2] = { (u16*) 0x80200000, (u16*) 0x80225800 };
-UnkFont_8010566C D_8010566C_ovl_DA4570[1] = { { 10, 13, 10, 14 } };
+s32 pak_menu_framebuffer_index = 0;
+u16* pak_menu_framebuffers[2] = { (u16*) 0x80200000, (u16*) 0x80225800 };
+UnkFont_8010566C pak_menu_font_metrics[1] = { { 10, 13, 10, 14 } };
 u16 D_8010567C_ovl_DA4570[8] = {
 #include "assets/D_8010567C_ovl_DA4570.inc.c"
 };
 /* 4bpp font bitmap, 0x1980 bytes */
-u8 D_8010568C_ovl_DA4570[0x1980] = {
-#include "assets/D_8010568C_ovl_DA4570.inc.c"
+u8 pak_menu_font_bitmap[0x1980] = {
+#include "assets/pak_menu_font_bitmap.inc.c"
 };
 /* 7 palettes of 4 colours */
-u16 D_8010700C_ovl_DA4570[28] = {
-#include "assets/D_8010700C_ovl_DA4570.inc.c"
+u16 pak_menu_font_tluts[28] = {
+#include "assets/pak_menu_font_tluts.inc.c"
 };
-u16* D_80107044_ovl_DA4570 = &D_8010700C_ovl_DA4570[4];
+u16* pak_menu_active_font_tlut = &pak_menu_font_tluts[4];
 /* func_80101C80's two statics follow at 80107048/4C */
 /* .bss 80107080..80107300 */
-UnkStruct_80107080 D_80107080_ovl_DA4570[16];
-s32 D_80107280_ovl_DA4570;
+UnkStruct_80107080 pak_menu_note_states[16];
+s32 pak_menu_max_glyph_code;
 s32 D_80107284_ovl_DA4570;
-s32 D_80107288_ovl_DA4570[16];
-s16 D_801072C8_ovl_DA4570;
-s16 D_801072CA_ovl_DA4570;
-s16 D_801072CC_ovl_DA4570;
-u8 D_801072CE_ovl_DA4570;
-u8 D_801072CF_ovl_DA4570;
-s16 D_801072D0_ovl_DA4570;
-s16 D_801072D2_ovl_DA4570;
-s16 D_801072D4_ovl_DA4570;
-s32 D_801072D8_ovl_DA4570; /* Pak free space in 256-byte pages */
-s32 D_801072DC_ovl_DA4570;
-u16* D_801072E0_ovl_DA4570;
-OSMesgQueue* D_801072E4_ovl_DA4570;
-OSMesgQueue* D_801072E8_ovl_DA4570;
-OSMesg D_801072EC_ovl_DA4570;
-u16* D_801072F0_ovl_DA4570;
-s16 D_801072F4_ovl_DA4570;
-s16 D_801072F6_ovl_DA4570;
+s32 pak_menu_note_errors[16];
+s16 pak_menu_state;
+s16 pak_menu_selected_row;
+s16 pak_menu_previous_row;
+u8 pak_menu_list_offset;
+u8 pak_menu_previous_offset;
+s16 pak_menu_cursor_x;
+s16 pak_menu_cursor_y;
+s16 pak_menu_dialog_selection;
+s32 pak_menu_free_pages; /* Pak free space in 256-byte pages */
+s32 pak_menu_redraw_pending;
+u16* pak_menu_draw_framebuffer;
+OSMesgQueue* pak_menu_si_queue;
+OSMesgQueue* pak_menu_vi_queue;
+OSMesg pak_menu_message;
+u16* pak_menu_text_pixel_cursor;
+s16 pak_menu_text_x;
+s16 pak_menu_text_y;
 
 void PakMenu_FormatNumber(u16 arg0, u8* arg1);
 void PakMenu_DrawChar(s32 arg0);
@@ -698,38 +698,38 @@ void PakMenu_DrawChar(s32 arg0) {
     u16 px;
 
     if (arg0 == 1) {
-        D_801072F0_ovl_DA4570 += 3;
+        pak_menu_text_pixel_cursor += 3;
         return;
     }
     if (arg0 == 10) {
-        D_801072F6_ovl_DA4570 += 13;
-        PakMenu_SetCursor(D_801072F4_ovl_DA4570, D_801072F6_ovl_DA4570);
+        pak_menu_text_y += 13;
+        PakMenu_SetCursor(pak_menu_text_x, pak_menu_text_y);
         return;
     }
-    if ((arg0 < 0xF) || (arg0 > D_80107280_ovl_DA4570)) {
+    if ((arg0 < 0xF) || (arg0 > pak_menu_max_glyph_code)) {
         arg0 = 0x3B;
     }
     arg0 -= 0xF;
-    src = (u32*) (D_8010568C_ovl_DA4570 + (((arg0 & 0xF8) * 0x60) / 2) + (((arg0 & 7) * 8) / 2));
-    dst = D_801072F0_ovl_DA4570;
+    src = (u32*) (pak_menu_font_bitmap + (((arg0 & 0xF8) * 0x60) / 2) + (((arg0 & 7) * 8) / 2));
+    dst = pak_menu_text_pixel_cursor;
     for (i = 0; i < 12; i++) {
         for (shift = 28; shift >= 0; shift -= 4) {
             px = (*src >> shift) & 0xF;
             if (px != 0) {
-                *dst = D_80107044_ovl_DA4570[px];
+                *dst = pak_menu_active_font_tlut[px];
             }
             dst++;
         }
         dst += 312;
         src += 8;
     }
-    D_801072F0_ovl_DA4570 += 9;
+    pak_menu_text_pixel_cursor += 9;
 }
 
 void PakMenu_SetCursor(s16 arg0, s16 arg1) {
-    D_801072F4_ovl_DA4570 = arg0;
-    D_801072F6_ovl_DA4570 = arg1;
-    D_801072F0_ovl_DA4570 = D_801072E0_ovl_DA4570 + (arg0 + (arg1 * 320));
+    pak_menu_text_x = arg0;
+    pak_menu_text_y = arg1;
+    pak_menu_text_pixel_cursor = pak_menu_draw_framebuffer + (arg0 + (arg1 * 320));
 }
 
 void func_80100284_ovl_DA4570(void) {
@@ -742,11 +742,11 @@ void PakMenu_DrawString(u8* arg0, s32 arg1) {
 }
 
 void PakMenu_SetTextPalette(s32 arg0) {
-    D_80107044_ovl_DA4570 = D_8010700C_ovl_DA4570 + arg0 * 4;
+    pak_menu_active_font_tlut = pak_menu_font_tluts + arg0 * 4;
 }
 
 void PakMenu_BlitImage(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palette, u8 mode) {
-    u16* dst = D_801072E0_ovl_DA4570 + (x + y * 320);
+    u16* dst = pak_menu_draw_framebuffer + (x + y * 320);
     u8* src = pixels;
     s32 i;
     s32 j;
@@ -793,15 +793,15 @@ void PakMenu_DrawSprites(UnkStruct_801004E8* arg0, s32 arg1) {
 
 void PakMenu_WaitFrame(void) {
     osWritebackDCacheAll();
-    osRecvMesg(D_801072E8_ovl_DA4570, &D_801072EC_ovl_DA4570, OS_MESG_BLOCK);
-    if ((s32) D_801072EC_ovl_DA4570 == 0x29D) {
+    osRecvMesg(pak_menu_vi_queue, &pak_menu_message, OS_MESG_BLOCK);
+    if ((s32) pak_menu_message == 0x29D) {
         osViBlack(1);
         return;
     }
-    if (D_801072DC_ovl_DA4570 != 0) {
-        osViSwapBuffer(D_80105664_ovl_DA4570[D_80105660_ovl_DA4570 & 1]);
-        D_801072E0_ovl_DA4570 = D_80105664_ovl_DA4570[++D_80105660_ovl_DA4570 & 1];
-        D_801072DC_ovl_DA4570 = 0;
+    if (pak_menu_redraw_pending != 0) {
+        osViSwapBuffer(pak_menu_framebuffers[pak_menu_framebuffer_index & 1]);
+        pak_menu_draw_framebuffer = pak_menu_framebuffers[++pak_menu_framebuffer_index & 1];
+        pak_menu_redraw_pending = 0;
     }
 }
 
@@ -809,39 +809,39 @@ void PakMenu_DrawNoteRow(s32 arg0) {
     u8 buf[3];
     s16 y;
 
-    D_80107280_ovl_DA4570 = 0x94;
-    if ((arg0 == D_801072CA_ovl_DA4570) && (D_801072C8_ovl_DA4570 >= 2) && (D_801072C8_ovl_DA4570 < 5)) {
+    pak_menu_max_glyph_code = 0x94;
+    if ((arg0 == pak_menu_selected_row) && (pak_menu_state >= 2) && (pak_menu_state < 5)) {
         PakMenu_SetTextPalette(3);
     } else {
         PakMenu_SetTextPalette(1);
     }
-    if (D_80107288_ovl_DA4570[arg0 + D_801072CE_ovl_DA4570] == 0) {
+    if (pak_menu_note_errors[arg0 + pak_menu_list_offset] == 0) {
         y = arg0 * 13 + 0x58;
         PakMenu_SetCursor(0x52, y);
 
-        PakMenu_DrawString((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].name, 16);
-        if ((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unkA != 0) {
+        PakMenu_DrawString((&pak_menu_note_states[arg0])[pak_menu_list_offset].name, 16);
+        if ((&pak_menu_note_states[arg0])[pak_menu_list_offset].unkA != 0) {
             PakMenu_DrawChar(0x3C);
-            D_801072F0_ovl_DA4570 = D_801072F0_ovl_DA4570;
-            PakMenu_DrawChar((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unkA);
+            pak_menu_text_pixel_cursor = pak_menu_text_pixel_cursor;
+            PakMenu_DrawChar((&pak_menu_note_states[arg0])[pak_menu_list_offset].unkA);
         }
         PakMenu_SetCursor(0x100, y);
-        PakMenu_FormatNumber(((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unk0 + 0xFF) >> 8, buf);
+        PakMenu_FormatNumber(((&pak_menu_note_states[arg0])[pak_menu_list_offset].unk0 + 0xFF) >> 8, buf);
         PakMenu_DrawString(buf, 3);
     }
     y = arg0 * 13 + 0x58;
-    if (D_801072CE_ovl_DA4570 + arg0 < 9) {
+    if (pak_menu_list_offset + arg0 < 9) {
         PakMenu_SetCursor(0x3C, y);
-        PakMenu_DrawChar(D_801072CE_ovl_DA4570 + arg0 + 0x11);
+        PakMenu_DrawChar(pak_menu_list_offset + arg0 + 0x11);
     } else {
         PakMenu_SetCursor(0x37, y);
         PakMenu_DrawChar(0x11);
         PakMenu_SetCursor(0x3D, y);
-        PakMenu_DrawChar(D_801072CE_ovl_DA4570 + arg0 + 7);
+        PakMenu_DrawChar(pak_menu_list_offset + arg0 + 7);
     }
     PakMenu_SetCursor(0x43, y);
     PakMenu_DrawChar(0x3E);
-    D_80107280_ovl_DA4570 = 0x62;
+    pak_menu_max_glyph_code = 0x62;
 }
 
 void PakMenu_DrawFreePages(u16 arg0) {
@@ -854,7 +854,7 @@ void PakMenu_DrawFreePages(u16 arg0) {
 }
 
 void PakMenu_DrawCursor(void) {
-    PakMenu_BlitImage(D_801072D0_ovl_DA4570, D_801072D2_ovl_DA4570, 16, 14, D_80101FC0_ovl_DA4570, D_80101FA0_ovl_DA4570, 2);
+    PakMenu_BlitImage(pak_menu_cursor_x, pak_menu_cursor_y, 16, 14, pak_menu_cursor_tex, pak_menu_cursor_tlut, 2);
 }
 
 #ifdef NON_MATCHING
@@ -864,26 +864,26 @@ void PakMenu_DrawMessageBox(u8* arg0) {
 void PakMenu_DrawMessageBox(s32 arg0) {
 #endif
     PakMenu_DrawScreen();
-    PakMenu_DrawSprites(D_80104DD8_ovl_DA4570, 75);
-    PakMenu_DrawSprites(D_80105288_ovl_DA4570, 22);
+    PakMenu_DrawSprites(pak_menu_message_frame_sprites, 75);
+    PakMenu_DrawSprites(pak_menu_message_detail_sprites, 22);
     PakMenu_DrawText(0x34, 0x4E, arg0);
 }
 
 void PakMenu_DrawScreen(void) {
     s32 i;
 
-    PakMenu_DrawSprites(D_80103F28_ovl_DA4570, 235);
-    PakMenu_DrawFreePages(D_801072D8_ovl_DA4570);
-    if (D_801072CE_ovl_DA4570 != 0) {
-        PakMenu_DrawSprites(D_801053E8_ovl_DA4570, 1);
+    PakMenu_DrawSprites(pak_menu_screen_sprites, 235);
+    PakMenu_DrawFreePages(pak_menu_free_pages);
+    if (pak_menu_list_offset != 0) {
+        PakMenu_DrawSprites(pak_menu_previous_rows_sprite, 1);
     }
-    if (D_801072CE_ovl_DA4570 < 10) {
-        PakMenu_DrawSprites(D_801053F8_ovl_DA4570, 1);
+    if (pak_menu_list_offset < 10) {
+        PakMenu_DrawSprites(pak_menu_more_rows_sprite, 1);
     }
     for (i = 0; i < 6; i++) {
         PakMenu_DrawNoteRow(i);
     }
-    D_801072DC_ovl_DA4570 = 1;
+    pak_menu_redraw_pending = 1;
 }
 
 #ifdef NON_MATCHING
@@ -911,13 +911,13 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
     u16 cur;
     UnkStruct_80107080* file;
 
-    D_801072E4_ovl_DA4570 = mq;
-    D_801072E8_ovl_DA4570 = arg1;
+    pak_menu_si_queue = mq;
+    pak_menu_vi_queue = arg1;
     if (input_connected_port_bits == 0) {
         return 0;
     }
     osContStartReadData(mq);
-    osRecvMesg(mq, &D_801072EC_ovl_DA4570, 1);
+    osRecvMesg(mq, &pak_menu_message, 1);
     osContGetReadData(pads);
     if (!(input_controller_statuses[input_primary_port].status & 1)) {
         return 0;
@@ -943,20 +943,20 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         return 0;
     }
     if (ret == 0) {
-        D_801072C8_ovl_DA4570 = 0;
+        pak_menu_state = 0;
     } else {
-        D_801072C8_ovl_DA4570 = 5;
+        pak_menu_state = 5;
     }
-    if (!(pads[input_primary_port].button & 0x1000) && (D_801072C8_ovl_DA4570 != 5)) {
+    if (!(pads[input_primary_port].button & 0x1000) && (pak_menu_state != 5)) {
         return 2;
     }
     for (p = (u32*) 0x80200000; p != (u32*) 0x8024B000; p++) {
         *p = 0;
     }
     osViBlack(0);
-    D_801072DC_ovl_DA4570 = 1;
+    pak_menu_redraw_pending = 1;
     PakMenu_WaitFrame();
-    D_80107280_ovl_DA4570 = 0x62;
+    pak_menu_max_glyph_code = 0x62;
     repeat = 0;
     held = 0;
     btn = 0x400;
@@ -964,8 +964,8 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
     sub = 0;
 
     while (TRUE) {
-        ret2 = D_801072CA_ovl_DA4570 + D_801072CE_ovl_DA4570;
-        switch (D_801072C8_ovl_DA4570) {
+        ret2 = pak_menu_selected_row + pak_menu_list_offset;
+        switch (pak_menu_state) {
             case 0:
                 if (sub == 0) {
                     count = 0;
@@ -973,24 +973,24 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     ret = func_8003EDC0(&pfs, &maxFiles, &count);
                     if (ret == 0) {
                         for (i = 0; i < 16; i++) {
-                            D_80107288_ovl_DA4570[i] = osPfsFileState(&pfs, i, (OSPfsState*)(D_80107080_ovl_DA4570 + i));
+                            pak_menu_note_errors[i] = osPfsFileState(&pfs, i, (OSPfsState*)(pak_menu_note_states + i));
                         }
-                        ret = osPfsFreeBlocks(&pfs, &D_801072D8_ovl_DA4570);
+                        ret = osPfsFreeBlocks(&pfs, &pak_menu_free_pages);
                     }
                     switch (ret) {
                         case 0:
-                            D_801072D4_ovl_DA4570 = 1;
-                            D_801072C8_ovl_DA4570 = 1;
-                            D_801072D8_ovl_DA4570 >>= 8;
+                            pak_menu_dialog_selection = 1;
+                            pak_menu_state = 1;
+                            pak_menu_free_pages >>= 8;
                             break;
                         case 1:
-                            D_801072C8_ovl_DA4570 = 8;
+                            pak_menu_state = 8;
                             break;
                         case 2:
                             sub = 1;
                             break;
                         case 10:
-                            D_801072C8_ovl_DA4570 = 5;
+                            pak_menu_state = 5;
                             break;
                         default:
                             return 0;
@@ -999,42 +999,42 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 if (sub != 0) {
                     ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
-                        D_801072C8_ovl_DA4570 = 0;
+                        pak_menu_state = 0;
                     } else if (ret == 1) {
-                        D_801072C8_ovl_DA4570 = 8;
+                        pak_menu_state = 8;
                     } else if (ret == 2) {
-                        D_801072C8_ovl_DA4570 = 0;
+                        pak_menu_state = 0;
                     } else if (ret == 10) {
-                        D_801072C8_ovl_DA4570 = 5;
+                        pak_menu_state = 5;
                     } else {
                         return 0;
                     }
                 }
-                D_801072CC_ovl_DA4570 = D_801072CA_ovl_DA4570 = D_801072CF_ovl_DA4570 = D_801072CE_ovl_DA4570 = 0;
+                pak_menu_previous_row = pak_menu_selected_row = pak_menu_previous_offset = pak_menu_list_offset = 0;
                 sub = 0;
                 break;
             case 1:
                 if (sub == 0) {
                     sub++;
-                    D_801072D2_ovl_DA4570 = 0x36;
+                    pak_menu_cursor_y = 0x36;
                     if (count == 0) {
-                        D_801072D4_ovl_DA4570 = 1;
+                        pak_menu_dialog_selection = 1;
                     }
-                    D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xBA : 0x4C;
+                    pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0xBA : 0x4C;
                     PakMenu_DrawScreen();
                     PakMenu_DrawCursor();
-                } else if ((D_801072D4_ovl_DA4570 == 0) && (btn & 0x8000)) {
-                    D_801072C8_ovl_DA4570 = 2;
+                } else if ((pak_menu_dialog_selection == 0) && (btn & 0x8000)) {
+                    pak_menu_state = 2;
                     sub = 0;
                 } else if (btn & 0xC000) {
                     return 3;
-                } else if ((count != 0) && (((btn & 2) && (D_801072D4_ovl_DA4570 != 0)) || ((btn & 1) && (D_801072D4_ovl_DA4570 == 0)))) {
+                } else if ((count != 0) && (((btn & 2) && (pak_menu_dialog_selection != 0)) || ((btn & 1) && (pak_menu_dialog_selection == 0)))) {
                     if (btn & 2) {
-                        D_801072D4_ovl_DA4570 = 0;
-                        D_801072D0_ovl_DA4570 = 0x4C;
+                        pak_menu_dialog_selection = 0;
+                        pak_menu_cursor_x = 0x4C;
                     } else {
-                        D_801072D4_ovl_DA4570 = 1;
-                        D_801072D0_ovl_DA4570 = 0xBA;
+                        pak_menu_dialog_selection = 1;
+                        pak_menu_cursor_x = 0xBA;
                     }
                     PakMenu_DrawScreen();
                     PakMenu_DrawCursor();
@@ -1042,86 +1042,86 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 break;
             case 2:
                 if (sub == 0) {
-                    D_801072D0_ovl_DA4570 = 0x26;
-                    D_801072D2_ovl_DA4570 = (D_801072CA_ovl_DA4570 * 13) + 0x58;
+                    pak_menu_cursor_x = 0x26;
+                    pak_menu_cursor_y = (pak_menu_selected_row * 13) + 0x58;
                     PakMenu_DrawScreen();
                     PakMenu_DrawCursor();
                     sub++;
                 } else if (btn & 0x4000) {
-                    D_801072C8_ovl_DA4570 = 1;
+                    pak_menu_state = 1;
                     sub = 0;
-                    D_801072D4_ovl_DA4570 = 0;
+                    pak_menu_dialog_selection = 0;
                 } else if (btn & 0x8000) {
-                    if (D_80107288_ovl_DA4570[ret2] == 0) {
-                        D_801072C8_ovl_DA4570 = 4;
+                    if (pak_menu_note_errors[ret2] == 0) {
+                        pak_menu_state = 4;
                         sub = 0;
-                        D_801072D4_ovl_DA4570 = 1;
+                        pak_menu_dialog_selection = 1;
                     }
                 } else {
                     if (held & 4) {
-                        if (D_801072CA_ovl_DA4570 >= 5) {
-                            if (D_801072CE_ovl_DA4570 < 10) {
-                                D_801072CE_ovl_DA4570++;
+                        if (pak_menu_selected_row >= 5) {
+                            if (pak_menu_list_offset < 10) {
+                                pak_menu_list_offset++;
                             }
-                            D_801072CA_ovl_DA4570 = 5;
+                            pak_menu_selected_row = 5;
                         } else {
-                            D_801072CA_ovl_DA4570++;
+                            pak_menu_selected_row++;
                         }
                     }
                     if (held & 8) {
-                        if (D_801072CA_ovl_DA4570 == 0) {
-                            if (D_801072CE_ovl_DA4570 != 0) {
-                                D_801072CE_ovl_DA4570--;
+                        if (pak_menu_selected_row == 0) {
+                            if (pak_menu_list_offset != 0) {
+                                pak_menu_list_offset--;
                             }
                         } else {
-                            D_801072CA_ovl_DA4570--;
+                            pak_menu_selected_row--;
                         }
                     }
-                    if ((D_801072CA_ovl_DA4570 != D_801072CC_ovl_DA4570) || (D_801072CE_ovl_DA4570 != D_801072CF_ovl_DA4570)) {
-                        D_801072CC_ovl_DA4570 = D_801072CA_ovl_DA4570;
-                        D_801072CF_ovl_DA4570 = D_801072CE_ovl_DA4570;
+                    if ((pak_menu_selected_row != pak_menu_previous_row) || (pak_menu_list_offset != pak_menu_previous_offset)) {
+                        pak_menu_previous_row = pak_menu_selected_row;
+                        pak_menu_previous_offset = pak_menu_list_offset;
                         PakMenu_DrawScreen();
-                        D_801072D0_ovl_DA4570 = 0x26;
-                        D_801072D2_ovl_DA4570 = (D_801072CA_ovl_DA4570 * 13) + 0x58;
+                        pak_menu_cursor_x = 0x26;
+                        pak_menu_cursor_y = (pak_menu_selected_row * 13) + 0x58;
                         PakMenu_DrawCursor();
                     }
                 }
                 break;
             case 3:
                 if (sub == 0) {
-                    D_801072D2_ovl_DA4570 = 0xA2;
+                    pak_menu_cursor_y = 0xA2;
                     sub++;
-                    D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xA6 : 0x60;
+                    pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0xA6 : 0x60;
                     PakMenu_DrawScreen();
                     PakMenu_DrawMessageBox(D_80105408_ovl_DA4570);
                     PakMenu_DrawCursor();
                 }
-                if ((D_801072D4_ovl_DA4570 == 0) && (btn & 0x8000)) {
-                    sub = 0; file = &D_80107080_ovl_DA4570[ret2]; ret = osPfsDeleteFile(&pfs, file->unk8, file->unk4, file->name, &file->unkA);
+                if ((pak_menu_dialog_selection == 0) && (btn & 0x8000)) {
+                    sub = 0; file = &pak_menu_note_states[ret2]; ret = osPfsDeleteFile(&pfs, file->unk8, file->unk4, file->name, &file->unkA);
                     if (ret != 0) {
                         if (ret == 1) {
-                            D_801072C8_ovl_DA4570 = 8;
+                            pak_menu_state = 8;
                         } else {
-                            D_801072C8_ovl_DA4570 = 7;
+                            pak_menu_state = 7;
                         }
                     } else {
-                        count--; D_80107288_ovl_DA4570[ret2] = -1; D_801072D8_ovl_DA4570 += (u8) ((D_80107080_ovl_DA4570[ret2].unk0 + 0xFF) >> 8); if (count != 0) {
-                            D_801072C8_ovl_DA4570 = 2;
+                        count--; pak_menu_note_errors[ret2] = -1; pak_menu_free_pages += (u8) ((pak_menu_note_states[ret2].unk0 + 0xFF) >> 8); if (count != 0) {
+                            pak_menu_state = 2;
                         } else {
-                            D_801072C8_ovl_DA4570 = 1;
+                            pak_menu_state = 1;
                         }
                     }
                 } else if (btn & 0xC000) {
-                    D_801072C8_ovl_DA4570 = 4;
+                    pak_menu_state = 4;
                     sub = 0;
-                    D_801072D4_ovl_DA4570 = 0;
-                } else if (((btn & 2) && (D_801072D4_ovl_DA4570 != 0)) || ((btn & 1) && (D_801072D4_ovl_DA4570 == 0))) {
+                    pak_menu_dialog_selection = 0;
+                } else if (((btn & 2) && (pak_menu_dialog_selection != 0)) || ((btn & 1) && (pak_menu_dialog_selection == 0))) {
                     if (btn & 2) {
-                        D_801072D4_ovl_DA4570 = 0;
-                        D_801072D0_ovl_DA4570 = 0x60;
+                        pak_menu_dialog_selection = 0;
+                        pak_menu_cursor_x = 0x60;
                     } else {
-                        D_801072D4_ovl_DA4570 = 1;
-                        D_801072D0_ovl_DA4570 = 0xA6;
+                        pak_menu_dialog_selection = 1;
+                        pak_menu_cursor_x = 0xA6;
                     }
                     PakMenu_DrawScreen();
                     PakMenu_DrawMessageBox(D_80105408_ovl_DA4570);
@@ -1130,25 +1130,25 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 break;
             case 4:
                 if (sub == 0) {
-                    D_801072D2_ovl_DA4570 = 0xC0;
+                    pak_menu_cursor_y = 0xC0;
                     sub++;
-                    D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0x9C : 0x59;
+                    pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0x9C : 0x59;
                     PakMenu_DrawScreen();
                     PakMenu_DrawCursor();
-                } else if ((D_801072D4_ovl_DA4570 == 0) && (btn & 0x8000)) {
-                    D_801072C8_ovl_DA4570 = 3;
+                } else if ((pak_menu_dialog_selection == 0) && (btn & 0x8000)) {
+                    pak_menu_state = 3;
                     sub = 0;
-                    D_801072D4_ovl_DA4570 = 1;
+                    pak_menu_dialog_selection = 1;
                 } else if (btn & 0xC000) {
-                    D_801072C8_ovl_DA4570 = 2;
+                    pak_menu_state = 2;
                     sub = 0;
-                } else if (((btn & 2) && (D_801072D4_ovl_DA4570 != 0)) || ((btn & 1) && (D_801072D4_ovl_DA4570 == 0))) {
+                } else if (((btn & 2) && (pak_menu_dialog_selection != 0)) || ((btn & 1) && (pak_menu_dialog_selection == 0))) {
                     if (btn & 2) {
-                        D_801072D4_ovl_DA4570 = 0;
-                        D_801072D0_ovl_DA4570 = 0x59;
+                        pak_menu_dialog_selection = 0;
+                        pak_menu_cursor_x = 0x59;
                     } else {
-                        D_801072D4_ovl_DA4570 = 1;
-                        D_801072D0_ovl_DA4570 = 0x9C;
+                        pak_menu_dialog_selection = 1;
+                        pak_menu_cursor_x = 0x9C;
                     }
                     PakMenu_DrawScreen();
                     PakMenu_DrawCursor();
@@ -1156,37 +1156,37 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 break;
             case 5:
                 if (sub == 0) {
-                    count = D_801072D8_ovl_DA4570 = 0; sub++;
+                    count = pak_menu_free_pages = 0; sub++;
                     for (i = 0; i < 16; i++) {
-                        D_80107288_ovl_DA4570[i] = -1;
+                        pak_menu_note_errors[i] = -1;
                     }
-                    if (D_801072D4_ovl_DA4570 != 0) {
-                        D_801072D0_ovl_DA4570 = 0xA6;
+                    if (pak_menu_dialog_selection != 0) {
+                        pak_menu_cursor_x = 0xA6;
                     } else {
-                        D_801072D0_ovl_DA4570 = 0x60;
+                        pak_menu_cursor_x = 0x60;
                     }
-                    D_801072D2_ovl_DA4570 = 0xA2;
+                    pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
                     PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
-                        if (D_801072D4_ovl_DA4570 == 0) {
+                        if (pak_menu_dialog_selection == 0) {
                             timer = 0;
                             blink = 0;
                         } else {
-                            D_801072C8_ovl_DA4570 = 9;
+                            pak_menu_state = 9;
                             sub = 0;
-                            D_801072D4_ovl_DA4570 = 0;
+                            pak_menu_dialog_selection = 0;
                         }
-                    } else if (((btn & 2) && (D_801072D4_ovl_DA4570 != 0)) || ((btn & 1) && (D_801072D4_ovl_DA4570 == 0))) {
+                    } else if (((btn & 2) && (pak_menu_dialog_selection != 0)) || ((btn & 1) && (pak_menu_dialog_selection == 0))) {
                         if (btn & 2) {
-                            D_801072D4_ovl_DA4570 = 0;
-                            D_801072D0_ovl_DA4570 = 0x60;
+                            pak_menu_dialog_selection = 0;
+                            pak_menu_cursor_x = 0x60;
                         } else {
-                            D_801072D4_ovl_DA4570 = 1;
-                            D_801072D0_ovl_DA4570 = 0xA6;
+                            pak_menu_dialog_selection = 1;
+                            pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
                         PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
@@ -1196,23 +1196,23 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 } else {
                     timer++;
                     if (blink == 0) {
-                        D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xA6 : 0x60;
-                        D_801072D2_ovl_DA4570 = 0xA2;
+                        pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0xA6 : 0x60;
+                        pak_menu_cursor_y = 0xA2;
                         PakMenu_DrawScreen();
                         PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
-                        if (D_80105660_ovl_DA4570 & 1) {
+                        if (pak_menu_framebuffer_index & 1) {
                             PakMenu_DrawCursor();
                         }
                     }
                     ret = osPfsRepairId(&pfs);
                     if (ret == 0) {
-                        D_801072C8_ovl_DA4570 = 6;
+                        pak_menu_state = 6;
                         sub = 0;
                     } else if (ret == 1) {
-                        D_801072C8_ovl_DA4570 = 8;
+                        pak_menu_state = 8;
                         sub = 0;
                     } else if (timer >= 181) {
-                        D_801072C8_ovl_DA4570 = 10;
+                        pak_menu_state = 10;
                         sub = 0;
                     }
                 }
@@ -1225,32 +1225,32 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 } else {
                     timer++;
                     if (blink == 0) {
-                        D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xA6 : 0x60;
-                        D_801072D2_ovl_DA4570 = 0xA2;
+                        pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0xA6 : 0x60;
+                        pak_menu_cursor_y = 0xA2;
                         PakMenu_DrawScreen();
                         PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
-                        if (D_80105660_ovl_DA4570 & 1) {
+                        if (pak_menu_framebuffer_index & 1) {
                             PakMenu_DrawCursor();
                         }
                     }
                     ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
-                        D_801072C8_ovl_DA4570 = 0;
+                        pak_menu_state = 0;
                         sub = 0;
                     } else if (ret == 1) {
-                        D_801072C8_ovl_DA4570 = 8;
+                        pak_menu_state = 8;
                         sub = 0;
                     } else if (timer >= 181) {
-                        D_801072C8_ovl_DA4570 = 10;
+                        pak_menu_state = 10;
                         sub = 0;
                     }
                 }
                 break;
             case 7:
                 if (sub == 0) {
-                    D_801072D0_ovl_DA4570 = 0x88;
+                    pak_menu_cursor_x = 0x88;
                     sub++;
-                    D_801072D2_ovl_DA4570 = 0xA2;
+                    pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
                     PakMenu_DrawMessageBox(D_801054B0_ovl_DA4570);
                     PakMenu_DrawCursor();
@@ -1261,29 +1261,29 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 } else {
                     ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
-                        D_801072C8_ovl_DA4570 = 0;
+                        pak_menu_state = 0;
                         sub = 0;
                     } else if (ret == 10) {
-                        D_801072C8_ovl_DA4570 = 5;
+                        pak_menu_state = 5;
                         sub = 0;
                     } else if (ret == 1) {
-                        D_801072C8_ovl_DA4570 = 8;
+                        pak_menu_state = 8;
                         sub = 0;
                     }
                 }
                 break;
             case 8:
                 if (sub == 0) {
-                    count = D_801072D8_ovl_DA4570 = 0; sub++;
+                    count = pak_menu_free_pages = 0; sub++;
                     for (i = 0; i < 16; i++) {
-                        D_80107288_ovl_DA4570[i] = -1;
+                        pak_menu_note_errors[i] = -1;
                     }
-                    if (D_801072D4_ovl_DA4570 != 0) {
-                        D_801072D0_ovl_DA4570 = 0xA6;
+                    if (pak_menu_dialog_selection != 0) {
+                        pak_menu_cursor_x = 0xA6;
                     } else {
-                        D_801072D0_ovl_DA4570 = 0x60;
+                        pak_menu_cursor_x = 0x60;
                     }
-                    D_801072D2_ovl_DA4570 = 0xA2;
+                    pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
                     PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
                     PakMenu_DrawCursor();
@@ -1291,33 +1291,33 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     if (btn & 0x8000) {
                         sub++;
                         timer = 0;
-                    } else if (((btn & 2) && (D_801072D4_ovl_DA4570 != 0)) || ((btn & 1) && (D_801072D4_ovl_DA4570 == 0))) {
+                    } else if (((btn & 2) && (pak_menu_dialog_selection != 0)) || ((btn & 1) && (pak_menu_dialog_selection == 0))) {
                         if (btn & 2) {
-                            D_801072D4_ovl_DA4570 = 0;
-                            D_801072D0_ovl_DA4570 = 0x60;
+                            pak_menu_dialog_selection = 0;
+                            pak_menu_cursor_x = 0x60;
                         } else {
-                            D_801072D4_ovl_DA4570 = 1;
-                            D_801072D0_ovl_DA4570 = 0xA6;
+                            pak_menu_dialog_selection = 1;
+                            pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
                         PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
                         PakMenu_DrawCursor();
                     }
                 } else if (sub == 2) {
-                    if (D_801072D4_ovl_DA4570 == 0) {
+                    if (pak_menu_dialog_selection == 0) {
                         if (blink == 0) {
                             PakMenu_DrawScreen();
                             PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
-                            if (D_80105660_ovl_DA4570 & 1) {
+                            if (pak_menu_framebuffer_index & 1) {
                                 PakMenu_DrawCursor();
                             }
                         }
                         ret = func_8003D0F0(mq, &pfs, input_primary_port);
                         if (ret == 0) {
-                            D_801072C8_ovl_DA4570 = 0;
+                            pak_menu_state = 0;
                             sub = 0;
                         } else if (ret == 10) {
-                            D_801072C8_ovl_DA4570 = 5;
+                            pak_menu_state = 5;
                             sub = 0;
                         }
                         if (++timer >= 181) {
@@ -1331,40 +1331,40 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
             case 9:
                 if (sub == 0) {
                     sub++;
-                    if (D_801072D4_ovl_DA4570 != 0) {
-                        D_801072D0_ovl_DA4570 = 0xA6;
+                    if (pak_menu_dialog_selection != 0) {
+                        pak_menu_cursor_x = 0xA6;
                     } else {
-                        D_801072D0_ovl_DA4570 = 0x60;
+                        pak_menu_cursor_x = 0x60;
                     }
-                    D_801072D2_ovl_DA4570 = 0xA2;
+                    pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
                     PakMenu_DrawMessageBox(D_80105578_ovl_DA4570);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
-                    } else if (((btn & 2) && (D_801072D4_ovl_DA4570 != 0)) || ((btn & 1) && (D_801072D4_ovl_DA4570 == 0))) {
+                    } else if (((btn & 2) && (pak_menu_dialog_selection != 0)) || ((btn & 1) && (pak_menu_dialog_selection == 0))) {
                         if (btn & 2) {
-                            D_801072D4_ovl_DA4570 = 0;
-                            D_801072D0_ovl_DA4570 = 0x60;
+                            pak_menu_dialog_selection = 0;
+                            pak_menu_cursor_x = 0x60;
                         } else {
-                            D_801072D4_ovl_DA4570 = 1;
-                            D_801072D0_ovl_DA4570 = 0xA6;
+                            pak_menu_dialog_selection = 1;
+                            pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
                         PakMenu_DrawMessageBox(D_80105578_ovl_DA4570);
                         PakMenu_DrawCursor();
                     }
-                } else if (D_801072D4_ovl_DA4570 == 0) {
+                } else if (pak_menu_dialog_selection == 0) {
                     ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
-                        D_801072C8_ovl_DA4570 = 0;
+                        pak_menu_state = 0;
                         sub = 0;
                     } else if (ret == 10) {
-                        D_801072C8_ovl_DA4570 = 5;
+                        pak_menu_state = 5;
                         sub = 0;
                     } else if (ret == 1) {
-                        D_801072C8_ovl_DA4570 = 8;
+                        pak_menu_state = 8;
                         sub = 0;
                     }
                 } else {
@@ -1374,40 +1374,40 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
             case 10:
                 if (sub == 0) {
                     sub++;
-                    if (D_801072D4_ovl_DA4570 != 0) {
-                        D_801072D0_ovl_DA4570 = 0xA6;
+                    if (pak_menu_dialog_selection != 0) {
+                        pak_menu_cursor_x = 0xA6;
                     } else {
-                        D_801072D0_ovl_DA4570 = 0x60;
+                        pak_menu_cursor_x = 0x60;
                     }
-                    D_801072D2_ovl_DA4570 = 0xA2;
+                    pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
                     PakMenu_DrawMessageBox(D_80105608_ovl_DA4570);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
-                    } else if (((btn & 2) && (D_801072D4_ovl_DA4570 != 0)) || ((btn & 1) && (D_801072D4_ovl_DA4570 == 0))) {
+                    } else if (((btn & 2) && (pak_menu_dialog_selection != 0)) || ((btn & 1) && (pak_menu_dialog_selection == 0))) {
                         if (btn & 2) {
-                            D_801072D4_ovl_DA4570 = 0;
-                            D_801072D0_ovl_DA4570 = 0x60;
+                            pak_menu_dialog_selection = 0;
+                            pak_menu_cursor_x = 0x60;
                         } else {
-                            D_801072D4_ovl_DA4570 = 1;
-                            D_801072D0_ovl_DA4570 = 0xA6;
+                            pak_menu_dialog_selection = 1;
+                            pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
                         PakMenu_DrawMessageBox(D_80105608_ovl_DA4570);
                         PakMenu_DrawCursor();
                     }
-                } else if (D_801072D4_ovl_DA4570 == 0) {
+                } else if (pak_menu_dialog_selection == 0) {
                     ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
-                        D_801072C8_ovl_DA4570 = 0;
+                        pak_menu_state = 0;
                         sub = 0;
                     } else if (ret == 10) {
-                        D_801072C8_ovl_DA4570 = 5;
+                        pak_menu_state = 5;
                         sub = 0;
                     } else if (ret == 1) {
-                        D_801072C8_ovl_DA4570 = 8;
+                        pak_menu_state = 8;
                         sub = 0;
                     }
                 } else {
@@ -1415,12 +1415,12 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                 }
                 break;
         }
-        if ((D_801072C8_ovl_DA4570 != 0) && (D_801072C8_ovl_DA4570 < 5)) {
+        if ((pak_menu_state != 0) && (pak_menu_state < 5)) {
             osContStartQuery(mq);
-            osRecvMesg(mq, &D_801072EC_ovl_DA4570, 1);
+            osRecvMesg(mq, &pak_menu_message, 1);
             osContGetQuery(input_controller_statuses);
             if (input_controller_statuses[input_primary_port].status & 2) {
-                D_801072C8_ovl_DA4570 = 8;
+                pak_menu_state = 8;
                 sub = 0;
             }
         }
@@ -1430,7 +1430,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         }
         osContStartReadData(mq);
         PakMenu_WaitFrame();
-        osRecvMesg(mq, &D_801072EC_ovl_DA4570, 1);
+        osRecvMesg(mq, &pak_menu_message, 1);
         unused3 = pads[input_primary_port].stick_y;
         dir = (((unused3 < 33) ^ 1) << 3) | ((pads[input_primary_port].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[input_primary_port].stick_x < -32) << 1);
         btn = pads[input_primary_port].button | dir;
@@ -1493,7 +1493,7 @@ void PakMenu_DrawText(s32 x, s32 y, u8* str) {
                     switch (arg) {
                         case 0:
                             curX = x;
-                            curY += D_8010566C_ovl_DA4570[font].lineHeight;
+                            curY += pak_menu_font_metrics[font].lineHeight;
                             break;
                         case 30:
                             break;
@@ -1501,11 +1501,11 @@ void PakMenu_DrawText(s32 x, s32 y, u8* str) {
                     break;
             }
         } else {
-            f = &D_8010566C_ovl_DA4570[font];
+            f = &pak_menu_font_metrics[font];
             if (*str == 0x7F) {
                 curX += f->advance + spacing;
             } else {
-                dst = D_801072E0_ovl_DA4570 + (curY * 320 + curX);
+                dst = pak_menu_draw_framebuffer + (curY * 320 + curX);
                 arg = *str & 0x7F;
                 src = D_803245A0 + (f->width >> 1) * arg + rowOff;
                 for (rows = f->height; rows != 0;) {

@@ -199,8 +199,8 @@
 - { name: D_8006CC18, rom: 0x6D818, size: 0x10, type: u8 }             # message text
 
 # ovl_DA4570 .data (ROM = vram - 0x80101FA0 + 0xDA6510)
-- { name: D_80101FA0_ovl_DA4570, rom: 0xDA6510, size: 0x20, type: u16 }     # palette, 16 colours
-- { name: D_80101FC0_ovl_DA4570, rom: 0xDA6530, size: 0x70, type: u8 }      # texture
+- { name: pak_menu_cursor_tlut, rom: 0xDA6510, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: pak_menu_cursor_tex, rom: 0xDA6530, size: 0x70, type: u8 }      # texture
 - { name: D_80102030_ovl_DA4570, rom: 0xDA65A0, size: 0x20, type: u16 }     # palette, 16 colours
 - { name: D_80102050_ovl_DA4570, rom: 0xDA65C0, size: 0x200, type: u8 }     # texture
 - { name: D_80102250_ovl_DA4570, rom: 0xDA67C0, size: 0x200, type: u8 }     # texture
@@ -257,8 +257,8 @@
 - { name: D_80105578_ovl_DA4570, rom: 0xDA9AE8, size: 0x90, type: u8 }      # message text
 - { name: D_80105608_ovl_DA4570, rom: 0xDA9B78, size: 0x58, type: u8 }      # message text
 - { name: D_8010567C_ovl_DA4570, rom: 0xDA9BEC, size: 0x10, type: u16 }    # font palette, 8 colours
-- { name: D_8010568C_ovl_DA4570, rom: 0xDA9BFC, size: 0x1980, type: u8 }   # 4bpp font bitmap
-- { name: D_8010700C_ovl_DA4570, rom: 0xDAB57C, size: 0x38, type: u16 }    # 7 palettes of 4 colours
+- { name: pak_menu_font_bitmap, rom: 0xDA9BFC, size: 0x1980, type: u8 }   # 4bpp font bitmap
+- { name: pak_menu_font_tluts, rom: 0xDAB57C, size: 0x38, type: u16 }    # 7 palettes of 4 colours
 
 # main .data (ROM = vram - 0x7FFFF400)
 - { name: npc_rest_choice_row0, rom: 0x4E910, size: 0x8, type: u8 }                  # message text
@@ -281,12 +281,12 @@
 - { name: D_8022BAD0_ovl_ending, rom: 0xE42090, size: 0x20, type: u16 }     # palette, 16 colours
 
 # ovl_title .data (ROM = vram - 0x8020F1E0 + 0xDAE700)
-- { name: D_8020F510_ovl_title, rom: 0xDAEA30, size: 0x200, type: u16 }     # palette, 256 colours
-- { name: D_8020F710_ovl_title, rom: 0xDAEC30, size: 0x700, type: u8 }      # texture
+- { name: title_menu_cursor_tlut, rom: 0xDAEA30, size: 0x200, type: u16 }     # palette, 256 colours
+- { name: title_menu_cursor_tex, rom: 0xDAEC30, size: 0x700, type: u8 }      # texture
 - { name: D_8020FE10_ovl_title, rom: 0xDAF330, size: 0x200, type: u16 }     # palette, 256 colours
 - { name: D_80210010_ovl_title, rom: 0xDAF530, size: 0x5E0, type: u8 }      # texture
-- { name: D_802105F8_ovl_title, rom: 0xDAFB18, size: 0x500, type: u8 }      # texture
-- { name: D_80210B00_ovl_title, rom: 0xDB0020, size: 0x200, type: u16 }     # palette, 256 colours
+- { name: title_menu_strip_tex, rom: 0xDAFB18, size: 0x500, type: u8 }      # texture
+- { name: title_menu_strip_tlut, rom: 0xDB0020, size: 0x200, type: u16 }     # palette, 256 colours
 - { name: D_80210D00_ovl_title, rom: 0xDB0220, size: 0x20, type: u16 }      # palette, 16 colours
 - { name: D_80210D20_ovl_title, rom: 0xDB0240, size: 0x420, type: u8 }      # texture
 - { name: D_80211148_ovl_title, rom: 0xDB0668, size: 0x58, type: u8 }       # texture
@@ -298,10 +298,10 @@
 - { name: D_8021150C_ovl_title, rom: 0xDB0A2C, size: 0x34, type: u8 }       # message text
 - { name: D_80211540_ovl_title, rom: 0xDB0A60, size: 0x8, type: u8 }        # message text
 - { name: D_80211548_ovl_title, rom: 0xDB0A68, size: 0x8, type: u8 }        # message text
-- { name: D_80211550_ovl_title, rom: 0xDB0A70, size: 0x200, type: u16 }     # palette, 256 colours
-- { name: D_80211750_ovl_title, rom: 0xDB0C70, size: 0x39A0, type: u8 }     # texture
-- { name: D_802150F0_ovl_title, rom: 0xDB4610, size: 0x200, type: u16 }     # palette, 256 colours
-- { name: D_802152F0_ovl_title, rom: 0xDB4810, size: 0x11800, type: u8 }    # texture
+- { name: title_center_image_tlut, rom: 0xDB0A70, size: 0x200, type: u16 }     # palette, 256 colours
+- { name: title_center_image_tex, rom: 0xDB0C70, size: 0x39A0, type: u8 }     # texture
+- { name: title_background_tlut, rom: 0xDB4610, size: 0x200, type: u16 }     # palette, 256 colours
+- { name: title_background_tex, rom: 0xDB4810, size: 0x11800, type: u8 }    # texture
 - { name: D_80226AF8_ovl_title, rom: 0xDC6018, size: 0x200, type: u16 }     # palette, 256 colours
 - { name: D_80226D00_ovl_title, rom: 0xDC6220, size: 0x10, type: u8 }       # texture
 - { name: D_80226D18_ovl_title, rom: 0xDC6238, size: 0x10, type: u8 }       # texture
