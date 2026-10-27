@@ -1,0 +1,7 @@
+# Focused D3 follow-up: neutral code-proven behavior names
+func_800189F0	Magic_TryStartFlag4ReturnTransition	magic.c: when map_flags==4 and stored map_flag4_return_map exists, sets exit_destination, core transition flag/timer and spawn type; return is skipped if subarea has flag 4
+func_80018B40	Magic_TryStartFlag8ReturnTransition	magic.c: when map flag 8 and stored map_flag8_return_map exists outside excluded maps, sets exit_destination, core transition flag/timer and spawn type
+func_80025228	Item_RemoveMatchingInventoryEntry	item.c: scans item_inventory for handler_index 0xF with ItemDef.unk4 equal to arg0, shifts later entries left and returns whether an entry was removed
+func_80036124	Pak_QueryFileCounts	input.c/asm/matchings/game/input/input/func_80036124.s: wrapper directly calls func_8003EDC0, the libultra pfsnumfiles.c implementation of osPfsNumFiles; no separate gameplay role claimed
+func_80036184	Pak_InitGbPak	input.c/asm/matchings/game/input/input/func_80036184.s: wrapper directly calls func_8003D6B0, the libultra gbpakinit.c implementation of osGbpakInit; no separate gameplay role claimed
+D_8007A9B8	player_battle_extra_reward	enemy.c Enemy_StateHurt accumulates defeated EnemyDef/ActorStats offset 0x14 here; player.c Player_Update clears it at battle start and adds it to player_stats offset 0x14 at battle end, alongside player_battle_exp
