@@ -36,8 +36,8 @@ void Math_MtxFRotate(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
 void Math_MtxFMulVecNegZ(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3, f32 *arg4, f32 *arg5, f32 *arg6);
 void Audio_StartSeqFadeOut(s32 arg0);
 void Bgm_Play(s8 arg0);
-void Text_ResetAllWindows(s32 arg0, s32 arg1);
-void Text_OpenWindow(u8 arg0);
+void Text_ResetAllWindows(s32 arg0);
+s32 Text_OpenWindow(s32 arg0);
 
 /* This file's .bss, 8007A8C0..8007A8F0, in address order. D_8007A8C0 and
  * D_8007A8EC are unreferenced gaps (D_8007A8C0 could as well be 1870.c's tail). */
@@ -87,7 +87,7 @@ void Cutscene_StartEntry(s32 arg0) {
     map_id = -1;
     map_next_id = entry->unk0;
     map_next_subarea = entry->unk4;
-    Text_ResetAllWindows(0, arg0);
+    Text_ResetAllWindows(0);
     text_active_window_count = 0;
     D_80084308 = -1;
     Map_LoadArea();

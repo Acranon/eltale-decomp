@@ -401,7 +401,8 @@ s32 Intro_RunSpriteScript(void) {
             return 1;
         }
     }
-    if ((Intro_CountActiveSprites() == 0) && (intro_wait_for_sprites != 0)) {
+    /* Retail sets up no a0 for this call (nop in the delay slot); the callee zeroes n first. */
+    if ((Intro_CountActiveSprites(0) == 0) && (intro_wait_for_sprites != 0)) {
         intro_wait_for_sprites = 0;
         intro_cue_group_index++;
         if (intro_cue_group_index >= intro_cue_group_count) {

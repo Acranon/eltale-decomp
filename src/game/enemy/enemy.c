@@ -274,15 +274,15 @@ void Enemy_DrawAll(struct GfxFrameData *arg0) {
 }
 
 void Enemy_LoadAreaSet(void) {
-    u32 start;
-    u32 end;
+    u8 *start;
+    u8 *end;
 
     enemy_area_set = &enemy_area_sets[map_subarea_def->unk12];
     enemy_anim_tables = enemy_area_set->unk8;
     enemy_names = enemy_area_set->unk10;
     start = enemy_area_set->start;
     end = enemy_area_set->end;
-    Dma_ReadRom(start, D_8020E6F0, end - start, &enemy_area_set);
+    Dma_ReadRom(start, D_8020E6F0, end - start);
 }
 
 void Enemy_RemoveAll(void) {

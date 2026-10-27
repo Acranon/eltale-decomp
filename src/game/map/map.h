@@ -70,9 +70,10 @@ typedef struct MapExit {
     /* 0x14 */ u16 flags; /* 2: any direction; 0x10/0x20: needs / must not have the item id */
     /* 0x16 */ u16 id;
     /* 0x18 */ u8 pad18[2];
-    /* 0x1A */ u16 unk1A;
+    /* 0x1A */ u16 mapObj; /* the exit's door: map_objs index (exit_destination.mapObj, Player_StartAreaExit) */
     /* 0x1C */ u8 pad1C[2];
-    /* 0x1E */ u16 dest[3]; /* the destination (Exit_SetDestination): next map, next subarea, [2] */
+    /* 0x1E */ u16 dest[3]; /* the destination (Exit_SetDestination): next map, next subarea, entry point
+                             * (index into the sub-area's entries, exit_destination.entry) */
 } MapExit; /* 0x24 bytes */
 
 /* A sub-area entry point (MapSubareaDef.entries). */
@@ -108,8 +109,8 @@ typedef struct MapDlPair {
 typedef struct MapAreaDef {
     /* 0x00 */ u16 flags; /* copied to map_flags */
     /* 0x02 */ u8 pad2[2];
-    /* 0x04 */ u32 romStart; /* the area's ROM block, read to dst */
-    /* 0x08 */ u32 romEnd;
+    /* 0x04 */ u8 *romStart; /* the area's ROM block, read to dst (Dma_ReadRom devAddr) */
+    /* 0x08 */ u8 *romEnd;
     /* 0x0C */ void *dst;
     /* 0x10 */ MapModel *models;
     /* 0x14 */ MapGrid *grids;
@@ -197,7 +198,7 @@ extern s32 mapobj_spinner_prev_count;
 extern s32 mapobj_spinner_count;
 extern u8 map_backdrop_tex[0x4000];
 extern u16 map_backdrop_tlut[0x100];
-extern u8 map_backdrop_phase_tluts[0x800];
+extern u16 map_backdrop_phase_tluts[4][0x100];
 extern u16 map_clock_tlut[0x200];
 extern u16 map_clock_tlut_srcs[3][0x100];
 extern u16 D_80081AB0[0x100];

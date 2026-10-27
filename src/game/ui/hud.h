@@ -6,6 +6,8 @@
 #include "game/player/player.h"
 #include "game/math/math.h"
 
+struct GfxFrameData;
+
 typedef struct HudPopup {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u8 pad2[2];
@@ -18,11 +20,6 @@ typedef struct HudPopup {
     /* 0x18 */ u16 unk18;
     /* 0x1A */ u16 unk1A;
 } HudPopup; /* 0x1C bytes */
-
-typedef struct HudMtxPool {
-    /* 0x00 */ Mtx unk0[3];
-    /* 0xC0 */ Mtx unkC0[1];
-} HudMtxPool; /* 0x100 bytes */
 
 typedef struct HudTextureDesc {
     /* 0x00 */ void *img;
@@ -75,13 +72,13 @@ extern u8 D_8004F488[0x10];
 extern u8 hud_spell_label_palettes[8];
 
 void Hud_ResetState(void);
-void Hud_Draw(HudMtxPool* buf);
+void Hud_Draw(struct GfxFrameData* buf);
 void Hud_DrawPlayerMeters(Actor* arg0);
-void Hud_DrawElementLevels(HudMtxPool* buf, s32 arg1);
-void Hud_DrawCompass(HudMtxPool* buf);
-void Hud_DrawSpellInput(HudMtxPool* buf, Player* arg1);
+void Hud_DrawElementLevels(struct GfxFrameData* buf, s32 arg1);
+void Hud_DrawCompass(struct GfxFrameData* buf);
+void Hud_DrawSpellInput(struct GfxFrameData* buf, Player* arg1);
 void Hud_DrawSpellName(void* arg0);
-void Hud_UpdateElementAllocation(HudMtxPool* buf, Player* pl);
+void Hud_UpdateElementAllocation(struct GfxFrameData* buf, Player* pl);
 void Hud_DrawNpcTalkMarker(void);
 void Hud_DrawSpiritMarker(void);
 void Hud_DrawChestMarker(void);

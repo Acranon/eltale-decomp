@@ -612,7 +612,7 @@ void Camera_InitForMap(void);
 void Audio_StartSeqFadeOut(s32);
 void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
 void Math_MtxFMulVecNegZ(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
-void Text_ResetAllWindows(s32, KfAnim **);
+void Text_ResetAllWindows(s32 arg0);
 
 void Cutscene_ResetSequence(void) {
     cutscene_sequence_index = 0;
@@ -629,7 +629,7 @@ void Cutscene_StartNextScene(void) {
     map_id = -1;
     map_next_id = e->unk0;
     map_next_subarea = e->unk4;
-    Text_ResetAllWindows(0, &cutscene_camera_track);
+    Text_ResetAllWindows(0);
     text_active_window_count = 0;
     D_80084308 = -1;
     Map_LoadArea();

@@ -1,4 +1,5 @@
 #include "game/ui/hud.h"
+#include "game/core/main.h"
 
 /*
  * In-game HUD: meters, compass, spell input, status indicators, and text primitives.
@@ -182,7 +183,7 @@ typedef struct {
     /* 0x14 */ u16 unk14;
 } Struct_8007C288;
 
-extern HudMtxPool D_2000000;
+extern GfxFrameData D_2000000;
 extern s32 core_flags;
 extern s32 gfx_mtx_index;
 extern s32 player_talk_npc;
@@ -202,13 +203,13 @@ struct Struct_80021030;
 struct Struct_80021C04;
 struct Struct_80022970;
 
-void Hud_Draw(HudMtxPool* buf) {
+void Hud_Draw(GfxFrameData* buf) {
     s32 n;
     Struct_8007B908_216E0* e;
 
-    gSPMatrix(gfx_dl_head++, &D_2000000.unk0[1], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
-    guTranslate(&buf->unkC0[gfx_mtx_index], -160.0f, -120.0f, 0.0f);
-    gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_NOPUSH | G_MTX_MUL | G_MTX_PROJECTION);
+    gSPMatrix(gfx_dl_head++, &D_2000000.ortho, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+    guTranslate(&buf->mtx[gfx_mtx_index], -160.0f, -120.0f, 0.0f);
+    gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_NOPUSH | G_MTX_MUL | G_MTX_PROJECTION);
     hud_clip_right = 0x140;
     hud_clip_bottom = 0xF0;
     gSPDisplayList(gfx_dl_head++, D_803A8788);
@@ -341,7 +342,7 @@ extern Gfx D_803AA3C8[];
 extern u8 hud_element_colors[][4];
 extern Gfx D_803AA2F8[];
 
-void Hud_DrawElementLevels(HudMtxPool* buf, s32 arg1) {
+void Hud_DrawElementLevels(GfxFrameData* buf, s32 arg1) {
     s32 x;
     f32 fx;
     f32 fy;
@@ -372,8 +373,8 @@ void Hud_DrawElementLevels(HudMtxPool* buf, s32 arg1) {
             col = &hud_element_colors[0][i];
             fx = i * 22.0f + 5.0 + (f32)hud_draw_origin_x;
             fy = hud_draw_origin_y + 5.0f;
-            guTranslate(&buf->unkC0[gfx_mtx_index], fx, fy, 0.0f);
-            gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+            guTranslate(&buf->mtx[gfx_mtx_index], fx, fy, 0.0f);
+            gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
             gDPPipeSync(gfx_dl_head++);
             gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], (sins(*angle) >> 10) + 0x88);
             gSPDisplayList(gfx_dl_head++, D_803AA3C8);
@@ -384,8 +385,8 @@ void Hud_DrawElementLevels(HudMtxPool* buf, s32 arg1) {
         col = hud_element_colors[hud_selected_element_index];
         fx = hud_selected_element_index * 22.0f + 5.0 + (f32)hud_draw_origin_x;
             fy = hud_draw_origin_y + 5.0f;
-            guTranslate(&buf->unkC0[gfx_mtx_index], fx, fy, 0.0f);
-        gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+            guTranslate(&buf->mtx[gfx_mtx_index], fx, fy, 0.0f);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], hud_element_gain_flash_timer * 255 / 30);
         gSPDisplayList(gfx_dl_head++, D_803AA2F8);
@@ -403,21 +404,21 @@ extern Gfx D_803AA758[];
 extern HudTextureDesc D_803A86F8;
 f32 sqrtf(f32);
 
-void Hud_DrawCompass(HudMtxPool* buf) {
+void Hud_DrawCompass(GfxFrameData* buf) {
     f32 dx;
     f32 dz;
     f32 dist;
     f32 ang;
-    f32 mf[4][4];
+    MtxF mf;
 
     hud_draw_origin_x = 0x104;
     hud_draw_origin_y = 0x18;
-    Math_MtxFRotate((MtxF *)mf, 0.0f, 0.0f, D_80085E74);
-    mf[3][0] = hud_draw_origin_x + 17;
-    mf[3][1] = hud_draw_origin_y + 17;
-    mf[3][2] = 0.0f;
-    guMtxF2L(mf, &buf->unkC0[gfx_mtx_index]);
-    gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+    Math_MtxFRotate(&mf, 0.0f, 0.0f, D_80085E74);
+    mf.mf[3][0] = hud_draw_origin_x + 17;
+    mf.mf[3][1] = hud_draw_origin_y + 17;
+    mf.mf[3][2] = 0.0f;
+    guMtxF2L(mf.mf, &buf->mtx[gfx_mtx_index]);
+    gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     gSPDisplayList(gfx_dl_head++, D_803AA758);
     Hud_DrawTextureTile(&D_803A86F8, 13, 10, 11, 14, 0x93, 0, 0x400, 0x400);
     if (menu_map_region < 6 && menu_map_spot < 0 && !(core_flags & 0x80)) {
@@ -433,6 +434,7 @@ void Hud_DrawCompass(HudMtxPool* buf) {
             }
             hud_temp_vec.x = 0.0f;
             hud_temp_vec.y = 18.0f;
+            /* hud_temp_vec is a Vec3f elsewhere; here its x,y pair is the compass offset. */
             Math_RotateVec2(ang, (Vec2f *)&hud_temp_vec);
             Hud_DrawTextureTile(&D_803A86F8, hud_temp_vec.x + 14.0f, hud_temp_vec.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
         }
@@ -464,7 +466,7 @@ extern Vec2f hud_spell_input_icon_positions[];
 extern u8 hud_element_colors[][4];
 extern Gfx D_803AA2F8[];
 
-void Hud_DrawSpellInput(HudMtxPool* buf, Player* arg1) {
+void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
     s32 i;
     s32 x1;
     u8* col;
@@ -560,8 +562,8 @@ void Hud_DrawSpellInput(HudMtxPool* buf, Player* arg1) {
         pos = (f32*)hud_spell_input_icon_positions + arg1->unk11D[arg1->unk120 - 1] * 2;
         fx = pos[0] + 109.0f + hud_draw_origin_x;
         fy = pos[1] + 13.0f + hud_draw_origin_y;
-        guTranslate(&buf->unkC0[gfx_mtx_index], fx, fy, 0.0f);
-        gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        guTranslate(&buf->mtx[gfx_mtx_index], fx, fy, 0.0f);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], hud_spell_input_anim_timer * 255 / 8);
         gSPDisplayList(gfx_dl_head++, D_803AA2F8);
@@ -643,7 +645,7 @@ extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
 void Sfx_Play(s32, s32, s32);
 
-void Hud_UpdateElementAllocation(HudMtxPool* buf, Player* pl) {
+void Hud_UpdateElementAllocation(GfxFrameData* buf, Player* pl) {
     u16 alpha;
     s32 yoff;
     s32 t;
@@ -684,8 +686,8 @@ void Hud_UpdateElementAllocation(HudMtxPool* buf, Player* pl) {
         pos = (f32*)hud_element_icon_positions + hud_selected_element_index * 2;
         x = pos[0] + hud_draw_origin_x;
         y = pos[1] + hud_draw_origin_y;
-        guTranslate(&buf->unkC0[gfx_mtx_index], x, y, 0.0f);
-        gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        guTranslate(&buf->mtx[gfx_mtx_index], x, y, 0.0f);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], hud_element_input_timer * 255 / 8);
         gSPDisplayList(gfx_dl_head++, D_803AA2F8);

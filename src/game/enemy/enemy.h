@@ -52,8 +52,8 @@ typedef struct EnemyDef {
 
 /* One enemy_area_sets entry. */
 typedef struct EnemyAreaSet {
-    /* 0x00 */ u32 start; /* ROM range DMA'd by Enemy_LoadAreaSet */
-    /* 0x04 */ u32 end;
+    /* 0x00 */ u8 *start; /* ROM range DMA'd by Enemy_LoadAreaSet (Dma_ReadRom devAddr) */
+    /* 0x04 */ u8 *end;
     /* 0x08 */ u8 **unk8; /* -> enemy_anim_tables */
     /* 0x0C */ EnemyDef *unkC;
     /* 0x10 */ s32 unk10; /* -> enemy_names */

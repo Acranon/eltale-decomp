@@ -116,7 +116,7 @@ s32 mapobj_spinner_prev_count;
 s32 mapobj_spinner_count;
 u8 map_backdrop_tex[0x4000];
 u16 map_backdrop_tlut[0x100];
-u8 map_backdrop_phase_tluts[0x800];
+u16 map_backdrop_phase_tluts[4][0x100]; /* the four day-phase backdrop palettes */
 u16 map_clock_tlut[0x200];
 u16 map_clock_tlut_srcs[3][0x100];
 u16 D_80081AB0[0x100];

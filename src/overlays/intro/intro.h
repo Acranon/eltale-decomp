@@ -95,12 +95,8 @@ s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx);
 void Intro_ClearAllSprites(void);
 void Intro_ClearSprite(s32 idx);
 s32 Intro_CountFreeSprites(s32 n);
-#ifdef NON_MATCHING
-/* The draft call has no argument; the callee overwrites n before reading it. H2 fixes the call. */
-s32 Intro_CountActiveSprites();
-#else
+/* n is the counter: it only gets the parameter's register (a0); the callee zeroes it first. */
 s32 Intro_CountActiveSprites(s32 n);
-#endif
 s16 Intro_FindFreeSprite(void);
 s32 Intro_StepClipGrow(s32 arg0, s32 arg1, IntroRect* arg2);
 s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r);

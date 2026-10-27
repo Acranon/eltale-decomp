@@ -6,6 +6,8 @@
 #include "game/enemy/enemy.h"
 #include "game/map/map.h"
 
+struct GfxFrameData;
+
 typedef struct MenuPictureDma {
     /* 0x00 */ void *dst;
     /* 0x04 */ u32 start;
@@ -45,6 +47,12 @@ typedef struct MenuMapLocation {
     /* 0x00 */ s8 a;
     /* 0x01 */ s8 b;
 } MenuMapLocation; /* 0x2 bytes */
+
+/* One grid-cell offset of the mapobj_cell_* tables (MapObj_UpdateAndDrawNearby walks them). */
+typedef struct CellOffset {
+    /* 0x00 */ s8 dx;
+    /* 0x01 */ s8 dz;
+} CellOffset; /* 0x2 bytes */
 
 typedef struct MenuExpGaugePalettes { /* 0x00 */ u16 *v[4]; } MenuExpGaugePalettes; /* 0x10 bytes */
 typedef struct MenuExpGaugeTextures { /* 0x00 */ u8 *v[4][2]; } MenuExpGaugeTextures; /* 0x20 bytes */
@@ -95,11 +103,11 @@ extern MenuRomRange npc_area_set_rom_ranges[7];
 extern u8 npc_area_entry_message[0x2F8];
 extern MapAreaDef map_area_defs[36];
 extern MapRomRange map_extra_rom_ranges[6];
-extern u32 mapobj_cell_single;
-extern s8 mapobj_cell_disc_r7[158][2];
-extern s8 mapobj_cell_disc_r5[90][2];
-extern s8 mapobj_cell_square_3x3[10][2];
-extern s8 mapobj_cell_disc_r2[22][2];
+extern CellOffset mapobj_cell_single[2];
+extern CellOffset mapobj_cell_disc_r7[158];
+extern CellOffset mapobj_cell_disc_r5[90];
+extern CellOffset mapobj_cell_square_3x3[10];
+extern CellOffset mapobj_cell_disc_r2[22];
 extern u32 mapobjanim_type23_keys[0x8F];
 extern MapObjAnimDef mapobjanim_type23_anim;
 extern u32 D_80057A18[0xC3];
@@ -181,7 +189,7 @@ extern MenuFourPointers menu_bg_strip_tex;
 
 void Menu_Init(void);
 void Menu_ResetKeepPage(void);
-void Menu_Update(s32 arg0);
+void Menu_Update(struct GfxFrameData *arg0);
 void Menu_UpdatePageSlide(void);
 void Menu_UpdateStatsPage(s32 x);
 void Menu_UpdateOptionsPage(s32 x);

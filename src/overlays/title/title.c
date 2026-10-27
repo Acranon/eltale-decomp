@@ -50,7 +50,7 @@ s32 Title_Update(void) {
     return 2;
 }
 
-extern u8 D_8006CC80;
+extern s8 D_8006CC80[0x10];
 extern u8 title_menu_choice;
 extern s8 input_stick_x;
 extern s8 input_stick_y;
@@ -70,7 +70,7 @@ s32 Title_RunPhase(void) {
         title_flow_state = 3;
         title_state_timer = 1;
         title_menu_state = 0;
-        D_8006CC80 = 0;
+        D_8006CC80[0] = 0;
         D_8020F1F0_ovl_title++;
     }
 

@@ -79,7 +79,7 @@ void Exit_SetDestination(MapExit *arg0) {
     exit_destination.subarea = exit_destination_src[1];
     exit_destination.entry = exit_destination_src[2];
     exit_destination.flags = arg0->flags;
-    exit_destination.mapObj = arg0->unk1A;
+    exit_destination.mapObj = arg0->mapObj;
     exit_destination.angle = arg0->angle;
 }
 
