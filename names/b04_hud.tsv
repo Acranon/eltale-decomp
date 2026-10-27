@@ -3,7 +3,7 @@
 # old<TAB>new<TAB>evidence
 func_80020AE0	Hud_ResetState	Resets the HUD origin and clip bounds, the info-panel, spell-name and allocation timers, and other HUD counters; called from 1870 on area setup.
 func_80020B78	Hud_Draw	Sets the HUD projection and, by game/battle flags, draws the HP/MP bars, element levels, compass, popups, target/prompt markers, status icons, spell input and element allocation; in 1870's frame display-list build.
-func_80021030	Hud_DrawPlayerMeters	Draws the player's HP (stats +4 of +6) and MP (+8 of +A) as bars (widths ease toward value*56/max) with current/max numbers; HP/MP per Q64 PlayerMainData (b07 header).
+func_80021030	Hud_DrawPlayerMeters	Draws two stat pairs of the player as bars (width eases toward value*56/max) with current/max numbers: +4 of +6 (HP: Player_TakeDamage subtracts from it, 0 sends Player_StateHurt to the dying state) and +8 of +A (MP: Player_StartCastSpell pays the spell cost from it, walking refills it up to +A)
 func_800213A8	Hud_DrawElementLevels	Draws the four element levels (stats +0x24..+0x27, the values Hud_UpdateElementAllocation raises) with icons, a pulsing symbol for each element flagged at 50 (player flags 0x1000 << i) and a fading highlight on the last raised one.
 func_80021920	Hud_DrawCompass	Draws a graphic rotated by the camera yaw D_80085E74 and, when a target point D_8008FB48/4C is set and over 10 units away, a marker at its direction relative to the camera.
 func_80021C04	Hud_DrawSpellInput	Draws the four choices (the spell the sequence would become with each element appended, Hud_DrawSpellLabel) and the current up-to-three-element sequence, with slide/fade transitions.

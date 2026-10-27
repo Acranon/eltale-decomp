@@ -1,4 +1,4 @@
-# r2 reviewed 2026-10-26: kept 55, renamed 0, reverted 0
+# r2 reviewed 2026-10-26: kept 53, renamed 2, reverted 0
 # b07_player (3F50 player actor, 9D50 NPCs). Quest 64 refs: decomp include/33D0.h
 # (PlayerMainData: HP/MP/agi/def, *XP counters, elements[4], exp) and symbol_addrs.txt
 # (gSaveSpawnLocationTbl, gNPCData, gMessageBuffer, gNPCName); twins via us_map.tsv.
@@ -40,10 +40,10 @@ func_800079B4	Player_StartUseItem	called from 25B20 after an item's use check pa
 func_80007A38	Player_LoadAnim	DMAs the ROM range D_80055F98[actor.unk52] (current anim id, Q64 PlayerPosData.currentAnimID) to 0x80200000, cached in a static so it only loads on change; always passed the player actor
 func_80007A8C	Player_FindMeleeTarget	in battle: returns 1 + index of the first live monster (D_8007C050 into D_8007B908) within reach in front of the player and at a reachable height, or 0; stored in unk2, used by Player_StartMeleeAttack
 func_80007D30	Player_StartMeleeAttack	called by Player_Update on A/Z in battle with a target (unk2): state 13, anim 0xA, faces the target monster, battle camera on the player (func_80015F44)
-func_80007E04	Player_RollMeleeHit	returns get_rand(100) < chance, chance = 100*A/(A + (M+7)/8) from the player's and the monster's +0x86 values; Player_StateMeleeAttack deals damage only if it returns 1
+func_80007E04	Player_RollHitOnEnemy	returns get_rand(100) < chance, chance = 100*A/(A + (M+7)/8) from the attacker's and the monster's +0x86 values; used by Player_StateMeleeAttack and by Magic_GetHitOutcome for spells against enemies (so not melee-only); counterpart of Enemy_RollHitOnPlayer
 func_80007EAC	Player_CalcMeleeDamage	returns the hit's damage from the element-level sum unk108 (uneven levels capped at a quarter, D_8004DCFC factor), 1/32 critical (1/4 with all elements at 50) that shows message D_8004F760, halved with unk84 & 1
 func_80007FD8	Player_TakeDamage	called by monster attacks (AEA0) and spells (17360) with (damage, flags, attacker); damage x1.5 when hit from behind (> 135 deg off the facing), scales by the attacker's +0x84 against defense unk10C, subtracts from HP (stats +0x4), adds HP/def XP (+0x28/+0x2E), enters state 5
-func_8000847C	Player_StartDodge	called when a monster's hit roll fails (Enemy_StateMeleeAttack, then agility XP +1) or a spell misses the player (17360); state 3, anim 7, the miss popup (Hud_ShowActorPopup, as Enemy_PlayMissEffect), sound 0x17. "Dodge" is a reading of that
+func_8000847C	Player_StartMissReaction	called when an attack on the player misses: a monster's failed hit roll (Enemy_StateMeleeAttack, then agility XP +1) or a missed spell (Magic_UpdateEffects, where enemies get Enemy_PlayMissEffect instead); state 3, anim 7, the miss popup (Hud_ShowActorPopup) and sound 0x17, as Enemy_PlayMissEffect
 func_80008540	Player_CanAct	returns 1 unless the player is locked (actor flag 1), exiting (D_8004DCA0 & 0x80) or the battle is won; in battle also needs the player's turn (no 0x202), no active spell (func_80017AB0) and D_8008BE54 == 0; gates R and spell input in Player_Update
 func_800085D8	Player_HandleSpellInput	C buttons append an element (0-3) to unk11D (max 3, rejected when func_800168F0 says invalid), B removes the last, A/Z with a valid spell (func_800167B0) stores its id in unk122 and returns 1
 func_80008840	Player_StartCastSpell	called by Player_Update when Player_HandleSpellInput returns 1: subtracts the MP cost D_800C186E[count] from MP (stats +0x8), picks the cast anim from the spell def D_800C185C, state 14

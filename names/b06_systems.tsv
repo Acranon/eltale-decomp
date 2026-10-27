@@ -1,4 +1,4 @@
-# r2 reviewed 2026-10-26: kept 58, renamed 1, reverted 0
+# r2 reviewed 2026-10-26: kept 57, renamed 2, reverted 0
 # b06 D3 round 1: save menu, text, input/Pak, overlays, cutscenes
 # old<TAB>new<TAB>evidence
 func_8002FA00	SaveMenu_Init	Sets the save-menu state flags, selection, fade value, and navigation counters to initial values.
@@ -35,7 +35,7 @@ func_8003522C	Text_IsStickAdvanceHeld	Returns true after the enabled stick input
 func_800352C0	Text_CopyTerminatedBytes	Copies bytes until the 0xFF terminator and writes the terminator to the destination.
 func_80035308	Text_LoadFontAssets	DMAs the font palette and glyph data from ROM to their rendering buffers.
 func_80035350	Text_DrawEncodedString	Parses 0xFF-terminated glyph and control bytes and emits textured glyph rectangles at X/Y.
-func_800357B0	Input_InitializeControllers	Creates the SI message queue, initializes four controllers, chooses the first usable port, and returns connection state.
+func_800357B0	Input_InitControllers	Creates the SI message queue, initializes four controllers, chooses the first usable port, and returns connection state.
 func_80035970	Input_ReadController	Reads the chosen controller and updates buttons, stick axes, and newly pressed button bits.
 func_80035A24	Pak_ScanGameFiles	Initializes a selected Pak, enumerates its 16 files, identifies matching game files, and records free blocks.
 func_80035D58	Pak_AllocateGameFile	Calls osPfsAllocateFile for the game's company/code/name and records the returned file number.
