@@ -5,12 +5,25 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Live source: [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c)
 - Retail assembly: [`asm/nonmatchings/ovl_ending/E22690/func_8020D98C_ovl_ending.s`](../../asm/nonmatchings/ovl_ending/E22690/func_8020D98C_ovl_ending.s)
 - Retail code size: `0x103c` bytes
-- Current best gap: 25 linked ROM words.
+- Current gap: 25 linked ROM words (NON_MATCHING C in the source); length and frame exact.
 - Specific blocker: Second packed texrect step folds an extra temporary and rotates t3/t4 thereafter.
 - Next discriminating test: Use stock-verified ugen trace to alter the one temp release without changing command value.
-- Saved function-only C attempt: [`func_8020D98C_ovl_ending.draft.c`](func_8020D98C_ovl_ending.draft.c)
+- C: in [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/d1-overlay/func_8020D98C_ovl_ending_25words.c` (SHA-256 `866f6f94c888dd7c8ec9819fb994083132383c5511a7f4d526fad6c1908e4a7e`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__d98c-focus__REPORT.txt), [ REPORT-resume.txt ](reports/codex__overlay-oct26__REPORT-resume.txt)
+
+## Equivalence
+
+Verdict: **equivalent.**
+
+- Checked: linked NON_MATCHING build against retail with asm-differ, every instruction. The 25 words are
+  t4/t9 and t3/t5 swapped in the flipped texrect block and at the loop end. The data addresses that show as
+  different (D_8022BB10.., D_8022BB38, D_8020F718/F748) are all 0x30 lower because func_8020E9C8 is shorter
+  in this build and the overlay's data moves up; the symbols are the same.
+- The draft used the pre-D2 names (D_8022BB10.., D_8022BB38): renamed to the module's `_ovl_ending`
+  objects. GFX_TEXRECT_STEPS is defined in the file's NON_MATCHING block.
+- Bugs fixed: none.
+- Open doubts: none.
 
 ## Prior attempts and findings
 

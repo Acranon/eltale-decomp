@@ -5,12 +5,37 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Live source: [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c)
 - Retail assembly: [`asm/nonmatchings/ovl_ending/E22690/func_8020E9C8_ovl_ending.s`](../../asm/nonmatchings/ovl_ending/E22690/func_8020E9C8_ovl_ending.s)
 - Retail code size: `0xcbc` bytes
-- Current best gap: 757 object words; frame 0x198 vs 0x1A8.
+- Current gap: 754 object words (NON_MATCHING C in the source); code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8.
 - Specific blocker: Statics are available but TLUT/settile pointer homes and arg0 reloads are wrong; code is 0x24 bytes short.
 - Next discriminating test: Reconstruct first texture command and stack homes before register tuning.
-- Saved function-only C attempt: [`func_8020E9C8_ovl_ending.draft.c`](func_8020E9C8_ovl_ending.draft.c)
+- C: in [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/claude/d2r2/e9c8_statics_757.c` (SHA-256 `05d0d0a397362b07e3c71c451d40eae8675f5c2cfa13280e9b1e5c3e514ef32f`)
 - Detailed research reports: [ REPORT-resume.txt ](reports/codex__overlay-oct26__REPORT-resume.txt)
+
+## Equivalence
+
+Verdict: **equivalent, after one fix.**
+
+- One object, one definition: the draft defined D_8020F69C..D_8020F6B4 as function statics with
+  initializers. The module already defines them as globals (right before the function), so the statics
+  were dropped and the C uses those globals. UnkPic_80210800 and the externs (D_8020F730, D_80210800,
+  D_8022BAF0 f32, D_8022BAF8 f64, func_8002A338) are in the file's NON_MATCHING block.
+- Checked: the whole retail asm in order against the C and the compiled object: arg0 == 0 path (F69C =
+  BAF0, F6B4 = 0, return 0), F6B4 == 2 -> return 1, the E7/B9 (G_RM_AA_XLU_SURF, 0x5041C8)/DL D_8020F730/
+  BA TLUT commands, F6A0 == 0x26AC and the double compare with D_8022BAF8 (store before the 0x1E0 call),
+  both delta switches (constants 0x3F888889, 0xBF360B61, 0x3F360B61, 0xBEDA740E), the 255/0 clamps and the
+  F6B4 1 -> 2 step, the `< 0x2814` / `>= 0x26AC` blocks with picture arg0 / arg0 + 1 (img +0, tlut +4,
+  width +8), env alpha trunc.w.s & 0xFF, the TLUT sequence, the extra F6A4/F6A8 store, the unsigned
+  `(s32)F69C % width` (with IDO's divide-by-zero break), all 20 commands per 6-line strip for y = 0..216
+  (texture image, both tiles, load tile 303/y+5 and 0/x-1, tile sizes, texrects at (304-x)<<2, B4 s/t
+  words, B3 0x04000400), and the tail (F6A0++, `>= 240.0` double, `< 0x26E8`, F69C = scroll - (f32)(u32)
+  width / (f32)arg1 with the unsigned fix-up, else F6A0 == 0x26E8 -> F6B4 = 1, return 0).
+- Bug fixed: the draft read `pic->img` again for each SetTextureImage (four loads per strip); retail loads
+  img once with width and tlut before the TLUT commands. The C now keeps it in a local `img`.
+- Remaining differences are layout only: arg0 is kept/reloaded differently, width lives in a register
+  and its home, retail hoists 0xB3000000/0xB4000000 into fp/s7 and builds more of the per-x words on the
+  stack, so the code is 0x4C bytes shorter and the frame 0x10 smaller.
+- Open doubts: none.
 
 ## Prior attempts and findings
 
