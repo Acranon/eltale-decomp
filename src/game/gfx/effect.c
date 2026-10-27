@@ -372,10 +372,10 @@ void Effect_DrawFloatingNumbers(void) {
     do {
         if (d->timer) {
             actor = d->target;
-            if (actor->unk64->unk0 == 0) {
-                y = actor->y + actor->unk64->unk1C * actor->scale;
-            } else if (actor->unk64->unk0 == 1) {
-                y = actor->unk68->unk94;
+            if (actor->stats->unk0 == 0) {
+                y = actor->y + actor->stats->unk1C * actor->scale;
+            } else if (actor->stats->unk0 == 1) {
+                y = actor->battle->unk94;
             } else {
                 y = actor->y + 600.0 * actor->scale;
             }

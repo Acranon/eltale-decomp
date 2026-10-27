@@ -395,7 +395,7 @@ s32 Item_CanUseNever(s32 arg0, ItemDef* arg1) {
 
 s32 Item_CanUseRestore(Actor* arg0, ItemDef* arg1) {
     s32 ret = 0;
-    ActorStats* temp = arg0->unk64;
+    ActorStats* temp = arg0->stats;
 
     if ((arg1->unk4 != 0) && (temp->unk6 != temp->unk4)) {
         ret = 1;
@@ -432,7 +432,7 @@ void Item_UseNothing(s32 arg0, ItemDef* arg1) {
 
 void Item_UseRestore(Actor* arg0, ItemDef* arg1) {
     u16 amt;
-    ActorStats* st = arg0->unk64;
+    ActorStats* st = arg0->stats;
     MagicVisualDef* fx;
 
     if (arg1->unk4 != 0) {

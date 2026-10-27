@@ -68,7 +68,7 @@ void Camera_InitForMap(void) {
     if (exit_destination.entry < 0) {
         cam->spawnHeadingOffset = 3.1415927f;
     }
-    camera_preset_index = (player_state.actor.unk62 >> 1) & 7;
+    camera_preset_index = (player_state.actor.floorFlags >> 1) & 7;
     if (map_area_def->cameraPresets != NULL) {
         camera_presets = map_area_def->cameraPresets[map_subarea].presets;
         camera_preset_count[0] = map_area_def->cameraPresets[map_subarea].count;
@@ -146,7 +146,7 @@ void Camera_Update(GfxFrameData* arg0) {
     s32 pad;
 
     if ((map_subarea_def->flags & 2) && !(battle_flags & 1) && cam->mode != 3) {
-        idx = (player_state.actor.unk62 >> 1) & 7;
+        idx = (player_state.actor.floorFlags >> 1) & 7;
         if (idx != camera_preset_index) {
             Camera_SetPreset(idx);
         }
@@ -481,8 +481,8 @@ void Camera_UpdateLookAt(Camera* arg0, Actor* arg1) {
 
     arg0->atX = arg1->x;
     arg0->atZ = arg1->z;
-    if (arg1->unk64->unk0 == 1) {
-        y = arg1->unk68->unk94;
+    if (arg1->stats->unk0 == 1) {
+        y = arg1->battle->unk94;
     } else {
         y = arg1->y;
     }
@@ -564,27 +564,27 @@ void Camera_StartBattleFocus(s32 arg0, Actor* arg1) {
     }
     camera_focus_target.x = arg1->x;
     camera_focus_target.z = arg1->z;
-    if (arg1->unk5E & 4) {
+    if (arg1->typeFlags & 4) {
         camera_focus_target.y = player_state.actor.y;
-    } else if (arg1->unk64->unk0 == 1) {
-        camera_focus_target.y = arg1->unk68->unk94;
+    } else if (arg1->stats->unk0 == 1) {
+        camera_focus_target.y = arg1->battle->unk94;
     } else {
         camera_focus_target.y = arg1->y;
     }
     camera_focus_target.scale = arg1->scale;
-    camera_focus_target.unk64 = arg1->unk64;
-    camera_focus_target.unk68 = arg1->unk68;
-    if (arg1->unk5E & 4) {
-        h = arg1->unk64->unk1C * arg1->scale + 40.0;
-    } else if (arg1->unk64->unk1C < arg1->unk64->unk18) {
-        h = arg1->unk64->unk18 * arg1->scale * 2.0 + 40.0;
+    camera_focus_target.stats = arg1->stats;
+    camera_focus_target.battle = arg1->battle;
+    if (arg1->typeFlags & 4) {
+        h = arg1->stats->unk1C * arg1->scale + 40.0;
+    } else if (arg1->stats->unk1C < arg1->stats->unk18) {
+        h = arg1->stats->unk18 * arg1->scale * 2.0 + 40.0;
     } else {
-        h = arg1->unk64->unk1C * arg1->scale * 2.0 + 40.0;
+        h = arg1->stats->unk1C * arg1->scale * 2.0 + 40.0;
     }
     camera_state.mode = 4;
     camera_state.flags |= 0x40;
     camera_state.target = &camera_focus_target;
-    camera_state.eyeHeight = (arg1->unk5E & 4) ? 20.0 : 15.0;
+    camera_state.eyeHeight = (arg1->typeFlags & 4) ? 20.0 : 15.0;
     camera_state.eyeVelZ = 0.0f;
     camera_state.distance = h;
     camera_state.focusFramesLeft = arg0;

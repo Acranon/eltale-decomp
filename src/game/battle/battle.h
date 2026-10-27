@@ -10,48 +10,48 @@ struct Actor; /* game/actor/actor.h */
 
 /* A rectangle the player can meet the region's groups in (Battle_FindEncounterRegion). */
 typedef struct EncounterRegion {
-    /* 0x00 */ s16 unk0; /* x */
-    /* 0x02 */ s16 unk2; /* z */
-    /* 0x04 */ s16 unk4; /* x extent */
-    /* 0x06 */ s16 unk6; /* z extent */
-    /* 0x08 */ u8 unk8[0x18 - 0x8]; /* group list: u16 count, then group ids (Battle_SpawnEncounterGroup) */
+    /* 0x00 */ s16 x; /* x */
+    /* 0x02 */ s16 z; /* z */
+    /* 0x04 */ s16 x_extent; /* x extent */
+    /* 0x06 */ s16 z_extent; /* z extent */
+    /* 0x08 */ u8 group_list[0x18 - 0x8]; /* group list: u16 count, then group ids (Battle_SpawnEncounterGroup) */
 } EncounterRegion; /* 0x18 bytes */
 
 typedef struct EncounterRegionList {
-    /* 0x00 */ EncounterRegion *unk0;
-    /* 0x04 */ s32 unk4; /* count */
+    /* 0x00 */ EncounterRegion *regions;
+    /* 0x04 */ s32 count; /* count */
 } EncounterRegionList; /* 0x8 bytes */
 
 /* A spawn point a battle can be centred on (Battle_ChooseNearbyEncounterPoint). */
 typedef struct EncounterPoint {
-    /* 0x00 */ s16 unk0; /* x */
-    /* 0x02 */ s16 unk2; /* z */
+    /* 0x00 */ s16 x; /* x */
+    /* 0x02 */ s16 z; /* z */
 } EncounterPoint; /* 0x4 bytes */
 
 /* One kind of enemy in a group. */
 typedef struct EncounterGroupEntry {
-    /* 0x00 */ s32 unk0; /* enemy def index (Enemy_Spawn) */
-    /* 0x04 */ s32 unk4; /* count */
-    /* 0x08 */ s32 unk8; /* random extra count, 0..unk8 */
+    /* 0x00 */ s32 enemy_def_index; /* enemy def index (Enemy_Spawn) */
+    /* 0x04 */ s32 count; /* count */
+    /* 0x08 */ s32 extra_count_max; /* random extra count, 0..extra_count_max */
 } EncounterGroupEntry; /* 0xC bytes */
 
 typedef struct EncounterGroup {
-    /* 0x00 */ EncounterGroupEntry *unk0;
-    /* 0x04 */ u16 unk4; /* entry count */
-    /* 0x06 */ u16 unk6; /* first formation position */
+    /* 0x00 */ EncounterGroupEntry *entries;
+    /* 0x04 */ u16 entry_count; /* entry count */
+    /* 0x06 */ u16 formation_start; /* first formation position */
 } EncounterGroup; /* 0x8 bytes */
 
 typedef struct EncounterGroupTable {
-    /* 0x00 */ struct Vec3f **unk0; /* formation positions */
-    /* 0x04 */ EncounterGroup *unk4;
-    /* 0x08 */ EncounterPoint *unk8;
-    /* 0x0C */ s32 unkC; /* point count */
+    /* 0x00 */ struct Vec3f **formation_positions; /* formation positions */
+    /* 0x04 */ EncounterGroup *groups;
+    /* 0x08 */ EncounterPoint *points;
+    /* 0x0C */ s32 point_count; /* point count */
 } EncounterGroupTable; /* 0x10 bytes */
 
 /* battle_camera_offsets entry (per map id) */
 typedef struct BattleCameraOffset {
-    /* 0x00 */ f32 unk0; /* added to camera_state 0x58 */
-    /* 0x04 */ f32 unk4; /* added to camera_state 0x4C */
+    /* 0x00 */ f32 eye_height; /* added to camera_state 0x58 */
+    /* 0x04 */ f32 distance; /* added to camera_state 0x4C */
     /* 0x08 */ f32 unk8;
 } BattleCameraOffset; /* 0xC bytes */
 

@@ -87,8 +87,8 @@ void Chest_LoadForMap(void) {
         while (i != 0) {
             p->x = def->x;
             p->z = def->z;
-            p->unkC = 0.0f;
-            p->unk14 = 0.0f;
+            p->rotX = 0.0f;
+            p->rotZ = 0.0f;
             p->rot = def->ry;
             Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &chest_coll);
             p->y = chest_coll.y;
@@ -101,10 +101,10 @@ void Chest_LoadForMap(void) {
             p->unk44 = def->boxX;
             p->unk4C = def->boxZ;
             p->scale = 0.07f;
-            p->unk62 = def->flagId;
-            p->unk50 = def->unk21;
-            p->unk60 = 0;
-            if (Chest_IsOpened(p->unk62)) {
+            p->floorFlags = def->flagId;
+            p->animSetIndex = def->unk21;
+            p->animFlags = 0;
+            if (Chest_IsOpened(p->floorFlags)) {
                 mode = 3;
             } else {
                 mode = 0;
@@ -127,18 +127,18 @@ void Chest_UpdateAll(struct GfxFrameData *arg0) {
     n = chest_count;
     p = chest_objects;
     while (n != 0) {
-        if (p->unk60 & 0x8000) {
-            t = p->unk60 & ~0x8000;
+        if (p->animFlags & 0x8000) {
+            t = p->animFlags & ~0x8000;
             t--;
             if (!t) {
-                p->unk60 = 0;
+                p->animFlags = 0;
                 Anim_SetCurrentAndNext(p, 3, 1, 3, 1, 1);
             } else {
-                p->unk60 = t | 0x8000;
+                p->animFlags = t | 0x8000;
             }
         }
-        Anim_DrawModel(0, p, &D_8010FDC4[p->unk52], arg0);
-        Anim_AdvanceFrame(p->unk58, p, &D_8010FDC4[p->unk52]);
+        Anim_DrawModel(0, p, &D_8010FDC4[p->animIndex], arg0);
+        Anim_AdvanceFrame(p->animStep, p, &D_8010FDC4[p->animIndex]);
         Shadow_Queue(p->x, p->y, p->z, p->nx, p->ny, p->nz, 6.0f);
         n--;
         p++;
@@ -153,7 +153,7 @@ Actor* Chest_FindInFront(Actor* arg0) {
     f32 dz;
 
     while (n != 0) {
-        if (Chest_IsOpened(obj->unk62) == 0) {
+        if (Chest_IsOpened(obj->floorFlags) == 0) {
             d = arg0->rot - obj->unk1C;
             if (d > 3.141592653589793) {
                 d = d - 3.141592653589793;
@@ -191,8 +191,8 @@ Actor* Chest_FindInFront(Actor* arg0) {
 }
 
 void Chest_Open(Actor* arg0) {
-    Chest_SetOpened(arg0->unk62);
-    arg0->unk60 = 0x805B;
+    Chest_SetOpened(arg0->floorFlags);
+    arg0->animFlags = 0x805B;
     Anim_SetCurrentAndNext(arg0, 1, 1, 2, 1, 1);
     Sfx_Play(0x1A, 8, 0xFF);
 }
