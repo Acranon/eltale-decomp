@@ -63,9 +63,9 @@ extern u16 ending_scroll_backdrop_first_tlut[0x100];
 extern u8 ending_scroll_backdrop_tex[0x10A00];
 extern u16 ending_scroll_backdrop_second_tlut[0x100];
 extern Gfx D_80221610_ovl_ending[1];
-extern u8 D_80221618_ovl_ending[0xA4B0];
+extern u8 ending_sprite_anim_1_tex[0xA4B0];
 extern Gfx D_8022BAC8_ovl_ending[1];
-extern u16 D_8022BAD0_ovl_ending[0x10];
+extern u16 ending_sprite_anim_1_tlut[0x10];
 extern f32 D_8022BAF0_ovl_ending;
 extern f64 D_8022BAF8_ovl_ending;
 

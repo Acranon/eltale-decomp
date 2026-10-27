@@ -54,7 +54,7 @@ Gfx title_menu_sprite_setup_dl[5] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 Gfx D_8020F2A8_ovl_title[11] = {
-    {{ 0xFD480057, (u32) D_80210D20_ovl_title }},
+    {{ 0xFD480057, (u32) title_menu_atlas_tex }},
     {{ 0xF5480800, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
     {{ 0xF4000000, 0x0706A02C }},
@@ -67,7 +67,7 @@ Gfx D_8020F2A8_ovl_title[11] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 Gfx D_8020F300_ovl_title[11] = {
-    {{ 0xFD480057, (u32) D_80210D20_ovl_title }},
+    {{ 0xFD480057, (u32) title_menu_atlas_tex }},
     {{ 0xF5480800, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
     {{ 0xF406C000, 0x070D802C }},
@@ -80,7 +80,7 @@ Gfx D_8020F300_ovl_title[11] = {
     {{ 0xB8000000, 0x00000000 }},
 };
 Gfx D_8020F358_ovl_title[11] = {
-    {{ 0xFD480057, (u32) D_80210D20_ovl_title }},
+    {{ 0xFD480057, (u32) title_menu_atlas_tex }},
     {{ 0xF5480A00, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
     {{ 0xF40DA000, 0x0715C02C }},
@@ -92,18 +92,18 @@ Gfx D_8020F358_ovl_title[11] = {
     {{ 0xB3000000, 0x04000400 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_8020F3B0_ovl_title[21] = {
+Gfx title_initial_screen_dl[21] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xB900031D, 0x00504240 }},
     {{ 0xFCFF9BFF, 0xFF34FE7F }},
     {{ 0xBA000E02, 0x00008000 }},
-    {{ 0xFD100000, (u32) D_8020FE10_ovl_title }},
+    {{ 0xFD100000, (u32) title_initial_screen_image_tlut }},
     {{ 0xE8000000, 0x00000000 }},
     {{ 0xF5000100, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
     {{ 0xF0000000, 0x073FC000 }},
     {{ 0xE7000000, 0x00000000 }},
-    {{ 0xFD480063, (u32) D_80210010_ovl_title }},
+    {{ 0xFD480063, (u32) title_initial_screen_image_tex }},
     {{ 0xF5481800, 0x07000000 }},
     {{ 0xE6000000, 0x00000000 }},
     {{ 0xF4000000, 0x07168038 }},
@@ -231,7 +231,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         case 0:
         case 1:
             if (arg0 < 2) {
-                gSPDisplayList(gfx_dl_head++, D_8020F3B0_ovl_title);
+                gSPDisplayList(gfx_dl_head++, title_initial_screen_dl);
             }
             break;
         case 2:
@@ -283,7 +283,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         case 15:
             gSPDisplayList(gfx_dl_head++, title_menu_sprite_setup_dl);
             gDPPipeSync(gfx_dl_head++);
-            gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_80210D00_ovl_title);
+            gDPLoadTLUT_pal16(gfx_dl_head++, 0, title_menu_atlas_tlut);
             gSPDisplayList(gfx_dl_head++, D_8020F2A8_ovl_title);
             gSPDisplayList(gfx_dl_head++, D_8020F300_ovl_title);
             gSPDisplayList(gfx_dl_head++, D_8020F358_ovl_title);
@@ -301,8 +301,8 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                 blink = title_cursor_anim_frame / 4;
             }
             gDPPipeSync(gfx_dl_head++);
-            gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_802111A8_ovl_title);
-            gDPLoadTextureTile_4b(gfx_dl_head++, D_80211148_ovl_title, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
+            gDPLoadTLUT_pal16(gfx_dl_head++, 0, title_menu_item_cursor_tlut);
+            gDPLoadTextureTile_4b(gfx_dl_head++, title_menu_item_cursor_tex, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(gfx_dl_head++, title_menu_item_cursor_pos[title_menu_item].x << 2, title_menu_item_cursor_pos[title_menu_item].y << 2,
                                 (title_menu_item_cursor_pos[title_menu_item].x + 11) << 2, (title_menu_item_cursor_pos[title_menu_item].y + 11) << 2,
                                 G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
@@ -332,18 +332,18 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                 gDPPipeSync(gfx_dl_head++);
                 gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
                 GFX_WORDS(0xB900031D, 0x504240);
-                gDPLoadTLUT_pal256(gfx_dl_head++, D_80226AF8_ovl_title);
+                gDPLoadTLUT_pal256(gfx_dl_head++, title_message_box_border_tlut);
                 gDPPipeSync(gfx_dl_head++);
-                gDPLoadTextureTile(gfx_dl_head++, D_80226D00_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gDPLoadTextureTile(gfx_dl_head++, title_message_box_top_left_border_tex, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
                 gSPTextureRectangle(gfx_dl_head++, 64 << 2, 42 << 2, 256 << 2, 43 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                 gDPPipeSync(gfx_dl_head++);
-                gDPLoadTextureTile(gfx_dl_head++, D_80226D00_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gDPLoadTextureTile(gfx_dl_head++, title_message_box_top_left_border_tex, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
                 gSPTextureRectangle(gfx_dl_head++, 64 << 2, 42 << 2, 65 << 2, 140 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                 gDPPipeSync(gfx_dl_head++);
-                gDPLoadTextureTile(gfx_dl_head++, D_80226D18_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gDPLoadTextureTile(gfx_dl_head++, title_message_box_bottom_right_border_tex, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
                 gSPTextureRectangle(gfx_dl_head++, 64 << 2, 141 << 2, 256 << 2, 142 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                 gDPPipeSync(gfx_dl_head++);
-                gDPLoadTextureTile(gfx_dl_head++, D_80226D18_ovl_title, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
+                gDPLoadTextureTile(gfx_dl_head++, title_message_box_bottom_right_border_tex, G_IM_FMT_CI, G_IM_SIZ_8b, 4, 4, 0, 0, 3, 3, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, 0, 0);
                 gSPTextureRectangle(gfx_dl_head++, 256 << 2, 42 << 2, 257 << 2, 142 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                 gDPPipeSync(gfx_dl_head++);
                 gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, 255);

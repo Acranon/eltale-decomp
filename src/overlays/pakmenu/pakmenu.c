@@ -576,12 +576,12 @@ u8 pak_menu_repair_confirmation_message[0x90] = {
 #include "assets/pak_menu_repair_confirmation_message.inc.c"
 };
 /* message text */
-u8 D_80105578_ovl_DA4570[0x90] = {
-#include "assets/D_80105578_ovl_DA4570.inc.c"
+u8 pak_menu_state9_confirmation_message[0x90] = {
+#include "assets/pak_menu_state9_confirmation_message.inc.c"
 };
 /* message text */
-u8 D_80105608_ovl_DA4570[0x58] = {
-#include "assets/D_80105608_ovl_DA4570.inc.c"
+u8 pak_menu_state10_confirmation_message[0x58] = {
+#include "assets/pak_menu_state10_confirmation_message.inc.c"
 };
 s32 pak_menu_framebuffer_index = 0;
 u16* pak_menu_framebuffers[2] = { (u16*) 0x80200000, (u16*) 0x80225800 };
@@ -1289,7 +1289,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     }
                     pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
-                    PakMenu_DrawMessageBox(D_80105578_ovl_DA4570);
+                    PakMenu_DrawMessageBox(pak_menu_state9_confirmation_message);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
@@ -1303,7 +1303,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
-                        PakMenu_DrawMessageBox(D_80105578_ovl_DA4570);
+                        PakMenu_DrawMessageBox(pak_menu_state9_confirmation_message);
                         PakMenu_DrawCursor();
                     }
                 } else if (pak_menu_dialog_selection == 0) {
@@ -1332,7 +1332,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     }
                     pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
-                    PakMenu_DrawMessageBox(D_80105608_ovl_DA4570);
+                    PakMenu_DrawMessageBox(pak_menu_state10_confirmation_message);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
@@ -1346,7 +1346,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
-                        PakMenu_DrawMessageBox(D_80105608_ovl_DA4570);
+                        PakMenu_DrawMessageBox(pak_menu_state10_confirmation_message);
                         PakMenu_DrawCursor();
                     }
                 } else if (pak_menu_dialog_selection == 0) {

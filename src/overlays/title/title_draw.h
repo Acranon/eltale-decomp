@@ -17,7 +17,7 @@ extern Gfx title_menu_sprite_setup_dl[5];
 extern Gfx D_8020F2A8_ovl_title[11];
 extern Gfx D_8020F300_ovl_title[11];
 extern Gfx D_8020F358_ovl_title[11];
-extern Gfx D_8020F3B0_ovl_title[21];
+extern Gfx title_initial_screen_dl[21];
 extern Gfx title_cursor_combine_dl[3];
 extern Gfx title_screen_fade_combine_dl[3];
 extern s32 D_8020F488_ovl_title[18];
