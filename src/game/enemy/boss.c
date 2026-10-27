@@ -210,7 +210,7 @@ void Boss_HandleDefeat(s32 arg0) {
             *dst++ = *src++;
         }
         Text_OpenWindow(1);
-        player_state.unk8 |= 0x10;
+        player_state.flags |= 0x10;
         core_flags |= 0x80;
         core_transition_timer = 0x40;
         fade_transition_style = 3;

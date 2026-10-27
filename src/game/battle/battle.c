@@ -90,7 +90,7 @@ void Battle_TryStartRandomEncounter(void) {
                         battle_flags = 0x205;
                         D_8008BE56 = 0;
                         battle_turn_delay = 20;
-                        if (player_state.unk14->unkC < enemy_slots[enemy_turn_order[0]].unk28->unkC) {
+                        if (player_state.stats->unkC < enemy_slots[enemy_turn_order[0]].unk28->unkC) {
                             battle_turn_order_index = 0;
                             battle_flags |= 2;
                         } else {
@@ -274,7 +274,7 @@ void Battle_UpdateTurnTransition(void) {
                 player_battle_drop_item = func_800200F8();
             } else if (battle_flags & 0x10) {
                 done = 1;
-            } else if (!(battle_flags & 0x100) && (player_state.unk8 & 0x20)) {
+            } else if (!(battle_flags & 0x100) && (player_state.flags & 0x20)) {
                 battle_flags |= 0x10;
                 done = 1;
             }
@@ -458,7 +458,7 @@ void func_800200F0(void) {
 s32 func_800200F8(void) {
     s32 r;
 
-    if (player_state.unk8 & 0x2000) {
+    if (player_state.flags & 0x2000) {
         r = 3;
     } else {
         r = 4;

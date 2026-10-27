@@ -145,7 +145,7 @@ void Hud_Draw(GfxFrameData* buf) {
     }
     if (!(core_flags & 0xC00)) {
         Hud_DrawPlayerMeters((Actor*)&player_state.actor);
-        Hud_DrawElementLevels(buf, (s32)player_state.unk14);
+        Hud_DrawElementLevels(buf, (s32)player_state.stats);
         if (hud_panel_transition_state == 1) {
             if (++hud_panel_transition_frame >= 13) {
                 hud_panel_transition_frame = 12;
@@ -166,10 +166,10 @@ void Hud_Draw(GfxFrameData* buf) {
     hud_draw_origin_x = hud_draw_origin_y = 0;
     if (battle_flags & 1) {
         Hud_DrawPopups();
-        if (!(battle_flags & 2) && player_state.unk2 && !(player_state.actor.animFlags & 1) && !(magic_cast_state & 1)) {
-            Hud_DrawMeleeTargetMarker(player_state.unk2 - 1);
+        if (!(battle_flags & 2) && player_state.melee_target_plus_one && !(player_state.actor.animFlags & 1) && !(magic_cast_state & 1)) {
+            Hud_DrawMeleeTargetMarker(player_state.melee_target_plus_one - 1);
         }
-        if ((player_state.unk8 & 0x20) && !(core_flags & 0x800)) {
+        if ((player_state.flags & 0x20) && !(core_flags & 0x800)) {
             Hud_DrawOutOfRangeIcon();
         }
         Hud_UpdateAndDrawActorStatusIndicators((Actor*)&player_state.actor);
@@ -281,7 +281,7 @@ void Hud_DrawElementLevels(GfxFrameData* buf, s32 arg1) {
         x += 0x16;
     }
     for (i = 0; i < 4; i++) {
-        if (player_state.unk8 & hud_element_max_level_masks[i]) {
+        if (player_state.flags & hud_element_max_level_masks[i]) {
             col = &hud_element_colors[0][i];
             fx = i * 22.0f + 5.0 + (f32)hud_draw_origin_x;
             fy = hud_draw_origin_y + 5.0f;
@@ -402,22 +402,22 @@ void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
         { Gfx* _g = gfx_dl_head++; if (i) {} _g->words.w0 = 0xFCFF9BFF; _g->words.w1 = 0xFF34FE7F; }
         gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, 255 - i * 255 / 64);
     }
-    if (arg1->unk120 < 3) {
+    if (arg1->spell_input_count < 3) {
         Hud_DrawTextureTile(&D_803A8718, x0, y0, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, x1, y1, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, x2, y2, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, x3, y3, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
-        for (i = 0; i < arg1->unk120; i++) {
-            str[i] = arg1->unk11D[i];
+        for (i = 0; i < arg1->spell_input_count; i++) {
+            str[i] = arg1->spell_input_dirs[i];
         }
         str[i] = 0;
-        Hud_DrawSpellLabel(x0, y0 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x0, y0 + 3, str, i + 1, arg1->stats->unk8);
         str[i] = 1;
-        Hud_DrawSpellLabel(x1, y1 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x1, y1 + 3, str, i + 1, arg1->stats->unk8);
         str[i] = 2;
-        Hud_DrawSpellLabel(x2, y2 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x2, y2 + 3, str, i + 1, arg1->stats->unk8);
         str[i] = 3;
-        Hud_DrawSpellLabel(x3, y3 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x3, y3 + 3, str, i + 1, arg1->stats->unk8);
     }
     hud_draw_origin_x = 0x69;
     hud_draw_origin_y = 0x32;
@@ -431,16 +431,16 @@ void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
     gDPPipeSync(gfx_dl_head++);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
     Hud_DrawTextureTile(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
-    x0 = 0x37 - arg1->unk120 * 6;
-    for (i = 0; i < arg1->unk120; i++) {
-        y0 = arg1->unk11D[i];
+    x0 = 0x37 - arg1->spell_input_count * 6;
+    for (i = 0; i < arg1->spell_input_count; i++) {
+        y0 = arg1->spell_input_dirs[i];
         Hud_DrawTextureTile(&D_803A8718, x0, yoff + 0xD, 0xB, 0xB, 0x40, y0 * 0xB + 0x24, 0x400, 0x400);
         x0 += 0xC;
     }
-    Hud_DrawSpellLabel(0, yoff + 3, arg1->unk11D, arg1->unk120, arg1->unk14->unk8);
+    Hud_DrawSpellLabel(0, yoff + 3, arg1->spell_input_dirs, arg1->spell_input_count, arg1->stats->unk8);
     hud_draw_origin_x = 0x22;
     hud_draw_origin_y = 0x8C;
-    if (arg1->unk120 != 3) {
+    if (arg1->spell_input_count != 3) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetRenderMode(gfx_dl_head++, 0x0F0A4000, 0);
         gDPSetCombine(gfx_dl_head++, 0xFFFFFF, 0xFFFCF279);
@@ -448,8 +448,8 @@ void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
         Hud_DrawTextureTile(&D_803A8718, 0x6D, 0xD, 0x24, 0x24, 0x40, 0, 0x400, 0x400);
     }
     if (hud_spell_input_anim_timer && (hud_spell_input_anim_flags & 1)) {
-        col = hud_element_colors[arg1->unk11D[arg1->unk120 - 1]];
-        pos = (f32*)hud_spell_input_icon_positions + arg1->unk11D[arg1->unk120 - 1] * 2;
+        col = hud_element_colors[arg1->spell_input_dirs[arg1->spell_input_count - 1]];
+        pos = (f32*)hud_spell_input_icon_positions + arg1->spell_input_dirs[arg1->spell_input_count - 1] * 2;
         fx = pos[0] + 109.0f + hud_draw_origin_x;
         fy = pos[1] + 13.0f + hud_draw_origin_y;
         guTranslate(&buf->mtx[gfx_mtx_index], fx, fy, 0.0f);
@@ -480,7 +480,7 @@ void Hud_DrawSpellName(void* arg0) {
 
     hud_draw_origin_x = 0x69;
     hud_draw_origin_y = 0x32;
-    w = ((Player *)arg0)->unk122;
+    w = ((Player *)arg0)->spell_id;
     id = (u8)w;
     str = D_800C03D8[(u8)(w >> 8) & 0xF][(u8)w];
     gDPPipeSync(gfx_dl_head++);
@@ -570,12 +570,12 @@ void Hud_UpdateElementAllocation(GfxFrameData* buf, Player* pl) {
             } else {
                 hud_selected_element_index = 3;
             }
-            if (pl->unk14->unk24[hud_selected_element_index] < 50) {
-                pl->unk14->unk24[hud_selected_element_index]++;
-                if (pl->unk14->unk24[hud_selected_element_index] == 50) {
-                    pl->unk8 |= hud_element_max_level_set_masks[hud_selected_element_index];
-                    if ((pl->unk8 & 0xF000) == 0xF000) {
-                        pl->unk8 |= 0x10000;
+            if (pl->stats->unk24[hud_selected_element_index] < 50) {
+                pl->stats->unk24[hud_selected_element_index]++;
+                if (pl->stats->unk24[hud_selected_element_index] == 50) {
+                    pl->flags |= hud_element_max_level_set_masks[hud_selected_element_index];
+                    if ((pl->flags & 0xF000) == 0xF000) {
+                        pl->flags |= 0x10000;
                     }
                 }
                 Sfx_Play(0, 4, 0xFF);
