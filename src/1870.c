@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Main runtime: game-state loops, graphics frame setup and submission,
+ * plus scene transitions.
+ * Folder: src/game/core/
+ */
+
 typedef short NNScMsg;
 
 typedef struct SCClient_s {

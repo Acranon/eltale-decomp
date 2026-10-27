@@ -1,0 +1,17 @@
+# b03: src/1870.c core runtime, graphics frames, state transitions
+# old<TAB>new<TAB>evidence
+func_80000C70	Core_MainThread	Thread 6 entry from Boot_IdleThread: initializes VI and scheduler, then dispatches the persistent game-state loops.
+func_80000F4C	Core_ResetGameState	Resets scene, player/map, camera and transition flags to their startup values before state dispatch.
+func_80001084	Gfx_InitializeFrames	Loads frame resources, initializes both graphics tasks and framebuffers, then clears both 320x240 buffers.
+func_800011B8	Gfx_InitializeFrameTask	Fills one OSTask's graphics microcode, DRAM stack, output, yield buffer, queue, and framebuffer fields.
+func_80001278	Gfx_BuildFrameDisplayList	Starts the frame display list, dispatches state-specific drawing, ends/syncs it, and sets the graphics task data pointer and size.
+func_80001944	Core_RunGameplayLoop	While state 1, updates player/NPC/enemy/magic/environment/map, builds and submits graphics frames, and handles area exits.
+func_8000205C	Core_RunSequentialMapScenes	While state 6, advances a count-indexed map scene via func_80002F40 and sends each rendered frame; switches to state 5 after seven scenes.
+func_800023F4	Core_RunScriptedMapScenes	While state 7, initializes map/camera scenes with func_8003627C, advances them with func_8003642C, and submits frames.
+func_8000275C	Core_RunMenuLoop	While state 2, builds/submits frames drawn by the menu dispatcher func_8002A984, then handles return state.
+func_80002948	Core_RunTitleLoop	Loads the title overlay through func_800361B0 and runs its entrypoint while state 3.
+func_80002A8C	Core_RunIntroLoop	Loads the intro overlay through func_800361E8 and runs its entrypoint while state 4.
+func_80002BDC	Core_RunEndingLoop	Loads the ending overlay through func_80036220 and runs its entrypoint while state 5.
+func_80002D44	Gfx_WaitForFrameMessage	Receives from the graphics client message queue until the message's first s16 equals the requested frame marker.
+func_80002DB0	Transition_StartStateFadeIn	Selects a state-specific fully opaque color ramp and starts it with reverse traversal flag 4; frame fade then moves toward transparency.
+func_80002E74	Transition_StartStateFadeOut	Selects a state-specific increasing-alpha color ramp and starts it with forward traversal flag 2 before a state exit.
