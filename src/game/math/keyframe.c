@@ -1,27 +1,10 @@
-#include "common.h"
+#include "game/math/keyframe.h"
 
 /*
  * Keyframe animation: evaluates 9-channel keyframe tracks with Kochanek-Bartels (TCB)
  * Hermite splines or linear segments.
  * Original file: 27600.c (ROM 0x27600).
  */
-
-typedef struct {
-    /* 0x00 */ f32 v[9];
-    /* 0x24 */ f32 tension;
-    /* 0x28 */ f32 continuity;
-    /* 0x2C */ f32 bias;
-    /* 0x30 */ u16 linear;
-    /* 0x32 */ u16 frame;
-} Keyframe; /* size = 0x34 */
-
-typedef struct {
-    /* 0x00 */ Keyframe* kfs;
-    /* 0x04 */ u16 count;
-    /* 0x06 */ u16 last;
-} KfAnim;
-
-void Math_HermiteBasis(f32 t, f32* a, f32* b, f32* c, f32* d);
 
 void Math_EvalTcbSpline(KfAnim* anim, f32* out, s32 frame) {
     Keyframe* k0;

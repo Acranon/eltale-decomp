@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/audio/sound.h"
 
 /*
  * Music and sound requests: BGM change with delay (per map/submap table), the BGM volume
@@ -6,25 +6,13 @@
  * Original file: 2B0F0.c (ROM 0x2B0F0).
  */
 
-typedef struct {
-    u8 unk0;
-    s8 unk1;
-    u8 unk2;
-} BgmFade;
-
-typedef struct {
-    s16 unk0;
-    s16 unk2;
-    s8 unk4;
-} BgmMapEntry;
-
 /* .bss 8008FAF0..8008FB30 */
 s8 bgm_current;
 s8 bgm_next;
 u16 bgm_flags; /* bit 0 change requested (after the delay), 1 stop the current sequence, 2 wait for the stop, then play the next */
 u8 sfx_master_volume;
 u16 bgm_change_delay;
-BgmFade sfx_delayed[16];
+SfxDelayed sfx_delayed[16];
 
 /* This file's .data, 80055B40..80055D40. */
 BgmMapEntry bgm_map_table[72] = {
@@ -59,11 +47,10 @@ void Audio_StopSeq(s32 slot);
 s32 Audio_GetSeqState(s32 slot);
 void Sfx_Enqueue(s32 arg0, s32 arg1, s32 arg2);
 s32 Audio_SetSeqVolume(s32 vol);
-void Bgm_ApplyVolumeOption(void);
 
 void Bgm_Init(void) {
     s32 i;
-    BgmFade* p;
+    SfxDelayed* p;
 
     bgm_flags = 0;
     bgm_change_delay = 0;
@@ -78,7 +65,7 @@ void Bgm_Init(void) {
 }
 
 void Bgm_Update(void) {
-    BgmFade* var_s0;
+    SfxDelayed* var_s0;
     s32 i;
 
     if ((bgm_flags & 1) != 0) {
@@ -158,7 +145,7 @@ void Bgm_PlayForMap(s32 arg0, s32 arg1, u16 delay) {
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2) {
     s32 var_v0;
     s32 temp_t2;
-    BgmFade* var_v1;
+    SfxDelayed* var_v1;
 
     temp_t2 = (u32) ((sfx_volumes)[arg1] * (arg2) * sfx_master_volume) / 65536;
     if (arg0 == 0) {
