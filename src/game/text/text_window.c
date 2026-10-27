@@ -1,4 +1,11 @@
 #include "game/text/text_window.h"
+#include "game/audio/sound.h"
+#include "game/core/main.h"
+#include "game/event/cutscene.h"
+#include "game/input/input.h"
+#include "game/npc/npc.h"
+#include "game/save/save_menu.h"
+#include "game/text/text.h"
 
 /*
  * Text windows: slot lifecycle, message and choice layout, input, and drawing.
@@ -12,8 +19,6 @@
 
 
 
-extern Gfx *gfx_dl_head;
-extern u16 text_window_tlut[];
 /* This file's .data, 80061660..80061760. */
 s8 text_reveal_delay_steps[8] = {
     -1, 0, 1, 2, 4, 8, 16, 30,
@@ -28,16 +33,8 @@ s32 D_800616B4 = -1;
 TextAnimSteps D_800616B8 = { { 5, 3, 1, 0, 1, 2, 3, 4 } };
 TextAnimSteps D_800616C0 = { { 7, 5, 3, 0, 1, 3, 5, 7 } };
 TextAnimSteps D_800616C8 = { { 3, 1, 0, 0, 0, 1, 2, 3 } };
-extern u8 text_window_fill_tex[];
-extern u8 text_speaker_name_bg_tex[];
-extern u8 text_advance_icon_tex[];
-extern u8 text_window_line_tex[];
-extern u8 text_choice_cursor_tex[];
 TextTexturePointers text_rect_texture_ptrs = { { text_window_fill_tex, text_speaker_name_bg_tex, text_advance_icon_tex, text_window_line_tex, text_choice_cursor_tex } };
 TextTextureTiles text_rect_texture_params = { { { 16, 16, 0, 0, 4, 4 }, { 40, 13, 0, 0, 0, 0 }, { 12, 12, 0, 0, 0, 0 }, { 1, 1, 2, 2, 0, 0 }, { 12, 12, 0, 0, 0, 0 } } };
-extern u8 text_speaker_name[32];
-extern u8 text_message_buf[0x4B0];
-extern s32 core_flags;
 /* .bss 80090450..80092C70 */
 s32 text_active_window_count;
 s32 text_last_choice_index;
@@ -45,10 +42,7 @@ TextChoiceRows text_pending_choice_rows;
 TextWindow text_window_slots[4];
 u8 text_stick_advance_enabled;
 u16 text_stick_advance_frames;
-extern s8 input_stick_x;
-extern s8 input_stick_y;
 
-void Text_DrawEncodedString(s32, s32, u8 *);
 
 #ifdef NON_MATCHING
 typedef union {
@@ -57,10 +51,6 @@ typedef union {
     s32 w;
 } Bytes4;
 
-extern Gfx text_glyph_setup_dl[];
-extern u16 input_pressed_buttons;
-extern u8 save_menu_choice_cursor;
-void Sfx_Play(u8, s8, u8);
 #endif
 
 void Text_ResetAllWindows(s32 arg0) {

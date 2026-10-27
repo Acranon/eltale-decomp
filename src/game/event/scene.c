@@ -1,43 +1,24 @@
 #include "game/event/scene.h"
+#include "game/env/env.h"
+#include "game/audio/audio.h"
+#include "game/audio/sound.h"
+#include "game/camera/camera.h"
+#include "game/core/main.h"
+#include "game/enemy/enemy.h"
+#include "game/map/map.h"
+#include "game/math/math.h"
+#include "game/npc/npc.h"
+#include "game/player/player.h"
+#include "game/text/text_window.h"
 
 /*
  * Scripted scene entry setup, timed messages, and transition audio.
  * Original file: 3B40.c (ROM 0x3B40).
  */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 unk4[0x8];
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-} Unk80085E48;
 
-typedef struct {
-    /* 0x0 */ u8 unk0[0x4];
-    /* 0x4 */ u16 unk4;
-    /* 0x6 */ u16 unk6;
-} Unk8007A9D0;
 
-typedef struct {
-    /* 0x00 */ u8 unk0[0x12];
-    /* 0x12 */ u16 unk12;
-} Unk8007C288;
 
-void Player_Spawn(void);
-void func_80009764(u16 arg0);
-void Npc_SpawnForArea(s32 arg0, s32 arg1);
-void Map_LoadArea(void);
-void Camera_InitForMap(void);
-void Math_MtxFRotate(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
-void Math_MtxFMulVecNegZ(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3, f32 *arg4, f32 *arg5, f32 *arg6);
-void Audio_StartSeqFadeOut(s32 arg0);
-void Bgm_Play(s8 arg0);
-void Text_ResetAllWindows(s32 arg0);
-s32 Text_OpenWindow(s32 arg0);
 
 /* This file's .bss, 8007A8C0..8007A8F0, in address order. D_8007A8C0 and
  * D_8007A8EC are unreferenced gaps (D_8007A8C0 could as well be 1870.c's tail). */
@@ -47,34 +28,6 @@ s32 cutscene_messages_remaining;
 SceneMessage *cutscene_next_message;
 s32 D_8007A8EC;
 
-extern s32 core_flags;
-extern s32 core_transition_timer;
-extern u16 fade_transition_style;
-extern s16 core_fade_out_time;
-extern f32 player_spawn_x;
-extern f32 player_spawn_z;
-extern f32 player_spawn_rot;
-extern s32 player_spawn_type;
-extern Unk8007A9D0 player_stats;
-extern s16 D_8007AA0E;
-extern s32 npc_count;
-extern u8 text_message_buf[];
-extern u8 text_speaker_name[];
-extern s32 enemy_count;
-extern Unk8007C288 *map_subarea_def;
-extern s32 map_id;
-extern s32 map_next_id;
-extern s32 map_next_subarea;
-extern s32 D_80084308;
-extern Unk80085E48 camera_state;
-extern f32 D_80085E54;
-extern f32 D_80085E58;
-extern f32 D_80085E5C;
-extern f32 D_80085E60;
-extern f32 D_80085E64;
-extern f32 D_80085E68;
-extern f32 camera_fovy;
-extern s32 text_active_window_count;
 extern SceneEntry D_801C14E4[];
 
 void Cutscene_StartEntry(s32 arg0) {
@@ -89,13 +42,13 @@ void Cutscene_StartEntry(s32 arg0) {
     map_next_subarea = entry->unk4;
     Text_ResetAllWindows(0);
     text_active_window_count = 0;
-    D_80084308 = -1;
+    exit_destination.entry = -1;
     Map_LoadArea();
     player_spawn_x = entry->unk20;
     player_spawn_z = entry->unk24;
     player_spawn_rot = entry->unk28;
     player_spawn_type = 0x108;
-    D_8007AA0E = 0;
+    player_state.unk6 = 0;
     player_stats.unk4 = player_stats.unk6;
     Player_Spawn();
     if (!(entry->unk3C & 1)) {
@@ -106,15 +59,15 @@ void Cutscene_StartEntry(s32 arg0) {
     Npc_SpawnForArea(entry->unk2C, entry->unk30);
     enemy_count = 0;
     Camera_InitForMap();
-    camera_state.unk0 = 3;
-    D_80085E54 = entry->unk8;
-    D_80085E58 = entry->unkC;
-    D_80085E5C = entry->unk10;
+    camera_state.mode = 3;
+    camera_state.eyeX = entry->unk8;
+    camera_state.eyeY = entry->unkC;
+    camera_state.eyeZ = entry->unk10;
     Math_MtxFRotate(mtx, -entry->unk14 * 0.017453292519943295, -entry->unk18 * 0.017453292519943295, 0.0f);
-    Math_MtxFMulVecNegZ(mtx, 0.0f, 0.0f, -100.0f, &D_80085E60, &D_80085E64, &D_80085E68);
-    camera_state.unk18 = camera_state.unk18 + camera_state.unkC;
-    camera_state.unk1C = camera_state.unk1C + camera_state.unk10;
-    camera_state.unk20 = camera_state.unk14 - camera_state.unk20;
+    Math_MtxFMulVecNegZ(mtx, 0.0f, 0.0f, -100.0f, &camera_state.atX, &camera_state.atY, &camera_state.atZ);
+    camera_state.atX = camera_state.atX + camera_state.eyeX;
+    camera_state.atY = camera_state.atY + camera_state.eyeY;
+    camera_state.atZ = camera_state.eyeZ - camera_state.atZ;
     camera_fovy = entry->unk1C;
     Bgm_Play(((s8 *)&entry->unk3E)[1]);
 }
