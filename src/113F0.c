@@ -126,7 +126,7 @@ extern s32 D_800842C0;
 /* This file's .bss, 800842F0..80084300. */
 f32 D_800842F0;
 extern Vec2f D_80084320;
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 extern u8 D_8008C9B8[];
 
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) {
@@ -479,7 +479,7 @@ s32 Exit_CheckEnter(f32 x, f32 z, f32 angle) {
     Unk24 *p;
     f32 dx;
     f32 dz;
-    if (D_8007C288->count == 0 || (D_8008BE52 & 1)) {
+    if (D_8007C288->count == 0 || (battle_flags & 1)) {
         return 0;
     }
     n = D_8007C288->count;

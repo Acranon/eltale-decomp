@@ -104,7 +104,7 @@ typedef struct {
 extern u16 D_800806B0[];
 extern u16 D_800808B0[][0x100];
 extern u16 D_800842B8;
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 extern s32 D_8004DCA0;
 extern s32 D_8008C168;
 typedef struct {
@@ -273,7 +273,7 @@ void Env_Update(void) {
         }
     }
     if (D_800842B8 & 5) {
-        if (!(D_8008BE52 & 1) && !(D_8004DCA0 & 3) && D_8008C168 == 0) {
+        if (!(battle_flags & 1) && !(D_8004DCA0 & 3) && D_8008C168 == 0) {
             if (++D_80084980 >= D_80084984) {
                 D_80084980 -= D_80084984;
                 if (D_80084990 < 999) {

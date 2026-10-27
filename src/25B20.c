@@ -38,7 +38,7 @@ extern u8 D_D384B0[];
 extern u8 D_8007AA20[];
 extern Struct_8007C288* D_8007C288;
 extern u16 D_800842B8;
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 extern u8 D_8008CA4E;
 extern u8 D_803AC460[];
 extern Struct_803AAAA0 D_803AAAA0[];
@@ -215,9 +215,9 @@ s32 Item_TryUse(u8 arg0) {
     s32 ret = 0;
     Struct_803AAAA0* item = &D_803AAAA0[arg0];
 
-    if ((D_8008BE52 & 1) && (item->unk0 & 2)) {
+    if ((battle_flags & 1) && (item->unk0 & 2)) {
         ret = 1;
-    } else if (!(D_8008BE52 & 1) && (item->unk0 & 1)) {
+    } else if (!(battle_flags & 1) && (item->unk0 & 1)) {
         ret = 1;
     }
     if (ret) {
@@ -491,7 +491,7 @@ s32 Item_CanUseWarp(s32 arg0, Struct_803AAAA0* arg1) {
 s32 Item_CanUseSpell(s32 arg0, Struct_803AAAA0* arg1) {
     s32 ret = 1;
 
-    if ((D_8008BE52 & 0x100) && (arg1->unk0 & 8)) {
+    if ((battle_flags & 0x100) && (arg1->unk0 & 8)) {
         ret = 0;
     }
     return ret;

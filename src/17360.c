@@ -140,7 +140,7 @@ Coll17360 D_800863C8;
 extern u16 D_8004ED34[];
 extern u16 D_8007AB18;
 extern Unk8007B908 D_8007B908[];
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ u16 unk18;
@@ -309,7 +309,7 @@ s32 Magic_GetSpellRestrictionFlags(u32 arg0, u16 arg1) {
     if (D_8007AA1C->unk24[grp] < rec->unk0) {
         flags = 4;
     }
-    if (!(((D_8008BE52 & 1) ? 1 : 2) & rec->unk2)) {
+    if (!(((battle_flags & 1) ? 1 : 2) & rec->unk2)) {
         flags |= 2;
     }
     if (arg1 < D_800C186E[rec->unk4]) {
@@ -1145,8 +1145,8 @@ void func_80018968(s32 arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
         arg1->unk50 = -1;
         D_8007B900--;
-    } else if (!(D_8008BE52 & 0x100)) {
-        D_8008BE52 |= 0x10;
+    } else if (!(battle_flags & 0x100)) {
+        battle_flags |= 0x10;
         D_8007AA1C->unk2A++;
     } else {
         Hud_ShowActorPopup(arg1);
@@ -1193,7 +1193,7 @@ void func_80018B40(s32 arg0, Actor17360* arg1) {
 
 void Magic_RemoveEnemyOrDamagePlayer(Unk17360Cam* arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
-        if (!(D_8008BE52 & 0x100)) {
+        if (!(battle_flags & 0x100)) {
             Hud_ClearActorStatusIndicators(arg1);
             arg1->unk50 = -1;
             arg1->unk60 &= ~1;
@@ -1323,7 +1323,7 @@ void Magic_TargetCaster(Unk80019024* arg0) {
 }
 
 void Magic_ApplyShrinkStatus(s32 arg0, Actor17360* arg1) {
-    if (!(D_8008BE52 & 0x100)) {
+    if (!(battle_flags & 0x100)) {
         arg1->unk68->unk0 |= 1;
         arg1->scale = arg1->unk64->unk20 * 0.5;
         Hud_StartActorStatusIndicator(arg1, 1, 4, -1);
@@ -1351,7 +1351,7 @@ void func_80019104(s32 arg0, Actor17360* arg1) {
 }
 
 void func_80019184(s32 arg0, Actor17360* arg1) {
-    if (!(D_8008BE52 & 0x100)) {
+    if (!(battle_flags & 0x100)) {
         arg1->unk68->unk0 |= 8;
         arg1->unk60 |= 1;
         Hud_StartActorStatusIndicator(arg1, 8, arg0 - 1, -1);
@@ -1392,7 +1392,7 @@ void func_800192C8(s32 arg0, Actor17360* arg1) {
 }
 
 void func_800193A4(s32 arg0, Actor17360* arg1) {
-    if (!(D_8008BE52 & 0x100)) {
+    if (!(battle_flags & 0x100)) {
         arg1->unk68->unk0 |= 0x40;
         Hud_StartActorStatusIndicator(arg1, 0x40, 0xB, -1);
     } else {
