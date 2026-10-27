@@ -9,7 +9,7 @@
 void func_80036AC0(void);
 void osCreatePiManager(s32, OSMesgQueue *, OSMesg *, s32);
 void Boot_IdleThread(void *);
-void func_80000C70(void *);
+void Core_MainThread(void *);
 
 /* This file's .bss, 80070D20..80077160, in address order. D_80070D20 is the
  * boot stack: the entry code (asm/1000.s) clears bss from its address and starts
@@ -32,7 +32,7 @@ void Boot_Main(s32 arg0) {
 
 void Boot_IdleThread(void *arg0) {
     osCreatePiManager(OS_PRIORITY_PIMGR, &D_80077080, D_80077098, 0x32);
-    osCreateThread(&D_80072ED0, 6, func_80000C70, arg0, &D_80077080, 5);
+    osCreateThread(&D_80072ED0, 6, Core_MainThread, arg0, &D_80077080, 5);
     osStartThread(&D_80072ED0);
     for (;;) {}
 }

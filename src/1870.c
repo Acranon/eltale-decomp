@@ -93,16 +93,16 @@ void nnScCreateScheduler(NNSched *sc, u8 numFields);
 void nnScStartScheduler(NNSched *sc);
 OSMesgQueue *nnScGetGfxMQ(NNSched *sc);
 void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
-void func_80000F4C(void);
-void func_80001084(void);
-void func_800011B8(GfxFrame *arg0);
-void func_80001944(void);
-void func_8000205C(void);
-void func_800023F4(void);
-void func_8000275C(void);
-void func_80002948(void);
-void func_80002A8C(void);
-void func_80002BDC(void);
+void Core_ResetGameState(void);
+void Gfx_InitializeFrames(void);
+void Gfx_InitializeFrameTask(GfxFrame *arg0);
+void Core_RunGameplayLoop(void);
+void Core_RunSequentialMapScenes(void);
+void Core_RunScriptedMapScenes(void);
+void Core_RunMenuLoop(void);
+void Core_RunTitleLoop(void);
+void Core_RunIntroLoop(void);
+void Core_RunEndingLoop(void);
 void Player_Init(void);
 void Boss_ClearDefeated(void);
 void Env_InitClock(void);
@@ -189,7 +189,7 @@ extern u8 D_8039ADB0[];
 extern u16 D_803B5000[];
 extern u16 D_803DA800[];
 
-void func_80000C70(void *arg0) {
+void Core_MainThread(void *arg0) {
     osCreateViManager(0xFE);
     osCreateMesgQueue(&D_8007A1A8, &D_8007A1C0, 1);
     func_800285C4();
@@ -214,7 +214,7 @@ void func_80000C70(void *arg0) {
     osCreateMesgQueue(&D_8007A870, D_8007A888, 8);
     nnScAddClient(&D_8007A1E0, &D_8007A868, &D_8007A870);
     D_8007A860 = nnScGetGfxMQ(&D_8007A1E0);
-    func_80001084();
+    Gfx_InitializeFrames();
 
     while (1) {
         Boss_ClearDefeated();
@@ -225,7 +225,7 @@ void func_80000C70(void *arg0) {
         Env_InitClock();
         func_80035308();
         func_8002A4F0();
-        func_80000F4C();
+        Core_ResetGameState();
         func_8002A930();
     loop:
         D_8004DCA0 &= ~3;
@@ -234,25 +234,25 @@ void func_80000C70(void *arg0) {
         }
         switch (D_8007A170) {
             case 1:
-                func_80001944();
+                Core_RunGameplayLoop();
                 break;
             case 6:
-                func_8000205C();
+                Core_RunSequentialMapScenes();
                 break;
             case 7:
-                func_800023F4();
+                Core_RunScriptedMapScenes();
                 break;
             case 2:
-                func_8000275C();
+                Core_RunMenuLoop();
                 break;
             case 3:
-                func_80002948();
+                Core_RunTitleLoop();
                 break;
             case 4:
-                func_80002A8C();
+                Core_RunIntroLoop();
                 break;
             case 5:
-                func_80002BDC();
+                Core_RunEndingLoop();
                 break;
         }
         if (!(D_8004DCA0 & 0x8000)) {
@@ -261,7 +261,7 @@ void func_80000C70(void *arg0) {
     }
 }
 
-void func_80000F4C(void) {
+void Core_ResetGameState(void) {
     D_8004DCA0 &= 0x20000;
     D_8004DCA0 |= 0x160;
     D_8007A170 = 4;
@@ -292,7 +292,7 @@ void func_80000F4C(void) {
     D_8007A1CD = 0;
 }
 
-void func_80001084(void) {
+void Gfx_InitializeFrames(void) {
     u16 *b;
     u16 *a;
     u32 i;
@@ -304,10 +304,10 @@ void func_80001084(void) {
     func_80028120(D_D74AC0, a, D_D86170 - D_D74AC0);
     D_80301000[0].data.msg = 2;
     D_80301000[0].data.framebuffer = D_803B5000;
-    func_800011B8(&D_80301000[0]);
+    Gfx_InitializeFrameTask(&D_80301000[0]);
     D_80301000[1].data.msg = 2;
     D_80301000[1].data.framebuffer = D_803DA800;
-    func_800011B8(&D_80301000[1]);
+    Gfx_InitializeFrameTask(&D_80301000[1]);
     D_8007A17C = 0;
     i = 320 * 240;
     b = D_803B5000;
@@ -321,7 +321,7 @@ void func_80001084(void) {
     }
 }
 
-void func_800011B8(GfxFrame *arg0) {
+void Gfx_InitializeFrameTask(GfxFrame *arg0) {
     arg0->task.list.t.type = M_GFXTASK;
     arg0->task.list.t.flags = 0;
     arg0->task.list.t.ucode_boot = D_8004B980;
@@ -382,7 +382,7 @@ s32 func_8020C11C(void);
 s32 func_8020C15C(void);
 s32 func_8020C16C(void);
 
-void func_80001278(GfxFrame *arg0) {
+void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
     s32 count;
     s32 one = 1;
     GfxFrameData *sub;
@@ -515,7 +515,7 @@ extern s8 D_8008FAF0;
 extern s8 D_8008FB40;
 extern s8 D_80092C80;
 extern u16 D_8008CA50;
-void func_80002D44(s16 arg0);
+void Gfx_WaitForFrameMessage(s16 arg0);
 void Player_SetSpawnFromSaveTable(void);
 void func_8002A558(void);
 void func_8002A6B8(s32 arg0);
@@ -544,8 +544,8 @@ extern s8 D_8008FAF4;
 extern u8 D_801C0000[];
 extern u8 D_E420D0[];
 extern u8 D_E43780[];
-void func_80002DB0(void);
-void func_80002E74(void);
+void Transition_StartStateFadeIn(void);
+void Transition_StartStateFadeOut(void);
 void func_80002F40(s32 arg0);
 s32 func_80003184(void);
 void func_8000328C(s32 arg0);
@@ -636,7 +636,7 @@ void func_8002F87C(void);
 void func_8002FA00(s32 arg0);
 void func_80032BB0(s32 arg0);
 
-void func_80001944(void) {
+void Core_RunGameplayLoop(void) {
     OSMesg msg;
     GfxFrame *frame;
 
@@ -679,7 +679,7 @@ void func_80001944(void) {
     }
     if (D_8004DCA0 & 0x20) {
         D_8004DCA0 &= ~0x20;
-        func_80002DB0();
+        Transition_StartStateFadeIn();
     }
     if (D_8004DCA0 & 0x100) {
         func_8002A744(D_800842BC, D_800842C0, 0);
@@ -711,7 +711,7 @@ void func_80001944(void) {
         Env_Update();
         Map_StartFrame();
         MapObjAnim_UpdateAll();
-        func_80001278(&D_80301000[D_8007A17C]);
+        Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (!(D_8004DCA0 & 0x87)) {
             if (!(D_8007AA08.unk78 & 1) && Exit_CheckEnter(D_8007AA08.x, D_8007AA08.z, D_8007AA08.rot) != 0) {
@@ -750,7 +750,7 @@ void func_80001944(void) {
                 D_8004DCA0 |= 0x100;
                 func_8002A38C();
             } else if (D_8007A174 == D_8007A17A) {
-                func_80002E74();
+                Transition_StartStateFadeOut();
             }
         }
         func_8002A558();
@@ -763,9 +763,9 @@ void func_80001944(void) {
         D_8007A8B8 = (D_8007A8B0 - D_8007A8A8) * 64 / 3000;
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
-            func_80002D44(1);
+            Gfx_WaitForFrameMessage(1);
         } else {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
             while (D_8007A160 < 2) {
                 osRecvMesg(&D_8007A870, &msg, OS_MESG_BLOCK);
             }
@@ -778,7 +778,7 @@ void func_80001944(void) {
     if (D_8004DCA0 & 0x200) {
         func_800292DC(0);
     }
-    func_80002D44(2);
+    Gfx_WaitForFrameMessage(2);
     if (D_8004DCA0 & 0x200) {
         D_8004DCA0 &= ~0x200;
         while (func_80029328(0) != 0) {
@@ -789,7 +789,7 @@ void func_80001944(void) {
     }
 }
 
-void func_8000205C(void) {
+void Core_RunSequentialMapScenes(void) {
     s32 count;
     GfxFrame *frame;
     OSMesg msg;
@@ -813,7 +813,7 @@ void func_8000205C(void) {
             D_8008CA50 |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
-                func_80002DB0();
+                Transition_StartStateFadeIn();
             }
             D_8004DCA0 &= ~0x1C0;
         }
@@ -826,7 +826,7 @@ void func_8000205C(void) {
         }
         Env_Update();
         Map_StartFrame();
-        func_80001278(&D_80301000[D_8007A17C]);
+        Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8004DCA0 & 0x80) {
             if (--D_8007A174 == 0) {
@@ -838,15 +838,15 @@ void func_8000205C(void) {
                     D_8004DCA0 |= 0x160;
                 }
             } else if (D_8007A174 == D_8007A17A) {
-                func_80002E74();
+                Transition_StartStateFadeOut();
             }
         }
         func_8002A558();
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
-            func_80002D44(1);
+            Gfx_WaitForFrameMessage(1);
         } else {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
             while (D_8007A160 < 2) {
                 osRecvMesg(&D_8007A870, &msg, OS_MESG_BLOCK);
             }
@@ -855,7 +855,7 @@ void func_8000205C(void) {
         D_8007A160 = 0;
         D_8007A17C ^= 1;
         if (D_8004DCA0 & 0x40) {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
             D_8007A1D0 = 0;
         }
     }
@@ -869,7 +869,7 @@ void func_8000205C(void) {
     }
 }
 
-void func_800023F4(void) {
+void Core_RunScriptedMapScenes(void) {
     s32 count;
     OSMesg msg;
     GfxFrame *frame;
@@ -893,7 +893,7 @@ void func_800023F4(void) {
             D_8008CA50 |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
-                func_80002DB0();
+                Transition_StartStateFadeIn();
             }
             D_8004DCA0 &= ~0xC0;
         }
@@ -904,22 +904,22 @@ void func_800023F4(void) {
         func_8003642C();
         Env_Update();
         Map_StartFrame();
-        func_80001278(&D_80301000[D_8007A17C]);
+        Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8004DCA0 & 0x80) {
             if (--D_8007A174 == 0) {
                 func_8002A38C();
                 func_800364F4();
             } else if (D_8007A174 == D_8007A17A) {
-                func_80002E74();
+                Transition_StartStateFadeOut();
             }
         }
         func_8002A558();
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
-            func_80002D44(1);
+            Gfx_WaitForFrameMessage(1);
         } else {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
             while (D_8007A160 < 2) {
                 osRecvMesg(&D_8007A870, &msg, OS_MESG_BLOCK);
             }
@@ -928,7 +928,7 @@ void func_800023F4(void) {
         D_8007A160 = 0;
         D_8007A17C ^= 1;
         if (D_8004DCA0 & 0x40) {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
             D_8007A1D0 = 0;
         }
     }
@@ -943,7 +943,7 @@ void func_800023F4(void) {
     D_8004DCA0 |= 0x20000;
 }
 
-void func_8000275C(void) {
+void Core_RunMenuLoop(void) {
     GfxFrame *frame;
 
     D_8007A1D0 = 0;
@@ -954,14 +954,14 @@ void func_8000275C(void) {
     while (D_8007A170 == 2) {
         func_80035970(D_80092C80);
         D_8007A180 = 0;
-        func_80001278(&D_80301000[D_8007A17C]);
+        Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         func_8002A558();
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
-            func_80002D44(1);
+            Gfx_WaitForFrameMessage(1);
         } else {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
         }
         osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
         D_8007A17C ^= 1;
@@ -978,10 +978,10 @@ void func_8000275C(void) {
         D_8004DCA0 &= ~0x400;
     }
     func_8002A900();
-    func_80002D44(2);
+    Gfx_WaitForFrameMessage(2);
 }
 
-void func_80002948(void) {
+void Core_RunTitleLoop(void) {
     GfxFrame *frame;
 
     D_8007A1D0 = 0;
@@ -990,21 +990,21 @@ void func_80002948(void) {
     while (D_8007A170 == 3) {
         func_80035970(D_80092C80);
         D_8007A180 = 0;
-        func_80001278(&D_80301000[D_8007A17C]);
+        Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
-            func_80002D44(1);
+            Gfx_WaitForFrameMessage(1);
         } else {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
         }
         osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
         D_8007A17C ^= 1;
     }
-    func_80002D44(2);
+    Gfx_WaitForFrameMessage(2);
 }
 
-void func_80002A8C(void) {
+void Core_RunIntroLoop(void) {
     GfxFrame *frame;
 
     D_8007A1D0 = 0;
@@ -1014,23 +1014,23 @@ void func_80002A8C(void) {
         func_80035970(D_80092C80);
         D_8007A180 = 0;
         func_8002A558();
-        func_80001278(&D_80301000[D_8007A17C]);
+        Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
-            func_80002D44(1);
+            Gfx_WaitForFrameMessage(1);
         } else {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
         }
         osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
         D_8007A17C ^= 1;
     }
     func_8002A6B8(-1);
     func_8002A558();
-    func_80002D44(2);
+    Gfx_WaitForFrameMessage(2);
 }
 
-void func_80002BDC(void) {
+void Core_RunEndingLoop(void) {
     GfxFrame *frame;
 
     D_8007A1D0 = 0;
@@ -1043,18 +1043,18 @@ void func_80002BDC(void) {
         func_80035970(D_80092C80);
         D_8007A180 = 0;
         func_8002A558();
-        func_80001278(&D_80301000[D_8007A17C]);
+        Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
-            func_80002D44(1);
+            Gfx_WaitForFrameMessage(1);
         } else {
-            func_80002D44(2);
+            Gfx_WaitForFrameMessage(2);
         }
         osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
         D_8007A17C ^= 1;
     }
-    func_80002D44(2);
+    Gfx_WaitForFrameMessage(2);
 }
 
 void func_800269B8(s32 arg0, s32 arg1, void *arg2);
@@ -1070,7 +1070,7 @@ extern u8 D_8004F73C[];
 extern u8 D_8008CA58[];
 extern u8 D_8008CE54[];
 
-void func_80002D44(s16 arg0) {
+void Gfx_WaitForFrameMessage(s16 arg0) {
     OSMesg msg = NULL;
 
     do {
@@ -1078,7 +1078,7 @@ void func_80002D44(s16 arg0) {
     } while (arg0 != *(s16 *)msg);
 }
 
-void func_80002DB0(void) {
+void Transition_StartStateFadeIn(void) {
     switch (D_8007A178) {
         case 0:
             func_800269B8(0x10, 4, D_8004F5DC);
@@ -1098,7 +1098,7 @@ void func_80002DB0(void) {
     }
 }
 
-void func_80002E74(void) {
+void Transition_StartStateFadeOut(void) {
     switch (D_8007A178) {
         case 0:
             func_800269B8(0xF, 2, D_8004F5A0);
