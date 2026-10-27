@@ -1,4 +1,14 @@
 #include "game/ui/menu.h"
+#include "game/audio/sound.h"
+#include "game/core/dma.h"
+#include "game/core/main.h"
+#include "game/event/cutscene.h"
+#include "game/input/input.h"
+#include "game/map/map.h"
+#include "game/player/player.h"
+#include "game/save/save_menu.h"
+#include "game/text/text.h"
+#include "game/text/text_window.h"
 
 /*
  * Start-button menu (game state 2): four pages (stats, map, element levels, options) with
@@ -25,8 +35,6 @@ s32 menu_options_marker_x; /* only Menu_UpdateOptionsPage (asm) uses it */
 f32 menu_map_cursor_saved_x; /* only Menu_UpdateMapPage (asm) uses these two */
 f32 menu_map_cursor_saved_y;
 
-extern Gfx* gfx_dl_head;
-extern u16 save_menu_flags;
 
 void Menu_Init(void) {
     menu_flags = 0x8000;
@@ -40,13 +48,7 @@ void Menu_ResetKeepPage(void) {
     menu_map_cursor_active = 0;
 }
 
-extern Gfx* gfx_dl_head;
-extern Gfx text_glyph_setup_dl[];
-extern u16 core_game_mode;
-extern u16 input_pressed_buttons;
-void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
-void SaveMenu_Update(void);
 
 void Menu_Update(struct GfxFrameData *arg0) {
     gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
@@ -192,9 +194,6 @@ extern u8 D_8007AA01;
 extern u8 D_8007AA02;
 extern u8 D_8007AA03;
 extern s32 D_8007AA10;
-extern s8 input_stick_x;
-extern u16 input_held_buttons;
-void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
 void Menu_UpdateStatsPage(s32 x) {
     s32 px;
@@ -308,17 +307,6 @@ void Menu_UpdateStatsPage(s32 x) {
 
 #ifdef NON_MATCHING
 /* context for the NON_MATCHING Menu_UpdateOptionsPage and Menu_UpdateMapPage (their data is defined below) */
-typedef struct {
-    /* 0x00 */ u8 unk0[0x18];
-    /* 0x18 */ f32 x;
-    /* 0x1C */ f32 y;
-    /* 0x20 */ f32 z;
-} Unk8007AA08_2B530;
-extern Unk8007AA08_2B530 player_state;
-extern s8 menu_text_delay_option;
-extern s8 input_stick_y;
-void Dma_ReadRom(u32, void *, s32);
-void SaveMenu_SetTextDrawState(void);
 #endif
 
 #ifdef NON_MATCHING
@@ -680,8 +668,8 @@ void Menu_UpdateMapPage(s32 arg0) {
     Menu_DrawSprite(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
     if (menu_map_region < 6) {
         if (menu_map_spot < 0) {
-            cx = (s32) player_state.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
-            cy = (s32) player_state.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
+            cx = (s32) player_state.actor.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
+            cy = (s32) player_state.actor.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
         } else {
             cx = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2];
             cy = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2 + 1];
@@ -788,9 +776,6 @@ extern u8 D_8007A9F6;
 extern u8 D_8007A9F7;
 extern s32 D_8007A9E0;
 extern u8 D_8007AA04;
-extern s8 input_stick_x;
-extern u16 input_held_buttons;
-void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
 void Menu_UpdateElementsPage(s32 x) {
     s32 p;
@@ -878,7 +863,6 @@ void Menu_UpdateElementsPage(s32 x) {
 
 #ifdef NON_MATCHING
 /* w, s, lrs and lrt are kept in registers where retail reloads them from the stack; code is equivalent */
-extern u16 menu_sprite_tlut[];
 
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
     s32 ret;
@@ -1085,7 +1069,6 @@ void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
     menu_flags &= ~0x10;
 }
 
-extern u16 menu_bg_tlut[];
 
 void Menu_DrawBackground(void) {
     s32 i;
@@ -1115,7 +1098,6 @@ void Menu_DrawBackground(void) {
     }
 }
 
-extern u16 menu_sprite_tlut[];
 
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     s32 i;
@@ -1212,8 +1194,6 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
 }
 
 
-extern s32 map_id;
-extern s32 map_subarea;
 
 
 /* ---------------------------------------------------------------------------
@@ -1225,110 +1205,6 @@ extern s32 map_subarea;
  */
 #ifndef NON_MATCHING /* the NON_MATCHING build declares it earlier, for Menu_UpdateMapPage */
 #endif
-extern u8 D_800620A0[];
-extern u8 D_800621A8[];
-extern u8 D_80062280[];
-extern u8 D_80062290[];
-extern u8 D_800622A0[];
-extern u8 D_80062338[];
-extern u8 D_80062380[];
-extern u8 D_80062438[];
-extern u8 D_800624F0[];
-extern u8 D_80062500[];
-extern u8 D_80062510[];
-extern u8 D_80062568[];
-extern u8 D_800625C0[];
-extern u8 D_80062618[];
-extern u8 D_80062670[];
-extern u8 D_800626C8[];
-extern u8 D_80062720[];
-extern u8 D_80062778[];
-extern u8 D_800627D0[];
-extern u8 D_80062828[];
-extern u8 D_80062880[];
-extern u8 D_800628D8[];
-extern u8 D_80062930[];
-extern u8 D_80062988[];
-extern u8 D_800629E0[];
-extern u8 D_80062A38[];
-extern u8 D_80062A90[];
-extern u8 D_80062EC8[];
-extern u8 D_80063038[];
-extern u8 D_800631B0[];
-extern u8 D_800633D8[];
-extern u8 D_80063588[];
-extern u8 D_80063598[];
-extern u8 D_80063680[];
-extern u8 D_80063B40[];
-extern u8 D_80063DD0[];
-extern u8 D_80063FD0[];
-extern u8 D_80064228[];
-extern u8 D_80064320[];
-extern u8 D_80064380[];
-extern u8 D_800643E0[];
-extern u8 D_80064440[];
-extern u8 D_80064538[];
-extern u8 D_80064630[];
-extern u8 D_800649D8[];
-extern u8 D_80064AA0[];
-extern u8 D_80064F08[];
-extern u8 D_80064FA0[];
-extern u8 D_80065038[];
-extern u8 D_800650D0[];
-extern u8 D_80065168[];
-extern u8 D_80065350[];
-extern u8 D_800653F8[];
-extern u8 D_80065408[];
-extern u8 D_80065418[];
-extern u8 D_80065590[];
-extern u8 D_800655A8[];
-extern u8 D_800655C0[];
-extern u8 D_800655D8[];
-extern u8 D_800655F0[];
-extern u8 D_80065608[];
-extern u8 D_80065620[];
-extern u8 D_80065638[];
-extern u8 D_80065648[];
-extern u8 D_80065780[];
-extern u8 D_80065790[];
-extern u8 D_800657A0[];
-extern u8 D_80065D78[];
-extern u8 D_80065F08[];
-extern u8 D_80066098[];
-extern u8 D_80066210[];
-extern u8 D_80066330[];
-extern u8 D_80066488[];
-extern u8 D_800664E0[];
-extern u8 D_80066538[];
-extern u8 D_80066590[];
-extern u8 D_800665E8[];
-extern u8 D_80066640[];
-extern u8 D_80066698[];
-extern u8 D_800666F0[];
-extern u8 D_80066748[];
-extern u8 D_800667A0[];
-extern u8 D_800667F8[];
-extern u8 D_80066850[];
-extern u8 D_80066918[];
-extern u8 D_800669E0[];
-extern u8 D_800669F0[];
-extern u8 D_80066AE8[];
-extern u8 menu_bg_strip_tex_0[];
-extern u8 menu_bg_strip_tex_1[];
-extern u8 menu_bg_strip_tex_2[];
-extern u8 menu_bg_strip_tex_3[];
-extern u16 D_80068EB0[];
-extern u8 D_800690B8[];
-extern u8 D_800695A8[];
-extern u16 D_80069A98[];
-extern u8 D_80069CA0[];
-extern u8 D_8006A2C8[];
-extern u16 D_8006A8F0[];
-extern u8 D_8006AAF8[];
-extern u8 D_8006AFE8[];
-extern u16 D_8006B4D8[];
-extern u8 D_8006B6E0[];
-extern u8 D_8006BBD0[];
 void *player_char_data[1] = {
     (void*)0x80206064,
 };
@@ -1959,7 +1835,6 @@ MenuFourWords menu_bg_strip_tex_heights = { { 32, 32, 32, 24 } };
 MenuFourWords menu_bg_strip_heights = { { 26, 26, 26, 20 } };
 MenuFourPointers menu_bg_strip_tex = { { menu_bg_strip_tex_0, menu_bg_strip_tex_1, menu_bg_strip_tex_2, menu_bg_strip_tex_3 } };
 
-void Text_DrawEncodedString(s32, s32, u8 *);
 
 
 
