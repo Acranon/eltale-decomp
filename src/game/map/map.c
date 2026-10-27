@@ -1,7 +1,12 @@
 #include "game/actor/anim.h"
-#include "game/camera/camera.h"
-#include "game/gfx/sprite_effect.h"
+#include "game/audio/sound.h"
+#include "game/core/dma.h"
+#include "game/core/main.h"
+#include "game/env/env.h"
+#include "game/gfx/effect.h"
 #include "game/gfx/shadow.h"
+#include "game/gfx/sprite_effect.h"
+#include "game/player/player.h"
 
 /*
  * Field map: area loading (ROM blocks, area/sub-area tables, map objects), drawing the
@@ -11,43 +16,26 @@
  * Original file: E2A0.c (ROM 0xE2A0).
  */
 
-/* Local view of EnvAreaSettings (game/env/env.h, h_core) until H2. */
-typedef struct EnvAreaSettings {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ u16 unk18;
-    /* 0x1A */ u8 pad1A[2];
-    /* 0x1C */ s32 unk1C;
-} Unk80084994; /* size 0x20 */
-
-/* Local view of GfxFrameData (game/core/main.h, h_core) until H2. */
-typedef struct GfxFrameData {
-    /* 0x00 */ u8 pad0[0xC0];
-    /* 0xC0 */ Mtx mtx[1];
-} MtxBuf;
-
-extern AnimNode mapobjanim_type23_anim;
-extern AnimNode mapobjanim_type23_odd_anim;
-extern AnimNode mapobjanim_type4_anim;
-extern s32 gfx_frame_index;
-extern Gfx *gfx_dl_head;
-
-extern u8 mapobj_arc_sprite_tex[];
-extern u16 D_80124E00[];
-extern s32 gfx_mtx_index;
+/* Not defined by a module: segment 2, and env_light_dirs[2][0..2] (env.c) through its interior
+ * labels (undefined_syms.txt): H2b: retail loads each with its own lui, as separate symbols. */
+extern GfxFrameData D_2000000;
 extern s32 D_80084B60;
 extern s32 D_80084B64;
 extern s32 D_80084B68;
-extern Unk80084994 *env_area_settings;
-extern MtxBuf D_2000000;
 
-void Dma_ReadRom();
-extern s32 D_80084308;
-extern f32 player_spawn_x;
-extern f32 player_spawn_z;
-extern f32 player_spawn_rot;
-extern s32 player_spawn_obj;
-extern u16 D_80081B78[];
-extern u16 D_80081B7A[];
+/* map.h comes after the headers and externs above on purpose (.bss order). Its .bss externs fix
+ * this file's .bss order (first declaration; IDO sorts by declaration number mod 256, later
+ * blocks first on a tie), and Map_BlendPaletteByClock's static map_clock_blend_len only lands at
+ * 80082858 (after mapobj_noanim_list) if the number of declarations (typedefs, tags, used
+ * externs) between map.h's externs and the static stays as it is now: measured margin 3 more
+ * or 2 fewer. That is why menu.h (which includes map.h) and camera.h come right after map.h and
+ * the four externs above sit before it. Above map.h about 96 more declarations still work. */
+#include "game/map/map.h"
+#include "game/ui/menu.h"
+#include "game/camera/camera.h"
+
+/* Not defined by a module: overlay data, ROM addresses and fixed RAM addresses. */
+extern u16 D_80124E00[];
 extern u8 D_753F0[];
 extern u8 D_851F0[];
 /* Same address as D_851F0: the end of the ROM block that starts at D_753F0 (a separate linker symbol in the original). */
@@ -60,40 +48,13 @@ extern u8 D_3F1BA0[];
 extern u8 D_80100000[];
 extern u8 D_8010FE00[];
 extern u8 D_801E0000[];
-
-extern u8 mapobj_translucent_alpha[];
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ f32 x;
-    /* 0x1C */ f32 y;
-    /* 0x20 */ f32 z;
-} Unk8007AA08;
-extern Unk8007AA08 player_state;
-f32 sqrtf(f32);
-void guMtxF2L(f32 (*)[4], Mtx *);
+/* menu.c's mapobj_animtex_frame_tables / mapobj_kind12_setup_dl read with a base biased by
+ * the first animated kind (0x11): mapobj_animtex_dls + 0xC, mapobj_kind12_setup_dl + 0x14. */
 extern u8 **D_8005E5AC[];
-extern f32 D_80085E74;
-
-extern s32 env_clock;
-extern struct MapBackdropDef map_backdrop_defs[];
 extern struct MapDlPair D_8005E51C[];
-extern struct MapDlPair mapobj_animtex_dls[];
-extern struct MapAreaDef map_area_defs[];
-extern struct MapRomRange map_extra_rom_ranges[];
-extern u8 mapobj_arc_sprite_dl[];
-extern u8 mapobj_drop_sprite_tex[];
-extern u8 mapobj_drop_sprite_dl[];
-
-/* map.h is included after the declarations above on purpose. Its .bss externs fix this file's
- * .bss order (first declaration; IDO sorts by declaration number mod 256, later blocks first on
- * a tie), and Map_BlendPaletteByClock's static map_clock_blend_len only lands at 80082858
- * (after mapobj_noanim_list) if few declarations sit between those externs and the static:
- * keep new declarations above this include (margin: about 2 more or 3 fewer). The extern block
- * also must not cross a multiple of 256 declarations: about 24 more declarations above this
- * include still work, env.h's are too many (so the EnvAreaSettings view stays local). */
-#include "game/map/map.h"
-
-void Effect_QueueMapObjEmitter(f32, f32, f32, MapObj *);
+/* Labels inside this file's D_80081AB0 (undefined_syms.txt); Map_LoadArea needs them as symbols. */
+extern u16 D_80081B78[];
+extern u16 D_80081B7A[];
 
 /* This file's .bss starts here: 8007C280..80082030 in address order, then
  * D_80082030.. below. mapobj_billboard_list is a pointer table other files use.
@@ -221,20 +182,20 @@ void Map_LoadArea(void) {
             if (map_subarea == 2 && map_next_subarea == 0) {
                 map_flag4_return_map = map_next_id;
                 map_flag4_return_subarea = map_next_subarea;
-                map_flag4_return_entry = D_80084308;
+                map_flag4_return_entry = exit_destination.entry;
             }
         } else if (map_next_id == 6) {
             map_flag4_return_map = map_next_id;
             map_flag4_return_subarea = map_next_subarea;
-            map_flag4_return_entry = D_80084308;
+            map_flag4_return_entry = exit_destination.entry;
         } else if ((map_flags & 1) && (map_area_def->flags & 4)) {
             map_flag4_return_map = map_next_id;
             map_flag4_return_subarea = map_next_subarea;
-            map_flag4_return_entry = D_80084308;
+            map_flag4_return_entry = exit_destination.entry;
         } else if (map_next_id != map_id && (map_area_def->flags & 8)) {
             map_flag8_return_map = map_next_id;
             map_flag8_return_subarea = map_next_subarea;
-            map_flag8_return_entry = D_80084308;
+            map_flag8_return_entry = exit_destination.entry;
             if (map_flag8_return_map == 0x1A && map_flag8_return_subarea == 4) {
                 map_flag8_return_subarea = 2;
                 map_flag8_return_entry = 1;
@@ -291,8 +252,8 @@ void Map_LoadArea(void) {
         Dma_ReadRom(map_backdrop_defs[map_backdrop_id].start, map_backdrop_phase_tluts, 0x800);
         Dma_ReadRom(map_backdrop_defs[map_backdrop_id].start + 0x800, map_backdrop_tex, 0x4000);
     }
-    if (D_80084308 != -1) {
-        sp = &map_subarea_def->entries[D_80084308];
+    if (exit_destination.entry != -1) {
+        sp = &map_subarea_def->entries[exit_destination.entry];
         player_spawn_x = sp->x;
         player_spawn_z = sp->y;
         player_spawn_rot = sp->z;
@@ -350,25 +311,10 @@ void Map_StartFrame(void) {
 }
 
 #ifdef NON_MATCHING
-typedef struct {
-    /* 0x00 */ s8 dx;
-    /* 0x01 */ s8 dz;
-} CellOffset;
-
-extern CellOffset mapobj_cell_single[];
-extern CellOffset mapobj_cell_disc_r7[];
-extern CellOffset mapobj_cell_disc_r5[];
-extern CellOffset mapobj_cell_square_3x3[];
-extern CellOffset mapobj_cell_disc_r2[];
-extern AnimNode mapobj_loop_anims[];
-extern Gfx D_10000E8[];
-extern s16 gfx_fog_near;
-extern s16 gfx_fog_far;
-void Sfx_StopChannel4(void);
-void Sfx_PlayIfAudible(s8, u8);
+extern Gfx D_10000E8[]; /* segment 1 (no module defines it) */
 
 /* &mapobj_opaque_list kept in a saved register instead of rematerialized, 8 bytes short, register allocation; code is equivalent */
-void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
+void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     CellOffset *off;
     s32 n;
     s32 cx;
@@ -475,7 +421,7 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
         z = s->z;
         rot = s->angle;
         if (flags & 0x2000) {
-            anim = &mapobj_loop_anims[(flags & 0xF00) >> 8];
+            anim = (AnimNode *)&mapobj_loop_anims[(flags & 0xF00) >> 8]; /* H2b: menu.h types it MapObjAnimDef */
             t = flags;
             t = (t & 0xFF) + 1;
             Math_EvalTcbSpline(&anim->track, (f32 *)&mapobj_spline_out, flags & 0xFF);
@@ -568,7 +514,7 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
 #pragma GLOBAL_ASM("asm/nonmatchings/game/map/map/MapObj_UpdateAndDrawNearby.s")
 #endif
 
-void MapObj_DrawTranslucent(MtxBuf *arg0) {
+void MapObj_DrawTranslucent(GfxFrameData *arg0) {
     MapObj *s;
     s32 n;
     s32 k;
@@ -641,9 +587,9 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
     for (; count != 0; count--) {
         s = &map_objs[*ids++];
         if (s->kind & 0x1000) {
-            dx = s->x - player_state.x;
-            dy = s->y - player_state.y;
-            dz = s->z - player_state.z;
+            dx = s->x - player_state.actor.x;
+            dy = s->y - player_state.actor.y;
+            dz = s->z - player_state.actor.z;
             d = sqrtf(dx * dx + dy * dy + dz * dz);
             if (d < mapobj_ambient_dist) {
                 mapobj_ambient_dist = d;
@@ -699,7 +645,7 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
     }
 }
 
-void Map_DrawBackdrop(MtxBuf *arg0) {
+void Map_DrawBackdrop(GfxFrameData *arg0) {
     Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, 0.0f, 0.0f, 1.0f, camera_state.eyeX, camera_state.eyeY - 10.0f, camera_state.eyeZ);
     gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
     gfx_mtx_index++;
@@ -760,13 +706,13 @@ void MapObjAnim_Start(s32 state, s32 frame, s32 type, MapObj *obj) {
             case 2:
             case 3:
                 if (p->type & 1) {
-                    anim = &mapobjanim_type23_odd_anim;
+                    anim = (AnimNode *)&mapobjanim_type23_odd_anim; /* H2b: menu.h types it MapObjAnimDef */
                 } else {
-                    anim = &mapobjanim_type23_anim;
+                    anim = (AnimNode *)&mapobjanim_type23_anim; /* H2b: menu.h types it MapObjAnimDef */
                 }
                 break;
             case 4:
-                anim = &mapobjanim_type4_anim;
+                anim = (AnimNode *)&mapobjanim_type4_anim; /* H2b: menu.h types it MapObjAnimDef */
                 break;
         }
         p->timer = anim->track.last - frame + 1;
@@ -797,13 +743,13 @@ void MapObjAnim_UpdateAll(void) {
                         case 2:
                         case 3:
                             if (p->type & 1) {
-                                anim = &mapobjanim_type23_odd_anim;
+                                anim = (AnimNode *)&mapobjanim_type23_odd_anim; /* H2b: menu.h types it MapObjAnimDef */
                             } else {
-                                anim = &mapobjanim_type23_anim;
+                                anim = (AnimNode *)&mapobjanim_type23_anim; /* H2b: menu.h types it MapObjAnimDef */
                             }
                             break;
                         case 4:
-                            anim = &mapobjanim_type4_anim;
+                            anim = (AnimNode *)&mapobjanim_type4_anim; /* H2b: menu.h types it MapObjAnimDef */
                             break;
                     }
                     Math_EvalTcbSpline(&anim->track, (f32 *)&mapobj_spline_out, p->frame++);
@@ -817,7 +763,7 @@ void MapObjAnim_UpdateAll(void) {
     } while (i != 0);
 }
 
-void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, MapObj **list) {
+void MapObj_DrawBillboards(GfxFrameData *arg0, s32 count, s32 type, MapObj **list) {
     MapObj *s;
     f32 dx;
     f32 dz;
@@ -872,7 +818,7 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, MapObj **list) {
 
 void MapObj_EmitArcSprite(MapObj *arg0) {
     static EffectSprite mapobj_arc_sprite_template = {
-        0x23, 0, 0, MapObj_StepArcSprite, 7, 0x20, 0x20, 0, 0, { 0 }, mapobj_arc_sprite_tex, (Gfx *)mapobj_arc_sprite_dl,
+        0x23, 0, 0, MapObj_StepArcSprite, 7, 0x20, 0x20, 0, 0, { 0 }, mapobj_arc_sprite_tex, mapobj_arc_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 15.0f, 0.0f, 0,
     };
 
@@ -905,7 +851,7 @@ void MapObj_StepArcSprite(EffectSprite *arg0) {
 
 void MapObj_EmitDropSprite(MapObj *arg0) {
     static EffectSprite mapobj_drop_sprite_template = {
-        0xF, 0, 0, MapObj_StepDropSprite, 0, 0x08, 0x10, 0, 0, { 0 }, mapobj_drop_sprite_tex, (Gfx *)mapobj_drop_sprite_dl,
+        0xF, 0, 0, MapObj_StepDropSprite, 0, 0x08, 0x10, 0, 0, { 0 }, mapobj_drop_sprite_tex, mapobj_drop_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0,
     };
 
@@ -978,7 +924,7 @@ void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, MapObj *arg4) {
     }
 }
 
-void MapObj_DrawSpinners(MtxBuf *arg0) {
+void MapObj_DrawSpinners(GfxFrameData *arg0) {
     MapObjSpinner *p;
     u32 i;
     MapObj *s;
@@ -1000,7 +946,7 @@ void MapObj_DrawSpinners(MtxBuf *arg0) {
     }
 }
 
-void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, MapObj **list) {
+void MapObj_DrawAnimTexBillboards(GfxFrameData *arg0, s32 count, s32 type, MapObj **list) {
     s32 pad1;
     s32 idx;
     s32 pad;
@@ -1021,7 +967,7 @@ void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, MapObj **li
                 first++;
             }
             gDPLoadTextureBlock(gfx_dl_head++, tex[(s->model >> 1) & 7], G_IM_FMT_CI, G_IM_SIZ_8b, mapobj_animtex_width[type - 0x11], 32, 0, 0, 0, 0, 0, 0, 0);
-            Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, D_80085E74, 0.0f, s->scale, s->x, s->y, s->z);
+            Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, camera_state.yaw, 0.0f, s->scale, s->x, s->y, s->z);
             gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
             gfx_mtx_index++;
             gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_animtex_alpha[s->model & 3]);
