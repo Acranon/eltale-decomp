@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Title overlay data: the title screen's images, palettes and message text.
+ * Folder: src/game/title/   (proposed for round 4)
+ */
+
 /* ovl_title .data 8020F510..80226D30: the title screen's images, palettes and message text.
    A data-only file: DAC190.c's .data ends at 8020F504 and this starts 16-aligned at 8020F510.
    The 8-byte Gfx after some images is a gsSPEndDisplayList that follows the converted texture. */

@@ -1,5 +1,12 @@
 #include "common.h"
 
+/*
+ * Boot-time Controller Pak manager (overlay at 0x80100000, run once by Core_MainThread
+ * with START held): lists the pak's notes, deletes notes, repairs the pak ID. Draws
+ * straight into its own two framebuffers with a CPU blitter and font.
+ * Folder: src/game/save/   (proposed for round 4)
+ */
+
 typedef struct {
     s16 x;
     s16 y;
