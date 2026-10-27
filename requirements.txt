@@ -1,0 +1,7 @@
+splat64==0.50.1
+spimdisasm==1.42.4
+rabbitizer==1.16.2
+crunch64==0.6.2
+n64img==0.3.3
+ninja_syntax==1.7.2
+PyYAML==6.0.3
