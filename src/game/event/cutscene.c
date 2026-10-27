@@ -1,48 +1,22 @@
 #include "game/event/cutscene.h"
+#include "game/audio/audio.h"
+#include "game/camera/camera.h"
+#include "game/core/main.h"
+#include "game/enemy/enemy.h"
+#include "game/env/env.h"
+#include "game/map/map.h"
+#include "game/math/math.h"
+#include "game/npc/npc.h"
+#include "game/player/player.h"
+#include "game/text/text_window.h"
 
 /*
  * Cutscene scene sequencing, camera tracks, and timed image cue drawing.
  * Original file: 36E60.c (ROM 0x36E60).
  */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 pad4[8];
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-} Unk80085E48;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-} Unk8007A9D0;
 
-extern s32 core_flags;
-extern s16 core_game_mode;
-extern s32 core_transition_timer;
-extern s16 fade_transition_style;
-extern s16 core_fade_out_time;
-extern f32 player_spawn_x;
-extern f32 player_spawn_z;
-extern f32 player_spawn_rot;
-extern s32 player_spawn_type;
-extern Unk8007A9D0 player_stats;
-extern s16 D_8007AA0E;
-extern s32 npc_count;
-extern s32 enemy_count;
-extern s32 map_id;
-extern s32 map_next_id;
-extern s32 map_next_subarea;
-extern s32 D_80084308;
-extern s32 env_clock;
-extern Unk80085E48 camera_state;
-extern f32 camera_fovy;
-extern s32 text_active_window_count;
 /* .bss 80092ED0..80092FF0 */
 s32 cutscene_sequence_index;
 s32 cutscene_camera_frame; /* current camera-track frame */
@@ -51,7 +25,6 @@ KfAnim *cutscene_camera_track;
 s32 cutscene_image_frame;
 CutsceneImageCue *cutscene_next_image_cue;
 CutsceneImageCueSlot cutscene_image_cue_slots[32];
-extern Gfx *gfx_dl_head;
 /* This file's .data, 80061850..8006CD00: textures and palettes (assets; the
  * converter put a gsSPEndDisplayList word after most images), message text
  * (assets), the message pointer tables and layouts, flags and a display list. */
@@ -606,13 +579,6 @@ Gfx cutscene_image_setup_dl[14] = {
 };
 extern CutsceneSequenceEntry D_801D8620[];
 
-void Player_Spawn(void);
-void Map_LoadArea(void);
-void Camera_InitForMap(void);
-void Audio_StartSeqFadeOut(s32);
-void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
-void Math_MtxFMulVecNegZ(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
-void Text_ResetAllWindows(s32 arg0);
 
 void Cutscene_ResetSequence(void) {
     cutscene_sequence_index = 0;
@@ -631,7 +597,7 @@ void Cutscene_StartNextScene(void) {
     map_next_subarea = e->unk4;
     Text_ResetAllWindows(0);
     text_active_window_count = 0;
-    D_80084308 = -1;
+    exit_destination.entry = -1;
     Map_LoadArea();
     if (e->unk8 & 1) {
         player_spawn_x = e->unkC;
@@ -639,13 +605,13 @@ void Cutscene_StartNextScene(void) {
         player_spawn_rot = e->unk14;
         player_spawn_type = 0x108;
         player_stats.unk4 = player_stats.unk6;
-        D_8007AA0E = 0;
+        player_state.unk6 = 0;
         Player_Spawn();
     } else {
         core_flags |= 0x10000;
     }
     Camera_InitForMap();
-    camera_state.unk0 = 3;
+    camera_state.mode = 3;
     camera_fovy = 35.0f;
     Cutscene_ApplyCameraFrame(cutscene_camera_track, cutscene_camera_frame);
     npc_count = 0;
@@ -692,14 +658,14 @@ void Cutscene_ApplyCameraFrame(KfAnim *arg0, s32 frame) {
         frame = arg0->last;
     }
     Math_EvalTcbSpline(arg0, buf, frame);
-    camera_state.unkC = buf[0];
-    camera_state.unk10 = buf[1];
-    camera_state.unk14 = buf[2];
-    Math_MtxFRotate(m, -buf[4] * 0.0174532925199432955, -buf[3] * 0.0174532925199432955, buf[5] * 0.0174532925199432955);
-    Math_MtxFMulVecNegZ(m, 0.0f, 0.0f, -100.0f, &camera_state.unk18, &camera_state.unk1C, &camera_state.unk20);
-    camera_state.unk18 += camera_state.unkC;
-    camera_state.unk1C += camera_state.unk10;
-    camera_state.unk20 = camera_state.unk14 - camera_state.unk20;
+    camera_state.eyeX = buf[0];
+    camera_state.eyeY = buf[1];
+    camera_state.eyeZ = buf[2];
+    Math_MtxFRotate((MtxF *)m, -buf[4] * 0.0174532925199432955, -buf[3] * 0.0174532925199432955, buf[5] * 0.0174532925199432955);
+    Math_MtxFMulVecNegZ((MtxF *)m, 0.0f, 0.0f, -100.0f, &camera_state.atX, &camera_state.atY, &camera_state.atZ);
+    camera_state.atX += camera_state.eyeX;
+    camera_state.atY += camera_state.eyeY;
+    camera_state.atZ = camera_state.eyeZ - camera_state.atZ;
 }
 
 void Cutscene_UpdateAndDrawImageCues(void) {

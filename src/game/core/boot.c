@@ -1,4 +1,5 @@
 #include "game/core/boot.h"
+#include "game/core/main.h"
 
 /*
  * Boot: the entry point's first C function and the idle thread, which starts the PI
@@ -6,9 +7,9 @@
  * Original file: 1050.c (ROM 0x1050).
  */
 
+/* libultra's osInitialize (libultra/os/initialize.c), still func_ in symbol_addrs.txt,
+ * so no SDK header declares it under this name. */
 void func_80036AC0(void);
-void osCreatePiManager(s32, OSMesgQueue *, OSMesg *, s32);
-void Core_MainThread(void *);
 
 /* This file's .bss, 80070D20..80077160, in address order. boot_stack is the
  * boot stack: the entry code (asm/1000.s) clears bss from its address and starts
