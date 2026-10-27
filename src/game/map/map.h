@@ -132,8 +132,8 @@ typedef struct MapAreaDef {
 
 /* A ROM range and its RAM destination (map_extra_rom_ranges). */
 typedef struct MapRomRange {
-    /* 0x00 */ u32 start;
-    /* 0x04 */ u32 end;
+    /* 0x00 */ u8 *start; /* ROM address */
+    /* 0x04 */ u8 *end;
     /* 0x08 */ void *dst;
 } MapRomRange; /* 0xC bytes */
 

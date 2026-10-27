@@ -249,7 +249,7 @@ void Gfx_InitFrames(void) {
     Dma_ReadRom(D_71920, D_80095AF0, D_753F0 - D_71920);
     gfx_segment1_base = D_80095AF0;
     Dma_ReadRom(D_D490C0, D_800C0000, D_D74AC0 - D_D490C0);
-    a = D_8039ADB0;
+    a = (u16 *)D_8039ADB0;
     Dma_ReadRom(D_D74AC0, a, D_D86170 - D_D74AC0);
     D_80301000[0].data.msg = 2;
     D_80301000[0].data.framebuffer = D_803B5000;

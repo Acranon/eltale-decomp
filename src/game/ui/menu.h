@@ -11,8 +11,8 @@ struct GfxFrameData;
 
 typedef struct MenuPictureDma {
     /* 0x00 */ void *dst;
-    /* 0x04 */ u32 start;
-    /* 0x08 */ u32 end;
+    /* 0x04 */ u8 *start; /* ROM address */
+    /* 0x08 */ u8 *end;
 } MenuPictureDma; /* 0xC bytes */
 
 typedef struct MenuRomRange {

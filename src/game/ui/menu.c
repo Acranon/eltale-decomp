@@ -1385,9 +1385,9 @@ MapAreaDef map_area_defs[36] = {
     { 0x0088, { 0, 0 }, (u8 *)0x00851240, (u8 *)0x00869620, (void*)0x8010FE00, (void*)0x801269B4, (void*)0x80127A80, (void*)0x80127AE8, (void*)0x80127C28, NULL, (void*)0x80127BA8, (void*)0x801281D0, (void*)0x801281C0, NULL, NULL, NULL, 0, { 0, 0, 0, 1 } },
 };
 MapRomRange map_extra_rom_ranges[6] = {
-    { 0x000C8DE0, 0x000D0570, (void*)0x801F8000 }, { 0x000D0570, 0x000D7FE0, (void*)0x801F8000 },
-    { 0x000D7FE0, 0x000DD790, (void*)0x801F8000 }, { 0x000DD790, 0x000E4D00, (void*)0x801F8000 },
-    { 0x000E4D00, 0x000EBDE0, (void*)0x801F8000 }, { 0x000EBDE0, 0x000EF280, (void*)0x801F8000 },
+    { (u8 *)0x000C8DE0, (u8 *)0x000D0570, (void*)0x801F8000 }, { (u8 *)0x000D0570, (u8 *)0x000D7FE0, (void*)0x801F8000 },
+    { (u8 *)0x000D7FE0, (u8 *)0x000DD790, (void*)0x801F8000 }, { (u8 *)0x000DD790, (u8 *)0x000E4D00, (void*)0x801F8000 },
+    { (u8 *)0x000E4D00, (u8 *)0x000EBDE0, (void*)0x801F8000 }, { (u8 *)0x000EBDE0, (u8 *)0x000EF280, (void*)0x801F8000 },
 };
 /* One cell (the player's own); [1] pads to the word the table occupies. */
 CellOffset mapobj_cell_single[2] = { { 0, 0 }, { 0, 0 } };
@@ -1774,11 +1774,11 @@ s16 menu_map_origin[12] = {
     139, 125, 124, 124, 88, 133, 88, 95, 87, 78, 60, 96,
 };
 MenuPictureDma menu_map_picture_dma[10] = {
-    { (void*)0x801C0000, 0x00F2FB70, 0x00F3ADD0 }, { (void*)0x801C0000, 0x00F3ADD0, 0x00F46030 },
-    { (void*)0x801C0000, 0x00F46030, 0x00F51290 }, { (void*)0x801C0000, 0x00F51290, 0x00F5C4F0 },
-    { (void*)0x801C0000, 0x00F5C4F0, 0x00F67750 }, { (void*)0x801C0000, 0x00F67750, 0x00F729B0 },
-    { (void*)0x801C0000, 0x00F729B0, 0x00F73050 }, { (void*)0x801C0000, 0x00F73050, 0x00F73730 },
-    { (void*)0x801C0000, 0x00F73730, 0x00F73F90 }, { (void*)0x801C0000, 0x00F73F90, 0x00F74890 },
+    { (void*)0x801C0000, (u8 *)0x00F2FB70, (u8 *)0x00F3ADD0 }, { (void*)0x801C0000, (u8 *)0x00F3ADD0, (u8 *)0x00F46030 },
+    { (void*)0x801C0000, (u8 *)0x00F46030, (u8 *)0x00F51290 }, { (void*)0x801C0000, (u8 *)0x00F51290, (u8 *)0x00F5C4F0 },
+    { (void*)0x801C0000, (u8 *)0x00F5C4F0, (u8 *)0x00F67750 }, { (void*)0x801C0000, (u8 *)0x00F67750, (u8 *)0x00F729B0 },
+    { (void*)0x801C0000, (u8 *)0x00F729B0, (u8 *)0x00F73050 }, { (void*)0x801C0000, (u8 *)0x00F73050, (u8 *)0x00F73730 },
+    { (void*)0x801C0000, (u8 *)0x00F73730, (u8 *)0x00F73F90 }, { (void*)0x801C0000, (u8 *)0x00F73F90, (u8 *)0x00F74890 },
 };
 void *menu_map_small_tluts[4] = {
     (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000,
