@@ -1000,7 +1000,7 @@ void Enemy_RunAttackScript(void) {
                 enemy_temp_vec.y = d->unkC;
                 m = enemy_script_enemy->unk1C->unk0;
                 if (m & 0x8000) {
-                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C;
+                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].hit_range;
                 } else {
                     enemy_temp_vec.z = obj->unk28;
                 }

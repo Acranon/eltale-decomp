@@ -20,30 +20,30 @@ typedef struct MagicVisualDef {
 
 /* One spell definition (row of the D_800C185C tables, indexed [group][index]). */
 typedef struct SpellDef {
-    /* 0x00 */ u16 unk0; /* level the caster needs in group unk6[0] (Magic_GetSpellRestrictionFlags) */
-    /* 0x02 */ u16 unk2; /* bit 0: usable in battle, bit 1: on the field; also the damage flags */
-    /* 0x04 */ u16 unk4; /* input sequence length */
-    /* 0x06 */ u8 unk6[4]; /* input sequence; unk6[0] is the group (element) */
-    /* 0x0A */ u16 unkA; /* effect lifetime */
+    /* 0x00 */ u16 required_level; /* level the caster needs in group input_sequence[0] (Magic_GetSpellRestrictionFlags) */
+    /* 0x02 */ u16 flags; /* bit 0: usable in battle, bit 1: on the field; also the damage flags */
+    /* 0x04 */ u16 input_length; /* input sequence length */
+    /* 0x06 */ u8 input_sequence[4]; /* input sequence; input_sequence[0] is the group (element) */
+    /* 0x0A */ u16 effect_lifetime; /* effect lifetime */
     /* 0x0C */ u16 unkC; /* heal percent of max (Magic_HealTarget), damage base (Magic_CalculateEffectDamage) */
-    /* 0x0E */ u16 unkE; /* hit chance, percent */
-    /* 0x10 */ u16 unk10; /* magic_hit_handlers index */
-    /* 0x12 */ u16 unk12; /* magic_move_handlers index; launch kind in Magic_CreateCastEffect */
-    /* 0x14 */ u16 unk14; /* floor collision mode */
-    /* 0x16 */ u16 unk16; /* magic_find_target_handlers index */
-    /* 0x18 */ u16 unk18; /* magic_target_select_handlers index */
+    /* 0x0E */ u16 hit_chance; /* hit chance, percent */
+    /* 0x10 */ u16 hit_handler_index; /* magic_hit_handlers index */
+    /* 0x12 */ u16 move_handler_index; /* magic_move_handlers index; launch kind in Magic_CreateCastEffect */
+    /* 0x14 */ u16 floor_collision_mode; /* floor collision mode */
+    /* 0x16 */ u16 find_target_handler_index; /* magic_find_target_handlers index */
+    /* 0x18 */ u16 target_select_handler_index; /* magic_target_select_handlers index */
     /* 0x1A */ u8 pad1A[2];
-    /* 0x1C */ f32 unk1C; /* hit range */
-    /* 0x20 */ u16 unk20; /* cast count (repeats through magic_cast_repeats) */
-    /* 0x22 */ u16 unk22; /* frames between repeats */
-    /* 0x24 */ u16 unk24; /* start delay */
-    /* 0x26 */ u16 unk26; /* magic_place_handlers index */
-    /* 0x28 */ u16 unk28; /* magic_homing_strengths index */
-    /* 0x2A */ u16 unk2A; /* bit 0: vy -= 0.3 per frame, bit 1: launched with vy = 0 */
-    /* 0x2C */ u16 unk2C; /* launch direction (D_800C1878 index) */
-    /* 0x2E */ u16 unk2E; /* magic_homing_accels index */
-    /* 0x30 */ s16 unk30; /* magic_launch_speeds index */
-    /* 0x32 */ u8 unk32[12]; /* argument for each magic_status_handlers entry, 0: not applied */
+    /* 0x1C */ f32 hit_range; /* hit range */
+    /* 0x20 */ u16 cast_count; /* cast count (repeats through magic_cast_repeats) */
+    /* 0x22 */ u16 repeat_interval; /* frames between repeats */
+    /* 0x24 */ u16 start_delay; /* start delay */
+    /* 0x26 */ u16 place_handler_index; /* magic_place_handlers index */
+    /* 0x28 */ u16 homing_strength_index; /* magic_homing_strengths index */
+    /* 0x2A */ u16 launch_flags; /* bit 0: vy -= 0.3 per frame, bit 1: launched with vy = 0 */
+    /* 0x2C */ u16 launch_direction_index; /* launch direction (D_800C1878 index) */
+    /* 0x2E */ u16 homing_accel_index; /* magic_homing_accels index */
+    /* 0x30 */ s16 launch_speed_index; /* magic_launch_speeds index */
+    /* 0x32 */ u8 status_args[12]; /* argument for each magic_status_handlers entry, 0: not applied */
     /* 0x3E */ u8 pad3E[6];
 } SpellDef; /* 0x44 bytes */
 
@@ -171,8 +171,8 @@ extern s32 magic_status_time_range_self[12];
 
 /* The spell data block: fixed addresses in a block read from ROM (no C module defines it). */
 extern SpellDef *D_800C185C[]; /* per group (element): its SpellDef rows */
-extern u16 D_800C186E[]; /* indexed by SpellDef.unk4 (input length): Magic_GetSpellRestrictionFlags */
-extern Vec3f D_800C1878[]; /* launch directions (SpellDef.unk2C) */
+extern u16 D_800C186E[]; /* indexed by SpellDef.input_length (input length): Magic_GetSpellRestrictionFlags */
+extern Vec3f D_800C1878[]; /* launch directions (SpellDef.launch_direction_index) */
 extern MagicVisualDef D_800C18D8[]; /* visual effects (SpellFxDef stage indices) */
 extern SpellFxDef *D_800C3268[]; /* per group: its SpellFxDef rows */
 extern SpellParticleDef *D_800C363C[]; /* per group: its SpellParticleDef rows */

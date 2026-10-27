@@ -24,7 +24,7 @@ typedef struct EnemyAttack {
 } EnemyAttack; /* 0x18 bytes */
 
 /* An enemy definition record (enemy_area_set->unkC[], the boss defs). 0x00..0x23 are
- * the same fields as ActorStats: Enemy_Spawn points the actor's unk64 at it. */
+ * the same fields as ActorStats: Enemy_Spawn points the actor's stats at it. */
 typedef struct EnemyDef {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ s16 unk2;
@@ -88,7 +88,7 @@ typedef struct Enemy {
     /* 0x024 */ f32 unk24;
     /* 0x028 */ EnemyDef *unk28;
     /* 0x02C */ Actor actor;
-    /* 0x098 */ ActorBattle battle; /* actor.unk68 points here */
+    /* 0x098 */ ActorBattle battle; /* actor.battle points here */
 } Enemy; /* 0x130 bytes */
 
 typedef void (*EnemyStateFunc)(Actor *, Enemy *, struct AnimSet *);
@@ -100,7 +100,7 @@ extern Enemy enemy_slots[6];
 extern Enemy *enemy_turn_current;
 extern s32 enemy_drawn_count;
 extern Actor *enemy_drawn_list[6];
-extern struct AnimSet **enemy_anim_tables; /* per anim set index (Actor.unk50): the AnimSet table */
+extern struct AnimSet **enemy_anim_tables; /* per anim set index (Actor.animSetIndex): the AnimSet table */
 extern u8 **enemy_names; /* name strings, indexed by EnemyDef.unk2 (hud.c) */
 extern u16 enemy_turn_order[6];
 extern EnemyAreaSet *enemy_area_set;
