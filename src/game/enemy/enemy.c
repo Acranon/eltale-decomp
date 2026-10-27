@@ -44,7 +44,7 @@ Enemy *enemy_turn_current;
 s32 enemy_drawn_count;
 Actor *enemy_drawn_list[6];
 u8 **enemy_anim_tables;
-s32 enemy_names;
+u8 **enemy_names;
 u16 enemy_turn_order[6];
 EnemyAreaSet *enemy_area_set;
 u16 enemy_script_time;

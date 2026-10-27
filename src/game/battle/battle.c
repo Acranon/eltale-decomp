@@ -1,24 +1,26 @@
 #include "common.h"
 #include "game/battle/battle.h"
 #include "game/actor/actor.h"
-
-/* local copy of game/math/math.h's Vec3f until H2 */
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "game/math/math.h"
+#include "game/map/map.h"
+#include "game/camera/camera.h"
+#include "game/player/player.h"
+#include "game/enemy/enemy.h"
+#include "game/enemy/boss.h"
+#include "game/magic/magic.h"
+#include "game/gfx/effect.h"
+#include "game/ui/hud.h"
+#include "game/audio/sound.h"
 
 /*
  * Battle setup, encounter placement, turn order, camera transition, and completion.
  * Original file: 1FA00.c (ROM 0x1FA00).
  */
 
-typedef struct {
-    char unk0[0x30];
-    EncounterRegionList* unk30;
-    EncounterGroupTable* unk34;
-} Struct_8007C284;
-
-extern Struct_8007C284* map_area_def;
+/* The boss anim set and name tables, at fixed addresses in a block DMA'd from ROM
+ * (no C module defines them; boss.c reads D_803ABA58 too). */
+extern u8 *D_803ABA58[];
+extern u8 *D_803AC3F8[];
 
 /* This file's .bss, 8008BE40..8008BFC0, in address order (first declaration fixes the order). */
 Vec3f battle_temp_vec;
@@ -47,49 +49,6 @@ void* battle_saved_enemy_names;
 s32 battle_boss_index_plus_one;
 f32 battle_travel_accumulator;
 u16 battle_encounter_roll_limit;
-extern s32 map_subarea;
-extern u16 map_subarea_flags;
-
-u32 Math_Rand(u32);
-
-typedef struct {
-    /* 0x000 */ char unk0[0xA];
-    /* 0x00A */ u16 unkA;
-    /* 0x00C */ char unkC[0x10 - 0xC];
-    /* 0x010 */ f32 unk10;
-    /* 0x014 */ char unk14[0x28 - 0x14];
-    /* 0x028 */ struct Struct_Stats* unk28;
-    /* 0x02C */ char unk2C[0x7C - 0x2C];
-    /* 0x07C */ s16 unk7C;
-    /* 0x07E */ char unk7E[0x130 - 0x7E];
-} Struct_8007B908;
-
-extern Struct_8007B908 enemy_slots[];
-extern u16 enemy_turn_order[];
-
-void Magic_StepActorStatusTimers(Actor*);
-void Effect_FadeRing(u16, f32, f32, f32);
-
-
-extern s32 enemy_count;
-extern Struct_8007B908 enemy_slots[];
-extern void* enemy_anim_tables;
-extern void* enemy_names;
-extern s32 boss_field_index;
-extern f32 D_8007C174;
-extern f32 D_8007C178;
-extern f32 D_8007C17C;
-extern f32 D_8007C184;
-extern u8 D_803ABA58[];
-extern u8 D_803AC3F8[];
-
-void Player_InitBattle(void);
-void Enemy_SortTurnOrder(void);
-void Enemy_ClearAttackScript(void);
-void Boss_Spawn(s32, f32, f32, f32, Struct_8007B908*);
-s16 Effect_CreateTerrainRing(u16, f32, f32, f32, f32);
-void Hud_ResetPopups(void);
-void Bgm_Play(s8);
 
 void Battle_ResetState(void) {
     battle_flags &= 0x8000;
@@ -97,37 +56,16 @@ void Battle_ResetState(void) {
     battle_encounter_roll_limit = 0;
     if (map_subarea_flags & 1) {
         if (map_area_def->unk30 != NULL) {
-            battle_encounter_region_table = &map_area_def->unk30[map_subarea];
-            battle_encounter_group_table = &map_area_def->unk34[map_subarea];
+            /* H2b: map.h types MapAreaDef 0x30/0x34 as void *; they are the per-sub-area
+             * EncounterRegionList / EncounterGroupTable arrays (D3_HINTS.md) */
+            battle_encounter_region_table = &((EncounterRegionList*)map_area_def->unk30)[map_subarea];
+            battle_encounter_group_table = &((EncounterGroupTable*)map_area_def->unk34)[map_subarea];
             return;
         }
         battle_encounter_region_table = NULL;
         battle_encounter_group_table = NULL;
     }
 }
-
-typedef struct Struct_Stats {
-    /* 0x00 */ char unk0[0xC];
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ char unkE[0x34 - 0xE];
-    /* 0x34 */ u8 unk34;
-} Struct_Stats;
-
-typedef struct {
-    /* 0x00 */ char unk0[0x8];
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ char unk10[0x14 - 0x10];
-    /* 0x14 */ Struct_Stats* unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-} Struct_8007AA08;
-
-extern Struct_8007AA08 player_state;
-extern f32 player_move_dist;
-extern u16 D_8007AA80;
-f32 Math_Atan2(f32, f32);
 
 void Battle_TryStartRandomEncounter(void) {
     f32 x;
@@ -138,13 +76,13 @@ void Battle_TryStartRandomEncounter(void) {
     EncounterRegion* area;
     EncounterPoint* pt;
 
-    if (!(battle_flags & 1) && !(battle_flags & 0x8000) && !(D_8007AA80 & 1) && (player_move_dist != 0.0f)) {
+    if (!(battle_flags & 1) && !(battle_flags & 0x8000) && !(player_state.actor.unk60 & 1) && (player_move_dist != 0.0f)) {
         battle_travel_accumulator += player_move_dist;
         if (battle_travel_accumulator >= 50.0) {
             battle_encounter_roll_limit += 50;
             if (Math_Rand(2000) < battle_encounter_roll_limit) {
-                x = player_state.unk18;
-                y = player_state.unk20;
+                x = player_state.actor.x;
+                y = player_state.actor.z;
                 pt = Battle_ChooseNearbyEncounterPoint(x, y);
                 if (pt != NULL) {
                     area = Battle_FindEncounterRegion(x, y, battle_encounter_region_table);
@@ -168,7 +106,7 @@ void Battle_TryStartRandomEncounter(void) {
                         Player_InitBattle();
                         Hud_ResetPopups();
                         battle_arena_radius = 100.0f;
-                        battle_outer_ring_slot = Effect_CreateTerrainRing(0, battle_center_x, player_state.unk1C, battle_center_z, battle_arena_radius * 1.04);
+                        battle_outer_ring_slot = Effect_CreateTerrainRing(0, battle_center_x, player_state.actor.y, battle_center_z, battle_arena_radius * 1.04);
                         battle_camera_phase = 0;
                         battle_camera_phase_timer = 1;
                         battle_camera_enemy_index = Math_Rand(enemy_count);
@@ -188,8 +126,8 @@ void Battle_StartBossEncounter(void) {
         battle_center_x = 0.0f;
         battle_center_z = 0.0f;
     } else {
-        battle_center_x = D_8007C174;
-        battle_center_z = D_8007C17C;
+        battle_center_x = boss_field_record.actor.x;
+        battle_center_z = boss_field_record.actor.z;
     }
     battle_flags = 0x305;
     D_8008BE56 = 0;
@@ -199,13 +137,13 @@ void Battle_StartBossEncounter(void) {
     battle_boss_index_plus_one = boss_field_index;
     enemy_anim_tables = D_803ABA58;
     enemy_names = D_803AC3F8;
-    Boss_Spawn(boss_field_index - 1, battle_center_x, battle_center_z, D_8007C184, enemy_slots);
+    Boss_Spawn(boss_field_index - 1, battle_center_x, battle_center_z, boss_field_record.actor.rot, enemy_slots);
     Enemy_ClearAttackScript();
     boss_field_index = 0;
     battle_enemy_count = enemy_count = 1;
     Enemy_SortTurnOrder();
     D_8008BF90 = 1;
-    D_8008BF70[0] = enemy_slots[0].unk2C;
+    D_8008BF70[0] = &enemy_slots[0].actor;
     battle_camera_phase = 1;
     battle_camera_phase_timer = 1;
     battle_camera_enemy_index = 0;
@@ -219,43 +157,8 @@ void Battle_StartBossEncounter(void) {
     Player_InitBattle();
     Hud_ResetPopups();
     battle_arena_radius = battle_boss_arena_radii[battle_boss_index_plus_one - 1];
-    battle_outer_ring_slot = Effect_CreateTerrainRing(0, battle_center_x, D_8007C178, battle_center_z, battle_arena_radius * 1.04);
+    battle_outer_ring_slot = Effect_CreateTerrainRing(0, battle_center_x, boss_field_record.actor.y, battle_center_z, battle_arena_radius * 1.04);
 }
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ char unk4[4];
-    /* 0x08 */ u16 unk8;
-    /* 0x0A */ char unkA[2];
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ char unk18[0x2C - 0x18];
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ char unk30[0x3C - 0x30];
-    /* 0x3C */ f32 unk3C;
-    /* 0x40 */ f32 unk40;
-    /* 0x44 */ f32 unk44;
-    /* 0x48 */ f32 unk48;
-    /* 0x4C */ f32 unk4C;
-    /* 0x50 */ char unk50[0x58 - 0x50];
-    /* 0x58 */ f32 unk58;
-    /* 0x5C */ f32 unk5C;
-    /* 0x60 */ char unk60[0x70 - 0x60];
-    /* 0x70 */ f32 unk70;
-    /* 0x74 */ char unk74[0x80 - 0x74];
-    /* 0x80 */ void* unk80;
-} Struct_80085E48;
-
-extern Struct_80085E48 camera_state;
-extern f32 D_80085F78;
-extern f32 camera_battle_angle_offset;
-extern s32 camera_preset_index;
-extern s32 map_id;
-void Math_RotateVec2(f32, Vec3f*);
-void Camera_SetPreset(s32);
-
-extern Actor D_8007AA20;
 
 void Battle_UpdateStartCamera(void) {
     f32 dx;
@@ -265,9 +168,9 @@ void Battle_UpdateStartCamera(void) {
 
     switch (battle_camera_phase) {
         case 0:
-            a = (Actor*)enemy_slots[battle_camera_enemy_index].unk2C;
-            dx = a->x - player_state.unk18;
-            dz = a->z - player_state.unk20;
+            a = &enemy_slots[battle_camera_enemy_index].actor;
+            dx = a->x - player_state.actor.x;
+            dz = a->z - player_state.actor.z;
             ang = Math_Atan2(dx, dz);
             if (Math_Rand(100) > 50) {
                 ang += 3.141592653589793;
@@ -289,23 +192,23 @@ void Battle_UpdateStartCamera(void) {
             } else {
                 battle_temp_vec.y = a->unk64->unk1C * a->scale * 2.0 + 15.0;
             }
-            camera_state.unk4C = battle_temp_vec.y * 1.5;
-            Math_RotateVec2(ang, &battle_temp_vec);
-            camera_state.unkC = a->x + battle_temp_vec.x;
-            camera_state.unk14 = a->z + battle_temp_vec.y;
-            camera_state.unk10 = a->y + 15.0;
-            if (camera_state.unk10 < player_state.unk1C) {
-                camera_state.unk10 = player_state.unk1C;
+            camera_state.distance = battle_temp_vec.y * 1.5;
+            Math_RotateVec2(ang, (Vec2f*)&battle_temp_vec);
+            camera_state.eyeX = a->x + battle_temp_vec.x;
+            camera_state.eyeZ = a->z + battle_temp_vec.y;
+            camera_state.eyeY = a->y + 15.0;
+            if (camera_state.eyeY < player_state.actor.y) {
+                camera_state.eyeY = player_state.actor.y;
             }
-            camera_state.unk48 = 0.0f;
-            camera_state.unk0 = 0;
-            camera_state.unk3C = 0.0f;
-            camera_state.unk44 = camera_state.unk48;
-            camera_state.unk40 = camera_state.unk44;
-            camera_state.unk58 = 15.0f;
-            camera_state.unk80 = a;
+            camera_state.eyeVelZ = 0.0f;
+            camera_state.mode = 0;
+            camera_state.orbitSpeed = 0.0f;
+            camera_state.eyeVelY = camera_state.eyeVelZ;
+            camera_state.eyeVelX = camera_state.eyeVelY;
+            camera_state.eyeHeight = 15.0f;
+            camera_state.target = a;
             camera_state.unk70 = 0.01f;
-            D_80085F78 = camera_state.unk2C;
+            camera_delayed_turn.orbitAngle = camera_state.yaw;
             battle_camera_phase++;
             battle_camera_phase_timer = 60;
             break;
@@ -313,8 +216,8 @@ void Battle_UpdateStartCamera(void) {
             if (--battle_camera_phase_timer == 0) {
                 battle_flags &= ~0x200;
                 Camera_SetPreset(camera_preset_index);
-                dx = battle_center_x - player_state.unk18;
-                dz = battle_center_z - player_state.unk20;
+                dx = battle_center_x - player_state.actor.x;
+                dz = battle_center_z - player_state.actor.z;
                 ang = Math_Atan2(dx, dz) + 3.141592653589793;
                 if (ang > 3.141592653589793) {
                     ang -= 6.283185307179586;
@@ -323,46 +226,31 @@ void Battle_UpdateStartCamera(void) {
                 }
                 battle_temp_vec.x = 0.0f;
                 battle_temp_vec.y = 50.0f;
-                Math_RotateVec2(ang, &battle_temp_vec);
-                camera_state.unk0 = 4;
-                camera_state.unk8 |= 0x10;
-                camera_state.unkC = player_state.unk18 + battle_temp_vec.x;
-                camera_state.unk48 = 0.0f;
-                camera_state.unk10 = player_state.unk1C + 30.0;
-                camera_state.unk14 = player_state.unk20 + battle_temp_vec.y;
-                camera_state.unk44 = camera_state.unk48;
-                camera_state.unk3C = 0.0f;
-                camera_state.unk40 = camera_state.unk44;
+                Math_RotateVec2(ang, (Vec2f*)&battle_temp_vec);
+                camera_state.mode = 4;
+                camera_state.flags |= 0x10;
+                camera_state.eyeX = player_state.actor.x + battle_temp_vec.x;
+                camera_state.eyeVelZ = 0.0f;
+                camera_state.eyeY = player_state.actor.y + 30.0;
+                camera_state.eyeZ = player_state.actor.z + battle_temp_vec.y;
+                camera_state.eyeVelY = camera_state.eyeVelZ;
+                camera_state.orbitSpeed = 0.0f;
+                camera_state.eyeVelX = camera_state.eyeVelY;
                 if ((battle_flags & 0x100) && battle_boss_index_plus_one == 8) {
-                    camera_state.unk58 = 50.0f;
-                    camera_state.unk5C = 28.0f;
-                    camera_state.unk4C = 180.0f;
+                    camera_state.eyeHeight = 50.0f;
+                    camera_state.atHeight = 28.0f;
+                    camera_state.distance = 180.0f;
                 } else {
-                    camera_state.unk58 += battle_camera_offsets[map_id].unk0;
-                    camera_state.unk4C += battle_camera_offsets[map_id].unk4;
+                    camera_state.eyeHeight += battle_camera_offsets[map_id].unk0;
+                    camera_state.distance += battle_camera_offsets[map_id].unk4;
                 }
-                camera_state.unk80 = &D_8007AA20;
+                camera_state.target = &player_state.actor;
                 camera_state.unk70 = 0.02f;
                 camera_battle_angle_offset = 0.0f;
             }
             break;
     }
 }
-
-
-extern Actor D_8007AA20;
-extern s32 player_battle_drop_item;
-extern s32 camera_preset_index;
-extern s32 map_id;
-extern s16 hud_enemy_info_timer;
-
-void Boss_SetDefeated(u16);
-void Boss_HandleDefeat(s32);
-void Enemy_RemoveAll(void);
-void Camera_SetPresetDelayedTurn(s32);
-void Enemy_StartTurn(void);
-void Bgm_PlayDelayed(s32, s32);
-void Bgm_PlayForMap(s32, s32, s32);
 
 void Battle_UpdateTurnTransition(void) {
     s32 done;
@@ -375,9 +263,9 @@ void Battle_UpdateTurnTransition(void) {
             return;
         }
         if (battle_flags & 2) {
-            a = (Actor*)enemy_slots[enemy_turn_order[battle_turn_order_index]].unk2C;
+            a = &enemy_slots[enemy_turn_order[battle_turn_order_index]].actor;
         } else {
-            a = &D_8007AA20;
+            a = &player_state.actor;
         }
         if (!(a->unk60 & 1)) {
             done = 0;
@@ -400,7 +288,7 @@ void Battle_UpdateTurnTransition(void) {
             if (done) {
                 battle_flags &= ~1;
                 hud_enemy_info_timer = 0;
-                Effect_FadeRing(battle_outer_ring_slot, player_state.unk18, player_state.unk1C, player_state.unk20);
+                Effect_FadeRing((u16)battle_outer_ring_slot, player_state.actor.x, player_state.actor.y, player_state.actor.z);
                 Enemy_RemoveAll();
                 Camera_SetPresetDelayedTurn(camera_preset_index);
                 if (battle_flags & 0x100) {
@@ -425,9 +313,9 @@ void Battle_UpdateTurnTransition(void) {
                 f = player_state.unkC;
             }
             if (battle_flags & 2) {
-                a = (Actor*)enemy_slots[enemy_turn_order[battle_turn_order_index]].unk2C;
+                a = &enemy_slots[enemy_turn_order[battle_turn_order_index]].actor;
             } else {
-                a = &D_8007AA20;
+                a = &player_state.actor;
             }
             f *= a->unk68->unk90;
             f += a->unk64->unk18 * a->scale;
@@ -439,7 +327,7 @@ void Battle_UpdateTurnTransition(void) {
 void Battle_EndTurn(Actor* arg0) {
     s32 n;
     s32 max; s32 id;
-    Struct_8007B908* e;
+    Enemy* e;
 
     Magic_StepActorStatusTimers(arg0);
     if (battle_flags & 1) {
@@ -452,7 +340,7 @@ void Battle_EndTurn(Actor* arg0) {
                     battle_turn_order_index = 0;
                 }
                 e = &enemy_slots[id = enemy_turn_order[battle_turn_order_index]];
-                if (e->unkA != 0 && e->unk7C != -1) {
+                if (e->unkA != 0 && e->actor.unk50 != -1) {
                     break;
                 }
                 n--;
@@ -526,15 +414,13 @@ EncounterPoint* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y) {
     return p;
 }
 
-void Math_RotateVec2(f32, Vec3f*);
-void Enemy_Spawn(s32, f32, f32, f32, void*, Struct_8007B908*);
 
 void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
     EncounterGroup* e;
     s32 n;
     EncounterGroupEntry* p;
     Vec3f* pos;
-    Struct_8007B908* actor;
+    Enemy* actor;
     s32 (*o)[2];
     s32 cnt;
     s32 out[8][2];
@@ -556,12 +442,12 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
         (*o)[1] = cnt;
         o++;
         enemy_count += cnt;
-        D_8008BF70[D_8008BF90++] = &actor->unk2C;
+        D_8008BF70[D_8008BF90++] = &actor->actor;
         while (cnt != 0) {
             battle_temp_vec.x = pos->x;
             battle_temp_vec.y = pos->y;
-            Math_RotateVec2(z, &battle_temp_vec);
-            Enemy_Spawn(p->unk0, x + battle_temp_vec.x, y + battle_temp_vec.y, z, &actor->unk2C, actor);
+            Math_RotateVec2(z, (Vec2f*)&battle_temp_vec);
+            Enemy_Spawn(p->unk0, x + battle_temp_vec.x, y + battle_temp_vec.y, z, &actor->actor, actor);
             cnt--;
             actor++;
             pos++;

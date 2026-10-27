@@ -56,7 +56,7 @@ typedef struct EnemyAreaSet {
     /* 0x04 */ u8 *end;
     /* 0x08 */ u8 **unk8; /* -> enemy_anim_tables */
     /* 0x0C */ EnemyDef *unkC;
-    /* 0x10 */ s32 unk10; /* -> enemy_names */
+    /* 0x10 */ u8 **unk10; /* -> enemy_names */
 } EnemyAreaSet; /* 0x14 bytes */
 
 /* One step of an enemy attack script (enemy_attack_scripts, Enemy_RunAttackScript). */
@@ -101,7 +101,7 @@ extern Enemy *enemy_turn_current;
 extern s32 enemy_drawn_count;
 extern Actor *enemy_drawn_list[6];
 extern u8 **enemy_anim_tables;
-extern s32 enemy_names;
+extern u8 **enemy_names; /* name strings, indexed by EnemyDef.unk2 (hud.c) */
 extern u16 enemy_turn_order[6];
 extern EnemyAreaSet *enemy_area_set;
 extern u16 enemy_script_time;
