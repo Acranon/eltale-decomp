@@ -331,7 +331,7 @@ typedef struct {
 } Unk8007AA08_2B530;
 extern Unk8007AA08_2B530 player_state;
 extern s8 menu_bgm_volume_option;
-extern s8 D_800616B0;
+extern s8 menu_text_delay_option;
 extern s8 input_stick_y;
 extern s16 menu_options_top_row_pos[][2];
 extern s16 menu_options_bgm_row_pos[][2];
@@ -360,7 +360,7 @@ void Menu_UpdateOptionsPage(s32 x) {
     u8 ids[3] = { 0x28, 0x27, 0x26 }; /* the retail build keeps these bytes as the file-scope menu_options_marker_sprites */
     static s32 menu_options_marker_x; /* the retail build keeps it as the file-scope menu_options_marker_x */
 
-    D_800616B0 = 4 - D_800616B0;
+    menu_text_delay_option = 4 - menu_text_delay_option;
     Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x6C);
     Menu_DrawSprite(0x37, x + 0x2B, 0x8B, 0xF0, 3);
     Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x68);
@@ -400,15 +400,15 @@ void Menu_UpdateOptionsPage(s32 x) {
                 Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
                 break;
             case 0x100:
-                Menu_DrawSprite(ids[menu_options_top_row_pos[D_800616B0][1]], menu_options_top_row_pos[D_800616B0][0] + x, 0x39, 8, 0xB);
+                Menu_DrawSprite(ids[menu_options_top_row_pos[menu_text_delay_option][1]], menu_options_top_row_pos[menu_text_delay_option][0] + x, 0x39, 8, 0xB);
                 break;
         }
     } else {
         Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
-        Menu_DrawSprite(ids[menu_options_top_row_pos[D_800616B0][1]], menu_options_top_row_pos[D_800616B0][0] + x, 0x39, 8, 0xB);
+        Menu_DrawSprite(ids[menu_options_top_row_pos[menu_text_delay_option][1]], menu_options_top_row_pos[menu_text_delay_option][0] + x, 0x39, 8, 0xB);
     }
     if (menu_flags & 0x2000) {
-        D_800616B0 = 4 - D_800616B0;
+        menu_text_delay_option = 4 - menu_text_delay_option;
         return;
     }
     if (!(menu_flags & 0x800)) {
@@ -429,7 +429,7 @@ void Menu_UpdateOptionsPage(s32 x) {
         if ((input_pressed_buttons & 0x8000) && !(menu_flags & 0x200)) {
             menu_flags &= ~0x920;
             Sfx_Play(0, 2, 0xFF);
-            D_800616B0 = 4 - D_800616B0;
+            menu_text_delay_option = 4 - menu_text_delay_option;
             return;
         }
         wob = menu_frame_counter;
@@ -439,12 +439,12 @@ void Menu_UpdateOptionsPage(s32 x) {
         if (menu_flags & 0x200) {
             switch (sel) {
                 case 0:
-                    if (menu_options_marker_x < menu_options_top_row_pos[D_800616B0][0]) {
-                    } else if (menu_options_top_row_pos[D_800616B0][0] < menu_options_marker_x) {
+                    if (menu_options_marker_x < menu_options_top_row_pos[menu_text_delay_option][0]) {
+                    } else if (menu_options_top_row_pos[menu_text_delay_option][0] < menu_options_marker_x) {
                     } else {
                         menu_flags &= ~0x200;
                         menu_flags &= ~0x400;
-                        sel = ids[menu_options_top_row_pos[D_800616B0][1]];
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option][1]];
                         if (input_stick_x < 0x14 && input_stick_x > -0x14) {
                             Menu_DrawSprite(sel, menu_options_marker_x + x, 0x39, 8, 0xB);
                         }
@@ -481,17 +481,17 @@ void Menu_UpdateOptionsPage(s32 x) {
                         }
                     } else if (input_stick_x < -0x14) {
                         if (!(menu_flags & 0x400)) {
-                            menu_options_marker_x = menu_options_top_row_pos[D_800616B0--][0];
-                            if (D_800616B0 < 0) {
-                                D_800616B0 = 0;
+                            menu_options_marker_x = menu_options_top_row_pos[menu_text_delay_option--][0];
+                            if (menu_text_delay_option < 0) {
+                                menu_text_delay_option = 0;
                             }
                             menu_flags |= 0x600;
                         }
                     } else if (input_stick_x > 0x14) {
                         if (!(menu_flags & 0x400)) {
-                            menu_options_marker_x = menu_options_top_row_pos[D_800616B0++][0];
-                            if (D_800616B0 > 4) {
-                                D_800616B0 = 4;
+                            menu_options_marker_x = menu_options_top_row_pos[menu_text_delay_option++][0];
+                            if (menu_text_delay_option > 4) {
+                                menu_text_delay_option = 4;
                             }
                             menu_flags |= 0x600;
                         }
@@ -539,17 +539,17 @@ void Menu_UpdateOptionsPage(s32 x) {
                 case 0:
                     y = 0x3A;
                     pos = menu_options_marker_x + x;
-                    if (menu_options_marker_x < menu_options_top_row_pos[D_800616B0][0]) {
+                    if (menu_options_marker_x < menu_options_top_row_pos[menu_text_delay_option][0]) {
                         menu_options_marker_x++;
                         pos++;
-                        sel = ids[menu_options_top_row_pos[D_800616B0 - 1][1]];
-                    } else if (menu_options_top_row_pos[D_800616B0][0] < menu_options_marker_x) {
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option - 1][1]];
+                    } else if (menu_options_top_row_pos[menu_text_delay_option][0] < menu_options_marker_x) {
                         menu_options_marker_x--;
                         pos--;
-                        sel = ids[menu_options_top_row_pos[D_800616B0 + 1][1]];
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option + 1][1]];
                     } else {
                         menu_flags &= ~0x400;
-                        sel = ids[menu_options_top_row_pos[D_800616B0][1]];
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option][1]];
                     }
                     Menu_DrawSprite(sel, pos, 0x39, 8, 0xB);
                     break;
@@ -574,7 +574,7 @@ void Menu_UpdateOptionsPage(s32 x) {
         }
         Menu_DrawSprite(1, x - wob + 0x1E, y, 0x10, 0xD);
     }
-    D_800616B0 = 4 - D_800616B0;
+    menu_text_delay_option = 4 - menu_text_delay_option;
 }
 #else
 #pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_UpdateOptionsPage.s")
@@ -917,7 +917,7 @@ extern u8 *menu_sprite_tex[];
 extern u8 menu_sprite_sizes[][2];
 extern Gfx menu_sprite_opaque_dl[];
 extern Gfx menu_sprite_alpha_dl[];
-extern u16 menu_ui_tlut[];
+extern u16 menu_sprite_tlut[];
 
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
     s32 ret;
@@ -1012,7 +1012,7 @@ void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
         }
         if (!(menu_flags & 0x10)) {
             gDPPipeSync(gfx_dl_head++);
-            gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
             menu_flags |= 0x10;
         }
         gDPLoadTextureTile(gfx_dl_head++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
@@ -1143,7 +1143,7 @@ typedef struct {
 extern Unk4Words menu_bg_strip_tex_heights;
 extern Unk4Words menu_bg_strip_heights;
 extern Unk4Ptrs menu_bg_strip_tex;
-extern u16 D_80066E88[];
+extern u16 menu_bg_tlut[];
 
 void Menu_DrawBackground(void) {
     s32 i;
@@ -1153,7 +1153,7 @@ void Menu_DrawBackground(void) {
     Unk4Ptrs tex = menu_bg_strip_tex;
 
     gDPPipeSync(gfx_dl_head++);
-    gDPLoadTLUT_pal256(gfx_dl_head++, D_80066E88);
+    gDPLoadTLUT_pal256(gfx_dl_head++, menu_bg_tlut);
     menu_flags &= ~0x10;
     for (i = 0, y = 22; i < 4; i++) {
         gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
@@ -1174,7 +1174,7 @@ void Menu_DrawBackground(void) {
 }
 
 extern u8* menu_sprite_tex[];
-extern u16 menu_ui_tlut[];
+extern u16 menu_sprite_tlut[];
 
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     s32 i;
@@ -1209,7 +1209,7 @@ void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     i = 0;
     if (!(menu_flags & 0x10)) {
         gDPPipeSync(gfx_dl_head++);
-        gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
         menu_flags |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {
@@ -1257,7 +1257,7 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     digits[0] = v;
     if (!(menu_flags & 0x10)) {
         gDPPipeSync(gfx_dl_head++);
-        gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
         menu_flags |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {
@@ -1390,10 +1390,10 @@ extern u8 D_80066918[];
 extern u8 D_800669E0[];
 extern u8 D_800669F0[];
 extern u8 D_80066AE8[];
-extern u8 D_80067090[];
-extern u8 D_80067898[];
-extern u8 D_800680A0[];
-extern u8 D_800688A8[];
+extern u8 menu_bg_strip_tex_0[];
+extern u8 menu_bg_strip_tex_1[];
+extern u8 menu_bg_strip_tex_2[];
+extern u8 menu_bg_strip_tex_3[];
 extern u8 D_80068EB0[];
 extern u8 D_800690B8[];
 extern u8 D_800695A8[];
@@ -2033,7 +2033,7 @@ Unk4Pals menu_exp_gauge_tluts = { { D_80068EB0, D_8006A8F0, D_8006B4D8, D_80069A
 Unk4x2Ptrs menu_exp_gauge_tex = { { { D_800690B8, D_800695A8 }, { D_8006AAF8, D_8006AFE8 }, { D_8006B6E0, D_8006BBD0 }, { D_80069CA0, D_8006A2C8 } } };
 Unk4Words menu_bg_strip_tex_heights = { { 32, 32, 32, 24 } };
 Unk4Words menu_bg_strip_heights = { { 26, 26, 26, 20 } };
-Unk4Ptrs menu_bg_strip_tex = { { D_80067090, D_80067898, D_800680A0, D_800688A8 } };
+Unk4Ptrs menu_bg_strip_tex = { { menu_bg_strip_tex_0, menu_bg_strip_tex_1, menu_bg_strip_tex_2, menu_bg_strip_tex_3 } };
 
 void Text_DrawEncodedString(s32, s32, u8 *);
 

@@ -87,26 +87,26 @@ extern Gfx *gfx_dl_head;
 /* This file's .data, 80061850..8006CD00: textures and palettes (assets; the
  * converter put a gsSPEndDisplayList word after most images), message text
  * (assets), the message pointer tables and layouts, flags and a display list. */
-u16 text_font_tlut[0x100] = {
-#include "assets/text_font_tlut.inc.c"
+u16 text_window_tlut[0x100] = {
+#include "assets/text_window_tlut.inc.c"
 };
-u8 D_80061A50[0x100] = {
-#include "assets/D_80061A50.inc.c"
+u8 text_window_fill_tex[0x100] = {
+#include "assets/text_window_fill_tex.inc.c"
 };
-u8 D_80061B50[0x208] = {
-#include "assets/D_80061B50.inc.c"
+u8 text_speaker_name_bg_tex[0x208] = {
+#include "assets/text_speaker_name_bg_tex.inc.c"
 };
-u8 D_80061D58[0x90] = {
-#include "assets/D_80061D58.inc.c"
+u8 text_advance_icon_tex[0x90] = {
+#include "assets/text_advance_icon_tex.inc.c"
 };
-u8 D_80061DE8[0x10] = {
-#include "assets/D_80061DE8.inc.c"
+u8 text_window_line_tex[0x10] = {
+#include "assets/text_window_line_tex.inc.c"
 };
-u8 D_80061DF8[0xA0] = {
-#include "assets/D_80061DF8.inc.c"
+u8 text_choice_cursor_tex[0xA0] = {
+#include "assets/text_choice_cursor_tex.inc.c"
 };
-u16 menu_ui_tlut[0x104] = {
-#include "assets/menu_ui_tlut.inc.c"
+u16 menu_sprite_tlut[0x104] = {
+#include "assets/menu_sprite_tlut.inc.c"
 };
 u8 D_800620A0[0x108] = {
 #include "assets/D_800620A0.inc.c"
@@ -372,20 +372,20 @@ u8 D_800669F0[0xF8] = {
 u8 D_80066AE8[0x3A0] = {
 #include "assets/D_80066AE8.inc.c"
 };
-u16 D_80066E88[0x104] = {
-#include "assets/D_80066E88.inc.c"
+u16 menu_bg_tlut[0x104] = {
+#include "assets/menu_bg_tlut.inc.c"
 };
-u8 D_80067090[0x808] = {
-#include "assets/D_80067090.inc.c"
+u8 menu_bg_strip_tex_0[0x808] = {
+#include "assets/menu_bg_strip_tex_0.inc.c"
 };
-u8 D_80067898[0x808] = {
-#include "assets/D_80067898.inc.c"
+u8 menu_bg_strip_tex_1[0x808] = {
+#include "assets/menu_bg_strip_tex_1.inc.c"
 };
-u8 D_800680A0[0x808] = {
-#include "assets/D_800680A0.inc.c"
+u8 menu_bg_strip_tex_2[0x808] = {
+#include "assets/menu_bg_strip_tex_2.inc.c"
 };
-u8 D_800688A8[0x608] = {
-#include "assets/D_800688A8.inc.c"
+u8 menu_bg_strip_tex_3[0x608] = {
+#include "assets/menu_bg_strip_tex_3.inc.c"
 };
 u16 D_80068EB0[0x104] = {
 #include "assets/D_80068EB0.inc.c"
@@ -519,13 +519,13 @@ u8 D_8006C858[0x28] = {
 u8 D_8006C880[0x78] = {
 #include "assets/D_8006C880.inc.c"
 };
-u8 *save_menu_choice_messages[5] = {
+u8 *save_menu_operation_panel_messages[5] = {
     D_8006C0C0, D_8006C0EC, D_8006C10C, D_8006C128, D_8006C144,
 };
-s16 save_menu_choice_rects[5][4] = {
+s16 save_menu_operation_panel_rects[5][4] = {
     { 44, 107, 232, 25 }, { 79, 107, 162, 25 }, { 84, 107, 152, 25 }, { 84, 107, 152, 25 }, { 54, 107, 212, 25 },
 };
-u8 *save_menu_dialog_messages_flag4[1] = {
+u8 *save_menu_dialog_messages_save[1] = {
     D_8006C16C,
 };
 u8 *D_8006C938[1] = {
@@ -540,7 +540,7 @@ u8 *D_8006C940[22] = {
     D_8006C458, D_8006C4C4, D_8006C4C8, D_8006C50C, D_8006C560, D_8006C564,
     D_8006C5F8, D_8006C63C, D_8006C658, D_8006C6CC,
 };
-u8 *save_menu_dialog_messages_default[25] = {
+u8 *save_menu_dialog_messages_load_delete[25] = {
     D_8006C16C, D_8006C174, D_8006C180, D_8006C188, D_8006C190, D_8006C1BC,
     D_8006C880, D_8006C258, D_8006C280, D_8006C2CC, D_8006C2CC, D_8006C370,
     D_8006C390, D_8006C3B8, D_8006C408, D_8006C458, D_8006C4C4, D_8006C4C8,
@@ -610,15 +610,15 @@ u8 D_8006CC08[0x10] = {
 u8 D_8006CC18[0x10] = {
 #include "assets/D_8006CC18.inc.c"
 };
-u8 *save_menu_slot_label_ptrs[19] = {
+u8 *save_menu_slot_map_labels[19] = {
     D_8006CAD4, D_8006CAE8, D_8006CAF8, D_8006CB10, D_8006CB2C, D_8006CB40,
     D_8006CB54, D_8006CB68, D_8006CB88, D_8006CB9C, D_8006CBAC, D_8006CBC0,
     D_8006CBD8, D_8006CBEC, D_8006CBFC, D_8006CC08, D_8006CC18, NULL,
     NULL,
 };
 u8 D_8006CC74 = 0;
-u8 D_8006CC78 = 0;
-u8 D_8006CC7C = 0;
+u8 intro_first_frame_skipped = 0;
+u8 intro_pak_check_done = 0;
 s8 D_8006CC80[0x10] = { 0 };
 Gfx cutscene_image_setup_dl[14] = {
     {{ 0xE7000000, 0x00000000 }},

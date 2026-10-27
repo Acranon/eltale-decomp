@@ -198,8 +198,8 @@ extern OSMesgQueue input_si_queue;
 extern OSPfs pak_port_states[4];
 extern Unk80092E48 pak_game_file_scans[4];
 extern u8 D_8006CC74;
-extern u8 D_8006CC78;
-extern u8 D_8006CC7C;
+extern u8 intro_first_frame_skipped;
+extern u8 intro_pak_check_done;
 
 s32 Pak_ScanGameFiles(s32);
 s32 Pak_ClassifyError(s32);
@@ -247,7 +247,7 @@ s32 Intro_Update(void) {
         Intro_DrawNoControllerMessage();
         return 2;
     }
-    if (D_8006CC7C == 0) {
+    if (intro_pak_check_done == 0) {
         switch (D_80212238_ovl_intro) {
             case 0:
                 err = Pak_ClassifyError(Pak_ScanGameFiles(input_primary_port));
@@ -257,7 +257,7 @@ s32 Intro_Update(void) {
                         D_80212238_ovl_intro = 1;
                         return 2;
                     }
-                    D_8006CC7C = 1;
+                    intro_pak_check_done = 1;
                     return 2;
                 }
                 if (err != -3) {
@@ -276,27 +276,27 @@ s32 Intro_Update(void) {
                 return 2;
             case 1:
                 if (Intro_RunPakFullScreen() != 0) {
-                    D_8006CC7C = 1;
+                    intro_pak_check_done = 1;
                     return 2;
                 }
                 break;
             case 2:
                 if (Intro_RunNoPakScreen() != 0) {
-                    D_8006CC7C = 1;
+                    intro_pak_check_done = 1;
                     return 2;
                 }
                 break;
             case 3:
                 if (Intro_RunPakErrorScreen() != 0) {
-                    D_8006CC7C = 1;
+                    intro_pak_check_done = 1;
                 }
                 break;
         }
         return 2;
     }
     ret = 2;
-    if (D_8006CC78 == 0) {
-        D_8006CC78++;
+    if (intro_first_frame_skipped == 0) {
+        intro_first_frame_skipped++;
     } else {
         switch (D_80212240_ovl_intro) {
             case 0:

@@ -38,9 +38,9 @@ void* D_8008F088[2];
 s16* audio_output_buffers[3];
 OSMesgQueue audio_dma_queue;
 OSMesgQueue audio_rom_read_queue;
-OSMesg audio_dma_msg;
-OSMesg audio_rom_read_msg;
-OSIoMesg audio_dma_io_msgs[32];
+OSMesg audio_dma_mesg;
+OSMesg audio_rom_read_mesg;
+OSIoMesg audio_dma_io_mesgs[32];
 ALGlobals audio_globals;
 ALSynConfig audio_syn_config;
 ALSndPlayer audio_sound_player;
@@ -125,8 +125,8 @@ void Audio_Init(void) {
     audio_output_buffers[0] = alHeapAlloc(&audio_heap, 1, 0x8000);
     audio_output_buffers[1] = alHeapAlloc(&audio_heap, 1, 0x8000);
     audio_output_buffers[2] = alHeapAlloc(&audio_heap, 1, 0x8000);
-    osCreateMesgQueue(&audio_dma_queue, &audio_dma_msg, 1);
-    osCreateMesgQueue(&audio_rom_read_queue, &audio_rom_read_msg, 1);
+    osCreateMesgQueue(&audio_dma_queue, &audio_dma_mesg, 1);
+    osCreateMesgQueue(&audio_rom_read_queue, &audio_rom_read_mesg, 1);
     audio_dma_state.initialized = 0;
     audio_syn_config.outputRate = osAiSetFrequency(0x5622);
     audio_syn_config.maxVVoices = 0x10;
@@ -185,7 +185,7 @@ s32 Audio_DmaCallback(s32 addr, s32 len, void* state) {
     addr -= delta;
     dmaPtr->startAddr = addr;
     dmaPtr->lastFrame = audio_frame_count;
-    osPiStartDma(&audio_dma_io_msgs[audio_dma_count++], 0, 0, addr, foundBuffer, 0x500, &audio_dma_queue);
+    osPiStartDma(&audio_dma_io_mesgs[audio_dma_count++], 0, 0, addr, foundBuffer, 0x500, &audio_dma_queue);
 
     return osVirtualToPhysical(foundBuffer) + delta;
 }

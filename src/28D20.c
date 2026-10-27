@@ -6,7 +6,7 @@
  */
 
 extern OSMesgQueue dma_mesg_queue;
-OSIoMesg dma_io_msg; /* .bss 8008CEA0..8008CEC0 */
+OSIoMesg dma_io_mesg; /* .bss 8008CEA0..8008CEC0 */
 
 void Dma_ReadRom(u8* devAddr, void* vAddr, s32 size) {
     u32 mesgSize;
@@ -20,7 +20,7 @@ void Dma_ReadRom(u8* devAddr, void* vAddr, s32 size) {
         } else {
             mesgSize = size;
         }
-        osPiStartDma(&dma_io_msg, 0, 0, (u32) devAddr, vAddr, mesgSize, &dma_mesg_queue);
+        osPiStartDma(&dma_io_mesg, 0, 0, (u32) devAddr, vAddr, mesgSize, &dma_mesg_queue);
         osRecvMesg(&dma_mesg_queue, NULL, 1);
         size -= mesgSize;
         devAddr = devAddr + mesgSize;

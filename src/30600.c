@@ -89,7 +89,7 @@ typedef struct {
 /* .bss 8008FB70..80090450 */
 u16 save_menu_flags; /* low three bits select the save-menu state */
 u8 save_menu_dialog_index;
-u8 save_menu_choice_prompt_index;
+u8 save_menu_operation_panel_index;
 s32 save_menu_pak_error;
 u8 save_menu_choice_cursor;
 s8 save_menu_delay_frames; /* save-menu delay, in frames */
@@ -99,7 +99,7 @@ u8 save_menu_stick_repeat_counter; /* SaveMenu_UpdateSlotList reads it with lbu 
 #else
 s8 save_menu_stick_repeat_counter;
 #endif
-u8 save_menu_repair_attempts;
+u8 save_menu_repair_count;
 Unk8008FB80 save_menu_file_entries[17];
 Unk8008FBA8 save_menu_save_headers[16];
 Unk80090228 save_menu_game_state_block;
@@ -109,7 +109,7 @@ u8 save_menu_state_read_scratch[0xE0];
 
 extern s32 core_flags;
 extern s8 menu_bgm_volume_option;
-extern s8 D_800616B0;
+extern s8 menu_text_delay_option;
 extern u16 player_respawn_map;
 extern u16 player_respawn_subarea;
 extern u16 player_respawn_entry;
@@ -133,8 +133,8 @@ extern Gfx text_glyph_setup_dl[];
 extern s16 core_game_mode;
 extern Gfx *gfx_dl_head;
 extern u16 menu_flags;
-extern s16 save_menu_choice_rects[][4];
-extern u8 *save_menu_choice_messages[];
+extern s16 save_menu_operation_panel_rects[][4];
+extern u8 *save_menu_operation_panel_messages[];
 extern u8 D_8008FB81[];
 extern u8 D_80090248[];
 extern u8 D_80090258[];
@@ -171,15 +171,15 @@ s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 s32 Pak_ScanGameFiles(s32);
 void SaveMenu_RefreshFileList(void);
 extern s16 save_menu_dialog_rects[][4];
-extern u8 *save_menu_dialog_messages_flag4[];
-extern u8 *save_menu_dialog_messages_default[];
+extern u8 *save_menu_dialog_messages_save[];
+extern u8 *save_menu_dialog_messages_load_delete[];
 extern s16 save_menu_choice_cursor_positions[][2];
 extern s8 input_stick_y;
 extern u16 input_pressed_buttons;
 void Sfx_Play(s32, s32, s32);
 
 #ifdef NON_MATCHING
-extern u8 *save_menu_slot_label_ptrs[];
+extern u8 *save_menu_slot_map_labels[];
 extern s8 menu_wobble_offsets[];
 extern s32 menu_frame_counter;
 void Menu_DrawNumber(s32, s32, s32, u32, s32);
@@ -196,7 +196,7 @@ void SaveMenu_Init(s32 arg0) {
     save_menu_delay_frames = 0;
     save_menu_dialog_index = 0;
     save_menu_stick_repeat_counter = 0;
-    save_menu_repair_attempts = 0;
+    save_menu_repair_count = 0;
 }
 
 void SaveMenu_Update(void) {
@@ -206,10 +206,10 @@ void SaveMenu_Update(void) {
             SaveMenu_CheckControllerPak();
             save_menu_flags |= 0x4000;
             save_menu_flags &= ~0x2000;
-            save_menu_repair_attempts = 0;
+            save_menu_repair_count = 0;
         } else {
             save_menu_flags |= 0x2000;
-            save_menu_choice_prompt_index = 0;
+            save_menu_operation_panel_index = 0;
         }
     }
     if (save_menu_flags & 0x4000) {
@@ -247,7 +247,7 @@ void SaveMenu_Update(void) {
 
 void SaveMenu_DrawOperationPanel(void) {
     u8 unused[4];
-    s16 *r = save_menu_choice_rects[save_menu_choice_prompt_index];
+    s16 *r = save_menu_operation_panel_rects[save_menu_operation_panel_index];
     s16 x = r[0];
     s16 y = r[1];
     s16 w = r[2];
@@ -264,7 +264,7 @@ void SaveMenu_DrawOperationPanel(void) {
     Menu_DrawSprite(0x38, x + 1, y + 2, 1, h - 4);
     Menu_DrawSprite(0x39, x + 1, y + h - 2, w - 2, 1);
     Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
-    Text_DrawEncodedString(x + 6, y + 6, save_menu_choice_messages[save_menu_choice_prompt_index]);
+    Text_DrawEncodedString(x + 6, y + 6, save_menu_operation_panel_messages[save_menu_operation_panel_index]);
     SaveMenu_SetTextDrawState();
 }
 
@@ -334,7 +334,7 @@ void SaveMenu_CheckControllerPak(void) {
                 save_menu_flags |= 5;
                 return;
             }
-        } else if (save_menu_repair_attempts != 0 && ((p = &pak_game_file_scans[input_primary_port])->unk13 < 2 || p->unk0 & 0x2000)) {
+        } else if (save_menu_repair_count != 0 && ((p = &pak_game_file_scans[input_primary_port])->unk13 < 2 || p->unk0 & 0x2000)) {
             save_menu_dialog_index = 24;
             save_menu_delay_frames = 10;
             SaveMenu_RefreshFileList();
@@ -378,9 +378,9 @@ void SaveMenu_UpdateDialog(void) {
     w = save_menu_dialog_rects[save_menu_dialog_index][2];
     h = save_menu_dialog_rects[save_menu_dialog_index][3];
     if (menu_flags & 4) {
-        msg = save_menu_dialog_messages_flag4[save_menu_dialog_index];
+        msg = save_menu_dialog_messages_save[save_menu_dialog_index];
     } else {
-        msg = save_menu_dialog_messages_default[save_menu_dialog_index];
+        msg = save_menu_dialog_messages_load_delete[save_menu_dialog_index];
     }
     Menu_DrawSprite(0, x, y, w, h);
     Menu_DrawSprite(0x37, x + 3, y + h, w, 3);
@@ -510,13 +510,13 @@ void SaveMenu_UpdateDialog(void) {
         Menu_DrawSprite(0x39, x + 1, y + h - 2, w - 2, 1);
         Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
         if (save_menu_flags & 0x10) {
-            msg = save_menu_dialog_messages_flag4[1];
+            msg = save_menu_dialog_messages_save[1];
             Text_DrawEncodedString(x + 6, y + 6, msg);
-            Text_DrawEncodedString(x + 6, y + 19, save_menu_dialog_messages_flag4[0]);
+            Text_DrawEncodedString(x + 6, y + 19, save_menu_dialog_messages_save[0]);
         } else {
-            msg = save_menu_dialog_messages_flag4[2];
+            msg = save_menu_dialog_messages_save[2];
             Text_DrawEncodedString(x + 6, y + 6, msg);
-            Text_DrawEncodedString(x + 6, y + 19, save_menu_dialog_messages_flag4[3]);
+            Text_DrawEncodedString(x + 6, y + 19, save_menu_dialog_messages_save[3]);
         }
         SaveMenu_SetTextDrawState();
         if (save_menu_delay_frames < 0) {
@@ -547,17 +547,17 @@ void SaveMenu_UpdateDialog(void) {
                             save_menu_flags &= 0xFFF8;
                             save_menu_flags |= 4;
                             save_menu_flags |= 0x2000;
-                            save_menu_choice_prompt_index = 3;
+                            save_menu_operation_panel_index = 3;
                             break;
                         case 4:
                             save_menu_flags |= 0x2000;
-                            save_menu_choice_prompt_index = 2;
+                            save_menu_operation_panel_index = 2;
                             save_menu_flags &= 0xFFF8;
                             save_menu_flags |= 3;
                             break;
                         case 6:
                             save_menu_flags |= 0x2000;
-                            save_menu_choice_prompt_index = 4;
+                            save_menu_operation_panel_index = 4;
                             save_menu_flags &= 0xFFF8;
                             save_menu_flags |= 1;
                             break;
@@ -768,7 +768,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     n = 0xF;
                     break;
             }
-            Text_DrawEncodedString(0x51, 0x48, save_menu_slot_label_ptrs[n]);
+            Text_DrawEncodedString(0x51, 0x48, save_menu_slot_map_labels[n]);
             SaveMenu_SetTextDrawState();
             n = 0;
             secs = save_menu_save_headers[idx].unk38;
@@ -870,7 +870,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                         n = 0xF;
                         break;
                 }
-                Text_DrawEncodedString(0x51, 0x96, save_menu_slot_label_ptrs[n]);
+                Text_DrawEncodedString(0x51, 0x96, save_menu_slot_map_labels[n]);
                 SaveMenu_SetTextDrawState();
                 n = 0;
                 secs = save_menu_save_headers[idx].unk38;
@@ -953,7 +953,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
             switch (idx) {
                 case 0:
                     save_menu_flags |= 0x2000;
-                    save_menu_choice_prompt_index = 1;
+                    save_menu_operation_panel_index = 1;
                     save_menu_flags &= ~7;
                     save_menu_flags |= 2;
                     break;
@@ -966,7 +966,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 case 4:
                     if (save_menu_file_entries[save_menu_selected_slot].unk0 == -2) {
                         save_menu_flags |= 0x2000;
-                        save_menu_choice_prompt_index = 2;
+                        save_menu_operation_panel_index = 2;
                         save_menu_flags &= ~7;
                         save_menu_flags |= 3;
                     } else {
@@ -1193,7 +1193,7 @@ void SaveMenu_RepairPak(void) {
         save_menu_flags &= 0xFFF8;
         save_menu_flags &= ~0x4000;
         save_menu_flags |= 0x1000;
-        save_menu_repair_attempts++;
+        save_menu_repair_count++;
     }
 }
 
@@ -1302,7 +1302,7 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     e->unk5C = player_respawn_map;
     e->unk5E = player_respawn_subarea;
     e->unk60 = player_respawn_entry;
-    e->unk62 = D_800616B0;
+    e->unk62 = menu_text_delay_option;
     e->unk63 = menu_bgm_volume_option;
     if (core_flags & 0x20000) {
         e->unk64 = 1;
@@ -1347,7 +1347,7 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     player_respawn_map = e->unk5C;
     player_respawn_subarea = e->unk5E;
     player_respawn_entry = e->unk60;
-    D_800616B0 = e->unk62;
+    menu_text_delay_option = e->unk62;
     menu_bgm_volume_option = e->unk63;
     if (e->unk64 != 0) {
         core_flags |= 0x20000;

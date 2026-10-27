@@ -46,7 +46,7 @@ Gfx text_glyph_setup_dl[20] = {
     {{ 0x00000000, 0x00000000 }},
 };
 /* .bss 80092C70..80092C80 */
-s32 text_current_glyph_index;
+s32 text_font_index;
 s32 text_extra_glyph_spacing;
 
 void Text_CopyTerminatedBytes(u8 *dst, u8 *src) {
@@ -83,7 +83,7 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
                     break;
                 case 0x40:
                     if (c < 16) {
-                        text_current_glyph_index = c;
+                        text_font_index = c;
                     } else {
                         text_extra_glyph_spacing = c;
                     }
@@ -99,7 +99,7 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
                             break;
                         case 0:
                             x = x0;
-                            y += text_font_metrics[text_current_glyph_index].unkC;
+                            y += text_font_metrics[text_font_index].unkC;
                             break;
                     }
                     break;
@@ -107,11 +107,11 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
         } else {
             c = *str & 0x7F;
             if (*str == 0x7F) {
-                x += text_font_metrics[text_current_glyph_index].unk8 + text_extra_glyph_spacing;
+                x += text_font_metrics[text_font_index].unk8 + text_extra_glyph_spacing;
             } else {
-                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + text_font_metrics[text_current_glyph_index].unk0) << 2, (text_font_metrics[text_current_glyph_index].unk4 + y) << 2, G_TX_RENDERTILE,
-                                    (text_font_metrics[text_current_glyph_index].unk0 * c) << 5, 0, 1 << 10, 1 << 10);
-                x += text_font_metrics[text_current_glyph_index].unk8 + text_extra_glyph_spacing;
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + text_font_metrics[text_font_index].unk0) << 2, (text_font_metrics[text_font_index].unk4 + y) << 2, G_TX_RENDERTILE,
+                                    (text_font_metrics[text_font_index].unk0 * c) << 5, 0, 1 << 10, 1 << 10);
+                x += text_font_metrics[text_font_index].unk8 + text_extra_glyph_spacing;
             }
         }
     }

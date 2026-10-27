@@ -75,9 +75,9 @@ typedef struct {
 } TexParams5;
 
 extern Gfx *gfx_dl_head;
-extern u16 text_font_tlut[];
+extern u16 text_window_tlut[];
 /* This file's .data, 80061660..80061760. */
-s8 text_reveal_speed_steps[8] = {
+s8 text_reveal_delay_steps[8] = {
     -1, 0, 1, 2, 4, 8, 16, 30,
 };
 Unk800616A8 text_window_default_rects[8] = {
@@ -85,17 +85,17 @@ Unk800616A8 text_window_default_rects[8] = {
     { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
 };
 Unk800616A8 text_choice_window_rect = { 180, 110, 30, 40 };
-s8 D_800616B0 = 2;
+s8 menu_text_delay_option = 2;
 s32 D_800616B4 = -1;
 Unk8Bytes D_800616B8 = { { 5, 3, 1, 0, 1, 2, 3, 4 } };
 Unk8Bytes D_800616C0 = { { 7, 5, 3, 0, 1, 3, 5, 7 } };
 Unk8Bytes D_800616C8 = { { 3, 1, 0, 0, 0, 1, 2, 3 } };
-extern u8 D_80061A50[];
-extern u8 D_80061B50[];
-extern u8 D_80061D58[];
-extern u8 D_80061DE8[];
-extern u8 D_80061DF8[];
-TexPtrs5 text_rect_texture_ptrs = { { D_80061A50, D_80061B50, D_80061D58, D_80061DE8, D_80061DF8 } };
+extern u8 text_window_fill_tex[];
+extern u8 text_speaker_name_bg_tex[];
+extern u8 text_advance_icon_tex[];
+extern u8 text_window_line_tex[];
+extern u8 text_choice_cursor_tex[];
+TexPtrs5 text_rect_texture_ptrs = { { text_window_fill_tex, text_speaker_name_bg_tex, text_advance_icon_tex, text_window_line_tex, text_choice_cursor_tex } };
 TexParams5 text_rect_texture_params = { { { 16, 16, 0, 0, 4, 4 }, { 40, 13, 0, 0, 0, 0 }, { 12, 12, 0, 0, 0, 0 }, { 1, 1, 2, 2, 0, 0 }, { 12, 12, 0, 0, 0, 0 } } };
 extern u8 text_speaker_name[32];
 extern u8 text_message_buf[0x4B0];
@@ -105,7 +105,7 @@ s32 text_active_window_count;
 s32 text_last_choice_index;
 Unk80090458 text_pending_choice_rows;
 Unk80090470 text_window_slots[4];
-u8 text_font_load_flag;
+u8 text_stick_advance_enabled;
 u16 text_stick_advance_frames;
 extern s8 input_stick_x;
 extern s8 input_stick_y;
@@ -215,7 +215,7 @@ s32 Text_OpenWindow(s32 arg0) {
                     text_window_slots[i].unk17[j] = text_speaker_name[j];
                 }
                 for (j = 0; j < 0x4B0; j++) {
-                    c = text_reveal_speed_steps[0] + D_800616B0;
+                    c = text_reveal_delay_steps[0] + menu_text_delay_option;
                     text_window_slots[i].unk9C[j] = text_message_buf[j];
                 }
                 for (k = 0; k < text_pending_choice_rows.n; k++) {
@@ -239,7 +239,7 @@ s32 Text_OpenWindow(s32 arg0) {
                     text_window_slots[i].unkA = text_choice_window_rect.unk6;
                     text_window_slots[i].unkE = 0x80;
                 }
-                text_window_slots[i].unkF = text_reveal_speed_steps[0] + D_800616B0;
+                text_window_slots[i].unkF = text_reveal_delay_steps[0] + menu_text_delay_option;
                 text_window_slots[i].unk10 = c;
             }
             text_window_slots[i].unk12 = 1;
@@ -250,12 +250,12 @@ s32 Text_OpenWindow(s32 arg0) {
         }
     }
     core_flags |= 2;
-    text_font_load_flag = 0;
+    text_stick_advance_enabled = 0;
     return ret;
 }
 
 #ifdef NON_MATCHING
-/* 18 words: D_800616B0, the text cursor index and 0xE7000000 sit in other registers (allocation only); code is equivalent */
+/* 18 words: menu_text_delay_option, the text cursor index and 0xE7000000 sit in other registers (allocation only); code is equivalent */
 void Text_UpdateAndDrawWindows(void) {
     Gfx *gfx;
     s32 w;
@@ -294,7 +294,7 @@ void Text_UpdateAndDrawWindows(void) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
         gDPPipeSync(gfx_dl_head++);
-        gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
+        gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
         idx = order.v[w];
         if (idx >= 0) {
             if (text_window_slots[idx].unk0 & 0x10000000) {
@@ -377,7 +377,7 @@ void Text_UpdateAndDrawWindows(void) {
                                 x = text_window_slots[idx].unk4 - 2;
                                 y = text_window_slots[idx].unk6 + text_window_slots[idx].unk15 * 13 + 2;
                                 gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
-                                gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
+                                gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
                                 Text_DrawTexturedRect(4, x, y, 12, 12);
                             }
                         }
@@ -419,7 +419,7 @@ void Text_UpdateAndDrawWindows(void) {
                                     }
                                 }
                             } else {
-                                if (D_800616B0 != 0) {
+                                if (menu_text_delay_option != 0) {
                                     if (!(text_window_slots[idx].unk0 & 0x100000) && (input_pressed_buttons & 0xA000)) {
                                         text_window_slots[idx].unk0 |= 0x100000;
                                     }
@@ -460,7 +460,7 @@ void Text_UpdateAndDrawWindows(void) {
                                             case 0xE6:
                                             case 0xE7:
                                             case 0xE8:
-                                                col = text_reveal_speed_steps[c & 7] * D_800616B0;
+                                                col = text_reveal_delay_steps[c & 7] * menu_text_delay_option;
                                                 text_window_slots[idx].unk10 = text_window_slots[idx].unkF = col;
                                             default:
                                                 cnt++;
@@ -770,7 +770,7 @@ void Text_DrawAdvanceIndicator(s32 idx) {
     gDPPipeSync(gfx_dl_head++);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     gDPPipeSync(gfx_dl_head++);
-    gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
+    gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
     text_window_slots[idx].unkC++;
     i = (text_window_slots[idx].unkC >> 1) & 7;
     x = text_window_slots[idx].unk4 + text_window_slots[idx].unk8 - 11;
@@ -885,7 +885,7 @@ s32 Text_IsStickAdvanceHeld(void) {
     s32 ret = 0;
     u32 sum;
 
-    if (text_font_load_flag != 0) {
+    if (text_stick_advance_enabled != 0) {
         sum = input_stick_x * input_stick_x + input_stick_y * input_stick_y;
         if (sum > 60 * 60) {
             text_stick_advance_frames++;

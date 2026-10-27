@@ -29,7 +29,7 @@ OSPfs pak_port_states[4];
 Unk80092E48 pak_game_file_scans[4];
 u8 input_connected_port_bits;
 OSContStatus input_controller_statuses[4];
-OSMesg input_si_message;
+OSMesg input_si_mesg;
 OSContPad input_pad_states[4];
 /* This file's .data, 80061810..80061850: the pak file's game_name, an
  * unreferenced digit string, and the two ext_name values. */
@@ -64,8 +64,8 @@ s32 Input_InitControllers(void) {
         input_pad_states[i].stick_x = 0;
         input_pad_states[i].stick_y = 0;
     }
-    osCreateMesgQueue(&input_si_queue, &input_si_message, 1);
-    osSetEventMesg(OS_EVENT_SI, &input_si_queue, &input_si_message);
+    osCreateMesgQueue(&input_si_queue, &input_si_mesg, 1);
+    osSetEventMesg(OS_EVENT_SI, &input_si_queue, &input_si_mesg);
     osContInit(&input_si_queue, &input_connected_port_bits, input_controller_statuses);
     osContSetCh(4);
     input_primary_port = -1;

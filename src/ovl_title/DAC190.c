@@ -141,7 +141,7 @@ s32 D_8020F488_ovl_title[18] = {
 extern u8 title_menu_choice;
 extern s8 input_stick_x;
 extern s8 input_stick_y;
-extern u16 text_font_tlut[];
+extern u16 text_window_tlut[];
 extern u16 title_confirm_cursor_tlut[];
 extern u8 title_confirm_cursor_tex[];
 extern u8 title_lower_strip_tex[];
@@ -351,7 +351,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                     title_current_message = D_8021150C_ovl_title;
                 }
                 gDPPipeSync(gfx_dl_head++);
-                gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
+                gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
                 gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, 255);
                 Text_DrawTexturedRect(0, 0x3E, 0x28, 0xC4, 0x67);
                 Text_DrawTexturedRect(3, 0x102, 0x2A, 2, 0x67);
