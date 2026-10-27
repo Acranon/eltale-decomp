@@ -81,12 +81,12 @@ void Battle_TryStartRandomEncounter(void) {
                     area = Battle_FindEncounterRegion(x, y, battle_encounter_region_table);
                     if (area != NULL) {
                         battle_encounter_roll_limit = 0;
-                        dx = x - pt->unk0;
-                        dy = y - pt->unk2;
+                        dx = x - pt->x;
+                        dy = y - pt->z;
                         ang = Math_Atan2(dx, dy);
-                        Battle_SpawnEncounterGroup(pt->unk0, pt->unk2, ang, (u16*)area->unk8);
-                        battle_center_x = pt->unk0;
-                        battle_center_z = pt->unk2;
+                        Battle_SpawnEncounterGroup(pt->x, pt->z, ang, (u16*)area->group_list);
+                        battle_center_x = pt->x;
+                        battle_center_z = pt->z;
                         battle_flags = 0x205;
                         D_8008BE56 = 0;
                         battle_turn_delay = 20;
@@ -234,8 +234,8 @@ void Battle_UpdateStartCamera(void) {
                     camera_state.atHeight = 28.0f;
                     camera_state.distance = 180.0f;
                 } else {
-                    camera_state.eyeHeight += battle_camera_offsets[map_id].unk0;
-                    camera_state.distance += battle_camera_offsets[map_id].unk4;
+                    camera_state.eyeHeight += battle_camera_offsets[map_id].eye_height;
+                    camera_state.distance += battle_camera_offsets[map_id].distance;
                 }
                 camera_state.target = &player_state.actor;
                 camera_state.unk70 = 0.02f;
@@ -356,10 +356,10 @@ EncounterRegion* Battle_FindEncounterRegion(f32 x, f32 y, EncounterRegionList* l
     s32 n;
 
     if (list != NULL) {
-        n = list->unk4;
-        r = list->unk0;
+        n = list->count;
+        r = list->regions;
         while (n != 0) {
-            if (r->unk0 <= x && r->unk2 <= y && x - r->unk0 <= r->unk4 && y - r->unk2 <= r->unk6) {
+            if (r->x <= x && r->z <= y && x - r->x <= r->x_extent && y - r->z <= r->z_extent) {
                 break;
             }
             n--;
@@ -384,12 +384,12 @@ EncounterPoint* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y) {
     n = 0;
 
     if (battle_encounter_group_table != NULL) {
-        cnt = battle_encounter_group_table->unkC;
-        p = battle_encounter_group_table->unk8;
+        cnt = battle_encounter_group_table->point_count;
+        p = battle_encounter_group_table->points;
         while (n < 6 && cnt != 0) {
             cnt--;
-            dx = p->unk0 - x;
-            dy = p->unk2 - y;
+            dx = p->x - x;
+            dy = p->z - y;
             d = dx * dx + dy * dy;
             if (d >= 2500.0f && d <= 8100.0f) {
                 cands[n++] = p;
@@ -419,19 +419,19 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
     s32 out[8][2];
 
     cnt = Math_Rand(*list++);
-    e = &battle_encounter_group_table->unk4[list[cnt]];
-    pos = &(*battle_encounter_group_table->unk0)[e->unk6];
-    n = e->unk4;
-    p = e->unk0;
+    e = &battle_encounter_group_table->groups[list[cnt]];
+    pos = &(*battle_encounter_group_table->formation_positions)[e->formation_start];
+    n = e->entry_count;
+    p = e->entries;
     actor = enemy_slots;
     o = out;
     D_8008BF90 = 0;
     while (n != 0) {
-        cnt = p->unk4;
-        if (p->unk8 != 0) {
-            cnt += Math_Rand(p->unk8 + 1);
+        cnt = p->count;
+        if (p->extra_count_max != 0) {
+            cnt += Math_Rand(p->extra_count_max + 1);
         }
-        (*o)[0] = p->unk0;
+        (*o)[0] = p->enemy_def_index;
         (*o)[1] = cnt;
         o++;
         enemy_count += cnt;
@@ -440,7 +440,7 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
             battle_temp_vec.x = pos->x;
             battle_temp_vec.y = pos->y;
             Math_RotateVec2(z, (Vec2f*)&battle_temp_vec);
-            Enemy_Spawn(p->unk0, x + battle_temp_vec.x, y + battle_temp_vec.y, z, &actor->actor, actor);
+            Enemy_Spawn(p->enemy_def_index, x + battle_temp_vec.x, y + battle_temp_vec.y, z, &actor->actor, actor);
             cnt--;
             actor++;
             pos++;
