@@ -6,6 +6,7 @@
 #include "game/enemy/enemy.h"
 
 struct CollResult;
+struct AnimSet;
 
 /* .bss 8007C0B0..8007C280, in address order (unreferenced gaps included) */
 extern struct CollResult boss_spawn_coll;
@@ -20,6 +21,12 @@ extern s32 D_8007C278[2];
 /* .data */
 extern u16 boss_reward_max_hp[8];
 extern u16 boss_reward_max_mp[8];
+
+/* The bosses' anim set and name tables: fixed addresses in the boss data block read from
+ * ROM (no C module defines them). Battle_StartBossEncounter swaps them in for
+ * enemy_anim_tables / enemy_names. */
+extern struct AnimSet *D_803ABA58[];
+extern u8 *D_803AC3F8[];
 
 void Boss_ClearDefeated(void);
 void Boss_LoadForArea(void);

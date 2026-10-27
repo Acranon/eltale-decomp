@@ -17,11 +17,6 @@
  * Original file: 1FA00.c (ROM 0x1FA00).
  */
 
-/* The boss anim set and name tables, at fixed addresses in a block DMA'd from ROM
- * (no C module defines them; boss.c reads D_803ABA58 too). */
-extern u8 *D_803ABA58[];
-extern u8 *D_803AC3F8[];
-
 /* This file's .bss, 8008BE40..8008BFC0, in address order (first declaration fixes the order). */
 Vec3f battle_temp_vec;
 u16 battle_camera_phase;
