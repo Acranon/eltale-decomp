@@ -1,5 +1,12 @@
 #include "common.h"
 
+/*
+ * Player actor: init/spawn, per-frame update and draw, the state machine (move, talk, chest,
+ * item, exits, melee attack, spell input and casting, hurt, death, battle start/won),
+ * movement and collision, damage taken and dealt, stat growth from XP.
+ * Folder: src/game/player/   (proposed for round 4)
+ */
+
 typedef struct {
     f32 x;
     f32 z;

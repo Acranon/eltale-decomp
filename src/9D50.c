@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Town NPCs: spawn from the area's def list, per-frame wander/turn update, draw, collision,
+ * start/end of a talk and loading the message and speaker name into the text buffers.
+ * Folder: src/game/npc/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ u8 pad0[2];
     /* 0x02 */ s16 unk2;
