@@ -14,47 +14,6 @@
 
 
 
-extern u8 D_8021C3A0_ovl_intro[];
-extern u16 D_80218400_ovl_intro[];
-extern u16 D_8021C1A0_ovl_intro[];
-extern u8 D_80218800_ovl_intro[];
-extern u16 D_80218600_ovl_intro[];
-extern u8 D_8024B348_ovl_intro[];
-extern u16 D_8024BB30_ovl_intro[];
-extern u8 D_8024CE78_ovl_intro[];
-extern u16 D_8024E050_ovl_intro[];
-extern u8 D_8024C4E8_ovl_intro[];
-extern u16 D_8024CC70_ovl_intro[];
-extern u8 D_8022D530_ovl_intro[];
-extern u16 D_8022D330_ovl_intro[];
-extern u8 D_8024E258_ovl_intro[];
-extern u16 D_802510B0_ovl_intro[];
-extern u8 D_8022CFA0_ovl_intro[];
-extern u16 D_8022CDA0_ovl_intro[];
-extern u8 D_80232FE0_ovl_intro[];
-extern u16 D_80232DE0_ovl_intro[];
-extern u8 D_80238A90_ovl_intro[];
-extern u16 D_80238890_ovl_intro[];
-extern u8 D_802512B8_ovl_intro[];
-extern u16 D_802531B0_ovl_intro[];
-extern u8 D_8023D8D0_ovl_intro[];
-extern u16 D_8023D6D0_ovl_intro[];
-extern u8 D_802533B8_ovl_intro[];
-extern u16 D_80254E90_ovl_intro[];
-extern u8 D_80243380_ovl_intro[];
-extern u16 D_80243180_ovl_intro[];
-extern u8 D_80255098_ovl_intro[];
-extern u16 D_802566F8_ovl_intro[];
-extern u8 D_80248E30_ovl_intro[];
-extern u16 D_80248C30_ovl_intro[];
-extern u8 D_80256900_ovl_intro[];
-extern u16 D_80257538_ovl_intro[];
-extern u8 D_80257740_ovl_intro[];
-extern u16 D_80258378_ovl_intro[];
-extern u8 D_80258580_ovl_intro[];
-extern u16 D_80259048_ovl_intro[];
-extern u8 D_80217300_ovl_intro[];
-extern u16 D_80217100_ovl_intro[];
 Gfx intro_render_setup_dl[11] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},

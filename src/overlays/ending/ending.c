@@ -1,4 +1,7 @@
 #include "overlays/ending/ending.h"
+#include "game/audio/audio.h"
+#include "game/core/main.h"
+#include "overlays/ending/ending_data.h"
 
 /*
  * Ending overlay: entry and per-frame update, the same scripted sprite engine as the intro,
@@ -6,8 +9,6 @@
  * Original file: ovl_ending/E22690.c (ROM 0xE22690).
  */
 
-extern Gfx* gfx_dl_head;
-extern Gfx ending_sprite_setup_dl[];
 
 
 typedef struct {
@@ -40,11 +41,6 @@ u32 ending_cue_group_index = 0;
 s32 ending_wait_for_sprites = 0;
 s32 ending_display_buffer_index = 0;
 
-extern EndingCueGroup ending_cue_groups[];
-extern u32 ending_cue_group_count;
-extern EndingAnim ending_sprite_anim_table[];
-extern Gfx D_8020F718_ovl_ending[];
-extern Gfx D_8020F748_ovl_ending[];
 
 #ifdef NON_MATCHING
 /* gSPTextureRectangle with the RDPHALF_2 step word built as ((dsdx & 0xFFFF) << 13) << 3
@@ -69,10 +65,6 @@ typedef struct {
     s32 unkC;
 } UnkPic_80210800;
 
-extern Gfx D_8020F730_ovl_ending[];
-extern f32 D_8022BAF0_ovl_ending;
-extern f64 D_8022BAF8_ovl_ending;
-void Audio_StartSeqFadeOut(s32);
 #endif
 
 

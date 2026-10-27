@@ -1,6 +1,9 @@
 #include "game/env/env.h"
 #include "game/map/map.h"
 #include "game/camera/camera.h"
+#include "game/core/main.h"
+#include "game/battle/battle.h"
+#include "game/ui/hud.h"
 
 /*
  * World clock and environment: day counter, day-phase palette fades, the lighting/fog
@@ -40,11 +43,6 @@ EnvLightSlot env_light_slots[8];
 s32 env_light_colors[4][3];
 s32 env_light_dirs[4][3];
 s32 env_fog_range[2];
-extern s32 D_8008C164;
-
-extern u16 battle_flags;
-extern s32 core_flags;
-extern s32 D_8008C168;
 
 /* This file's .data, 8004DED0..8004DF00: the day-phase table (env_day_phase_last is
  * its last entry, named separately by the asm). */
@@ -57,21 +55,12 @@ EnvDayPhase env_day_phase_last[1] = {
     { 0x537F, 3, 0x80 },
 };
 
-extern s32 gfx_frame_index;
-extern Gfx *gfx_dl_head;
-extern s16 gfx_fog_near;
-extern s16 gfx_fog_far;
-
-void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
 extern s32 D_80084B60;
 extern s32 D_80084B64;
 extern s32 D_80084B68;
 extern s32 D_80084B6C;
 extern s32 D_80084B70;
 extern s32 D_80084B74;
-extern s32 gfx_clear_r;
-extern s32 gfx_clear_g;
-extern s32 gfx_clear_b;
 
 void Exit_SetDestination(MapExit *arg0) {
     exit_destination_src = arg0->dest;
@@ -127,7 +116,7 @@ void Env_InitForMap(void) {
         env_next_phase = i;
     }
     /* map.h declares the four phase palettes as u8[0x800]; they are u16[4][0x100] (D3_HINTS). */
-    src = ((u16(*)[0x100]) map_backdrop_phase_tluts)[p->unk4];
+    src = map_backdrop_phase_tluts[p->unk4];
     dst = map_backdrop_tlut;
     i = 0x100;
     do {
@@ -165,7 +154,8 @@ void Env_Update(void) {
     } else {
         p = &env_day_phases[env_next_phase];
         if (env_light_time >= p->unk0 && (env_next_phase != 0 || env_light_time < env_last_phase_start)) {
-            Env_StartPaletteFade(p->unk8, (u16 *) map_backdrop_phase_tluts + p->unk4 * 256, map_backdrop_tlut);
+            /* row p->unk4 written as an offset: map_backdrop_phase_tluts[p->unk4] DIFFs (55 words) */
+            Env_StartPaletteFade(p->unk8, map_backdrop_phase_tluts[0] + p->unk4 * 256, map_backdrop_tlut);
             if (++env_next_phase >= 4) {
                 env_next_phase = 0;
             }

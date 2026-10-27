@@ -1,4 +1,5 @@
 #include "game/math/math.h"
+#include "game/camera/camera.h"
 
 /*
  * Math: the random number generator, arctangent, 2D vector helpers, float matrix builders
@@ -15,10 +16,6 @@
 u8 math_bit_masks[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 u32 math_rand_seed = 0x9B0;
 MtxF math_scratch_mtxf; /* .bss 8008CE60..8008CEA0 */
-
-extern MtxF camera_view_mtx;
-extern f32 camera_near;
-extern f32 camera_tan_half_fovy;
 
 u32 Math_Rand(u32 max) {
     if (max != 0) {

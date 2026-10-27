@@ -2,46 +2,37 @@
 #include "game/actor/actor.h"
 #include "game/camera/camera.h"
 #include "game/map/map.h"
+#include "game/actor/anim.h"
+#include "game/core/dma.h"
+#include "game/core/main.h"
+#include "game/env/env.h"
+#include "game/math/math.h"
+#include "game/player/player.h"
 
 /*
  * Sprite particles, model effects, floating numbers, streaks, and terrain rings.
  * Original file: 1B200.c (ROM 0x1B200).
  */
 
-
-extern Gfx* gfx_dl_head;
-extern s16 D_800865CC;
+/* Not defined by a module: overlay data at fixed addresses and segment 2. */
 extern u8 D_800EB5E4[][4];
-extern s32 D_80084B6C;
-extern s32 D_80084B70;
-extern s32 D_80084B74;
-/* This file's .bss, 800863F0..80087E30 (in address order; first declaration
- * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds effect_stat_up_marker_slots (Effect_ResetStatUpMarkers shares a lui between its pairs only when it
- * is defined here). Labels splat put inside these arrays (D_800865CC..,
- * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
-
-extern s32 gfx_frame_index;
 extern AnimSet D_800EB2B4[];
 extern u8 D_800CADA8[][4];
 extern EffectTexAnim D_800DA0F0[];
 extern Gfx D_800EB6D0[];
-void Math_MtxFRotate(MtxF*, f32, f32, f32);
-f32 Math_Atan2(f32, f32);
-u32 Math_Rand(u32);
-s32 Text_FormatNumber(s32, u8*, u16);
-extern s32 gfx_mtx_index;
-void Math_MtxFRotScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32);
-void Math_MtxFAlignYToVector(MtxF*, f32, f32, f32);
-void Math_MtxFScaleAxes(MtxF*, f32, f32, f32);
-f32 sqrtf(f32);
-/* Local view of GfxFrameData (game/core/main.h, h_core) until H2. */
-typedef struct GfxFrameData {
-    /* 0x00 */ Mtx unk0[3];
-    /* 0xC0 */ Mtx unkC0[1];
-} Unk2000000_1B200;
-extern Unk2000000_1B200 D_2000000;
+extern GfxFrameData D_2000000;
 extern Gfx D_800EB880[];
 extern Gfx D_800EB8E8[];
+/* H2b: env_light_dirs[3][0..2] (env.c), read through its interior labels (undefined_syms.txt):
+ * retail loads each with its own lui; env_light_dirs[3][i] shares one base (65 words differ). */
+extern s32 D_80084B6C;
+extern s32 D_80084B70;
+extern s32 D_80084B74;
+
+/* This file's .bss, 800863F0..80087E30 (in address order; first declaration
+ * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds effect_stat_up_marker_slots (Effect_ResetStatUpMarkers shares a lui between its pairs only when it
+ * is defined here). Labels splat put inside these arrays (D_800865CC..,
+ * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
 
 
 /* This file's .data, 8004EE20..8004F060: effect descriptors (EffectSprite,
@@ -361,10 +352,9 @@ void Effect_AddFloatingNumber(Actor* arg0, s32 arg1, s32 arg2) {
 }
 
 
+/* Not defined by a module: overlay data and a buffer at fixed addresses. */
 extern Gfx D_800C40C0[];
 extern u8 D_8039E290[];
-s32 Camera_WorldToScreen(f32, f32, f32, s32*, s32*);
-s16 sins(u16);
 
 void Effect_DrawFloatingNumbers(void) {
     s32 n;
@@ -624,8 +614,8 @@ void Effect_UpdateAndDrawStreaks(struct GfxFrameData* arg0) {
                 mtx.mf[3][0] = p->x;
                 mtx.mf[3][1] = p->y;
                 mtx.mf[3][2] = p->z;
-                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[gfx_mtx_index]);
-                gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                guMtxF2L(mtx.mf, &arg0->mtx[gfx_mtx_index]);
+                gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
                 gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, alpha);
                 gSPDisplayList(gfx_dl_head++, D_800EB8E8);
             }
@@ -683,11 +673,6 @@ void Effect_ResetRings(void) {
     } while (i != 0);
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ f32 unk1C;
-} Unk8007AA08_1B200;
-extern Unk8007AA08_1B200 player_state;
 s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     s32 i;
     EffectRing* p;
@@ -718,7 +703,7 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
         Math_RotateVec2(angle, &effect_temp_vec);
         pt->x = effect_temp_vec.x + arg1;
         pt->z = effect_temp_vec.y + arg3;
-        Coll_ResolveFloorAndWalls(pt->x, player_state.unk1C, pt->z, 0xA00, &effect_ring_coll);
+        Coll_ResolveFloorAndWalls(pt->x, player_state.actor.y, pt->z, 0xA00, &effect_ring_coll);
         if (effect_ring_coll.flags & 0x8000) {
             pt->y = arg2;
             n->x = 0.0f;
@@ -844,8 +829,8 @@ void Effect_UpdateAndDrawRings(struct GfxFrameData* arg0) {
                     mtx.mf[3][0] = x0;
                     mtx.mf[3][1] = y0;
                     mtx.mf[3][2] = z0;
-                    guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[gfx_mtx_index]);
-                    gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                    guMtxF2L(mtx.mf, &arg0->mtx[gfx_mtx_index]);
+                    gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
                     gSPDisplayList(gfx_dl_head++, D_800C4840);
                 }
             } while (j != 0);
@@ -950,7 +935,6 @@ void Effect_UpdateAndDrawModelEffects(struct GfxFrameData* arg0) {
 }
 
 
-extern s32 anim_node_position_count;
 s32 Effect_DrawModelEffectGeometry(EffectModel* arg0, struct GfxFrameData* arg1) {
     u32 i;
     AnimNode* anims;
@@ -1068,16 +1052,9 @@ void Effect_ResetStatUpMarkers(void) {
     }
 }
 
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-} Unk8007AB48;
-extern Unk8007AB48 player_shadow_pos;
-extern f32 D_8007AA44;
+/* Not defined by a module: overlay display lists. */
 extern Gfx D_800EB9C8[];
 extern Gfx D_800EB990[];
-void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
 void Effect_DrawStatUpMarkers(struct GfxFrameData* arg0) {
     s32 first;
     s32 i;
@@ -1104,16 +1081,16 @@ void Effect_DrawStatUpMarkers(struct GfxFrameData* arg0) {
                     alpha = ((25 - p->unk0) * alpha) >> 2;
                 }
                 x = player_shadow_pos.x;
-                y = D_8007AA44 * 70.0 + player_shadow_pos.y;
+                y = player_state.actor.scale * 70.0 + player_shadow_pos.y;
                 z = player_shadow_pos.z;
                 Math_MtxFAimAt(&mtx, x, y, z, camera_state.eyeX, camera_state.eyeY, camera_state.eyeZ);
-                Math_MtxFScaleAxes(&mtx, D_8007AA44, D_8007AA44, D_8007AA44);
-                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[gfx_mtx_index]);
+                Math_MtxFScaleAxes(&mtx, player_state.actor.scale, player_state.actor.scale, player_state.actor.scale);
+                guMtxF2L(mtx.mf, &arg0->mtx[gfx_mtx_index]);
                 /* Keep the index update in the matrix command's scope for IDO scheduling. */
                 {
                     Gfx* _g = gfx_dl_head++;
                     _g->words.w0 = 0x01020040;
-                    _g->words.w1 = (u32)&D_2000000.unkC0[gfx_mtx_index];
+                    _g->words.w1 = (u32)&D_2000000.mtx[gfx_mtx_index];
                     gfx_mtx_index++;
                 }
                 gDPSetEnvColor(gfx_dl_head++, effect_stat_up_marker_colors[i / 1][0], effect_stat_up_marker_colors[i / 1][1], effect_stat_up_marker_colors[i / 1][2], alpha);

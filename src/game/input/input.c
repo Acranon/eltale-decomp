@@ -26,15 +26,13 @@ char D_80061820[] = "012345678901234567890123456789";
 PakExtName pak_allocate_extension_template = { { 0, 0, 0, 0 } };
 PakExtName pak_delete_extension_template = { { 0, 0, 0, 0 } };
 
-s32 osContInit();
-s32 osPfsFreeBlocks();
+/* libultra functions that symbol_addrs.txt still calls func_ (libultra/io), so no SDK
+ * header declares them under these names. K&R: func_8003D6B0 is called with three
+ * arguments and with none (func_80036184). */
 s32 func_8003D554();
 s32 func_8003D6B0();
 s32 func_8003D0F0();
-s32 osPfsRepairId();
 s32 func_8003EDC0();
-s32 osPfsFileState();
-s32 osPfsFreeBlocks();
 
 s32 Input_InitControllers(void) {
     s32 pad[2];

@@ -1,18 +1,15 @@
 #include "game/gfx/sprite_effect.h"
 #include "game/camera/camera.h"
+#include "game/core/main.h"
+#include "game/math/math.h"
 
 /*
  * EffectSprite effect pool: allocate, update, transform, draw, and load textures.
  * Original file: 1E570.c (ROM 0x1E570).
  */
 
-/* Local view of GfxFrameData (game/core/main.h, h_core) until H2. */
-typedef struct GfxFrameData {
-    char unk00[0xC0];
-    Mtx unkC0[1];
-} Struct_8001DA3C;
+extern GfxFrameData D_2000000; /* segment 2 (no module defines it) */
 
-extern Mtx D_2000000[];
 Gfx effect_sprite_setup_dl[8] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00100000 }},
@@ -23,8 +20,6 @@ Gfx effect_sprite_setup_dl[8] = {
     {{ 0xBB000001, 0x80008000 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-extern s32 gfx_mtx_index;
-extern Gfx* gfx_dl_head;
 /* This file's .bss, 80087E30..8008BE40. */
 s32 effect_active_sprite_count;
 EffectSprite effect_sprite_slots[0x100];
@@ -62,7 +57,7 @@ EffectSprite* Effect_AllocateSprite(EffectSprite* arg0) {
     return ret;
 }
 
-void Effect_UpdateAndDrawSprites(Struct_8001DA3C* arg0) {
+void Effect_UpdateAndDrawSprites(GfxFrameData* arg0) {
     s32 i;
     u8* tex;
     EffectSprite* dust;
@@ -94,13 +89,13 @@ void Effect_UpdateAndDrawSprites(Struct_8001DA3C* arg0) {
                 Math_MtxFAimAt(&spB4, dust->x, dust->y, dust->z, camera_state.eyeX, camera_state.eyeY, camera_state.eyeZ);
                 if (dust->roll != 0.0f) {
                     Math_MtxFRotate(&sp74, 0.0f, 0.0f, dust->roll);
-                    guMtxCatF((f32 (*)[4]) &sp74, (f32 (*)[4]) &spB4, (f32 (*)[4]) &spB4);
+                    guMtxCatF(sp74.mf, spB4.mf, spB4.mf);
                 }
                 Math_MtxFScaleAxes(&spB4, dust->scaleX, dust->scaleY, 1.0f);
             }
             if (gfx_mtx_index < 0x1E6) {
-                guMtxF2L((f32 (*)[4]) &spB4, &arg0->unkC0[gfx_mtx_index]);
-                gSPMatrix(gfx_dl_head++, &D_2000000[gfx_mtx_index + 3].m[0][0], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+                guMtxF2L(spB4.mf, &arg0->mtx[gfx_mtx_index]);
+                gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
                 gfx_mtx_index++;
                 gSPDisplayList(gfx_dl_head++, dust->dl);
             }

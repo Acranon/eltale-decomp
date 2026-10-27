@@ -1,4 +1,5 @@
 #include "game/audio/audio.h"
+#include "game/core/sched.h"
 
 /*
  * Audio driver: synthesizer init and sample DMA cache, the audio thread (nnSc client),
@@ -48,6 +49,8 @@ SeqSlot audio_seq_slots[2];
 s32 D_8008FAE0;
 s32 D_8008FAE4;
 
+/* The audio heap (0x68000 bytes at 80332DB0, above the overlay area): a fixed
+ * address, no object. */
 extern u8 D_80332DB0[];
 f32 sfx_pitch_table[73] = {
 #include "assets/sfx_pitch_table.inc.c"
@@ -61,12 +64,8 @@ ALSeqFile* audio_seq_file = NULL;
 s32 audio_dma_count = 0;
 u32 audio_frame_count = 0;
 
-void alCSeqNew(ALCSeq*, u8*);
-
 extern s32 D_800559E4;
 extern s32 D_800559F8;
-
-void alSndpNew(ALSndPlayer*, ALSndpConfig*);
 
 void Audio_DmaReadRom(u32 devAddr, void* vAddr, s32 nbytes) {
     OSIoMesg sp28;
@@ -193,30 +192,13 @@ void Audio_FreeOldDmaBuffers(void) {
     audio_frame_count++;
 }
 
-typedef short NNScMsg;
-
-typedef struct SCClient_s {
-    struct SCClient_s* next;
-    OSMesgQueue* msgQ;
-} NNScClient;
-
-typedef struct SCTask_s {
-    struct SCTask_s* next;
-    u32 state;
-    u32 flags;
-    void* framebuffer;
-    OSTask list;
-    OSMesgQueue* msgQ;
-    OSMesg msg;
-} NNScTask;
-
+/* The RSP microcode (rspboot, aspMain text and data): linked from the SDK's binaries,
+ * no C module defines them. */
 extern u8 D_8004B980[];
 extern u8 D_8004BA50[];
 extern u8 D_8004CE80[];
 extern u8 D_80070A60[];
-void nnScAddClient(void* sc, NNScClient* c, OSMesgQueue* msgQ);
-OSMesgQueue* nnScGetAudioMQ(void* sc);
-Acmd* alAudioFrame(Acmd* cmdList, s32* cmdLen, s16* outBuf, s32 outLen);
+/* n_libaudio's (PR/n_libaudio.h, which can't be included with PR/libaudio.h). */
 s16 n_alSeqpGetVol(ALSeqPlayer* seqp);
 
 void Audio_ThreadMain(void* arg) {

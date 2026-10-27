@@ -1,5 +1,9 @@
 #include "game/map/collision.h"
 #include "game/map/map.h"
+#include "game/battle/battle.h"
+#include "game/env/env.h"
+#include "game/item/item.h"
+#include "game/math/math.h"
 
 /*
  * Map collision: floor height and normal from the room's triangle meshes (grid lookup),
@@ -7,14 +11,8 @@
  * Original file: 113F0.c (ROM 0x113F0).
  */
 
-f32 sqrtf(f32);
-void Exit_SetDestination(MapExit *);
-
 /* This file's .bss, 800842F0..80084300. */
 f32 coll_push_radius;
-extern Vec2f exit_local_offset;
-extern u16 battle_flags;
-extern u8 item_inventory[];
 
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) {
     u16 *list;
@@ -73,7 +71,7 @@ s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     MapModel *mesh;
     MapObj *obj;
     f32 ang;
-    f32 v[2];
+    Vec2f v;
 
     obj = &map_objs[idx];
     x -= obj->x;
@@ -82,22 +80,22 @@ s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     ret = 0;
     mesh = &map_obj_models[obj->model];
     if (ang != 0.0f) {
-        v[0] = x;
-        v[1] = z;
-        Math_RotateVec2(ang, (Vec2f *)v);
-        x = -v[0];
-        z = v[1];
+        v.x = x;
+        v.y = z;
+        Math_RotateVec2(ang, &v);
+        x = -v.x;
+        z = v.y;
     }
     if ((obj->kind & 0xFF) < 0x10) {
         ret = Coll_TestMeshFloor(x, z, obj->scale, flags, mesh, out);
         if (ret) {
             out->y += obj->y;
             if (ang != 0.0f) {
-                v[0] = out->nx;
-                v[1] = out->nz;
-                Math_RotateVec2(-ang, (Vec2f *)v);
-                out->nx = -v[0];
-                out->nz = v[1];
+                v.x = out->nx;
+                v.y = out->nz;
+                Math_RotateVec2(-ang, &v);
+                out->nx = -v.x;
+                out->nz = v.y;
             }
         }
     }

@@ -1,4 +1,5 @@
 #include "overlays/pakmenu/pakmenu.h"
+#include "game/input/input.h"
 
 /*
  * Boot-time Controller Pak manager (overlay at 0x80100000, run once by Core_MainThread
@@ -623,9 +624,6 @@ s16 pak_menu_text_y;
 
 
 #ifdef NON_MATCHING
-extern u8 input_connected_port_bits;
-extern s8 input_primary_port;
-extern OSContStatus input_controller_statuses[];
 s32 func_8003D0F0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D554(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D6B0(OSMesgQueue*, OSPfs*, s32);

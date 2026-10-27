@@ -1,4 +1,5 @@
 #include "game/gfx/fade.h"
+#include "game/core/main.h"
 
 /*
  * Screen fade: a full-screen quad whose colour steps through an RGBA ramp each frame, and
@@ -6,16 +7,8 @@
  * Original file: 272D0.c (ROM 0x272D0).
  */
 
-/* Local view of GfxFrameData (game/core/main.h, h_core) until H2. */
-typedef struct GfxFrameData {
-    char unk00[0xC0];
-    Mtx unkC0[1];
-} Struct_80026774;
+extern GfxFrameData D_2000000; /* segment 2 (no module defines it) */
 
-extern Mtx D_2000000[];
-extern Mtx D_2000040[];
-extern s32 gfx_mtx_index;
-extern Gfx* gfx_dl_head;
 /* .bss 8008CA50..8008CE60 */
 u16 fade_flags; /* bit 0 quad on, 1 hold at the end, 2 step the ramp backwards, 3 letterbox bars */
 u8 fade_grey_ramp_256[0x100][4];
@@ -115,15 +108,15 @@ void Fade_Init(void) {
     }
 }
 
-void Fade_UpdateAndDraw(Struct_80026774* arg0) {
+void Fade_UpdateAndDraw(GfxFrameData* arg0) {
     if (fade_flags & 8) {
         gSPDisplayList(gfx_dl_head++, fade_letterbox_dl);
     }
     if (fade_flags & 1) {
         gDPPipeSync(gfx_dl_head++);
-        gSPMatrix(gfx_dl_head++, D_2000040, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
-        guMtxIdent(&arg0->unkC0[gfx_mtx_index]);
-        gSPMatrix(gfx_dl_head++, &D_2000000[gfx_mtx_index + 3], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        gSPMatrix(gfx_dl_head++, &D_2000000.ortho, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+        guMtxIdent(&arg0->mtx[gfx_mtx_index]);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
         gfx_mtx_index++;
         gDPSetEnvColor(gfx_dl_head++, fade_ramp_ptr->r, fade_ramp_ptr->g, fade_ramp_ptr->b, fade_ramp_ptr->a);
         if (fade_ramp_ptr->a == 0xFF) {
