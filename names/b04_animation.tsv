@@ -1,0 +1,8 @@
+# D3 b04 animation
+# old<TAB>new<TAB>evidence
+func_800201A0	Anim_SetCurrentAndNext	Sets current and queued animation indices and frame values, resetting frame counters when requested.
+func_80020214	Anim_UpdateRootMotion	Samples the root animation frame and writes current root position and motion delta to the actor.
+func_80020428	Anim_DrawModel	Builds the actor transform and recursively draws every root node in the animation set.
+func_80020568	Anim_DrawNode	Samples one node transform, combines it with its parent, emits its display list, and recurses into children.
+func_8002099C	Anim_AdvanceFrame	Advances the frame counter and either switches to queued animation or wraps within the current one.
+func_80020A28	Anim_ApplyPivotOffset	Subtracts a node pivot multiplied by each matrix basis vector from the transform translation.

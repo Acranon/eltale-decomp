@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Sprite particles, model effects, floating numbers, streaks, and terrain rings.
+ * Folder: src/game/gfx/
+ */
+
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;

@@ -1,0 +1,42 @@
+# D3 b04 effects
+# old<TAB>new<TAB>evidence
+func_8001A600	Effect_ResetAll	Calls the reset routines for pulse emitters, marker emitters, spark bursts, streaks, actor markers, number popups, model effects, and rings.
+func_8001A658	Effect_UpdateAndDrawAll	Calls the per-frame update and draw routines for all local effect pools.
+func_8001A6B4	Effect_ResetPulseEmitters	Sets every timer in the eight-entry D_80086400 emitter pool to zero.
+func_8001A6E4	Effect_StartPulseEmitter	Allocates a D_80086400 entry, stores a position pointer, and starts its four-frame timer.
+func_8001A728	Effect_UpdatePulseEmitters	Ticks D_80086400 timers and spawns sprite particles on alternating frames at their stored positions.
+func_8001A828	Effect_UpdatePulseParticle	Integrates the particle velocity, damps it, and sets size and alpha from age tables.
+func_8001A8F4	Effect_ResetMarkerEmitters	Clears the active fields of both eight-entry D_80086440 and D_80086500 marker buffers.
+func_8001A948	Effect_QueueVisibleMarker	Accepts a position only when in the camera-facing half-space, then stores it in the current marker buffer.
+func_8001AB44	Effect_UpdateMarkerEmitters	Ticks the current marker buffer and periodically creates sprite effects at stored positions.
+func_8001AC20	Effect_UpdateMarkerParticle	Moves and grows a sprite particle and derives its color and alpha from the environment and age table.
+func_8001AD28	Effect_SpawnSmallParticle	Copies the supplied position into a preset sprite descriptor and allocates a sprite effect.
+func_8001AD64	Effect_UpdateSmallParticle	Selects its image by age and sets size and alpha from lookup tables.
+func_8001ADE4	Effect_ResetFloatingNumbers	Clears the timers for all ten floating-number entries.
+func_8001AE24	Effect_AddFloatingNumber	Allocates a timed entry for an actor, formats the absolute amount into digits, and records its display category.
+func_8001AF90	Effect_DrawFloatingNumbers	Projects each timed actor to screen and draws the formatted digits above it.
+func_8001B3CC	Effect_ResetBurstEmitters	Clears the active field of each D_800866D8 burst-emitter slot.
+func_8001B3FC	Effect_StartBurstEmitter	Allocates a D_800866D8 entry and stores duration, color selection, position, and radius.
+func_8001B45C	Effect_UpdateBurstEmitters	Ticks burst emitters and spawns particles with randomized directions on alternating frames.
+func_8001B688	Effect_UpdateBurstParticle	Moves and damps a burst particle, rotates it, and sets color and alpha.
+func_8001B7E0	Effect_SpawnBurst	Creates fifteen particles around the supplied point with randomized directions and the given radius.
+func_8001B9C0	Effect_UpdateBurstParticleWithDrag	Moves and rotates a burst particle, using 0.8 velocity damping and table-based color and alpha.
+func_8001BB18	Effect_ResetStreaks	Clears the active count in each of the 32 D_80087298 streak entries.
+func_8001BB48	Effect_DrawStreaks	Moves each active streak and draws a scaled, velocity-aligned model with fading alpha.
+func_8001BE2C	Effect_SpawnStreakBurst	Allocates up to sixteen streaks at the supplied point and gives each a randomized outward velocity.
+func_8001C038	Effect_ResetRings	Clears the active field of all four D_800877A8 ring entries.
+func_8001C060	Effect_CreateTerrainRing	Allocates a ring and samples floor height and normals at sixteen rotated points around its center.
+func_8001C298	Effect_FadeRing	Sets an existing ring to its timed fade state and updates its center.
+func_8001C2F8	Effect_DrawRings	Updates ring lifetime and alpha, then draws sixteen connected segments along saved terrain points.
+func_8001C7E8	Effect_ResetModelEffects	Clears the active field in the 32-entry model-effect pool.
+func_8001C818	Effect_CreateModelEffect	Allocates a model-effect record and copies position, scale, animation, color, and texture descriptors into it.
+func_8001C948	Effect_DrawModelEffects	Ticks all active model effects, configures color and texture, and draws each model hierarchy.
+func_8001CBD0	Effect_DrawModelEffectGeometry	Builds a transform from a model-effect record and draws each root animation node.
+func_8001CDF4	Effect_ConfigureModelEffectTexture	Advances texture coordinates or frames and emits texture, combine, tile, and geometry commands.
+func_8001D688	Effect_ResetActorMarkers	Clears the active field in the four-entry actor-marker pool.
+func_8001D6A8	Effect_DrawActorMarkers	Billboards active marker sprites above D_8007AB48, scales by D_8007AA44, and fades their lifetimes.
+func_8001D94C	Effect_ActivateActorMarker	Starts the indexed D_80087798 marker at a 25-frame lifetime.
+func_8001D970	Effect_ResetSpritePool	Clears all 256 D_80087E38 sprite lifetimes and resets the active count.
+func_8001D9A8	Effect_AllocateSprite	Copies a descriptor into the first inactive sprite slot and increments the active count.
+func_8001DA3C	Effect_DrawSprites	Ticks active sprite lifetimes, applies callback or display list, builds transforms, and draws them.
+func_8001DCE8	Effect_LoadSpriteTexture	Selects the GBI texture load format and dimensions and configures its texture LUT.

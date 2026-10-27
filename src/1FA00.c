@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Battle setup, encounter placement, turn order, camera transition, and completion.
+ * Folder: src/game/battle/
+ */
+
 typedef struct {
     /* 0x00 */ s16 unk0;
     /* 0x02 */ s16 unk2;

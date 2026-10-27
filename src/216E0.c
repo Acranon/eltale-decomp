@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * In-game HUD: meters, compass, spell input, status indicators, and text primitives.
+ * Folder: src/game/ui/
+ */
+
 typedef struct {
     /* 0x00 */ char unk0[4];
     /* 0x04 */ f32 unk4;

@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Sprite effect pool: allocate, update, transform, draw, and load textures.
+ * Folder: src/game/gfx/
+ */
+
 typedef struct {
     f32 mf[4][4];
 } MtxF;

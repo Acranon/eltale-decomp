@@ -1,0 +1,11 @@
+# D3 b04 battle
+# old<TAB>new<TAB>evidence
+func_8001EE00	Battle_ResetState	Clears battle state, encounter accumulator, and battle pointers, then selects map encounter tables when enabled.
+func_8001EE94	Battle_TryStartRandomEncounter	Accumulates player travel, chooses a nearby encounter point and region, spawns a group, and calls Player_InitBattle.
+func_8001F164	Battle_StartBossEncounter	Spawns the selected boss, initializes turn order and battle state, and calls Player_InitBattle.
+func_8001F36C	Battle_UpdateTurnCamera	Changes the camera to an enemy position for one timed phase, then restores a player-facing preset.
+func_8001F888	Battle_UpdateTurnTransition	After a turn timer, checks battle completion and rewards or starts the next enemy turn.
+func_8001FC14	Battle_EndTurn	Ticks actor statuses, advances the turn-order index, toggles the active side, and starts the turn transition.
+func_8001FD44	Battle_FindEncounterRegion	Returns the rectangular encounter record containing the supplied X and Y point.
+func_8001FE08	Battle_ChooseNearbyEncounterPoint	Collects up to six encounter points at a squared distance of 2500 through 8100 and randomly chooses one.
+func_8001FF10	Battle_SpawnEncounterGroup	Chooses a group entry, spawns its listed enemies around a point, and sorts their turn order.

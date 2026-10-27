@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Actor model animation: state changes, root motion, frame advance, and node drawing.
+ * Folder: src/game/actor/
+ */
+
 typedef struct {
     f32 mf[4][4];
 } MtxF;
