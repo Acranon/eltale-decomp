@@ -1,12 +1,5 @@
 #include "game/event/cutscene.h"
 
-/* Temporary full view until the math owner's keyframe.h lands. */
-struct KfAnim {
-    /* 0x00 */ void *kfs;
-    /* 0x04 */ u16 count;
-    /* 0x06 */ u16 last;
-};
-
 /*
  * Cutscene scene sequencing, camera tracks, and timed image cue drawing.
  * Original file: 36E60.c (ROM 0x36E60).
@@ -617,7 +610,6 @@ void Player_Spawn(void);
 void Map_LoadArea(void);
 void Camera_InitForMap(void);
 void Audio_StartSeqFadeOut(s32);
-void Math_EvalTcbSpline(KfAnim *, f32 *, s32);
 void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
 void Math_MtxFMulVecNegZ(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
 void Text_ResetAllWindows(s32, KfAnim **);

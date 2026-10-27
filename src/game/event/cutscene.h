@@ -2,8 +2,7 @@
 #define GAME_EVENT_CUTSCENE_H
 
 #include "common.h"
-
-typedef struct KfAnim KfAnim; /* owned by game/math/keyframe.h */
+#include "game/math/keyframe.h"
 
 typedef struct CutsceneImageCue {
     /* 0x00 */ u16 frame;
