@@ -182,7 +182,7 @@ extern f32 mapobj_wave_z_div[4];
 extern u16 mapobj_animtex_width[2];
 extern u8 mapobj_animtex_alpha[4];
 extern MapClockTlutStep map_clock_tlut_schedule[6];
-extern s32 D_8004DEC8;
+extern s32 map_halfword_rotation_counter;
 
 /* .bss 8007C280..80082030 */
 extern u16 map_env_flags; /* bit 0: own light cycle, bit 1: world clock time (Env_*) */
@@ -308,6 +308,6 @@ void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, MapObj *arg4);
 void MapObj_DrawSpinners(struct GfxFrameData *arg0);
 void MapObj_DrawAnimTexBillboards(struct GfxFrameData *arg0, s32 count, s32 type, MapObj **list);
 void Map_BlendPaletteByClock(void);
-void func_80010768(void);
+void Map_RotateHalfwordBuffer(void);
 
 #endif

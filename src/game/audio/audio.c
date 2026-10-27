@@ -221,9 +221,9 @@ void Audio_ThreadMain(void* arg) {
     u32 state = 0;
     s16 vol0[2];
     s16 vol[2];
-    static s32 D_8005593C = 0;
-    static s32 D_80055940 = 1;
-    static s16 D_80055944[4] = { 0 };
+    static s32 audio_task_index = 0;
+    static s32 audio_output_frame_index = 1;
+    static s16 audio_output_sample_counts[4] = { 0 };
 
     fsize = (f32) audio_syn_config.outputRate * 1 / 60.0f;
     frameSize = (s32) fsize;
@@ -255,21 +255,21 @@ void Audio_ThreadMain(void* arg) {
                         state++;
                     }
                     default:
-                task = &tasks[D_8005593C];
-                end = audio_cmd_lists[D_8005593C];
-                idx = D_80055940 % 3;
+                task = &tasks[audio_task_index];
+                end = audio_cmd_lists[audio_task_index];
+                idx = audio_output_frame_index % 3;
                 Audio_FreeOldDmaBuffers();
                 phys = (s16*) osVirtualToPhysical(audio_output_buffers[idx]);
-                D_80055944[idx] = (frameSize - samplesLeft + 0x60) & ~0xF;
-                if (D_80055944[idx] < frameSize - 16) {
-                    D_80055944[idx] = frameSize - 16;
+                audio_output_sample_counts[idx] = (frameSize - samplesLeft + 0x60) & ~0xF;
+                if (audio_output_sample_counts[idx] < frameSize - 16) {
+                    audio_output_sample_counts[idx] = frameSize - 16;
                 }
-                end = alAudioFrame(end, &D_8008F758, phys, D_80055944[idx]);
+                end = alAudioFrame(end, &D_8008F758, phys, audio_output_sample_counts[idx]);
                 task->next = NULL;
                 task->msgQ = &rtnQ;
                 task->msg = NULL;
-                task->list.t.data_ptr = audio_cmd_lists[D_8005593C];
-                task->list.t.data_size = (end - audio_cmd_lists[D_8005593C]) * sizeof(Acmd);
+                task->list.t.data_ptr = audio_cmd_lists[audio_task_index];
+                task->list.t.data_size = (end - audio_cmd_lists[audio_task_index]) * sizeof(Acmd);
                 task->list.t.type = M_AUDTASK;
                 task->list.t.flags = 0;
                 task->list.t.ucode_boot = (u64*) D_8004B980;
@@ -285,10 +285,10 @@ void Audio_ThreadMain(void* arg) {
                 task->list.t.yield_data_size = 0;
                 osSendMesg(audioMQ, task, OS_MESG_BLOCK);
                 samplesLeft = osAiGetLength() >> 2;
-                D_8005593C ^= 1;
-                D_80055940++;
+                audio_task_index ^= 1;
+                audio_output_frame_index++;
                 osRecvMesg(&rtnQ, NULL, OS_MESG_BLOCK);
-                osAiSetNextBuffer(audio_output_buffers[idx], D_80055944[idx] << 2);
+                osAiSetNextBuffer(audio_output_buffers[idx], audio_output_sample_counts[idx] << 2);
                     break;
                     case 2:
                         break;
@@ -580,7 +580,7 @@ void Sfx_SelectScript(s32 arg0) {
 
 /* Takes the request argument: the code leaves a0 untouched for Audio_StartSeqRequest (H1;
  * it was written with no parameter and a no-argument call). */
-s32 func_80029834(s32 arg0) {
+s32 Audio_TryStartSeqRequest(s32 arg0) {
     if (audio_seq_fade_out_step != 0 || audio_seq_fade_in_step != 0) {
         return 1;
     }

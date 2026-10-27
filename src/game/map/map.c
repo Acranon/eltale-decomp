@@ -483,7 +483,7 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     }
     mapobj_wave_capture = 0;
     Map_BlendPaletteByClock();
-    func_80010768();
+    Map_RotateHalfwordBuffer();
     if (mapobj_ambient_type == -1) {
         if (mapobj_ambient_prev_type != mapobj_ambient_type) {
             Sfx_StopChannel4();
@@ -1036,13 +1036,13 @@ MapClockTlutStep map_clock_tlut_schedule[6] = {
     { 0, 0x1C, 2 }, { 0x15F9, 0x80, 0 }, { 0x4F1A, 0x1C, 1 },
     { 0x6513, 0x1C, 2 }, { 0x6977, 0x1C, 2 }, { 0x6979, 0xFF, 0xFF },
 };
-s32 D_8004DEC8 = 0;
+s32 map_halfword_rotation_counter = 0;
 
 extern u16 D_80081C40;
 extern u16 D_80081C42;
 
-void func_80010768(void) {
-    s32 *cnt = &D_8004DEC8;
+void Map_RotateHalfwordBuffer(void) {
+    s32 *cnt = &map_halfword_rotation_counter;
     s32 v;
     u16 *p;
     u16 tmp;

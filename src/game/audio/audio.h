@@ -115,7 +115,7 @@ void Audio_StopSound(s32 id);
 void Audio_GetSoundState(s32 id);
 void Audio_UpdateFrame(void);
 void Sfx_SelectScript(s32 arg0);
-s32 func_80029834(s32 arg0);
+s32 Audio_TryStartSeqRequest(s32 arg0);
 void Audio_StartSeqRequest(s32 arg0);
 void Sfx_EnqueueDefault(s32 arg0);
 void Sfx_Enqueue(s32 arg0, s32 arg1, s32 arg2);
