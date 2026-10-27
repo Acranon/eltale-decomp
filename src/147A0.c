@@ -102,7 +102,7 @@ Unk800859B8 D_800859B8[8];
 Unk80085A78 D_80085A78;
 u8 D_80085A98[0x10];
 
-extern u8 D_8004F770[];
+extern u8 math_bit_masks[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
 
@@ -307,5 +307,5 @@ void Spirit_MoveSparkle(Unk80013FA4Arg* arg0) {
 }
 
 u8 Spirit_IsCollected(u16 arg0) {
-    return D_80085A98[arg0 >> 3] & D_8004F770[arg0 & 7];
+    return D_80085A98[arg0 >> 3] & math_bit_masks[arg0 & 7];
 }

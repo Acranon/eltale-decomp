@@ -176,11 +176,11 @@ extern s32 D_800842DC;
 extern s32 D_80084308;
 extern s16 D_80084992;
 extern f32 D_80085ECC;
-extern s16 D_8008C152;
-extern u16 D_8008C154;
-extern s16 D_8008C156;
-extern s16 D_8008C158[];
-extern OSMesgQueue D_80092C90;
+extern s16 hud_panel_transition_frame;
+extern u16 hud_panel_transition_state;
+extern s16 hud_hp_meter_width;
+extern s16 hud_mp_meter_width[];
+extern OSMesgQueue input_si_queue;
 extern u8 D_80095AF0[];
 extern u8 D_800C0000[];
 extern u8 D_80100000[];
@@ -210,7 +210,7 @@ void Core_MainThread(void *arg0) {
     osViBlack(1);
     Dma_ReadRom(D_DA4570, D_80100000, D_DAB5F0 - D_DA4570);
     Text_LoadFontAssets();
-    func_801009EC(&D_80092C90, &D_8007A254);
+    func_801009EC(&input_si_queue, &D_8007A254);
     osViBlack(1);
     osViSetSpecialFeatures(0x5A);
     nnScStartScheduler(&D_8007A1E0);
@@ -286,10 +286,10 @@ void Core_ResetGameState(void) {
     D_8007A994 = 1.5707964f;
     D_8007A998 = 0x108;
     D_8007AA0E = 0;
-    D_8008C154 = 1;
-    D_8008C152 = 0xC;
-    D_8008C158[0] *= 0;
-    D_8008C156 = 0;
+    hud_panel_transition_state = 1;
+    hud_panel_transition_frame = 0xC;
+    hud_mp_meter_width[0] *= 0;
+    hud_hp_meter_width = 0;
     D_8007A172 = 1;
     D_8007A178 = 0;
     D_8007A1CC = 0;
@@ -515,10 +515,10 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
 
 extern s32 D_8007A180;
 extern s32 D_8007A1D0;
-extern s8 D_8008FAF0;
-extern s8 D_8008FB40;
-extern s8 D_80092C80;
-extern u16 D_8008CA50;
+extern s8 bgm_current;
+extern s8 menu_save_loaded;
+extern s8 input_primary_port;
+extern u16 fade_flags;
 void Gfx_WaitForFrameMessage(s16 arg0);
 void Player_SetSpawnFromSaveTable(void);
 void Bgm_Update(void);
@@ -543,8 +543,8 @@ extern u16 D_8007A17A;
 extern s32 D_8007A1C4;
 extern s32 D_80084980;
 extern Unk80084998 D_80084998[];
-extern s32 D_800863F0;
-extern s8 D_8008FAF4;
+extern s32 effect_mapobj_emitter_count;
+extern s8 sfx_master_volume;
 extern u8 D_801C0000[];
 extern u8 D_E420D0[];
 extern u8 D_E43780[];
@@ -599,11 +599,11 @@ extern u8 D_8007AA20[];
 extern s32 D_800842C0;
 extern u16 D_800842E8;
 extern Unk80084300 D_80084300;
-extern u16 D_8008BE52;
-extern s32 D_8008C170;
-extern s32 D_80090450;
-extern u16 D_80092C84;
-extern u16 D_80092C86;
+extern u16 battle_flags;
+extern s32 hud_pending_sequence_id;
+extern s32 text_active_window_count;
+extern u16 input_held_buttons;
+extern u16 input_pressed_buttons;
 void Player_Spawn(void);
 void Player_SetSpawnFromSaveTable(void);
 void Player_Update(void);
@@ -654,7 +654,7 @@ void Core_RunGameplayLoop(void) {
             Player_SetSpawnFromSaveTable();
         }
         Text_ResetAllWindows(0);
-        D_80090450 = 0;
+        text_active_window_count = 0;
         Map_LoadArea();
         Chest_LoadForMap();
         Spirit_LoadForMap();
@@ -694,15 +694,15 @@ void Core_RunGameplayLoop(void) {
     D_8007A17A = 0x12;
     D_8007A172 = 0;
     while (D_8007A170 == 1) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
-        D_800863F0 = 0;
+        effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
         if (D_800842E8 & 1) {
             Battle_TryStartRandomEncounter();
         }
-        if (D_8008BE52 & 1) {
-            if (D_8008BE52 & 0x200) {
+        if (battle_flags & 1) {
+            if (battle_flags & 0x200) {
                 Battle_UpdateStartCamera();
             } else {
                 Battle_UpdateTurnTransition();
@@ -723,8 +723,8 @@ void Core_RunGameplayLoop(void) {
                 Camera_TurnForExit();
                 Player_StartAreaExit();
                 D_8007A178 = 0;
-            } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (D_80092C86 & 0x1000) &&
-                       !(D_8008BE52 & 1) && !(D_80092C84 & 0x2000) && !(D_8004DCA0 & 1)) {
+            } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (input_pressed_buttons & 0x1000) &&
+                       !(battle_flags & 1) && !(input_held_buttons & 0x2000) && !(D_8004DCA0 & 1)) {
                 D_8007A170 = 2;
                 Sfx_Play(0, 1, 0xFF);
             }
@@ -758,10 +758,10 @@ void Core_RunGameplayLoop(void) {
             }
         }
         Bgm_Update();
-        if (D_8008C170 != -1 && Audio_GetSeqState(0) == 0) {
-            Audio_LoadSeq(0, D_8008C170);
+        if (hud_pending_sequence_id != -1 && Audio_GetSeqState(0) == 0) {
+            Audio_LoadSeq(0, hud_pending_sequence_id);
             Audio_PlaySeq(0);
-            D_8008C170 = -1;
+            hud_pending_sequence_id = -1;
         }
         D_8007A8B0 = osGetTime();
         D_8007A8B8 = (D_8007A8B0 - D_8007A8A8) * 64 / 3000;
@@ -814,16 +814,16 @@ void Core_RunMessageCutsceneLoop(void) {
             D_8007AB60 = Env_AllocateLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
             Fade_Init();
-            D_8008CA50 |= 8;
+            fade_flags |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
                 Fade_StartTransitionIn();
             }
             D_8004DCA0 &= ~0x1C0;
         }
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
-        D_800863F0 = 0;
+        effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
         if (Cutscene_UpdateMessageSequence() != 0) {
             Cutscene_StartAudioFadeForEntry(count);
@@ -882,7 +882,7 @@ void Core_RunCameraCutsceneLoop(void) {
     Dma_ReadRom(D_E43780, D_801C0000, D_E5BF60 - D_E43780);
     D_8007A174 = 0;
     D_8007A178 = 2;
-    D_8008FAF4 = 0;
+    sfx_master_volume = 0;
     Cutscene_ResetSequence();
     while (D_8007A170 == 7) {
         if (D_8004DCA0 & 0x40) {
@@ -894,16 +894,16 @@ void Core_RunCameraCutsceneLoop(void) {
             D_8007AB60 = Env_AllocateLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
             Fade_Init();
-            D_8008CA50 |= 8;
+            fade_flags |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
                 Fade_StartTransitionIn();
             }
             D_8004DCA0 &= ~0xC0;
         }
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
-        D_800863F0 = 0;
+        effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
         Cutscene_UpdateScene();
         Env_Update();
@@ -951,12 +951,12 @@ void Core_RunMenuLoop(void) {
     GfxFrame *frame;
 
     D_8007A1D0 = 0;
-    D_8008FB40 = 0;
+    menu_save_loaded = 0;
     if (D_8004DCA0 & 0x400) {
         Bgm_Play(0x13);
     }
     while (D_8007A170 == 2) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
@@ -972,11 +972,11 @@ void Core_RunMenuLoop(void) {
     }
     if (D_8004DCA0 & 0x400) {
         Bgm_Play(-1);
-        while (D_8008FAF0 != -1) {
+        while (bgm_current != -1) {
             Bgm_Update();
         }
     }
-    if (D_8008FB40 != 0) {
+    if (menu_save_loaded != 0) {
         Player_SetSpawnFromSaveTable();
         D_8007A172 = 2;
         D_8004DCA0 &= ~0x400;
@@ -992,7 +992,7 @@ void Core_RunTitleLoop(void) {
     Overlay_LoadTitle();
     func_8020C0D0();
     while (D_8007A170 == 3) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
@@ -1015,7 +1015,7 @@ void Core_RunIntroLoop(void) {
     Overlay_LoadIntro();
     func_8020C0D0();
     while (D_8007A170 == 4) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Bgm_Update();
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
@@ -1041,10 +1041,10 @@ void Core_RunEndingLoop(void) {
     Overlay_LoadEnding();
     func_8020C0D0();
     Fade_Init();
-    D_8008CA50 |= 8;
+    fade_flags |= 8;
     Bgm_PlayDelayed(0x14, 0x3C);
     while (D_8007A170 == 5) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Bgm_Update();
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
@@ -1063,15 +1063,15 @@ void Core_RunEndingLoop(void) {
 
 void Fade_Start(s32 arg0, s32 arg1, void *arg2);
 
-extern u8 D_8004F5A0[];
-extern u8 D_8004F5DC[];
-extern u8 D_8004F5E0[];
-extern u8 D_8004F61C[];
-extern u8 D_8004F620[];
-extern u8 D_8004F69C[];
-extern u8 D_8004F6C0[];
-extern u8 D_8004F73C[];
-extern u8 D_8008CA58[];
+extern u8 fade_black_ramp[];
+extern u8 fade_black_ramp_end[];
+extern u8 fade_grey_ramp[];
+extern u8 fade_grey_ramp_end[];
+extern u8 fade_black_ramp_slow[];
+extern u8 fade_black_ramp_slow_end[];
+extern u8 fade_grey_ramp_slow[];
+extern u8 fade_grey_ramp_slow_end[];
+extern u8 fade_grey_ramp_256[];
 extern u8 D_8008CE54[];
 
 void Gfx_WaitForFrameMessage(s16 arg0) {
@@ -1085,16 +1085,16 @@ void Gfx_WaitForFrameMessage(s16 arg0) {
 void Fade_StartTransitionIn(void) {
     switch (D_8007A178) {
         case 0:
-            Fade_Start(0x10, 4, D_8004F5DC);
+            Fade_Start(0x10, 4, fade_black_ramp_end);
             break;
         case 1:
-            Fade_Start(0x10, 4, D_8004F61C);
+            Fade_Start(0x10, 4, fade_grey_ramp_end);
             break;
         case 2:
-            Fade_Start(0x20, 4, D_8004F69C);
+            Fade_Start(0x20, 4, fade_black_ramp_slow_end);
             break;
         case 3:
-            Fade_Start(0x20, 4, D_8004F73C);
+            Fade_Start(0x20, 4, fade_grey_ramp_slow_end);
             break;
         case 4:
             Fade_Start(0x100, 4, D_8008CE54);
@@ -1105,19 +1105,19 @@ void Fade_StartTransitionIn(void) {
 void Fade_StartTransitionOut(void) {
     switch (D_8007A178) {
         case 0:
-            Fade_Start(0xF, 2, D_8004F5A0);
+            Fade_Start(0xF, 2, fade_black_ramp);
             break;
         case 1:
-            Fade_Start(0xF, 2, D_8004F5E0);
+            Fade_Start(0xF, 2, fade_grey_ramp);
             break;
         case 2:
-            Fade_Start(0x1F, 2, D_8004F620);
+            Fade_Start(0x1F, 2, fade_black_ramp_slow);
             break;
         case 3:
-            Fade_Start(0x1F, 2, D_8004F6C0);
+            Fade_Start(0x1F, 2, fade_grey_ramp_slow);
             break;
         case 4:
-            Fade_Start(0xFF, 2, D_8008CA58);
+            Fade_Start(0xFF, 2, fade_grey_ramp_256);
             break;
     }
 }

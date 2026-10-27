@@ -21,9 +21,9 @@ typedef struct {
 /* This file's .data, 8004F770..8004F780: a bit table (used by other files),
  * the random seed, and Math_MtxFRotDegScaleTrans's static degrees-to-radians factor
  * (8004F77C), which must be a function-scope static for IDO to match. */
-u8 D_8004F770[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
-u32 D_8004F778 = 0x9B0;
-MtxF D_8008CE60; /* .bss 8008CE60..8008CEA0 */
+u8 math_bit_masks[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+u32 math_rand_seed = 0x9B0;
+MtxF math_scratch_mtxf; /* .bss 8008CE60..8008CEA0 */
 
 extern MtxF D_80085F10;
 extern f32 D_80085F54;
@@ -37,7 +37,7 @@ void Math_MtxFAlignYToVector(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3);
 
 u32 Math_Rand(u32 max) {
     if (max != 0) {
-        return ((D_8004F778 = (D_8004F778 * 0x41C64E6D) + 0x3039) >> 0x10) % max;
+        return ((math_rand_seed = (math_rand_seed * 0x41C64E6D) + 0x3039) >> 0x10) % max;
     }
     return 0;
 }
@@ -138,8 +138,8 @@ void Math_MtxFRotScaleTrans(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, 
 }
 
 void Math_MtxRotScaleTrans(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
-    Math_MtxFRotScaleTrans(&D_8008CE60, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-    guMtxF2L(D_8008CE60.mf, arg0);
+    Math_MtxFRotScaleTrans(&math_scratch_mtxf, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    guMtxF2L(math_scratch_mtxf.mf, arg0);
 }
 
 void Math_MtxFRotate(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
@@ -179,8 +179,8 @@ void Math_MtxFRotate(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
 }
 
 void Math_MtxRotate(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
-    Math_MtxFRotate(&D_8008CE60, arg1, arg2, arg3);
-    guMtxF2L(D_8008CE60.mf, arg0);
+    Math_MtxFRotate(&math_scratch_mtxf, arg1, arg2, arg3);
+    guMtxF2L(math_scratch_mtxf.mf, arg0);
 }
 
 void Math_MtxFAimAt(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
@@ -238,8 +238,8 @@ void Math_MtxFAimAt(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5
 }
 
 void Math_MtxAimAt(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
-    Math_MtxFAimAt(&D_8008CE60, arg1, arg2, arg3, arg4, arg5, arg6);
-    guMtxF2L(D_8008CE60.mf, arg0);
+    Math_MtxFAimAt(&math_scratch_mtxf, arg1, arg2, arg3, arg4, arg5, arg6);
+    guMtxF2L(math_scratch_mtxf.mf, arg0);
 }
 
 void Math_MtxFMulVecTransposed(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32* arg4, f32* arg5, f32* arg6) {
@@ -296,8 +296,8 @@ void Math_MtxFAlignYToVector(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
 }
 
 void Math_MtxAlignYToVector(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
-    Math_MtxFAlignYToVector(&D_8008CE60, arg1, arg2, arg3);
-    guMtxF2L(D_8008CE60.mf, arg0);
+    Math_MtxFAlignYToVector(&math_scratch_mtxf, arg1, arg2, arg3);
+    guMtxF2L(math_scratch_mtxf.mf, arg0);
 }
 
 void Math_MtxFRotDegScaleTrans(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8,

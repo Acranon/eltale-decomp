@@ -74,21 +74,21 @@ extern s32 D_80084308;
 extern s32 D_80084980;
 extern Unk80085E48 D_80085E48;
 extern f32 D_80085F50;
-extern s32 D_80090450;
+extern s32 text_active_window_count;
 /* .bss 80092ED0..80092FF0 */
-s32 D_80092ED0;
-s32 D_80092ED4;
-s32 D_80092ED8;
-Unk80092EDC *D_80092EDC;
-s32 D_80092EE0;
-Cue *D_80092EE4;
-Unk80092EE8 D_80092EE8[32];
+s32 cutscene_sequence_index;
+s32 cutscene_camera_frame; /* current camera-track frame */
+s32 cutscene_camera_end_frame;
+Unk80092EDC *cutscene_camera_track;
+s32 cutscene_image_frame;
+Cue *cutscene_next_image_cue;
+Unk80092EE8 cutscene_image_cue_slots[32];
 extern Gfx *D_8007A184;
 /* This file's .data, 80061850..8006CD00: textures and palettes (assets; the
  * converter put a gsSPEndDisplayList word after most images), message text
  * (assets), the message pointer tables and layouts, flags and a display list. */
-u16 D_80061850[0x100] = {
-#include "assets/D_80061850.inc.c"
+u16 text_font_tlut[0x100] = {
+#include "assets/text_font_tlut.inc.c"
 };
 u8 D_80061A50[0x100] = {
 #include "assets/D_80061A50.inc.c"
@@ -105,8 +105,8 @@ u8 D_80061DE8[0x10] = {
 u8 D_80061DF8[0xA0] = {
 #include "assets/D_80061DF8.inc.c"
 };
-u16 D_80061E98[0x104] = {
-#include "assets/D_80061E98.inc.c"
+u16 menu_ui_tlut[0x104] = {
+#include "assets/menu_ui_tlut.inc.c"
 };
 u8 D_800620A0[0x108] = {
 #include "assets/D_800620A0.inc.c"
@@ -519,13 +519,13 @@ u8 D_8006C858[0x28] = {
 u8 D_8006C880[0x78] = {
 #include "assets/D_8006C880.inc.c"
 };
-u8 *D_8006C8F8[5] = {
+u8 *save_menu_choice_messages[5] = {
     D_8006C0C0, D_8006C0EC, D_8006C10C, D_8006C128, D_8006C144,
 };
-s16 D_8006C90C[5][4] = {
+s16 save_menu_choice_rects[5][4] = {
     { 44, 107, 232, 25 }, { 79, 107, 162, 25 }, { 84, 107, 152, 25 }, { 84, 107, 152, 25 }, { 54, 107, 212, 25 },
 };
-u8 *D_8006C934[1] = {
+u8 *save_menu_dialog_messages_flag4[1] = {
     D_8006C16C,
 };
 u8 *D_8006C938[1] = {
@@ -540,14 +540,14 @@ u8 *D_8006C940[22] = {
     D_8006C458, D_8006C4C4, D_8006C4C8, D_8006C50C, D_8006C560, D_8006C564,
     D_8006C5F8, D_8006C63C, D_8006C658, D_8006C6CC,
 };
-u8 *D_8006C998[25] = {
+u8 *save_menu_dialog_messages_default[25] = {
     D_8006C16C, D_8006C174, D_8006C180, D_8006C188, D_8006C190, D_8006C1BC,
     D_8006C880, D_8006C258, D_8006C280, D_8006C2CC, D_8006C2CC, D_8006C370,
     D_8006C390, D_8006C3B8, D_8006C408, D_8006C458, D_8006C4C4, D_8006C4C8,
     D_8006C678, D_8006C560, D_8006C564, D_8006C5F8, D_8006C63C, D_8006C658,
     D_8006C6CC,
 };
-s16 D_8006C9FC[25][4] = {
+s16 save_menu_dialog_rects[25][4] = {
     { 220, 160, 42, 38 }, { 220, 160, 42, 38 }, { 220, 160, 42, 38 }, { 220, 160, 42, 38 },
     { 44, 107, 232, 25 }, { 64, 107, 192, 25 }, { 54, 94, 212, 51 }, { 59, 107, 202, 25 },
     { 59, 101, 202, 38 }, { 49, 101, 222, 38 }, { 49, 101, 222, 38 }, { 79, 107, 162, 25 },
@@ -556,7 +556,7 @@ s16 D_8006C9FC[25][4] = {
     { 49, 86, 222, 68 }, { 64, 101, 192, 38 }, { 84, 107, 152, 25 }, { 84, 107, 152, 25 },
     { 29, 37, 262, 166 },
 };
-s16 D_8006CAC4[4][2] = {
+s16 save_menu_choice_cursor_positions[4][2] = {
     { 258, 163 }, { 258, 176 }, { 258, 162 }, { 258, 175 },
 };
 u8 D_8006CAD4[0x14] = {
@@ -610,7 +610,7 @@ u8 D_8006CC08[0x10] = {
 u8 D_8006CC18[0x10] = {
 #include "assets/D_8006CC18.inc.c"
 };
-u8 *D_8006CC28[19] = {
+u8 *save_menu_slot_label_ptrs[19] = {
     D_8006CAD4, D_8006CAE8, D_8006CAF8, D_8006CB10, D_8006CB2C, D_8006CB40,
     D_8006CB54, D_8006CB68, D_8006CB88, D_8006CB9C, D_8006CBAC, D_8006CBC0,
     D_8006CBD8, D_8006CBEC, D_8006CBFC, D_8006CC08, D_8006CC18, NULL,
@@ -620,7 +620,7 @@ u8 D_8006CC74 = 0;
 u8 D_8006CC78 = 0;
 u8 D_8006CC7C = 0;
 s8 D_8006CC80[0x10] = { 0 };
-Gfx D_8006CC90[14] = {
+Gfx cutscene_image_setup_dl[14] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},
     {{ 0xB6000000, 0x000F3205 }},
@@ -649,22 +649,22 @@ void Text_ResetAllWindows(s32, Unk80092EDC **);
 void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame);
 
 void Cutscene_ResetSequence(void) {
-    D_80092ED0 = 0;
+    cutscene_sequence_index = 0;
     D_80084980 = 0x34BC;
 }
 
 void Cutscene_StartNextScene(void) {
-    Unk801D8620 *e = &D_801D8620[D_80092ED0++];
+    Unk801D8620 *e = &D_801D8620[cutscene_sequence_index++];
     s32 i;
 
-    D_80092EDC = e->unk18;
-    D_80092ED4 = 0;
-    D_80092ED8 = D_80092EDC->unk6;
+    cutscene_camera_track = e->unk18;
+    cutscene_camera_frame = 0;
+    cutscene_camera_end_frame = cutscene_camera_track->unk6;
     D_800842BC = -1;
     D_800842C4 = e->unk0;
     D_800842C8 = e->unk4;
-    Text_ResetAllWindows(0, &D_80092EDC);
-    D_80090450 = 0;
+    Text_ResetAllWindows(0, &cutscene_camera_track);
+    text_active_window_count = 0;
     D_80084308 = -1;
     Map_LoadArea();
     if (e->unk8 & 1) {
@@ -681,23 +681,23 @@ void Cutscene_StartNextScene(void) {
     Camera_InitForMap();
     D_80085E48.unk0 = 3;
     D_80085F50 = 35.0f;
-    Cutscene_ApplyCameraFrame(D_80092EDC, D_80092ED4);
+    Cutscene_ApplyCameraFrame(cutscene_camera_track, cutscene_camera_frame);
     D_8007ABA4 = 0;
     D_8007B900 = 0;
-    D_80092EE0 = 0;
-    D_80092EE4 = e->unk1C;
+    cutscene_image_frame = 0;
+    cutscene_next_image_cue = e->unk1C;
     for (i = 0; i < 32; i++) {
-        D_80092EE8[i].unk0 = 0;
+        cutscene_image_cue_slots[i].unk0 = 0;
     }
 }
 
 void Cutscene_UpdateScene(void) {
-    Cutscene_ApplyCameraFrame(D_80092EDC, D_80092ED4++);
-    if (D_80092ED8 - D_80092ED4 == 0x31) {
+    Cutscene_ApplyCameraFrame(cutscene_camera_track, cutscene_camera_frame++);
+    if (cutscene_camera_end_frame - cutscene_camera_frame == 0x31) {
         if (!(D_8004DCA0 & 0x80)) {
             D_8004DCA0 |= 0x80;
             D_8007A178 = 2;
-            if (D_80092ED0 >= 14) {
+            if (cutscene_sequence_index >= 14) {
                 D_8007A174 = 0x14E;
                 D_8007A17A = 0x14C;
                 Audio_StartSeqFadeOut(0x12C);
@@ -710,7 +710,7 @@ void Cutscene_UpdateScene(void) {
 }
 
 void Cutscene_EndScene(void) {
-    if (D_80092ED0 < 14) {
+    if (cutscene_sequence_index < 14) {
         D_8004DCA0 |= 0x60;
     } else {
         D_8007A170 = 0;
@@ -746,21 +746,21 @@ void Cutscene_UpdateAndDrawImageCues(void) {
     s32 t;
 
     n = 31;
-    slot = D_80092EE8;
-    if (D_80092EE0 == D_80092EE4->frame) {
+    slot = cutscene_image_cue_slots;
+    if (cutscene_image_frame == cutscene_next_image_cue->frame) {
         do {
             while (n != 0 && slot->unk0 != 0) {
                 n--;
                 slot++;
             }
-            D_80092EE4->tlut[0] = 0;
-            slot->unk0 = D_80092EE4->dur;
-            slot->unk4 = D_80092EE4;
-            D_80092EE4++;
-        } while (D_80092EE0 == D_80092EE4->frame);
+            cutscene_next_image_cue->tlut[0] = 0;
+            slot->unk0 = cutscene_next_image_cue->dur;
+            slot->unk4 = cutscene_next_image_cue;
+            cutscene_next_image_cue++;
+        } while (cutscene_image_frame == cutscene_next_image_cue->frame);
     }
-    slot = D_80092EE8;
-    gSPDisplayList(D_8007A184++, D_8006CC90);
+    slot = cutscene_image_cue_slots;
+    gSPDisplayList(D_8007A184++, cutscene_image_setup_dl);
     for (n = 32; n != 0; slot++) {
         n--;
         d = slot->unk0;
@@ -784,5 +784,5 @@ void Cutscene_UpdateAndDrawImageCues(void) {
             slot->unk0--;
         }
     }
-    D_80092EE0++;
+    cutscene_image_frame++;
 }

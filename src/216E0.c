@@ -45,39 +45,39 @@ typedef struct {
 
 /* This file's .bss, 8008C040..8008C190, in address order (first declaration fixes
  * the order). D_8008C164 is used only by 12610. */
-u16 D_8008C040;
-u16 D_8008C042;
-s32 D_8008C044;
-s32 D_8008C048;
-s32 D_8008C04C;
-u16 D_8008C050;
-s32 D_8008C054;
-Struct_8008C058 D_8008C058[8];
-u32 D_8008C138;
-u32 D_8008C13C;
-Vec3f_216E0 D_8008C140;
-u16 D_8008C14C[2];
-u16 D_8008C150;
-u16 D_8008C152;
-u16 D_8008C154;
-u16 D_8008C156;
-u16 D_8008C158;
-u16 D_8008C15A;
-u16 D_8008C15C;
-u16 D_8008C15E;
-u16 D_8008C160;
-u16 D_8008C162;
+u16 hud_npc_marker_phase;
+u16 hud_element_allocation_flags;
+s32 hud_clip_left; /* HUD clip bound, screen pixels */
+s32 hud_clip_top;
+s32 hud_clip_right;
+u16 hud_spirit_marker_phase;
+s32 hud_clip_bottom;
+Struct_8008C058 hud_popup_slots[8];
+u32 hud_element_gain_flash_timer;
+u32 hud_selected_element_index;
+Vec3f_216E0 hud_rotated_vector_scratch;
+u16 hud_chest_text_marker_phases[2];
+u16 hud_melee_marker_phase;
+u16 hud_panel_transition_frame;
+u16 hud_panel_transition_state;
+u16 hud_hp_meter_width;
+u16 hud_mp_meter_width;
+u16 hud_element_allocation_timer;
+u16 hud_element_allocation_mode_flags;
+u16 hud_melee_hint_timer;
+u16 hud_element_input_timer; /* eight-frame element input/fade timer */
+u16 hud_battle_message_timer;
 s32 D_8008C164;
 s32 D_8008C168;
 s32 D_8008C16C;
-s32 D_8008C170;
-s32 D_8008C174;
-s32 D_8008C178;
-s32 D_8008C17C;
-u16 D_8008C180;
+s32 hud_pending_sequence_id;
+s32 hud_draw_origin_x;
+s32 hud_draw_origin_y;
+s32 hud_npc_marker_screen_y;
+u16 hud_element_pulse_phase;
 extern u8** D_800C03D8[];
-extern u8 D_8004F2C4[];
-extern u8 D_8004F498[];
+extern u8 hud_digit_glyph_data[];
+extern u8 hud_number_spacing[];
 
 u32 Magic_LookupSpellSequence(u16, s32);
 s32 Magic_GetSpellRestrictionFlags(u32, u16);
@@ -168,8 +168,8 @@ typedef struct {
     char unk0[0xA];
 } Struct_803AA690;
 
-extern u16 D_8004F2DC[];
-extern u16 D_8004F2EC[];
+extern u16 hud_actor_status_masks[];
+extern u16 hud_actor_status_alt_masks[];
 extern Struct_803AA690 D_803AA690[];
 extern Struct_803AA6C4 D_803AA6C4[];
 
@@ -178,19 +178,19 @@ s32 Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AA690*, Vec
 void Hud_ResetState(void) {
     D_8008C168 = 0;
     D_8008C16C = 0;
-    D_8008C170 = -1;
-    D_8008C178 = 0;
-    D_8008C174 = D_8008C178;
-    D_8008C048 = 0;
-    D_8008C044 = D_8008C048;
-    D_8008C04C = 0x140;
-    D_8008C054 = 0xF0;
-    D_8008C162 = 0;
-    D_8008C15E = 0;
-    D_8008C15C = 0;
-    D_8008C15A = D_8008C15C;
-    D_8008C138 = 0;
-    D_8008C042 = 0;
+    hud_pending_sequence_id = -1;
+    hud_draw_origin_y = 0;
+    hud_draw_origin_x = hud_draw_origin_y;
+    hud_clip_top = 0;
+    hud_clip_left = hud_clip_top;
+    hud_clip_right = 0x140;
+    hud_clip_bottom = 0xF0;
+    hud_battle_message_timer = 0;
+    hud_melee_hint_timer = 0;
+    hud_element_allocation_mode_flags = 0;
+    hud_element_allocation_timer = hud_element_allocation_mode_flags;
+    hud_element_gain_flash_timer = 0;
+    hud_element_allocation_flags = 0;
 }
 
 typedef struct {
@@ -227,7 +227,7 @@ extern Struct_8007B908_216E0 D_8007B908[];
 extern Struct_8007C288* D_8007C288;
 extern u16 D_800842B8;
 extern s32 D_80085F90;
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 extern Gfx D_803A8788[];
 
 struct Struct_80021030;
@@ -256,38 +256,38 @@ void Hud_Draw(Unk2000000* buf) {
     gSPMatrix(D_8007A184++, &D_2000000.unk0[1], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
     guTranslate(&buf->unkC0[D_8007A180], -160.0f, -120.0f, 0.0f);
     gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_NOPUSH | G_MTX_MUL | G_MTX_PROJECTION);
-    D_8008C04C = 0x140;
-    D_8008C054 = 0xF0;
+    hud_clip_right = 0x140;
+    hud_clip_bottom = 0xF0;
     gSPDisplayList(D_8007A184++, D_803A8788);
-    if ((D_8004DCA0 & 2) && D_8008C154 != 1) {
-        D_8008C154 = 1;
-    } else if (!(D_8004DCA0 & 2) && D_8008C154 == 1) {
-        D_8008C154 = 2;
+    if ((D_8004DCA0 & 2) && hud_panel_transition_state != 1) {
+        hud_panel_transition_state = 1;
+    } else if (!(D_8004DCA0 & 2) && hud_panel_transition_state == 1) {
+        hud_panel_transition_state = 2;
     }
     if (!(D_8004DCA0 & 0xC00)) {
         Hud_DrawPlayerMeters((struct Struct_80021030*)D_8007AA20);
         Hud_DrawElementLevels(buf, D_8007AA1C);
-        if (D_8008C154 == 1) {
-            if (++D_8008C152 >= 13) {
-                D_8008C152 = 12;
+        if (hud_panel_transition_state == 1) {
+            if (++hud_panel_transition_frame >= 13) {
+                hud_panel_transition_frame = 12;
             }
-        } else if (D_8008C154 == 2) {
-            if (--D_8008C152 == 0) {
-                D_8008C154 = 0;
+        } else if (hud_panel_transition_state == 2) {
+            if (--hud_panel_transition_frame == 0) {
+                hud_panel_transition_state = 0;
             }
         }
     }
-    if ((D_800842B8 & 0xD) && !(D_8008BE52 & 1) && !(D_8007C288->unk14 & 8) && !(D_8004DCA0 & 2)) {
+    if ((D_800842B8 & 0xD) && !(battle_flags & 1) && !(D_8007C288->unk14 & 8) && !(D_8004DCA0 & 2)) {
         Hud_DrawCompass(buf);
     }
-    if ((D_8008BE52 & 1) && D_8008C162) {
+    if ((battle_flags & 1) && hud_battle_message_timer) {
         Hud_DrawEnemyInfoPanel();
-        D_8008C162--;
+        hud_battle_message_timer--;
     }
-    D_8008C174 = D_8008C178 = 0;
-    if (D_8008BE52 & 1) {
+    hud_draw_origin_x = hud_draw_origin_y = 0;
+    if (battle_flags & 1) {
         Hud_DrawPopups();
-        if (!(D_8008BE52 & 2) && D_8007AA0A && !(D_8007AA80 & 1) && !(D_80085F90 & 1)) {
+        if (!(battle_flags & 2) && D_8007AA0A && !(D_8007AA80 & 1) && !(D_80085F90 & 1)) {
             Hud_DrawMeleeTargetMarker(D_8007AA0A - 1);
         }
         if ((D_8007AA10 & 0x20) && !(D_8004DCA0 & 0x800)) {
@@ -319,9 +319,9 @@ void Hud_Draw(Unk2000000* buf) {
     } else if (D_8004DCA0 & 8) {
         Hud_UpdateElementAllocation(buf, (struct Struct_80022970*)&D_8007AA08);
     }
-    if (D_8008C15E) {
+    if (hud_melee_hint_timer) {
         Hud_DrawSpellName(&D_8007AA08);
-        D_8008C15E--;
+        hud_melee_hint_timer--;
     }
 }
 
@@ -346,34 +346,34 @@ void Hud_DrawPlayerMeters(Struct_80021030* arg0) {
     s32 w;
     s32 d;
 
-    D_8008C174 = 0x1C;
-    D_8008C178 = 0x18;
-    if (D_8008C154 != 0) {
-        w = D_8008C152 * D_8008C152;
-        D_8008C174 -= w * 150 / 144;
+    hud_draw_origin_x = 0x1C;
+    hud_draw_origin_y = 0x18;
+    if (hud_panel_transition_state != 0) {
+        w = hud_panel_transition_frame * hud_panel_transition_frame;
+        hud_draw_origin_x -= w * 150 / 144;
     }
     st = arg0->unk64;
     Hud_DrawTextureTile(&D_803A86F8, 0, 1, 0x3E, 0x11, 0x20, 0x27, 0x400, 0x400);
     Hud_DrawTextureTile(&D_803A86F8, 0, 0x12, 0x3E, 0x12, 0x20, 0x38, 0x400, 0x400);
     w = st->unk4 * 56 / st->unk6;
-    d = w - D_8008C156;
+    d = w - hud_hp_meter_width;
     if (d >= 2 || d < -1) {
-        D_8008C156 += d >> 1;
+        hud_hp_meter_width += d >> 1;
     } else {
-        D_8008C156 = w;
+        hud_hp_meter_width = w;
     }
-    if (D_8008C156) {
-        Hud_DrawTextureTile(&D_803A86F8, 3, 0xB, D_8008C156, 5, 0x5E, 0x27, 0x400, 0x400);
+    if (hud_hp_meter_width) {
+        Hud_DrawTextureTile(&D_803A86F8, 3, 0xB, hud_hp_meter_width, 5, 0x5E, 0x27, 0x400, 0x400);
     }
     w = st->unk8 * 56 / st->unkA;
-    d = w - D_8008C158;
+    d = w - hud_mp_meter_width;
     if (d >= 2 || d < -1) {
-        D_8008C158 += d >> 1;
+        hud_mp_meter_width += d >> 1;
     } else {
-        D_8008C158 = w;
+        hud_mp_meter_width = w;
     }
-    if (D_8008C158) {
-        Hud_DrawTextureTile(&D_803A86F8, 3, 0x15, D_8008C158, 5, 0x5E, 0x2C, 0x400, 0x400);
+    if (hud_mp_meter_width) {
+        Hud_DrawTextureTile(&D_803A86F8, 3, 0x15, hud_mp_meter_width, 5, 0x5E, 0x2C, 0x400, 0x400);
     }
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     Hud_DrawNumber(3, 0xC, 0, st->unk4);
@@ -384,9 +384,9 @@ void Hud_DrawPlayerMeters(Struct_80021030* arg0) {
     Hud_DrawClippedTextureRect(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
 }
 
-extern s32 D_8004F2F4[];
+extern s32 hud_element_unlock_masks[];
 extern Gfx D_803AA3C8[];
-extern u8 D_8004F2CC[][4];
+extern u8 hud_element_colors[][4];
 extern Gfx D_803AA2F8[];
 
 void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
@@ -396,13 +396,13 @@ void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
     s32 i;
     u8* p;
     u8* col;
-    u16 *angle = &D_8008C180;
+    u16 *angle = &hud_element_pulse_phase;
 
-    D_8008C174 = 0x1C;
-    D_8008C178 = 0xC6;
-    if (D_8008C154 != 0) {
-        i = D_8008C152 * D_8008C152;
-        D_8008C174 -= i * 200 / 144;
+    hud_draw_origin_x = 0x1C;
+    hud_draw_origin_y = 0xC6;
+    if (hud_panel_transition_state != 0) {
+        i = hud_panel_transition_frame * hud_panel_transition_frame;
+        hud_draw_origin_x -= i * 200 / 144;
     }
     Hud_DrawTextureTile(&D_803A86F8, 0, 0, 0xC, 0xC, 0x20, 0x10, 0x400, 0x400);
     Hud_DrawTextureTile(&D_803A86F8, 0x16, 0, 0xC, 0xC, 0x2C, 0x10, 0x400, 0x400);
@@ -416,10 +416,10 @@ void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
         x += 0x16;
     }
     for (i = 0; i < 4; i++) {
-        if (((s32*)&D_8007AA08)[2] & D_8004F2F4[i]) {
-            col = &D_8004F2CC[0][i];
-            fx = i * 22.0f + 5.0 + (f32)D_8008C174;
-            fy = D_8008C178 + 5.0f;
+        if (((s32*)&D_8007AA08)[2] & hud_element_unlock_masks[i]) {
+            col = &hud_element_colors[0][i];
+            fx = i * 22.0f + 5.0 + (f32)hud_draw_origin_x;
+            fy = hud_draw_origin_y + 5.0f;
             guTranslate(&buf->unkC0[D_8007A180], fx, fy, 0.0f);
             gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
             gDPPipeSync(D_8007A184++);
@@ -428,25 +428,25 @@ void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
         }
     }
     *angle += 0x444;
-    if (D_8008C138) {
-        col = D_8004F2CC[D_8008C13C];
-        fx = D_8008C13C * 22.0f + 5.0 + (f32)D_8008C174;
-            fy = D_8008C178 + 5.0f;
+    if (hud_element_gain_flash_timer) {
+        col = hud_element_colors[hud_selected_element_index];
+        fx = hud_selected_element_index * 22.0f + 5.0 + (f32)hud_draw_origin_x;
+            fy = hud_draw_origin_y + 5.0f;
             guTranslate(&buf->unkC0[D_8007A180], fx, fy, 0.0f);
         gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         gDPPipeSync(D_8007A184++);
-        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], D_8008C138 * 255 / 30);
+        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], hud_element_gain_flash_timer * 255 / 30);
         gSPDisplayList(D_8007A184++, D_803AA2F8);
-        D_8008C138--;
+        hud_element_gain_flash_timer--;
     }
 }
 
 
 extern f32 D_80085E74;
-extern f32 D_8008FB48;
-extern f32 D_8008FB4C;
-extern s32 D_8008FB50;
-extern s32 D_8008FB54;
+extern f32 menu_map_marker_x;
+extern f32 menu_map_marker_z;
+extern s32 menu_map_region;
+extern s32 menu_map_spot;
 extern Gfx D_803AA758[];
 extern Struct_80024A54 D_803A86F8;
 f32 sqrtf(f32);
@@ -461,19 +461,19 @@ void Hud_DrawCompass(Unk2000000* buf) {
     f32 ang;
     f32 mf[4][4];
 
-    D_8008C174 = 0x104;
-    D_8008C178 = 0x18;
+    hud_draw_origin_x = 0x104;
+    hud_draw_origin_y = 0x18;
     Math_MtxFRotate(mf, 0.0f, 0.0f, D_80085E74);
-    mf[3][0] = D_8008C174 + 17;
-    mf[3][1] = D_8008C178 + 17;
+    mf[3][0] = hud_draw_origin_x + 17;
+    mf[3][1] = hud_draw_origin_y + 17;
     mf[3][2] = 0.0f;
     guMtxF2L(mf, &buf->unkC0[D_8007A180]);
     gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     gSPDisplayList(D_8007A184++, D_803AA758);
     Hud_DrawTextureTile(&D_803A86F8, 13, 10, 11, 14, 0x93, 0, 0x400, 0x400);
-    if (D_8008FB50 < 6 && D_8008FB54 < 0 && !(D_8004DCA0 & 0x80)) {
-        dx = D_8008FB48 - D_8007AA08.unk18;
-        dz = D_8008FB4C - D_8007AA08.unk20;
+    if (menu_map_region < 6 && menu_map_spot < 0 && !(D_8004DCA0 & 0x80)) {
+        dx = menu_map_marker_x - D_8007AA08.unk18;
+        dz = menu_map_marker_z - D_8007AA08.unk20;
         dist = sqrtf(dx * dx + dz * dz);
         if (dist > 10.0) {
             ang = Math_Atan2(dx, dz) - D_80085E74;
@@ -482,10 +482,10 @@ void Hud_DrawCompass(Unk2000000* buf) {
             } else if (ang > 3.141592653589793) {
                 ang -= 6.283185307179586;
             }
-            D_8008C140.x = 0.0f;
-            D_8008C140.y = 18.0f;
-            Math_RotateVec2(ang, &D_8008C140);
-            Hud_DrawTextureTile(&D_803A86F8, D_8008C140.x + 14.0f, D_8008C140.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
+            hud_rotated_vector_scratch.x = 0.0f;
+            hud_rotated_vector_scratch.y = 18.0f;
+            Math_RotateVec2(ang, &hud_rotated_vector_scratch);
+            Hud_DrawTextureTile(&D_803A86F8, hud_rotated_vector_scratch.x + 14.0f, hud_rotated_vector_scratch.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
         }
     }
 }
@@ -512,8 +512,8 @@ typedef struct {
 } Struct_8004F324;
 
 void Hud_DrawSpellLabel(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4);
-extern Struct_8004F324 D_8004F304[];
-extern u8 D_8004F2CC[][4];
+extern Struct_8004F324 hud_spell_input_icon_positions[];
+extern u8 hud_element_colors[][4];
 extern Gfx D_803AA2F8[];
 
 void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
@@ -533,8 +533,8 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
     f32 fy;
     u8 str[0x8];
 
-    D_8008C174 = 0x22;
-    D_8008C178 = 0x8C;
+    hud_draw_origin_x = 0x22;
+    hud_draw_origin_y = 0x8C;
     x0 = 0x47;
     y0 = 0;
     x1 = 0;
@@ -547,8 +547,8 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
     gDPPipeSync(D_8007A184++);
     gDPSetTextureFilter(D_8007A184++, G_TF_POINT);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
-    if (D_8008C15A && (D_8008C15C & 2)) {
-        i = D_8008C15A * D_8008C15A;
+    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 2)) {
+        i = hud_element_allocation_timer * hud_element_allocation_timer;
         x0 = 0x47 - i * 20 / 64;
         y0 = -(i * 10 / 64);
         x1 = 0 - i * 10 / 64;
@@ -579,10 +579,10 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
         str[i] = 3;
         Hud_DrawSpellLabel(x3, y3 + 3, str, i + 1, arg1->unk14->unk8);
     }
-    D_8008C174 = 0x69;
-    D_8008C178 = 0x32;
-    if (D_8008C15A && (D_8008C15C & 2)) {
-        i = D_8008C15A * D_8008C15A;
+    hud_draw_origin_x = 0x69;
+    hud_draw_origin_y = 0x32;
+    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 2)) {
+        i = hud_element_allocation_timer * hud_element_allocation_timer;
         yoff = i * 40 / 64;
         gDPSetRenderMode(D_8007A184++, 0x504240, 0);
         gDPSetCombine(D_8007A184++, 0xFF9BFF, 0xFF34FE7F);
@@ -598,8 +598,8 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
         x0 += 0xC;
     }
     Hud_DrawSpellLabel(0, yoff + 3, arg1->unk11D, arg1->unk120, arg1->unk14->unk8);
-    D_8008C174 = 0x22;
-    D_8008C178 = 0x8C;
+    hud_draw_origin_x = 0x22;
+    hud_draw_origin_y = 0x8C;
     if (arg1->unk120 != 3) {
         gDPPipeSync(D_8007A184++);
         gDPSetRenderMode(D_8007A184++, 0x0F0A4000, 0);
@@ -607,19 +607,19 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
         gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
         Hud_DrawTextureTile(&D_803A8718, 0x6D, 0xD, 0x24, 0x24, 0x40, 0, 0x400, 0x400);
     }
-    if (D_8008C15A && (D_8008C15C & 1)) {
-        col = D_8004F2CC[arg1->unk11D[arg1->unk120 - 1]];
-        pos = (f32*)D_8004F304 + arg1->unk11D[arg1->unk120 - 1] * 2;
-        fx = pos[0] + 109.0f + D_8008C174;
-        fy = pos[1] + 13.0f + D_8008C178;
+    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 1)) {
+        col = hud_element_colors[arg1->unk11D[arg1->unk120 - 1]];
+        pos = (f32*)hud_spell_input_icon_positions + arg1->unk11D[arg1->unk120 - 1] * 2;
+        fx = pos[0] + 109.0f + hud_draw_origin_x;
+        fy = pos[1] + 13.0f + hud_draw_origin_y;
         guTranslate(&buf->unkC0[D_8007A180], fx, fy, 0.0f);
         gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         gDPPipeSync(D_8007A184++);
-        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], D_8008C15A * 255 / 8);
+        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], hud_element_allocation_timer * 255 / 8);
         gSPDisplayList(D_8007A184++, D_803AA2F8);
     }
-    if (D_8008C15A) {
-        D_8008C15A--;
+    if (hud_element_allocation_timer) {
+        hud_element_allocation_timer--;
     }
 }
 
@@ -642,8 +642,8 @@ void Hud_DrawSpellName(void* arg0) {
     s32 yoff;
     u8* str;
 
-    D_8008C174 = 0x69;
-    D_8008C178 = 0x32;
+    hud_draw_origin_x = 0x69;
+    hud_draw_origin_y = 0x32;
     w = ((Struct_80022658*)arg0)->unk122;
     id = (u8)w;
     str = D_800C03D8[(u8)(w >> 8) & 0xF][(u8)w];
@@ -651,14 +651,14 @@ void Hud_DrawSpellName(void* arg0) {
     gDPSetTextureFilter(D_8007A184++, G_TF_POINT);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
     yoff = 0;
-    if (D_8008C15A && (D_8008C15C & 2)) {
-        w = D_8008C15A;
+    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 2)) {
+        w = hud_element_allocation_timer;
         t = w * w;
         yoff = t * 40 / 64;
         gDPSetRenderMode(D_8007A184++, 0x504240, 0);
         gDPSetCombine(D_8007A184++, 0xFF9BFF, 0xFF34FE7F);
         gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255 - t * 255 / 64);
-        D_8008C15A--;
+        hud_element_allocation_timer--;
     }
     Hud_DrawTextureTile(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
     Hud_DrawGlyphString(0x37 - Hud_MeasureGlyphString(str) / 2, yoff + 3, 0, str);
@@ -683,14 +683,14 @@ typedef struct Struct_80022970 {
 } Struct_80022970;
 
 
-extern u8 D_8004F2CC[][4];
-extern Struct_8004F324 D_8004F324[];
-extern s32 D_8004F344[];
+extern u8 hud_element_colors[][4];
+extern Struct_8004F324 hud_element_icon_positions[];
+extern s32 hud_element_milestone_masks[];
 extern u8 D_8007A9F4;
 extern u8 D_8007A9F5;
 extern u8 D_8007A9F6;
 extern u8 D_8007A9F7;
-extern u16 D_80092C86;
+extern u16 input_pressed_buttons;
 extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
 void Sfx_Play(s32, s32, s32);
@@ -704,14 +704,14 @@ void Hud_UpdateElementAllocation(Unk2000000* buf, Struct_80022970* pl) {
     u8* col;
     f32 y;
 
-    D_8008C174 = 0x81;
-    D_8008C178 = 0x48;
+    hud_draw_origin_x = 0x81;
+    hud_draw_origin_y = 0x48;
     yoff = 0;
-    if (D_8008C160) {
-        if (D_8008C042 & 1) {
-            alpha = D_8008C160 * 255 / 8;
+    if (hud_element_input_timer) {
+        if (hud_element_allocation_flags & 1) {
+            alpha = hud_element_input_timer * 255 / 8;
         } else {
-            t = D_8008C160 * D_8008C160;
+            t = hud_element_input_timer * hud_element_input_timer;
             yoff = t * 20 / 64;
             alpha = 255 - t * 255 / 64;
         }
@@ -731,47 +731,47 @@ void Hud_UpdateElementAllocation(Unk2000000* buf, Struct_80022970* pl) {
     Hud_DrawNumber(5, 0xA, yoff + 0x34, D_8007A9F5);
     Hud_DrawNumber(5, 0x1C, yoff + 0x43, D_8007A9F6);
     Hud_DrawNumber(5, 0x2E, yoff + 0x34, D_8007A9F7);
-    if (D_8008C160 && (D_8008C042 & 1)) {
-        col = D_8004F2CC[D_8008C13C];
-        pos = (f32*)D_8004F324 + D_8008C13C * 2;
-        x = pos[0] + D_8008C174;
-        y = pos[1] + D_8008C178;
+    if (hud_element_input_timer && (hud_element_allocation_flags & 1)) {
+        col = hud_element_colors[hud_selected_element_index];
+        pos = (f32*)hud_element_icon_positions + hud_selected_element_index * 2;
+        x = pos[0] + hud_draw_origin_x;
+        y = pos[1] + hud_draw_origin_y;
         guTranslate(&buf->unkC0[D_8007A180], x, y, 0.0f);
         gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         gDPPipeSync(D_8007A184++);
-        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], D_8008C160 * 255 / 8);
+        gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], hud_element_input_timer * 255 / 8);
         gSPDisplayList(D_8007A184++, D_803AA2F8);
     }
-    if (D_8008C160 == 0) {
-        if (D_80092C86 & 0xF) {
-            if (D_80092C86 & 8) {
-                D_8008C13C = 0;
-            } else if (D_80092C86 & 2) {
-                D_8008C13C = 1;
-            } else if (D_80092C86 & 4) {
-                D_8008C13C = 2;
+    if (hud_element_input_timer == 0) {
+        if (input_pressed_buttons & 0xF) {
+            if (input_pressed_buttons & 8) {
+                hud_selected_element_index = 0;
+            } else if (input_pressed_buttons & 2) {
+                hud_selected_element_index = 1;
+            } else if (input_pressed_buttons & 4) {
+                hud_selected_element_index = 2;
             } else {
-                D_8008C13C = 3;
+                hud_selected_element_index = 3;
             }
-            if (pl->unk14->unk24[D_8008C13C] < 50) {
-                pl->unk14->unk24[D_8008C13C]++;
-                if (pl->unk14->unk24[D_8008C13C] == 50) {
-                    pl->unk8 |= D_8004F344[D_8008C13C];
+            if (pl->unk14->unk24[hud_selected_element_index] < 50) {
+                pl->unk14->unk24[hud_selected_element_index]++;
+                if (pl->unk14->unk24[hud_selected_element_index] == 50) {
+                    pl->unk8 |= hud_element_milestone_masks[hud_selected_element_index];
                     if ((pl->unk8 & 0xF000) == 0xF000) {
                         pl->unk8 |= 0x10000;
                     }
                 }
                 Sfx_Play(0, 4, 0xFF);
-                D_8008C138 = 30;
-                D_8008C160 = 8;
-                D_8008C042 |= 1;
+                hud_element_gain_flash_timer = 30;
+                hud_element_input_timer = 8;
+                hud_element_allocation_flags |= 1;
             }
         }
     } else {
-        D_8008C160--;
-        if ((D_8008C042 & 1) && D_8008C160 == 0) {
+        hud_element_input_timer--;
+        if ((hud_element_allocation_flags & 1) && hud_element_input_timer == 0) {
             D_8004DCA0 &= ~8;
-            D_8008C042 ^= 1;
+            hud_element_allocation_flags ^= 1;
         }
     }
 }
@@ -790,19 +790,19 @@ void Hud_DrawNpcTalkMarker(void) {
     s32 sx;
     s32 bob;
     Vec3f_216E0* p;
-    u16 *angle = &D_8008C040;
+    u16 *angle = &hud_npc_marker_phase;
 
     p = &D_8007ABF0[D_8007A9C0 - 1].unk14;
-    if (Camera_WorldToScreen(p->x, p->y + 14.0, p->z, &sx, &D_8008C17C)) {
+    if (Camera_WorldToScreen(p->x, p->y + 14.0, p->z, &sx, &hud_npc_marker_screen_y)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
         }
         *angle += 0x600;
         gSPDisplayList(D_8007A184++, D_803AA448);
-        Hud_DrawClippedTextureRect(sx, D_8008C17C - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
+        Hud_DrawClippedTextureRect(sx, hud_npc_marker_screen_y - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
     } else {
-        D_8008C17C = 0xF0;
+        hud_npc_marker_screen_y = 0xF0;
     }
 }
 
@@ -810,7 +810,7 @@ void Hud_DrawSpiritMarker(void) {
     s32 sx;
     s32 sy;
     s32 bob;
-    u16 *angle = &D_8008C050;
+    u16 *angle = &hud_spirit_marker_phase;
 
     if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
@@ -827,7 +827,7 @@ void Hud_DrawChestMarker(void) {
     s32 sx;
     s32 sy;
     s32 bob;
-    u16 *angle = &D_8008C14C[0];
+    u16 *angle = &hud_chest_text_marker_phases[0];
 
     if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
@@ -844,7 +844,7 @@ void Hud_DrawTextSpotMarker(void) {
     s32 sx;
     s32 sy;
     s32 bob;
-    u16 *angle = &D_8008C14C[1];
+    u16 *angle = &hud_chest_text_marker_phases[1];
 
     if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
@@ -866,7 +866,7 @@ void Hud_DrawMeleeTargetMarker(u16 arg0) {
     s32 bob;
     f32 y;
     Struct_8002373C* a;
-    u16 *angle = &D_8008C150;
+    u16 *angle = &hud_melee_marker_phase;
 
     a = (Struct_8002373C*)D_8007B908[arg0].unk2C;
     if (a->unk64->unk0 == 1) {
@@ -910,19 +910,19 @@ void Hud_StartActorStatusIndicator(Struct_8002373C* arg0, u16 mask, u16 idx, s16
     Struct_803AA690* fx;
 
     for (i = 0; i < 7; i++) {
-        if (D_8004F2DC[i] & mask) {
+        if (hud_actor_status_masks[i] & mask) {
             s->unk12[i] = idx;
             s->unk22[i] = val;
             break;
         }
     }
     for (i = 0; i < 4; i++) {
-        if ((D_8004F2EC[i] & mask) && s->unk44[i] == 0) {
+        if ((hud_actor_status_alt_masks[i] & mask) && s->unk44[i] == 0) {
             s->unk32[i] = val;
             e = &D_803AA6C4[idx];
-            D_8008C140.x = e->unk8;
-            D_8008C140.y = e->unkC;
-            D_8008C140.z = 1.0f;
+            hud_rotated_vector_scratch.x = e->unk8;
+            hud_rotated_vector_scratch.y = e->unkC;
+            hud_rotated_vector_scratch.z = 1.0f;
             fx = &D_803AA690[e->unk0];
             if (arg0->unk64->unk0 == 1) {
                 if (e->unk4 & 0x100) {
@@ -935,7 +935,7 @@ void Hud_StartActorStatusIndicator(Struct_8002373C* arg0, u16 mask, u16 idx, s16
             } else {
                 y = arg0->unk4;
             }
-            s->unk44[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->unk0, y, arg0->unk8, 0.0f, fx, &D_8008C140, arg0);
+            s->unk44[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->unk0, y, arg0->unk8, 0.0f, fx, &hud_rotated_vector_scratch, arg0);
             return;
         }
     }
@@ -999,7 +999,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Struct_8002373C* arg0) {
                 if (vis) {
                     Hud_DrawTextureTile(D_803A8728, sx + ox - (w >> 1), sy + oy - (h >> 1), w, h, u, v, 0x400, 0x400);
                 }
-                if (!(D_8004F2DC[i] & s->unk0)) {
+                if (!(hud_actor_status_masks[i] & s->unk0)) {
                     s->unk12[i] = 0;
                 } else if (s->unk22[i] > 0) {
                     if (--s->unk22[i] == 0) {
@@ -1027,7 +1027,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Struct_8002373C* arg0) {
             } else {
                 fx->unk10 = arg0->unk4;
             }
-            if (!(D_8004F2EC[i] & s->unk0)) {
+            if (!(hud_actor_status_alt_masks[i] & s->unk0)) {
                 s->unk44[i] = 0;
                 if (fx->unk8 & 1) {
                     fx->unk8 &= ~1;
@@ -1113,12 +1113,12 @@ void Hud_DrawNumber(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
 void Hud_DrawEnemyInfoPanel(void) {
     s32 d;
 
-    D_8008C174 = 0xB5;
-    D_8008C178 = 0x1A;
-    d = D_8008C162 - 50;
+    hud_draw_origin_x = 0xB5;
+    hud_draw_origin_y = 0x1A;
+    d = hud_battle_message_timer - 50;
     if (d > 0) {
         d *= d;
-        D_8008C174 += d * 120 / 100;
+        hud_draw_origin_x += d * 120 / 100;
     }
     gDPPipeSync(D_8007A184++);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
@@ -1147,7 +1147,7 @@ void Hud_DrawEnemyInfoPanel(void) {
 }
 
 void Hud_ResetPopups(void) {
-    Struct_8008C058* p = D_8008C058;
+    Struct_8008C058* p = hud_popup_slots;
     s32 i = 8;
 
     while (i > 0) {
@@ -1158,7 +1158,7 @@ void Hud_ResetPopups(void) {
 }
 
 void Hud_ShowActorPopup(Struct_8002433C_arg* arg0) {
-    Struct_8008C058* p = D_8008C058;
+    Struct_8008C058* p = hud_popup_slots;
     s32 i = 7;
 
     while (i != 0 && p->unk0 != 0) {
@@ -1193,7 +1193,7 @@ void Hud_DrawPopups(void) {
 
     gDPPipeSync(D_8007A184++);
     gDPLoadTLUT_pal256(D_8007A184++, D_803A4118);
-    p = D_8008C058;
+    p = hud_popup_slots;
     i = 8;
     do {
         if (p->unk0 != 0) {
@@ -1227,11 +1227,11 @@ void Hud_DrawSpellLabel(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4) {
     id &= 0xFF;
     str = D_800C03D8[tmp][id];
     if (flags & 4) {
-        str = D_8004F2C4;
+        str = hud_digit_glyph_data;
     }
     w = Hud_MeasureGlyphString(str);
     arg0 = arg0 - w / 2 + 0x37;
-    Hud_DrawGlyphString(arg0, arg1, D_8004F498[flags], str);
+    Hud_DrawGlyphString(arg0, arg1, hud_number_spacing[flags], str);
 }
 
 void Hud_DrawGlyphString(s32 x, s32 y, s32 pal, u8* str) {
@@ -1314,35 +1314,35 @@ void Hud_LoadTextureTile(Struct_80024A54* tex, s32 x, s32 y, s32 w, s32 h) {
 }
 
 void Hud_DrawClippedTextureRect(s32 x, s32 y, s32 x2, s32 y2, s32 s, s32 t, s32 dsdx, s32 dtdy) {
-    x += D_8008C174;
+    x += hud_draw_origin_x;
     x2 += x;
-    y += D_8008C178;
-    if (x2 < D_8008C044) {
+    y += hud_draw_origin_y;
+    if (x2 < hud_clip_left) {
         return;
     }
     y2 += y;
-    if (y2 < D_8008C048) {
+    if (y2 < hud_clip_top) {
         return;
     }
-    if (D_8008C04C < x) {
+    if (hud_clip_right < x) {
         return;
     }
-    if (D_8008C054 < y) {
+    if (hud_clip_bottom < y) {
         return;
     }
-    if (D_8008C04C < x2) {
-        x2 = D_8008C04C;
+    if (hud_clip_right < x2) {
+        x2 = hud_clip_right;
     }
-    if (D_8008C054 < y2) {
-        y2 = D_8008C054;
+    if (hud_clip_bottom < y2) {
+        y2 = hud_clip_bottom;
     }
-    if (x < D_8008C044) {
-        s = s - x + D_8008C044;
-        x = D_8008C044;
+    if (x < hud_clip_left) {
+        s = s - x + hud_clip_left;
+        x = hud_clip_left;
     }
-    if (y < D_8008C048) {
-        t = t - y + D_8008C048;
-        y = D_8008C048;
+    if (y < hud_clip_top) {
+        t = t - y + hud_clip_top;
+        y = hud_clip_top;
     }
     gSPTextureRectangle(D_8007A184++, x << 2, y << 2, x2 << 2, y2 << 2, 0, s << 5, t << 5, dsdx, dtdy);
 }
@@ -1356,23 +1356,23 @@ void Hud_DrawTextureTile(void* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32
 
 /* .data 8004F2C0..8004F4A0 */
 s32 D_8004F2C0 = 0; /* nothing references it */
-u8 D_8004F2C4[8] = {
-#include "assets/D_8004F2C4.inc.c"
+u8 hud_digit_glyph_data[8] = {
+#include "assets/hud_digit_glyph_data.inc.c"
 };
-u8 D_8004F2CC[4][4] = {
+u8 hud_element_colors[4][4] = {
     { 0xFF, 0x00, 0x00, 0x00 },
     { 0xFF, 0xC8, 0x00, 0x00 },
     { 0x00, 0x00, 0xFF, 0x00 },
     { 0x00, 0xFF, 0x00, 0x00 },
 };
-u16 D_8004F2DC[8] = { 0x4, 0x1, 0x400, 0x20, 0x10, 0x80, 0x40, 0x0 };
-u16 D_8004F2EC[4] = { 0x8, 0x2, 0x200, 0x100 };
-s32 D_8004F2F4[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
-Struct_8004F324 D_8004F304[4] = { { 17.0f, 5.0f }, { 5.0f, 17.0f }, { 17.0f, 30.0f }, { 30.0f, 17.0f } };
-Struct_8004F324 D_8004F324[4] = { { 30.0f, 35.0f }, { 12.0f, 51.0f }, { 30.0f, 66.0f }, { 48.0f, 51.0f } };
-s32 D_8004F344[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
+u16 hud_actor_status_masks[8] = { 0x4, 0x1, 0x400, 0x20, 0x10, 0x80, 0x40, 0x0 };
+u16 hud_actor_status_alt_masks[4] = { 0x8, 0x2, 0x200, 0x100 };
+s32 hud_element_unlock_masks[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
+Struct_8004F324 hud_spell_input_icon_positions[4] = { { 17.0f, 5.0f }, { 5.0f, 17.0f }, { 17.0f, 30.0f }, { 30.0f, 17.0f } };
+Struct_8004F324 hud_element_icon_positions[4] = { { 30.0f, 35.0f }, { 12.0f, 51.0f }, { 30.0f, 66.0f }, { 48.0f, 51.0f } };
+s32 hud_element_milestone_masks[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
 s32 D_8004F354[77] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 3, 3, 3, 2, 0, 0, 5 }; /* nothing references it */
 u8 D_8004F488[0x10] = { /* message text, nothing references it */
 #include "assets/D_8004F488.inc.c"
 };
-u8 D_8004F498[8] = { 0, 1, 2, 2, 2, 2, 2, 2 };
+u8 hud_number_spacing[8] = { 0, 1, 2, 2, 2, 2, 2, 2 };

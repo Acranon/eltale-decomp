@@ -57,32 +57,32 @@ typedef struct {
 extern Struct_8007C284* D_8007C284;
 
 /* This file's .bss, 8008BE40..8008BFC0, in address order (first declaration fixes the order). */
-Struct_8001FF10_Pos D_8008BE40;
-u16 D_8008BE4C;
-u16 D_8008BE4E;
-u16 D_8008BE50;
-u16 D_8008BE52;
-u16 D_8008BE54;
+Struct_8001FF10_Pos battle_rotated_offset_scratch;
+u16 battle_camera_phase;
+u16 battle_camera_phase_timer;
+u16 battle_camera_enemy_index;
+u16 battle_flags; /* bit 0x1: in battle; 0x2: enemy turn; 0x100: boss encounter */
+u16 battle_turn_delay;
 s16 D_8008BE56;
-u16 D_8008BE58;
-u16 D_8008BE5A;
-f32 D_8008BE5C;
-f32 D_8008BE60;
-f32 D_8008BE64;
-f32 D_8008BE68;
-f32 D_8008BE6C;
+u16 battle_turn_order_index;
+u16 battle_enemy_count;
+f32 battle_center_x;
+f32 battle_center_z;
+f32 battle_active_enemy_x;
+f32 battle_active_enemy_z;
+f32 battle_arena_radius;
 u8 D_8008BE70[0x100]; /* unreferenced */
-void* D_8008BF70[8];
-u32 D_8008BF90;
-s16 D_8008BF94;
-u16 D_8008BF96;
-Struct_8007C284_30* D_8008BF98;
-Struct_8007C284_34* D_8008BF9C;
+void* battle_spawned_actor_ptrs[8];
+u32 battle_spawned_actor_count;
+s16 battle_outer_ring_slot;
+u16 battle_turn_ring_slot;
+Struct_8007C284_30* battle_encounter_region_table;
+Struct_8007C284_34* battle_encounter_group_table;
 void* D_8008BFA0;
 void* D_8008BFA4;
-s32 D_8008BFA8;
-f32 D_8008BFAC;
-u16 D_8008BFB0;
+s32 battle_boss_index_plus_one;
+f32 battle_travel_accumulator;
+u16 battle_encounter_roll_limit;
 extern s32 D_800842C0;
 extern u16 D_800842E8;
 
@@ -111,7 +111,7 @@ void Magic_StepActorStatusTimers(Vec3f*);
 void Effect_FadeRing(u16, f32, f32, f32);
 
 
-extern f32 D_8004F2A0[];
+extern f32 battle_boss_arena_radii[];
 extern s32 D_8007B900;
 extern Struct_8007B908 D_8007B908[];
 extern void* D_8007C048;
@@ -133,17 +133,17 @@ void Hud_ResetPopups(void);
 void Bgm_Play(s8);
 
 void Battle_ResetState(void) {
-    D_8008BE52 &= 0x8000;
-    D_8008BFAC = 0.0f;
-    D_8008BFB0 = 0;
+    battle_flags &= 0x8000;
+    battle_travel_accumulator = 0.0f;
+    battle_encounter_roll_limit = 0;
     if (D_800842E8 & 1) {
         if (D_8007C284->unk30 != NULL) {
-            D_8008BF98 = &D_8007C284->unk30[D_800842C0];
-            D_8008BF9C = &D_8007C284->unk34[D_800842C0];
+            battle_encounter_region_table = &D_8007C284->unk30[D_800842C0];
+            battle_encounter_group_table = &D_8007C284->unk34[D_800842C0];
             return;
         }
-        D_8008BF98 = NULL;
-        D_8008BF9C = NULL;
+        battle_encounter_region_table = NULL;
+        battle_encounter_group_table = NULL;
     }
 }
 
@@ -182,45 +182,45 @@ void Battle_TryStartRandomEncounter(void) {
     Struct_8001FD44* area;
     Struct_8001FE08* pt;
 
-    if (!(D_8008BE52 & 1) && !(D_8008BE52 & 0x8000) && !(D_8007AA80 & 1) && (D_8007A9A8 != 0.0f)) {
-        D_8008BFAC += D_8007A9A8;
-        if (D_8008BFAC >= 50.0) {
-            D_8008BFB0 += 50;
-            if (Math_Rand(2000) < D_8008BFB0) {
+    if (!(battle_flags & 1) && !(battle_flags & 0x8000) && !(D_8007AA80 & 1) && (D_8007A9A8 != 0.0f)) {
+        battle_travel_accumulator += D_8007A9A8;
+        if (battle_travel_accumulator >= 50.0) {
+            battle_encounter_roll_limit += 50;
+            if (Math_Rand(2000) < battle_encounter_roll_limit) {
                 x = D_8007AA08.unk18;
                 y = D_8007AA08.unk20;
                 pt = Battle_ChooseNearbyEncounterPoint(x, y);
                 if (pt != NULL) {
-                    area = Battle_FindEncounterRegion(x, y, D_8008BF98);
+                    area = Battle_FindEncounterRegion(x, y, battle_encounter_region_table);
                     if (area != NULL) {
-                        D_8008BFB0 = 0;
+                        battle_encounter_roll_limit = 0;
                         dx = x - pt->unk0;
                         dy = y - pt->unk2;
                         ang = Math_Atan2(dx, dy);
                         Battle_SpawnEncounterGroup(pt->unk0, pt->unk2, ang, (u16*)area->unk8);
-                        D_8008BE5C = pt->unk0;
-                        D_8008BE60 = pt->unk2;
-                        D_8008BE52 = 0x205;
+                        battle_center_x = pt->unk0;
+                        battle_center_z = pt->unk2;
+                        battle_flags = 0x205;
                         D_8008BE56 = 0;
-                        D_8008BE54 = 20;
+                        battle_turn_delay = 20;
                         if (D_8007AA08.unk14->unkC < D_8007B908[D_8007C050[0]].unk28->unkC) {
-                            D_8008BE58 = 0;
-                            D_8008BE52 |= 2;
+                            battle_turn_order_index = 0;
+                            battle_flags |= 2;
                         } else {
-                            D_8008BE58 = D_8008BE5A - 1;
+                            battle_turn_order_index = battle_enemy_count - 1;
                         }
                         Player_InitBattle();
                         Hud_ResetPopups();
-                        D_8008BE6C = 100.0f;
-                        D_8008BF94 = Effect_CreateTerrainRing(0, D_8008BE5C, D_8007AA08.unk1C, D_8008BE60, D_8008BE6C * 1.04);
-                        D_8008BE4C = 0;
-                        D_8008BE4E = 1;
-                        D_8008BE50 = Math_Rand(D_8007B900);
+                        battle_arena_radius = 100.0f;
+                        battle_outer_ring_slot = Effect_CreateTerrainRing(0, battle_center_x, D_8007AA08.unk1C, battle_center_z, battle_arena_radius * 1.04);
+                        battle_camera_phase = 0;
+                        battle_camera_phase_timer = 1;
+                        battle_camera_enemy_index = Math_Rand(D_8007B900);
                         Bgm_Play(13);
                     }
                 }
             }
-            D_8008BFAC = 0.0f;
+            battle_travel_accumulator = 0.0f;
         }
     }
 }
@@ -229,32 +229,32 @@ void Battle_StartBossEncounter(void) {
     s32 v;
 
     if (D_8007C140 == 7) {
-        D_8008BE5C = 0.0f;
-        D_8008BE60 = 0.0f;
+        battle_center_x = 0.0f;
+        battle_center_z = 0.0f;
     } else {
-        D_8008BE5C = D_8007C174;
-        D_8008BE60 = D_8007C17C;
+        battle_center_x = D_8007C174;
+        battle_center_z = D_8007C17C;
     }
-    D_8008BE52 = 0x305;
+    battle_flags = 0x305;
     D_8008BE56 = 0;
-    D_8008BE54 = 0;
+    battle_turn_delay = 0;
     D_8008BFA0 = D_8007C048;
     D_8008BFA4 = D_8007C04C;
-    D_8008BFA8 = D_8007C140;
+    battle_boss_index_plus_one = D_8007C140;
     D_8007C048 = D_803ABA58;
     D_8007C04C = D_803AC3F8;
-    Boss_Spawn(D_8007C140 - 1, D_8008BE5C, D_8008BE60, D_8007C184, D_8007B908);
+    Boss_Spawn(D_8007C140 - 1, battle_center_x, battle_center_z, D_8007C184, D_8007B908);
     Enemy_ClearAttackScript();
     D_8007C140 = 0;
-    D_8008BE5A = D_8007B900 = 1;
+    battle_enemy_count = D_8007B900 = 1;
     Enemy_SortTurnOrder();
-    D_8008BF90 = 1;
-    D_8008BF70[0] = D_8007B908[0].unk2C;
-    D_8008BE4C = 1;
-    D_8008BE4E = 1;
-    D_8008BE50 = 0;
-    D_8008BE58 = D_8008BE5A - 1;
-    if (D_8008BFA8 != 8) {
+    battle_spawned_actor_count = 1;
+    battle_spawned_actor_ptrs[0] = D_8007B908[0].unk2C;
+    battle_camera_phase = 1;
+    battle_camera_phase_timer = 1;
+    battle_camera_enemy_index = 0;
+    battle_turn_order_index = battle_enemy_count - 1;
+    if (battle_boss_index_plus_one != 8) {
         v = 0;
     } else {
         v = 0x29;
@@ -262,8 +262,8 @@ void Battle_StartBossEncounter(void) {
     Bgm_Play(v);
     Player_InitBattle();
     Hud_ResetPopups();
-    D_8008BE6C = D_8004F2A0[D_8008BFA8 - 1];
-    D_8008BF94 = Effect_CreateTerrainRing(0, D_8008BE5C, D_8007C178, D_8008BE60, D_8008BE6C * 1.04);
+    battle_arena_radius = battle_boss_arena_radii[battle_boss_index_plus_one - 1];
+    battle_outer_ring_slot = Effect_CreateTerrainRing(0, battle_center_x, D_8007C178, battle_center_z, battle_arena_radius * 1.04);
 }
 
 typedef struct {
@@ -298,7 +298,7 @@ typedef struct {
 } Struct_8004F0B0;
 
 extern Struct_80085E48 D_80085E48;
-extern Struct_8004F0B0 D_8004F0B0[];
+extern Struct_8004F0B0 battle_camera_offsets[];
 extern f32 D_80085F78;
 extern f32 D_80085F84;
 extern s32 D_80085F60;
@@ -326,9 +326,9 @@ void Battle_UpdateStartCamera(void) {
     f32 ang;
     Actor* a;
 
-    switch (D_8008BE4C) {
+    switch (battle_camera_phase) {
         case 0:
-            a = (Actor*)D_8007B908[D_8008BE50].unk2C;
+            a = (Actor*)D_8007B908[battle_camera_enemy_index].unk2C;
             dx = a->unk0 - D_8007AA08.unk18;
             dz = a->unk8 - D_8007AA08.unk20;
             ang = Math_Atan2(dx, dz);
@@ -346,16 +346,16 @@ void Battle_UpdateStartCamera(void) {
             } else if (ang > 3.141592653589793) {
                 ang -= 6.283185307179586;
             }
-            D_8008BE40.unk0 = 0.0f;
+            battle_rotated_offset_scratch.unk0 = 0.0f;
             if (a->unk64->unk1C < a->unk64->unk18) {
-                D_8008BE40.unk4 = a->unk64->unk18 * a->unk24 * 2.0 + 15.0;
+                battle_rotated_offset_scratch.unk4 = a->unk64->unk18 * a->unk24 * 2.0 + 15.0;
             } else {
-                D_8008BE40.unk4 = a->unk64->unk1C * a->unk24 * 2.0 + 15.0;
+                battle_rotated_offset_scratch.unk4 = a->unk64->unk1C * a->unk24 * 2.0 + 15.0;
             }
-            D_80085E48.unk4C = D_8008BE40.unk4 * 1.5;
-            Math_RotateVec2(ang, &D_8008BE40);
-            D_80085E48.unkC = a->unk0 + D_8008BE40.unk0;
-            D_80085E48.unk14 = a->unk8 + D_8008BE40.unk4;
+            D_80085E48.unk4C = battle_rotated_offset_scratch.unk4 * 1.5;
+            Math_RotateVec2(ang, &battle_rotated_offset_scratch);
+            D_80085E48.unkC = a->unk0 + battle_rotated_offset_scratch.unk0;
+            D_80085E48.unk14 = a->unk8 + battle_rotated_offset_scratch.unk4;
             D_80085E48.unk10 = a->unk4 + 15.0;
             if (D_80085E48.unk10 < D_8007AA08.unk1C) {
                 D_80085E48.unk10 = D_8007AA08.unk1C;
@@ -369,40 +369,40 @@ void Battle_UpdateStartCamera(void) {
             D_80085E48.unk80 = a;
             D_80085E48.unk70 = 0.01f;
             D_80085F78 = D_80085E48.unk2C;
-            D_8008BE4C++;
-            D_8008BE4E = 60;
+            battle_camera_phase++;
+            battle_camera_phase_timer = 60;
             break;
         case 1:
-            if (--D_8008BE4E == 0) {
-                D_8008BE52 &= ~0x200;
+            if (--battle_camera_phase_timer == 0) {
+                battle_flags &= ~0x200;
                 Camera_SetPreset(D_80085F60);
-                dx = D_8008BE5C - D_8007AA08.unk18;
-                dz = D_8008BE60 - D_8007AA08.unk20;
+                dx = battle_center_x - D_8007AA08.unk18;
+                dz = battle_center_z - D_8007AA08.unk20;
                 ang = Math_Atan2(dx, dz) + 3.141592653589793;
                 if (ang > 3.141592653589793) {
                     ang -= 6.283185307179586;
                 } else if (ang < -3.141592653589793) {
                     ang += 6.283185307179586;
                 }
-                D_8008BE40.unk0 = 0.0f;
-                D_8008BE40.unk4 = 50.0f;
-                Math_RotateVec2(ang, &D_8008BE40);
+                battle_rotated_offset_scratch.unk0 = 0.0f;
+                battle_rotated_offset_scratch.unk4 = 50.0f;
+                Math_RotateVec2(ang, &battle_rotated_offset_scratch);
                 D_80085E48.unk0 = 4;
                 D_80085E48.unk8 |= 0x10;
-                D_80085E48.unkC = D_8007AA08.unk18 + D_8008BE40.unk0;
+                D_80085E48.unkC = D_8007AA08.unk18 + battle_rotated_offset_scratch.unk0;
                 D_80085E48.unk48 = 0.0f;
                 D_80085E48.unk10 = D_8007AA08.unk1C + 30.0;
-                D_80085E48.unk14 = D_8007AA08.unk20 + D_8008BE40.unk4;
+                D_80085E48.unk14 = D_8007AA08.unk20 + battle_rotated_offset_scratch.unk4;
                 D_80085E48.unk44 = D_80085E48.unk48;
                 D_80085E48.unk3C = 0.0f;
                 D_80085E48.unk40 = D_80085E48.unk44;
-                if ((D_8008BE52 & 0x100) && D_8008BFA8 == 8) {
+                if ((battle_flags & 0x100) && battle_boss_index_plus_one == 8) {
                     D_80085E48.unk58 = 50.0f;
                     D_80085E48.unk5C = 28.0f;
                     D_80085E48.unk4C = 180.0f;
                 } else {
-                    D_80085E48.unk58 += D_8004F0B0[D_800842BC].unk0;
-                    D_80085E48.unk4C += D_8004F0B0[D_800842BC].unk4;
+                    D_80085E48.unk58 += battle_camera_offsets[D_800842BC].unk0;
+                    D_80085E48.unk4C += battle_camera_offsets[D_800842BC].unk4;
                 }
                 D_80085E48.unk80 = &D_8007AA20;
                 D_80085E48.unk70 = 0.02f;
@@ -417,7 +417,7 @@ extern Actor D_8007AA20;
 extern s32 D_8007A9BC;
 extern s32 D_80085F60;
 extern s32 D_800842BC;
-extern s16 D_8008C162;
+extern s16 hud_battle_message_timer;
 
 void Boss_SetDefeated(u16);
 void Boss_HandleDefeat(s32);
@@ -433,69 +433,69 @@ void Battle_UpdateTurnTransition(void) {
     f32 f;
     Actor* a;
 
-    if (D_8008BE52 & 4) {
-        if (D_8008BE54 != 0) {
-            D_8008BE54--;
+    if (battle_flags & 4) {
+        if (battle_turn_delay != 0) {
+            battle_turn_delay--;
             return;
         }
-        if (D_8008BE52 & 2) {
-            a = (Actor*)D_8007B908[D_8007C050[D_8008BE58]].unk2C;
+        if (battle_flags & 2) {
+            a = (Actor*)D_8007B908[D_8007C050[battle_turn_order_index]].unk2C;
         } else {
             a = &D_8007AA20;
         }
         if (!(a->unk60 & 1)) {
             done = 0;
-            if (D_8007B900 == 0 || (D_8008BE52 & 0x400)) {
-                D_8008BE52 |= 8;
+            if (D_8007B900 == 0 || (battle_flags & 0x400)) {
+                battle_flags |= 8;
                 done = 1;
-                if (D_8008BE52 & 0x100) {
-                    Boss_SetDefeated(D_8008BFA8 - 1);
-                    Boss_HandleDefeat(D_8008BFA8 - 1);
+                if (battle_flags & 0x100) {
+                    Boss_SetDefeated(battle_boss_index_plus_one - 1);
+                    Boss_HandleDefeat(battle_boss_index_plus_one - 1);
                     D_8007C048 = D_8008BFA0;
                     D_8007C04C = D_8008BFA4;
                 }
                 D_8007A9BC = func_800200F8();
-            } else if (D_8008BE52 & 0x10) {
+            } else if (battle_flags & 0x10) {
                 done = 1;
-            } else if (!(D_8008BE52 & 0x100) && (D_8007AA08.unk8 & 0x20)) {
-                D_8008BE52 |= 0x10;
+            } else if (!(battle_flags & 0x100) && (D_8007AA08.unk8 & 0x20)) {
+                battle_flags |= 0x10;
                 done = 1;
             }
             if (done) {
-                D_8008BE52 &= ~1;
-                D_8008C162 = 0;
-                Effect_FadeRing(D_8008BF94, D_8007AA08.unk18, D_8007AA08.unk1C, D_8007AA08.unk20);
+                battle_flags &= ~1;
+                hud_battle_message_timer = 0;
+                Effect_FadeRing(battle_outer_ring_slot, D_8007AA08.unk18, D_8007AA08.unk1C, D_8007AA08.unk20);
                 Enemy_RemoveAll();
                 Camera_SetPresetDelayedTurn(D_80085F60);
-                if (D_8008BE52 & 0x100) {
-                    D_8008BE52 &= ~0x100;
+                if (battle_flags & 0x100) {
+                    battle_flags &= ~0x100;
                 }
-                if (D_8008BE52 & 0x10) {
+                if (battle_flags & 0x10) {
                     Bgm_PlayForMap(D_800842BC, D_800842C0, 0);
                 } else {
                     Bgm_PlayDelayed(0x2B, 8);
                 }
                 return;
             }
-            D_8008BE52 &= ~4;
-            if (D_8008BE52 & 2) {
+            battle_flags &= ~4;
+            if (battle_flags & 2) {
                 Enemy_StartTurn();
             }
-            D_8008BE64 = a->unk0;
-            D_8008BE68 = a->unk8;
-            if (D_8008BE52 & 2) {
-                f = D_8007B908[D_8007C050[D_8008BE58]].unk10;
+            battle_active_enemy_x = a->unk0;
+            battle_active_enemy_z = a->unk8;
+            if (battle_flags & 2) {
+                f = D_8007B908[D_8007C050[battle_turn_order_index]].unk10;
             } else {
                 f = D_8007AA08.unkC;
             }
-            if (D_8008BE52 & 2) {
-                a = (Actor*)D_8007B908[D_8007C050[D_8008BE58]].unk2C;
+            if (battle_flags & 2) {
+                a = (Actor*)D_8007B908[D_8007C050[battle_turn_order_index]].unk2C;
             } else {
                 a = &D_8007AA20;
             }
             f *= a->unk68->unk90;
             f += a->unk64->unk18 * a->unk24;
-            D_8008BF96 = Effect_CreateTerrainRing((D_8008BE52 & 2) ? 1 : 2, D_8008BE64, a->unk4, D_8008BE68, f * 1.04);
+            battle_turn_ring_slot = Effect_CreateTerrainRing((battle_flags & 2) ? 1 : 2, battle_active_enemy_x, a->unk4, battle_active_enemy_z, f * 1.04);
         }
     }
 }
@@ -506,31 +506,31 @@ void Battle_EndTurn(Vec3f* arg0) {
     Struct_8007B908* e;
 
     Magic_StepActorStatusTimers(arg0);
-    if (D_8008BE52 & 1) {
-        if (!(D_8008BE52 & 2)) {
-            n = D_8008BE5A;
+    if (battle_flags & 1) {
+        if (!(battle_flags & 2)) {
+            n = battle_enemy_count;
             while (n != 0) {
-                D_8008BE58++;
-                max = D_8008BE5A;
-                if (D_8008BE58 >= max) {
-                    D_8008BE58 = 0;
+                battle_turn_order_index++;
+                max = battle_enemy_count;
+                if (battle_turn_order_index >= max) {
+                    battle_turn_order_index = 0;
                 }
-                e = &D_8007B908[id = D_8007C050[D_8008BE58]];
+                e = &D_8007B908[id = D_8007C050[battle_turn_order_index]];
                 if (e->unkA != 0 && e->unk7C != -1) {
                     break;
                 }
                 n--;
             }
             if (n == 0) {
-                D_8008BE52 |= 0x400;
+                battle_flags |= 0x400;
             }
-            D_8008BE54 = 0x14;
+            battle_turn_delay = 0x14;
         } else {
-            D_8008BE54 = 0;
+            battle_turn_delay = 0;
         }
-        Effect_FadeRing(D_8008BF96, arg0->x, arg0->y, arg0->z);
-        D_8008BE52 ^= 2;
-        D_8008BE52 |= 4;
+        Effect_FadeRing(battle_turn_ring_slot, arg0->x, arg0->y, arg0->z);
+        battle_flags ^= 2;
+        battle_flags |= 4;
     }
 }
 
@@ -566,9 +566,9 @@ Struct_8001FE08* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y) {
 
     n = 0;
 
-    if (D_8008BF9C != NULL) {
-        cnt = D_8008BF9C->unkC;
-        p = D_8008BF9C->unk8;
+    if (battle_encounter_group_table != NULL) {
+        cnt = battle_encounter_group_table->unkC;
+        p = battle_encounter_group_table->unk8;
         while (n < 6 && cnt != 0) {
             cnt--;
             dx = p->unk0 - x;
@@ -604,13 +604,13 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
     s32 out[8][2];
 
     cnt = Math_Rand(*list++);
-    e = &D_8008BF9C->unk4[list[cnt]];
-    pos = &(*D_8008BF9C->unk0)[e->unk6];
+    e = &battle_encounter_group_table->unk4[list[cnt]];
+    pos = &(*battle_encounter_group_table->unk0)[e->unk6];
     n = e->unk4;
     p = e->unk0;
     actor = D_8007B908;
     o = out;
-    D_8008BF90 = 0;
+    battle_spawned_actor_count = 0;
     while (n != 0) {
         cnt = p->unk4;
         if (p->unk8 != 0) {
@@ -620,12 +620,12 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
         (*o)[1] = cnt;
         o++;
         D_8007B900 += cnt;
-        D_8008BF70[D_8008BF90++] = &actor->unk2C;
+        battle_spawned_actor_ptrs[battle_spawned_actor_count++] = &actor->unk2C;
         while (cnt != 0) {
-            D_8008BE40.unk0 = pos->unk0;
-            D_8008BE40.unk4 = pos->unk4;
-            Math_RotateVec2(z, &D_8008BE40);
-            Enemy_Spawn(p->unk0, x + D_8008BE40.unk0, y + D_8008BE40.unk4, z, &actor->unk2C, actor);
+            battle_rotated_offset_scratch.unk0 = pos->unk0;
+            battle_rotated_offset_scratch.unk4 = pos->unk4;
+            Math_RotateVec2(z, &battle_rotated_offset_scratch);
+            Enemy_Spawn(p->unk0, x + battle_rotated_offset_scratch.unk0, y + battle_rotated_offset_scratch.unk4, z, &actor->unk2C, actor);
             cnt--;
             actor++;
             pos++;
@@ -634,7 +634,7 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
         p++;
     }
     Enemy_SortTurnOrder();
-    D_8008BE5A = D_8007B900;
+    battle_enemy_count = D_8007B900;
 }
 
 void func_800200F0(void) {
@@ -648,8 +648,8 @@ s32 func_800200F8(void) {
     } else {
         r = 4;
     }
-    if ((D_8008BE52 & 0x100) || Math_Rand(r) == 0) {
-        r = D_8007B908[Math_Rand(D_8008BE5A)].unk28->unk34;
+    if ((battle_flags & 0x100) || Math_Rand(r) == 0) {
+        r = D_8007B908[Math_Rand(battle_enemy_count)].unk28->unk34;
     } else {
         r = 0xFF;
     }
@@ -660,7 +660,7 @@ void func_8002018C(void) {
 }
 
 /* .data 8004F0B0..8004F2C0 */
-Struct_8004F0B0 D_8004F0B0[36] = {
+Struct_8004F0B0 battle_camera_offsets[36] = {
     { 40.0f, 50.0f, 0.0f },
     { 40.0f, 50.0f, 0.0f },
     { 40.0f, 50.0f, 0.0f },
@@ -705,4 +705,4 @@ u8 D_8004F260[0x24] = {
 u8 D_8004F284[0x1C] = {
 #include "assets/D_8004F284.inc.c"
 };
-f32 D_8004F2A0[8] = { 85.0f, 140.0f, 100.0f, 150.0f, 150.0f, 100.0f, 100.0f, 190.0f };
+f32 battle_boss_arena_radii[8] = { 85.0f, 140.0f, 100.0f, 150.0f, 150.0f, 100.0f, 100.0f, 190.0f };

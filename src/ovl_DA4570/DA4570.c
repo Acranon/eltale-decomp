@@ -667,9 +667,9 @@ void PakMenu_DrawScreen(void);
 void PakMenu_DrawText(s32 x, s32 y, u8* str);
 
 #ifdef NON_MATCHING
-extern u8 D_80092E98;
-extern s8 D_80092C80;
-extern OSContStatus D_80092EA0[];
+extern u8 input_connected_port_bits;
+extern s8 input_primary_port;
+extern OSContStatus input_controller_statuses[];
 s32 func_8003D0F0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D554(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D6B0(OSMesgQueue*, OSPfs*, s32);
@@ -913,23 +913,23 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
 
     D_801072E4_ovl_DA4570 = mq;
     D_801072E8_ovl_DA4570 = arg1;
-    if (D_80092E98 == 0) {
+    if (input_connected_port_bits == 0) {
         return 0;
     }
     osContStartReadData(mq);
     osRecvMesg(mq, &D_801072EC_ovl_DA4570, 1);
     osContGetReadData(pads);
-    if (!(D_80092EA0[D_80092C80].status & 1)) {
+    if (!(input_controller_statuses[input_primary_port].status & 1)) {
         return 0;
     }
-    ret = func_8003D0F0(mq, &pfs, D_80092C80);
+    ret = func_8003D0F0(mq, &pfs, input_primary_port);
     if (ret == 10) {
-        ret2 = func_8003D554(mq, &pfs2, D_80092C80);
+        ret2 = func_8003D554(mq, &pfs2, input_primary_port);
     } else {
         ret2 = 11;
     }
     if ((ret == 10) && (ret2 == 11)) {
-        ret3 = func_8003D6B0(mq, &pfs2, D_80092C80);
+        ret3 = func_8003D6B0(mq, &pfs2, input_primary_port);
     } else {
         ret3 = 11;
     }
@@ -947,7 +947,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
     } else {
         D_801072C8_ovl_DA4570 = 5;
     }
-    if (!(pads[D_80092C80].button & 0x1000) && (D_801072C8_ovl_DA4570 != 5)) {
+    if (!(pads[input_primary_port].button & 0x1000) && (D_801072C8_ovl_DA4570 != 5)) {
         return 2;
     }
     for (p = (u32*) 0x80200000; p != (u32*) 0x8024B000; p++) {
@@ -997,7 +997,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     }
                 }
                 if (sub != 0) {
-                    ret = func_8003D0F0(mq, &pfs, D_80092C80);
+                    ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
                         D_801072C8_ovl_DA4570 = 0;
                     } else if (ret == 1) {
@@ -1233,7 +1233,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             PakMenu_DrawCursor();
                         }
                     }
-                    ret = func_8003D0F0(mq, &pfs, D_80092C80);
+                    ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
                         D_801072C8_ovl_DA4570 = 0;
                         sub = 0;
@@ -1259,7 +1259,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         sub++;
                     }
                 } else {
-                    ret = func_8003D0F0(mq, &pfs, D_80092C80);
+                    ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
                         D_801072C8_ovl_DA4570 = 0;
                         sub = 0;
@@ -1312,7 +1312,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                                 PakMenu_DrawCursor();
                             }
                         }
-                        ret = func_8003D0F0(mq, &pfs, D_80092C80);
+                        ret = func_8003D0F0(mq, &pfs, input_primary_port);
                         if (ret == 0) {
                             D_801072C8_ovl_DA4570 = 0;
                             sub = 0;
@@ -1356,7 +1356,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         PakMenu_DrawCursor();
                     }
                 } else if (D_801072D4_ovl_DA4570 == 0) {
-                    ret = func_8003D0F0(mq, &pfs, D_80092C80);
+                    ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
                         D_801072C8_ovl_DA4570 = 0;
                         sub = 0;
@@ -1399,7 +1399,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         PakMenu_DrawCursor();
                     }
                 } else if (D_801072D4_ovl_DA4570 == 0) {
-                    ret = func_8003D0F0(mq, &pfs, D_80092C80);
+                    ret = func_8003D0F0(mq, &pfs, input_primary_port);
                     if (ret == 0) {
                         D_801072C8_ovl_DA4570 = 0;
                         sub = 0;
@@ -1418,8 +1418,8 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         if ((D_801072C8_ovl_DA4570 != 0) && (D_801072C8_ovl_DA4570 < 5)) {
             osContStartQuery(mq);
             osRecvMesg(mq, &D_801072EC_ovl_DA4570, 1);
-            osContGetQuery(D_80092EA0);
-            if (D_80092EA0[D_80092C80].status & 2) {
+            osContGetQuery(input_controller_statuses);
+            if (input_controller_statuses[input_primary_port].status & 2) {
                 D_801072C8_ovl_DA4570 = 8;
                 sub = 0;
             }
@@ -1431,13 +1431,13 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         osContStartReadData(mq);
         PakMenu_WaitFrame();
         osRecvMesg(mq, &D_801072EC_ovl_DA4570, 1);
-        unused3 = pads[D_80092C80].stick_y;
-        dir = (((unused3 < 33) ^ 1) << 3) | ((pads[D_80092C80].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[D_80092C80].stick_x < -32) << 1);
-        btn = pads[D_80092C80].button | dir;
+        unused3 = pads[input_primary_port].stick_y;
+        dir = (((unused3 < 33) ^ 1) << 3) | ((pads[input_primary_port].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[input_primary_port].stick_x < -32) << 1);
+        btn = pads[input_primary_port].button | dir;
         osContGetReadData(pads);
-        unused3 = pads[D_80092C80].stick_y;
-        dir = (((unused3 < 33) ^ 1) << 3) | ((pads[D_80092C80].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[D_80092C80].stick_x < -32) << 1);
-        cur = pads[D_80092C80].button | dir;
+        unused3 = pads[input_primary_port].stick_y;
+        dir = (((unused3 < 33) ^ 1) << 3) | ((pads[input_primary_port].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[input_primary_port].stick_x < -32) << 1);
+        cur = pads[input_primary_port].button | dir;
         held = cur & btn;
         if (held) {
             repeat++;

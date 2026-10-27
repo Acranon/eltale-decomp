@@ -20,10 +20,10 @@ typedef struct {
 
 extern Gfx *D_8007A184;
 /* This file's .data, 80061760..80061810. */
-Font D_80061760[1] = {
+Font text_font_metrics[1] = {
     { 10, 13, 10, 14 },
 };
-Gfx D_80061770[20] = {
+Gfx text_glyph_setup_dl[20] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},
     {{ 0xBA001301, 0x00000000 }},
@@ -46,8 +46,8 @@ Gfx D_80061770[20] = {
     {{ 0x00000000, 0x00000000 }},
 };
 /* .bss 80092C70..80092C80 */
-s32 D_80092C70;
-s32 D_80092C74;
+s32 text_current_glyph_index;
+s32 text_extra_glyph_spacing;
 
 void Text_CopyTerminatedBytes(u8 *dst, u8 *src) {
     s32 i = 0;
@@ -83,9 +83,9 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
                     break;
                 case 0x40:
                     if (c < 16) {
-                        D_80092C70 = c;
+                        text_current_glyph_index = c;
                     } else {
-                        D_80092C74 = c;
+                        text_extra_glyph_spacing = c;
                     }
                     break;
                 case 0x60:
@@ -95,11 +95,11 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
                         case 0x14:
                             break;
                         case 0x1E:
-                            gSPDisplayList(D_8007A184++, D_80061770);
+                            gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
                             break;
                         case 0:
                             x = x0;
-                            y += D_80061760[D_80092C70].unkC;
+                            y += text_font_metrics[text_current_glyph_index].unkC;
                             break;
                     }
                     break;
@@ -107,11 +107,11 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
         } else {
             c = *str & 0x7F;
             if (*str == 0x7F) {
-                x += D_80061760[D_80092C70].unk8 + D_80092C74;
+                x += text_font_metrics[text_current_glyph_index].unk8 + text_extra_glyph_spacing;
             } else {
-                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + D_80061760[D_80092C70].unk0) << 2, (D_80061760[D_80092C70].unk4 + y) << 2, G_TX_RENDERTILE,
-                                    (D_80061760[D_80092C70].unk0 * c) << 5, 0, 1 << 10, 1 << 10);
-                x += D_80061760[D_80092C70].unk8 + D_80092C74;
+                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + text_font_metrics[text_current_glyph_index].unk0) << 2, (text_font_metrics[text_current_glyph_index].unk4 + y) << 2, G_TX_RENDERTILE,
+                                    (text_font_metrics[text_current_glyph_index].unk0 * c) << 5, 0, 1 << 10, 1 << 10);
+                x += text_font_metrics[text_current_glyph_index].unk8 + text_extra_glyph_spacing;
             }
         }
     }

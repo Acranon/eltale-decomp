@@ -141,7 +141,7 @@ Unk8007C148 D_8007C148;
 s32 D_8007C274;
 s32 D_8007C278[2];
 
-extern u8 D_8004F770[];
+extern u8 math_bit_masks[];
 extern Gfx *D_8007A184;
 extern Unk8007AA08 D_8007AA08;
 extern u8 D_802A7BC0[];
@@ -272,11 +272,11 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
 }
 
 u8 Boss_IsDefeated(u32 arg0) {
-    return D_8007C13C[arg0 >> 3] & D_8004F770[arg0 & 7];
+    return D_8007C13C[arg0 >> 3] & math_bit_masks[arg0 & 7];
 }
 
 void Boss_SetDefeated(u16 arg0) {
-    D_8007C13C[arg0 >> 3] |= D_8004F770[arg0 & 7];
+    D_8007C13C[arg0 >> 3] |= math_bit_masks[arg0 & 7];
 }
 
 void Boss_BeginEncounter(s32 arg0) {

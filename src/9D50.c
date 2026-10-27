@@ -200,8 +200,8 @@ u8 D_8004DD18[8] = {
 #include "assets/D_8004DD18.inc.c"
 };
 extern s32 D_8007A174;
-extern s32 D_80090454;
-extern Unk80090458 D_80090458;
+extern s32 text_last_choice_index;
+extern Unk80090458 text_pending_choice_rows;
 
 void func_80009764(s32);
 void Npc_SpawnForArea(NPCDef *, s32);
@@ -231,8 +231,8 @@ extern u8 D_A77F10[];
 extern u8 D_D2E2F0[];
 extern u8 D_802A0000[];
 extern u8 D_8020E6F0[];
-extern RomRange D_80056880[];
-extern u8 D_800568B8[];
+extern RomRange npc_area_set_rom_ranges[];
+extern u8 npc_area_entry_message[];
 extern u16 D_8007A172;
 void Math_RotateVec2(f32, f32 *);
 
@@ -265,7 +265,7 @@ void Npc_InitArea(void) {
         }
         D_8007AB74 = 0;
         if (D_8007A172 == 1) {
-            Npc_SetMessage(0, D_800568B8);
+            Npc_SetMessage(0, npc_area_entry_message);
             Text_OpenWindow(1);
         }
     }
@@ -376,7 +376,7 @@ void func_80009764(s32 arg0) {
     u32 start;
     u32 end;
 
-    D_8007AB70 = &D_80056880[arg0];
+    D_8007AB70 = &npc_area_set_rom_ranges[arg0];
     Dma_ReadRom(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
     Dma_ReadRom(D_A70350, D_802A0000, D_A77F10 - D_A70350);
     start = D_8007AB70->start;
@@ -569,10 +569,10 @@ void Npc_StartTalk(s32 idx) {
             break;
         case 6:
             Npc_LoadMessage(npc, npc->def->unk8);
-            D_80090458.unk0 = 2;
-            D_80090458.unk8 = D_8004DD10;
-            D_80090458.unkC = D_8004DD18;
-            D_80090454 = -1;
+            text_pending_choice_rows.unk0 = 2;
+            text_pending_choice_rows.unk8 = D_8004DD10;
+            text_pending_choice_rows.unkC = D_8004DD18;
+            text_last_choice_index = -1;
             D_8004DCA0 |= 0x10;
             break;
         default:
