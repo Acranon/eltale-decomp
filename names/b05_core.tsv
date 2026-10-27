@@ -1,0 +1,7 @@
+# --- 272D0: screen fade (Quest 64 US twin file: screen_dim.c)
+func_800266D0	Fade_Init	clears the fade flags D_8008CA50 and frame count D_8008CE58, fills D_8008CA58 with a 256-step 0xDC grey alpha ramp; called at the start of the Core_Run* loops
+func_80026774	Fade_Draw	when D_8008CA50 bit 0, draws the full-screen quad D_8004F510 with env colour *D_8008CE5C, then steps the ramp pointer (+1, or -1 with flag 4) and counts D_8008CE58 down, clearing bit 0 at 0 unless flag 2 holds it; called from Gfx_BuildFrameDisplayList
+func_800269B8	Fade_Start	(frames, flags, ramp): sets D_8008CE58 = frames, D_8008CA50 = flags | 1 (keeping bit 3), D_8008CE5C = ramp; Transition_StartStateFadeIn/Out and the menus call it with the D_8004F5xx ramps
+# --- 28D20
+func_80028120	Dma_ReadRom	(rom, ram, size): invalidates I/D cache, osPiStartDma in 0x4000-byte pieces on D_8007A1A8 and waits for each; Quest 64 twin dma_write (Rainchus dump.toml), same code
+func_800281F0	Text_FormatNumber	(value, buf, flags): writes value's decimal digits (0..9 codes) to buf and a 0xFF terminator; flag 2 = 5 digits, 4 = 2 digits, else as many as needed; flag 1 turns leading zeros into ' '; returns the digit count; Quest 64 twin count_digits (Rainchus)

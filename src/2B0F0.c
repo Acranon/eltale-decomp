@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Music and sound requests: BGM change with delay (per map/submap table), the BGM volume
+ * option, and sound-effect playback with per-sound volume and delayed triggers.
+ * Folder: src/game/audio/   (proposed for round 4)
+ */
+
 typedef struct {
     u8 unk0;
     s8 unk1;

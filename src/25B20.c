@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Items: the 150-slot inventory (D_8008C9B8), the in-field inventory menu with its icon cache,
+ * and the per-kind "can use" / "use" handlers (restore, warp, spell).
+ * Folder: src/game/item/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x0 */ u16 unk0;
     /* 0x2 */ u16 unk2;
@@ -491,6 +497,7 @@ s32 func_800260F4(s32 arg0, Struct_803AAAA0* arg1) {
     return ret;
 }
 
+// empty
 void func_80026130(s32 arg0, Struct_803AAAA0* arg1) {
 }
 

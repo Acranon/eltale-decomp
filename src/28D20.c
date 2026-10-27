@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Blocking ROM-to-RAM DMA, and integer-to-digit-string conversion for the game's text encoding.
+ * Folder: src/game/core/   (proposed for round 4)
+ */
+
 extern OSMesgQueue D_8007A1A8;
 OSIoMesg D_8008CEA0; /* .bss 8008CEA0..8008CEC0 */
 

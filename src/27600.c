@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Keyframe animation: evaluates 9-channel keyframe tracks with Kochanek-Bartels (TCB)
+ * Hermite splines or linear segments.
+ * Folder: src/game/math/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ f32 v[9];
     /* 0x24 */ f32 tension;
