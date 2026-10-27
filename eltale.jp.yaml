@@ -53,44 +53,44 @@ segments:
     follows_vram: entry
     bss_size: 0x24DD0
     subsegments:
-      - [0x1050, c, 1050]
-      - [0x1130, c, 1130]
-      - [0x1870, c, 1870]
-      - [0x3B40, c, 3B40]
-      - [0x3F50, c, 3F50]
-      - [0x9D50, c, 9D50]
-      - [0xAEA0, c, AEA0]
-      - [0xDAE0, c, DAE0]
-      - [0xE2A0, c, E2A0]
-      - [0x113F0, c, 113F0]
-      - [0x12610, c, 12610]
-      - [0x13DE0, c, 13DE0]
-      - [0x13DF0, c, 13DF0]
-      - [0x140D0, c, 140D0]
-      - [0x14760, c, 14760]
-      - [0x147A0, c, 147A0]
-      - [0x14CF0, c, 14CF0]
-      - [0x15150, c, 15150]
-      - [0x17360, c, 17360]
-      - [0x1B200, c, 1B200]
-      - [0x1E570, c, 1E570]
-      - [0x1FA00, c, 1FA00]
-      - [0x20DA0, c, 20DA0]
-      - [0x216E0, c, 216E0]
-      - [0x25B20, c, 25B20]
-      - [0x272D0, c, 272D0]
-      - [0x27600, c, 27600]
-      - [0x27A90, c, 27A90]
-      - [0x28D20, c, 28D20]
-      - [0x29150, c, 29150]
-      - [0x2B0F0, c, 2B0F0]
-      - [0x2B530, c, 2B530]
-      - [0x30600, c, 30600]
-      - [0x337B0, c, 337B0]
-      - [0x35EC0, c, 35EC0]
-      - [0x363B0, c, 363B0]
-      - [0x36DB0, c, 36DB0]
-      - [0x36E60, c, 36E60]
+      - [0x1050, c, game/core/boot]
+      - [0x1130, c, game/core/sched]
+      - [0x1870, c, game/core/main]
+      - [0x3B40, c, game/event/scene]
+      - [0x3F50, c, game/player/player]
+      - [0x9D50, c, game/npc/npc]
+      - [0xAEA0, c, game/enemy/enemy]
+      - [0xDAE0, c, game/enemy/boss]
+      - [0xE2A0, c, game/map/map]
+      - [0x113F0, c, game/map/collision]
+      - [0x12610, c, game/env/env]
+      - [0x13DE0, c, game/gfx/shadow_reset]
+      - [0x13DF0, c, game/gfx/shadow]
+      - [0x140D0, c, game/map/chest]
+      - [0x14760, c, game/map/chest_flag]
+      - [0x147A0, c, game/map/spirit]
+      - [0x14CF0, c, game/map/textspot]
+      - [0x15150, c, game/camera/camera]
+      - [0x17360, c, game/magic/magic]
+      - [0x1B200, c, game/gfx/effect]
+      - [0x1E570, c, game/gfx/sprite_effect]
+      - [0x1FA00, c, game/battle/battle]
+      - [0x20DA0, c, game/actor/anim]
+      - [0x216E0, c, game/ui/hud]
+      - [0x25B20, c, game/item/item]
+      - [0x272D0, c, game/gfx/fade]
+      - [0x27600, c, game/math/keyframe]
+      - [0x27A90, c, game/math/math]
+      - [0x28D20, c, game/core/dma]
+      - [0x29150, c, game/audio/audio]
+      - [0x2B0F0, c, game/audio/sound]
+      - [0x2B530, c, game/ui/menu]
+      - [0x30600, c, game/save/save_menu]
+      - [0x337B0, c, game/text/text_window]
+      - [0x35EC0, c, game/text/text]
+      - [0x363B0, c, game/input/input]
+      - [0x36DB0, c, game/core/overlay_load]
+      - [0x36E60, c, game/event/cutscene]
       - [0x376C0, c, libultra/os/initialize]
       - [0x37980, c, libultra/os/createthread]
       - [0x37AD0, c, libultra/os/startthread]
@@ -263,33 +263,33 @@ segments:
       - [0x4C580, databin, rspboot]
       - [0x4C650, databin, gspF3DEX_text]
       - [0x4DA80, databin, aspMain_text]
-      - [0x4E8A0, .data, 1870]                   # 8004DCA0..8004DCB0
-      - [0x4E8B0, .data, 3F50]                   # 8004DCB0..8004DD10
-      - [0x4E910, .data, 9D50]                   # 8004DD10..8004DD20
-      - [0x4E920, .data, AEA0]                   # 8004DD20..8004DD50
-      - [0x4E950, .data, DAE0]                   # 8004DD50..8004DD70
-      - [0x4E970, .data, E2A0]                   # 8004DD70..8004DED0
-      - [0x4EAD0, .data, 12610]                  # 8004DED0..8004DF00
-      - [0x4EB00, .data, 140D0]                  # 8004DF00..8004DFC0
-      - [0x4EBC0, .data, 147A0]                  # 8004DFC0..8004E6A0
-      - [0x4F2A0, .data, 14CF0]                  # 8004E6A0..8004EB70
-      - [0x4F770, .data, 15150]                  # 8004EB70..8004EC90
-      - [0x4F890, .data, 17360]                  # 8004EC90..8004EE20
-      - [0x4FA20, .data, 1B200]                  # 8004EE20..8004F060
-      - [0x4FC60, .data, 1E570]                  # 8004F060..8004F0B0
-      - [0x4FCB0, .data, 1FA00]                  # 8004F0B0..8004F2C0
-      - [0x4FEC0, .data, 216E0]                  # 8004F2C0..8004F4A0
-      - [0x500A0, .data, 25B20]                  # 8004F4A0..8004F4D0
-      - [0x500D0, .data, 272D0]                  # 8004F4D0..8004F770
-      - [0x50370, .data, 27A90]                  # 8004F770..8004F780
-      - [0x50380, .data, 29150]                  # 8004F780..80055B40
-      - [0x56740, .data, 2B0F0]                  # 80055B40..80055D40
-      - [0x56940, .data, 2B530]                  # 80055D40..80061650
-      - [0x62250, .data, 30600]                  # 80061650..80061660
-      - [0x62260, .data, 337B0]                  # 80061660..80061760
-      - [0x62360, .data, 35EC0]                  # 80061760..80061810
-      - [0x62410, .data, 363B0]                  # 80061810..80061850
-      - [0x62450, .data, 36E60]                  # 80061850..8006CD00
+      - [0x4E8A0, .data, game/core/main]                   # 8004DCA0..8004DCB0
+      - [0x4E8B0, .data, game/player/player]                   # 8004DCB0..8004DD10
+      - [0x4E910, .data, game/npc/npc]                   # 8004DD10..8004DD20
+      - [0x4E920, .data, game/enemy/enemy]                   # 8004DD20..8004DD50
+      - [0x4E950, .data, game/enemy/boss]                   # 8004DD50..8004DD70
+      - [0x4E970, .data, game/map/map]                   # 8004DD70..8004DED0
+      - [0x4EAD0, .data, game/env/env]                  # 8004DED0..8004DF00
+      - [0x4EB00, .data, game/map/chest]                  # 8004DF00..8004DFC0
+      - [0x4EBC0, .data, game/map/spirit]                  # 8004DFC0..8004E6A0
+      - [0x4F2A0, .data, game/map/textspot]                  # 8004E6A0..8004EB70
+      - [0x4F770, .data, game/camera/camera]                  # 8004EB70..8004EC90
+      - [0x4F890, .data, game/magic/magic]                  # 8004EC90..8004EE20
+      - [0x4FA20, .data, game/gfx/effect]                  # 8004EE20..8004F060
+      - [0x4FC60, .data, game/gfx/sprite_effect]                  # 8004F060..8004F0B0
+      - [0x4FCB0, .data, game/battle/battle]                  # 8004F0B0..8004F2C0
+      - [0x4FEC0, .data, game/ui/hud]                  # 8004F2C0..8004F4A0
+      - [0x500A0, .data, game/item/item]                  # 8004F4A0..8004F4D0
+      - [0x500D0, .data, game/gfx/fade]                  # 8004F4D0..8004F770
+      - [0x50370, .data, game/math/math]                  # 8004F770..8004F780
+      - [0x50380, .data, game/audio/audio]                  # 8004F780..80055B40
+      - [0x56740, .data, game/audio/sound]                  # 80055B40..80055D40
+      - [0x56940, .data, game/ui/menu]                  # 80055D40..80061650
+      - [0x62250, .data, game/save/save_menu]                  # 80061650..80061660
+      - [0x62260, .data, game/text/text_window]                  # 80061660..80061760
+      - [0x62360, .data, game/text/text]                  # 80061760..80061810
+      - [0x62410, .data, game/input/input]                  # 80061810..80061850
+      - [0x62450, .data, game/event/cutscene]                  # 80061850..8006CD00
       - [0x6D900, .data, libultra/os/initialize]
       - [0x6D920, .data, libultra/io/pimgr]      # 8006CD20..8006CD50
       - [0x6D950, .data, libultra/io/vitbl]      # 8006CD50..8006DED0 (data-only file)
@@ -313,31 +313,31 @@ segments:
       - [0x6F7A0, .data, libultra/vimodes/vimodempallan1]
       - [0x6F7F0, .data, libultra/vimodes/vimodentsclan1]
       - [0x6F840, .data, libc/xlitob]            # 8006EC40..8006EC70
-      - [0x6F870, .rodata, 1870]
-      - [0x6F8C0, .rodata, 3B40]
-      - [0x6F8D0, .rodata, 3F50]
-      - [0x6FB30, .rodata, 9D50]
-      - [0x6FB70, .rodata, AEA0]
-      - [0x6FC20, .rodata, DAE0]
-      - [0x6FC30, .rodata, E2A0]
-      - [0x6FCA0, .rodata, 113F0]
-      - [0x6FCF0, .rodata, 12610]
-      - [0x6FD00, .rodata, 140D0]
-      - [0x6FD30, .rodata, 147A0]
-      - [0x6FD50, .rodata, 14CF0]
-      - [0x6FD60, .rodata, 15150]
-      - [0x6FEF0, .rodata, 17360]
-      - [0x6FF90, .rodata, 1B200]
-      - [0x70080, .rodata, 1E570]
-      - [0x700A0, .rodata, 1FA00]
-      - [0x70130, .rodata, 216E0]
-      - [0x70170, .rodata, 27A90]
-      - [0x701A0, .rodata, 29150]
-      - [0x701D0, .rodata, 2B530]
-      - [0x70210, .rodata, 30600]
-      - [0x70490, .rodata, 337B0]
-      - [0x70510, .rodata, 363B0]
-      - [0x70540, .rodata, 36E60]
+      - [0x6F870, .rodata, game/core/main]
+      - [0x6F8C0, .rodata, game/event/scene]
+      - [0x6F8D0, .rodata, game/player/player]
+      - [0x6FB30, .rodata, game/npc/npc]
+      - [0x6FB70, .rodata, game/enemy/enemy]
+      - [0x6FC20, .rodata, game/enemy/boss]
+      - [0x6FC30, .rodata, game/map/map]
+      - [0x6FCA0, .rodata, game/map/collision]
+      - [0x6FCF0, .rodata, game/env/env]
+      - [0x6FD00, .rodata, game/map/chest]
+      - [0x6FD30, .rodata, game/map/spirit]
+      - [0x6FD50, .rodata, game/map/textspot]
+      - [0x6FD60, .rodata, game/camera/camera]
+      - [0x6FEF0, .rodata, game/magic/magic]
+      - [0x6FF90, .rodata, game/gfx/effect]
+      - [0x70080, .rodata, game/gfx/sprite_effect]
+      - [0x700A0, .rodata, game/battle/battle]
+      - [0x70130, .rodata, game/ui/hud]
+      - [0x70170, .rodata, game/math/math]
+      - [0x701A0, .rodata, game/audio/audio]
+      - [0x701D0, .rodata, game/ui/menu]
+      - [0x70210, .rodata, game/save/save_menu]
+      - [0x70490, .rodata, game/text/text_window]
+      - [0x70510, .rodata, game/input/input]
+      - [0x70540, .rodata, game/event/cutscene]
       - [0x70550, rodata, setintmask]
       - [0x705D0, .rodata, libultra/gu/position]
       - [0x705E0, .rodata, libultra/gu/sinf]
@@ -361,40 +361,40 @@ segments:
       - [0x70E50, .rodata, libultra/audio/seq]
       - [0x70E60, rodata, gspF3DEX_data]
       - [0x71660, rodata, aspMain_data]
-      - { start: 0x71920, type: .bss, vram: 0x80070D20, name: 1050 }       # 80070D20..80077160
-      - { start: 0x71920, type: .bss, vram: 0x80077160, name: 1130 }       # 80077160..8007A170
-      - { start: 0x71920, type: .bss, vram: 0x8007A170, name: 1870 }       # 8007A170..8007A8C0
-      - { start: 0x71920, type: .bss, vram: 0x8007A8C0, name: 3B40 }       # 8007A8C0..8007A8F0
-      - { start: 0x71920, type: .bss, vram: 0x8007A8F0, name: 3F50 }       # 8007A8F0..8007AB70
-      - { start: 0x71920, type: .bss, vram: 0x8007AB70, name: 9D50 }       # 8007AB70..8007B900
-      - { start: 0x71920, type: .bss, vram: 0x8007B900, name: AEA0 }       # 8007B900..8007C0B0
-      - { start: 0x71920, type: .bss, vram: 0x8007C0B0, name: DAE0 }       # 8007C0B0..8007C280
-      - { start: 0x71920, type: .bss, vram: 0x8007C280, name: E2A0 }       # 8007C280..800842F0
-      - { start: 0x71920, type: .bss, vram: 0x800842F0, name: 113F0 }      # 800842F0..80084300
-      - { start: 0x71920, type: .bss, vram: 0x80084300, name: 12610 }      # 80084300..80084B80
-      - { start: 0x71920, type: .bss, vram: 0x80084B80, name: 13DF0 }      # 80084B80..80085290
-      - { start: 0x71920, type: .bss, vram: 0x80085290, name: 140D0 }      # 80085290..800859B0
-      - { start: 0x71920, type: .bss, vram: 0x800859B0, name: 147A0 }      # 800859B0..80085AB0
-      - { start: 0x71920, type: .bss, vram: 0x80085AB0, name: 14CF0 }      # 80085AB0..80085B80
-      - { start: 0x71920, type: .bss, vram: 0x80085B80, name: 15150 }      # 80085B80..80085F90
-      - { start: 0x71920, type: .bss, vram: 0x80085F90, name: 17360 }      # 80085F90..800863F0
-      - { start: 0x71920, type: .bss, vram: 0x800863F0, name: 1B200 }      # 800863F0..80087E30
-      - { start: 0x71920, type: .bss, vram: 0x80087E30, name: 1E570 }      # 80087E30..8008BE40
-      - { start: 0x71920, type: .bss, vram: 0x8008BE40, name: 1FA00 }      # 8008BE40..8008BFC0
-      - { start: 0x71920, type: .bss, vram: 0x8008BFC0, name: 20DA0 }      # 8008BFC0..8008C040
-      - { start: 0x71920, type: .bss, vram: 0x8008C040, name: 216E0 }      # 8008C040..8008C190
-      - { start: 0x71920, type: .bss, vram: 0x8008C190, name: 25B20 }      # 8008C190..8008CA50
-      - { start: 0x71920, type: .bss, vram: 0x8008CA50, name: 272D0 }      # 8008CA50..8008CE60
-      - { start: 0x71920, type: .bss, vram: 0x8008CE60, name: 27A90 }      # 8008CE60..8008CEA0
-      - { start: 0x71920, type: .bss, vram: 0x8008CEA0, name: 28D20 }      # 8008CEA0..8008CEC0
-      - { start: 0x71920, type: .bss, vram: 0x8008CEC0, name: 29150 }      # 8008CEC0..8008FAF0
-      - { start: 0x71920, type: .bss, vram: 0x8008FAF0, name: 2B0F0 }      # 8008FAF0..8008FB30
-      - { start: 0x71920, type: .bss, vram: 0x8008FB30, name: 2B530 }      # 8008FB30..8008FB70
-      - { start: 0x71920, type: .bss, vram: 0x8008FB70, name: 30600 }      # 8008FB70..80090450
-      - { start: 0x71920, type: .bss, vram: 0x80090450, name: 337B0 }      # 80090450..80092C70
-      - { start: 0x71920, type: .bss, vram: 0x80092C70, name: 35EC0 }      # 80092C70..80092C80
-      - { start: 0x71920, type: .bss, vram: 0x80092C80, name: 363B0 }      # 80092C80..80092ED0
-      - { start: 0x71920, type: .bss, vram: 0x80092ED0, name: 36E60 }      # 80092ED0..80092FF0
+      - { start: 0x71920, type: .bss, vram: 0x80070D20, name: game/core/boot }       # 80070D20..80077160
+      - { start: 0x71920, type: .bss, vram: 0x80077160, name: game/core/sched }       # 80077160..8007A170
+      - { start: 0x71920, type: .bss, vram: 0x8007A170, name: game/core/main }       # 8007A170..8007A8C0
+      - { start: 0x71920, type: .bss, vram: 0x8007A8C0, name: game/event/scene }       # 8007A8C0..8007A8F0
+      - { start: 0x71920, type: .bss, vram: 0x8007A8F0, name: game/player/player }       # 8007A8F0..8007AB70
+      - { start: 0x71920, type: .bss, vram: 0x8007AB70, name: game/npc/npc }       # 8007AB70..8007B900
+      - { start: 0x71920, type: .bss, vram: 0x8007B900, name: game/enemy/enemy }       # 8007B900..8007C0B0
+      - { start: 0x71920, type: .bss, vram: 0x8007C0B0, name: game/enemy/boss }       # 8007C0B0..8007C280
+      - { start: 0x71920, type: .bss, vram: 0x8007C280, name: game/map/map }       # 8007C280..800842F0
+      - { start: 0x71920, type: .bss, vram: 0x800842F0, name: game/map/collision }      # 800842F0..80084300
+      - { start: 0x71920, type: .bss, vram: 0x80084300, name: game/env/env }      # 80084300..80084B80
+      - { start: 0x71920, type: .bss, vram: 0x80084B80, name: game/gfx/shadow }      # 80084B80..80085290
+      - { start: 0x71920, type: .bss, vram: 0x80085290, name: game/map/chest }      # 80085290..800859B0
+      - { start: 0x71920, type: .bss, vram: 0x800859B0, name: game/map/spirit }      # 800859B0..80085AB0
+      - { start: 0x71920, type: .bss, vram: 0x80085AB0, name: game/map/textspot }      # 80085AB0..80085B80
+      - { start: 0x71920, type: .bss, vram: 0x80085B80, name: game/camera/camera }      # 80085B80..80085F90
+      - { start: 0x71920, type: .bss, vram: 0x80085F90, name: game/magic/magic }      # 80085F90..800863F0
+      - { start: 0x71920, type: .bss, vram: 0x800863F0, name: game/gfx/effect }      # 800863F0..80087E30
+      - { start: 0x71920, type: .bss, vram: 0x80087E30, name: game/gfx/sprite_effect }      # 80087E30..8008BE40
+      - { start: 0x71920, type: .bss, vram: 0x8008BE40, name: game/battle/battle }      # 8008BE40..8008BFC0
+      - { start: 0x71920, type: .bss, vram: 0x8008BFC0, name: game/actor/anim }      # 8008BFC0..8008C040
+      - { start: 0x71920, type: .bss, vram: 0x8008C040, name: game/ui/hud }      # 8008C040..8008C190
+      - { start: 0x71920, type: .bss, vram: 0x8008C190, name: game/item/item }      # 8008C190..8008CA50
+      - { start: 0x71920, type: .bss, vram: 0x8008CA50, name: game/gfx/fade }      # 8008CA50..8008CE60
+      - { start: 0x71920, type: .bss, vram: 0x8008CE60, name: game/math/math }      # 8008CE60..8008CEA0
+      - { start: 0x71920, type: .bss, vram: 0x8008CEA0, name: game/core/dma }      # 8008CEA0..8008CEC0
+      - { start: 0x71920, type: .bss, vram: 0x8008CEC0, name: game/audio/audio }      # 8008CEC0..8008FAF0
+      - { start: 0x71920, type: .bss, vram: 0x8008FAF0, name: game/audio/sound }      # 8008FAF0..8008FB30
+      - { start: 0x71920, type: .bss, vram: 0x8008FB30, name: game/ui/menu }      # 8008FB30..8008FB70
+      - { start: 0x71920, type: .bss, vram: 0x8008FB70, name: game/save/save_menu }      # 8008FB70..80090450
+      - { start: 0x71920, type: .bss, vram: 0x80090450, name: game/text/text_window }      # 80090450..80092C70
+      - { start: 0x71920, type: .bss, vram: 0x80092C70, name: game/text/text }      # 80092C70..80092C80
+      - { start: 0x71920, type: .bss, vram: 0x80092C80, name: game/input/input }      # 80092C80..80092ED0
+      - { start: 0x71920, type: .bss, vram: 0x80092ED0, name: game/event/cutscene }      # 80092ED0..80092FF0
       - { start: 0x71920, type: .bss, vram: 0x80092FF0, name: libultra/os/initialize }
       - { start: 0x71920, type: .bss, vram: 0x80093000, name: libultra/io/pimgr }        # 80093000..800942C0
       - { start: 0x71920, type: .bss, vram: 0x800942C0, name: libultra/os/seteventmesg } # 800942C0..80094340
@@ -421,10 +421,10 @@ segments:
     symbol_name_format: $VRAM_$SEG
     bss_size: 0x280
     subsegments:
-      - [0xDA4570, c, ovl_DA4570/DA4570]
-      - [0xDA6510, .data, ovl_DA4570/DA4570]    # 80101FA0..80107050
-      - [0xDAB5C0, .rodata, ovl_DA4570/DA4570]
-      - { start: 0xDAB5F0, type: .bss, vram: 0x80107080, name: ovl_DA4570/DA4570 }
+      - [0xDA4570, c, overlays/pakmenu/pakmenu]
+      - [0xDA6510, .data, overlays/pakmenu/pakmenu]    # 80101FA0..80107050
+      - [0xDAB5C0, .rodata, overlays/pakmenu/pakmenu]
+      - { start: 0xDAB5F0, type: .bss, vram: 0x80107080, name: overlays/pakmenu/pakmenu }
 
   - name: ovl_title
     type: code
@@ -434,16 +434,16 @@ segments:
     symbol_name_format: $VRAM_$SEG
     bss_size: 0x40
     subsegments:
-      - [0xDAB5F0, c, ovl_title/DAB5F0]
-      - [0xDAC190, c, ovl_title/DAC190]
-      - [0xDAE700, c, ovl_title/DAEA30]
-      - [0xDAE700, .data, ovl_title/DAB5F0]      # 8020F1E0..8020F200
-      - [0xDAE720, .data, ovl_title/DAC190]      # 8020F200..8020F510
-      - [0xDAEA30, .data, ovl_title/DAEA30]      # 8020F510..80226D30
-      - [0xDC6250, .rodata, ovl_title/DAB5F0]
-      - [0xDC6270, .rodata, ovl_title/DAC190]
-      - { start: 0xDC62B0, type: .bss, vram: 0x80226D90, name: ovl_title/DAB5F0 }
-      - { start: 0xDC62B0, type: .bss, vram: 0x80226DB0, name: ovl_title/DAC190 }
+      - [0xDAB5F0, c, overlays/title/title]
+      - [0xDAC190, c, overlays/title/title_draw]
+      - [0xDAE700, c, overlays/title/title_data]
+      - [0xDAE700, .data, overlays/title/title]      # 8020F1E0..8020F200
+      - [0xDAE720, .data, overlays/title/title_draw]      # 8020F200..8020F510
+      - [0xDAEA30, .data, overlays/title/title_data]      # 8020F510..80226D30
+      - [0xDC6250, .rodata, overlays/title/title]
+      - [0xDC6270, .rodata, overlays/title/title_draw]
+      - { start: 0xDC62B0, type: .bss, vram: 0x80226D90, name: overlays/title/title }
+      - { start: 0xDC62B0, type: .bss, vram: 0x80226DB0, name: overlays/title/title_draw }
 
   - name: ovl_intro
     type: code
@@ -453,15 +453,15 @@ segments:
     symbol_name_format: $VRAM_$SEG
     bss_size: 0xEBE0
     subsegments:
-      - [0xDC62B0, c, ovl_intro/DC62B0]
-      - [0xDC9350, c, ovl_intro/DC9350]
-      - [0xDCC410, c, ovl_intro/DCC450]
-      - [0xDCC410, .data, ovl_intro/DC62B0]      # 80212230..80212250
-      - [0xDCC430, .data, ovl_intro/DC9350]      # 80212250..80212270
-      - [0xDCC450, .data, ovl_intro/DCC450]      # 80212270..80268480
-      - [0xE22660, .rodata, ovl_intro/DC62B0]
-      - { start: 0xE22690, type: .bss, vram: 0x802684B0, name: ovl_intro/DC62B0 }
-      - { start: 0xE22690, type: .bss, vram: 0x80277080, name: ovl_intro/DC9350 }
+      - [0xDC62B0, c, overlays/intro/intro]
+      - [0xDC9350, c, overlays/intro/intro_screens]
+      - [0xDCC410, c, overlays/intro/intro_data]
+      - [0xDCC410, .data, overlays/intro/intro]      # 80212230..80212250
+      - [0xDCC430, .data, overlays/intro/intro_screens]      # 80212250..80212270
+      - [0xDCC450, .data, overlays/intro/intro_data]      # 80212270..80268480
+      - [0xE22660, .rodata, overlays/intro/intro]
+      - { start: 0xE22690, type: .bss, vram: 0x802684B0, name: overlays/intro/intro }
+      - { start: 0xE22690, type: .bss, vram: 0x80277080, name: overlays/intro/intro_screens }
 
   - name: ovl_ending
     type: code
@@ -471,12 +471,12 @@ segments:
     symbol_name_format: $VRAM_$SEG
     bss_size: 0xCB50
     subsegments:
-      - [0xE22690, c, ovl_ending/E22690]
-      - [0xE25C50, c, ovl_ending/E25C80]
-      - [0xE25C50, .data, ovl_ending/E22690]     # 8020F690..8020F6C0
-      - [0xE25C80, .data, ovl_ending/E25C80]     # 8020F6C0..8022BB00
-      - [0xE420C0, .rodata, ovl_ending/E22690]
-      - { start: 0xE420D0, type: .bss, vram: 0x8022BB10, name: ovl_ending/E22690 }
+      - [0xE22690, c, overlays/ending/ending]
+      - [0xE25C50, c, overlays/ending/ending_data]
+      - [0xE25C50, .data, overlays/ending/ending]     # 8020F690..8020F6C0
+      - [0xE25C80, .data, overlays/ending/ending_data]     # 8020F6C0..8022BB00
+      - [0xE420C0, .rodata, overlays/ending/ending]
+      - { start: 0xE420D0, type: .bss, vram: 0x8022BB10, name: overlays/ending/ending }
 
   - [0xE420D0, databin, data_E420D0]
   - [0x1000000]

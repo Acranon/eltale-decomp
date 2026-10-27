@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/2B530.c`](../2B530.c)
-- Retail assembly: [`asm/nonmatchings/2B530/Menu_UpdateOptionsPage.s`](../../asm/nonmatchings/2B530/Menu_UpdateOptionsPage.s)
+- Live source: [`src/game/ui/menu.c`](../game/ui/menu.c)
+- Retail assembly: [`asm/nonmatchings/game/ui/menu/Menu_UpdateOptionsPage.s`](../../asm/nonmatchings/game/ui/menu/Menu_UpdateOptionsPage.s)
 - Retail code size: `0xd54` bytes
 - Current gap: 112 object words; length and frame (0x48) exact. Stack homes and register choice differ in the cursor-slide part (about +0x6E0 on).
 - Specific blocker: An extra pos home shifts repeated x+constant spills by 4 bytes; later register/scheduling gaps remain.
 - Next discriminating test: Reuse an existing home for pos while keeping its branch updates. Replace compiler symbol-table padding with a defensible layout mechanism.
-- C: in [`src/2B530.c`](../2B530.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/ui/menu.c`](../game/ui/menu.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex-ui-resume/2B530.b844-exact-layout-44words.c` (SHA-256 `ece11e9e46071d1b2a50e2f985837e506a82530a2929f9b9944700c55c7df9d8`)
 - Detailed research reports: [ 2B530-REPORT.txt ](reports/codex-ui-resume__2B530-REPORT.txt), [ B844_REPORT.txt ](reports/codex__gfx-resume__B844_REPORT.txt)
 

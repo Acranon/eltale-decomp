@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/216E0.c`](../216E0.c)
-- Retail assembly: [`asm/nonmatchings/216E0/Hud_DrawSpellName.s`](../../asm/nonmatchings/216E0/Hud_DrawSpellName.s)
+- Live source: [`src/game/ui/hud.c`](../game/ui/hud.c)
+- Retail assembly: [`asm/nonmatchings/game/ui/hud/Hud_DrawSpellName.s`](../../asm/nonmatchings/game/ui/hud/Hud_DrawSpellName.s)
 - Retail code size: `0x318` bytes
 - Current gap: 72 register words; instruction sequence exact apart from one `sll` scheduled after the dead `sw id` instead of before; frame 0x48 exact. `(u8)w` is in a2 (retail t9) and `w >> 8` in t9 (retail ra), which rotates the later t-registers.
 - Specific blocker: Low-byte index takes a2 instead of t9; high index misses ra. The dead stack store matches.
 - Next discriminating test: Change the index first-use or alias boundary while preserving exact instruction shape.
-- C: in [`src/216E0.c`](../216E0.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/ui/hud.c`](../game/ui/hud.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex-ui-resume/216E0.unmatched.c` (SHA-256 `7ff9fe03d31676f3169fb29b16ae3844a590e79894fed6fd6bd408dbebeef7f8`)
 - Detailed research reports: [ REPORT.txt ](reports/codex-ui-resume__REPORT.txt)
 

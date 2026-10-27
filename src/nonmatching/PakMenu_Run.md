@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/ovl_DA4570/DA4570.c`](../ovl_DA4570/DA4570.c)
-- Retail assembly: [`asm/nonmatchings/ovl_DA4570/DA4570/PakMenu_Run.s`](../../asm/nonmatchings/ovl_DA4570/DA4570/PakMenu_Run.s)
+- Live source: [`src/overlays/pakmenu/pakmenu.c`](../overlays/pakmenu/pakmenu.c)
+- Retail assembly: [`asm/nonmatchings/overlays/pakmenu/pakmenu/PakMenu_Run.s`](../../asm/nonmatchings/overlays/pakmenu/pakmenu/PakMenu_Run.s)
 - Retail code size: `0x1294` bytes
 - Current gap: 37 linked ROM words (NON_MATCHING C in the source); length and frame exact.
 - Specific blocker: Explicit signedStick<33 XOR1 gives retail slti/xori separation. Cached signed Y is v1 as retail; pad pointer is s1 instead of s0, raw X a1 instead of s1, then partial-OR temporaries rotate.
 - Next discriminating test: Use constrained allocation tracing on pointer/raw-X live ranges at +0x1154, preserving all now-matching operations and ABI.
-- C: in [`src/ovl_DA4570/DA4570.c`](../ovl_DA4570/DA4570.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
+- C: in [`src/overlays/pakmenu/pakmenu.c`](../overlays/pakmenu/pakmenu.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/09ec-focus/func_801009EC_37words.c` (SHA-256 `4fa8eb94d8c2de18d3561e6db9e6b2b7eea5cd84060452501c3f6f684b27b82e`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__09ec-focus__REPORT.txt), [ REPORT-resume.txt ](reports/codex__overlay-oct26__REPORT-resume.txt)
 

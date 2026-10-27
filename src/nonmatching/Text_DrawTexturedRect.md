@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/337B0.c`](../337B0.c)
-- Retail assembly: [`asm/nonmatchings/337B0/Text_DrawTexturedRect.s`](../../asm/nonmatchings/337B0/Text_DrawTexturedRect.s)
+- Live source: [`src/game/text/text_window.c`](../game/text/text_window.c)
+- Retail assembly: [`asm/nonmatchings/game/text/text_window/Text_DrawTexturedRect.s`](../../asm/nonmatchings/game/text/text_window/Text_DrawTexturedRect.s)
 - Retail code size: `0x400` bytes
 - Current gap: 92 object words (NON_MATCHING C in the source); code 0x404 vs 0x400, frame 0xE0 vs 0xD8.
 - Specific blocker: Texture-pointer spill and original-type branch are wrong. A 25-word candidate truncated a command opcode and was rejected.
 - Next discriminating test: Keep the valid pointer alias; recover GBI macro homes without narrowing the display-list command.
-- C: in [`src/337B0.c`](../337B0.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
+- C: in [`src/game/text/text_window.c`](../game/text/text_window.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex-ui/round2/34C9C.repaired.best.c` (SHA-256 `9356b907f2a8077a0a3ad49686d0cc30dc52653839305df5d1fa5fc33ffc7f45`)
 - Detailed research reports: [ REPORT.txt ](reports/codex-ui-resume__REPORT.txt), [ REPORT.txt ](reports/codex-ui__round2__REPORT.txt)
 

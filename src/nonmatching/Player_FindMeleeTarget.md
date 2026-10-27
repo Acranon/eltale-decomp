@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/3F50.c`](../3F50.c)
-- Retail assembly: [`asm/nonmatchings/3F50/Player_FindMeleeTarget.s`](../../asm/nonmatchings/3F50/Player_FindMeleeTarget.s)
+- Live source: [`src/game/player/player.c`](../game/player/player.c)
+- Retail assembly: [`asm/nonmatchings/game/player/player/Player_FindMeleeTarget.s`](../../asm/nonmatchings/game/player/player/Player_FindMeleeTarget.s)
 - Retail code size: `0x2a4` bytes
 - Current gap: 5 object words; length and frame exact (s5/s7 hold -1/0x130 swapped, one addu operand order).
 - Specific blocker: Stride 0x130 and sentinel -1 occupy the wrong saved registers; one address addition reverses operands.
 - Next discriminating test: Find a real earlier sentinel use or alternate valid pointer expression that changes tied allocator priority without extra instructions.
-- C: in [`src/3F50.c`](../3F50.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/player/player.c`](../game/player/player.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/gfx-resume/func_80007A8C_5words.c` (SHA-256 `9fd87d61003e52cb4d08848882a1126088853f6ba9f2c716ee0161554b7e63ed`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__gfx-resume__REPORT.txt)
 

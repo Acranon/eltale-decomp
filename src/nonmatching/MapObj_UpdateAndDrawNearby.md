@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/E2A0.c`](../E2A0.c)
-- Retail assembly: [`asm/nonmatchings/E2A0/MapObj_UpdateAndDrawNearby.s`](../../asm/nonmatchings/E2A0/MapObj_UpdateAndDrawNearby.s)
+- Live source: [`src/game/map/map.c`](../game/map/map.c)
+- Retail assembly: [`asm/nonmatchings/game/map/map/MapObj_UpdateAndDrawNearby.s`](../../asm/nonmatchings/game/map/map/MapObj_UpdateAndDrawNearby.s)
 - Retail code size: `0x9c8` bytes
 - Current gap: 437 object words; length exact (0x9C8).
 - Specific blocker: Address mapobj_opaque_list stays hoisted in s7 across calls; retail rematerializes it.
 - Next discriminating test: Express the correct owned-state identity without cross-object pointer arithmetic, then restore grid-loop bytes.
-- C: in [`src/E2A0.c`](../E2A0.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/map/map.c`](../game/map/map.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/gfx-resume/func_8000DE54_438words.c` (SHA-256 `0ec099a6fe47a584f0a50b4fa903aaaa9afdbb6430624551df94f6591c1179b0`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__gfx-resume__REPORT.txt)
 

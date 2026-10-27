@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/AEA0.c`](../AEA0.c)
-- Retail assembly: [`asm/nonmatchings/AEA0/Enemy_RunAttackScript.s`](../../asm/nonmatchings/AEA0/Enemy_RunAttackScript.s)
+- Live source: [`src/game/enemy/enemy.c`](../game/enemy/enemy.c)
+- Retail assembly: [`asm/nonmatchings/game/enemy/enemy/Enemy_RunAttackScript.s`](../../asm/nonmatchings/game/enemy/enemy/Enemy_RunAttackScript.s)
 - Retail code size: `0x264` bytes
 - Current gap: 78 object words; frame 0x68 exact (a CSE'd &enemy_script_time for the ++ shifts the temporaries by one).
 - Specific blocker: A label fixes FP call timing; d->unk0 uses t6 instead of t7 and m/hi/low/row still occupy wrong GPRs.
 - Next discriminating test: Trace the first table-index temporary and constrained row ranges on the 30-word source.
-- C: in [`src/AEA0.c`](../AEA0.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/enemy/enemy.c`](../game/enemy/enemy.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/gfx-resume/func_8000CC78_30words.c` (SHA-256 `25d989fb6e13ddb8d63310dff0b5b36ea1b320113c334b82fe864dc986ea5329`)
 - Detailed research reports: [ CC78_TRACE_REPORT.txt ](reports/codex__gfx-resume__CC78_TRACE_REPORT.txt)
 
@@ -26,8 +26,8 @@ This is the original worker history. Treat old D1/D2 labels and old best scores 
 
 - **Enemy_RunAttackScript** (0x268 bytes)
   - w2 s2: AEA0. Frame matched with pads (stash_cc78.c). The ++ on the timer at enemy_script_time still CSEs the address (lui+addiu) in mine, while the target uses a direct lui/%lo load and a lui at store. enemy_script_time is now `extern u16` with CC40 casting to the struct. Tried statement forms, +=, and volatile.
-  - w2 s3: AEA0. The ++enemy_script_time address CSE is still unresolved. Struct-cast load/store forms and mixed forms make no difference. The target also keeps e in t6 for the early part and copies it to s1 later (live-range split). Note: enemy_effect_defs is now a struct in AEA0.c, so the old stash needs `&((SpawnDef *)&enemy_effect_defs)[e->unk2]`.
-  - w2 s4: AEA0. Same no-address-CSE signature as the static family on enemy_script_time/enemy_script_cmd. Function statics reproduce it (no CSE, lui at, e in v1 then copied to s1), but these symbols are also used by an init function in AEA0.c. Probably a D2 question too.
+  - w2 s3: AEA0. The ++enemy_script_time address CSE is still unresolved. Struct-cast load/store forms and mixed forms make no difference. The target also keeps e in t6 for the early part and copies it to s1 later (live-range split). Note: enemy_effect_defs is now a struct in game/enemy/enemy.c, so the old stash needs `&((SpawnDef *)&enemy_effect_defs)[e->unk2]`.
+  - w2 s4: AEA0. Same no-address-CSE signature as the static family on enemy_script_time/enemy_script_cmd. Function statics reproduce it (no CSE, lui at, e in v1 then copied to s1), but these symbols are also used by an init function in game/enemy/enemy.c. Probably a D2 question too.
   - w2 s5: D2-blocked (function-scope static data). Re-checked 10768: even with the value read once into a temp (t = D_8004DEC8; ... D_8004DEC8 = t + 1), IDO CSEs &D_8004DEC8 for a load plus two stores, while the target uses lui at for every access. The loop itself is the DDBC rotate pattern, so use the DDBC trick (i = N; p = D + i) for it once D2 allows the static.
   - w2 s6: Still blocked on D2 (function-scope static or same-file data for the shared-lui pairs). Not retried.
   - Codex review: Confirmed shared-lui requirement at CD04 for B928/B92C; D2 appropriate. C060/C064 timer/state are also written by CC40, so do not assume private function statics.

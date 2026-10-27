@@ -68,8 +68,8 @@ FLAGS = [
     # libultra is 2.0I-era (osInitialize is between ultralib's I and J): like
     # ultralib's VERSION <= I rules, -O1 except gu/audio/libc at -O3 (ll.c -O1).
     ("src/libc/", "-mips2 -O3"),
-    ("src/ovl_DA4570/", "-mips2 -O2 -g3"),
-    ("src/ovl_", "-mips2 -O2"),
+    ("src/overlays/pakmenu/", "-mips2 -O2 -g3"),
+    ("src/overlays/", "-mips2 -O2"),
     ("src/", "-mips2 -O2 -g3"),
 ]
 # Files whose object needs the o32 ABI bit set after compiling (-mips3 -32).

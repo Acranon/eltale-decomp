@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/12610.c`](../12610.c)
-- Retail assembly: [`asm/nonmatchings/12610/Env_InterpolateLighting.s`](../../asm/nonmatchings/12610/Env_InterpolateLighting.s)
+- Live source: [`src/game/env/env.c`](../game/env/env.c)
+- Retail assembly: [`asm/nonmatchings/game/env/env/Env_InterpolateLighting.s`](../../asm/nonmatchings/game/env/env/Env_InterpolateLighting.s)
 - Retail code size: `0x5f4` bytes
 - Current gap: 379 object words; 0x620 vs 0x5F4 (an 8-byte frame with one saved register where retail is a no-frame leaf).
 - Specific blocker: The 12-byte color copies are understood but a saved cursor and base rematerialization remain wrong.
 - Next discriminating test: Use short caller-register cursors and straight aggregate groups; stabilize no-frame copy before interpolation.
-- C: in [`src/12610.c`](../12610.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/env/env.c`](../game/env/env.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/gfx-resume/func_80011EF4_325words.c` (SHA-256 `0b95e70f942012795be5ad0fa1a0e23d798fe42d139b0cc6ed7d8437abc53414`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__d1-gfx__REPORT.txt), [ REPORT.txt ](reports/codex__gfx-resume__REPORT.txt)
 

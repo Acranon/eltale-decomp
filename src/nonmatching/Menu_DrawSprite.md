@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/2B530.c`](../2B530.c)
-- Retail assembly: [`asm/nonmatchings/2B530/Menu_DrawSprite.s`](../../asm/nonmatchings/2B530/Menu_DrawSprite.s)
+- Live source: [`src/game/ui/menu.c`](../game/ui/menu.c)
+- Retail assembly: [`asm/nonmatchings/game/ui/menu/Menu_DrawSprite.s`](../../asm/nonmatchings/game/ui/menu/Menu_DrawSprite.s)
 - Retail code size: `0x560` bytes
 - Current gap: 328 object words; code 0x55C vs 0x560, frame 0xD8 exact. Retail keeps w, s, lrs and lrt in stack homes and reloads them; the C promotes some to registers.
 - Specific blocker: Retail reloads w, s, lrs and lrt together from stack; compiler promotes some.
 - Next discriminating test: Find a single local layout that keeps all four memory-resident with frame 0xD8 before tuning graphics macros.
-- C: in [`src/2B530.c`](../2B530.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/ui/menu.c`](../game/ui/menu.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/decc-review/base.c` (SHA-256 `bc6255cd0bbb643e69643a85014208d8e9c627ea7abfe688050d8a6745d716cb`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__decc-review__REPORT.txt)
 

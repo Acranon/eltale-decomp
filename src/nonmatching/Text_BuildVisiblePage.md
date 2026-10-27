@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/337B0.c`](../337B0.c)
-- Retail assembly: [`asm/nonmatchings/337B0/Text_BuildVisiblePage.s`](../../asm/nonmatchings/337B0/Text_BuildVisiblePage.s)
+- Live source: [`src/game/text/text_window.c`](../game/text/text_window.c)
+- Retail assembly: [`asm/nonmatchings/game/text/text_window/Text_BuildVisiblePage.s`](../../asm/nonmatchings/game/text/text_window/Text_BuildVisiblePage.s)
 - Retail code size: `0x37c` bytes
 - Current gap: 221 object words (NON_MATCHING C in the source); length exact, frame 0x40 vs 0x48.
 - Specific blocker: Rows should stay in a home and be reloaded; draft strengthens the loop and uses extra saved register.
 - Next discriminating test: Match the row spill and loop test before adjusting graphics body.
-- C: in [`src/337B0.c`](../337B0.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
+- C: in [`src/game/text/text_window.c`](../game/text/text_window.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex-ui-resume/337B0.unmatched.c` (SHA-256 `e55ea00712e5e50cfdb80e6a3b365fbaf398022f087263d1addc98ec8bebb2a0`)
 - Detailed research reports: [ REPORT.txt ](reports/codex-ui-resume__REPORT.txt)
 

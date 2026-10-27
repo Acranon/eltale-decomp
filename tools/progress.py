@@ -12,7 +12,7 @@ def area(path):
     p = str(path)
     if "/libultra/" in p or "/libc/" in p:
         return "libultra"
-    if "/ovl_" in p:
+    if "/overlays/" in p:
         return "overlays"
     return "game"
 

@@ -8,28 +8,28 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 
 | Function | Live module | Current gap |
 | --- | --- | --- |
-| [`Coll_PushFromSegment`](Coll_PushFromSegment.md) | `src/113F0.c`, C under `NON_MATCHING` | 164 object words; two extra instructions |
-| [`Env_InitForMap`](Env_InitForMap.md) | `src/12610.c`, C under `NON_MATCHING` | 83 object words; one instruction short |
-| [`Env_InterpolateLighting`](Env_InterpolateLighting.md) | `src/12610.c`, C under `NON_MATCHING` | 379 object words; retail no-frame leaf |
-| [`Hud_DrawSpellName`](Hud_DrawSpellName.md) | `src/216E0.c`, C under `NON_MATCHING` | 72 register words; instruction sequence exact apart from one `sll` scheduled after the dead `sw id` instead of before |
-| [`Item_UpdateInventoryMenu`](Item_UpdateInventoryMenu.md) | `src/25B20.c`, C under `NON_MATCHING` | 742 object words; code 0xCF8 vs 0xD28, frame 0x148 exact |
-| [`Menu_UpdateOptionsPage`](Menu_UpdateOptionsPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 112 object words; length and frame (0x48) exact |
-| [`Menu_UpdateMapPage`](Menu_UpdateMapPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120 |
-| [`Menu_DrawSprite`](Menu_DrawSprite.md) | `src/2B530.c`, C under `NON_MATCHING` | 328 object words; code 0x55C vs 0x560, frame 0xD8 exact |
-| [`SaveMenu_UpdateSlotList`](SaveMenu_UpdateSlotList.md) | `src/30600.c`, C under `NON_MATCHING` | 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact |
-| [`SaveMenu_SaveSelectedFile`](SaveMenu_SaveSelectedFile.md) | `src/30600.c`, C under `NON_MATCHING` | 20 register words; length and frame (0x40) exact |
-| [`Text_UpdateAndDrawWindows`](Text_UpdateAndDrawWindows.md) | `src/337B0.c`, C under `NON_MATCHING` | 18 object words; length exact, frame exact |
-| [`Text_BuildVisiblePage`](Text_BuildVisiblePage.md) | `src/337B0.c`, C under `NON_MATCHING` | 221 object words; length exact, frame 0x40 vs 0x48 |
-| [`Text_DrawTexturedRect`](Text_DrawTexturedRect.md) | `src/337B0.c`, C under `NON_MATCHING` | 92 object words; code 0x404 vs 0x400, frame 0xE0 vs 0xD8 |
-| [`Player_FindMeleeTarget`](Player_FindMeleeTarget.md) | `src/3F50.c`, C under `NON_MATCHING` | 5 object words |
-| [`Player_TakeDamage`](Player_TakeDamage.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
-| [`Enemy_RunAttackScript`](Enemy_RunAttackScript.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
-| [`MapObj_UpdateAndDrawNearby`](MapObj_UpdateAndDrawNearby.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
-| [`PakMenu_Run`](PakMenu_Run.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
-| [`Ending_UpdateAndDrawSprites`](Ending_UpdateAndDrawSprites.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
-| [`Ending_UpdateAndDrawScrollingBackdrop`](Ending_UpdateAndDrawScrollingBackdrop.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |
-| [`Intro_RunSpriteScript`](Intro_RunSpriteScript.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 609 masked object words; code 0x9D4 vs 0x9D0, frame 0xF0 exact |
-| [`Intro_UpdateAndDrawSprites`](Intro_UpdateAndDrawSprites.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 23 linked ROM words; length and frame 0x648 exact |
+| [`Coll_PushFromSegment`](Coll_PushFromSegment.md) | `src/game/map/collision.c`, C under `NON_MATCHING` | 164 object words; two extra instructions |
+| [`Env_InitForMap`](Env_InitForMap.md) | `src/game/env/env.c`, C under `NON_MATCHING` | 83 object words; one instruction short |
+| [`Env_InterpolateLighting`](Env_InterpolateLighting.md) | `src/game/env/env.c`, C under `NON_MATCHING` | 379 object words; retail no-frame leaf |
+| [`Hud_DrawSpellName`](Hud_DrawSpellName.md) | `src/game/ui/hud.c`, C under `NON_MATCHING` | 72 register words; instruction sequence exact apart from one `sll` scheduled after the dead `sw id` instead of before |
+| [`Item_UpdateInventoryMenu`](Item_UpdateInventoryMenu.md) | `src/game/item/item.c`, C under `NON_MATCHING` | 742 object words; code 0xCF8 vs 0xD28, frame 0x148 exact |
+| [`Menu_UpdateOptionsPage`](Menu_UpdateOptionsPage.md) | `src/game/ui/menu.c`, C under `NON_MATCHING` | 112 object words; length and frame (0x48) exact |
+| [`Menu_UpdateMapPage`](Menu_UpdateMapPage.md) | `src/game/ui/menu.c`, C under `NON_MATCHING` | 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120 |
+| [`Menu_DrawSprite`](Menu_DrawSprite.md) | `src/game/ui/menu.c`, C under `NON_MATCHING` | 328 object words; code 0x55C vs 0x560, frame 0xD8 exact |
+| [`SaveMenu_UpdateSlotList`](SaveMenu_UpdateSlotList.md) | `src/game/save/save_menu.c`, C under `NON_MATCHING` | 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact |
+| [`SaveMenu_SaveSelectedFile`](SaveMenu_SaveSelectedFile.md) | `src/game/save/save_menu.c`, C under `NON_MATCHING` | 20 register words; length and frame (0x40) exact |
+| [`Text_UpdateAndDrawWindows`](Text_UpdateAndDrawWindows.md) | `src/game/text/text_window.c`, C under `NON_MATCHING` | 18 object words; length exact, frame exact |
+| [`Text_BuildVisiblePage`](Text_BuildVisiblePage.md) | `src/game/text/text_window.c`, C under `NON_MATCHING` | 221 object words; length exact, frame 0x40 vs 0x48 |
+| [`Text_DrawTexturedRect`](Text_DrawTexturedRect.md) | `src/game/text/text_window.c`, C under `NON_MATCHING` | 92 object words; code 0x404 vs 0x400, frame 0xE0 vs 0xD8 |
+| [`Player_FindMeleeTarget`](Player_FindMeleeTarget.md) | `src/game/player/player.c`, C under `NON_MATCHING` | 5 object words |
+| [`Player_TakeDamage`](Player_TakeDamage.md) | `src/game/player/player.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
+| [`Enemy_RunAttackScript`](Enemy_RunAttackScript.md) | `src/game/enemy/enemy.c`, C under `NON_MATCHING` | 78 object words; frame exact |
+| [`MapObj_UpdateAndDrawNearby`](MapObj_UpdateAndDrawNearby.md) | `src/game/map/map.c`, C under `NON_MATCHING` | 437 object words; length exact |
+| [`PakMenu_Run`](PakMenu_Run.md) | `src/overlays/pakmenu/pakmenu.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
+| [`Ending_UpdateAndDrawSprites`](Ending_UpdateAndDrawSprites.md) | `src/overlays/ending/ending.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
+| [`Ending_UpdateAndDrawScrollingBackdrop`](Ending_UpdateAndDrawScrollingBackdrop.md) | `src/overlays/ending/ending.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |
+| [`Intro_RunSpriteScript`](Intro_RunSpriteScript.md) | `src/overlays/intro/intro.c`, C under `NON_MATCHING` | 609 masked object words; code 0x9D4 vs 0x9D0, frame 0xF0 exact |
+| [`Intro_UpdateAndDrawSprites`](Intro_UpdateAndDrawSprites.md) | `src/overlays/intro/intro.c`, C under `NON_MATCHING` | 23 linked ROM words; length and frame 0x648 exact |
 
 ## Recheck before promoting to a match
 

@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/113F0.c`](../113F0.c)
-- Retail assembly: [`asm/nonmatchings/113F0/Coll_PushFromSegment.s`](../../asm/nonmatchings/113F0/Coll_PushFromSegment.s)
+- Live source: [`src/game/map/collision.c`](../game/map/collision.c)
+- Retail assembly: [`asm/nonmatchings/game/map/collision/Coll_PushFromSegment.s`](../../asm/nonmatchings/game/map/collision/Coll_PushFromSegment.s)
 - Retail code size: `0x618` bytes
 - Current gap: 164 object words; two extra instructions (0x620 vs 0x618), FP registers and stack homes.
 - Specific blocker: FP endpoint expressions take f0 and force az reload; the named variables would use retail f18/f14.
 - Next discriminating test: Reconstruct endpoint value webs with the saved uopt cost trace, keeping az live across the check.
-- C: in [`src/113F0.c`](../113F0.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/map/collision.c`](../game/map/collision.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/gfx-resume/func_80011034_164words.c` (SHA-256 `bf071c71ac2bd20fa7c13d7c4a8438fde44e283d890e47e925ca79c0105d3530`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__d1-gfx__REPORT.txt), [ REPORT.txt ](reports/codex__gfx-resume__REPORT.txt)
 

@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/2B530.c`](../2B530.c)
-- Retail assembly: [`asm/nonmatchings/2B530/Menu_UpdateMapPage.s`](../../asm/nonmatchings/2B530/Menu_UpdateMapPage.s)
+- Live source: [`src/game/ui/menu.c`](../game/ui/menu.c)
+- Retail assembly: [`asm/nonmatchings/game/ui/menu/Menu_UpdateMapPage.s`](../../asm/nonmatchings/game/ui/menu/Menu_UpdateMapPage.s)
 - Retail code size: `0x1234` bytes
 - Current gap: 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120. Retail hoists the four scale/offset loads into registers and has fewer named homes; most words differ from the frame offsets.
 - Specific blocker: Private static and following data can be placed exactly, but draft code is 0x44 bytes short with extra homes.
 - Next discriminating test: Recover four hoisted scale/offset locals and remove four incorrect homes; match each draw branch separately.
-- C: in [`src/2B530.c`](../2B530.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/ui/menu.c`](../game/ui/menu.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex-ui-resume/2B530.b844-c598.draft.c` (SHA-256 `51131a3a841d98c58a67b22dc9fdafb9ad1a5727aed73b139ea268b03d846706`)
 - Detailed research reports: [ 2B530-REPORT.txt ](reports/codex-ui-resume__2B530-REPORT.txt)
 

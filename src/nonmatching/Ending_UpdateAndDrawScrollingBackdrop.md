@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c)
-- Retail assembly: [`asm/nonmatchings/ovl_ending/E22690/Ending_UpdateAndDrawScrollingBackdrop.s`](../../asm/nonmatchings/ovl_ending/E22690/Ending_UpdateAndDrawScrollingBackdrop.s)
+- Live source: [`src/overlays/ending/ending.c`](../overlays/ending/ending.c)
+- Retail assembly: [`asm/nonmatchings/overlays/ending/ending/Ending_UpdateAndDrawScrollingBackdrop.s`](../../asm/nonmatchings/overlays/ending/ending/Ending_UpdateAndDrawScrollingBackdrop.s)
 - Retail code size: `0xcbc` bytes
 - Current gap: 754 object words (NON_MATCHING C in the source); code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8.
 - Specific blocker: Statics are available but TLUT/settile pointer homes and arg0 reloads are wrong; code is 0x24 bytes short.
 - Next discriminating test: Reconstruct first texture command and stack homes before register tuning.
-- C: in [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
+- C: in [`src/overlays/ending/ending.c`](../overlays/ending/ending.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/claude/d2r2/e9c8_statics_757.c` (SHA-256 `05d0d0a397362b07e3c71c451d40eae8675f5c2cfa13280e9b1e5c3e514ef32f`)
 - Detailed research reports: [ REPORT-resume.txt ](reports/codex__overlay-oct26__REPORT-resume.txt)
 

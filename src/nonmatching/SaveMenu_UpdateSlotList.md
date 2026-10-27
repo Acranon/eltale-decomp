@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/30600.c`](../30600.c)
-- Retail assembly: [`asm/nonmatchings/30600/SaveMenu_UpdateSlotList.s`](../../asm/nonmatchings/30600/SaveMenu_UpdateSlotList.s)
+- Live source: [`src/game/save/save_menu.c`](../game/save/save_menu.c)
+- Retail assembly: [`asm/nonmatchings/game/save/save_menu/SaveMenu_UpdateSlotList.s`](../../asm/nonmatchings/game/save/save_menu/SaveMenu_UpdateSlotList.s)
 - Retail code size: `0xdcc` bytes
 - Current gap: 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact. Retail keeps the `~7` mask in s1 (`and`) where the C uses `andi 0xFFF8`, and spills the wobble value around the arrow calls; stack homes and registers differ.
 - Specific blocker: 14-byte copy is known; pointer homes and late flag/cursor lifetimes differ.
 - Next discriminating test: Recover named homes and six missing instructions before chasing registers.
-- C: in [`src/30600.c`](../30600.c) under `#ifdef NON_MATCHING` (draft removed).
+- C: in [`src/game/save/save_menu.c`](../game/save/save_menu.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex-ui-resume/30600.unmatched.c` (SHA-256 `dd034ae018369ae3d4a07eae226fd5ae74f39d224d09112c64727dc911383974`)
 - Detailed research reports: [ REPORT.txt ](reports/codex-ui-resume__REPORT.txt)
 

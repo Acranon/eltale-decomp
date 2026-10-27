@@ -2,13 +2,13 @@
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
-- Live source: [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c)
-- Retail assembly: [`asm/nonmatchings/ovl_intro/DC62B0/Intro_UpdateAndDrawSprites.s`](../../asm/nonmatchings/ovl_intro/DC62B0/Intro_UpdateAndDrawSprites.s)
+- Live source: [`src/overlays/intro/intro.c`](../overlays/intro/intro.c)
+- Retail assembly: [`asm/nonmatchings/overlays/intro/intro/Intro_UpdateAndDrawSprites.s`](../../asm/nonmatchings/overlays/intro/intro/Intro_UpdateAndDrawSprites.s)
 - Retail code size: `0x1060` bytes
 - Current gap: 23 linked ROM words (NON_MATCHING C in the source); length and frame 0x648 exact.
 - Specific blocker: Second texrect step folds one temporary differently and rotates t3/t4.
 - Next discriminating test: Find an equivalent C tree that releases the temp while preserving both packed command words.
-- C: in [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
+- C: in [`src/overlays/intro/intro.c`](../overlays/intro/intro.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/d1-overlay/func_8020E108_ovl_intro_23words.c` (SHA-256 `f30153240cc1b752691108033100c33ff5162d83ae85b6d67f47e7cc7ca54321`)
 - Detailed research reports: [ REPORT-resume.txt ](reports/codex__overlay-oct26__REPORT-resume.txt)
 
