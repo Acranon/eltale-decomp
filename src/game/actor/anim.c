@@ -37,9 +37,9 @@ void Anim_SetCurrentAndNext(Actor* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4,
 }
 
 typedef struct {
-    /* 0x00 */ Vec3f unk0;
-    /* 0x0C */ Vec3f unkC;
-    /* 0x18 */ Vec3f unk18;
+    /* 0x00 */ Vec3f translation;
+    /* 0x0C */ Vec3f rotation;
+    /* 0x18 */ Vec3f scale;
 } Struct_80020568_xf;
 
 void Anim_UpdateRootMotion(Actor* arg0, AnimSet* arg1, f32 scale) {
@@ -78,26 +78,26 @@ void Anim_UpdateRootMotion(Actor* arg0, AnimSet* arg1, f32 scale) {
         x = kf->v[0];
         y = kf->v[1];
         z = kf->v[2];
-        arg0->unk44 = (pos.unk0.x + x) * scale - arg0->rootX;
-        arg0->unk48 = (pos.unk0.y + y) * scale - arg0->rootY;
-        arg0->unk4C = (pos.unk0.z + z) * scale - arg0->rootZ;
-        arg0->rootX = pos.unk0.x * scale;
-        arg0->rootY = pos.unk0.y * scale;
-        arg0->rootZ = pos.unk0.z * scale;
+        arg0->unk44 = (pos.translation.x + x) * scale - arg0->rootX;
+        arg0->unk48 = (pos.translation.y + y) * scale - arg0->rootY;
+        arg0->unk4C = (pos.translation.z + z) * scale - arg0->rootZ;
+        arg0->rootX = pos.translation.x * scale;
+        arg0->rootY = pos.translation.y * scale;
+        arg0->rootZ = pos.translation.z * scale;
     } else if (arg0->animFlags & 0x400) {
         arg0->unk44 = 0.0f;
         arg0->unk48 = 0.0f;
         arg0->unk4C = 0.0f;
-        arg0->rootX = pos.unk0.x * scale;
-        arg0->rootY = pos.unk0.y * scale;
-        arg0->rootZ = pos.unk0.z * scale;
+        arg0->rootX = pos.translation.x * scale;
+        arg0->rootY = pos.translation.y * scale;
+        arg0->rootZ = pos.translation.z * scale;
     } else {
-        arg0->unk44 = pos.unk0.x * scale - arg0->rootX;
-        arg0->unk48 = pos.unk0.y * scale - arg0->rootY;
-        arg0->unk4C = pos.unk0.z * scale - arg0->rootZ;
-        arg0->rootX = pos.unk0.x * scale;
-        arg0->rootY = pos.unk0.y * scale;
-        arg0->rootZ = pos.unk0.z * scale;
+        arg0->unk44 = pos.translation.x * scale - arg0->rootX;
+        arg0->unk48 = pos.translation.y * scale - arg0->rootY;
+        arg0->unk4C = pos.translation.z * scale - arg0->rootZ;
+        arg0->rootX = pos.translation.x * scale;
+        arg0->rootY = pos.translation.y * scale;
+        arg0->rootZ = pos.translation.z * scale;
     }
 }
 
@@ -144,19 +144,19 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
     Math_EvalTcbSpline(&anim->track, (f32*)&xf, fr);
     if (anim->parent == 0) {
         if (flags & 1) {
-            xf.unk0.x = 0.0f;
-            xf.unk0.z = 0.0f;
+            xf.translation.x = 0.0f;
+            xf.translation.z = 0.0f;
         }
         if (flags & 2) {
-            xf.unk0.y = 0.0f;
+            xf.translation.y = 0.0f;
         }
     }
-    Math_MtxFRotDegScaleTrans(&mtx, xf.unk0.x, xf.unk0.y, xf.unk0.z, xf.unkC.y, xf.unkC.x, xf.unkC.z, xf.unk18.x, xf.unk18.y,
-                  xf.unk18.z);
+    Math_MtxFRotDegScaleTrans(&mtx, xf.translation.x, xf.translation.y, xf.translation.z, xf.rotation.y, xf.rotation.x, xf.rotation.z, xf.scale.x, xf.scale.y,
+                  xf.scale.z);
     Anim_ApplyPivotOffset(&mtx, anim);
-    scale.x *= xf.unk18.x;
-    scale.y *= xf.unk18.y;
-    scale.z *= xf.unk18.z;
+    scale.x *= xf.scale.x;
+    scale.y *= xf.scale.y;
+    scale.z *= xf.scale.z;
     if (anim->flags & 1) {
         Math_MtxFMul(parent, &mtx, &mtx);
         Math_MtxFAimAt(&anim_billboard_mtx_scratch, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], camera_state.eyeX, camera_state.eyeY,
