@@ -114,7 +114,7 @@ s32 Intro_Update(void) {
                 err = Pak_ClassifyError(Pak_ScanGameFiles(input_primary_port));
                 func_8003D8EC("pack_status = %d\n", err);
                 if (err != -1 && err != -2 && err != -3) {
-                    if (pak_game_file_scans[input_primary_port].unk0 & 0x2000) {
+                    if (pak_game_file_scans[input_primary_port].flags & 0x2000) {
                         D_80212238_ovl_intro = 1;
                         return 2;
                     }

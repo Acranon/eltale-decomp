@@ -3,19 +3,19 @@
 
 #include "common.h"
 
-/* A delayed sound effect (Sfx_Play with a delay): unk0 frames left, unk1 sound id,
- * unk2 volume; Bgm_Update enqueues it when the delay runs out. */
+/* A delayed sound effect (Sfx_Play with a delay): frames_left, sound_id,
+ * volume; Bgm_Update enqueues it when the delay runs out. */
 typedef struct SfxDelayed {
-    /* 0x00 */ u8 unk0;
-    /* 0x01 */ s8 unk1;
-    /* 0x02 */ u8 unk2;
+    /* 0x00 */ u8 frames_left;
+    /* 0x01 */ s8 sound_id;
+    /* 0x02 */ u8 volume;
 } SfxDelayed; /* 0x3 bytes */
 
-/* bgm_map_table: map unk0 and subarea unk2 (-1 = any) play sequence unk4 (-1 = none). */
+/* bgm_map_table: map_id and subarea_id (-1 = any) play sequence_id (-1 = none). */
 typedef struct BgmMapEntry {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s8 unk4;
+    /* 0x00 */ s16 map_id;
+    /* 0x02 */ s16 subarea_id;
+    /* 0x04 */ s8 sequence_id;
 } BgmMapEntry; /* 0x6 bytes */
 
 /* .bss 8008FAF0..8008FB30, in address order (the order of these declarations fixes it). */

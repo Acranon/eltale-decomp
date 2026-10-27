@@ -3,14 +3,14 @@
 
 #include "common.h"
 
-/* One port's Controller Pak scan (Pak_ScanGameFiles): unk0 flags (low nibble = this game's
- * note count, 0x2000 full, 0x4000 has a game note, 0x8000 pak present), unk2 each note's
- * ext_name[0] (0x7F other game, -1 empty), unk12 port state, unk13 free pages. */
+/* One port's Controller Pak scan (Pak_ScanGameFiles): flags (low nibble = this game's
+ * note count, 0x2000 full, 0x4000 has a game note, 0x8000 pak present), note_ext_first_bytes: each note's
+ * ext_name[0] (0x7F other game, -1 empty), port_status: controller port state; free_pages: free Pak pages. */
 typedef struct PakFileScan {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s8 unk2[16];
-    /* 0x12 */ s8 unk12;
-    /* 0x13 */ u8 unk13;
+    /* 0x00 */ s16 flags;
+    /* 0x02 */ s8 note_ext_first_bytes[16];
+    /* 0x12 */ s8 port_status;
+    /* 0x13 */ u8 free_pages;
 } PakFileScan; /* 0x14 bytes */
 
 /* A note's ext_name (osPfsAllocateFile/osPfsDeleteFile). */

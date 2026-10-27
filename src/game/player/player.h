@@ -22,7 +22,7 @@ typedef struct Player {
     /* 0x010 */ s32 unk10;
     /* 0x014 */ ActorStats *stats; /* &player_stats (Player_Init) */
     /* 0x018 */ Actor actor;
-    /* 0x084 */ ActorBattle battle; /* actor.unk68 points here */
+    /* 0x084 */ ActorBattle battle; /* actor.battle points here */
     /* 0x11C */ u8 item_id; /* item id (chest, use item) */
     /* 0x11D */ u8 spell_input_dirs[3]; /* spell input directions */
     /* 0x120 */ u16 spell_input_count; /* spell input count */

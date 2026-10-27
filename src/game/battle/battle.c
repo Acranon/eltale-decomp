@@ -50,9 +50,9 @@ void Battle_ResetState(void) {
     battle_travel_accumulator = 0.0f;
     battle_encounter_roll_limit = 0;
     if (map_subarea_flags & 1) {
-        if (map_area_def->unk30 != NULL) {
-            battle_encounter_region_table = &map_area_def->unk30[map_subarea];
-            battle_encounter_group_table = &map_area_def->unk34[map_subarea];
+        if (map_area_def->encounterRegions != NULL) {
+            battle_encounter_region_table = &map_area_def->encounterRegions[map_subarea];
+            battle_encounter_group_table = &map_area_def->encounterGroups[map_subarea];
             return;
         }
         battle_encounter_region_table = NULL;
@@ -200,7 +200,7 @@ void Battle_UpdateStartCamera(void) {
             camera_state.eyeVelX = camera_state.eyeVelY;
             camera_state.eyeHeight = 15.0f;
             camera_state.target = a;
-            camera_state.unk70 = 0.01f;
+            camera_state.followGain = 0.01f;
             camera_delayed_turn.orbitAngle = camera_state.yaw;
             battle_camera_phase++;
             battle_camera_phase_timer = 60;
@@ -238,7 +238,7 @@ void Battle_UpdateStartCamera(void) {
                     camera_state.distance += battle_camera_offsets[map_id].distance;
                 }
                 camera_state.target = &player_state.actor;
-                camera_state.unk70 = 0.02f;
+                camera_state.followGain = 0.02f;
                 camera_battle_angle_offset = 0.0f;
             }
             break;

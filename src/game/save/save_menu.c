@@ -174,8 +174,8 @@ void SaveMenu_CheckControllerPak(void) {
     } else {
         if (mode == 4) {
             p = &pak_game_file_scans[input_primary_port];
-            if (p->unk13 < 2) {
-                if (p->unk0 & 0x4000) {
+            if (p->free_pages < 2) {
+                if (p->flags & 0x4000) {
                     save_menu_dialog_index = 21;
                 } else {
                     save_menu_dialog_index = 20;
@@ -185,8 +185,8 @@ void SaveMenu_CheckControllerPak(void) {
                 save_menu_flags |= 5;
                 return;
             }
-            if (p->unk0 & 0x2000) {
-                if (p->unk0 & 0x4000) {
+            if (p->flags & 0x2000) {
+                if (p->flags & 0x4000) {
                     save_menu_dialog_index = 21;
                     save_menu_selected_slot = 0;
                     save_menu_flags &= ~0x20;
@@ -198,7 +198,7 @@ void SaveMenu_CheckControllerPak(void) {
                 save_menu_flags |= 5;
                 return;
             }
-        } else if (save_menu_repair_count != 0 && ((p = &pak_game_file_scans[input_primary_port])->unk13 < 2 || p->unk0 & 0x2000)) {
+        } else if (save_menu_repair_count != 0 && ((p = &pak_game_file_scans[input_primary_port])->free_pages < 2 || p->flags & 0x2000)) {
             save_menu_dialog_index = 24;
             save_menu_delay_frames = 10;
             SaveMenu_RefreshFileList();
@@ -207,7 +207,7 @@ void SaveMenu_CheckControllerPak(void) {
             save_menu_selected_slot = 0;
             save_menu_flags &= ~0x20;
             return;
-        } else if (!(pak_game_file_scans[input_primary_port].unk0 & 0x4000)) {
+        } else if (!(pak_game_file_scans[input_primary_port].flags & 0x4000)) {
             if (mode == 0) {
                 save_menu_dialog_index = 9;
                 save_menu_delay_frames = 10;
@@ -941,7 +941,7 @@ void SaveMenu_SaveSelectedFile(void) {
 
     if (p->file_no == -2) {
         cont = input_primary_port;
-        n = pak_game_file_scans[cont].unk0 & 0xF;
+        n = pak_game_file_scans[cont].flags & 0xF;
         id = 0xF;
         do {
             i = 0;
@@ -1077,17 +1077,17 @@ void SaveMenu_RefreshFileList(void) {
     cont = input_primary_port;
     n = 0;
     for (i = 0; i < 16; i++) {
-        if (pak_game_file_scans[cont].unk2[i] == 0x7F) {
+        if (pak_game_file_scans[cont].note_ext_first_bytes[i] == 0x7F) {
             continue;
         }
-        if (pak_game_file_scans[cont].unk2[i] >= 0) {
+        if (pak_game_file_scans[cont].note_ext_first_bytes[i] >= 0) {
             save_menu_file_entries[n].file_no = i;
-            save_menu_file_entries[n].extension_id = pak_game_file_scans[cont].unk2[i];
+            save_menu_file_entries[n].extension_id = pak_game_file_scans[cont].note_ext_first_bytes[i];
             n++;
         }
     }
     if (menu_flags & 4) {
-        if (pak_game_file_scans[cont].unk13 >= 2 && !(pak_game_file_scans[cont].unk0 & 0x2000)) {
+        if (pak_game_file_scans[cont].free_pages >= 2 && !(pak_game_file_scans[cont].flags & 0x2000)) {
             save_menu_file_entries[n].file_no = -2;
         }
     }

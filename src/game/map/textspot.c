@@ -98,7 +98,7 @@ TextSpot* TextSpot_FindInFront(Actor* arg0) {
             Math_RotateVec2(arg0->rot, &textspot_local_dir);
             angle = Math_Atan2(textspot_local_dir.x, textspot_local_dir.y);
             if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
-                out->unk4 = arg0->rot - angle;
+                out->interactionHeading = arg0->rot - angle;
                 if (out->entry->flags & 1) {
                     break;
                 }
@@ -126,5 +126,5 @@ void TextSpot_LoadMessage(TextSpot* arg0) {
     if (text_speaker_name[2] == 0xFF) {
         text_speaker_name[0] = 0xFF;
     }
-    player_state.unk134 = arg0->unk4;
+    player_state.unk134 = arg0->interactionHeading;
 }

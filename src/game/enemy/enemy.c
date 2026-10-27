@@ -151,7 +151,7 @@ void Enemy_LoadAreaSet(void) {
     u8 *start;
     u8 *end;
 
-    enemy_area_set = &enemy_area_sets[map_subarea_def->unk12];
+    enemy_area_set = &enemy_area_sets[map_subarea_def->areaSetIndex];
     enemy_anim_tables = enemy_area_set->unk8;
     enemy_names = enemy_area_set->unk10;
     start = enemy_area_set->start;
@@ -1000,7 +1000,7 @@ void Enemy_RunAttackScript(void) {
                 enemy_temp_vec.y = d->scale_y;
                 m = enemy_script_enemy->unk1C->unk0;
                 if (m & 0x8000) {
-                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C;
+                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].hit_range;
                 } else {
                     enemy_temp_vec.z = obj->unk28;
                 }

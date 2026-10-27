@@ -19,7 +19,7 @@ typedef struct ChestDef {
     /* 0x18 */ f32 boxHalfW;
     /* 0x1C */ f32 boxHalfD;
     /* 0x20 */ u8 flagId; /* bit index into chest_opened_flags */
-    /* 0x21 */ u8 unk21;
+    /* 0x21 */ u8 animSetIndex;
     /* 0x22 */ u8 pad22[2];
 } ChestDef; /* 0x24 bytes */
 

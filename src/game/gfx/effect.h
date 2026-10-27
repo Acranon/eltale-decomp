@@ -19,12 +19,12 @@ typedef struct EffectFootEmitter {
 
 /* A map object's particle emitter, queued each frame by Effect_QueueMapObjEmitter (double-buffered). */
 typedef struct EffectMapObjEmitter {
-    /* 0x00 */ s32 unk0; /* frames to the next particle */
+    /* 0x00 */ s32 particleCountdown; /* frames to the next particle */
     /* 0x04 */ f32 x;
     /* 0x08 */ f32 y;
     /* 0x0C */ f32 z;
-    /* 0x10 */ f32 unk10; /* the object's scale, the particle's size */
-    /* 0x14 */ struct MapObj *unk14; /* the object, to find it again next frame */
+    /* 0x10 */ f32 particleScale; /* the object's scale, the particle's size */
+    /* 0x14 */ struct MapObj *mapObj; /* the object, to find it again next frame */
 } EffectMapObjEmitter; /* 0x18 bytes */
 
 /* A damage/heal number shown over an actor. */
@@ -33,19 +33,19 @@ typedef struct EffectFloatingNumber {
     /* 0x04 */ u8 digits[8];
     /* 0x0C */ u16 timer;
     /* 0x0E */ u8 padE[2];
-    /* 0x10 */ s32 unk10; /* bit 15: large digits; low 4 bits: index into effect_floating_number_colors */
+    /* 0x10 */ s32 styleAndColor; /* bit 15: large digits; low 4 bits: index into effect_floating_number_colors */
     /* 0x14 */ s32 numDigits;
-    /* 0x18 */ s32 unk18; /* how many numbers the target already shows (stacks them) */
+    /* 0x18 */ s32 stackIndex; /* how many numbers the target already shows (stacks them) */
 } EffectFloatingNumber; /* 0x1C bytes */
 
 /* Spawns particles on a sphere that move to its centre (Effect_StartConvergeEmitter). */
 typedef struct EffectConvergeEmitter {
-    /* 0x00 */ s32 unk0; /* frames left */
-    /* 0x04 */ s32 unk4; /* colour index of the particles (EffectSprite.unk3C) */
-    /* 0x08 */ f32 unk8; /* the centre */
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14; /* the radius */
+    /* 0x00 */ s32 framesLeft; /* frames left */
+    /* 0x04 */ s32 colorIndex; /* colour index of the particles (EffectSprite.unk3C) */
+    /* 0x08 */ f32 centerX; /* the centre */
+    /* 0x0C */ f32 centerY;
+    /* 0x10 */ f32 centerZ;
+    /* 0x14 */ f32 radius; /* the radius */
 } EffectConvergeEmitter; /* 0x18 bytes */
 
 /* A model effect's scrolling/animated texture (copied from a table by Effect_CreateModelEffect). */
@@ -63,30 +63,30 @@ typedef struct EffectTexAnim {
 
 /* A model effect: an animated model drawn with Anim_DrawNode (Effect_CreateModelEffect). */
 typedef struct EffectModel {
-    /* 0x00 */ u16 unk0; /* frames left */
-    /* 0x02 */ u16 unk2; /* the model's loop length (restart value) */
-    /* 0x04 */ u16 unk4; /* frames since start */
-    /* 0x06 */ u16 unk6; /* colour index */
-    /* 0x08 */ u16 unk8; /* flags */
+    /* 0x00 */ u16 framesLeft; /* frames left */
+    /* 0x02 */ u16 loopLength; /* the model's loop length (restart value) */
+    /* 0x04 */ u16 age; /* frames since start */
+    /* 0x06 */ u16 colorIndex; /* colour index */
+    /* 0x08 */ u16 flags; /* flags */
     /* 0x0A */ u8 padA[2];
-    /* 0x0C */ f32 unkC; /* position */
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 unk18; /* rotation about y */
-    /* 0x1C */ f32 unk1C; /* scale */
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 unk28; /* the up vector with flags bit 2 */
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
-    /* 0x34 */ s32 unk34; /* animation frame */
+    /* 0x0C */ f32 x; /* position */
+    /* 0x10 */ f32 y;
+    /* 0x14 */ f32 z;
+    /* 0x18 */ f32 rotationY; /* rotation about y */
+    /* 0x1C */ f32 scaleX; /* scale */
+    /* 0x20 */ f32 scaleY;
+    /* 0x24 */ f32 scaleZ;
+    /* 0x28 */ f32 upX; /* the up vector with flags bit 2 */
+    /* 0x2C */ f32 upY;
+    /* 0x30 */ f32 upZ;
+    /* 0x34 */ s32 animFrame; /* animation frame */
     /* 0x38 */ AnimSet anim;
     /* 0x44 */ EffectTexAnim tex;
 } EffectModel; /* 0x58 bytes */
 
 /* A light streak (Effect_SpawnStreakBurst). */
 typedef struct EffectStreak {
-    /* 0x00 */ u16 unk0; /* frames left */
+    /* 0x00 */ u16 framesLeft; /* frames left */
     /* 0x02 */ u8 pad2[2];
     /* 0x04 */ f32 x;
     /* 0x08 */ f32 y;
@@ -100,19 +100,19 @@ typedef struct EffectStreak {
 } EffectStreak; /* 0x28 bytes */
 
 typedef struct EffectStatUpMarker {
-    /* 0x00 */ u16 unk0; /* frames left */
+    /* 0x00 */ u16 framesLeft; /* frames left */
     /* 0x02 */ s16 unk2;
 } EffectStatUpMarker; /* 0x4 bytes */
 
 /* A ring of 16 points laid on the floor around a centre (Effect_CreateTerrainRing). */
 typedef struct EffectRing {
-    /* 0x00 */ u16 unk0; /* state: 0 free, 1 growing, 2 shown, 3 fading */
-    /* 0x02 */ u16 unk2; /* frames in the state */
-    /* 0x04 */ u16 unk4; /* the state's length */
-    /* 0x06 */ u16 unk6; /* colour index */
-    /* 0x08 */ f32 unk8; /* the centre */
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
+    /* 0x00 */ u16 state; /* state: 0 free, 1 growing, 2 shown, 3 fading */
+    /* 0x02 */ u16 stateFrames; /* frames in the state */
+    /* 0x04 */ u16 stateLength; /* the state's length */
+    /* 0x06 */ u16 colorIndex; /* colour index */
+    /* 0x08 */ f32 centerX; /* the centre */
+    /* 0x0C */ f32 centerY;
+    /* 0x10 */ f32 centerZ;
     /* 0x14 */ Vec3f pts[16];
     /* 0xD4 */ Vec3f norms[16];
 } EffectRing; /* 0x194 bytes */

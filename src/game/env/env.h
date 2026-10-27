@@ -42,42 +42,42 @@ typedef struct EnvKeyframe {
     /* 0x34 */ EnvFogRange fog;
 } EnvKeyframe; /* 0x3C bytes */
 
-/* A subarea's environment record (map_area_def->unk1C[]); env_area_settings points at the
- * current one. unk8 set: unkC..unk14 are the light direction. */
+/* A subarea's environment record (map_area_def->envSettings[]); env_area_settings points at the
+ * current one. hasLightDirection selects lightDirX/Y/Z. */
 typedef struct EnvAreaSettings {
     /* 0x00 */ EnvKeyframe *frames;
     /* 0x04 */ s32 count;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ u16 unk18;
+    /* 0x08 */ s32 hasLightDirection;
+    /* 0x0C */ s32 lightDirX;
+    /* 0x10 */ s32 lightDirY;
+    /* 0x14 */ s32 lightDirZ;
+    /* 0x18 */ u16 mapFlags;
     /* 0x1A */ u8 unk1A[2];
-    /* 0x1C */ s32 unk1C;
+    /* 0x1C */ s32 backdropId;
 } EnvAreaSettings; /* 0x20 bytes */
 
-/* A light slot (Env_AllocateLightSlot): env colour animation (unk4..unk14), light colour
- * animation (unk18..unk28) and light directions (unk2C). */
+/* A light slot (Env_AllocateLightSlot): env colour animation (envAnimMode..envFramesStart), light colour
+ * animation (lightAnimMode..lightFramesStart) and light directions (lightDirs). */
 typedef struct EnvLightSlot {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 *unk10;
-    /* 0x14 */ s32 *unk14;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s32 unk20;
-    /* 0x24 */ s32 *unk24;
-    /* 0x28 */ s32 *unk28;
-    /* 0x2C */ s32 *unk2C;
+    /* 0x00 */ s32 state;
+    /* 0x04 */ s32 envAnimMode;
+    /* 0x08 */ s32 envFramesLeft;
+    /* 0x0C */ s32 envFrameCount;
+    /* 0x10 */ s32 *envFrame;
+    /* 0x14 */ s32 *envFramesStart;
+    /* 0x18 */ s32 lightAnimMode;
+    /* 0x1C */ s32 lightFrameCount;
+    /* 0x20 */ s32 lightFramesLeft;
+    /* 0x24 */ s32 *lightFrame;
+    /* 0x28 */ s32 *lightFramesStart;
+    /* 0x2C */ s32 *lightDirs;
 } EnvLightSlot; /* 0x30 bytes */
 
 /* A day phase: start time (env_clock), backdrop palette index, palette fade length. */
 typedef struct EnvDayPhase {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
+    /* 0x00 */ s32 startTime;
+    /* 0x04 */ s32 paletteIndex;
+    /* 0x08 */ s32 fadeFrames;
 } EnvDayPhase; /* 0xC bytes */
 
 /* .bss 80084300..80084B80, in address order (the order of these declarations fixes it). */

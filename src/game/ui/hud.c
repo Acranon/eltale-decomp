@@ -816,31 +816,31 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
     for (i = 0; i < 4; i++) {
         if (s->status_effect_handles[i] != 0) {
             fx = (EffectModel*)((Struct_8002373C_68*)arg0->battle)->status_effect_handles[i];
-            fx->unkC = arg0->x;
-            fx->unk14 = arg0->z;
+            fx->x = arg0->x;
+            fx->z = arg0->z;
             if (arg0->stats->unk0 == 1) {
-                if (fx->unk8 & 0x100) {
-                    fx->unk10 = arg0->battle->unk94;
+                if (fx->flags & 0x100) {
+                    fx->y = arg0->battle->unk94;
                 } else {
-                    fx->unk10 = arg0->battle->unk94 - arg0->stats->unk18 * arg0->scale;
+                    fx->y = arg0->battle->unk94 - arg0->stats->unk18 * arg0->scale;
                 }
-            } else if (fx->unk8 & 0x100) {
-                fx->unk10 = arg0->y + arg0->stats->unk1C * 0.5 * arg0->scale;
+            } else if (fx->flags & 0x100) {
+                fx->y = arg0->y + arg0->stats->unk1C * 0.5 * arg0->scale;
             } else {
-                fx->unk10 = arg0->y;
+                fx->y = arg0->y;
             }
             if (!(hud_actor_status_effect_masks[i] & s->status_bits)) {
                 s->status_effect_handles[i] = 0;
-                if (fx->unk8 & 1) {
-                    fx->unk8 &= ~1;
-                    fx->unk0 = 8;
+                if (fx->flags & 1) {
+                    fx->flags &= ~1;
+                    fx->framesLeft = 8;
                 }
             } else if (s->status_effect_timers[i] > 0) {
                 if (--s->status_effect_timers[i] == 0) {
                     s->status_effect_handles[i] = 0;
-                    if (fx->unk8 & 1) {
-                        fx->unk8 &= ~1;
-                        fx->unk0 = 8;
+                    if (fx->flags & 1) {
+                        fx->flags &= ~1;
+                        fx->framesLeft = 8;
                     }
                 }
             }
@@ -861,8 +861,8 @@ void Hud_ClearActorStatusIndicators(Actor* arg0) {
     for (i = 0; i < 4; i++) {
         if (s->status_effect_handles[i] != 0) {
             fx = (EffectModel*)s->status_effect_handles[i];
-            fx->unk0 = 8;
-            fx->unk8 &= ~1;
+            fx->framesLeft = 8;
+            fx->flags &= ~1;
             s->status_effect_handles[i] = 0;
         }
     }

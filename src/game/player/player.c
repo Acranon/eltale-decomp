@@ -542,7 +542,7 @@ void Player_StateMove(Actor *a, Player *p, PlayerAnimTable *cd) {
     if (x != 0.0f || z != 0.0f) {
         player_temp_vec.x = x;
         player_temp_vec.y = z;
-        Math_RotateVec2(camera_state.unk28, (Vec2f *)&player_temp_vec);
+        Math_RotateVec2(camera_state.followYaw, (Vec2f *)&player_temp_vec);
         x = player_temp_vec.x;
         z = player_temp_vec.y;
     }
@@ -607,9 +607,9 @@ void Player_StateMove(Actor *a, Player *p, PlayerAnimTable *cd) {
                 effect_foot_particle_template.x = a->x;
                 effect_foot_particle_template.y = a->y + 1.0f;
                 effect_foot_particle_template.z = a->z;
-                effect_foot_particle_template.unk30 = 0.0f;
-                effect_foot_particle_template.unk34 = 0.2f;
-                effect_foot_particle_template.unk38 = 0.0f;
+                effect_foot_particle_template.vecX = 0.0f;
+                effect_foot_particle_template.vecY = 0.2f;
+                effect_foot_particle_template.vecZ = 0.0f;
                 Effect_AllocateSprite(&effect_foot_particle_template);
             }
             p->state_timer--;
@@ -683,7 +683,7 @@ void Player_StateDying(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
     if (--arg1->state_timer == arg1->unk124) {
         camera_state.distance = 250.0f;
         camera_state.eyeHeight = 150.0f;
-        camera_state.unk70 = 0.01f;
+        camera_state.followGain = 0.01f;
     }
 }
 
@@ -779,7 +779,7 @@ void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd) {
             p->flags &= ~0x100;
             a->animFlags |= 1;
             Anim_SetCurrentAndNext(a, 0xB, 1, player_idle_anim, 1, 1);
-            camera_state.unk4 = 0x23;
+            camera_state.focusFramesLeft = 0x23;
             return;
         }
         p->state = 3;
@@ -1844,7 +1844,7 @@ void Player_StartCastSpell(Player *p, Actor *a, AnimSet *anims) {
 
     a->stats->unk8 -= D_800C186E[p->spell_input_count];
     e = &D_800C185C[(p->spell_id >> 8) & 0xF][p->spell_id & 0xFF];
-    if (e->unk18 == 2) {
+    if (e->target_select_handler_index == 2) {
         p->flags |= 4;
         anim = 0x17;
         next = 0x16;
