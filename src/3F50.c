@@ -274,9 +274,9 @@ extern RomRange player_anim_rom_ranges[];
 extern Monster enemy_slots[];
 extern u16 battle_flags;
 extern u16 battle_turn_delay;
-extern f32 battle_active_enemy_x;
-extern f32 battle_active_enemy_z;
-extern s16 hud_melee_hint_timer;
+extern f32 battle_turn_origin_x;
+extern f32 battle_turn_origin_z;
+extern s16 hud_spell_name_timer;
 extern Unk800C185C *D_800C185C[];
 extern u16 D_800C186E[];
 extern s32 core_transition_timer;
@@ -1635,13 +1635,13 @@ void Player_MoveAndCollide(u16 arg0, Actor *arg1, PlayerState *arg2) {
     f32 dist;
 
     if ((battle_flags & 1) && !(battle_flags & 6)) {
-        dx = arg1->x + arg1->vx - battle_active_enemy_x;
-        dz = arg1->z + arg1->vz - battle_active_enemy_z;
+        dx = arg1->x + arg1->vx - battle_turn_origin_x;
+        dz = arg1->z + arg1->vz - battle_turn_origin_z;
         dist = sqrtf(dx * dx + dz * dz);
         max = arg2->unkC * arg2->unk114;
         if (max < dist) {
-            arg1->vx = max * dx / dist - arg1->x + battle_active_enemy_x;
-            arg1->vz = max * dz / dist - arg1->z + battle_active_enemy_z;
+            arg1->vx = max * dx / dist - arg1->x + battle_turn_origin_x;
+            arg1->vz = max * dz / dist - arg1->z + battle_turn_origin_z;
         }
         dx = arg1->x + arg1->vx - battle_center_x;
         dz = arg1->z + arg1->vz - battle_center_z;
@@ -2263,8 +2263,8 @@ s32 Player_CanAct(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
-extern s16 hud_element_allocation_timer;
-extern u16 hud_element_allocation_mode_flags;
+extern s16 hud_spell_input_anim_timer;
+extern u16 hud_spell_input_anim_flags;
 extern u16 input_pressed_buttons;
 
 s32 Magic_GetSpellRestrictionFlags(s32 arg0, u16 arg1);
@@ -2301,12 +2301,12 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
         }
         Sfx_Play(0, sfx, 0xFF);
         if (prev != arg0->unk120) {
-            hud_element_allocation_timer = 8;
-            hud_element_allocation_mode_flags |= 1;
+            hud_spell_input_anim_timer = 8;
+            hud_spell_input_anim_flags |= 1;
             if (arg0->unk120 == 1) {
-                hud_element_allocation_mode_flags |= 2;
+                hud_spell_input_anim_flags |= 2;
             } else {
-                hud_element_allocation_mode_flags &= 0xFFFD;
+                hud_spell_input_anim_flags &= 0xFFFD;
             }
         }
     } else if (arg0->unk120 && (input_pressed_buttons & 0xA000)) {
@@ -2318,8 +2318,8 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
     } else if ((input_pressed_buttons & 0x4000) && (core_flags & 4)) {
         if (arg0->unk120) {
             arg0->unk120--;
-            hud_element_allocation_timer = 8;
-            hud_element_allocation_mode_flags &= 0xFFFE;
+            hud_spell_input_anim_timer = 8;
+            hud_spell_input_anim_flags &= 0xFFFE;
         }
         if (!arg0->unk120) {
             core_flags &= ~4;
@@ -2354,7 +2354,7 @@ void Player_StartCastSpell(PlayerState *p, Actor *a, AnimEntry *anims) {
     a->unk60 |= 1;
     Anim_SetCurrentAndNext(a, anim, 1, next, 1, 1);
     Camera_StartBattleFocus(0x2D, a);
-    hud_melee_hint_timer = 0x1E;
+    hud_spell_name_timer = 0x1E;
 }
 
 void Player_AddTurnMoveAgilityXP(PlayerState *arg0) {
@@ -2362,8 +2362,8 @@ void Player_AddTurnMoveAgilityXP(PlayerState *arg0) {
     f32 dz;
 
     if (battle_flags & 1) {
-        dx = arg0->actor.x - battle_active_enemy_x;
-        dz = arg0->actor.z - battle_active_enemy_z;
+        dx = arg0->actor.x - battle_turn_origin_x;
+        dz = arg0->actor.z - battle_turn_origin_z;
         player_battle_move_dist += sqrtf(dx * dx + dz * dz);
         while (player_battle_move_dist > 35.0) {
             player_battle_move_dist -= 35.0;

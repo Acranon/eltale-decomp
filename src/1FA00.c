@@ -57,7 +57,7 @@ typedef struct {
 extern Struct_8007C284* map_area_def;
 
 /* This file's .bss, 8008BE40..8008BFC0, in address order (first declaration fixes the order). */
-Struct_8001FF10_Pos battle_rotated_offset_scratch;
+Struct_8001FF10_Pos battle_temp_vec;
 u16 battle_camera_phase;
 u16 battle_camera_phase_timer;
 u16 battle_camera_enemy_index;
@@ -68,18 +68,18 @@ u16 battle_turn_order_index;
 u16 battle_enemy_count;
 f32 battle_center_x;
 f32 battle_center_z;
-f32 battle_active_enemy_x;
-f32 battle_active_enemy_z;
+f32 battle_turn_origin_x;
+f32 battle_turn_origin_z;
 f32 battle_arena_radius;
 u8 D_8008BE70[0x100]; /* unreferenced */
-void* battle_spawned_actor_ptrs[8];
-u32 battle_spawned_actor_count;
+void* D_8008BF70[8];
+u32 D_8008BF90;
 s16 battle_outer_ring_slot;
 u16 battle_turn_ring_slot;
 Struct_8007C284_30* battle_encounter_region_table;
 Struct_8007C284_34* battle_encounter_group_table;
-void* D_8008BFA0;
-void* D_8008BFA4;
+void* battle_saved_enemy_anim_tables;
+void* battle_saved_enemy_names;
 s32 battle_boss_index_plus_one;
 f32 battle_travel_accumulator;
 u16 battle_encounter_roll_limit;
@@ -238,8 +238,8 @@ void Battle_StartBossEncounter(void) {
     battle_flags = 0x305;
     D_8008BE56 = 0;
     battle_turn_delay = 0;
-    D_8008BFA0 = enemy_anim_tables;
-    D_8008BFA4 = enemy_names;
+    battle_saved_enemy_anim_tables = enemy_anim_tables;
+    battle_saved_enemy_names = enemy_names;
     battle_boss_index_plus_one = boss_field_index;
     enemy_anim_tables = D_803ABA58;
     enemy_names = D_803AC3F8;
@@ -248,8 +248,8 @@ void Battle_StartBossEncounter(void) {
     boss_field_index = 0;
     battle_enemy_count = enemy_count = 1;
     Enemy_SortTurnOrder();
-    battle_spawned_actor_count = 1;
-    battle_spawned_actor_ptrs[0] = enemy_slots[0].unk2C;
+    D_8008BF90 = 1;
+    D_8008BF70[0] = enemy_slots[0].unk2C;
     battle_camera_phase = 1;
     battle_camera_phase_timer = 1;
     battle_camera_enemy_index = 0;
@@ -346,16 +346,16 @@ void Battle_UpdateStartCamera(void) {
             } else if (ang > 3.141592653589793) {
                 ang -= 6.283185307179586;
             }
-            battle_rotated_offset_scratch.unk0 = 0.0f;
+            battle_temp_vec.unk0 = 0.0f;
             if (a->unk64->unk1C < a->unk64->unk18) {
-                battle_rotated_offset_scratch.unk4 = a->unk64->unk18 * a->unk24 * 2.0 + 15.0;
+                battle_temp_vec.unk4 = a->unk64->unk18 * a->unk24 * 2.0 + 15.0;
             } else {
-                battle_rotated_offset_scratch.unk4 = a->unk64->unk1C * a->unk24 * 2.0 + 15.0;
+                battle_temp_vec.unk4 = a->unk64->unk1C * a->unk24 * 2.0 + 15.0;
             }
-            camera_state.unk4C = battle_rotated_offset_scratch.unk4 * 1.5;
-            Math_RotateVec2(ang, &battle_rotated_offset_scratch);
-            camera_state.unkC = a->unk0 + battle_rotated_offset_scratch.unk0;
-            camera_state.unk14 = a->unk8 + battle_rotated_offset_scratch.unk4;
+            camera_state.unk4C = battle_temp_vec.unk4 * 1.5;
+            Math_RotateVec2(ang, &battle_temp_vec);
+            camera_state.unkC = a->unk0 + battle_temp_vec.unk0;
+            camera_state.unk14 = a->unk8 + battle_temp_vec.unk4;
             camera_state.unk10 = a->unk4 + 15.0;
             if (camera_state.unk10 < player_state.unk1C) {
                 camera_state.unk10 = player_state.unk1C;
@@ -384,15 +384,15 @@ void Battle_UpdateStartCamera(void) {
                 } else if (ang < -3.141592653589793) {
                     ang += 6.283185307179586;
                 }
-                battle_rotated_offset_scratch.unk0 = 0.0f;
-                battle_rotated_offset_scratch.unk4 = 50.0f;
-                Math_RotateVec2(ang, &battle_rotated_offset_scratch);
+                battle_temp_vec.unk0 = 0.0f;
+                battle_temp_vec.unk4 = 50.0f;
+                Math_RotateVec2(ang, &battle_temp_vec);
                 camera_state.unk0 = 4;
                 camera_state.unk8 |= 0x10;
-                camera_state.unkC = player_state.unk18 + battle_rotated_offset_scratch.unk0;
+                camera_state.unkC = player_state.unk18 + battle_temp_vec.unk0;
                 camera_state.unk48 = 0.0f;
                 camera_state.unk10 = player_state.unk1C + 30.0;
-                camera_state.unk14 = player_state.unk20 + battle_rotated_offset_scratch.unk4;
+                camera_state.unk14 = player_state.unk20 + battle_temp_vec.unk4;
                 camera_state.unk44 = camera_state.unk48;
                 camera_state.unk3C = 0.0f;
                 camera_state.unk40 = camera_state.unk44;
@@ -417,7 +417,7 @@ extern Actor D_8007AA20;
 extern s32 player_battle_drop_item;
 extern s32 camera_preset_index;
 extern s32 map_id;
-extern s16 hud_battle_message_timer;
+extern s16 hud_enemy_info_timer;
 
 void Boss_SetDefeated(u16);
 void Boss_HandleDefeat(s32);
@@ -451,8 +451,8 @@ void Battle_UpdateTurnTransition(void) {
                 if (battle_flags & 0x100) {
                     Boss_SetDefeated(battle_boss_index_plus_one - 1);
                     Boss_HandleDefeat(battle_boss_index_plus_one - 1);
-                    enemy_anim_tables = D_8008BFA0;
-                    enemy_names = D_8008BFA4;
+                    enemy_anim_tables = battle_saved_enemy_anim_tables;
+                    enemy_names = battle_saved_enemy_names;
                 }
                 player_battle_drop_item = func_800200F8();
             } else if (battle_flags & 0x10) {
@@ -463,7 +463,7 @@ void Battle_UpdateTurnTransition(void) {
             }
             if (done) {
                 battle_flags &= ~1;
-                hud_battle_message_timer = 0;
+                hud_enemy_info_timer = 0;
                 Effect_FadeRing(battle_outer_ring_slot, player_state.unk18, player_state.unk1C, player_state.unk20);
                 Enemy_RemoveAll();
                 Camera_SetPresetDelayedTurn(camera_preset_index);
@@ -481,8 +481,8 @@ void Battle_UpdateTurnTransition(void) {
             if (battle_flags & 2) {
                 Enemy_StartTurn();
             }
-            battle_active_enemy_x = a->unk0;
-            battle_active_enemy_z = a->unk8;
+            battle_turn_origin_x = a->unk0;
+            battle_turn_origin_z = a->unk8;
             if (battle_flags & 2) {
                 f = enemy_slots[enemy_turn_order[battle_turn_order_index]].unk10;
             } else {
@@ -495,7 +495,7 @@ void Battle_UpdateTurnTransition(void) {
             }
             f *= a->unk68->unk90;
             f += a->unk64->unk18 * a->unk24;
-            battle_turn_ring_slot = Effect_CreateTerrainRing((battle_flags & 2) ? 1 : 2, battle_active_enemy_x, a->unk4, battle_active_enemy_z, f * 1.04);
+            battle_turn_ring_slot = Effect_CreateTerrainRing((battle_flags & 2) ? 1 : 2, battle_turn_origin_x, a->unk4, battle_turn_origin_z, f * 1.04);
         }
     }
 }
@@ -610,7 +610,7 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
     p = e->unk0;
     actor = enemy_slots;
     o = out;
-    battle_spawned_actor_count = 0;
+    D_8008BF90 = 0;
     while (n != 0) {
         cnt = p->unk4;
         if (p->unk8 != 0) {
@@ -620,12 +620,12 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
         (*o)[1] = cnt;
         o++;
         enemy_count += cnt;
-        battle_spawned_actor_ptrs[battle_spawned_actor_count++] = &actor->unk2C;
+        D_8008BF70[D_8008BF90++] = &actor->unk2C;
         while (cnt != 0) {
-            battle_rotated_offset_scratch.unk0 = pos->unk0;
-            battle_rotated_offset_scratch.unk4 = pos->unk4;
-            Math_RotateVec2(z, &battle_rotated_offset_scratch);
-            Enemy_Spawn(p->unk0, x + battle_rotated_offset_scratch.unk0, y + battle_rotated_offset_scratch.unk4, z, &actor->unk2C, actor);
+            battle_temp_vec.unk0 = pos->unk0;
+            battle_temp_vec.unk4 = pos->unk4;
+            Math_RotateVec2(z, &battle_temp_vec);
+            Enemy_Spawn(p->unk0, x + battle_temp_vec.unk0, y + battle_temp_vec.unk4, z, &actor->unk2C, actor);
             cnt--;
             actor++;
             pos++;

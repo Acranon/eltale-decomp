@@ -600,7 +600,7 @@ extern s32 map_subarea;
 extern u16 map_subarea_flags;
 extern Unk80084300 exit_destination;
 extern u16 battle_flags;
-extern s32 hud_pending_sequence_id;
+extern s32 audio_pending_seq_id;
 extern s32 text_active_window_count;
 extern u16 input_held_buttons;
 extern u16 input_pressed_buttons;
@@ -758,10 +758,10 @@ void Core_RunGameplayLoop(void) {
             }
         }
         Bgm_Update();
-        if (hud_pending_sequence_id != -1 && Audio_GetSeqState(0) == 0) {
-            Audio_LoadSeq(0, hud_pending_sequence_id);
+        if (audio_pending_seq_id != -1 && Audio_GetSeqState(0) == 0) {
+            Audio_LoadSeq(0, audio_pending_seq_id);
             Audio_PlaySeq(0);
-            hud_pending_sequence_id = -1;
+            audio_pending_seq_id = -1;
         }
         core_frame_end_time = osGetTime();
         D_8007A8B8 = (core_frame_end_time - core_frame_start_time) * 64 / 3000;

@@ -251,7 +251,7 @@ void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, CollResult *);
 void Enemy_LoadAreaSet(void);
 Unk8000BA20 *Enemy_ChooseAttack(Enemy *, Obj *);
 void Enemy_StartAttack(Enemy *, Obj *, Unk8000BA20 *);
-extern s16 hud_battle_message_timer;
+extern s16 hud_enemy_info_timer;
 void Anim_DrawModel(s32, Obj *, u8 *, s32);
 void Anim_AdvanceFrame(s32, Obj *, u8 *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
@@ -310,8 +310,8 @@ void Camera_Shake(s32);
 void Enemy_ResolveCollisions(f32 *, f32 *, Obj *);
 extern f32 battle_center_x;
 extern f32 battle_center_z;
-extern f32 battle_active_enemy_x;
-extern f32 battle_active_enemy_z;
+extern f32 battle_turn_origin_x;
+extern f32 battle_turn_origin_z;
 extern f32 battle_arena_radius;
 
 typedef struct {
@@ -534,7 +534,7 @@ void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
     Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
     if (e->flags & 1) {
         enemy_turn_current = e;
-        hud_battle_message_timer = 60;
+        hud_enemy_info_timer = 60;
         e->flags &= 0xFFFC;
         if (e->unk98 & 8) {
             Battle_EndTurn(obj);
@@ -946,13 +946,13 @@ void Enemy_Move(s32 clamp, f32 dx, f32 dz, Obj *obj, EnemyAI *ai) {
         e->unk24 *= 0.9f;
     }
     if (clamp) {
-        x = obj->x + obj->unk18 - battle_active_enemy_x;
-        z = obj->z + obj->unk20 - battle_active_enemy_z;
+        x = obj->x + obj->unk18 - battle_turn_origin_x;
+        z = obj->z + obj->unk20 - battle_turn_origin_z;
         d = sqrtf(x * x + z * z);
         r = e->unk10 * e->unk128;
         if (r < d) {
-            dx = r * x / d - obj->x + battle_active_enemy_x;
-            dz = r * z / d - obj->z + battle_active_enemy_z;
+            dx = r * x / d - obj->x + battle_turn_origin_x;
+            dz = r * z / d - obj->z + battle_turn_origin_z;
             e->flags |= 2;
         }
     }

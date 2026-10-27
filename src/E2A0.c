@@ -1088,24 +1088,24 @@ extern u8 mapobj_drop_sprite_tex[];
 extern u8 mapobj_drop_sprite_dl[];
 
 void MapObj_EmitArcSprite(Unk8000FA9C *arg0) {
-    static SpriteObj mapobj_arc_sprite_tmpl = {
+    static SpriteObj mapobj_arc_sprite_template = {
         0x23, 0, (void *)MapObj_StepArcSprite, 0x07202000, 0, mapobj_arc_sprite_tex, mapobj_arc_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 15.0f, 0.0f, 0,
     };
 
     arg0->timer++;
     if (arg0->timer >= 0) {
-        mapobj_arc_sprite_tmpl.x = arg0->x;
-        mapobj_arc_sprite_tmpl.y = arg0->y;
-        mapobj_arc_sprite_tmpl.z = arg0->z;
-        mapobj_arc_sprite_tmpl.unk28 = mapobj_arc_sprite_tmpl.unk2C = arg0->scale * 10.0;
+        mapobj_arc_sprite_template.x = arg0->x;
+        mapobj_arc_sprite_template.y = arg0->y;
+        mapobj_arc_sprite_template.z = arg0->z;
+        mapobj_arc_sprite_template.unk28 = mapobj_arc_sprite_template.unk2C = arg0->scale * 10.0;
         mapobj_temp_vec[0] = arg0->scale * 2.0;
         mapobj_temp_vec[1] = 0.0f;
         Math_RotateVec2(arg0->angle, mapobj_temp_vec);
-        mapobj_arc_sprite_tmpl.unk30 = mapobj_temp_vec[0];
-        mapobj_arc_sprite_tmpl.unk38 = mapobj_temp_vec[1];
-        mapobj_arc_sprite_tmpl.unk10 = &mapobj_arc_sprite_tex[arg0->timer << 10];
-        Effect_AllocateSprite(&mapobj_arc_sprite_tmpl);
+        mapobj_arc_sprite_template.unk30 = mapobj_temp_vec[0];
+        mapobj_arc_sprite_template.unk38 = mapobj_temp_vec[1];
+        mapobj_arc_sprite_template.unk10 = &mapobj_arc_sprite_tex[arg0->timer << 10];
+        Effect_AllocateSprite(&mapobj_arc_sprite_template);
         if (arg0->timer >= 7) {
             arg0->timer = Math_Rand(0x3C) - 0x78;
         }
@@ -1121,18 +1121,18 @@ void MapObj_StepArcSprite(Particle *arg0) {
 }
 
 void MapObj_EmitDropSprite(Unk8000FA9C *arg0) {
-    static SpriteObj mapobj_drop_sprite_tmpl = {
+    static SpriteObj mapobj_drop_sprite_template = {
         0xF, 0, (void *)MapObj_StepDropSprite, 0x00081000, 0, mapobj_drop_sprite_tex, mapobj_drop_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0,
     };
 
     arg0->timer--;
     if (arg0->timer == 0) {
-        mapobj_drop_sprite_tmpl.x = arg0->x;
-        mapobj_drop_sprite_tmpl.y = arg0->y;
-        mapobj_drop_sprite_tmpl.z = arg0->z;
-        mapobj_drop_sprite_tmpl.unk28 = mapobj_drop_sprite_tmpl.unk2C = arg0->scale;
-        Effect_AllocateSprite(&mapobj_drop_sprite_tmpl);
+        mapobj_drop_sprite_template.x = arg0->x;
+        mapobj_drop_sprite_template.y = arg0->y;
+        mapobj_drop_sprite_template.z = arg0->z;
+        mapobj_drop_sprite_template.unk28 = mapobj_drop_sprite_template.unk2C = arg0->scale;
+        Effect_AllocateSprite(&mapobj_drop_sprite_template);
         arg0->timer = Math_Rand(0x96) + 0x96;
     }
 }

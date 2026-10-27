@@ -55,29 +55,29 @@ s32 hud_clip_bottom;
 Struct_8008C058 hud_popup_slots[8];
 u32 hud_element_gain_flash_timer;
 u32 hud_selected_element_index;
-Vec3f_216E0 hud_rotated_vector_scratch;
+Vec3f_216E0 hud_temp_vec;
 u16 hud_chest_text_marker_phases[2];
 u16 hud_melee_marker_phase;
 u16 hud_panel_transition_frame;
 u16 hud_panel_transition_state;
 u16 hud_hp_meter_width;
 u16 hud_mp_meter_width;
-u16 hud_element_allocation_timer;
-u16 hud_element_allocation_mode_flags;
-u16 hud_melee_hint_timer;
+u16 hud_spell_input_anim_timer;
+u16 hud_spell_input_anim_flags;
+u16 hud_spell_name_timer;
 u16 hud_element_input_timer; /* eight-frame element input/fade timer */
-u16 hud_battle_message_timer;
+u16 hud_enemy_info_timer;
 s32 D_8008C164;
 s32 D_8008C168;
 s32 D_8008C16C;
-s32 hud_pending_sequence_id;
+s32 audio_pending_seq_id;
 s32 hud_draw_origin_x;
 s32 hud_draw_origin_y;
 s32 hud_npc_marker_screen_y;
 u16 hud_element_pulse_phase;
 extern u8** D_800C03D8[];
-extern u8 hud_digit_glyph_data[];
-extern u8 hud_number_spacing[];
+extern u8 hud_spell_locked_label[];
+extern u8 hud_spell_label_palettes[];
 
 u32 Magic_LookupSpellSequence(u16, s32);
 s32 Magic_GetSpellRestrictionFlags(u32, u16);
@@ -169,7 +169,7 @@ typedef struct {
 } Struct_803AA690;
 
 extern u16 hud_actor_status_masks[];
-extern u16 hud_actor_status_alt_masks[];
+extern u16 hud_actor_status_effect_masks[];
 extern Struct_803AA690 D_803AA690[];
 extern Struct_803AA6C4 D_803AA6C4[];
 
@@ -178,17 +178,17 @@ s32 Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AA690*, Vec
 void Hud_ResetState(void) {
     D_8008C168 = 0;
     D_8008C16C = 0;
-    hud_pending_sequence_id = -1;
+    audio_pending_seq_id = -1;
     hud_draw_origin_y = 0;
     hud_draw_origin_x = hud_draw_origin_y;
     hud_clip_top = 0;
     hud_clip_left = hud_clip_top;
     hud_clip_right = 0x140;
     hud_clip_bottom = 0xF0;
-    hud_battle_message_timer = 0;
-    hud_melee_hint_timer = 0;
-    hud_element_allocation_mode_flags = 0;
-    hud_element_allocation_timer = hud_element_allocation_mode_flags;
+    hud_enemy_info_timer = 0;
+    hud_spell_name_timer = 0;
+    hud_spell_input_anim_flags = 0;
+    hud_spell_input_anim_timer = hud_spell_input_anim_flags;
     hud_element_gain_flash_timer = 0;
     hud_element_allocation_flags = 0;
 }
@@ -280,9 +280,9 @@ void Hud_Draw(Unk2000000* buf) {
     if ((map_flags & 0xD) && !(battle_flags & 1) && !(map_subarea_def->unk14 & 8) && !(core_flags & 2)) {
         Hud_DrawCompass(buf);
     }
-    if ((battle_flags & 1) && hud_battle_message_timer) {
+    if ((battle_flags & 1) && hud_enemy_info_timer) {
         Hud_DrawEnemyInfoPanel();
-        hud_battle_message_timer--;
+        hud_enemy_info_timer--;
     }
     hud_draw_origin_x = hud_draw_origin_y = 0;
     if (battle_flags & 1) {
@@ -319,9 +319,9 @@ void Hud_Draw(Unk2000000* buf) {
     } else if (core_flags & 8) {
         Hud_UpdateElementAllocation(buf, (struct Struct_80022970*)&player_state);
     }
-    if (hud_melee_hint_timer) {
+    if (hud_spell_name_timer) {
         Hud_DrawSpellName(&player_state);
-        hud_melee_hint_timer--;
+        hud_spell_name_timer--;
     }
 }
 
@@ -384,7 +384,7 @@ void Hud_DrawPlayerMeters(Struct_80021030* arg0) {
     Hud_DrawClippedTextureRect(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
 }
 
-extern s32 hud_element_unlock_masks[];
+extern s32 hud_element_max_level_masks[];
 extern Gfx D_803AA3C8[];
 extern u8 hud_element_colors[][4];
 extern Gfx D_803AA2F8[];
@@ -416,7 +416,7 @@ void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
         x += 0x16;
     }
     for (i = 0; i < 4; i++) {
-        if (((s32*)&player_state)[2] & hud_element_unlock_masks[i]) {
+        if (((s32*)&player_state)[2] & hud_element_max_level_masks[i]) {
             col = &hud_element_colors[0][i];
             fx = i * 22.0f + 5.0 + (f32)hud_draw_origin_x;
             fy = hud_draw_origin_y + 5.0f;
@@ -482,10 +482,10 @@ void Hud_DrawCompass(Unk2000000* buf) {
             } else if (ang > 3.141592653589793) {
                 ang -= 6.283185307179586;
             }
-            hud_rotated_vector_scratch.x = 0.0f;
-            hud_rotated_vector_scratch.y = 18.0f;
-            Math_RotateVec2(ang, &hud_rotated_vector_scratch);
-            Hud_DrawTextureTile(&D_803A86F8, hud_rotated_vector_scratch.x + 14.0f, hud_rotated_vector_scratch.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
+            hud_temp_vec.x = 0.0f;
+            hud_temp_vec.y = 18.0f;
+            Math_RotateVec2(ang, &hud_temp_vec);
+            Hud_DrawTextureTile(&D_803A86F8, hud_temp_vec.x + 14.0f, hud_temp_vec.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
         }
     }
 }
@@ -547,8 +547,8 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
     gDPPipeSync(gfx_dl_head++);
     gDPSetTextureFilter(gfx_dl_head++, G_TF_POINT);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
-    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 2)) {
-        i = hud_element_allocation_timer * hud_element_allocation_timer;
+    if (hud_spell_input_anim_timer && (hud_spell_input_anim_flags & 2)) {
+        i = hud_spell_input_anim_timer * hud_spell_input_anim_timer;
         x0 = 0x47 - i * 20 / 64;
         y0 = -(i * 10 / 64);
         x1 = 0 - i * 10 / 64;
@@ -581,8 +581,8 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
     }
     hud_draw_origin_x = 0x69;
     hud_draw_origin_y = 0x32;
-    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 2)) {
-        i = hud_element_allocation_timer * hud_element_allocation_timer;
+    if (hud_spell_input_anim_timer && (hud_spell_input_anim_flags & 2)) {
+        i = hud_spell_input_anim_timer * hud_spell_input_anim_timer;
         yoff = i * 40 / 64;
         gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
         gDPSetCombine(gfx_dl_head++, 0xFF9BFF, 0xFF34FE7F);
@@ -607,7 +607,7 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
         gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
         Hud_DrawTextureTile(&D_803A8718, 0x6D, 0xD, 0x24, 0x24, 0x40, 0, 0x400, 0x400);
     }
-    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 1)) {
+    if (hud_spell_input_anim_timer && (hud_spell_input_anim_flags & 1)) {
         col = hud_element_colors[arg1->unk11D[arg1->unk120 - 1]];
         pos = (f32*)hud_spell_input_icon_positions + arg1->unk11D[arg1->unk120 - 1] * 2;
         fx = pos[0] + 109.0f + hud_draw_origin_x;
@@ -615,11 +615,11 @@ void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
         guTranslate(&buf->unkC0[gfx_mtx_index], fx, fy, 0.0f);
         gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         gDPPipeSync(gfx_dl_head++);
-        gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], hud_element_allocation_timer * 255 / 8);
+        gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], hud_spell_input_anim_timer * 255 / 8);
         gSPDisplayList(gfx_dl_head++, D_803AA2F8);
     }
-    if (hud_element_allocation_timer) {
-        hud_element_allocation_timer--;
+    if (hud_spell_input_anim_timer) {
+        hud_spell_input_anim_timer--;
     }
 }
 
@@ -651,14 +651,14 @@ void Hud_DrawSpellName(void* arg0) {
     gDPSetTextureFilter(gfx_dl_head++, G_TF_POINT);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
     yoff = 0;
-    if (hud_element_allocation_timer && (hud_element_allocation_mode_flags & 2)) {
-        w = hud_element_allocation_timer;
+    if (hud_spell_input_anim_timer && (hud_spell_input_anim_flags & 2)) {
+        w = hud_spell_input_anim_timer;
         t = w * w;
         yoff = t * 40 / 64;
         gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
         gDPSetCombine(gfx_dl_head++, 0xFF9BFF, 0xFF34FE7F);
         gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, 255 - t * 255 / 64);
-        hud_element_allocation_timer--;
+        hud_spell_input_anim_timer--;
     }
     Hud_DrawTextureTile(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
     Hud_DrawGlyphString(0x37 - Hud_MeasureGlyphString(str) / 2, yoff + 3, 0, str);
@@ -685,7 +685,7 @@ typedef struct Struct_80022970 {
 
 extern u8 hud_element_colors[][4];
 extern Struct_8004F324 hud_element_icon_positions[];
-extern s32 hud_element_milestone_masks[];
+extern s32 hud_element_max_level_set_masks[];
 extern u8 D_8007A9F4;
 extern u8 D_8007A9F5;
 extern u8 D_8007A9F6;
@@ -756,7 +756,7 @@ void Hud_UpdateElementAllocation(Unk2000000* buf, Struct_80022970* pl) {
             if (pl->unk14->unk24[hud_selected_element_index] < 50) {
                 pl->unk14->unk24[hud_selected_element_index]++;
                 if (pl->unk14->unk24[hud_selected_element_index] == 50) {
-                    pl->unk8 |= hud_element_milestone_masks[hud_selected_element_index];
+                    pl->unk8 |= hud_element_max_level_set_masks[hud_selected_element_index];
                     if ((pl->unk8 & 0xF000) == 0xF000) {
                         pl->unk8 |= 0x10000;
                     }
@@ -917,12 +917,12 @@ void Hud_StartActorStatusIndicator(Struct_8002373C* arg0, u16 mask, u16 idx, s16
         }
     }
     for (i = 0; i < 4; i++) {
-        if ((hud_actor_status_alt_masks[i] & mask) && s->unk44[i] == 0) {
+        if ((hud_actor_status_effect_masks[i] & mask) && s->unk44[i] == 0) {
             s->unk32[i] = val;
             e = &D_803AA6C4[idx];
-            hud_rotated_vector_scratch.x = e->unk8;
-            hud_rotated_vector_scratch.y = e->unkC;
-            hud_rotated_vector_scratch.z = 1.0f;
+            hud_temp_vec.x = e->unk8;
+            hud_temp_vec.y = e->unkC;
+            hud_temp_vec.z = 1.0f;
             fx = &D_803AA690[e->unk0];
             if (arg0->unk64->unk0 == 1) {
                 if (e->unk4 & 0x100) {
@@ -935,7 +935,7 @@ void Hud_StartActorStatusIndicator(Struct_8002373C* arg0, u16 mask, u16 idx, s16
             } else {
                 y = arg0->unk4;
             }
-            s->unk44[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->unk0, y, arg0->unk8, 0.0f, fx, &hud_rotated_vector_scratch, arg0);
+            s->unk44[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->unk0, y, arg0->unk8, 0.0f, fx, &hud_temp_vec, arg0);
             return;
         }
     }
@@ -1027,7 +1027,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Struct_8002373C* arg0) {
             } else {
                 fx->unk10 = arg0->unk4;
             }
-            if (!(hud_actor_status_alt_masks[i] & s->unk0)) {
+            if (!(hud_actor_status_effect_masks[i] & s->unk0)) {
                 s->unk44[i] = 0;
                 if (fx->unk8 & 1) {
                     fx->unk8 &= ~1;
@@ -1115,7 +1115,7 @@ void Hud_DrawEnemyInfoPanel(void) {
 
     hud_draw_origin_x = 0xB5;
     hud_draw_origin_y = 0x1A;
-    d = hud_battle_message_timer - 50;
+    d = hud_enemy_info_timer - 50;
     if (d > 0) {
         d *= d;
         hud_draw_origin_x += d * 120 / 100;
@@ -1227,11 +1227,11 @@ void Hud_DrawSpellLabel(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4) {
     id &= 0xFF;
     str = D_800C03D8[tmp][id];
     if (flags & 4) {
-        str = hud_digit_glyph_data;
+        str = hud_spell_locked_label;
     }
     w = Hud_MeasureGlyphString(str);
     arg0 = arg0 - w / 2 + 0x37;
-    Hud_DrawGlyphString(arg0, arg1, hud_number_spacing[flags], str);
+    Hud_DrawGlyphString(arg0, arg1, hud_spell_label_palettes[flags], str);
 }
 
 void Hud_DrawGlyphString(s32 x, s32 y, s32 pal, u8* str) {
@@ -1356,8 +1356,8 @@ void Hud_DrawTextureTile(void* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32
 
 /* .data 8004F2C0..8004F4A0 */
 s32 D_8004F2C0 = 0; /* nothing references it */
-u8 hud_digit_glyph_data[8] = {
-#include "assets/hud_digit_glyph_data.inc.c"
+u8 hud_spell_locked_label[8] = {
+#include "assets/hud_spell_locked_label.inc.c"
 };
 u8 hud_element_colors[4][4] = {
     { 0xFF, 0x00, 0x00, 0x00 },
@@ -1366,13 +1366,13 @@ u8 hud_element_colors[4][4] = {
     { 0x00, 0xFF, 0x00, 0x00 },
 };
 u16 hud_actor_status_masks[8] = { 0x4, 0x1, 0x400, 0x20, 0x10, 0x80, 0x40, 0x0 };
-u16 hud_actor_status_alt_masks[4] = { 0x8, 0x2, 0x200, 0x100 };
-s32 hud_element_unlock_masks[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
+u16 hud_actor_status_effect_masks[4] = { 0x8, 0x2, 0x200, 0x100 };
+s32 hud_element_max_level_masks[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
 Struct_8004F324 hud_spell_input_icon_positions[4] = { { 17.0f, 5.0f }, { 5.0f, 17.0f }, { 17.0f, 30.0f }, { 30.0f, 17.0f } };
 Struct_8004F324 hud_element_icon_positions[4] = { { 30.0f, 35.0f }, { 12.0f, 51.0f }, { 30.0f, 66.0f }, { 48.0f, 51.0f } };
-s32 hud_element_milestone_masks[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
+s32 hud_element_max_level_set_masks[4] = { 0x1000, 0x2000, 0x4000, 0x8000 };
 s32 D_8004F354[77] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 3, 3, 3, 2, 0, 0, 5 }; /* nothing references it */
 u8 D_8004F488[0x10] = { /* message text, nothing references it */
 #include "assets/D_8004F488.inc.c"
 };
-u8 hud_number_spacing[8] = { 0, 1, 2, 2, 2, 2, 2, 2 };
+u8 hud_spell_label_palettes[8] = { 0, 1, 2, 2, 2, 2, 2, 2 };

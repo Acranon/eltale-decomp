@@ -203,7 +203,7 @@ typedef struct {
 } Unk80086798b; // size = 0x58
 
 /* This file's .bss, 800863F0..80087E30 (in address order; first declaration
- * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds effect_stat_marker_slots (Effect_ResetStatUpMarkers shares a lui between its pairs only when it
+ * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds effect_stat_up_marker_slots (Effect_ResetStatUpMarkers shares a lui between its pairs only when it
  * is defined here). Labels splat put inside these arrays (D_800865CC..,
  * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
 
@@ -266,20 +266,20 @@ typedef struct {
 
 s32 effect_mapobj_emitter_count;
 u16 effect_model_frame_counter;
-s32 effect_mapobj_previous_count;
+s32 effect_mapobj_emitter_prev_count;
 Unk80086400 effect_foot_emitter_slots[8];
-Unk80086440 effect_mapobj_emitter_buffer_a[8];
-Unk80086440 effect_mapobj_emitter_buffer_b[8];
+Unk80086440 effect_mapobj_emitter_buf1[8];
+Unk80086440 effect_mapobj_emitter_buf0[8];
 Unk800865C0 effect_floating_number_slots[10];
 Unk800866D8 effect_converge_emitter_slots[8];
 Unk80086798b effect_model_slots[32];
 Unk80087298 effect_streak_slots[32];
-Unk80087798 effect_stat_marker_slots[4];
+Unk80087798 effect_stat_up_marker_slots[4];
 Unk800877A8 effect_ring_slots[4];
 u16 effect_loaded_tlut_index;
-Unk1B200Vec2 effect_rotated_offset_scratch;
+Unk1B200Vec2 effect_temp_vec;
 u8 D_80087E08[8]; /* unreferenced */
-Coll1B200 effect_floor_collision_scratch;
+Coll1B200 effect_ring_coll;
 
 void Effect_ResetFootEmitters(void);
 void Effect_ResetMapObjEmitters(void);
@@ -360,12 +360,12 @@ void Effect_UpdateFootEmitters(void) {
                 effect_foot_particle_template.unk18 = pos->x;
                 effect_foot_particle_template.unk1C = pos->y + 1.0f;
                 effect_foot_particle_template.unk20 = pos->z;
-                effect_rotated_offset_scratch.x = 0.0f;
-                effect_rotated_offset_scratch.y = 0.7f;
-                Math_RotateVec2(pos->unk10, &effect_rotated_offset_scratch);
+                effect_temp_vec.x = 0.0f;
+                effect_temp_vec.y = 0.7f;
+                Math_RotateVec2(pos->unk10, &effect_temp_vec);
                 effect_foot_particle_template.unk34 = 0.2f;
-                effect_foot_particle_template.unk30 = effect_rotated_offset_scratch.x;
-                effect_foot_particle_template.unk38 = effect_rotated_offset_scratch.y;
+                effect_foot_particle_template.unk30 = effect_temp_vec.x;
+                effect_foot_particle_template.unk38 = effect_temp_vec.y;
                 Effect_AllocateSprite(&effect_foot_particle_template);
             }
         }
@@ -390,10 +390,10 @@ void Effect_ResetMapObjEmitters(void) {
     Unk80086440* a;
     Unk80086440* b;
 
-    effect_mapobj_previous_count = 0;
+    effect_mapobj_emitter_prev_count = 0;
     i = 8;
-    a = effect_mapobj_emitter_buffer_a;
-    b = effect_mapobj_emitter_buffer_b;
+    a = effect_mapobj_emitter_buf1;
+    b = effect_mapobj_emitter_buf0;
     do {
         i--;
         b->unk0 = 0;
@@ -410,8 +410,8 @@ void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     f32 angle;
     s32 n;
 
-    cur = gfx_frame_index ? effect_mapobj_emitter_buffer_a : effect_mapobj_emitter_buffer_b;
-    prev = gfx_frame_index ? effect_mapobj_emitter_buffer_b : effect_mapobj_emitter_buffer_a;
+    cur = gfx_frame_index ? effect_mapobj_emitter_buf1 : effect_mapobj_emitter_buf0;
+    prev = gfx_frame_index ? effect_mapobj_emitter_buf0 : effect_mapobj_emitter_buf1;
     angle = Math_Atan2(x - camera_state.eyeX, z - camera_state.eyeZ) - camera_state.yaw + 3.141592653589793;
     if (angle < -3.141592653589793) {
         angle += 6.283185307179586;
@@ -419,7 +419,7 @@ void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
         angle -= 6.283185307179586;
     }
     if (angle > -1.5707963267948966 && angle < 1.5707963267948966 && effect_mapobj_emitter_count < 8) {
-        n = effect_mapobj_previous_count;
+        n = effect_mapobj_emitter_prev_count;
         cur += effect_mapobj_emitter_count;
         while (n != 0 && arg3 != prev->unk14) {
             n--;
@@ -447,9 +447,9 @@ void Effect_UpdateMapObjEmitters(void) {
     Unk80086440* p;
     s32 n;
 
-    effect_mapobj_previous_count = effect_mapobj_emitter_count;
-    p = gfx_frame_index ? effect_mapobj_emitter_buffer_a : effect_mapobj_emitter_buffer_b;
-    n = effect_mapobj_previous_count;
+    effect_mapobj_emitter_prev_count = effect_mapobj_emitter_count;
+    p = gfx_frame_index ? effect_mapobj_emitter_buf1 : effect_mapobj_emitter_buf0;
+    n = effect_mapobj_emitter_prev_count;
     while (n != 0) {
         if (p->unk0 != 0 && --p->unk0 == 0) {
             effect_mapobj_particle_template.unk18 = p->x;
@@ -513,7 +513,7 @@ f32 effect_flipbook_scale_anim[12] = {
     0.88f, 0.88f, 0.84f, 0.84f, 0.82f, 0.82f, 0.8f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f,
 };
 u8 effect_flipbook_alpha_anim[12] = { 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x80, 0xA0, 0xC0, 0xC8, 0x80, 0x60 };
-u8 effect_converge_colors[4][4] = {
+u8 effect_floating_number_colors[4][4] = {
     { 0xFF, 0xFF, 0xFF, 0xFF }, { 0xC8, 0xFF, 0xC8, 0xFF }, { 0xC8, 0xC8, 0xFF, 0xFF }, { 0xFF, 0x7F, 0x7F, 0xFF },
 };
 Unk8004EE20 effect_converge_particle_template = {
@@ -524,11 +524,11 @@ Unk8004EE20 effect_burst_particle_template = {
     0x0014, 0, (void*)Effect_UpdateBurstParticle, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
     0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
 };
-u16 effect_ring_lifetimes[4] = { 0x14, 0xC, 0xC, 0 };
+u16 effect_ring_grow_frames[4] = { 0x14, 0xC, 0xC, 0 };
 u8 effect_ring_colors[3][4] = { { 0xC8, 0xC8, 0x00, 0x00 }, { 0xC8, 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xC8, 0x00 } };
 u8 effect_ring_alpha_values[4] = { 0xFF, 0x96, 0x00, 0x00 };
 s32 effect_model_tlut_ptrs[4] = { 0x800CAE68, 0x800CB068, 0x800CB268, 0x800CB468 };
-u8 effect_ring_segment_colors[5][4] = {
+u8 effect_stat_up_marker_colors[5][4] = {
     { 0xFF, 0x00, 0x00, 0x00 }, { 0xFF, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0xFF, 0x00 }, { 0x00, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0x00, 0x00 },
 };
 
@@ -666,7 +666,7 @@ void Effect_DrawFloatingNumbers(void) {
                 }
                 sx -= d->unk18 * w;
                 sy = sy - d->unk18 * 5 - 8;
-                c = effect_converge_colors[d->unk10 & 0xF];
+                c = effect_floating_number_colors[d->unk10 & 0xF];
                 gDPPipeSync(gfx_dl_head++);
                 gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 255);
                 dp = d->digits;
@@ -952,36 +952,36 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     p->unk6 = arg0;
     p->unk0 = 1;
     p->unk2 = 0;
-    p->unk4 = effect_ring_lifetimes[arg0];
+    p->unk4 = effect_ring_grow_frames[arg0];
     p->unk8 = arg1;
     p->unkC = arg2;
     p->unk10 = arg3;
     pt = p->pts; n = p->norms; j = 16;
     angle = 0.0f;
     do {
-        effect_rotated_offset_scratch.x = 0.0f;
-        effect_rotated_offset_scratch.y = arg4;
-        Math_RotateVec2(angle, &effect_rotated_offset_scratch);
-        pt->x = effect_rotated_offset_scratch.x + arg1;
-        pt->z = effect_rotated_offset_scratch.y + arg3;
-        Coll_ResolveFloorAndWalls(pt->x, player_state.unk1C, pt->z, 0xA00, &effect_floor_collision_scratch);
-        if (effect_floor_collision_scratch.flags & 0x8000) {
+        effect_temp_vec.x = 0.0f;
+        effect_temp_vec.y = arg4;
+        Math_RotateVec2(angle, &effect_temp_vec);
+        pt->x = effect_temp_vec.x + arg1;
+        pt->z = effect_temp_vec.y + arg3;
+        Coll_ResolveFloorAndWalls(pt->x, player_state.unk1C, pt->z, 0xA00, &effect_ring_coll);
+        if (effect_ring_coll.flags & 0x8000) {
             pt->y = arg2;
             n->x = 0.0f;
             n->y = 1.0f;
             n->z = 0.0f;
         } else {
-            dy = effect_floor_collision_scratch.y - arg2;
+            dy = effect_ring_coll.y - arg2;
             if (dy < -40.0 || dy > 40.0) {
                 pt->y = arg2;
                 n->x = 0.0f;
                 n->y = 1.0f;
                 n->z = 0.0f;
             } else {
-                pt->y = effect_floor_collision_scratch.y;
-                n->x = effect_floor_collision_scratch.normal.x;
-                n->y = effect_floor_collision_scratch.normal.y;
-                n->z = effect_floor_collision_scratch.normal.z;
+                pt->y = effect_ring_coll.y;
+                n->x = effect_ring_coll.normal.x;
+                n->y = effect_ring_coll.normal.y;
+                n->z = effect_ring_coll.normal.z;
             }
         }
         angle += 0.39269908169872414;
@@ -1323,7 +1323,7 @@ void Effect_ResetStatUpMarkers(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        effect_stat_marker_slots[i].unk0 = 0;
+        effect_stat_up_marker_slots[i].unk0 = 0;
     }
 }
 
@@ -1349,7 +1349,7 @@ void Effect_DrawStatUpMarkers(void* arg0) {
     Gfx* gfx;
 
     first = 0;
-    for (i = 0, p = effect_stat_marker_slots; i < 4; i++, p++) {
+    for (i = 0, p = effect_stat_up_marker_slots; i < 4; i++, p++) {
         if (p->unk0 != 0) {
             if (gfx_mtx_index < 0x1E6) {
                 if (first == 0) {
@@ -1375,7 +1375,7 @@ void Effect_DrawStatUpMarkers(void* arg0) {
                     _g->words.w1 = (u32)&D_2000000.unkC0[gfx_mtx_index];
                     gfx_mtx_index++;
                 }
-                gDPSetEnvColor(gfx_dl_head++, effect_ring_segment_colors[i / 1][0], effect_ring_segment_colors[i / 1][1], effect_ring_segment_colors[i / 1][2], alpha);
+                gDPSetEnvColor(gfx_dl_head++, effect_stat_up_marker_colors[i / 1][0], effect_stat_up_marker_colors[i / 1][1], effect_stat_up_marker_colors[i / 1][2], alpha);
                 gSPDisplayList(gfx_dl_head++, D_800EB9C8);
             }
             p->unk0--;
@@ -1385,5 +1385,5 @@ void Effect_DrawStatUpMarkers(void* arg0) {
 
 
 void Effect_StartStatUpMarker(s32 arg0) {
-    effect_stat_marker_slots[arg0].unk0 = 25;
+    effect_stat_up_marker_slots[arg0].unk0 = 25;
 }
