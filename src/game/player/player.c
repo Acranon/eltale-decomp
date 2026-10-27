@@ -170,8 +170,8 @@ void Player_Spawn(void) {
                 player_temp_vec.x = 0.0f;
                 player_temp_vec.y = 20.0f;
                 Math_RotateVec2(p->actor.rot, (Vec2f *)&player_temp_vec);
-                p->unk12C = player_temp_vec.x;
-                p->unk130 = player_temp_vec.y;
+                p->move_step_x = player_temp_vec.x;
+                p->move_step_z = player_temp_vec.y;
                 p->actor.animFlags = 1;
                 Sfx_Play(5, 0x21, 0xFF);
                 Sfx_Play(0xF, 0x21, 0xFF);
@@ -179,7 +179,7 @@ void Player_Spawn(void) {
             case 2:
                 p->state = 10;
                 pos = &map_objs[player_spawn_obj];
-                p->unk138 = p->actor.rot = pos->angle * 0.017453292519943295;
+                p->finish_angle = p->actor.rot = pos->angle * 0.017453292519943295;
                 if (player_spawn_type & 1) {
                     p->state_timer = 0x15;
                     p->actor.frame = 0x55;
@@ -188,7 +188,7 @@ void Player_Spawn(void) {
                     n = 0xE;
                 } else {
                     p->state_timer = 0x1F;
-                    p->unk138 = p->unk138 + 3.141592653589793;
+                    p->finish_angle = p->finish_angle + 3.141592653589793;
                     p->actor.frame = 0x3C;
                     player_temp_vec.x = -132.831f;
                     player_temp_vec.y = -120.681f;
@@ -209,8 +209,8 @@ void Player_Spawn(void) {
                 player_temp_vec.x = 0.0f;
                 player_temp_vec.y = 20.0f;
                 Math_RotateVec2(p->actor.rot, (Vec2f *)&player_temp_vec);
-                p->unk12C = player_temp_vec.x;
-                p->unk130 = player_temp_vec.y;
+                p->move_step_x = player_temp_vec.x;
+                p->move_step_z = player_temp_vec.y;
                 p->actor.animFlags = 1;
                 Player_LoadAnim(&player_state.actor);
                 Anim_UpdateRootMotion(&player_state.actor, p->actor.animIndex * 0xC + (s32) cd, p->actor.scale);
@@ -359,7 +359,7 @@ void Player_Update(void) {
                     p->actor.x = player_front_chest->x + player_temp_vec.x;
                     p->actor.z = player_front_chest->z + player_temp_vec.y;
                     p->actor.rot = player_front_chest->rot;
-                    p->unk138 = player_front_chest->rot + 3.141592653589793;
+                    p->finish_angle = player_front_chest->rot + 3.141592653589793;
                     p->item_id = player_front_chest->animSetIndex;
                     Player_StartOpenChest(&player_state, &player_state.actor, (s32) cd);
                     player_front_chest = NULL;
@@ -517,7 +517,7 @@ void Player_InitBattle(void) {
     p->state = 3;
     p->state_timer = cd->unkDA;
     p->melee_target_plus_one = 0;
-    p->unk134 = p->actor.rot;
+    p->turn_target_angle = p->actor.rot;
     p->flags &= ~0x20;
     p->actor.animFlags |= 1;
     if (player_idle_anim != 0x19) {
@@ -717,7 +717,7 @@ void Player_StateTalk(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
 }
 
 void Player_StateAutoWalk(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
-    Player_MoveWalk(arg1->unk12C, arg1->unk130, arg0, arg1);
+    Player_MoveWalk(arg1->move_step_x, arg1->move_step_z, arg0, arg1);
     Player_MoveAndCollide(0xA01, arg0, arg1);
     if (--arg1->state_timer == 0) {
         arg1->state = 0;
@@ -832,9 +832,9 @@ void Player_StateWalkToExitObject(Actor *arg0, Player *arg1, PlayerAnimTable *ar
     arg0->vz = 0.0f;
     arg0->vx = 0.0f;
     rot = arg0->rot;
-    arg0->x += arg1->unk12C;
-    arg0->z += arg1->unk130;
-    d = arg1->unk134 - rot;
+    arg0->x += arg1->move_step_x;
+    arg0->z += arg1->move_step_z;
+    d = arg1->turn_target_angle - rot;
     if (d > 3.141592653589793) {
         d -= 6.283185307179586;
     } else if (d < -3.141592653589793) {
@@ -853,7 +853,7 @@ void Player_StateWalkToExitObject(Actor *arg0, Player *arg1, PlayerAnimTable *ar
         Anim_SetCurrentAndNext(arg0, arg1->unk6, 1, player_idle_anim, 1, 1);
         Player_LoadAnim(arg0);
         Anim_UpdateRootMotion(arg0, arg0->animIndex + (AnimSet *)arg2, arg0->scale); /* the table as its AnimSet array */
-        arg0->rot = arg1->unk138;
+        arg0->rot = arg1->finish_angle;
         Sfx_Play(0x1A, 8, 0xFF);
     }
 }
@@ -866,7 +866,7 @@ void Player_StateAnimMove(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
     if (--arg1->state_timer == 0) {
         arg1->state = 0;
         arg0->animFlags &= 0xFFFE;
-        arg0->rot = arg1->unk138;
+        arg0->rot = arg1->finish_angle;
     }
 }
 
@@ -884,7 +884,7 @@ void Player_StateOpenChest(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
             Sfx_Play(0, 0x3B, 0xFF);
         }
         if (--arg1->state_timer == 0) {
-            arg0->rot = arg1->unk138;
+            arg0->rot = arg1->finish_angle;
             Anim_SetCurrentAndNext(arg0, player_idle_anim, 1, player_idle_anim, 1, 1);
         }
     } else if (text_active_window_count == 0) {
@@ -929,7 +929,7 @@ void Player_StateBattleWon(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
     arg0->vx = 0.0f;
     if (arg1->state_timer < 0x26) {
         rot = arg0->rot;
-        d = arg1->unk134 - rot;
+        d = arg1->turn_target_angle - rot;
         if (d < -3.141592653589793) {
             d += 6.283185307179586;
         } else if (d > 3.141592653589793) {
@@ -958,7 +958,7 @@ void Player_StateExamine(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
     f32 d;
 
     rot = arg0->rot;
-    d = arg1->unk134 - rot;
+    d = arg1->turn_target_angle - rot;
     if (d < -3.141592653589793) {
         d += 6.283185307179586;
     } else if (d > 3.141592653589793) {
@@ -1410,8 +1410,8 @@ void Player_StartAreaExit(void) {
             player_temp_vec.y = 40.0f;
             p->actor.rot = r;
             Math_RotateVec2(r, (Vec2f *)&player_temp_vec);
-            p->unk12C = player_temp_vec.x;
-            p->unk130 = player_temp_vec.y;
+            p->move_step_x = player_temp_vec.x;
+            p->move_step_z = player_temp_vec.y;
             p->actor.animFlags |= 1;
             Sfx_Play(5, 0x21, 0xFF);
             Sfx_Play(0xF, 0x21, 0xFF);
@@ -1478,16 +1478,16 @@ void Player_StartObjectExit(Player *arg0, Actor *arg1) {
         arg0->unk6 = n;
         rot = pos->angle * 0.017453292519943295;
         Math_RotateVec2(-rot, (Vec2f *)&player_temp_vec);
-        arg0->unk12C = (pos->x - player_temp_vec.x * arg1->scale - arg1->x) / arg0->state_timer;
-        arg0->unk130 = (pos->z + player_temp_vec.y * arg1->scale - arg1->z) / arg0->state_timer;
-        arg0->unk138 = rot;
+        arg0->move_step_x = (pos->x - player_temp_vec.x * arg1->scale - arg1->x) / arg0->state_timer;
+        arg0->move_step_z = (pos->z + player_temp_vec.y * arg1->scale - arg1->z) / arg0->state_timer;
+        arg0->finish_angle = rot;
         rot = rot + player_temp_vec.z * 0.017453292519943295;
         if (rot > 3.141592653589793) {
             rot -= 6.283185307179586;
         } else if (rot < -3.141592653589793) {
             rot += 6.283185307179586;
         }
-        arg0->unk134 = rot;
+        arg0->turn_target_angle = rot;
         arg1->rotX = 0.0f;
         arg1->rotZ = 0.0f;
     }

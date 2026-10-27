@@ -126,5 +126,5 @@ void TextSpot_LoadMessage(TextSpot* arg0) {
     if (text_speaker_name[2] == 0xFF) {
         text_speaker_name[0] = 0xFF;
     }
-    player_state.unk134 = arg0->interactionHeading;
+    player_state.turn_target_angle = arg0->interactionHeading;
 }

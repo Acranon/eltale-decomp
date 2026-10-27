@@ -31,10 +31,10 @@ typedef struct Player {
     /* 0x126 */ u16 unk126;
     /* 0x128 */ u16 unk128;
     /* 0x12A */ u16 unk12A;
-    /* 0x12C */ f32 unk12C;
-    /* 0x130 */ f32 unk130;
-    /* 0x134 */ f32 unk134;
-    /* 0x138 */ f32 unk138;
+    /* 0x12C */ f32 move_step_x;
+    /* 0x130 */ f32 move_step_z;
+    /* 0x134 */ f32 turn_target_angle;
+    /* 0x138 */ f32 finish_angle;
     /* 0x13C */ u8 unk13C[4];
 } Player; /* 0x140 bytes */
 
