@@ -50,9 +50,9 @@ void Battle_ResetState(void) {
     battle_travel_accumulator = 0.0f;
     battle_encounter_roll_limit = 0;
     if (map_subarea_flags & 1) {
-        if (map_area_def->unk30 != NULL) {
-            battle_encounter_region_table = &map_area_def->unk30[map_subarea];
-            battle_encounter_group_table = &map_area_def->unk34[map_subarea];
+        if (map_area_def->encounterRegions != NULL) {
+            battle_encounter_region_table = &map_area_def->encounterRegions[map_subarea];
+            battle_encounter_group_table = &map_area_def->encounterGroups[map_subarea];
             return;
         }
         battle_encounter_region_table = NULL;

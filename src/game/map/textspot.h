@@ -22,7 +22,7 @@ typedef struct TextSpotDef {
 /* A text spot of the current sub-area (textspot_list). */
 typedef struct TextSpot {
     /* 0x00 */ TextSpotDef *entry;
-    /* 0x04 */ f32 unk4; /* the player's heading minus the direction to the spot */
+    /* 0x04 */ f32 interactionHeading; /* the player's heading minus the direction to the spot */
     /* 0x08 */ s32 unk8;
 } TextSpot; /* 0xC bytes */
 

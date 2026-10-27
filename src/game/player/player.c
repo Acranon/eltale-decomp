@@ -607,9 +607,9 @@ void Player_StateMove(Actor *a, Player *p, PlayerAnimTable *cd) {
                 effect_foot_particle_template.x = a->x;
                 effect_foot_particle_template.y = a->y + 1.0f;
                 effect_foot_particle_template.z = a->z;
-                effect_foot_particle_template.unk30 = 0.0f;
-                effect_foot_particle_template.unk34 = 0.2f;
-                effect_foot_particle_template.unk38 = 0.0f;
+                effect_foot_particle_template.vecX = 0.0f;
+                effect_foot_particle_template.vecY = 0.2f;
+                effect_foot_particle_template.vecZ = 0.0f;
                 Effect_AllocateSprite(&effect_foot_particle_template);
             }
             p->unk4--;

@@ -210,7 +210,7 @@ void Map_LoadArea(void) {
             if (map_flags & 2) {
                 Dma_ReadRom(D_851F0, D_8010FE00, D_C8DE0 - D_851F0);
             }
-            q = &((u32 *)map_extra_rom_ranges)[map_area_def->unk3C * 3];
+            q = &((u32 *)map_extra_rom_ranges)[map_area_def->extraRomRangeIndex * 3];
             start = *q++;
             end = *q++;
             Dma_ReadRom(start, *q, end - start);
@@ -826,8 +826,8 @@ void MapObj_EmitArcSprite(MapObj *arg0) {
         mapobj_temp_vec[0] = arg0->scale * 2.0;
         mapobj_temp_vec[1] = 0.0f;
         Math_RotateVec2(arg0->angle, (Vec2f *)mapobj_temp_vec);
-        mapobj_arc_sprite_template.unk30 = mapobj_temp_vec[0];
-        mapobj_arc_sprite_template.unk38 = mapobj_temp_vec[1];
+        mapobj_arc_sprite_template.vecX = mapobj_temp_vec[0];
+        mapobj_arc_sprite_template.vecZ = mapobj_temp_vec[1];
         mapobj_arc_sprite_template.tex = &mapobj_arc_sprite_tex[arg0->model << 10];
         Effect_AllocateSprite(&mapobj_arc_sprite_template);
         if (arg0->model >= 7) {
@@ -837,10 +837,10 @@ void MapObj_EmitArcSprite(MapObj *arg0) {
 }
 
 void MapObj_StepArcSprite(EffectSprite *arg0) {
-    arg0->x += arg0->unk30;
-    arg0->y += arg0->unk34;
-    arg0->z += arg0->unk38;
-    arg0->unk34 -= 0.9;
+    arg0->x += arg0->vecX;
+    arg0->y += arg0->vecY;
+    arg0->z += arg0->vecZ;
+    arg0->vecY -= 0.9;
     gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, (mapobj_arc_flicker_tick & 1) ? 0xDC : 0x78);
 }
 
@@ -866,8 +866,8 @@ u16 mapobj_animtex_width[2] = { 0x10, 0x10 };
 u8 mapobj_animtex_alpha[4] = { 0x82, 0xDC, 0x78, 0xF0 };
 
 void MapObj_StepDropSprite(EffectSprite *arg0) {
-    arg0->y = arg0->y + arg0->unk34 / 2;
-    arg0->unk34 -= 0.2;
+    arg0->y = arg0->y + arg0->vecY / 2;
+    arg0->vecY -= 0.2;
     gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, arg0->life * 5);
 }
 

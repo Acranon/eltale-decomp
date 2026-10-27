@@ -124,9 +124,9 @@ void Effect_UpdateFootEmitters(void) {
                 effect_temp_vec.x = 0.0f;
                 effect_temp_vec.y = 0.7f;
                 Math_RotateVec2(pos->rot, &effect_temp_vec);
-                effect_foot_particle_template.unk34 = 0.2f;
-                effect_foot_particle_template.unk30 = effect_temp_vec.x;
-                effect_foot_particle_template.unk38 = effect_temp_vec.y;
+                effect_foot_particle_template.vecY = 0.2f;
+                effect_foot_particle_template.vecX = effect_temp_vec.x;
+                effect_foot_particle_template.vecZ = effect_temp_vec.y;
                 Effect_AllocateSprite(&effect_foot_particle_template);
             }
         }
@@ -136,12 +136,12 @@ void Effect_UpdateFootEmitters(void) {
 }
 
 void Effect_UpdateFootParticle(EffectSprite* arg0) {
-    arg0->x += arg0->unk30;
-    arg0->y += arg0->unk34;
-    arg0->z += arg0->unk38;
-    arg0->unk30 *= 0.8;
-    arg0->unk34 *= 0.9;
-    arg0->unk38 *= 0.8;
+    arg0->x += arg0->vecX;
+    arg0->y += arg0->vecY;
+    arg0->z += arg0->vecZ;
+    arg0->vecX *= 0.8;
+    arg0->vecY *= 0.9;
+    arg0->vecZ *= 0.8;
     arg0->scaleX = arg0->scaleY = effect_foot_particle_scale_anim[arg0->life];
     gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, effect_foot_particle_alpha_anim[arg0->life]);
 }
@@ -236,9 +236,9 @@ void Effect_UpdateMapObjParticle(EffectSprite* arg0) {
     s32 g;
     s32 b;
 
-    arg0->x += arg0->unk30;
-    arg0->y += arg0->unk34;
-    arg0->z += arg0->unk38;
+    arg0->x += arg0->vecX;
+    arg0->y += arg0->vecY;
+    arg0->z += arg0->vecZ;
     arg0->scaleX += 0.08;
     arg0->scaleY += 0.08;
     r = D_80084B6C + 0x40;
@@ -478,9 +478,9 @@ void Effect_UpdateConvergeEmitters(void) {
                 spawn.x = p->centerX + x;
                 spawn.y = p->centerY + y;
                 spawn.z = p->centerZ + z;
-                spawn.unk30 = x * -0.03;
-                spawn.unk34 = y * -0.03;
-                spawn.unk38 = z * -0.03;
+                spawn.vecX = x * -0.03;
+                spawn.vecY = y * -0.03;
+                spawn.vecZ = z * -0.03;
                 spawn.unk3C = p->colorIndex;
                 Effect_AllocateSprite(&spawn);
             }
@@ -494,12 +494,12 @@ void Effect_UpdateConvergeEmitters(void) {
 void Effect_UpdateConvergeParticle(EffectSprite* arg0) {
     u8* c;
 
-    arg0->x += arg0->unk30;
-    arg0->y += arg0->unk34;
-    arg0->z += arg0->unk38;
-    arg0->unk30 *= 0.9;
-    arg0->unk34 *= 0.9;
-    arg0->unk38 *= 0.9;
+    arg0->x += arg0->vecX;
+    arg0->y += arg0->vecY;
+    arg0->z += arg0->vecZ;
+    arg0->vecX *= 0.9;
+    arg0->vecY *= 0.9;
+    arg0->vecZ *= 0.9;
     arg0->roll += 0.39269908169872414;
     if (arg0->life < 10) {
         arg0->scaleX = arg0->scaleY = 1.0f;
@@ -529,9 +529,9 @@ void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
         spawn.x = arg1;
         spawn.y = arg2;
         spawn.z = arg3;
-        spawn.unk30 = a;
-        spawn.unk34 = b;
-        spawn.unk38 = c;
+        spawn.vecX = a;
+        spawn.vecY = b;
+        spawn.vecZ = c;
         spawn.unk3C = arg0;
         Effect_AllocateSprite(&spawn);
         i--;
@@ -541,12 +541,12 @@ void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
 void Effect_UpdateBurstParticle(EffectSprite* arg0) {
     u8* c;
 
-    arg0->x += arg0->unk30;
-    arg0->y += arg0->unk34;
-    arg0->z += arg0->unk38;
-    arg0->unk30 *= 0.8;
-    arg0->unk34 *= 0.8;
-    arg0->unk38 *= 0.8;
+    arg0->x += arg0->vecX;
+    arg0->y += arg0->vecY;
+    arg0->z += arg0->vecZ;
+    arg0->vecX *= 0.8;
+    arg0->vecY *= 0.8;
+    arg0->vecZ *= 0.8;
     arg0->roll += 0.39269908169872414;
     if (arg0->life < 10) {
         arg0->scaleX = arg0->scaleY = 1.0f;

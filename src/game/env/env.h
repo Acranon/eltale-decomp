@@ -42,8 +42,8 @@ typedef struct EnvKeyframe {
     /* 0x34 */ EnvFogRange fog;
 } EnvKeyframe; /* 0x3C bytes */
 
-/* A subarea's environment record (map_area_def->unk1C[]); env_area_settings points at the
- * current one. unk8 set: unkC..unk14 are the light direction. */
+/* A subarea's environment record (map_area_def->envSettings[]); env_area_settings points at the
+ * current one. hasLightDirection selects lightDirX/Y/Z. */
 typedef struct EnvAreaSettings {
     /* 0x00 */ EnvKeyframe *frames;
     /* 0x04 */ s32 count;
@@ -56,8 +56,8 @@ typedef struct EnvAreaSettings {
     /* 0x1C */ s32 backdropId;
 } EnvAreaSettings; /* 0x20 bytes */
 
-/* A light slot (Env_AllocateLightSlot): env colour animation (unk4..unk14), light colour
- * animation (unk18..unk28) and light directions (unk2C). */
+/* A light slot (Env_AllocateLightSlot): env colour animation (envAnimMode..envFramesStart), light colour
+ * animation (lightAnimMode..lightFramesStart) and light directions (lightDirs). */
 typedef struct EnvLightSlot {
     /* 0x00 */ s32 state;
     /* 0x04 */ s32 envAnimMode;
