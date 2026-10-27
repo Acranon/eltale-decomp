@@ -1,67 +1,84 @@
+# r3b reviewed 2026-10-26: kept 52, renamed 13, reverted 0
+# r3b added 13 (D_800616B0, D_80066E88, the 4 menu_bg_strip_tex entries, the 5 text_rect_texture_ptrs entries, D_8006CC78, D_8006CC7C)
 # b06 round 3: data names owned by save menu, text, input/Pak and cutscene modules
 # old<TAB>new<TAB>evidence
-D_8008FB70	save_menu_flags	SaveMenu_Update dispatches on the low state bits and uses upper bits for save/load and dialog transition flags.
-D_8008FB72	save_menu_dialog_index	SaveMenu_UpdateDialog indexes dialog layout and message tables with this value.
-D_8008FB73	save_menu_choice_prompt_index	SaveMenu_UpdateDialog indexes five choice prompts and rectangles with this value.
-D_8008FB74	save_menu_pak_error	Save, load and delete paths store Pak errors here; SaveMenu_RepairPak passes it to Pak_TryRepair.
-D_8008FB78	save_menu_choice_cursor	Dialog input toggles this selection and SaveMenu_UpdateDialog uses it for cursor position.
-D_8008FB79	save_menu_delay_frames	Save-menu states assign frame delays and SaveMenu_UpdateDelay decrements this signed counter.
-D_8008FB7A	save_menu_selected_slot	SaveMenu_UpdateSlotList changes it with navigation; load, save and delete use it to index slots.
-D_8008FB7B	save_menu_stick_repeat_counter	SaveMenu_UpdateSlotList increments this modulo 16 to pace held-stick navigation.
-D_8008FB7C	save_menu_repair_attempts	The Pak error path increments it and tests it when deciding whether to retry or show an error.
-D_8008FB80	save_menu_file_entries	Seventeen entries map displayed slots to Pak file numbers and extension bytes.
-D_8008FBA8	save_menu_save_headers	Sixteen save-header records are displayed in the slot list and written as the first Pak block.
-D_80090228	save_menu_game_state_block	SaveMenu_CaptureGameState copies game globals into this block; SaveMenu_RestoreGameState copies them back.
-D_800902F0	save_menu_header_read_scratch	SaveMenu_RefreshFileList reads a Pak header here before copying it into a save-header slot.
-D_80090370	save_menu_state_read_scratch	SaveMenu_LoadSelectedFile reads the secondary Pak block here before copying it into game state.
-D_80061660	text_reveal_speed_steps	Text_OpenWindow and Text_UpdateAndDrawWindows use this eight-entry table for per-character reveal timing.
-D_80061668	text_window_default_rects	Text_OpenWindow copies X, Y, width and height from the indexed rectangle.
-D_800616A8	text_choice_window_rect	Text_MeasureChoiceWindow updates this rectangle from choice rows; Text_OpenWindow copies it for choice windows.
-D_800616D0	text_rect_texture_ptrs	Text_DrawTexturedRect copies this five-entry texture pointer table before selecting a texture.
-D_800616E4	text_rect_texture_params	Text_DrawTexturedRect copies these five tile width, height and mask records.
-D_80090450	text_active_window_count	Text_OpenWindow increments it and Text_UpdateAndDrawWindows decrements it as windows close.
-D_80090454	text_last_choice_index	Text_UpdateAndDrawWindows copies the selected row here; NPC code tests whether it is zero.
-D_80090458	text_pending_choice_rows	Text_OpenWindow copies its row count and row pointers into a new choice window.
-D_80090470	text_window_slots	Four records hold per-window geometry, text, choices, cursor and animation state.
-D_80092C60	text_font_load_flag	Text_LoadFontAssets clears it; Text_DrawEncodedString checks it before using font data.
-D_80092C62	text_stick_advance_frames	Text_IsStickAdvanceHeld increments this counter until five strong-stick frames, then resets it.
-D_80061760	text_font_metrics	Text_DrawEncodedString reads glyph width, height, advance and vertical offset from this table.
-D_80061770	text_glyph_setup_dl	Text_DrawEncodedString emits this display list before drawing textured glyph rectangles.
-D_80092C70	text_current_glyph_index	Text_DrawEncodedString stores the current encoded glyph index here for metric lookup.
-D_80092C74	text_extra_glyph_spacing	Text_DrawEncodedString adds this control-byte spacing to glyph advance.
-D_80092C80	input_primary_port	Input_InitializeControllers picks the first usable controller port; gameplay and Pak code use it.
-D_80092C81	input_stick_x	Input_ReadController copies the selected OSContPad stick_x here.
-D_80092C82	input_stick_y	Input_ReadController copies the selected OSContPad stick_y here.
-D_80092C84	input_held_buttons	Input_ReadController stores the selected pad button bits here each frame.
-D_80092C86	input_pressed_buttons	Input_ReadController masks current buttons with the inverted previous mask to retain new presses.
-D_80092C88	input_previous_button_inverse	Input_ReadController stores complement of current buttons here for next-frame edge detection.
-D_80092C90	input_si_queue	Input_InitializeControllers creates this SI event queue and controller/Pak calls pass it as their message queue.
-D_80092CA8	pak_port_states	Four OSPfs structs initialized or repaired per controller port and used for file operations.
-D_80092E48	pak_game_file_scans	Pak_ScanGameFiles records matching file IDs, extension bytes, note count and free-space flags per port.
-D_80092E98	input_connected_port_bits	osContInit fills this bitmask and Input_InitializeControllers scans set bits for usable ports.
-D_80092EA0	input_controller_statuses	osContInit and osContGetQuery fill four OSContStatus records read for controller and Pak state.
-D_80092EB0	input_si_message	OS_EVENT_SI sends this message through the controller SI queue.
-D_80092EB8	input_pad_states	Input_ReadController fills four OSContPad records via osContGetReadData.
-D_80061810	pak_game_name	Pak_ScanGameFiles compares this game-name byte field with Pak note names; allocation and deletion pass it to libultra.
-D_80061840	pak_allocate_extension_template	Pak_AllocateGameFile copies this zero extension template before osPfsAllocateFile.
-D_80061844	pak_delete_extension_template	Pak_DeleteGameFile copies this zero extension template before osPfsDeleteFile.
-D_80092ED0	cutscene_sequence_index	Cutscene_ResetSequence zeros it; Cutscene_StartNextScene increments it and stops at 14 entries.
-D_80092ED4	cutscene_camera_frame	Cutscene_StartNextScene zeros it; Cutscene_UpdateScene increments it when sampling the camera track.
-D_80092ED8	cutscene_camera_end_frame	Cutscene_StartNextScene copies the camera track duration here and UpdateScene compares it to the current frame.
-D_80092EDC	cutscene_camera_track	Cutscene_StartNextScene stores a pointer to the active camera track; UpdateScene samples it.
-D_80092EE0	cutscene_image_frame	Cutscene_DrawImageCues increments this frame counter and compares it to cue start frames.
-D_80092EE4	cutscene_next_image_cue	Cutscene_DrawImageCues advances this pointer when a cue's start frame is reached.
-D_80092EE8	cutscene_image_cue_slots	Thirty-two active image cue entries reset, allocated and drawn by Cutscene_DrawImageCues.
-D_80061850	text_font_tlut	Text_DrawWindow and related text rendering load this palette before drawing glyph textures.
-D_80061E98	menu_ui_tlut	Menu texture drawing and number rendering load this 256-color palette.
-D_8006C8F8	save_menu_choice_messages	SaveMenu_UpdateDialog indexes these five message pointers by choice prompt index.
-D_8006C90C	save_menu_choice_rects	SaveMenu_UpdateDialog indexes these five X/Y/width/height records for choice prompts.
-D_8006C934	save_menu_dialog_messages_flag4	SaveMenu_UpdateDialog selects messages from this contiguous table when menu bit 4 is set.
-D_8006C998	save_menu_dialog_messages_default	SaveMenu_UpdateDialog selects this 25-entry message table when menu bit 4 is clear.
-D_8006C9FC	save_menu_dialog_rects	SaveMenu_UpdateDialog indexes these 25 X/Y/width/height records by dialog index.
-D_8006CAC4	save_menu_choice_cursor_positions	SaveMenu_UpdateDialog uses these four X/Y pairs to draw its two-choice cursor.
-D_8006CC28	save_menu_slot_label_ptrs	SaveMenu_UpdateSlotList chooses one of these pointers for a slot summary label.
-D_8006CC90	cutscene_image_setup_dl	Cutscene_DrawImageCues emits this display list before drawing cue rectangles.
-D_8007A8E0	cutscene_message_wait_frames	Cutscene_StartEntry sets 60; Cutscene_UpdateMessageSequence decrements it between message windows.
-D_8007A8E4	cutscene_messages_remaining	Cutscene_StartEntry copies the entry's message count; UpdateMessageSequence decrements it per message.
-D_8007A8E8	cutscene_next_message	Cutscene_StartEntry copies the entry message pointer here; Cutscene_UpdateMessageSequence reads one message/name pair and advances it.
+# Stay D_: D_80090358 (tail of the 0x80-byte header read buffer, unreferenced), D_80061650/D_800616B4/D_800616B8/D_800616C0/D_800616C8 (local-variable initializers that SaveMenu_UpdateSlotList, Text_UpdateAndDrawWindows and Text_DrawAdvanceIndicator copy to the stack), D_80061820 (unreferenced digit string), D_8006C938/D_8006C93C/D_8006C940 (rest of the 25-entry save dialog table, reached only by indexing save_menu_dialog_messages_save), the 36E60 message byte arrays and the other 36E60 textures (entries of named tables only), D_8006CC74 and D_8006CC80 (write-only), D_8007A8C0/D_8007A8EC (unreferenced .bss gaps).
+D_8008FB70	save_menu_flags	SaveMenu_Update: bits 0-2 the state (0 slot list, 1 repair, 2 load, 3 save, 4 delete, 5 dialog, 6 delay), 0x2000 draw the operation panel, 0x4000 Pak checked, 0x8000 close (clears menu_flags 0x8000), 0x800 yes/no box (SaveMenu_UpdateDialog), 0x1000 re-check the Pak (set by SaveMenu_Init)
+D_8008FB72	save_menu_dialog_index	which dialog SaveMenu_UpdateDialog shows: indexes save_menu_dialog_rects and the two dialog message tables; set by the Pak check and the load/save/delete/repair results
+D_8008FB73	save_menu_operation_panel_index	SaveMenu_DrawOperationPanel indexes save_menu_operation_panel_rects/messages with it; set to 0 (Pak check, SaveMenu_Update), 1 load, 2 save, 3 delete, 4 repair when the operation starts
+D_8008FB74	save_menu_pak_error	Pak error code stored by the check, load, save, delete and repair paths; SaveMenu_RepairPak passes it to Pak_TryRepair
+D_8008FB78	save_menu_choice_cursor	row 0/1 of the yes/no box: SaveMenu_UpdateDialog toggles it with the stick, draws the cursor at save_menu_choice_cursor_positions[it] and branches on it; Text_UpdateAndDrawWindows stores the choice of 0x80000 windows here
+D_8008FB79	save_menu_delay_frames	signed frame count: the save-menu states set 10 (or 2/4), SaveMenu_UpdateDialog ignores input until it is < 0, SaveMenu_UpdateDelay returns to the slot list when it goes < 0
+D_8008FB7A	save_menu_selected_slot	slot index SaveMenu_UpdateSlotList moves with the stick; load, save, delete and repair index save_menu_file_entries/save_menu_save_headers with it
+D_8008FB7B	save_menu_stick_repeat_counter	SaveMenu_UpdateSlotList moves the slot only when it is 0, then counts it up modulo 16 while the stick is held, 0 when released
+D_8008FB7C	save_menu_repair_count	SaveMenu_RepairPak increments it after a successful repair, SaveMenu_Update zeroes it after the Pak check; SaveMenu_CheckControllerPak shows dialog 24 when it is nonzero and the Pak is still full
+D_8008FB80	save_menu_file_entries	17 (Pak file number, ext_name byte) entries SaveMenu_RefreshFileList builds from pak_game_file_scans; -1 ends the list, -2 is the new-file entry added in save mode; load/save/delete use [save_menu_selected_slot]
+D_8008FBA8	save_menu_save_headers	16 x 0x68 headers (player stats, play time, day count, map/subarea, return points, options): SaveMenu_CaptureGameState fills, Pak_WriteFile writes as bytes 0..0x80 of the file, SaveMenu_UpdateSlotList shows, SaveMenu_RestoreGameState copies back
+D_80090228	save_menu_game_state_block	chest, spirit, inventory and boss flags: SaveMenu_CaptureGameState copies them in, SaveMenu_SaveSelectedFile writes it at file offset 0x80, SaveMenu_LoadSelectedFile/RestoreGameState copy them back
+D_800902F0	save_menu_header_read_scratch	SaveMenu_RefreshFileList reads each file's 0x80-byte header here (Pak_ReadFile) and copies it into save_menu_save_headers
+D_80090370	save_menu_state_read_scratch	SaveMenu_LoadSelectedFile reads the file's 0xE0 bytes at offset 0x80 here and copies them into save_menu_game_state_block
+D_80061660	text_reveal_delay_steps	{-1, 0, 1, 2, 4, 8, 16, 30}: Text_OpenWindow sets the per-character delay to [0] + menu_text_delay_option; Text_UpdateAndDrawWindows sets it to [code & 7] * menu_text_delay_option for control codes 0xE1..0xE8
+D_80061668	text_window_default_rects	(x, y, w, h) per window type 0..7; Text_OpenWindow(type >= 0) copies [type] into the slot
+D_800616A8	text_choice_window_rect	(x, y, w, h) of choice windows: Text_MeasureChoiceWindow sets w/h from the rows, Text_OpenWindow(type < 0) copies it into the slot
+D_800616D0	text_rect_texture_ptrs	5 textures Text_DrawTexturedRect selects by its type argument (copied to a local)
+D_800616E4	text_rect_texture_params	(w, h, cms, cmt, masks, maskt) per Text_DrawTexturedRect type, used for the tile load (copied to a local)
+D_80090450	text_active_window_count	Text_OpenWindow increments it, Text_UpdateAndDrawWindows decrements it when a window closes; player, cutscene and core code wait for it to be 0
+D_80090454	text_last_choice_index	row confirmed in a choice window (Text_UpdateAndDrawWindows); the rest-choice code (9D50) sets -1 before opening, Player code (3F50) tests == 0
+D_80090458	text_pending_choice_rows	row count and row pointers the caller fills (9D50) before Text_OpenWindow copies them into the window
+D_80090470	text_window_slots	4 x 0x9FC window records (flags, rect, delay, choice cursor, speaker name, choice rows, text buffers): Text_ResetWindow/OpenWindow/UpdateAndDrawWindows and the draw helpers
+D_80092C60	text_stick_advance_enabled	Text_IsStickAdvanceHeld only counts the stick when it is nonzero; Text_OpenWindow clears it and nothing in the tree sets it
+D_80092C62	text_stick_advance_frames	Text_IsStickAdvanceHeld counts frames with the stick past radius 60 and returns 1 at 5; zeroed on release and by Text_ResetStickAdvanceTimer
+D_80061760	text_font_metrics	(glyph width, height, x advance, line height) records: Text_DrawEncodedString draws and advances with [text_font_index], line height on control code 0xE0
+D_80061770	text_glyph_setup_dl	render-state list for text: Text_DrawEncodedString (control code 0xFE), Text_UpdateAndDrawWindows, Menu_Update and SaveMenu_SetTextDrawState call it
+D_80092C70	text_font_index	Text_DrawEncodedString sets it from control codes 0xC0..0xCF and indexes text_font_metrics with it
+D_80092C74	text_extra_glyph_spacing	Text_DrawEncodedString sets it from control codes 0xD0..0xDF and adds it to every glyph advance
+D_80092C80	input_primary_port	first port without errors and of standard type (Input_InitControllers, -1 = none); Input_ReadController reads it, the save menu, Pak code and Intro_Update use it
+D_80092C81	input_stick_x	Input_ReadController copies the port's OSContPad stick_x here
+D_80092C82	input_stick_y	Input_ReadController copies the port's OSContPad stick_y here
+D_80092C84	input_held_buttons	Input_ReadController copies the port's button bits here each frame
+D_80092C86	input_pressed_buttons	Input_ReadController: buttons & input_previous_button_inverse, the newly pressed bits
+D_80092C88	input_previous_button_inverse	Input_ReadController stores ~buttons here for the next frame's edge test; Input_InitControllers zeroes it
+D_80092C90	input_si_queue	OSMesgQueue Input_InitControllers creates and registers for OS_EVENT_SI; controller reads and every Pak call pass it
+D_80092CA8	pak_port_states	OSPfs per port: Pak_ScanGameFiles and the init/repair calls set them up, Pak_Allocate/Delete/Read/WriteFile use [port]
+D_80092E48	pak_game_file_scans	per port: controller status (Input_InitControllers), found-file count and full/found flags, ext_name byte per note and free pages (Pak_ScanGameFiles); the save menu and intro read it
+D_80092E98	input_connected_port_bits	pattern bits osContInit fills in Input_InitControllers, which tests bit i per port
+D_80092EA0	input_controller_statuses	4 OSContStatus osContInit fills in Input_InitControllers (errno, type, Pak status tested per port)
+D_80092EB0	input_si_mesg	OSMesg storage of input_si_queue (osCreateMesgQueue/osSetEventMesg in Input_InitControllers)
+D_80092EB8	input_pad_states	4 OSContPad osContGetReadData fills in Input_ReadController
+D_80061810	pak_game_name	game_name Pak_ScanGameFiles compares with each note's; Pak_AllocateGameFile/DeleteGameFile pass it to libultra
+D_80061840	pak_allocate_extension_template	zero ext_name Pak_AllocateGameFile copies to a local and sets byte 0 of before osPfsAllocateFile
+D_80061844	pak_delete_extension_template	zero ext_name Pak_DeleteGameFile copies to a local and sets byte 0 of before osPfsDeleteFile
+D_80092ED0	cutscene_sequence_index	Cutscene_ResetSequence zeroes it, Cutscene_StartNextScene takes entry [it++]; UpdateScene/EndScene end the sequence at 14
+D_80092ED4	cutscene_camera_frame	Cutscene_StartNextScene zeroes it, Cutscene_UpdateScene applies the camera track at it and increments it
+D_80092ED8	cutscene_camera_end_frame	camera track length Cutscene_StartNextScene copies; Cutscene_UpdateScene starts the fade 0x31 frames before it
+D_80092EDC	cutscene_camera_track	camera track of the current scene (Cutscene_StartNextScene); Cutscene_UpdateScene samples it through Cutscene_ApplyCameraFrame
+D_80092EE0	cutscene_image_frame	Cutscene_UpdateAndDrawImageCues compares it with the next cue's start frame and increments it; zeroed per scene
+D_80092EE4	cutscene_next_image_cue	next cue to start: set per scene by Cutscene_StartNextScene, advanced by Cutscene_UpdateAndDrawImageCues when its frame is reached
+D_80092EE8	cutscene_image_cue_slots	32 (frames left, cue) slots Cutscene_UpdateAndDrawImageCues fills, fades in/out and draws; cleared per scene
+D_80061850	text_window_tlut	256-colour palette loaded before Text_DrawTexturedRect's textures (window fill, lines, cursor, advance icon) in Text_UpdateAndDrawWindows/DrawAdvanceIndicator and the title overlay's box; glyphs use the DMA'd 16-colour palettes instead
+D_80061E98	menu_sprite_tlut	256-colour palette Menu_DrawSprite and Menu_DrawNumber/ZeroPad load (menu_flags 0x10) for the menu_sprite_tex textures
+D_8006C8F8	save_menu_operation_panel_messages	5 messages SaveMenu_DrawOperationPanel draws, [save_menu_operation_panel_index]
+D_8006C90C	save_menu_operation_panel_rects	5 (x, y, w, h) boxes SaveMenu_DrawOperationPanel draws, [save_menu_operation_panel_index]
+D_8006C934	save_menu_dialog_messages_save	25-entry dialog message table (with D_8006C938..) SaveMenu_UpdateDialog uses in save mode (menu_flags & 4: SaveMenu_Init(4), the only mode whose A press runs SaveSelectedFile); entries 0..3 are also the yes/no box rows in every mode
+D_8006C998	save_menu_dialog_messages_load_delete	25-entry dialog message table SaveMenu_UpdateDialog uses when menu_flags & 4 is clear (SaveMenu_Init(0) load, SaveMenu_Init(8) delete)
+D_8006C9FC	save_menu_dialog_rects	25 (x, y, w, h) boxes SaveMenu_UpdateDialog draws, [save_menu_dialog_index]; [0]/[2] for the yes/no box
+D_8006CAC4	save_menu_choice_cursor_positions	4 (x, y): SaveMenu_UpdateDialog draws the cursor at [save_menu_choice_cursor] (+2 with save_menu_flags 0x10)
+D_8006CC28	save_menu_slot_map_labels	labels SaveMenu_UpdateSlotList draws per slot, chosen by the header's saved map id and subarea
+D_8006CC90	cutscene_image_setup_dl	render setup Cutscene_UpdateAndDrawImageCues calls before drawing the cue images
+D_8007A8E0	cutscene_message_wait_frames	Cutscene_StartEntry sets 60; Cutscene_UpdateMessageSequence counts it down while no text window is open and opens the next message at 0 (15 after each)
+D_8007A8E4	cutscene_messages_remaining	Cutscene_StartEntry copies the entry's message count; Cutscene_UpdateMessageSequence decrements it per message and ends the scene at 0
+D_8007A8E8	cutscene_next_message	Cutscene_StartEntry copies the entry's message list; Cutscene_UpdateMessageSequence copies (message, speaker name), opens the window type and advances it
+# --- r3b additions
+D_800616B0	menu_text_delay_option	text option 0..4 (default 2): Menu_UpdateOptionsPage moves it on the upper row (shown as 4 - value), Text_OpenWindow sets the per-character delay from it (0 = whole page at once, Text_UpdateAndDrawWindows), the save header stores it (+0x62)
+D_80066E88	menu_bg_tlut	256-colour palette Menu_DrawBackground loads for menu_bg_strip_tex
+D_80067090	menu_bg_strip_tex_0	menu_bg_strip_tex[0], drawn by Menu_DrawBackground (64 x 32 CI8)
+D_80067898	menu_bg_strip_tex_1	menu_bg_strip_tex[1], drawn by Menu_DrawBackground (64 x 32 CI8)
+D_800680A0	menu_bg_strip_tex_2	menu_bg_strip_tex[2], drawn by Menu_DrawBackground (64 x 32 CI8)
+D_800688A8	menu_bg_strip_tex_3	menu_bg_strip_tex[3], drawn by Menu_DrawBackground (64 x 24 CI8)
+D_80061A50	text_window_fill_tex	Text_DrawTexturedRect type 0 (16 x 16): the window body in Text_DrawWindowFrame, Text_AnimateWindowSize and Text_DrawFramedRect
+D_80061B50	text_speaker_name_bg_tex	Text_DrawTexturedRect type 1 (40 x 13): Text_DrawWindowContents draws it at the window's top left before the speaker name, only when there is one
+D_80061D58	text_advance_icon_tex	Text_DrawTexturedRect type 2 (12 x 12): the bobbing icon of Text_DrawAdvanceIndicator
+D_80061DE8	text_window_line_tex	Text_DrawTexturedRect type 3 (1 x 1): the window edge lines and drop-shadow strips (Text_DrawWindowFrame, Text_AnimateWindowSize, Text_DrawAdvanceIndicator)
+D_80061DF8	text_choice_cursor_tex	Text_DrawTexturedRect type 4 (12 x 12): the cursor Text_UpdateAndDrawWindows draws beside the selected choice row
+D_8006CC7C	intro_pak_check_done	Intro_Update runs the boot Controller Pak check (scan, Pak full / no Pak / error screens) while it is 0 and sets 1 when done; main .data, so it survives overlay reloads
+D_8006CC78	intro_first_frame_skipped	Intro_Update returns without running the intro phases the first time it gets past the Pak check and sets this to 1; nothing resets it

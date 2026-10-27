@@ -1,3 +1,4 @@
+# r3b reviewed 2026-10-26: kept 215, renamed 4, reverted 0 (renames: the four OSMesg/OSIoMesg objects msg -> mesg)
 # b05 data names (round 3, 2026-10-26). Objects defined in 25B20, 272D0, 27A90, 28D20, 29150, 2B0F0, 2B530 (27600 defines none).
 # Stay D_: D_8008C1A8/AC (unreferenced), D_8008F088 (two 0x40 heap blocks Audio_Init allocates, never read), D_8008F4C0 (count Audio_InitSoundPlayer writes, never read), D_8008F758 (alAudioFrame's cmdLen out-param, never read), D_8008FAE0/E4 (last queue index the two Sfx_Enqueue* write, never read), D_80056198/D_80056878 (unreferenced zero words), D_80057D24 and its keys D_80057A18 (anim header nothing references).
 # --- 25B20: items and the inventory menu
@@ -34,18 +35,18 @@ D_8004F770	math_bit_masks	{1, 2, 4, ..., 0x80}: bit for index & 7 in Chest_IsOpe
 D_8004F778	math_rand_seed	LCG state of Math_Rand (seed * 0x41C64E6D + 0x3039), initial 0x9B0
 D_8008CE60	math_scratch_mtxf	MtxF that Math_MtxRotScaleTrans/Rotate/AimAt/AlignYToVector build into before guMtxF2L
 # --- 28D20
-D_8008CEA0	dma_io_msg	the OSIoMesg Dma_ReadRom passes to each osPiStartDma
+D_8008CEA0	dma_io_mesg	the OSIoMesg Dma_ReadRom passes to each osPiStartDma
 # --- 29150: audio driver
 D_8008CEC0	audio_thread	OSThread created and started by Audio_StartThread (id 5, Audio_ThreadMain)
 D_8008D070	audio_thread_stack	0x2000 bytes just below the stack top &audio_heap that Audio_StartThread passes to osCreateThread; nothing else touches it
 D_8008F070	audio_heap	ALHeap: alHeapInit over D_80332DB0 (0x68000) in Audio_Init; every audio alHeapAlloc and the synth/player configs use it
 D_8008F080	audio_cmd_lists	two 0x8000 Acmd buffers (Audio_Init); Audio_ThreadMain builds the frame's alAudioFrame list in [D_8005593C] and submits it as the task
 D_8008F090	audio_output_buffers	three 0x8000 sample buffers (Audio_Init); Audio_ThreadMain renders into one and passes it to osAiSetNextBuffer
-D_8008F0A0	audio_dma_queue	message queue (1 slot, audio_dma_msg) for the osPiStartDma of Audio_DmaCallback
-D_8008F0D0	audio_dma_msg	message storage of audio_dma_queue (osCreateMesgQueue in Audio_Init)
-D_8008F0B8	audio_rom_read_queue	message queue (1 slot, audio_rom_read_msg) Audio_DmaReadRom starts its DMA on and waits on
-D_8008F0D4	audio_rom_read_msg	message storage of audio_rom_read_queue (osCreateMesgQueue in Audio_Init)
-D_8008F0D8	audio_dma_io_msgs	32 OSIoMesg, one per DMA Audio_DmaCallback starts in a frame (index audio_dma_count)
+D_8008F0A0	audio_dma_queue	message queue (1 slot, audio_dma_mesg) for the osPiStartDma of Audio_DmaCallback
+D_8008F0D0	audio_dma_mesg	message storage of audio_dma_queue (osCreateMesgQueue in Audio_Init)
+D_8008F0B8	audio_rom_read_queue	message queue (1 slot, audio_rom_read_mesg) Audio_DmaReadRom starts its DMA on and waits on
+D_8008F0D4	audio_rom_read_mesg	message storage of audio_rom_read_queue (osCreateMesgQueue in Audio_Init)
+D_8008F0D8	audio_dma_io_mesgs	32 OSIoMesg, one per DMA Audio_DmaCallback starts in a frame (index audio_dma_count)
 D_8008F3D8	audio_globals	ALGlobals passed to alInit by Audio_Init
 D_8008F428	audio_syn_config	ALSynConfig Audio_Init fills (16 voices, dmaproc Audio_DmaNew, heap) for alInit; Audio_ThreadMain reads outputRate for the frame size
 D_8008F450	audio_sound_player	ALSndPlayer created by Audio_InitSoundPlayer (alSndpNew); Audio_Play/Stop/GetSoundState and Sfx_StepScript (pitch, volume, pan) drive it
@@ -59,7 +60,7 @@ D_8008F7A8	audio_seq_slots	the two sequence slots (ALCSPlayer, config, 0x8000 se
 D_80055928	audio_seq_bank_file	ALBankFile read from ROM by Audio_InitSeqPlayers; its bank 0 is set on both sequence players
 D_8005592C	audio_sound_bank_file	ALBankFile read from ROM by Audio_InitSoundPlayer; audio_sound_bank = its bank 0
 D_80055930	audio_seq_file	ALSeqFile header + seqArray read by Audio_LoadSeqFileHeader; Audio_LoadSeq takes offset/len of seqArray[seqNo]
-D_80055934	audio_dma_count	DMAs started this frame: Audio_DmaCallback uses it as the audio_dma_io_msgs index and increments it, Audio_FreeOldDmaBuffers resets it
+D_80055934	audio_dma_count	DMAs started this frame: Audio_DmaCallback uses it as the audio_dma_io_mesgs index and increments it, Audio_FreeOldDmaBuffers resets it
 D_80055938	audio_frame_count	incremented each frame by Audio_FreeOldDmaBuffers; Audio_DmaCallback stamps buffers with it, buffers older than 2 frames are freed
 D_800559B4	audio_seq_volume_limit	sequence volume target: Audio_SetSeqVolume sets vol * 128 + 0x7F on both players; the fade-in stops at it, the fade-out clamps to it
 D_800559B8	audio_active_seq_slot	the sequence slot (0 or 1) the fades act on; Audio_StartSeqRequest sets 1 for request 1, else 0
@@ -105,7 +106,7 @@ D_80055B40	bgm_map_table	72 (map, submap or -1 for any, bgm) entries searched by
 D_80055CF0	bgm_volume_levels	sequence volume (0, 0x78, 0xB4, 0xDC, 0xFF) for each value 0..4 of menu_bgm_volume_option; Bgm_ApplyVolumeOption passes it to Audio_SetSeqVolume
 D_80055CF8	sfx_volumes	per-sound-id base volume (mostly 0xFA) used by Sfx_Play and Sfx_PlayIfAudible
 # --- 2B530: start menu (game state 2)
-D_8008FB3E	menu_flags	bits 0-1 page (0 stats, 1 map, 2 elements, 3 options), 0x10 menu TLUT loaded (Menu_DrawSprite/Number), 0x20 a page is in edit/cursor mode (blocks B/Start from closing the menu), 0x100-0x800 options-page edit state, 0x1000 slide direction, 0x2000 page slide, 0x4000 save menu (SaveMenu_Init), 0x8000 menu open; Menu_Init sets 0x8000
+D_8008FB3E	menu_flags	bits 0-1 page (0 stats, 1 map, 2 elements, 3 options), 0x10 menu TLUT loaded (Menu_DrawSprite/Number), 0x20 a page is in edit/cursor mode (blocks B/Start from closing the menu), 0x100-0x800 options-page edit state, 0x1000 slide direction, 0x2000 page slide, 0x4000 save menu (SaveMenu_Init), bits 2-3 its mode (0 load, 4 save, 8 delete; Menu_Update picks the next game mode from it), 0x8000 menu open; Menu_Init sets 0x8000
 D_8008FB44	menu_frame_counter	incremented by Menu_Update every frame; the pages use (counter >> 2) & 0xF into menu_wobble_offsets and bit 0x20 to blink the map marker
 D_80060D64	menu_wobble_offsets	16 small x offsets (0..-3..0) indexed by menu_frame_counter; the pages move the left/right arrow sprites 6/7 by +-offset; SaveMenu_UpdateSlotList reads it the same way
 D_8008FB38	menu_slide_timer	frames left of the page slide: set to 31 by the pages when the stick/button starts a slide, Menu_UpdatePageSlide decrements it (offset timer^2 * 0.3125) and switches the page at 0
@@ -115,7 +116,7 @@ D_8008FB40	menu_save_loaded	set by Menu_Update when the save menu closes after a
 D_80060CB0	menu_bgm_volume_option	BGM volume option 0..4 (default 2): Menu_UpdateOptionsPage moves it on the lower row, Bgm_ApplyVolumeOption looks up bgm_volume_levels with it, the save menu saves/restores it
 D_8008FB58	menu_options_marker_x	x of the moving option marker: Menu_UpdateOptionsPage sets it from the old position and steps it 1 px per frame towards the new one
 D_800615A8	menu_options_marker_sprites	sprite ids 0x28, 0x27, 0x26 chosen by column [1] of the option position tables (retail keeps Menu_UpdateOptionsPage's local ids[] here)
-D_800615AC	menu_options_top_row_pos	(x, marker sprite index) for each value of the upper option row (D_800616B0, y 0x39) in Menu_UpdateOptionsPage
+D_800615AC	menu_options_top_row_pos	(x, marker sprite index) per position of the upper option row (y 0x39) in Menu_UpdateOptionsPage, indexed by menu_text_delay_option (held as 4 - value while the page runs)
 D_800615CC	menu_options_bgm_row_pos	(x, marker sprite index) for each value 0..4 of menu_bgm_volume_option (row y 0x67) in Menu_UpdateOptionsPage
 D_80060CB4	menu_sprite_sizes	texture width/height of each menu sprite id; Menu_DrawSprite loads the tile with them
 D_80060D74	menu_sprite_tex	CI8 texture of each menu sprite id: Menu_DrawSprite draws [id], Menu_DrawNumber/ZeroPad [pal + digit]
