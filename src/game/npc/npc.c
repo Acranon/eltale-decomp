@@ -166,8 +166,8 @@ void Npc_DrawAll(struct GfxFrameData *arg0) {
             filter = (dist < 20000.0f) ? G_TF_BILERP : G_TF_POINT;
             gDPSetTextureFilter(gfx_dl_head++, filter);
             anims = npc->def->unk10;
-            Anim_DrawModel(0, obj, &anims[obj->unk52], arg0);
-            Anim_AdvanceFrame(obj->unk58, obj, &anims[obj->unk52]);
+            Anim_DrawModel(0, obj, &anims[obj->animIndex], arg0);
+            Anim_AdvanceFrame(obj->animStep, obj, &anims[obj->animIndex]);
             Shadow_Queue(obj->x, obj->y, obj->z, obj->nx, obj->ny, obj->nz, 5.0f);
             *list++ = obj;
             npc_drawn_count++;
@@ -199,8 +199,8 @@ void Npc_SpawnForArea(NpcDef *def, s32 n) {
             npc->actor.x = def->x;
             npc->actor.z = def->z;
             npc->actor.rot = def->angle;
-            npc->actor.unkC = 0.0f;
-            npc->actor.unk14 = 0.0f;
+            npc->actor.rotX = 0.0f;
+            npc->actor.rotZ = 0.0f;
             npc->actor.scale = def->unk28;
             npc->actor.unk28 = 50.0f;
             Coll_ResolveFloorAndWalls(npc->actor.x, npc->actor.y, npc->actor.z, 0xA00, &out);
@@ -213,9 +213,9 @@ void Npc_SpawnForArea(NpcDef *def, s32 n) {
             npc->homeZ = def->z;
             npc->homeAngle = def->angle;
             if (def->flags & 1) {
-                npc->actor.unk60 = 0x1000;
+                npc->actor.animFlags = 0x1000;
             } else {
-                npc->actor.unk60 = 0;
+                npc->actor.animFlags = 0;
             }
             npc++;
             npc_count++;
@@ -355,7 +355,7 @@ void Npc_StartTalk(s32 idx) {
             Npc_LoadMessage(npc, msg);
             if (found == 0) {
                 Item_AddToInventory(npc->def->u6.b.unk7);
-                player_state.unk8 |= 0x40;
+                player_state.flags |= 0x40;
             }
             break;
         case 5:
