@@ -927,19 +927,19 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
                 rect.y = ending_clip_top;
             }
             if (fade == 0) {
-                rect.prim = 0xFF;
-                rect.env = 0xFF;
+                rect.brightness = 0xFF;
+                rect.alpha = 0xFF;
             } else if (fade & 0x30) {
-                rect.prim = 0xFF;
-                rect.env = obj->fade_value;
+                rect.brightness = 0xFF;
+                rect.alpha = obj->fade_value;
             } else if (fade & 0xC0) {
-                rect.prim = obj->fade_value;
-                rect.env = 0xFF;
+                rect.brightness = obj->fade_value;
+                rect.alpha = 0xFF;
             }
             gDPPipeSync(gfx_dl_head++);
             if ((flags & 0xF0) || fadeDone) {
                 gSPDisplayList(gfx_dl_head++, D_8020F748_ovl_ending);
-                gDPSetEnvColor(gfx_dl_head++, rect.prim, rect.prim, rect.prim, rect.env);
+                gDPSetEnvColor(gfx_dl_head++, rect.brightness, rect.brightness, rect.brightness, rect.alpha);
             } else {
                 gSPDisplayList(gfx_dl_head++, D_8020F718_ovl_ending);
             }

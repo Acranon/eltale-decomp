@@ -51,7 +51,7 @@ void Cutscene_StartEntry(s32 arg0) {
     player_state.unk6 = 0;
     player_stats.unk4 = player_stats.unk6;
     Player_Spawn();
-    if (!(entry->unk3C & 1)) {
+    if (!(entry->flags & 1)) {
         core_flags |= 0x10000;
     }
     npc_count = 0;

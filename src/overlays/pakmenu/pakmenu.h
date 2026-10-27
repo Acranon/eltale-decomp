@@ -18,8 +18,7 @@ typedef struct PakMenuNoteState {
     /* 0x00 */ u32 file_size;
     /* 0x04 */ u32 game_code;
     /* 0x08 */ u16 company_code;
-    /* 0x0A */ u8 unkA;
-    /* 0x0B */ char unkB[3];
+    /* 0x0A */ u8 ext_name[4];
     /* 0x0E */ u8 name[18];
 } PakMenuNoteState; /* 0x20 bytes */
 

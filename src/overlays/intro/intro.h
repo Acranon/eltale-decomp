@@ -63,8 +63,8 @@ typedef struct IntroRect {
     /* 0x24 */ s32 dtdy;
     /* 0x28 */ s32 sfrac;
     /* 0x2C */ s32 tfrac;
-    /* 0x30 */ s32 env;
-    /* 0x34 */ s32 prim;
+    /* 0x30 */ s32 alpha;
+    /* 0x34 */ s32 brightness;
 } IntroRect; /* size = 0x38 */
 
 extern s32 intro_phase_timer;
