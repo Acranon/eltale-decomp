@@ -902,7 +902,7 @@ void Hud_DrawEnemyInfoPanel(void) {
     }
     gDPPipeSync(gfx_dl_head++);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
-    if (enemy_turn_current->battle.unk0 & 0x80) {
+    if (enemy_turn_current->battle.status_bits & 0x80) {
         Hud_DrawTextureTile(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0x10, 0x64, 0x2C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x20, 0x6E, 0x10, 0x64, 0x3C, 0x400, 0x400);
@@ -915,7 +915,7 @@ void Hud_DrawEnemyInfoPanel(void) {
     Hud_DrawGlyphString(4, 0x11, 0, ((u8 **)enemy_names)[enemy_turn_current->unk28->unk2]); /* enemy_names stores a pointer table in one s32 slot */
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039ADB0);
-    if (enemy_turn_current->battle.unk0 & 0x80) {
+    if (enemy_turn_current->battle.status_bits & 0x80) {
         Hud_DrawNumber(3, 0x10, 0x1C, enemy_turn_current->unk28->unk6);
         Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->unk28->unkE);
         Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->unk28->unk2A);

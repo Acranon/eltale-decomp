@@ -227,9 +227,9 @@ void Player_Spawn(void) {
     if (core_flags & 0x800) {
         p->actor.stats->unk4 = 1;
         p->actor.stats->unk8 = p->actor.stats->unkA;
-        p->actor.battle->unk0 = 0;
+        p->actor.battle->status_bits = 0;
     }
-    p->actor.battle->unk0 = 0;
+    p->actor.battle->status_bits = 0;
     player_move_dist = player_mp_regen_dist = 0.0f;
     player_run_sfx_timer = 0;
     player_battle_drop_item = 0xFF;
@@ -398,7 +398,7 @@ void Player_Update(void) {
                 Sfx_Play(0, 1, 0xFF);
                 p->actor.animFlags |= 1;
             }
-            if (!(core_flags & 1) && !(p->actor.battle->unk0 & 0x40) && Player_HandleSpellInput(&player_state) != 0) {
+            if (!(core_flags & 1) && !(p->actor.battle->status_bits & 0x40) && Player_HandleSpellInput(&player_state) != 0) {
                 Player_StartCastSpell(&player_state, &player_state.actor, (AnimSet *) cd);
             }
         }
@@ -424,7 +424,7 @@ void Player_Update(void) {
             }
         }
         Hud_ClearActorStatusIndicators(&player_state.actor);
-        player_state.battle.unk0 = 0;
+        player_state.battle.status_bits = 0;
         p->state = 0xF;
         p->state_timer = cd->unkC2;
         p->actor.animFlags |= 1;
@@ -435,7 +435,7 @@ void Player_Update(void) {
         Anim_SetCurrentAndNext(&player_state.actor, 0x10, 1, player_idle_anim, 1, 1);
     } else if (battle_flags & 0x10) {
         Hud_ClearActorStatusIndicators(&player_state.actor);
-        player_state.battle.unk0 = 0;
+        player_state.battle.status_bits = 0;
     }
     player_state_handlers[p->state](&player_state.actor, &player_state, cd);
     player_move_dist = sqrtf(player_move_dx * player_move_dx + player_move_dz * player_move_dz);
@@ -495,7 +495,7 @@ void Player_InitBattle(void) {
     stats = player_state.actor.stats;
     cd = player_char_data[player_state.actor.animSetIndex];
     player_state.unkC = (f32)(u32)stats->unkC * 0.2857 + 17.0;
-    player_state.battle.unk0 = 0;
+    player_state.battle.status_bits = 0;
     player_state.battle.magic_hit_slot_bits = 0;
     player_state.battle.unk84 = player_state.stats->unk24[0] + player_state.stats->unk24[1] + player_state.stats->unk24[2] +
                         player_state.stats->unk24[3];
@@ -553,7 +553,7 @@ void Player_StateMove(Actor *a, Player *p, PlayerAnimTable *cd) {
         x = z = 0.0f;
     } else if (core_flags & 0x300F) {
         x = z = 0.0f;
-    } else if (p->battle.unk0 & 8) {
+    } else if (p->battle.status_bits & 8) {
         x = z = 0.0f;
     }
     if ((battle_flags & 1) && (battle_flags & 0x202)) {
@@ -751,7 +751,7 @@ void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd) {
                 if (a->stats->unkA < a->stats->unk8) {
                     a->stats->unk8 = a->stats->unkA;
                 }
-                if (p->battle.unk0 & 2) {
+                if (p->battle.status_bits & 2) {
                     t = ((dmg + 3) >> 2) + 1;
                     dmg = t;
                     a->stats->unk4 += dmg;
@@ -1661,7 +1661,7 @@ u16 Player_CalcMeleeDamage(Player *arg0) {
         Fade_Start(4, 0, fade_damage_flash);
         arg0->flags |= 0x400;
     }
-    if (arg0->battle.unk0 & 1) {
+    if (arg0->battle.status_bits & 1) {
         val >>= 1;
     }
     return val;
@@ -1705,7 +1705,7 @@ u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
             } else {
                 p->actor.stats->unk4 -= d;
             }
-            if (p->battle.unk0 & 0x200) {
+            if (p->battle.status_bits & 0x200) {
                 p->actor.stats->unk8 += d;
                 if (p->actor.stats->unkA < p->actor.stats->unk8) {
                     p->actor.stats->unk8 = p->actor.stats->unkA;

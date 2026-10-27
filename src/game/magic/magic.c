@@ -358,7 +358,7 @@ void Magic_UpdateEffects(void) {
             a = magic_find_target_handlers[p->cfg->find_target_handler_index](p, i);
             if (a != NULL) {
                 Magic_MarkActorHitBySlot(i, a);
-                if (!(a->battle->unk0 & 0x100) || p->cfg->target_select_handler_index == 2) {
+                if (!(a->battle->status_bits & 0x100) || p->cfg->target_select_handler_index == 2) {
                     if (Magic_GetHitOutcome(p, a)) {
                         if (a == p->unk24) {
                             Hud_ShowActorPopup(p->unk24);
@@ -676,7 +676,7 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
 
     flag = 0;
     dmg = Magic_CalculateEffectDamage(arg0->cfg, arg0->unk24);
-    if (arg0->unk24->battle->unk0 & 1) {
+    if (arg0->unk24->battle->status_bits & 1) {
         dmg >>= 1;
     }
     if (arg1->typeFlags & 1) {
@@ -821,8 +821,8 @@ void Magic_RemoveEnemyOrDamagePlayer(MagicEffect* arg0, Actor* arg1) {
 }
 
 void Magic_ClearActorStatuses(s32 arg0, Actor* arg1) {
-    if (arg1->battle->unk0 != 0) {
-        arg1->battle->unk0 = 0;
+    if (arg1->battle->status_bits != 0) {
+        arg1->battle->status_bits = 0;
         if (arg1->typeFlags & 1) {
             Enemy_GetSlotIndex(arg1);
         }
@@ -914,7 +914,7 @@ void Magic_TargetCaster(MagicEffect* arg0) {
 
 void Magic_ApplyShrinkStatus(s32 arg0, Actor* arg1) {
     if (!(battle_flags & 0x100)) {
-        arg1->battle->unk0 |= 1;
+        arg1->battle->status_bits |= 1;
         arg1->scale = arg1->stats->scale * 0.5;
         Hud_StartActorStatusIndicator(arg1, 1, 4, -1);
     } else {
@@ -923,12 +923,12 @@ void Magic_ApplyShrinkStatus(s32 arg0, Actor* arg1) {
 }
 
 void func_800190BC(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 2;
+    arg1->battle->status_bits |= 2;
     Hud_StartActorStatusIndicator(arg1, 2, 2, -1);
 }
 
 void func_80019104(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 4;
+    arg1->battle->status_bits |= 4;
     switch (arg0) {
         case 1:
             arg1->battle->unk8A = 0x18;
@@ -942,7 +942,7 @@ void func_80019104(s32 arg0, Actor* arg1) {
 
 void func_80019184(s32 arg0, Actor* arg1) {
     if (!(battle_flags & 0x100)) {
-        arg1->battle->unk0 |= 8;
+        arg1->battle->status_bits |= 8;
         arg1->animFlags |= 1;
         Hud_StartActorStatusIndicator(arg1, 8, arg0 - 1, -1);
     } else {
@@ -951,7 +951,7 @@ void func_80019184(s32 arg0, Actor* arg1) {
 }
 
 void func_8001920C(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 0x10;
+    arg1->battle->status_bits |= 0x10;
     switch (arg0) {
         case 1:
             arg1->battle->unk90 = 0.5f;
@@ -964,7 +964,7 @@ void func_8001920C(s32 arg0, Actor* arg1) {
 }
 
 void func_800192C8(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 0x20;
+    arg1->battle->status_bits |= 0x20;
     switch (arg0) {
         case 1:
             arg1->battle->unk86 = arg1->stats->unkC * 2;
@@ -983,7 +983,7 @@ void func_800192C8(s32 arg0, Actor* arg1) {
 
 void func_800193A4(s32 arg0, Actor* arg1) {
     if (!(battle_flags & 0x100)) {
-        arg1->battle->unk0 |= 0x40;
+        arg1->battle->status_bits |= 0x40;
         Hud_StartActorStatusIndicator(arg1, 0x40, 0xB, -1);
     } else {
         Hud_ShowActorPopup(arg1);
@@ -991,22 +991,22 @@ void func_800193A4(s32 arg0, Actor* arg1) {
 }
 
 void func_80019408(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 0x80;
+    arg1->battle->status_bits |= 0x80;
     Hud_StartActorStatusIndicator(arg1, 0x80, 0xA, -1);
 }
 
 void func_80019450(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 0x100;
+    arg1->battle->status_bits |= 0x100;
     Hud_StartActorStatusIndicator(arg1, 0x100, 4, -1);
 }
 
 void func_80019498(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 0x200;
+    arg1->battle->status_bits |= 0x200;
     Hud_StartActorStatusIndicator(arg1, 0x200, 3, -1);
 }
 
 void func_800194E0(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 0x400;
+    arg1->battle->status_bits |= 0x400;
     switch (arg0) {
         case 1:
             arg1->battle->unk88 = arg1->stats->unkE >> 1;
@@ -1025,7 +1025,7 @@ void func_800194E0(s32 arg0, Actor* arg1) {
 }
 
 void func_800195E0(s32 arg0, Actor* arg1) {
-    arg1->battle->unk0 |= 0x800;
+    arg1->battle->status_bits |= 0x800;
 }
 
 u16 Magic_CalculateEffectDamage(SpellDef* arg0, Actor* arg1) {
@@ -1268,9 +1268,9 @@ void Magic_StepActorStatusTimers(Actor* arg0) {
     s32 i;
 
     for (i = 0; i < 12; i++) {
-        if (data->unk0 & bit) {
+        if (data->status_bits & bit) {
             if (--data->timers[i] == 0) {
-                data->unk0 ^= bit;
+                data->status_bits ^= bit;
                 if (bit & 1) {
                     arg0->scale = arg0->stats->scale;
                 } else if (bit & 4) {

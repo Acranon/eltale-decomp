@@ -137,7 +137,7 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     arg4->type = 0;
     arg4->flags = 0;
     arg4->unk10 = sqrtf((u32)s2->unkC) * 3.846 + 17.838;
-    arg4->battle.unk0 = 0;
+    arg4->battle.status_bits = 0;
     arg4->battle.unk84 = arg4->unk28->unk2A;
     arg4->battle.unk86 = ((EnemyDef *)s1->stats)->unkC;
     arg4->battle.unk88 = ((EnemyDef *)s1->stats)->unkE;

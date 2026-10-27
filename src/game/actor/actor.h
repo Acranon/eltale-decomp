@@ -42,9 +42,14 @@ typedef struct ActorStats {
 
 /* What Actor.battle points to: the 0x98 bytes after the actor in its owner. */
 typedef struct ActorBattle {
-    /* 0x00 */ u16 unk0; /* status bits (Magic_ status handlers; bit 0x40 blocks spell input) */
-    /* 0x02 */ u8 timers[12]; /* status timers, counted down by Magic_StepActorStatusTimers */
-    /* 0x0E */ u8 unkE[0x84 - 0xE];
+    /* 0x00 */ u16 status_bits; /* Magic_ status handlers; bit 0x40 blocks spell input */
+    /* 0x02 */ u8 timers[12]; /* counted down by Magic_StepActorStatusTimers */
+    /* 0x0E */ u8 padE[0x12 - 0xE];
+    /* 0x12 */ u8 status_icon_ids[0x10]; /* Hud_StartActorStatusIndicator */
+    /* 0x22 */ s8 status_icon_timers[0x10];
+    /* 0x32 */ s8 status_effect_timers[0x12];
+    /* 0x44 */ s32 status_effect_handles[4];
+    /* 0x54 */ u8 pad54[0x84 - 0x54];
     /* 0x84 */ u16 unk84;
     /* 0x86 */ u16 unk86; /* from ActorStats.unkC (Player_InitBattle, Enemy_Spawn) */
     /* 0x88 */ u16 unk88; /* from ActorStats.unkE */

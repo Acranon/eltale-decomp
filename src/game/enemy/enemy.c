@@ -215,7 +215,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     obj->floorFlags = enemy_coll.flags;
     obj->typeFlags = 1;
     obj->animFlags = 0;
-    e->battle.unk0 = 0;
+    e->battle.status_bits = 0;
     e->battle.magic_hit_slot_bits = 0;
     e->battle.unk84 = e->unk28->unk2A;
     e->battle.unk8A = 16;
@@ -264,7 +264,7 @@ void Enemy_StateIdle(Actor *obj, Enemy *e, AnimSet *arg2) {
         enemy_turn_current = e;
         hud_enemy_info_timer = 60;
         e->flags &= 0xFFFC;
-        if (e->battle.unk0 & 8) {
+        if (e->battle.status_bits & 8) {
             Battle_EndTurn(obj);
             return;
         }
@@ -430,7 +430,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
                         enemy_temp_vec.y = 2.0f * (obj->stats->unk18 * obj->scale);
                         Math_RotateVec2(obj->rot, (Vec2f *)&enemy_temp_vec);
                         Effect_SpawnStreakBurst(obj->x + enemy_temp_vec.x, obj->y + obj->stats->unk1C * obj->scale * 0.7f, obj->z + enemy_temp_vec.y);
-                        if (e->battle.unk0 & 2) {
+                        if (e->battle.status_bits & 2) {
                             n = ((n + 3) >> 2) + 1;
                             e->unkA += n;
                             if (obj->stats->unk6 < e->unkA) {
@@ -614,7 +614,7 @@ EnemyAttack *Enemy_ChooseAttack(Enemy *e, Actor *obj) {
 void Enemy_StartAttack(Enemy *e, Actor *obj, EnemyAttack *arg2) {
     s32 t = arg2->unk0 & 0x8000;
 
-    if (t && (e->battle.unk0 & 0x40)) {
+    if (t && (e->battle.status_bits & 0x40)) {
         e->type = 0;
         Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
         Battle_EndTurn(obj);
@@ -818,7 +818,7 @@ u16 Enemy_CalcAttackDamage(Enemy *arg0) {
         Fade_Start(4, 0, fade_damage_flash);
         arg0->flags |= 0x20;
     }
-    if (arg0->battle.unk0 & 1) {
+    if (arg0->battle.status_bits & 1) {
         dmg >>= 1;
     }
     return dmg;
@@ -875,7 +875,7 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Actor *src) {
             } else {
                 enemy_slots[idx].unkA -= dmg;
             }
-            if (enemy_slots[idx].battle.unk0 & 0x200) {
+            if (enemy_slots[idx].battle.status_bits & 0x200) {
                 enemy_slots[idx].unkC += dmg;
                 enemies = enemy_slots;
                 if (obj->stats->unkA < enemies[idx].unkC) {
