@@ -271,7 +271,7 @@ void Battle_UpdateTurnTransition(void) {
                     enemy_anim_tables = battle_saved_enemy_anim_tables;
                     enemy_names = battle_saved_enemy_names;
                 }
-                player_battle_drop_item = func_800200F8();
+                player_battle_drop_item = Battle_RollDropItem();
             } else if (battle_flags & 0x10) {
                 done = 1;
             } else if (!(battle_flags & 0x100) && (player_state.flags & 0x20)) {
@@ -455,7 +455,7 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
 void func_800200F0(void) {
 }
 
-s32 func_800200F8(void) {
+s32 Battle_RollDropItem(void) {
     s32 r;
 
     if (player_state.flags & 0x2000) {

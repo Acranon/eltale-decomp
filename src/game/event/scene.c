@@ -55,7 +55,7 @@ void Cutscene_StartEntry(s32 arg0) {
         core_flags |= 0x10000;
     }
     npc_count = 0;
-    func_80009764(map_subarea_def->areaSetIndex);
+    Npc_LoadAreaAssets(map_subarea_def->areaSetIndex);
     Npc_SpawnForArea(entry->npc_defs_addr, entry->npc_count);
     enemy_count = 0;
     Camera_InitForMap();

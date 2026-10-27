@@ -46,7 +46,7 @@ u8 npc_rest_choice_row1[8] = {
 #include "assets/npc_rest_choice_row1.inc.c"
 };
 
-/* The overlay entry point and ROM symbols func_80009764 loads (no C module declares them). */
+/* The overlay entry point and ROM symbols Npc_LoadAreaAssets loads (no C module declares them). */
 void func_8020C0D0(void);
 extern u8 D_86F6F0[];
 extern u8 D_871D10[];
@@ -61,7 +61,7 @@ void Npc_InitArea(void) {
 
     npc_count = 0;
     if (!(map_subarea_flags & 1)) {
-        func_80009764(map_subarea_def->areaSetIndex);
+        Npc_LoadAreaAssets(map_subarea_def->areaSetIndex);
         list = map_area_def->npcList;
         if (list != NULL) {
             Npc_SpawnForArea(list->defs, list->count);
@@ -175,7 +175,7 @@ void Npc_DrawAll(struct GfxFrameData *arg0) {
     }
 }
 
-void func_80009764(s32 arg0) {
+void Npc_LoadAreaAssets(s32 arg0) {
     u8 *start;
     u8 *end;
 

@@ -46,7 +46,7 @@ typedef struct EnemyDef {
     /* 0x2C */ u16 attack_count; /* attack count */
     /* 0x2E */ u8 pad2E[2];
     /* 0x30 */ EnemyAttack *attacks; /* attack list */
-    /* 0x34 */ u8 item_id; /* item id (func_800200F8) */
+    /* 0x34 */ u8 item_id; /* item id (Battle_RollDropItem) */
     /* 0x35 */ u8 pad35[3];
 } EnemyDef; /* 0x38 bytes */
 

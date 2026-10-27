@@ -99,7 +99,7 @@ EncounterRegion *Battle_FindEncounterRegion(f32 x, f32 y, EncounterRegionList *l
 EncounterPoint *Battle_ChooseNearbyEncounterPoint(f32 x, f32 y);
 void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16 *list);
 void func_800200F0(void); /* empty */
-s32 func_800200F8(void);
+s32 Battle_RollDropItem(void);
 void func_8002018C(void); /* empty */
 
 #endif

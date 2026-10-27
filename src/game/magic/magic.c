@@ -922,12 +922,12 @@ void Magic_ApplyShrinkStatus(s32 arg0, Actor* arg1) {
     }
 }
 
-void func_800190BC(s32 arg0, Actor* arg1) {
+void Magic_ApplyHealOnHitStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 2;
     Hud_StartActorStatusIndicator(arg1, 2, 2, -1);
 }
 
-void func_80019104(s32 arg0, Actor* arg1) {
+void Magic_ApplyAttackScaleStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 4;
     switch (arg0) {
         case 1:
@@ -940,7 +940,7 @@ void func_80019104(s32 arg0, Actor* arg1) {
     Hud_StartActorStatusIndicator(arg1, 4, 3, -1);
 }
 
-void func_80019184(s32 arg0, Actor* arg1) {
+void Magic_ApplyActionBlockStatus(s32 arg0, Actor* arg1) {
     if (!(battle_flags & 0x100)) {
         arg1->battle->status_bits |= 8;
         arg1->animFlags |= 1;
@@ -950,7 +950,7 @@ void func_80019184(s32 arg0, Actor* arg1) {
     }
 }
 
-void func_8001920C(s32 arg0, Actor* arg1) {
+void Magic_ApplyRangeScaleStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x10;
     switch (arg0) {
         case 1:
@@ -963,7 +963,7 @@ void func_8001920C(s32 arg0, Actor* arg1) {
     Hud_StartActorStatusIndicator(arg1, 0x10, (arg1->battle->unk90 > 1.0) ? 8 : 9, -1);
 }
 
-void func_800192C8(s32 arg0, Actor* arg1) {
+void Magic_ApplyAgilityScaleStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x20;
     switch (arg0) {
         case 1:
@@ -981,7 +981,7 @@ void func_800192C8(s32 arg0, Actor* arg1) {
     }
 }
 
-void func_800193A4(s32 arg0, Actor* arg1) {
+void Magic_ApplySpellBlockStatus(s32 arg0, Actor* arg1) {
     if (!(battle_flags & 0x100)) {
         arg1->battle->status_bits |= 0x40;
         Hud_StartActorStatusIndicator(arg1, 0x40, 0xB, -1);
@@ -990,22 +990,22 @@ void func_800193A4(s32 arg0, Actor* arg1) {
     }
 }
 
-void func_80019408(s32 arg0, Actor* arg1) {
+void Magic_ApplyEnemyStatRevealStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x80;
     Hud_StartActorStatusIndicator(arg1, 0x80, 0xA, -1);
 }
 
-void func_80019450(s32 arg0, Actor* arg1) {
+void Magic_ApplyMagicHitBlockStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x100;
     Hud_StartActorStatusIndicator(arg1, 0x100, 4, -1);
 }
 
-void func_80019498(s32 arg0, Actor* arg1) {
+void Magic_ApplyResourceGainOnDamageStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x200;
     Hud_StartActorStatusIndicator(arg1, 0x200, 3, -1);
 }
 
-void func_800194E0(s32 arg0, Actor* arg1) {
+void Magic_ApplyDefenseScaleStatus(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x400;
     switch (arg0) {
         case 1:
@@ -1405,16 +1405,16 @@ MagicHitFunc magic_hit_handlers[10] = {
 };
 MagicStatusFunc magic_status_handlers[12] = {
     (MagicStatusFunc) Magic_ApplyShrinkStatus,
-    (MagicStatusFunc) func_800190BC,
-    (MagicStatusFunc) func_80019104,
-    (MagicStatusFunc) func_80019184,
-    (MagicStatusFunc) func_8001920C,
-    (MagicStatusFunc) func_800192C8,
-    (MagicStatusFunc) func_800193A4,
-    (MagicStatusFunc) func_80019408,
-    (MagicStatusFunc) func_80019450,
-    (MagicStatusFunc) func_80019498,
-    (MagicStatusFunc) func_800194E0,
+    (MagicStatusFunc) Magic_ApplyHealOnHitStatus,
+    (MagicStatusFunc) Magic_ApplyAttackScaleStatus,
+    (MagicStatusFunc) Magic_ApplyActionBlockStatus,
+    (MagicStatusFunc) Magic_ApplyRangeScaleStatus,
+    (MagicStatusFunc) Magic_ApplyAgilityScaleStatus,
+    (MagicStatusFunc) Magic_ApplySpellBlockStatus,
+    (MagicStatusFunc) Magic_ApplyEnemyStatRevealStatus,
+    (MagicStatusFunc) Magic_ApplyMagicHitBlockStatus,
+    (MagicStatusFunc) Magic_ApplyResourceGainOnDamageStatus,
+    (MagicStatusFunc) Magic_ApplyDefenseScaleStatus,
     (MagicStatusFunc) func_800195E0,
 };
 u16 magic_slot_bits[16] = {

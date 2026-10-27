@@ -29,10 +29,10 @@ TextWindowRect text_window_default_rects[8] = {
 };
 TextWindowRect text_choice_window_rect = { 180, 110, 30, 40 };
 s8 menu_text_delay_option = 2;
-s32 D_800616B4 = -1;
-TextAnimSteps D_800616B8 = { { 5, 3, 1, 0, 1, 2, 3, 4 } };
-TextAnimSteps D_800616C0 = { { 7, 5, 3, 0, 1, 3, 5, 7 } };
-TextAnimSteps D_800616C8 = { { 3, 1, 0, 0, 0, 1, 2, 3 } };
+s32 text_choice_order_empty_word = -1;
+TextAnimSteps text_advance_icon_diagonal_offsets = { { 5, 3, 1, 0, 1, 2, 3, 4 } };
+TextAnimSteps text_advance_line_widths = { { 7, 5, 3, 0, 1, 3, 5, 7 } };
+TextAnimSteps text_advance_line_x_offsets = { { 3, 1, 0, 0, 0, 1, 2, 3 } };
 TextTexturePointers text_rect_texture_ptrs = { { text_window_fill_tex, text_speaker_name_bg_tex, text_advance_icon_tex, text_window_line_tex, text_choice_cursor_tex } };
 TextTextureTiles text_rect_texture_params = { { { 16, 16, 0, 0, 4, 4 }, { 40, 13, 0, 0, 0, 0 }, { 12, 12, 0, 0, 0, 0 }, { 1, 1, 2, 2, 0, 0 }, { 12, 12, 0, 0, 0, 0 } } };
 /* .bss 80090450..80092C70 */
@@ -192,7 +192,7 @@ void Text_UpdateAndDrawWindows(void) {
     s32 n = 0;
     s32 cnt = 0;
 
-    order.w = D_800616B4;
+    order.w = text_choice_order_empty_word;
     gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
     gDPSetBlendColor(gfx_dl_head++, 0, 0, 0, 1);
     for (j = 0; j < 4; j++) {
@@ -678,9 +678,9 @@ void Text_DrawAdvanceIndicator(s32 idx) {
     s32 x;
     s32 y;
     s32 i;
-    TextAnimSteps a = D_800616B8;
-    TextAnimSteps b = D_800616C0;
-    TextAnimSteps c = D_800616C8;
+    TextAnimSteps a = text_advance_icon_diagonal_offsets;
+    TextAnimSteps b = text_advance_line_widths;
+    TextAnimSteps c = text_advance_line_x_offsets;
 
     gDPPipeSync(gfx_dl_head++);
     gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
