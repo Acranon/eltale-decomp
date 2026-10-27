@@ -1,4 +1,11 @@
 #include "overlays/title/title_draw.h"
+#include "game/audio/audio.h"
+#include "game/core/main.h"
+#include "game/event/cutscene.h"
+#include "game/input/input.h"
+#include "game/text/text.h"
+#include "game/text/text_window.h"
+#include "overlays/title/title_data.h"
 
 /*
  * Title overlay: draws the title screen, its menu cursors and message windows; screen fades.
@@ -17,10 +24,6 @@ typedef struct {
     f32 unk8;
 } UnkFade_8020F4F8;
 
-extern Gfx* gfx_dl_head;
-extern u16 D_8020FE10_ovl_title[];
-extern u8 D_80210010_ovl_title[];
-extern u8 D_80210D20_ovl_title[];
 
 /* .data 8020F200..8020F510. The data before it (8020F1E0..F200) is DAB5F0.c's, still asm. */
 s32 D_8020F200_ovl_title = 0;
@@ -131,35 +134,7 @@ s32 D_8020F488_ovl_title[18] = {
 #define GFX_WORDS(a, b) { Gfx *_g = gfx_dl_head++; _g->words.w0 = (a); _g->words.w1 = (b); }
 
 
-extern u8 title_menu_choice;
-extern s8 input_stick_x;
-extern s8 input_stick_y;
-extern u16 text_window_tlut[];
-extern u16 title_confirm_cursor_tlut[];
-extern u8 title_confirm_cursor_tex[];
-extern u8 title_lower_strip_tex[];
-extern u16 title_lower_strip_tlut[];
-extern u16 D_80210D00_ovl_title[];
-extern u8 D_80211148_ovl_title[];
-extern u16 D_802111A8_ovl_title[];
-extern u8 D_802113A8_ovl_title[];
-extern u8 D_80211428_ovl_title[];
-extern u8 D_80211464_ovl_title[];
-extern u8 D_802114E0_ovl_title[];
-extern u8 D_8021150C_ovl_title[];
-extern u8 D_80211540_ovl_title[];
-extern u8 D_80211548_ovl_title[];
-extern u16 title_center_image_tlut[];
-extern u8 title_center_image_tex[];
-extern u16 title_background_tlut[];
-extern u8 title_background_tex[];
-extern u16 D_80226AF8_ovl_title[];
-extern u8 D_80226D00_ovl_title[];
-extern u8 D_80226D18_ovl_title[];
 
-void Sfx_Enqueue(s32, s32, s32);
-void Text_DrawTexturedRect(s32, s32, s32, s32, s32);
-void Text_DrawEncodedString(s32, s32, u8*);
 
 
 /* .bss 80226DB0..80226DD0: DB0 and DB4 are shared with DAB5F0.c */

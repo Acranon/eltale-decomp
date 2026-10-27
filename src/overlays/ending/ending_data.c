@@ -13,11 +13,6 @@
 
 
 
-extern u8 D_80210A10_ovl_ending[];
-extern u16 D_80210810_ovl_ending[];
-extern u8 D_80221618_ovl_ending[];
-extern u16 D_8022BAD0_ovl_ending[];
-extern u16 D_80221410_ovl_ending[];
 Gfx ending_sprite_setup_dl[11] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},
