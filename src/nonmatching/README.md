@@ -12,10 +12,10 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`Env_InitForMap`](Env_InitForMap.md) | `src/12610.c`, C under `NON_MATCHING` | 83 object words; one instruction short |
 | [`Env_InterpolateLighting`](Env_InterpolateLighting.md) | `src/12610.c`, C under `NON_MATCHING` | 379 object words; retail no-frame leaf |
 | [`Hud_DrawSpellName`](Hud_DrawSpellName.md) | `src/216E0.c`, C under `NON_MATCHING` | 72 register words; instruction sequence exact apart from one `sll` scheduled after the dead `sw id` instead of before |
-| [`func_80025318`](func_80025318.md) | `src/25B20.c`, C under `NON_MATCHING` | 742 object words; code 0xCF8 vs 0xD28, frame 0x148 exact |
-| [`func_8002B844`](func_8002B844.md) | `src/2B530.c`, C under `NON_MATCHING` | 112 object words; length and frame (0x48) exact |
-| [`func_8002C598`](func_8002C598.md) | `src/2B530.c`, C under `NON_MATCHING` | 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120 |
-| [`func_8002DECC`](func_8002DECC.md) | `src/2B530.c`, C under `NON_MATCHING` | 328 object words; code 0x55C vs 0x560, frame 0xD8 exact |
+| [`Item_UpdateInventoryMenu`](Item_UpdateInventoryMenu.md) | `src/25B20.c`, C under `NON_MATCHING` | 742 object words; code 0xCF8 vs 0xD28, frame 0x148 exact |
+| [`Menu_DrawOptionsPage`](Menu_DrawOptionsPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 112 object words; length and frame (0x48) exact |
+| [`Menu_DrawMapPage`](Menu_DrawMapPage.md) | `src/2B530.c`, C under `NON_MATCHING` | 1129 object words; code 0x121C vs 0x1234, frame 0x138 vs 0x120 |
+| [`Menu_DrawSprite`](Menu_DrawSprite.md) | `src/2B530.c`, C under `NON_MATCHING` | 328 object words; code 0x55C vs 0x560, frame 0xD8 exact |
 | [`SaveMenu_UpdateSlotList`](SaveMenu_UpdateSlotList.md) | `src/30600.c`, C under `NON_MATCHING` | 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact |
 | [`SaveMenu_SaveSelectedFile`](SaveMenu_SaveSelectedFile.md) | `src/30600.c`, C under `NON_MATCHING` | 20 register words; length and frame (0x40) exact |
 | [`Text_UpdateAndDrawWindows`](Text_UpdateAndDrawWindows.md) | `src/337B0.c`, C under `NON_MATCHING` | 18 object words; length exact, frame exact |

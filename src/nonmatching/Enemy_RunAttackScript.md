@@ -16,7 +16,7 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 
 Verdict: **equivalent.**
 
-- Read the retail asm against the C: `++D_8007C060` (u16, compared after masking with the script's `time`), the flag tests 8/2/4/1 (each reloaded as in retail), the `SpawnDef` index into the table at `D_80056718` (16-byte entries), `D_800C18D8` (10-byte entries), `D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C` (0x44 stride), the float sums with `obj->unk24`, both `func_800271B4` calls, the 9 arguments of `Magic_CreateVisualEffect`, and the script cursor advancing by 0x18 or clearing.
+- Read the retail asm against the C: `++D_8007C060` (u16, compared after masking with the script's `time`), the flag tests 8/2/4/1 (each reloaded as in retail), the `SpawnDef` index into the table at `D_80056718` (16-byte entries), `D_800C18D8` (10-byte entries), `D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C` (0x44 stride), the float sums with `obj->unk24`, both `Math_RotateVec2` calls, the 9 arguments of `Magic_CreateVisualEffect`, and the script cursor advancing by 0x18 or clearing.
 - Changed from the draft: it read `D_8007C060..D_8007C06C` through an `Unk8007C060` struct laid over `&D_8007C060`; the C now uses the module's own scalars (`D_8007C060`, `D_8007C064`, `D_8007C068`, `D_8007C06C`), the objects the asm's %hi/%lo name. Same addresses, but it no longer depends on the .bss layout. Dropped the dummy label. This cost words (draft: 30).
 - Open: the spawn table is read through `(SpawnDef *)&D_80056718`, an extern typed as a different struct (same address as the asm).
 

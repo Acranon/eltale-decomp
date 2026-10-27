@@ -143,8 +143,8 @@ void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
 void Anim_SetCurrentAndNext(Unk80085290*, s32, s32, s32, s32, u16);
 void Anim_DrawModel(s32, Unk80085290*, Unk8010FDC4*, s32);
 void Anim_AdvanceFrame(u16, Unk80085290*, Unk8010FDC4*);
-void func_800271B4(f32, Unk80085958*);
-void func_8002A7C8(u8, s8, u8);
+void Math_RotateVec2(f32, Unk80085958*);
+void Sfx_Play(u8, s8, u8);
 
 void Chest_ClearOpenedFlags(void) {
     s32 i;
@@ -256,7 +256,7 @@ Unk80085290* Chest_FindInFront(Unk80013808Arg* arg0) {
                 if (dx * dx + dz * dz < 300.0f) {
                     D_80085958.x = dx;
                     D_80085958.y = dz;
-                    func_800271B4(obj->unk1C, &D_80085958);
+                    Math_RotateVec2(obj->unk1C, &D_80085958);
                     dx = D_80085958.x;
                     dz = D_80085958.y;
                     if (dx < 0.0f) {
@@ -284,7 +284,7 @@ void Chest_Open(Unk80085290* arg0) {
     Chest_SetOpened(arg0->unk62);
     arg0->unk60 = 0x805B;
     Anim_SetCurrentAndNext(arg0, 1, 1, 2, 1, 1);
-    func_8002A7C8(0x1A, 8, 0xFF);
+    Sfx_Play(0x1A, 8, 0xFF);
 }
 
 void Item_BuildMessage(s32 arg0) {

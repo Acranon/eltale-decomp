@@ -125,7 +125,7 @@ typedef union {
 extern Gfx D_80061770[];
 extern u16 D_80092C86;
 extern u8 D_8008FB78;
-void func_8002A7C8(u8, s8, u8);
+void Sfx_Play(u8, s8, u8);
 s32 Text_AnimateWindowSize(s32);
 void Text_DrawWindowFrame(s32);
 void Text_BuildVisiblePage(s32);
@@ -341,7 +341,7 @@ void Text_UpdateAndDrawWindows(void) {
                         }
                         if (D_80090470[idx].unk0 & 0x80000000) {
                             if (D_80092C86 & 0xA000) {
-                                func_8002A7C8(0, 1, 0xFF);
+                                Sfx_Play(0, 1, 0xFF);
                                 if (D_80090470[idx].unk0 & 0x80000) {
                                     D_8008FB78 = D_80090470[idx].unk15;
                                 } else {
@@ -354,13 +354,13 @@ void Text_UpdateAndDrawWindows(void) {
                                     if (D_80090470[idx].unk16 == 0) {
                                         D_80090470[idx].unk15--;
                                         D_80090470[idx].unk16 = 1;
-                                        func_8002A7C8(0, 0, 0xFF);
+                                        Sfx_Play(0, 0, 0xFF);
                                     }
                                 } else if (D_80092C82 < -20) {
                                     if (D_80090470[idx].unk16 == 0) {
                                         D_80090470[idx].unk15++;
                                         D_80090470[idx].unk16 = 1;
-                                        func_8002A7C8(0, 0, 0xFF);
+                                        Sfx_Play(0, 0, 0xFF);
                                     }
                                 } else {
                                     D_80090470[idx].unk16 = 0;
@@ -464,7 +464,7 @@ void Text_UpdateAndDrawWindows(void) {
                                                 D_80090470[idx].unk10 = D_80090470[idx].unkF = col;
                                             default:
                                                 cnt++;
-                                                func_8002A7C8(0, 3, 0xFF);
+                                                Sfx_Play(0, 3, 0xFF);
                                                 while (c >= 0x80) {
                                                     j = D_80090470[idx].unk12++;
                                                     D_80090470[idx].unk9C[j++] = D_80090470[idx].unk14;

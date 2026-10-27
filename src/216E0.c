@@ -81,7 +81,7 @@ extern u8 D_8004F498[];
 
 u32 Magic_LookupSpellSequence(u16, s32);
 s32 Magic_GetSpellRestrictionFlags(u32, u16);
-s32 func_800281F0(s32, u8*, u16);
+s32 Text_FormatNumber(s32, u8*, u16);
 void Hud_DrawGlyphString(s32, s32, s32, u8*);
 s32 Hud_MeasureGlyphString(u8*);
 typedef struct {
@@ -115,7 +115,7 @@ extern Gfx D_803AA448[];
 extern Gfx D_803AA4C0[];
 extern Gfx D_803AA538[];
 
-s32 func_80027FFC(f32, f32, f32, s32*, s32*);
+s32 Camera_WorldToScreen(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 void Hud_DrawClippedTextureRect(s32, s32, s32, s32, s32, s32, s32, s32);
 
@@ -450,9 +450,9 @@ extern s32 D_8008FB54;
 extern Gfx D_803AA758[];
 extern Struct_80024A54 D_803A86F8;
 f32 sqrtf(f32);
-f32 func_800270D0(f32, f32);
-void func_800271B4(f32, Vec3f_216E0*);
-void func_80027430(f32 (*)[4], f32, f32, f32);
+f32 Math_Atan2(f32, f32);
+void Math_RotateVec2(f32, Vec3f_216E0*);
+void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
 
 void Hud_DrawCompass(Unk2000000* buf) {
     f32 dx;
@@ -463,7 +463,7 @@ void Hud_DrawCompass(Unk2000000* buf) {
 
     D_8008C174 = 0x104;
     D_8008C178 = 0x18;
-    func_80027430(mf, 0.0f, 0.0f, D_80085E74);
+    Math_MtxFRotate(mf, 0.0f, 0.0f, D_80085E74);
     mf[3][0] = D_8008C174 + 17;
     mf[3][1] = D_8008C178 + 17;
     mf[3][2] = 0.0f;
@@ -476,7 +476,7 @@ void Hud_DrawCompass(Unk2000000* buf) {
         dz = D_8008FB4C - D_8007AA08.unk20;
         dist = sqrtf(dx * dx + dz * dz);
         if (dist > 10.0) {
-            ang = func_800270D0(dx, dz) - D_80085E74;
+            ang = Math_Atan2(dx, dz) - D_80085E74;
             if (ang < -3.141592653589793) {
                 ang += 6.283185307179586;
             } else if (ang > 3.141592653589793) {
@@ -484,7 +484,7 @@ void Hud_DrawCompass(Unk2000000* buf) {
             }
             D_8008C140.x = 0.0f;
             D_8008C140.y = 18.0f;
-            func_800271B4(ang, &D_8008C140);
+            Math_RotateVec2(ang, &D_8008C140);
             Hud_DrawTextureTile(&D_803A86F8, D_8008C140.x + 14.0f, D_8008C140.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
         }
     }
@@ -693,7 +693,7 @@ extern u8 D_8007A9F7;
 extern u16 D_80092C86;
 extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
-void func_8002A7C8(s32, s32, s32);
+void Sfx_Play(s32, s32, s32);
 
 void Hud_UpdateDirectionalAllocation(Unk2000000* buf, Struct_80022970* pl) {
     u16 alpha;
@@ -761,7 +761,7 @@ void Hud_UpdateDirectionalAllocation(Unk2000000* buf, Struct_80022970* pl) {
                         pl->unk8 |= 0x10000;
                     }
                 }
-                func_8002A7C8(0, 4, 0xFF);
+                Sfx_Play(0, 4, 0xFF);
                 D_8008C138 = 30;
                 D_8008C160 = 8;
                 D_8008C042 |= 1;
@@ -793,7 +793,7 @@ void Hud_DrawWorldObjectMarker(void) {
     u16 *angle = &D_8008C040;
 
     p = &D_8007ABF0[D_8007A9C0 - 1].unk14;
-    if (func_80027FFC(p->x, p->y + 14.0, p->z, &sx, &D_8008C17C)) {
+    if (Camera_WorldToScreen(p->x, p->y + 14.0, p->z, &sx, &D_8008C17C)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -812,7 +812,7 @@ void func_800231C4(void) {
     s32 bob;
     u16 *angle = &D_8008C050;
 
-    if (func_80027FFC(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+    if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -829,7 +829,7 @@ void func_800232A8(void) {
     s32 bob;
     u16 *angle = &D_8008C14C[0];
 
-    if (func_80027FFC(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+    if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -846,7 +846,7 @@ void func_8002338C(void) {
     s32 bob;
     u16 *angle = &D_8008C14C[1];
 
-    if (func_80027FFC(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+    if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -876,7 +876,7 @@ void Hud_DrawEnemyMarker(u16 arg0) {
     } else {
         y = a->unk4 + a->unk64->unk1C * a->unk24;
     }
-    if (func_80027FFC(a->unk0, y, a->unk8, &sx, &sy)) {
+    if (Camera_WorldToScreen(a->unk0, y, a->unk8, &sx, &sy)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -895,7 +895,7 @@ void Hud_DrawPlayerOverheadIcon(void) {
 
     h = D_8007AA08.unk7C->unk1C * D_8007AA08.unk3C;
     y = D_8007AA08.unk1C + h;
-    if (func_80027FFC(D_8007AA08.unk18, y, D_8007AA08.unk20, &sx, &sy) != 0) {
+    if (Camera_WorldToScreen(D_8007AA08.unk18, y, D_8007AA08.unk20, &sx, &sy) != 0) {
         gDPPipeSync(D_8007A184++);
         gDPLoadTLUT_pal256(D_8007A184++, D_803A4118);
         Hud_DrawTextureTile(D_803A8728, sx - 0x17, sy - 0xF, 0x2E, 0xF, 0x51, 0x31, 0x400, 0x400);
@@ -984,7 +984,7 @@ void Hud_DrawActorStatusIndicators(Struct_8002373C* arg0) {
             y = arg0->unk4 + arg0->unk64->unk1C * arg0->unk24;
         }
         pad1 = pad2 = 0;
-    vis = func_80027FFC(arg0->unk0, y, arg0->unk8, &sx, &sy);
+    vis = Camera_WorldToScreen(arg0->unk0, y, arg0->unk8, &sx, &sy);
         gDPPipeSync(D_8007A184++);
         gDPLoadTLUT_pal256(D_8007A184++, D_803A4118);
         oy = 0;
@@ -1205,7 +1205,7 @@ void Hud_DrawPopups(void) {
                 y += ((Vec3f_216E0*) p->unk4)->y;
                 z += ((Vec3f_216E0*) p->unk4)->z;
             }
-            func_80027FFC(x, y, z, &sx, &sy);
+            Camera_WorldToScreen(x, y, z, &sx, &sy);
             Hud_DrawTextureTile(D_803A8728, sx - (p->unk18 >> 1), sy - p->unk1A, p->unk18, p->unk1A, p->unk14, p->unk16, 0x400, 0x400);
             p->unk0--;
         }
@@ -1287,7 +1287,7 @@ void Hud_DrawNumber(u16 arg0, s32 arg1, s32 arg2, s32 arg3) {
     u8 buf[8];
 
     p = buf;
-    for (n = func_800281F0(arg3, buf, arg0); n != 0; n--) {
+    for (n = Text_FormatNumber(arg3, buf, arg0); n != 0; n--) {
         if (*p != 0x20) {
             Hud_DrawClippedTextureRect(arg1, arg2, 8, 0xA, *p * 8 + 0x20, 0x1D, 0x400, 0x400);
             arg1 += 7;

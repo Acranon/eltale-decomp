@@ -31,7 +31,7 @@ typedef struct {
 
 /* .bss 8008CEC0..8008FAF0 */
 OSThread D_8008CEC0;
-u64 D_8008D070[0x2000 / 8]; /* func_80028AAC's stack (its top is D_8008F070) */
+u64 D_8008D070[0x2000 / 8]; /* Audio_ThreadMain's stack (its top is D_8008F070) */
 ALHeap D_8008F070;
 Acmd* D_8008F080[2];
 void* D_8008F088[2];
@@ -83,7 +83,7 @@ ALSeqFile* D_80055930 = NULL;
 s32 D_80055934 = 0;
 u32 D_80055938 = 0;
 
-void func_80028AAC(void*);
+void Audio_ThreadMain(void*);
 void alCSeqNew(ALCSeq*, u8*);
 
 extern s32* D_80055A24[];
@@ -103,10 +103,10 @@ extern s32 D_800559E8[5];
 extern s32 D_800559F8;
 
 void alSndpNew(ALSndPlayer*, ALSndpConfig*);
-void func_80029588(s32 id);
-void func_80029880();
+void Audio_StopSound(s32 id);
+void Audio_StartSeqRequest();
 
-void func_80028550(u32 devAddr, void* vAddr, s32 nbytes) {
+void Audio_DmaReadRom(u32 devAddr, void* vAddr, s32 nbytes) {
     OSIoMesg sp28;
 
     osInvalDCache(vAddr, nbytes);
@@ -114,9 +114,9 @@ void func_80028550(u32 devAddr, void* vAddr, s32 nbytes) {
     osRecvMesg(&D_8008F0B8, NULL, 1);
 }
 
-ALDMAproc func_80028908(AMDMAState** state);
+ALDMAproc Audio_DmaNew(AMDMAState** state);
 
-void func_800285C4(void) {
+void Audio_Init(void) {
     alHeapInit(&D_8008F070, D_80332DB0, 0x68000);
     D_8008F080[0] = alHeapAlloc(&D_8008F070, 1, 0x8000);
     D_8008F080[1] = alHeapAlloc(&D_8008F070, 1, 0x8000);
@@ -132,14 +132,14 @@ void func_800285C4(void) {
     D_8008F428.maxVVoices = 0x10;
     D_8008F428.maxPVoices = 0x10;
     D_8008F428.maxUpdates = 0x40;
-    D_8008F428.dmaproc = func_80028908;
+    D_8008F428.dmaproc = Audio_DmaNew;
     D_8008F428.fxType = 1;
     D_8008F428.heap = &D_8008F070;
     D_8008F428.params = 0;
     alInit(&D_8008F3D8, &D_8008F428);
 }
 
-s32 func_80028788(s32 addr, s32 len, void* state) {
+s32 Audio_DmaCallback(s32 addr, s32 len, void* state) {
     void* foundBuffer;
     s32 delta;
     AMDMABuffer* dmaPtr;
@@ -190,7 +190,7 @@ s32 func_80028788(s32 addr, s32 len, void* state) {
     return osVirtualToPhysical(foundBuffer) + delta;
 }
 
-ALDMAproc func_80028908(AMDMAState** state) {
+ALDMAproc Audio_DmaNew(AMDMAState** state) {
     s32 i;
 
     if (!D_8008F4C8.initialized) {
@@ -203,10 +203,10 @@ ALDMAproc func_80028908(AMDMAState** state) {
         D_8008F4C8.initialized = 1;
     }
     *state = &D_8008F4C8;
-    return func_80028788;
+    return Audio_DmaCallback;
 }
 
-void func_800289DC(void) {
+void Audio_FreeOldDmaBuffers(void) {
     AMDMABuffer* dmaPtr;
     AMDMABuffer* nextPtr;
 
@@ -258,9 +258,9 @@ void nnScAddClient(void* sc, NNScClient* c, OSMesgQueue* msgQ);
 OSMesgQueue* nnScGetAudioMQ(void* sc);
 Acmd* alAudioFrame(Acmd* cmdList, s32* cmdLen, s16* outBuf, s32 outLen);
 s16 n_alSeqpGetVol(ALSeqPlayer* seqp);
-void func_80029618(void);
+void Audio_UpdateFrame(void);
 
-void func_80028AAC(void* arg) {
+void Audio_ThreadMain(void* arg) {
     OSMesgQueue msgQ;
     OSMesg msgBuf[8];
     OSMesgQueue rtnQ;
@@ -300,7 +300,7 @@ void func_80028AAC(void* arg) {
         osRecvMesg(&msgQ, (OSMesg*) &msg, OS_MESG_BLOCK);
         switch (*msg) {
             case 1:
-                func_80029618();
+                Audio_UpdateFrame();
                 switch (state) {
                     case 1:
                     for (i = 0; i < 2; i++) {
@@ -317,7 +317,7 @@ void func_80028AAC(void* arg) {
                 task = &tasks[D_8005593C];
                 end = D_8008F080[D_8005593C];
                 idx = D_80055940 % 3;
-                func_800289DC();
+                Audio_FreeOldDmaBuffers();
                 phys = (s16*) osVirtualToPhysical(D_8008F090[idx]);
                 D_80055944[idx] = (frameSize - samplesLeft + 0x60) & ~0xF;
                 if (D_80055944[idx] < frameSize - 16) {
@@ -454,22 +454,22 @@ s32* D_80055A24[] = {
     &D_8004F8A4[0x6068 / 4],
 };
 
-void func_80028F00(u32 devAddr) {
+void Audio_LoadSeqFileHeader(u32 devAddr) {
     s32 size;
 
     D_80055930 = alHeapAlloc(&D_8008F070, 1, 4);
-    func_80028550(devAddr, D_80055930, 4);
+    Audio_DmaReadRom(devAddr, D_80055930, 4);
     size = D_80055930->seqCount * 8 + 4;
     D_80055930 = alHeapAlloc(&D_8008F070, 1, size);
-    func_80028550(devAddr, D_80055930, size);
+    Audio_DmaReadRom(devAddr, D_80055930, size);
 }
 
-void func_80028FA8(void* arg) {
-    osCreateThread(&D_8008CEC0, 5, func_80028AAC, arg, &D_8008F070, 0x32);
+void Audio_StartThread(void* arg) {
+    osCreateThread(&D_8008CEC0, 5, Audio_ThreadMain, arg, &D_8008F070, 0x32);
     osStartThread(&D_8008CEC0);
 }
 
-void func_80028FFC(u32 bankStart, u32 bankEnd, u32 seqFile, s32 arg3, u8* table) {
+void Audio_InitSeqPlayers(u32 bankStart, u32 bankEnd, u32 seqFile, s32 arg3, u8* table) {
     s32 size;
     ALBank* bank;
 
@@ -493,18 +493,18 @@ void func_80028FFC(u32 bankStart, u32 bankEnd, u32 seqFile, s32 arg3, u8* table)
     D_8008F7A8[1].config.stopOsc = 0;
     D_8008F7A8[1].config.debugFlags = 0;
     alCSPNew(&D_8008F7A8[1].player, &D_8008F7A8[1].config);
-    func_80028F00(seqFile);
+    Audio_LoadSeqFileHeader(seqFile);
     alSeqFileNew(D_80055930, (u8*) seqFile);
     size = bankEnd - bankStart;
     D_80055928 = alHeapAlloc(&D_8008F070, 1, size);
-    func_80028550(bankStart, D_80055928, size);
+    Audio_DmaReadRom(bankStart, D_80055928, size);
     alBnkfNew(D_80055928, table);
     bank = D_80055928->bankArray[0];
     alSeqpSetBank((ALSeqPlayer*) &D_8008F7A8[0].player, bank);
     alSeqpSetBank((ALSeqPlayer*) &D_8008F7A8[1].player, bank);
 }
 
-void func_80029198(s32 slot, s32 seqNo) {
+void Audio_LoadSeq(s32 slot, s32 seqNo) {
     u8* offset;
     s32 len;
 
@@ -513,11 +513,11 @@ void func_80029198(s32 slot, s32 seqNo) {
     if (len & 1) {
         len++;
     }
-    func_80028550((u32) offset, D_8008F7A8[slot].seqData, len);
+    Audio_DmaReadRom((u32) offset, D_8008F7A8[slot].seqData, len);
     D_8008F7A8[slot].seqNo = seqNo;
 }
 
-s32 func_80029224(s32 slot) {
+s32 Audio_PlaySeq(s32 slot) {
     SeqSlot* s = &D_8008F7A8[slot];
     ALCSeq* seq = &s->seq;
     ALCSPlayer* player;
@@ -536,21 +536,21 @@ s32 func_80029224(s32 slot) {
     return 1;
 }
 
-void func_800292DC(s32 slot) {
+void Audio_StopSeq(s32 slot) {
     alSeqpStop((ALSeqPlayer*) &D_8008F7A8[slot].player);
 }
 
-s32 func_80029328(s32 slot) {
+s32 Audio_GetSeqState(s32 slot) {
     return alSeqpGetState((ALSeqPlayer*) &D_8008F7A8[slot].player);
 }
 
-void func_80029374(u32 start, u32 end, u8* table) {
+void Audio_InitSoundPlayer(u32 start, u32 end, u8* table) {
     s32 size;
     u32 i;
 
     size = end - start;
     D_8005592C = alHeapAlloc(&D_8008F070, 1, size);
-    func_80028550(start, D_8005592C, size);
+    Audio_DmaReadRom(start, D_8005592C, size);
     D_8008F4A8.maxSounds = 0x50;
     D_8008F4A8.maxEvents = 0x20;
     D_8008F4A8.heap = &D_8008F070;
@@ -568,7 +568,7 @@ void func_80029374(u32 start, u32 end, u8* table) {
     }
 }
 
-void func_80029520(s32 id) {
+void Audio_PlaySound(s32 id) {
     alSndpSetSound(&D_8008F450, D_8008F4BC[id]);
     if (alSndpGetState(&D_8008F450) == 0) {
         alSndpPlay(&D_8008F450);
@@ -576,23 +576,23 @@ void func_80029520(s32 id) {
     }
 }
 
-void func_80029588(s32 id) {
+void Audio_StopSound(s32 id) {
     alSndpSetSound(&D_8008F450, D_8008F4BC[id]);
     alSndpStop(&D_8008F450);
 }
 
-void func_800295D0(s32 id) {
+void Audio_GetSoundState(s32 id) {
     alSndpSetSound(&D_8008F450, D_8008F4BC[id]);
     alSndpGetState(&D_8008F450);
 }
 
 extern s32 D_800559BC;
-void func_80029AD4(void);
-void func_80029D10(void);
-void func_8002A118(void);
-void func_8002A1F8(void);
+void Sfx_ProcessQueue(void);
+void Sfx_StepScript(void);
+void Audio_StepSeqFadeOut(void);
+void Audio_StepSeqFadeIn(void);
 
-void func_80029618(void) {
+void Audio_UpdateFrame(void) {
     for (D_8008F764 = 0; D_8008F764 < 5; D_8008F764++) {
         if (D_800559E8[D_8008F764] != 0) {
             switch (D_8008F764) {
@@ -618,23 +618,23 @@ void func_80029618(void) {
                     break;
             }
             if (--D_800559E8[D_8008F764] == 0) {
-                func_80029D10();
+                Sfx_StepScript();
             }
         }
     }
     if (D_800559BC != 0xFF) {
-        func_80029880(D_800559BC);
+        Audio_StartSeqRequest(D_800559BC);
     }
     if (D_800559CC != 0) {
-        func_8002A118();
+        Audio_StepSeqFadeOut();
     }
     if (D_800559D0 != 0) {
-        func_8002A1F8();
+        Audio_StepSeqFadeIn();
     }
-    func_80029AD4();
+    Sfx_ProcessQueue();
 }
 
-void func_800297F4(s32 arg0) {
+void Sfx_SelectScript(s32 arg0) {
     if (arg0 >= 0 && arg0 < 0x47) {
         D_8008F75C = D_80055A24[arg0];
         return;
@@ -646,21 +646,21 @@ s32 func_80029834(void) {
     if (D_800559CC != 0 || D_800559D0 != 0) {
         return 1;
     }
-    func_80029880();
+    Audio_StartSeqRequest();
     return 0;
 }
 
 extern s32 D_800559BC;
 extern s32 D_800559C0;
-s32 func_8002A2AC(s32 seqNo);
+s32 Audio_LoadSeqsOrStop(s32 seqNo);
 
-void func_80029880(s32 arg0) {
+void Audio_StartSeqRequest(s32 arg0) {
     s32 seq;
 
     D_800559BC = arg0;
     if (arg0 == 1) {
         if (D_800559C0 == 0xFF) {
-            if (func_8002A2AC(0) != 0) {
+            if (Audio_LoadSeqsOrStop(0) != 0) {
                 return;
             }
         } else if (D_8008F7A8[0].player.state != 0) {
@@ -670,7 +670,7 @@ void func_80029880(s32 arg0) {
         D_800559B8 = 1;
         alSeqpSetVol((ALSeqPlayer*) &D_8008F7A8[1].player, 0x7FFF);
         D_800559C4[1] = 0x7FFF;
-        func_80029224(1);
+        Audio_PlaySeq(1);
         D_800559BC = 0xFF;
         return;
     }
@@ -678,16 +678,16 @@ void func_80029880(s32 arg0) {
     alSeqpStop((ALSeqPlayer*) &D_8008F7A8[1].player);
     if (arg0 >= 0x50) {
         seq = arg0 - 0x50;
-        if (D_800559C0 == seq || func_8002A2AC(seq) == 0) {
-            func_80029224(0);
+        if (D_800559C0 == seq || Audio_LoadSeqsOrStop(seq) == 0) {
+            Audio_PlaySeq(0);
             alSeqpSetVol((ALSeqPlayer*) &D_8008F7A8[0].player, 0);
             D_800559C4[0] = 0;
             D_800559D0 = 0x100;
             D_800559C0 = seq;
             D_800559BC = 0xFF;
         }
-    } else if (arg0 == D_800559C0 || func_8002A2AC(arg0) == 0) {
-        func_80029224(0);
+    } else if (arg0 == D_800559C0 || Audio_LoadSeqsOrStop(arg0) == 0) {
+        Audio_PlaySeq(0);
         alSeqpSetVol((ALSeqPlayer*) &D_8008F7A8[0].player, 0x7FFF);
         D_800559C4[0] = 0x7FFF;
         D_800559C0 = arg0;
@@ -695,7 +695,7 @@ void func_80029880(s32 arg0) {
     }
 }
 
-void func_80029A38(s32 arg0) {
+void Sfx_EnqueueDefault(s32 arg0) {
     s32 i = D_800559B0;
 
     D_8005594C[i] = arg0;
@@ -711,14 +711,14 @@ end:
     }
 }
 
-void func_80029A88(s32 arg0, s32 arg1, s32 arg2) {
+void Sfx_Enqueue(s32 arg0, s32 arg1, s32 arg2) {
     s32 i = D_800559B0;
 
     D_8005594C[i] = arg0;
     D_8005596C[i] = arg1;
     D_8005598C[i++] = arg2;
     D_800559B0 = i & 7;
-    // FAKE: same block layout trick as func_80029A38.
+    // FAKE: same block layout trick as Sfx_EnqueueDefault.
 end:
     while (TRUE) {
         D_8008FAE4 = i;
@@ -729,7 +729,7 @@ end:
 extern s32 D_800559FC[5];
 extern s32 D_80055A10[5];
 
-void func_80029AD4(void) {
+void Sfx_ProcessQueue(void) {
     s32 i;
     s32 idx = D_800559AC;
     s32 id;
@@ -740,27 +740,27 @@ void func_80029AD4(void) {
         D_8005594C[idx] = 0xFF;
         D_800559AC = (idx + 1) & 7;
         D_8008F764 = D_800559AC & 3;
-        func_800297F4(id);
+        Sfx_SelectScript(id);
         if (*D_8008F75C != 0) {
             D_8008F764 = 4;
             D_800559FC[D_8008F764] = D_8005596C[idx];
             D_80055A10[D_8008F764] = D_8005598C[idx];
             prev = D_800559D4[4];
             if (id != D_800559D4[4] && D_800559D4[4] != 0xFF) {
-                func_80029588(D_800559D4[4]);
+                Audio_StopSound(D_800559D4[4]);
                 D_800559D4[4] = id;
-                func_80029520(id);
+                Audio_PlaySound(id);
             }
             if (D_800559D4[4] == 0xFF) {
                 D_800559D4[4] = id;
-                func_80029520(id);
+                Audio_PlaySound(id);
             }
         } else {
             D_800559FC[D_8008F764] = D_8005596C[idx];
             D_80055A10[D_8008F764] = D_8005598C[idx];
             prev = -1;
             if (D_800559E8[D_8008F764] != 0 && id != D_800559D4[D_8008F764]) {
-                func_80029588(D_800559D4[D_8008F764]);
+                Audio_StopSound(D_800559D4[D_8008F764]);
             }
             for (i = 0; i < 4; i++) {
                 if (id == D_800559D4[i]) {
@@ -769,11 +769,11 @@ void func_80029AD4(void) {
                 }
             }
             D_800559D4[D_8008F764] = id;
-            func_80029520(id);
+            Audio_PlaySound(id);
         }
         if (prev != id) {
             D_8008F75C++;
-            func_80029D10();
+            Sfx_StepScript();
         }
     } else {
         D_800559AC = D_800559B0;
@@ -781,7 +781,7 @@ void func_80029AD4(void) {
 }
 
 
-void func_80029D10(void) {
+void Sfx_StepScript(void) {
     s32 snd = D_800559D4[D_8008F764];
     u32 vol;
     s32 cmd;
@@ -789,7 +789,7 @@ void func_80029D10(void) {
 
     end = 0xFFFF;
     if (*D_8008F75C == 0xFFFF) {
-        func_80029588(snd);
+        Audio_StopSound(snd);
         return;
     }
     if (*D_8008F75C == 0xFFFD) {
@@ -856,7 +856,7 @@ void func_80029D10(void) {
     }
 }
 
-void func_8002A118(void) {
+void Audio_StepSeqFadeOut(void) {
     s32 vol;
 
     vol = D_800559C4[D_800559B8] -= D_800559CC;
@@ -869,7 +869,7 @@ void func_8002A118(void) {
     }
 }
 
-void func_8002A1F8(void) {
+void Audio_StepSeqFadeIn(void) {
     s32 vol;
 
     vol = D_800559C4[D_800559B8] += D_800559D0;
@@ -881,10 +881,10 @@ void func_8002A1F8(void) {
     }
 }
 
-s32 func_8002A2AC(s32 seqNo) {
+s32 Audio_LoadSeqsOrStop(s32 seqNo) {
     if (D_8008F7A8[D_800559B8].player.state == 0) {
-        func_80029198(0, seqNo);
-        func_80029198(1, 1);
+        Audio_LoadSeq(0, seqNo);
+        Audio_LoadSeq(1, 1);
         return 0;
     }
     alSeqpStop((ALSeqPlayer*) &D_8008F7A8[0].player);
@@ -892,7 +892,7 @@ s32 func_8002A2AC(s32 seqNo) {
     return 1;
 }
 
-s32 func_8002A338(u32 frames) {
+s32 Audio_StartSeqFadeOut(u32 frames) {
     if (D_800559CC != 0 || D_800559D0 != 0) {
         return 1;
     }
@@ -900,29 +900,29 @@ s32 func_8002A338(u32 frames) {
     return 0;
 }
 
-void func_8002A38C(void) {
+void Sfx_StopAllChannels(void) {
     s32 i;
     s32 id;
 
     for (i = 0; i < 5; i++) {
         id = D_800559D4[i];
         if (id != 0xFFU) {
-            func_80029588(id);
+            Audio_StopSound(id);
         }
         D_800559E8[i] = 0;
         D_800559D4[i] = 0xFF;
     }
 }
 
-void func_8002A410(void) {
+void Sfx_StopChannel4(void) {
     if (D_800559E4 != 0xFF) {
-        func_80029588(D_800559E4);
+        Audio_StopSound(D_800559E4);
     }
     D_800559F8 = 0;
     D_800559E4 = 0xFF;
 }
 
-s32 func_8002A458(s32 vol) {
+s32 Audio_SetSeqVolume(s32 vol) {
     if (D_800559CC != 0 || D_800559D0 != 0) {
         return 1;
     }

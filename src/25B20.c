@@ -43,7 +43,7 @@ extern u8 D_8008CA4E;
 extern u8 D_803AC460[];
 extern Struct_803AAAA0 D_803AAAA0[];
 
-void func_80028120(void*, void*, s32);
+void Dma_ReadRom(void*, void*, s32);
 void Player_StartUseItem(u8);
 void Magic_CreateCastEffect(s32, s32, s32, s32);
 
@@ -100,16 +100,16 @@ extern Struct_803AB36C D_803AB36C[];
 
 void Effect_AddFloatingNumber(Struct_80026140*, s32, s32);
 void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AB358*, Vec3f*, Struct_80026140*);
-void func_8002A7C8(s32, s32, s32);
+void Sfx_Play(s32, s32, s32);
 
-s32 func_80026040(s32 arg0, Struct_803AAAA0* arg1);
-s32 func_80026054(Struct_80026054* arg0, Struct_803AAAA0* arg1);
-s32 func_800260A8(s32 arg0, Struct_803AAAA0* arg1);
-s32 func_800260F4(s32 arg0, Struct_803AAAA0* arg1);
-void func_80026130(s32 arg0, Struct_803AAAA0* arg1);
-void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1);
-void func_80026284(Struct_80026140* arg0, Struct_803AAAA0* arg1);
-void func_80026400(s32 arg0, Struct_803AAAA0* arg1);
+s32 Item_CanUseNever(s32 arg0, Struct_803AAAA0* arg1);
+s32 Item_CanUseRestore(Struct_80026054* arg0, Struct_803AAAA0* arg1);
+s32 Item_CanUseWarp(s32 arg0, Struct_803AAAA0* arg1);
+s32 Item_CanUseSpell(s32 arg0, Struct_803AAAA0* arg1);
+void Item_UseNothing(s32 arg0, Struct_803AAAA0* arg1);
+void Item_UseRestore(Struct_80026140* arg0, Struct_803AAAA0* arg1);
+void Item_UseWarp(Struct_80026140* arg0, Struct_803AAAA0* arg1);
+void Item_UseSpell(s32 arg0, Struct_803AAAA0* arg1);
 
 /* .bss 8008C190..8008CA50, in address order (IDO emits .bss by first declaration). */
 Vec3f D_8008C190;
@@ -124,24 +124,24 @@ u8 D_8008C9B8[0x97];
 
 /* .data 8004F4A0..8004F4D0 */
 ItemFunc D_8004F4A0[] = {
-    (ItemFunc) func_80026040,
-    (ItemFunc) func_80026054,
-    (ItemFunc) func_800260A8,
-    (ItemFunc) func_800260F4,
+    (ItemFunc) Item_CanUseNever,
+    (ItemFunc) Item_CanUseRestore,
+    (ItemFunc) Item_CanUseWarp,
+    (ItemFunc) Item_CanUseSpell,
 };
 ItemFunc D_8004F4B0[] = {
-    (ItemFunc) func_80026130,
-    (ItemFunc) func_80026140,
-    (ItemFunc) func_80026284,
-    (ItemFunc) func_80026400,
+    (ItemFunc) Item_UseNothing,
+    (ItemFunc) Item_UseRestore,
+    (ItemFunc) Item_UseWarp,
+    (ItemFunc) Item_UseSpell,
 };
-u16 D_8004F4C0 = 0; /* only func_80025318 uses it */
+u16 D_8004F4C0 = 0; /* only Item_UpdateInventoryMenu uses it */
 
-void func_80024F20(void) {
+void Item_InitInventory(void) {
     s32 i;
     u8* p;
 
-    func_80028120(D_D384B0, D_803AC460, 0x400);
+    Dma_ReadRom(D_D384B0, D_803AC460, 0x400);
     i = 8;
     p = D_8008C1B0;
     do {
@@ -161,7 +161,7 @@ void func_80024F20(void) {
     D_8008C1A4 = 0;
 }
 
-s32 func_80024FC4(void) {
+s32 Item_HasInventoryRoom(void) {
     s32 ret;
 
     if (D_8008C9B8[0x95] != 0xFF) {
@@ -172,7 +172,7 @@ s32 func_80024FC4(void) {
     return ret;
 }
 
-s32 func_80024FF0(u8 arg0) {
+s32 Item_CountInInventory(u8 arg0) {
     s32 count = 0;
     s32 i = 0x96;
     u8* p = D_8008C9B8;
@@ -187,7 +187,7 @@ s32 func_80024FF0(u8 arg0) {
     return count;
 }
 
-s32 func_8002504C(void) {
+s32 Item_GetInventoryCount(void) {
     s32 count = 0;
     s32 i = 0x96;
     u8* p = D_8008C9B8;
@@ -200,7 +200,7 @@ s32 func_8002504C(void) {
     return count;
 }
 
-void func_80025094(u8 arg0) {
+void Item_AddToInventory(u8 arg0) {
     s32 i;
 
     for (i = 0; i < 0x96; i++) {
@@ -211,7 +211,7 @@ void func_80025094(u8 arg0) {
     D_8008C9B8[i] = arg0;
 }
 
-s32 func_800250D8(u8 arg0) {
+s32 Item_TryUse(u8 arg0) {
     s32 ret = 0;
     Struct_803AAAA0* item = &D_803AAAA0[arg0];
 
@@ -229,7 +229,7 @@ s32 func_800250D8(u8 arg0) {
     return ret;
 }
 
-void func_800251CC(u8 arg0, void* arg1) {
+void Item_ApplyEffect(u8 arg0, void* arg1) {
     D_8004F4B0[D_803AAAA0[arg0].unk2](arg1, &D_803AAAA0[arg0], arg0);
 }
 
@@ -260,9 +260,9 @@ s32 func_80025228(u16 arg0) {
 
 #ifdef NON_MATCHING
 /* stack homes, saved registers and frame differ; code is equivalent */
-void func_80026430(s32, s32, s32, s32);
+void Item_DrawMenuFrame(s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, void*);
-void func_800269B8(s32, s32, void*);
+void Fade_Start(s32, s32, void*);
 extern Gfx* D_8007A184;
 extern s8 D_80092C81;
 extern u16 D_80092C86;
@@ -279,7 +279,7 @@ extern void* D_803AB288[];
 extern void* D_803AB2F0[];
 
 
-void func_80025318(void) {
+void Item_UpdateInventoryMenu(void) {
     volatile s32 n;
     u8* list;
     s32 count;
@@ -296,8 +296,8 @@ void func_80025318(void) {
     s32 b;
 
     gSPDisplayList(D_8007A184++, D_803AA7C0);
-    func_80026430(0x46, 0x7F, 0xB2, 0x16);
-    func_80026430(0x48, 0x44, 0xAD, 0x36);
+    Item_DrawMenuFrame(0x46, 0x7F, 0xB2, 0x16);
+    Item_DrawMenuFrame(0x48, 0x44, 0xAD, 0x36);
     gSPDisplayList(D_8007A184++, D_803AA940);
     gSPDisplayList(D_8007A184++, D_803AA998);
     x = D_80092C81;
@@ -349,7 +349,7 @@ void func_80025318(void) {
                     }
                 }
                 if (changed) {
-                    func_8002A7C8(0, 3, 0xFF);
+                    Sfx_Play(0, 3, 0xFF);
                 }
             }
             list = &D_8008C9B8[D_8008C19C];
@@ -390,7 +390,7 @@ void func_80025318(void) {
                 k = *--fp;
                 D_8008C1B0[k] = *p;
                 tex = ((u8 (*)[0x100])D_8008C1B8)[k];
-                func_80028120(&D_D384B0[(*p << 8) + 0x400], tex, 0x100);
+                Dma_ReadRom(&D_D384B0[(*p << 8) + 0x400], tex, 0x100);
             } else {
                 tex = ((u8 (*)[0x100])D_8008C1B8)[8 - k];
             }
@@ -433,7 +433,7 @@ void func_80025318(void) {
         gSPDisplayList(D_8007A184++, D_1000388);
         Text_DrawEncodedString(0x77, 0x48, D_803AB288[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
         Text_DrawEncodedString(0x4E, 0x5A, D_803AB2F0[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
-        if ((D_80092C86 & 0xA000) && func_800250D8(D_8008C9B8[D_8008C19C + D_8008C1A0])) {
+        if ((D_80092C86 & 0xA000) && Item_TryUse(D_8008C9B8[D_8008C19C + D_8008C1A0])) {
             p = &D_8008C9B8[D_8008C19C + D_8008C1A0];
             for (n = 0x95 - D_8008C19C - D_8008C1A0; n != 0; n--) {
                 *p = p[1];
@@ -441,7 +441,7 @@ void func_80025318(void) {
             }
             *p = 0xFF;
             D_8004DCA0 &= ~1;
-            func_800269B8(6, 4, D_8004F5B4);
+            Fade_Start(6, 4, D_8004F5B4);
             list = &D_8008C9B8[D_8008C19C];
             if (list[D_8008C1A0] == 0xFF) {
                 if (D_8008C19C > 0) {
@@ -457,14 +457,14 @@ void func_80025318(void) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/25B20/func_80025318.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/25B20/Item_UpdateInventoryMenu.s")
 #endif
 
-s32 func_80026040(s32 arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseNever(s32 arg0, Struct_803AAAA0* arg1) {
     return 0;
 }
 
-s32 func_80026054(Struct_80026054* arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseRestore(Struct_80026054* arg0, Struct_803AAAA0* arg1) {
     s32 ret = 0;
     Struct_80026054_64* temp = arg0->unk64;
 
@@ -477,7 +477,7 @@ s32 func_80026054(Struct_80026054* arg0, Struct_803AAAA0* arg1) {
     return ret;
 }
 
-s32 func_800260A8(s32 arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseWarp(s32 arg0, Struct_803AAAA0* arg1) {
     s32 ret;
 
     if ((D_800842B8 & 0xA) || (D_8007C288->unk14 & 4)) {
@@ -488,7 +488,7 @@ s32 func_800260A8(s32 arg0, Struct_803AAAA0* arg1) {
     return ret;
 }
 
-s32 func_800260F4(s32 arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseSpell(s32 arg0, Struct_803AAAA0* arg1) {
     s32 ret = 1;
 
     if ((D_8008BE52 & 0x100) && (arg1->unk0 & 8)) {
@@ -498,10 +498,10 @@ s32 func_800260F4(s32 arg0, Struct_803AAAA0* arg1) {
 }
 
 // empty
-void func_80026130(s32 arg0, Struct_803AAAA0* arg1) {
+void Item_UseNothing(s32 arg0, Struct_803AAAA0* arg1) {
 }
 
-void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
+void Item_UseRestore(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     u16 amt;
     Struct_80026054_64* st = arg0->unk64;
     Struct_803AB358* fx;
@@ -527,10 +527,10 @@ void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     fx = &D_803AB358[D_803AB36C[0].unk0];
     D_8008C190.z = 1.0f;
     Magic_CreateVisualEffect(D_803AB36C[0].unk2, D_803AB36C[0].unk4, arg0->unk0, arg0->unk4, arg0->unk8, 0.0f, fx, &D_8008C190, arg0);
-    func_8002A7C8(0, 0xB, 0xFF);
+    Sfx_Play(0, 0xB, 0xFF);
 }
 
-void func_80026284(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
+void Item_UseWarp(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     Struct_803AB358* fx;
 
     D_8004DCA0 |= 0x80;
@@ -549,17 +549,17 @@ void func_80026284(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     fx = &D_803AB358[D_803AB36C[1].unk0];
     D_8008C190.z = 1.0f;
     Magic_CreateVisualEffect(D_803AB36C[1].unk2, D_803AB36C[1].unk4, arg0->unk0, arg0->unk4, arg0->unk8, 0.0f, fx, &D_8008C190, arg0);
-    func_8002A7C8(0, 0x3B, 0xFF);
+    Sfx_Play(0, 0x3B, 0xFF);
 }
 
-void func_80026400(s32 arg0, Struct_803AAAA0* arg1) {
+void Item_UseSpell(s32 arg0, Struct_803AAAA0* arg1) {
     Magic_CreateCastEffect(arg0, arg1->unk4, 0, 4);
 }
 
 extern Gfx* D_8007A184;
 extern Gfx D_803AA8A8[];
 
-void func_80026430(s32 x, s32 y, s32 w, s32 h) {
+void Item_DrawMenuFrame(s32 x, s32 y, s32 w, s32 h) {
     gDPPipeSync(D_8007A184++);
     gDPSetCycleType(D_8007A184++, G_CYC_FILL);
     gDPSetRenderMode(D_8007A184++, G_RM_NOOP, G_RM_NOOP2);

@@ -240,9 +240,9 @@ s32 Enemy_GetSlotIndex(Actor17360*);
 s32 Enemy_TakeDamage(s32, u16, s32, u16, s32);
 void Player_TakeDamage(u16, u16, s32);
 void Hud_ClearActorStatusIndicators(Actor17360*);
-u32 func_80026E90(u32);
+u32 Math_Rand(u32);
 f32 sqrtf(f32);
-void func_800271B4(f32, Unk17360Vec2*);
+void Math_RotateVec2(f32, Unk17360Vec2*);
 
 void Magic_ApplyEffectDamage();
 void Magic_ClearActorStatuses(s32, Actor17360*);
@@ -505,7 +505,7 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
             D_800863B8.x = D_800C1878[(def->unk2C + arg2) & 7].x * sizes.v[def->unk30];
             D_800863B8.y = D_800C1878[(def->unk2C + arg2) & 7].z * sizes.v[def->unk30];
             boost = arg3 & 0x10;
-            func_800271B4(((Actor17360*)arg0)->ry, &D_800863B8);
+            Math_RotateVec2(((Actor17360*)arg0)->ry, &D_800863B8);
             p->vx = D_800863B8.x;
             p->vz = D_800863B8.y;
             if (def->unk2A & 2) {
@@ -568,7 +568,7 @@ void Magic_PlaceEffectAtActorUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
 void Magic_PlaceEffectAheadAtMiddlePoint(Unk17360Cam* arg0, Actor17360* arg1) {
     D_800863B8.x = 0.0f;
     D_800863B8.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
-    func_800271B4(arg1->ry, &D_800863B8);
+    Math_RotateVec2(arg1->ry, &D_800863B8);
     arg0->x = arg1->x + D_800863B8.x;
     arg0->z = arg1->z + D_800863B8.y;
     if (arg1->unk64->unk0 == 1) {
@@ -581,7 +581,7 @@ void Magic_PlaceEffectAheadAtMiddlePoint(Unk17360Cam* arg0, Actor17360* arg1) {
 void Magic_PlaceEffectAheadAtUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
     D_800863B8.x = 0.0f;
     D_800863B8.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
-    func_800271B4(arg1->ry, &D_800863B8);
+    Math_RotateVec2(arg1->ry, &D_800863B8);
     arg0->x = arg1->x + D_800863B8.x;
     arg0->z = arg1->z + D_800863B8.y;
     if (arg1->unk64->unk0 == 1) {
@@ -594,7 +594,7 @@ void Magic_PlaceEffectAheadAtUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
 void Magic_PlaceEffectBehindAtUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
     D_800863B8.x = 0.0f;
     D_800863B8.y = -arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
-    func_800271B4(arg1->ry, &D_800863B8);
+    Math_RotateVec2(arg1->ry, &D_800863B8);
     arg0->x = arg1->x + D_800863B8.x;
     arg0->z = arg1->z + D_800863B8.y;
     if (arg1->unk64->unk0 == 1) {
@@ -621,8 +621,8 @@ void Magic_PlaceEffectAtSelectedTarget(Unk17360Cam* arg0, Actor17360* arg1) {
 
 void Magic_PlaceEffectAtRandomOffset(Unk17360Cam* arg0, Actor17360* arg1) {
     D_800863B8.x = 0.0f;
-    D_800863B8.y = (f32)func_80026E90(20) + 20.0;
-    func_800271B4((f32)func_80026E90(16) * 3.141592653589793 / 8.0f - 3.141592653589793, &D_800863B8);
+    D_800863B8.y = (f32)Math_Rand(20) + 20.0;
+    Math_RotateVec2((f32)Math_Rand(16) * 3.141592653589793 / 8.0f - 3.141592653589793, &D_800863B8);
     arg0->x = arg1->x + D_800863B8.x;
     arg0->z = arg1->z + D_800863B8.y;
     if (arg1->unk64->unk0 == 1) {
@@ -645,7 +645,7 @@ void Magic_PlaceEffectAtDiagonalOffset(Unk17360Cam* arg0, Actor17360* arg1) {
     }
     D_800863B8.y = dist;
     D_800863B8.x = dist * 1.5;
-    func_800271B4(arg1->ry, &D_800863B8);
+    Math_RotateVec2(arg1->ry, &D_800863B8);
     arg0->x = arg1->x + D_800863B8.x;
     arg0->z = arg1->z + D_800863B8.y;
     if (arg1->unk64->unk0 == 1) {
@@ -658,7 +658,7 @@ void Magic_PlaceEffectAtDiagonalOffset(Unk17360Cam* arg0, Actor17360* arg1) {
 void Magic_PlaceEffectAtFixedForwardOffset(Unk17360Cam* arg0, Actor17360* arg1) {
     D_800863B8.x = 0.0f;
     D_800863B8.y = 380.0f;
-    func_800271B4(arg1->ry, &D_800863B8);
+    Math_RotateVec2(arg1->ry, &D_800863B8);
     arg0->x = arg1->x + D_800863B8.x * arg1->scale;
     arg0->y = arg1->y + 380.0f * arg1->scale;
     arg0->z = arg1->z + D_800863B8.y * arg1->scale;
@@ -1051,7 +1051,7 @@ typedef struct {
 extern s32 D_8007AA10;
 extern u8 D_8004F760[];
 u16 Magic_CalculateEffectDamage(Unk80018480Cfg*, Actor17360*);
-void func_800269B8(s32, s32, u8*);
+void Fade_Start(s32, s32, u8*);
 void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
     u16 dmg;
     u16 flag;
@@ -1063,9 +1063,9 @@ void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
     }
     if (arg1->unk5E & 1) {
         if (D_8007AA10 & 0x1000) {
-            if (func_80026E90((D_8007AA10 & 0x10000) ? 4 : 0x20) == 0) {
+            if (Math_Rand((D_8007AA10 & 0x10000) ? 4 : 0x20) == 0) {
                 dmg += (dmg + 1) >> 1;
-                func_800269B8(4, 0, D_8004F760);
+                Fade_Start(4, 0, D_8004F760);
                 flag = 0x4000;
             }
         }
@@ -1073,9 +1073,9 @@ void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
             D_8007AA1C->unk2A++;
         }
     } else {
-        if (func_80026E90(0x20) == 0) {
+        if (Math_Rand(0x20) == 0) {
             dmg += (dmg + 1) >> 1;
-            func_800269B8(4, 0, D_8004F760);
+            Fade_Start(4, 0, D_8004F760);
             flag = 0x4000;
         }
         Player_TakeDamage(dmg, arg0->cfg->unk2 | flag, (s32)arg0->unk24);
@@ -1094,14 +1094,14 @@ void Magic_HealTarget(Unk80018480* arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
         D_800863C4 = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
         amt = arg1->unk64->unk6 * arg0->cfg->unkC / 100;
-        amt += func_80026E90(amt >> 2);
+        amt += Math_Rand(amt >> 2);
         ((Unk8001860CRec*)D_800863C4)->unkA += amt;
         if (((Unk8001860CRec*)D_800863C4)->unkA > arg1->unk64->unk6) {
             ((Unk8001860CRec*)D_800863C4)->unkA = arg1->unk64->unk6;
         }
     } else {
         amt = (D_8007AA1C->unk24[arg0->cfg->unk6] >> 1) + arg1->unk64->unk6 * arg0->cfg->unkC / 100;
-        amt += func_80026E90(amt >> 2);
+        amt += Math_Rand(amt >> 2);
         if (arg1->unk64->unk4 != arg1->unk64->unk6) {
             arg1->unk64->unk4 += amt;
             if (arg1->unk64->unk4 > arg1->unk64->unk6) {
@@ -1250,7 +1250,7 @@ typedef struct {
     /* 0x28 */ void* unk28;
     /* 0x2C */ Unk80018DC0Cfg* cfg;
 } Unk80018DC0;
-f32 func_800270D0(f32, f32);
+f32 Math_Atan2(f32, f32);
 void Magic_SelectClosestAimTarget(Unk80018DC0* arg0) {
     f32 angle;
     f32 best;
@@ -1265,7 +1265,7 @@ void Magic_SelectClosestAimTarget(Unk80018DC0* arg0) {
         return;
     }
     if ((arg0->cfg->unk2 & 8) && (arg0->unk18 != 0.0f || arg0->unk20 != 0.0f)) {
-        angle = func_800270D0(arg0->unk18, arg0->unk20);
+        angle = Math_Atan2(arg0->unk18, arg0->unk20);
     } else {
         angle = caster->ry;
     }
@@ -1277,8 +1277,8 @@ void Magic_SelectClosestAimTarget(Unk80018DC0* arg0) {
         if (p->unk7C != -1) {
             D_800863B8.x = p->x - caster->x;
             D_800863B8.y = p->z - caster->z;
-            func_800271B4(angle, &D_800863B8);
-            d = func_800270D0(D_800863B8.x, D_800863B8.y);
+            Math_RotateVec2(angle, &D_800863B8);
+            d = Math_Atan2(D_800863B8.x, D_800863B8.y);
             if (d > 3.141592653589793) {
                 d -= 6.283185307179586;
             } else if (d < -3.141592653589793) {
@@ -1527,7 +1527,7 @@ typedef struct {
 } Unk800C18D8; // size = 0xA
 extern Unk800C18D8 D_800C18D8[];
 Unk80019BFCRet* Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Unk800C18D8*, Unk17360Vec2*, Actor17360*);
-void func_8002A7C8(u8, s8, s32);
+void Sfx_Play(u8, s8, s32);
 
 
 Unk80019BFCRet* Effect_CreateModelEffect(u16, u16, u16, s32, u16, f32, f32, f32, f32, f32, f32, f32);
@@ -1622,7 +1622,7 @@ typedef struct {
     /* 0x02 */ u16 unk2;
     /* 0x04 */ u8 pad4[8];
 } Unk800C363C_c; // size = 0xC
-f32 func_800270D0(f32, f32);
+f32 Math_Atan2(f32, f32);
 void Magic_CreateCastPresentation(Unk800199C0* arg0, Actor17360* arg1) {
     Unk80019BFCRet* ret;
     Unk17360CamCfg* cfg;
@@ -1641,7 +1641,7 @@ void Magic_CreateCastPresentation(Unk800199C0* arg0, Actor17360* arg1) {
         D_800863B8.y = def->unkC;
         D_800863B8.z = cfg->unk1C;
         if (arg0->unk18 != 0.0f || arg0->unk20 != 0.0f) {
-            angle = func_800270D0(arg0->unk18, arg0->unk20);
+            angle = Math_Atan2(arg0->unk18, arg0->unk20);
         } else {
             angle = arg1->ry;
         }
@@ -1666,7 +1666,7 @@ void Magic_CreateCastPresentation(Unk800199C0* arg0, Actor17360* arg1) {
         }
     }
     if (def->unk40 >= 0) {
-        func_8002A7C8(def->unk41, def->unk40, 0xFF);
+        Sfx_Play(def->unk41, def->unk40, 0xFF);
     }
 }
 
@@ -1693,7 +1693,7 @@ void Magic_CreateTimedPresentation(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
     ret->unk2C = arg0->unk1C;
     ret->unk30 = arg0->unk20;
     if (def->unk46 >= 0) {
-        func_8002A7C8(def->unk47, def->unk46, 0xFF);
+        Sfx_Play(def->unk47, def->unk46, 0xFF);
     }
 }
 
@@ -1767,9 +1767,9 @@ void Magic_CreateHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
         }
     }
     if (def->unk42 >= 0) {
-        func_8002A7C8(def->unk43, def->unk42, 0xFF);
+        Sfx_Play(def->unk43, def->unk42, 0xFF);
     } else if (arg0->unk24 != arg0->unk28) {
-        func_8002A7C8(0, 0x18, 0xFF);
+        Sfx_Play(0, 0x18, 0xFF);
     }
 }
 
@@ -1808,7 +1808,7 @@ void Magic_CreateGroundHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
         }
     }
     if (def->unk44 >= 0) {
-        func_8002A7C8(def->unk45, def->unk44, 0xFF);
+        Sfx_Play(def->unk45, def->unk44, 0xFF);
     }
 }
 
@@ -1872,7 +1872,7 @@ s32 Magic_GetHitOutcome(Unk8001A3EC* arg0, Actor17360* arg1) {
     if (arg0->unkA & 4) {
         ret = 2;
     } else {
-        ret = func_80026E90(100) < arg0->unk2C->unkE;
+        ret = Math_Rand(100) < arg0->unk2C->unkE;
         if (ret != 0) {
             if (arg1 != arg0->unk24) {
                 if (arg1->unk5E & 1) {
@@ -1897,19 +1897,19 @@ s32 Magic_ShouldApplyStatus(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
     } else if (cfg = arg0->unk2C, cfg->unk18 == 2) {
         ret = 1;
     } else if (arg1->unk5E & 1) {
-        ret = func_80026E90(64) < D_8004EDB0[arg2];
+        ret = Math_Rand(64) < D_8004EDB0[arg2];
     } else {
         n = (D_8007AA08.unk8 & 0x8000) ? 28 : 32;
-        ret = func_80026E90(n) < D_8004EDB0[arg2];
+        ret = Math_Rand(n) < D_8004EDB0[arg2];
     }
     return ret;
 }
 
 void Magic_StartStatusTimer(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
     if (arg1 != arg0->unk24) {
-        arg1->unk68->timers[arg2] = func_80026E90(D_8004EDBC[arg2]) + 2;
+        arg1->unk68->timers[arg2] = Math_Rand(D_8004EDBC[arg2]) + 2;
     } else {
-        arg1->unk68->timers[arg2] = func_80026E90(D_8004EDEC[arg2]) + 3;
+        arg1->unk68->timers[arg2] = Math_Rand(D_8004EDEC[arg2]) + 3;
     }
 }
 

@@ -157,7 +157,7 @@ extern Gfx D_8020F730_ovl_ending[];
 extern UnkPic_80210800 D_80210800_ovl_ending[];
 extern f32 D_8022BAF0_ovl_ending;
 extern f64 D_8022BAF8_ovl_ending;
-void func_8002A338(s32);
+void Audio_StartSeqFadeOut(s32);
 #endif
 
 void Ending_ClearAllSprites(void);
@@ -1131,7 +1131,7 @@ s32 Ending_DrawScrollingBackdrop(s32 arg0, s32 arg1) {
         D_8020F6B0_ovl_ending = 1;
     } else if (D_8020F6A0_ovl_ending == D_8022BAF8_ovl_ending) {
         D_8020F6B0_ovl_ending = 2;
-        func_8002A338(0x1E0);
+        Audio_StartSeqFadeOut(0x1E0);
     }
 
     switch (D_8020F6AC_ovl_ending) {

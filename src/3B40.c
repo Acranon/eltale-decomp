@@ -59,10 +59,10 @@ void func_80009764(u16 arg0);
 void Npc_SpawnForArea(s32 arg0, s32 arg1);
 void Map_LoadArea(void);
 void Camera_InitForMap(void);
-void func_80027430(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
-void func_80027834(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3, f32 *arg4, f32 *arg5, f32 *arg6);
-void func_8002A338(s32 arg0);
-void func_8002A6B8(s8 arg0);
+void Math_MtxFRotate(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3);
+void Math_MtxFMulVecNegZ(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3, f32 *arg4, f32 *arg5, f32 *arg6);
+void Audio_StartSeqFadeOut(s32 arg0);
+void Bgm_Play(s8 arg0);
 void Text_ResetAllWindows(s32 arg0, s32 arg1);
 void Text_OpenWindow(u8 arg0);
 
@@ -137,13 +137,13 @@ void Cutscene_StartEntry(s32 arg0) {
     D_80085E54 = entry->unk8;
     D_80085E58 = entry->unkC;
     D_80085E5C = entry->unk10;
-    func_80027430(mtx, -entry->unk14 * 0.017453292519943295, -entry->unk18 * 0.017453292519943295, 0.0f);
-    func_80027834(mtx, 0.0f, 0.0f, -100.0f, &D_80085E60, &D_80085E64, &D_80085E68);
+    Math_MtxFRotate(mtx, -entry->unk14 * 0.017453292519943295, -entry->unk18 * 0.017453292519943295, 0.0f);
+    Math_MtxFMulVecNegZ(mtx, 0.0f, 0.0f, -100.0f, &D_80085E60, &D_80085E64, &D_80085E68);
     D_80085E48.unk18 = D_80085E48.unk18 + D_80085E48.unkC;
     D_80085E48.unk1C = D_80085E48.unk1C + D_80085E48.unk10;
     D_80085E48.unk20 = D_80085E48.unk14 - D_80085E48.unk20;
     D_80085F50 = entry->unk1C;
-    func_8002A6B8(((s8 *)&entry->unk3E)[1]);
+    Bgm_Play(((s8 *)&entry->unk3E)[1]);
 }
 
 s32 Cutscene_UpdateMessageSequence(void) {
@@ -174,11 +174,11 @@ void Cutscene_StartAudioFadeForEntry(u32 arg0) {
     Unk801C14E4 *entry;
 
     if (arg0 > 6) {
-        func_8002A338(0x40);
+        Audio_StartSeqFadeOut(0x40);
     } else {
         entry = &D_801C14E4[arg0];
         if (entry->unk3E != (entry - 1)->unk3E) {
-            func_8002A338(0x40);
+            Audio_StartSeqFadeOut(0x40);
         }
     }
 }

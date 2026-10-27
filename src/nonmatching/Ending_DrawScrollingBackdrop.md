@@ -19,7 +19,7 @@ Verdict: **equivalent, after one fix.**
 - One object, one definition: the draft defined D_8020F69C..D_8020F6B4 as function statics with
   initializers. The module already defines them as globals (right before the function), so the statics
   were dropped and the C uses those globals. UnkPic_80210800 and the externs (D_8020F730, D_80210800,
-  D_8022BAF0 f32, D_8022BAF8 f64, func_8002A338) are in the file's NON_MATCHING block.
+  D_8022BAF0 f32, D_8022BAF8 f64, Audio_StartSeqFadeOut) are in the file's NON_MATCHING block.
 - Checked: the whole retail asm in order against the C and the compiled object: arg0 == 0 path (F69C =
   BAF0, F6B4 = 0, return 0), F6B4 == 2 -> return 1, the E7/B9 (G_RM_AA_XLU_SURF, 0x5041C8)/DL D_8020F730/
   BA TLUT commands, F6A0 == 0x26AC and the double compare with D_8022BAF8 (store before the 0x1E0 call),

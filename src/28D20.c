@@ -8,7 +8,7 @@
 extern OSMesgQueue D_8007A1A8;
 OSIoMesg D_8008CEA0; /* .bss 8008CEA0..8008CEC0 */
 
-void func_80028120(u8* devAddr, void* vAddr, s32 size) {
+void Dma_ReadRom(u8* devAddr, void* vAddr, s32 size) {
     u32 mesgSize;
 
     osInvalICache(vAddr, size);
@@ -28,7 +28,7 @@ void func_80028120(u8* devAddr, void* vAddr, s32 size) {
     }
 }
 
-s32 func_800281F0(s32 value, u8* str_ptr, u16 flags) {
+s32 Text_FormatNumber(s32 value, u8* str_ptr, u16 flags) {
     u32 char_count;
     s32 continue_loop;
     s32 power;

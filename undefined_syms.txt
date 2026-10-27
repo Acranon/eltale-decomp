@@ -202,7 +202,7 @@ D_80060C4C = D_80060C48 + 0x4;
 /* D2: labels inside objects that src/272D0.c defines (8008CA50..8008CE60). */
 D_8008CE54 = D_8008CA58 + 0x3FC;
 
-/* D2: labels inside objects that src/29150.c defines (8008CEC0..8008FAF0), used by func_80028AAC. */
+/* D2: labels inside objects that src/29150.c defines (8008CEC0..8008FAF0), used by Audio_ThreadMain. */
 D_8008F440 = D_8008F428 + 0x18;
 D_8008F7C4 = D_8008F7A8 + 0x1C;
 D_8008F960 = D_8008F7A8 + 0x1B8;

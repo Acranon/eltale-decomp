@@ -114,7 +114,7 @@ s32 Coll_PushFromWalls(f32, f32, CollWalls *, CollResult *);
 s32 Exit_IsFacing(f32);
 s32 Exit_IsEnabled(Unk24 *);
 void Exit_SetDestination(Unk24 *);
-void func_800271B4(f32, f32 *);
+void Math_RotateVec2(f32, f32 *);
 
 extern Unk8007C288 *D_8007C288;
 extern Unk8007C28C *D_8007C28C;
@@ -197,7 +197,7 @@ s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     if (ang != 0.0f) {
         v[0] = x;
         v[1] = z;
-        func_800271B4(ang, v);
+        Math_RotateVec2(ang, v);
         x = -v[0];
         z = v[1];
     }
@@ -208,7 +208,7 @@ s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
             if (ang != 0.0f) {
                 v[0] = out->nx;
                 v[1] = out->nz;
-                func_800271B4(-ang, v);
+                Math_RotateVec2(-ang, v);
                 out->nx = -v[0];
                 out->nz = v[1];
             }
@@ -487,7 +487,7 @@ s32 Exit_CheckEnter(f32 x, f32 z, f32 angle) {
         if (Exit_IsEnabled(p)) {
             D_80084320.x = x - p->x;
             D_80084320.z = z - p->z;
-            func_800271B4(p->angle, &D_80084320.x);
+            Math_RotateVec2(p->angle, &D_80084320.x);
             dx = D_80084320.x;
             if (dx < 0.0f) {
                 dx = -dx;

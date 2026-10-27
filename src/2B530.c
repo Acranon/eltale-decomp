@@ -20,21 +20,21 @@ f32 D_8008FB4C;
 s32 D_8008FB50;
 s32 D_8008FB54;
 #ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
-s32 D_8008FB58; /* only func_8002B844 (asm) uses it */
+s32 D_8008FB58; /* only Menu_DrawOptionsPage (asm) uses it */
 #endif
-f32 D_8008FB5C; /* only func_8002C598 (asm) uses these two */
+f32 D_8008FB5C; /* only Menu_DrawMapPage (asm) uses these two */
 f32 D_8008FB60;
 
 extern Gfx* D_8007A184;
 extern u16 D_8008FB70;
 
-void func_8002A930(void) {
+void Menu_Init(void) {
     D_8008FB3E = 0x8000;
     D_8008FB70 = 0;
     D_8008FB3C = 0;
 }
 
-void func_8002A954(void) {
+void Menu_ResetKeepPage(void) {
     D_8008FB3E = (D_8008FB3E & 3) | 0x8000;
     D_8008FB70 = 0;
     D_8008FB3C = 0;
@@ -44,38 +44,38 @@ extern Gfx* D_8007A184;
 extern Gfx D_80061770[];
 extern u16 D_8007A170;
 extern u16 D_80092C86;
-void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
+void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
-void func_8002AC1C(void);
-void func_8002AE58(s32);
-void func_8002B844(s32);
-void func_8002C598(s32);
-void func_8002D7CC(s32);
-void func_8002E9DC();
+void Menu_DrawPageSlide(void);
+void Menu_DrawStatsPage(s32);
+void Menu_DrawOptionsPage(s32);
+void Menu_DrawMapPage(s32);
+void Menu_DrawElementsPage(s32);
+void Menu_DrawBackground();
 void SaveMenu_Update(void);
 
-void func_8002A984(s32 arg0) {
+void Menu_Update(s32 arg0) {
     gSPDisplayList(D_8007A184++, D_80061770);
     gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
-    func_8002E9DC();
+    Menu_DrawBackground();
     D_8008FB44++;
     if (D_8008FB3E & 0x4000) {
         SaveMenu_Update();
     } else if (D_8008FB3E & 0x2000) {
-        func_8002AC1C();
+        Menu_DrawPageSlide();
     } else {
         switch ((u16)(D_8008FB3E & 3)) {
             case 0:
-                func_8002AE58(0);
+                Menu_DrawStatsPage(0);
                 break;
             case 1:
-                func_8002C598(0);
+                Menu_DrawMapPage(0);
                 break;
             case 2:
-                func_8002D7CC(0);
+                Menu_DrawElementsPage(0);
                 break;
             case 3:
-                func_8002B844(0);
+                Menu_DrawOptionsPage(0);
                 break;
         }
     }
@@ -84,7 +84,7 @@ void func_8002A984(s32 arg0) {
     gDPSetBlendColor(D_8007A184++, 0, 0, 0, 1);
     if ((D_80092C86 & 0x5000) && !(D_8008FB3E & 0x6020)) {
         D_8008FB3E &= 0x7FFF;
-        func_8002A7C8(0, 1, 0xFF);
+        Sfx_Play(0, 1, 0xFF);
     }
     if (!(D_8008FB3E & 0x8000)) {
         if (D_8008FB3E & 0x4000) {
@@ -108,16 +108,16 @@ void func_8002A984(s32 arg0) {
         } else {
             D_8007A170 = 1;
         }
-        func_8002A954();
+        Menu_ResetKeepPage();
     }
 }
 
-void func_8002AE58(s32);
-void func_8002B844(s32);
-void func_8002C598(s32);
-void func_8002D7CC(s32);
+void Menu_DrawStatsPage(s32);
+void Menu_DrawOptionsPage(s32);
+void Menu_DrawMapPage(s32);
+void Menu_DrawElementsPage(s32);
 
-void func_8002AC1C(void) {
+void Menu_DrawPageSlide(void) {
     s32 mode;
     s32 dir = 0;
     s32 d;
@@ -146,35 +146,35 @@ void func_8002AC1C(void) {
     mode = D_8008FB3E & 3;
     switch (mode) {
         case 0:
-            func_8002AE58(a);
+            Menu_DrawStatsPage(a);
             if (D_8008FB3E & 0x1000) {
-                func_8002B844(b);
+                Menu_DrawOptionsPage(b);
             } else {
-                func_8002C598(b);
+                Menu_DrawMapPage(b);
             }
             break;
         case 1:
-            func_8002C598(a);
+            Menu_DrawMapPage(a);
             if (D_8008FB3E & 0x1000) {
-                func_8002AE58(b);
+                Menu_DrawStatsPage(b);
             } else {
-                func_8002D7CC(b);
+                Menu_DrawElementsPage(b);
             }
             break;
         case 2:
-            func_8002D7CC(a);
+            Menu_DrawElementsPage(a);
             if (D_8008FB3E & 0x1000) {
-                func_8002C598(b);
+                Menu_DrawMapPage(b);
             } else {
-                func_8002B844(b);
+                Menu_DrawOptionsPage(b);
             }
             break;
         case 3:
-            func_8002B844(a);
+            Menu_DrawOptionsPage(a);
             if (D_8008FB3E & 0x1000) {
-                func_8002D7CC(b);
+                Menu_DrawElementsPage(b);
             } else {
-                func_8002AE58(b);
+                Menu_DrawStatsPage(b);
             }
             break;
     }
@@ -206,11 +206,11 @@ extern u16 D_80055F0C[];
 extern s8 D_80060D64[];
 extern s8 D_80092C81;
 extern u16 D_80092C84;
-void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
-void func_8002DECC(s32 id, s32 x, s32 y, s32 w, s32 h);
-void func_8002EED8(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
+void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
+void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
+void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
 
-void func_8002AE58(s32 x) {
+void Menu_DrawStatsPage(s32 x) {
     s32 px;
     s32 i;
     f32 f;
@@ -218,110 +218,110 @@ void func_8002AE58(s32 x) {
 
     gDPPipeSync(D_8007A184++);
     gDPSetEnvColor(D_8007A184++, 255, 255, 255, 255);
-    func_8002DECC(0, x + 0x28, 0x1E, 0xF0, 0x98);
-    func_8002DECC(0x37, x + 0x2B, 0xB7, 0xF0, 3);
-    func_8002DECC(0x37, x + 0x119, 0x24, 2, 0x96);
-    func_8002DECC(0x37, x + 0x27, 0x1D, 0xF2, 1);
-    func_8002DECC(0x37, x + 0x27, 0xB6, 0xF2, 1);
-    func_8002DECC(0x37, x + 0x27, 0x1D, 1, 0x9A);
-    func_8002DECC(0x37, x + 0x118, 0x1D, 1, 0x9A);
-    func_8002DECC(0x38, x + 0x29, 0x1F, 0xED, 1);
-    func_8002DECC(0x38, x + 0x29, 0x1F, 1, 0x95);
-    func_8002DECC(0x39, x + 0x29, 0xB4, 0xEE, 1);
-    func_8002DECC(0x39, x + 0x116, 0x1F, 1, 0x96);
-    func_8002DECC(0x3C, x + 0x3A, 0x1E, 0x15, 0x98);
+    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x98);
+    Menu_DrawSprite(0x37, x + 0x2B, 0xB7, 0xF0, 3);
+    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x96);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0xB6, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 1, 0x9A);
+    Menu_DrawSprite(0x37, x + 0x118, 0x1D, 1, 0x9A);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 1, 0x95);
+    Menu_DrawSprite(0x39, x + 0x29, 0xB4, 0xEE, 1);
+    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x96);
+    Menu_DrawSprite(0x3C, x + 0x3A, 0x1E, 0x15, 0x98);
     px = 0x4B;
     for (i = 0; i < 3; i++, px += 0x21) {
-        func_8002DECC(0x3D, x + 0x5D, px, 0xA7, 2);
+        Menu_DrawSprite(0x3D, x + 0x5D, px, 0xA7, 2);
     }
     px = 0x40;
     for (i = 0; i < 4; i++, px += 0x21) {
-        func_8002DECC(0x32, x + 0x63, px, 0x3C, 7);
+        Menu_DrawSprite(0x32, x + 0x63, px, 0x3C, 7);
     }
     px = 0x3C;
     for (i = 0; i < 4; i++, px += 0x21) {
-        func_8002DECC(0x20, x + 0xC3, px, 0x13, 11);
+        Menu_DrawSprite(0x20, x + 0xC3, px, 0x13, 11);
     }
-    func_8002DECC(0x1B, x + 0x38, 0x34, 0x18, 0xE);
-    func_8002DECC(0x1C, x + 0x37, 0x54, 0x1C, 0xD);
-    func_8002DECC(0x1D, x + 0x35, 0x78, 0x24, 0xF);
-    func_8002DECC(0x1E, x + 0x35, 0x99, 0x1C, 0xE);
-    func_8002DECC(5, x + 0x45, 0x1C, 8, 8);
-    func_8002DECC(5, x + 0xF3, 0x1C, 8, 8);
+    Menu_DrawSprite(0x1B, x + 0x38, 0x34, 0x18, 0xE);
+    Menu_DrawSprite(0x1C, x + 0x37, 0x54, 0x1C, 0xD);
+    Menu_DrawSprite(0x1D, x + 0x35, 0x78, 0x24, 0xF);
+    Menu_DrawSprite(0x1E, x + 0x35, 0x99, 0x1C, 0xE);
+    Menu_DrawSprite(5, x + 0x45, 0x1C, 8, 8);
+    Menu_DrawSprite(5, x + 0xF3, 0x1C, 8, 8);
     i = D_8008FB44;
     i = (i >> 2) & 0xF;
     i = D_80060D64[i];
-    func_8002DECC(6, x + i + 0x36, 0x1A, 0xE, 0xB);
-    func_8002DECC(7, x - i + 0xFB, 0x1A, 0xE, 0xB);
-    func_8002DECC(0x14, x + 0x79, 0x35, 8, 0xA);
-    func_8002DECC(0x14, x + 0x79, 0x56, 8, 0xA);
+    Menu_DrawSprite(6, x + i + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, x - i + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x14, x + 0x79, 0x35, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0x79, 0x56, 8, 0xA);
     i = D_8007A9D6;
-    func_8002EED8(3, x + 0x80, 0x35, i, 0xA);
+    Menu_DrawNumber(3, x + 0x80, 0x35, i, 0xA);
     i = D_8007A9DA;
-    func_8002EED8(3, x + 0x80, 0x56, i, 0xA);
+    Menu_DrawNumber(3, x + 0x80, 0x56, i, 0xA);
     i = D_8007A9D4;
-    func_8002EED8(3, x + 0x64, 0x35, i, 0xA);
+    Menu_DrawNumber(3, x + 0x64, 0x35, i, 0xA);
     i = D_8007A9D8;
-    func_8002EED8(3, x + 0x64, 0x56, i, 0xA);
+    Menu_DrawNumber(3, x + 0x64, 0x56, i, 0xA);
     i = D_8007A9DE;
-    func_8002EED8(3, x + 0x80, 0x77, i, 0xA);
+    Menu_DrawNumber(3, x + 0x80, 0x77, i, 0xA);
     i = D_8007A9DC;
-    func_8002EED8(3, x + 0x80, 0x98, i, 0xA);
+    Menu_DrawNumber(3, x + 0x80, 0x98, i, 0xA);
     i = D_80055F0C[D_8007AA00];
-    func_8002EED8(3, x + 0xDA, 0x3B, D_8007A9F8 * 100 / i, 0xA);
+    Menu_DrawNumber(3, x + 0xDA, 0x3B, D_8007A9F8 * 100 / i, 0xA);
     i = D_80055F0C[D_8007AA01];
     if (D_8007AA10 & 0x4000) {
         i = i * 3;
     } else {
         i = i * 4;
     }
-    func_8002EED8(3, x + 0xDA, 0x5C, D_8007A9FA * 100 / i, 0xA);
+    Menu_DrawNumber(3, x + 0xDA, 0x5C, D_8007A9FA * 100 / i, 0xA);
     i = D_80055F0C[D_8007AA03];
     if (D_8007AA10 & 0x2000) {
         i = (f32) i * 0.8;
     }
-    func_8002EED8(3, x + 0xDA, 0x7D, D_8007A9FE * 100 / i, 0xA);
+    Menu_DrawNumber(3, x + 0xDA, 0x7D, D_8007A9FE * 100 / i, 0xA);
     i = D_80055F0C[D_8007AA02];
     if (D_8007AA10 & 0x8000) {
         i = (f32) i * 0.8;
     }
-    func_8002EED8(3, x + 0xDA, 0x9E, D_8007A9FC * 100 / i, 0xA);
+    Menu_DrawNumber(3, x + 0xDA, 0x9E, D_8007A9FC * 100 / i, 0xA);
     f = (u32)D_8007A9D4;
     f /= (u32)D_8007A9D6;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0x64, 0x41, f, 3);
+    Menu_DrawSprite(0x33, x + 0x64, 0x41, f, 3);
     f = (u32)D_8007A9D8;
     f /= (u32)D_8007A9DA;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0x64, 0x62, f, 3);
+    Menu_DrawSprite(0x33, x + 0x64, 0x62, f, 3);
     f = (u32)D_8007A9DE;
     f /= 255.0f;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0x64, 0x83, f, 3);
+    Menu_DrawSprite(0x33, x + 0x64, 0x83, f, 3);
     f = (u32)D_8007A9DC;
     f /= 255.0f;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0x64, 0xA4, f, 3);
-    func_8002DECC(0x15, x + 0xF6, 0x3B, 8, 0xA);
-    func_8002DECC(0x15, x + 0xF6, 0x5C, 8, 0xA);
-    func_8002DECC(0x15, x + 0xF6, 0x7D, 8, 0xA);
-    func_8002DECC(0x15, x + 0xF6, 0x9E, 8, 0xA);
-    func_8002DECC(0x1A, x + 0x77, 0x19, 0x52, 0xD);
+    Menu_DrawSprite(0x33, x + 0x64, 0xA4, f, 3);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x3B, 8, 0xA);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x5C, 8, 0xA);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x7D, 8, 0xA);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x9E, 8, 0xA);
+    Menu_DrawSprite(0x1A, x + 0x77, 0x19, 0x52, 0xD);
     if (!(D_8008FB3E & 0x2000)) {
         if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
             D_8008FB3E |= 0x2000;
             D_8008FB38 = 31;
-            func_8002A7C8(0, 0, 0xFF);
+            Sfx_Play(0, 0, 0xFF);
         } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
             D_8008FB3E |= 0x3000;
             D_8008FB38 = 31;
-            func_8002A7C8(0, 0, 0xFF);
+            Sfx_Play(0, 0, 0xFF);
         }
     }
 }
 
 #ifdef NON_MATCHING
-/* context for the NON_MATCHING func_8002B844 and func_8002C598 (their data is defined below) */
+/* context for the NON_MATCHING Menu_DrawOptionsPage and Menu_DrawMapPage (their data is defined below) */
 typedef struct { void *dst; u32 start; u32 end; } D2DstRom;
 typedef struct {
     /* 0x00 */ u8 unk0[0x18];
@@ -347,13 +347,13 @@ extern void *D_8006155C[];
 extern void *D_8006156C[];
 extern u8 D_8006158C[][3];
 extern s16 D_80061598[];
-void func_80028120(u32, void *, s32);
+void Dma_ReadRom(u32, void *, s32);
 void SaveMenu_SetTextDrawState(void);
 #endif
 
 #ifdef NON_MATCHING
 /* stack homes and register allocation differ; code is equivalent */
-void func_8002B844(s32 x) {
+void Menu_DrawOptionsPage(s32 x) {
     s32 wob;
     s32 sel;
     s32 y;
@@ -361,51 +361,51 @@ void func_8002B844(s32 x) {
     static s32 D_8008FB58; /* the retail build keeps it as the file-scope D_8008FB58 */
 
     D_800616B0 = 4 - D_800616B0;
-    func_8002DECC(0, x + 0x28, 0x1E, 0xF0, 0x6C);
-    func_8002DECC(0x37, x + 0x2B, 0x8B, 0xF0, 3);
-    func_8002DECC(0x37, x + 0x119, 0x24, 2, 0x68);
-    func_8002DECC(0x37, x + 0x27, 0x1D, 0xF2, 1);
-    func_8002DECC(0x37, x + 0x27, 0x8A, 0xF2, 1);
-    func_8002DECC(0x37, x + 0x27, 0x1E, 1, 0x6D);
-    func_8002DECC(0x37, x + 0x118, 0x1E, 1, 0x6D);
-    func_8002DECC(0x38, x + 0x29, 0x1F, 0xED, 1);
-    func_8002DECC(0x38, x + 0x29, 0x20, 1, 0x68);
-    func_8002DECC(0x39, x + 0x29, 0x88, 0xEE, 1);
-    func_8002DECC(0x39, x + 0x116, 0x1F, 1, 0x69);
-    func_8002DECC(0x3C, x + 0x3A, 0x1E, 0x15, 0x6C);
-    func_8002DECC(0x3D, x + 0x5D, 0x56, 0xA7, 2);
-    func_8002DECC(0x24, x + 0x8D, 0x3E, 0x54, 7);
-    func_8002DECC(0x24, x + 0x8D, 0x6C, 0x54, 7);
-    func_8002DECC(0x57, x + 0xE9, 0x3C, 0x1A, 9);
-    func_8002DECC(0x56, x + 0x6C, 0x3C, 0x1A, 9);
-    func_8002DECC(0x29, x + 0xE9, 0x6B, 0x1A, 9);
-    func_8002DECC(0x2A, x + 0x6C, 0x6B, 0x1A, 9);
-    func_8002DECC(0x22, x + 0x31, 0x3B, 0x36, 0xC);
-    func_8002DECC(0x23, x + 0x35, 0x68, 0x2A, 0xC);
-    func_8002DECC(5, x + 0x45, 0x1C, 7, 7);
-    func_8002DECC(5, x + 0xF3, 0x1C, 7, 7);
+    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x6C);
+    Menu_DrawSprite(0x37, x + 0x2B, 0x8B, 0xF0, 3);
+    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x68);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x8A, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1E, 1, 0x6D);
+    Menu_DrawSprite(0x37, x + 0x118, 0x1E, 1, 0x6D);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
+    Menu_DrawSprite(0x38, x + 0x29, 0x20, 1, 0x68);
+    Menu_DrawSprite(0x39, x + 0x29, 0x88, 0xEE, 1);
+    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x69);
+    Menu_DrawSprite(0x3C, x + 0x3A, 0x1E, 0x15, 0x6C);
+    Menu_DrawSprite(0x3D, x + 0x5D, 0x56, 0xA7, 2);
+    Menu_DrawSprite(0x24, x + 0x8D, 0x3E, 0x54, 7);
+    Menu_DrawSprite(0x24, x + 0x8D, 0x6C, 0x54, 7);
+    Menu_DrawSprite(0x57, x + 0xE9, 0x3C, 0x1A, 9);
+    Menu_DrawSprite(0x56, x + 0x6C, 0x3C, 0x1A, 9);
+    Menu_DrawSprite(0x29, x + 0xE9, 0x6B, 0x1A, 9);
+    Menu_DrawSprite(0x2A, x + 0x6C, 0x6B, 0x1A, 9);
+    Menu_DrawSprite(0x22, x + 0x31, 0x3B, 0x36, 0xC);
+    Menu_DrawSprite(0x23, x + 0x35, 0x68, 0x2A, 0xC);
+    Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
+    Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
     wob = D_8008FB44;
     wob = (wob >> 2) & 0xF;
     wob = D_80060D64[wob];
-    func_8002DECC(6, x + wob + 0x36, 0x1A, 0xE, 0xB);
-    func_8002DECC(7, x - wob + 0xFB, 0x1A, 0xE, 0xB);
-    func_8002DECC(0x21, x + 0x75, 0x18, 0x56, 0xE);
-    func_8002DECC(0x25, x + 0x8E, 0x3F, 0x50, 3);
-    func_8002DECC(0x25, x + 0x8E, 0x6D, 0x50, 3);
-    func_8002DECC(0x27, x + 0xB3, 0x39, 8, 0xB);
-    func_8002DECC(0x27, x + 0xB3, 0x67, 8, 0xB);
+    Menu_DrawSprite(6, x + wob + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, x - wob + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x21, x + 0x75, 0x18, 0x56, 0xE);
+    Menu_DrawSprite(0x25, x + 0x8E, 0x3F, 0x50, 3);
+    Menu_DrawSprite(0x25, x + 0x8E, 0x6D, 0x50, 3);
+    Menu_DrawSprite(0x27, x + 0xB3, 0x39, 8, 0xB);
+    Menu_DrawSprite(0x27, x + 0xB3, 0x67, 8, 0xB);
     if (D_8008FB3E & 0x200) {
         switch (D_8008FB3E & 0x100) {
             case 0:
-                func_8002DECC(ids[D_800615CC[D_80060CB0][1]], D_800615CC[D_80060CB0][0] + x, 0x67, 8, 0xB);
+                Menu_DrawSprite(ids[D_800615CC[D_80060CB0][1]], D_800615CC[D_80060CB0][0] + x, 0x67, 8, 0xB);
                 break;
             case 0x100:
-                func_8002DECC(ids[D_800615AC[D_800616B0][1]], D_800615AC[D_800616B0][0] + x, 0x39, 8, 0xB);
+                Menu_DrawSprite(ids[D_800615AC[D_800616B0][1]], D_800615AC[D_800616B0][0] + x, 0x39, 8, 0xB);
                 break;
         }
     } else {
-        func_8002DECC(ids[D_800615CC[D_80060CB0][1]], D_800615CC[D_80060CB0][0] + x, 0x67, 8, 0xB);
-        func_8002DECC(ids[D_800615AC[D_800616B0][1]], D_800615AC[D_800616B0][0] + x, 0x39, 8, 0xB);
+        Menu_DrawSprite(ids[D_800615CC[D_80060CB0][1]], D_800615CC[D_80060CB0][0] + x, 0x67, 8, 0xB);
+        Menu_DrawSprite(ids[D_800615AC[D_800616B0][1]], D_800615AC[D_800616B0][0] + x, 0x39, 8, 0xB);
     }
     if (D_8008FB3E & 0x2000) {
         D_800616B0 = 4 - D_800616B0;
@@ -415,20 +415,20 @@ void func_8002B844(s32 x) {
         if (D_80092C81 > 0x14 || (D_80092C84 & 0x10)) {
             D_8008FB3E |= 0x2000;
             D_8008FB38 = 0x1F;
-            func_8002A7C8(0, 0, 0xFF);
+            Sfx_Play(0, 0, 0xFF);
         } else if (D_80092C81 < -0x14 || (D_80092C84 & 0x2000)) {
             D_8008FB3E |= 0x3000;
             D_8008FB38 = 0x1F;
-            func_8002A7C8(0, 0, 0xFF);
+            Sfx_Play(0, 0, 0xFF);
         }
         if (D_80092C86 & 0x8000) {
             D_8008FB3E |= 0x820;
-            func_8002A7C8(0, 1, 0xFF);
+            Sfx_Play(0, 1, 0xFF);
         }
     } else {
         if ((D_80092C86 & 0x8000) && !(D_8008FB3E & 0x200)) {
             D_8008FB3E &= ~0x920;
-            func_8002A7C8(0, 2, 0xFF);
+            Sfx_Play(0, 2, 0xFF);
             D_800616B0 = 4 - D_800616B0;
             return;
         }
@@ -446,7 +446,7 @@ void func_8002B844(s32 x) {
                         D_8008FB3E &= ~0x400;
                         sel = ids[D_800615AC[D_800616B0][1]];
                         if (D_80092C81 < 0x14 && D_80092C81 > -0x14) {
-                            func_8002DECC(sel, D_8008FB58 + x, 0x39, 8, 0xB);
+                            Menu_DrawSprite(sel, D_8008FB58 + x, 0x39, 8, 0xB);
                         }
                         y = 0x3A;
                         sel = 0;
@@ -460,7 +460,7 @@ void func_8002B844(s32 x) {
                         D_8008FB3E &= ~0x400;
                         sel = ids[D_800615CC[D_80060CB0][1]];
                         if (D_80092C81 < 0x14 && D_80092C81 > -0x14) {
-                            func_8002DECC(sel, D_8008FB58 + x, 0x67, 8, 0xB);
+                            Menu_DrawSprite(sel, D_8008FB58 + x, 0x67, 8, 0xB);
                         }
                         y = 0x65;
                         sel = 0x100;
@@ -477,7 +477,7 @@ void func_8002B844(s32 x) {
                             D_8008FB3E &= ~0x100;
                             D_8008FB3E |= 0x100;
                             D_8008FB3E |= 0x400;
-                            func_8002A7C8(0, 0, 0xFF);
+                            Sfx_Play(0, 0, 0xFF);
                         }
                     } else if (D_80092C81 < -0x14) {
                         if (!(D_8008FB3E & 0x400)) {
@@ -506,7 +506,7 @@ void func_8002B844(s32 x) {
                             D_8008FB3E &= ~0x100;
                             D_8008FB3E |= 0;
                             D_8008FB3E |= 0x400;
-                            func_8002A7C8(0, 0, 0xFF);
+                            Sfx_Play(0, 0, 0xFF);
                         }
                     } else if (D_80092C81 < -0x14) {
                         if (!(D_8008FB3E & 0x400)) {
@@ -551,7 +551,7 @@ void func_8002B844(s32 x) {
                         D_8008FB3E &= ~0x400;
                         sel = ids[D_800615AC[D_800616B0][1]];
                     }
-                    func_8002DECC(sel, pos, 0x39, 8, 0xB);
+                    Menu_DrawSprite(sel, pos, 0x39, 8, 0xB);
                     break;
                 case 0x100:
                     y = 0x65;
@@ -568,21 +568,21 @@ void func_8002B844(s32 x) {
                         D_8008FB3E &= ~0x400;
                         sel = ids[D_800615CC[D_80060CB0][1]];
                     }
-                    func_8002DECC(sel, pos, 0x67, 8, 0xB);
+                    Menu_DrawSprite(sel, pos, 0x67, 8, 0xB);
                     break;
             }
         }
-        func_8002DECC(1, x - wob + 0x1E, y, 0x10, 0xD);
+        Menu_DrawSprite(1, x - wob + 0x1E, y, 0x10, 0xD);
     }
     D_800616B0 = 4 - D_800616B0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002B844.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_DrawOptionsPage.s")
 #endif
 
 #ifdef NON_MATCHING
 /* frame, stack homes and register allocation differ; code is equivalent */
-void func_8002C598(s32 arg0) {
+void Menu_DrawMapPage(s32 arg0) {
     static s32 D_800615E0 = -1; /* the retail build keeps it as the file-scope D_800615E0 */
     s32 cx;
     s32 cy;
@@ -603,7 +603,7 @@ void func_8002C598(s32 arg0) {
     s = 0;
     if (D_8008FB50 < 6) {
         if (D_8008FB50 != D_800615E0) {
-            func_80028120(D_800614E4[D_8008FB50].start, D_800614E4[D_8008FB50].dst,
+            Dma_ReadRom(D_800614E4[D_8008FB50].start, D_800614E4[D_8008FB50].dst,
                           D_800614E4[D_8008FB50].end - D_800614E4[D_8008FB50].start);
             D_800615E0 = D_8008FB50;
         }
@@ -645,19 +645,19 @@ void func_8002C598(s32 arg0) {
             SaveMenu_SetTextDrawState();
         }
     } else {
-        func_8002DECC(0, arg0 + 0x28, 0x1E, 0xF0, 0xB4);
-        func_8002DECC(0x38, arg0 + 0x29, 0x1F, 0xED, 1);
-        func_8002DECC(0x38, arg0 + 0x29, 0x20, 1, 0xB1);
-        func_8002DECC(0x39, arg0 + 0x29, 0xD0, 0xEE, 1);
-        func_8002DECC(0x39, arg0 + 0x117, 0x1F, 1, 0xB2);
-        func_8002DECC(0x37, arg0 + 0x2C, 0xD4, 0xF0, 3);
-        func_8002DECC(0x37, arg0 + 0x11A, 0x25, 2, 0xB2);
-        func_8002DECC(0x37, arg0 + 0x27, 0x1D, 0xF2, 1);
-        func_8002DECC(0x37, arg0 + 0x27, 0xD3, 0xF2, 1);
-        func_8002DECC(0x37, arg0 + 0x27, 0x1E, 1, 0xB3);
-        func_8002DECC(0x37, arg0 + 0x119, 0x1E, 1, 0xB3);
+        Menu_DrawSprite(0, arg0 + 0x28, 0x1E, 0xF0, 0xB4);
+        Menu_DrawSprite(0x38, arg0 + 0x29, 0x1F, 0xED, 1);
+        Menu_DrawSprite(0x38, arg0 + 0x29, 0x20, 1, 0xB1);
+        Menu_DrawSprite(0x39, arg0 + 0x29, 0xD0, 0xEE, 1);
+        Menu_DrawSprite(0x39, arg0 + 0x117, 0x1F, 1, 0xB2);
+        Menu_DrawSprite(0x37, arg0 + 0x2C, 0xD4, 0xF0, 3);
+        Menu_DrawSprite(0x37, arg0 + 0x11A, 0x25, 2, 0xB2);
+        Menu_DrawSprite(0x37, arg0 + 0x27, 0x1D, 0xF2, 1);
+        Menu_DrawSprite(0x37, arg0 + 0x27, 0xD3, 0xF2, 1);
+        Menu_DrawSprite(0x37, arg0 + 0x27, 0x1E, 1, 0xB3);
+        Menu_DrawSprite(0x37, arg0 + 0x119, 0x1E, 1, 0xB3);
         if (D_8008FB50 != D_800615E0) {
-            func_80028120(D_800614E4[D_8008FB50].start, D_800614E4[D_8008FB50].dst,
+            Dma_ReadRom(D_800614E4[D_8008FB50].start, D_800614E4[D_8008FB50].dst,
                           D_800614E4[D_8008FB50].end - D_800614E4[D_8008FB50].start);
             D_800615E0 = D_8008FB50;
         }
@@ -701,13 +701,13 @@ void func_8002C598(s32 arg0) {
             SaveMenu_SetTextDrawState();
         }
     }
-    func_8002DECC(5, arg0 + 0x45, 0x1C, 7, 7);
-    func_8002DECC(5, arg0 + 0xF3, 0x1C, 7, 7);
+    Menu_DrawSprite(5, arg0 + 0x45, 0x1C, 7, 7);
+    Menu_DrawSprite(5, arg0 + 0xF3, 0x1C, 7, 7);
     n = (D_8008FB44 >> 2) & 0xF;
     n = D_80060D64[n];
-    func_8002DECC(6, arg0 + n + 0x36, 0x1A, 0xE, 0xB);
-    func_8002DECC(7, arg0 - n + 0xFB, 0x1A, 0xE, 0xB);
-    func_8002DECC(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
+    Menu_DrawSprite(6, arg0 + n + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, arg0 - n + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
     if (D_8008FB50 < 6) {
         if (D_8008FB54 < 0) {
             cx = (s32) D_8007AA08.x / D_800614B4[D_8008FB50] + D_800614CC[D_8008FB50];
@@ -717,7 +717,7 @@ void func_8002C598(s32 arg0) {
             cy = D_80061184[D_8008FB50 * 18 + D_8008FB54 * 2 + 1];
         }
         if (D_8008FB44 & 0x20) {
-            func_8002DECC(0x2C, arg0 + cx + 0x23, cy + 0xD, 0xC, 0x10);
+            Menu_DrawSprite(0x2C, arg0 + cx + 0x23, cy + 0xD, 0xC, 0x10);
         }
         if (D_8008FB54 < 0) {
             sx = D_800614B4[D_8008FB50];
@@ -775,8 +775,8 @@ void func_8002C598(s32 arg0) {
                 y = -2;
                 h = 6;
             }
-            func_8002DECC(0x55, arg0 + D_80060F28 + 39.0f + ox, D_80060F2C + 29.0f - 1.0f, h, 1);
-            func_8002DECC(4, arg0 + D_80060F28 + 39.0f - 2.0f, D_80060F2C + 29.0f - 12.0f + y, 0xC, 0xC);
+            Menu_DrawSprite(0x55, arg0 + D_80060F28 + 39.0f + ox, D_80060F2C + 29.0f - 1.0f, h, 1);
+            Menu_DrawSprite(4, arg0 + D_80060F28 + 39.0f - 2.0f, D_80060F2C + 29.0f - 12.0f + y, 0xC, 0xC);
         }
     }
     if (!(D_8008FB3E & 0x2000)) {
@@ -784,11 +784,11 @@ void func_8002C598(s32 arg0) {
             if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
                 D_8008FB3E |= 0x2000;
                 D_8008FB38 = 31;
-                func_8002A7C8(0, 0, 0xFF);
+                Sfx_Play(0, 0, 0xFF);
             } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
                 D_8008FB3E |= 0x3000;
                 D_8008FB38 = 31;
-                func_8002A7C8(0, 0, 0xFF);
+                Sfx_Play(0, 0, 0xFF);
             }
         }
         if (D_8008FB50 < 6 && D_8008FB54 < 0) {
@@ -799,17 +799,17 @@ void func_8002C598(s32 arg0) {
             if (D_80092C86 & 0x8000) {
                 D_8008FB3C ^= 1;
                 D_8008FB3E ^= 0x20;
-                func_8002A7C8(0, 0x17, 0xFF);
+                Sfx_Play(0, 0x17, 0xFF);
             } else if ((D_80092C86 & 0x4000) && D_8008FB3C != 0) {
                 D_80060F28 = D_8008FB5C;
                 D_80060F2C = D_8008FB60;
-                func_8002A7C8(0, 0x13, 0xFF);
+                Sfx_Play(0, 0x13, 0xFF);
             }
         }
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002C598.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_DrawMapPage.s")
 #endif
 
 extern s8 D_80060D64[];
@@ -822,91 +822,91 @@ extern u8 D_8007AA04;
 extern u32 D_80055D7C[];
 extern s8 D_80092C81;
 extern u16 D_80092C84;
-void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
-void func_8002DECC(s32 id, s32 x, s32 y, s32 w, s32 h);
-void func_8002E42C(s32 arg0, s32 arg1);
-void func_8002EED8(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
+void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
+void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
+void Menu_DrawExpGauge(s32 arg0, s32 arg1);
+void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
 
-void func_8002D7CC(s32 x) {
+void Menu_DrawElementsPage(s32 x) {
     s32 p;
     s32 v;
     f32 f;
 
-    func_8002DECC(0, x + 0x28, 0x1E, 0xF0, 0x9F);
-    func_8002DECC(0x37, x + 0x2B, 0xBE, 0xF0, 3);
-    func_8002DECC(0x37, x + 0x119, 0x24, 2, 0x9A);
-    func_8002DECC(0x37, x + 0x27, 0x1D, 0xF2, 1);
-    func_8002DECC(0x37, x + 0x27, 0xBD, 0xF2, 1);
-    func_8002DECC(0x37, x + 0x27, 0x1E, 1, 0x9F);
-    func_8002DECC(0x37, x + 0x118, 0x1E, 1, 0x9F);
-    func_8002DECC(0x38, x + 0x29, 0x1F, 0xED, 1);
-    func_8002DECC(0x38, x + 0x29, 0x20, 1, 0x9B);
-    func_8002DECC(0x39, x + 0x29, 0xBB, 0xEE, 1);
-    func_8002DECC(0x39, x + 0x116, 0x1F, 1, 0x9C);
-    func_8002DECC(5, x + 0x45, 0x1C, 7, 7);
-    func_8002DECC(5, x + 0xF3, 0x1C, 7, 7);
+    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x9F);
+    Menu_DrawSprite(0x37, x + 0x2B, 0xBE, 0xF0, 3);
+    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x9A);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0xBD, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1E, 1, 0x9F);
+    Menu_DrawSprite(0x37, x + 0x118, 0x1E, 1, 0x9F);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
+    Menu_DrawSprite(0x38, x + 0x29, 0x20, 1, 0x9B);
+    Menu_DrawSprite(0x39, x + 0x29, 0xBB, 0xEE, 1);
+    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x9C);
+    Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
+    Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
     p = D_8008FB44;
     p = (p >> 2) & 0xF;
     p = D_80060D64[p];
-    func_8002DECC(6, x + p + 0x36, 0x1A, 0xE, 0xB);
-    func_8002DECC(7, x - p + 0xFB, 0x1A, 0xE, 0xB);
-    func_8002DECC(0x2D, x + 0x75, 0x19, 0x56, 0xD);
-    func_8002DECC(0x32, x + 0xA5, 0x35, 0x35, 6);
-    func_8002DECC(0x32, x + 0x31, 0x78, 0x35, 6);
-    func_8002DECC(0x32, x + 0xD9, 0x78, 0x35, 6);
-    func_8002DECC(0x32, x + 0xA5, 0xAE, 0x35, 6);
-    func_8002DECC(0x14, x + 0x86, 0x34, 8, 0xA);
-    func_8002DECC(0x14, x + 0x47, 0x6B, 8, 0xA);
-    func_8002DECC(0x14, x + 0xF0, 0x6B, 8, 0xA);
-    func_8002DECC(0x14, x + 0x86, 0xAD, 8, 0xA);
-    func_8002DECC(0x2E, x + 0x9A, 0x3D, 0xC, 0xC);
-    func_8002DECC(0x2F, x + 0x67, 0x6F, 0xC, 0xC);
-    func_8002DECC(0x30, x + 0xCC, 0x6F, 0xC, 0xC);
-    func_8002DECC(0x31, x + 0x9A, 0xA1, 0xC, 0xC);
-    func_8002DECC(0x15, x + 0xA7, 0x92, 8, 0xA);
-    func_8002EED8(2, x + 0x8D, 0x34, 50, 0xA);
-    func_8002EED8(2, x + 0x4E, 0x6B, 50, 0xA);
-    func_8002EED8(2, x + 0xF7, 0x6B, 50, 0xA);
-    func_8002EED8(2, x + 0x8D, 0xAD, 50, 0xA);
+    Menu_DrawSprite(6, x + p + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, x - p + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x2D, x + 0x75, 0x19, 0x56, 0xD);
+    Menu_DrawSprite(0x32, x + 0xA5, 0x35, 0x35, 6);
+    Menu_DrawSprite(0x32, x + 0x31, 0x78, 0x35, 6);
+    Menu_DrawSprite(0x32, x + 0xD9, 0x78, 0x35, 6);
+    Menu_DrawSprite(0x32, x + 0xA5, 0xAE, 0x35, 6);
+    Menu_DrawSprite(0x14, x + 0x86, 0x34, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0x47, 0x6B, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0xF0, 0x6B, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0x86, 0xAD, 8, 0xA);
+    Menu_DrawSprite(0x2E, x + 0x9A, 0x3D, 0xC, 0xC);
+    Menu_DrawSprite(0x2F, x + 0x67, 0x6F, 0xC, 0xC);
+    Menu_DrawSprite(0x30, x + 0xCC, 0x6F, 0xC, 0xC);
+    Menu_DrawSprite(0x31, x + 0x9A, 0xA1, 0xC, 0xC);
+    Menu_DrawSprite(0x15, x + 0xA7, 0x92, 8, 0xA);
+    Menu_DrawNumber(2, x + 0x8D, 0x34, 50, 0xA);
+    Menu_DrawNumber(2, x + 0x4E, 0x6B, 50, 0xA);
+    Menu_DrawNumber(2, x + 0xF7, 0x6B, 50, 0xA);
+    Menu_DrawNumber(2, x + 0x8D, 0xAD, 50, 0xA);
     p = D_8007A9F4;
-    func_8002EED8(2, x + 0x78, 0x34, p, 0xA);
+    Menu_DrawNumber(2, x + 0x78, 0x34, p, 0xA);
     p = D_8007A9F5;
-    func_8002EED8(2, x + 0x39, 0x6B, p, 0xA);
+    Menu_DrawNumber(2, x + 0x39, 0x6B, p, 0xA);
     p = D_8007A9F7;
-    func_8002EED8(2, x + 0xE2, 0x6B, p, 0xA);
+    Menu_DrawNumber(2, x + 0xE2, 0x6B, p, 0xA);
     p = D_8007A9F6;
-    func_8002EED8(2, x + 0x78, 0xAD, p, 0xA);
+    Menu_DrawNumber(2, x + 0x78, 0xAD, p, 0xA);
     f = (u32)D_8007A9F4;
     f /= 50.0f;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0xA6, 0x36, f, 3);
+    Menu_DrawSprite(0x33, x + 0xA6, 0x36, f, 3);
     f = (u32)D_8007A9F5;
     f /= 50.0f;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0x32, 0x79, f, 3);
+    Menu_DrawSprite(0x33, x + 0x32, 0x79, f, 3);
     f = (u32)D_8007A9F7;
     f /= 50.0f;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0xDA, 0x79, f, 3);
+    Menu_DrawSprite(0x33, x + 0xDA, 0x79, f, 3);
     f = (u32)D_8007A9F6;
     f /= 50.0f;
     f *= 50.0f;
-    func_8002DECC(0x33, x + 0xA6, 0xAF, f, 3);
+    Menu_DrawSprite(0x33, x + 0xA6, 0xAF, f, 3);
     v = D_8007A9E0 * 100 / D_80055D7C[D_8007AA04];
     if (v > 100) {
         v = 100;
     }
-    func_8002EED8(3, x + 0x91, 0x92, v, 0xA);
-    func_8002E42C(v, x);
+    Menu_DrawNumber(3, x + 0x91, 0x92, v, 0xA);
+    Menu_DrawExpGauge(v, x);
     if (!(D_8008FB3E & 0x2000)) {
         if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
             D_8008FB3E |= 0x2000;
             D_8008FB38 = 31;
-            func_8002A7C8(0, 0, 0xFF);
+            Sfx_Play(0, 0, 0xFF);
         } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
             D_8008FB3E |= 0x3000;
             D_8008FB38 = 31;
-            func_8002A7C8(0, 0, 0xFF);
+            Sfx_Play(0, 0, 0xFF);
         }
     }
 }
@@ -919,7 +919,7 @@ extern Gfx D_80060ED8[];
 extern Gfx D_80060EF0[];
 extern u16 D_80061E98[];
 
-void func_8002DECC(s32 id, s32 x, s32 y, s32 w, s32 h) {
+void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
     s32 ret;
     s32 alpha;
     s32 xr;
@@ -1023,7 +1023,7 @@ void func_8002DECC(s32 id, s32 x, s32 y, s32 w, s32 h) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/2B530/func_8002DECC.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/2B530/Menu_DrawSprite.s")
 #endif
 
 typedef struct {
@@ -1037,7 +1037,7 @@ extern Unk4x2Ptrs D_800615F4;
 extern Gfx D_80060ED8[];
 extern Gfx D_80060EF0[];
 
-void func_8002E42C(s32 arg0, s32 arg1) {
+void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
     s32 k;
     s32 j;
     s32 d;
@@ -1145,7 +1145,7 @@ extern Unk4Words D_80061624;
 extern Unk4Ptrs D_80061634;
 extern u16 D_80066E88[];
 
-void func_8002E9DC(void) {
+void Menu_DrawBackground(void) {
     s32 i;
     s32 y;
     Unk4Words texH = D_80061614;
@@ -1176,7 +1176,7 @@ void func_8002E9DC(void) {
 extern u8* D_80060D74[];
 extern u16 D_80061E98[];
 
-void func_8002EED8(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
+void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     s32 i;
     u64 div;
     s64 v;
@@ -1225,7 +1225,7 @@ void func_8002EED8(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     }
 }
 
-void func_8002F2E4(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
+void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     s32 i;
     s32 n;
     u64 div;
@@ -1299,7 +1299,7 @@ typedef struct { u32 start; u32 end; void *dst; } D2RomDst;
 typedef struct { void *keys; u16 count; u16 frames; s32 pad[6]; } D2Anim; /* 0x20 */
 typedef struct { Gfx *a; Gfx *b; } D2DlPair;
 typedef struct { u32 start; u32 dl; } D2SegDl;
-#ifndef NON_MATCHING /* the NON_MATCHING build declares it earlier, for func_8002C598 */
+#ifndef NON_MATCHING /* the NON_MATCHING build declares it earlier, for Menu_DrawMapPage */
 typedef struct { void *dst; u32 start; u32 end; } D2DstRom;
 #endif
 extern u8 D_800620A0[];
@@ -2015,7 +2015,7 @@ u8 D_8006158C[4][3] = {
 s16 D_80061598[8] = {
     127, 112, 127, 112, 112, 112, 110, 112,
 };
-#ifndef NON_MATCHING /* func_8002B844's local ids[] initializer in the NON_MATCHING C */
+#ifndef NON_MATCHING /* Menu_DrawOptionsPage's local ids[] initializer in the NON_MATCHING C */
 u8 D_800615A8[4] = {
     0x28, 0x27, 0x26, 0,
 };
@@ -2043,7 +2043,7 @@ void Text_DrawEncodedString(s32, s32, u8 *);
 
 
 
-void func_8002F6D8(s32 ndigits, s32 x, s32 y, u32 value) {
+void Menu_PrintNumber(s32 ndigits, s32 x, s32 y, u32 value) {
     s32 i;
     u64 div = 1000000000;
     s64 v = value;
@@ -2083,7 +2083,7 @@ void func_8002F6D8(s32 ndigits, s32 x, s32 y, u32 value) {
     }
 }
 
-void func_8002F87C(void) {
+void Menu_FindMapPageLocation(void) {
     s32 cnt = 0;
     s32 i;
     s32 count = 0;

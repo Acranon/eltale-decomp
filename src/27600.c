@@ -21,9 +21,9 @@ typedef struct {
     /* 0x06 */ u16 last;
 } KfAnim;
 
-void func_80026E20(f32 t, f32* a, f32* b, f32* c, f32* d);
+void Math_HermiteBasis(f32 t, f32* a, f32* b, f32* c, f32* d);
 
-void func_80026A00(KfAnim* anim, f32* out, s32 frame) {
+void Math_EvalTcbSpline(KfAnim* anim, f32* out, s32 frame) {
     Keyframe* k0;
     Keyframe* k1;
     s32 i;
@@ -56,7 +56,7 @@ void func_80026A00(KfAnim* anim, f32* out, s32 frame) {
     len = k1->frame - k1[-1].frame;
     k0 = k1 - 1;
     if (k1->linear == 0) {
-        func_80026E20(frame / (f32)len, &h00, &h01, &h10, &h11);
+        Math_HermiteBasis(frame / (f32)len, &h00, &h01, &h10, &h11);
         a0 = (1.0 - k0->tension) * (1.0 + k0->continuity) * (1.0 + k0->bias);
         b0 = (1.0 - k0->tension) * (1.0 - k0->continuity) * (1.0 - k0->bias);
         a1 = (1.0 - k1->tension) * (1.0 - k1->continuity) * (1.0 + k1->bias);
@@ -89,7 +89,7 @@ void func_80026A00(KfAnim* anim, f32* out, s32 frame) {
     }
 }
 
-void func_80026E20(f32 t, f32* a, f32* b, f32* c, f32* d) {
+void Math_HermiteBasis(f32 t, f32* a, f32* b, f32* c, f32* d) {
     f32 t2 = t * t;
     f32 t3 = t * t2;
     f32 h1 = 3.0 * t2 - t3 - t3;

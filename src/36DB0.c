@@ -10,16 +10,16 @@ extern u8 D_DC62B0[];
 extern u8 D_E22690[];
 extern u8 D_E420D0[];
 void func_8020C0D0(void);
-void func_80028120(void *romStart, void *vram, s32 size);
+void Dma_ReadRom(void *romStart, void *vram, s32 size);
 
 void Overlay_LoadTitle(void) {
-    func_80028120(D_DAB5F0, func_8020C0D0, D_DC62B0 - D_DAB5F0);
+    Dma_ReadRom(D_DAB5F0, func_8020C0D0, D_DC62B0 - D_DAB5F0);
 }
 
 void Overlay_LoadIntro(void) {
-    func_80028120(D_DC62B0, func_8020C0D0, D_E22690 - D_DC62B0);
+    Dma_ReadRom(D_DC62B0, func_8020C0D0, D_E22690 - D_DC62B0);
 }
 
 void Overlay_LoadEnding(void) {
-    func_80028120(D_E22690, func_8020C0D0, D_E420D0 - D_E22690);
+    Dma_ReadRom(D_E22690, func_8020C0D0, D_E420D0 - D_E22690);
 }

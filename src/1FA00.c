@@ -86,7 +86,7 @@ u16 D_8008BFB0;
 extern s32 D_800842C0;
 extern u16 D_800842E8;
 
-u32 func_80026E90(u32);
+u32 Math_Rand(u32);
 
 typedef struct {
     f32 x, y, z;
@@ -130,7 +130,7 @@ void Enemy_ClearAttackScript(void);
 void Boss_Spawn(s32, f32, f32, f32, Struct_8007B908*);
 s16 Effect_CreateTerrainRing(u16, f32, f32, f32, f32);
 void Hud_ResetPopups(void);
-void func_8002A6B8(s8);
+void Bgm_Play(s8);
 
 void Battle_ResetState(void) {
     D_8008BE52 &= 0x8000;
@@ -171,7 +171,7 @@ extern u16 D_8007AA80;
 Struct_8001FD44* Battle_FindEncounterRegion(f32 x, f32 y, Struct_8007C284_30* list);
 Struct_8001FE08* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y);
 void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list);
-f32 func_800270D0(f32, f32);
+f32 Math_Atan2(f32, f32);
 
 void Battle_TryStartRandomEncounter(void) {
     f32 x;
@@ -186,7 +186,7 @@ void Battle_TryStartRandomEncounter(void) {
         D_8008BFAC += D_8007A9A8;
         if (D_8008BFAC >= 50.0) {
             D_8008BFB0 += 50;
-            if (func_80026E90(2000) < D_8008BFB0) {
+            if (Math_Rand(2000) < D_8008BFB0) {
                 x = D_8007AA08.unk18;
                 y = D_8007AA08.unk20;
                 pt = Battle_ChooseNearbyEncounterPoint(x, y);
@@ -196,7 +196,7 @@ void Battle_TryStartRandomEncounter(void) {
                         D_8008BFB0 = 0;
                         dx = x - pt->unk0;
                         dy = y - pt->unk2;
-                        ang = func_800270D0(dx, dy);
+                        ang = Math_Atan2(dx, dy);
                         Battle_SpawnEncounterGroup(pt->unk0, pt->unk2, ang, (u16*)area->unk8);
                         D_8008BE5C = pt->unk0;
                         D_8008BE60 = pt->unk2;
@@ -215,8 +215,8 @@ void Battle_TryStartRandomEncounter(void) {
                         D_8008BF94 = Effect_CreateTerrainRing(0, D_8008BE5C, D_8007AA08.unk1C, D_8008BE60, D_8008BE6C * 1.04);
                         D_8008BE4C = 0;
                         D_8008BE4E = 1;
-                        D_8008BE50 = func_80026E90(D_8007B900);
-                        func_8002A6B8(13);
+                        D_8008BE50 = Math_Rand(D_8007B900);
+                        Bgm_Play(13);
                     }
                 }
             }
@@ -259,7 +259,7 @@ void Battle_StartBossEncounter(void) {
     } else {
         v = 0x29;
     }
-    func_8002A6B8(v);
+    Bgm_Play(v);
     Player_InitBattle();
     Hud_ResetPopups();
     D_8008BE6C = D_8004F2A0[D_8008BFA8 - 1];
@@ -303,7 +303,7 @@ extern f32 D_80085F78;
 extern f32 D_80085F84;
 extern s32 D_80085F60;
 extern s32 D_800842BC;
-void func_800271B4(f32, Struct_8001FF10_Pos*);
+void Math_RotateVec2(f32, Struct_8001FF10_Pos*);
 void Camera_SetPreset(s32);
 
 typedef struct Actor {
@@ -331,8 +331,8 @@ void Battle_UpdateTurnCamera(void) {
             a = (Actor*)D_8007B908[D_8008BE50].unk2C;
             dx = a->unk0 - D_8007AA08.unk18;
             dz = a->unk8 - D_8007AA08.unk20;
-            ang = func_800270D0(dx, dz);
-            if (func_80026E90(100) > 50) {
+            ang = Math_Atan2(dx, dz);
+            if (Math_Rand(100) > 50) {
                 ang += 3.141592653589793;
                 if (ang < -3.141592653589793) {
                     ang += 6.283185307179586;
@@ -353,7 +353,7 @@ void Battle_UpdateTurnCamera(void) {
                 D_8008BE40.unk4 = a->unk64->unk1C * a->unk24 * 2.0 + 15.0;
             }
             D_80085E48.unk4C = D_8008BE40.unk4 * 1.5;
-            func_800271B4(ang, &D_8008BE40);
+            Math_RotateVec2(ang, &D_8008BE40);
             D_80085E48.unkC = a->unk0 + D_8008BE40.unk0;
             D_80085E48.unk14 = a->unk8 + D_8008BE40.unk4;
             D_80085E48.unk10 = a->unk4 + 15.0;
@@ -378,7 +378,7 @@ void Battle_UpdateTurnCamera(void) {
                 Camera_SetPreset(D_80085F60);
                 dx = D_8008BE5C - D_8007AA08.unk18;
                 dz = D_8008BE60 - D_8007AA08.unk20;
-                ang = func_800270D0(dx, dz) + 3.141592653589793;
+                ang = Math_Atan2(dx, dz) + 3.141592653589793;
                 if (ang > 3.141592653589793) {
                     ang -= 6.283185307179586;
                 } else if (ang < -3.141592653589793) {
@@ -386,7 +386,7 @@ void Battle_UpdateTurnCamera(void) {
                 }
                 D_8008BE40.unk0 = 0.0f;
                 D_8008BE40.unk4 = 50.0f;
-                func_800271B4(ang, &D_8008BE40);
+                Math_RotateVec2(ang, &D_8008BE40);
                 D_80085E48.unk0 = 4;
                 D_80085E48.unk8 |= 0x10;
                 D_80085E48.unkC = D_8007AA08.unk18 + D_8008BE40.unk0;
@@ -425,8 +425,8 @@ void Enemy_RemoveAll(void);
 void Camera_SetPresetDelayedTurn(s32);
 void Enemy_StartTurn(void);
 s32 func_800200F8(void);
-void func_8002A6F4(s32, s32);
-void func_8002A744(s32, s32, s32);
+void Bgm_PlayDelayed(s32, s32);
+void Bgm_PlayForMap(s32, s32, s32);
 
 void Battle_UpdateTurnTransition(void) {
     s32 done;
@@ -471,9 +471,9 @@ void Battle_UpdateTurnTransition(void) {
                     D_8008BE52 &= ~0x100;
                 }
                 if (D_8008BE52 & 0x10) {
-                    func_8002A744(D_800842BC, D_800842C0, 0);
+                    Bgm_PlayForMap(D_800842BC, D_800842C0, 0);
                 } else {
-                    func_8002A6F4(0x2B, 8);
+                    Bgm_PlayDelayed(0x2B, 8);
                 }
                 return;
             }
@@ -582,7 +582,7 @@ Struct_8001FE08* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y) {
         if (n == 0) {
             p = NULL;
         } else {
-            p = cands[func_80026E90(n)];
+            p = cands[Math_Rand(n)];
         }
     } else {
         p = NULL;
@@ -590,7 +590,7 @@ Struct_8001FE08* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y) {
     return p;
 }
 
-void func_800271B4(f32, Struct_8001FF10_Pos*);
+void Math_RotateVec2(f32, Struct_8001FF10_Pos*);
 void Enemy_Spawn(s32, f32, f32, f32, void*, Struct_8007B908*);
 
 void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
@@ -603,7 +603,7 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
     s32 cnt;
     s32 out[8][2];
 
-    cnt = func_80026E90(*list++);
+    cnt = Math_Rand(*list++);
     e = &D_8008BF9C->unk4[list[cnt]];
     pos = &(*D_8008BF9C->unk0)[e->unk6];
     n = e->unk4;
@@ -614,7 +614,7 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
     while (n != 0) {
         cnt = p->unk4;
         if (p->unk8 != 0) {
-            cnt += func_80026E90(p->unk8 + 1);
+            cnt += Math_Rand(p->unk8 + 1);
         }
         (*o)[0] = p->unk0;
         (*o)[1] = cnt;
@@ -624,7 +624,7 @@ void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
         while (cnt != 0) {
             D_8008BE40.unk0 = pos->unk0;
             D_8008BE40.unk4 = pos->unk4;
-            func_800271B4(z, &D_8008BE40);
+            Math_RotateVec2(z, &D_8008BE40);
             Enemy_Spawn(p->unk0, x + D_8008BE40.unk0, y + D_8008BE40.unk4, z, &actor->unk2C, actor);
             cnt--;
             actor++;
@@ -648,8 +648,8 @@ s32 func_800200F8(void) {
     } else {
         r = 4;
     }
-    if ((D_8008BE52 & 0x100) || func_80026E90(r) == 0) {
-        r = D_8007B908[func_80026E90(D_8008BE5A)].unk28->unk34;
+    if ((D_8008BE52 & 0x100) || Math_Rand(r) == 0) {
+        r = D_8007B908[Math_Rand(D_8008BE5A)].unk28->unk34;
     } else {
         r = 0xFF;
     }

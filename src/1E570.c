@@ -65,10 +65,10 @@ s32 D_80087E30;
 Struct_80087E38 D_80087E38[0x100];
 
 void Effect_LoadSpriteTexture(u8, u8*, s32, s32, u8, u8);
-void func_80027430(MtxF*, f32, f32, f32);
-void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
-void func_800278C8(MtxF*, f32, f32, f32);
-void func_80027CB4(MtxF*, f32, f32, f32);
+void Math_MtxFRotate(MtxF*, f32, f32, f32);
+void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
+void Math_MtxFAlignYToVector(MtxF*, f32, f32, f32);
+void Math_MtxFScaleAxes(MtxF*, f32, f32, f32);
 
 void Effect_ResetSpritePool(void) {
     s32 var_v1;
@@ -125,18 +125,18 @@ void Effect_DrawSprites(Struct_8001DA3C* arg0) {
                 gSPDisplayList(D_8007A184++, D_8004F060);
             }
             if (dust->unk2 & 1) {
-                func_800278C8(&spB4, dust->unk30, dust->unk34, dust->unk38);
+                Math_MtxFAlignYToVector(&spB4, dust->unk30, dust->unk34, dust->unk38);
                 spB4.mf[3][0] = dust->unk18;
                 spB4.mf[3][1] = dust->unk1C;
                 spB4.mf[3][2] = dust->unk20;
-                func_80027CB4(&spB4, dust->unk28, dust->unk28, dust->unk28);
+                Math_MtxFScaleAxes(&spB4, dust->unk28, dust->unk28, dust->unk28);
             } else {
-                func_800275DC(&spB4, dust->unk18, dust->unk1C, dust->unk20, D_80085E48.unkC, D_80085E48.unk10, D_80085E48.unk14);
+                Math_MtxFAimAt(&spB4, dust->unk18, dust->unk1C, dust->unk20, D_80085E48.unkC, D_80085E48.unk10, D_80085E48.unk14);
                 if (dust->unk24 != 0.0f) {
-                    func_80027430(&sp74, 0.0f, 0.0f, dust->unk24);
+                    Math_MtxFRotate(&sp74, 0.0f, 0.0f, dust->unk24);
                     guMtxCatF((f32 (*)[4]) &sp74, (f32 (*)[4]) &spB4, (f32 (*)[4]) &spB4);
                 }
-                func_80027CB4(&spB4, dust->unk28, dust->unk2C, 1.0f);
+                Math_MtxFScaleAxes(&spB4, dust->unk28, dust->unk2C, 1.0f);
             }
             if (D_8007A180 < 0x1E6) {
                 guMtxF2L((f32 (*)[4]) &spB4, &arg0->unkC0[D_8007A180]);

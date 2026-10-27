@@ -186,9 +186,9 @@ typedef struct {
     /* 0x0C */ u8 *unkC;
 } Unk80090458;
 
-f32 func_800270D0(f32, f32);
-s32 func_80024FF0(u8);
-void func_80025094(u8);
+f32 Math_Atan2(f32, f32);
+s32 Item_CountInInventory(u8);
+void Item_AddToInventory(u8);
 u8 Boss_IsDefeated(u32);
 void Npc_LoadMessage(NPC *, s32);
 extern s32 D_8004DCA0;
@@ -219,8 +219,8 @@ typedef struct {
 
 void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, void *);
 void Anim_SetCurrentAndNext(void *, s32, s32, s32, s32, u16);
-u32 func_80026E90(u32);
-void func_80028120();
+u32 Math_Rand(u32);
+void Dma_ReadRom();
 void Text_OpenWindow(s32);
 void func_8020C0D0(void);
 
@@ -234,7 +234,7 @@ extern u8 D_8020E6F0[];
 extern RomRange D_80056880[];
 extern u8 D_800568B8[];
 extern u16 D_8007A172;
-void func_800271B4(f32, f32 *);
+void Math_RotateVec2(f32, f32 *);
 
 typedef struct {
     /* 0x00 */ u16 state;
@@ -288,18 +288,18 @@ void Npc_UpdateAll(void) {
                     if (--npc->timer == 0) {
                         if (D_8007AB74 < 3) {
                             npc->state = 1;
-                            npc->timer = (func_80026E90(2) + 1) * npc->def->unk10->unkE;
+                            npc->timer = (Math_Rand(2) + 1) * npc->def->unk10->unkE;
                             Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
                             dx = npc->homeX - obj->x;
                             dz = npc->homeZ - obj->z;
                             if (sqrtf(dx * dx + dz * dz) > 50.0) {
-                                obj->angle = func_800270D0(dx, dz);
+                                obj->angle = Math_Atan2(dx, dz);
                             } else {
-                                obj->angle = (f32)func_80026E90(16) * 0.39269908169872414 - 1.5707963267948966;
+                                obj->angle = (f32)Math_Rand(16) * 0.39269908169872414 - 1.5707963267948966;
                             }
                             D_8007AB74++;
                         } else {
-                            npc->timer = (func_80026E90(2) + 1) * npc->def->unk10->unk2;
+                            npc->timer = (Math_Rand(2) + 1) * npc->def->unk10->unk2;
                         }
                     }
                 }
@@ -307,7 +307,7 @@ void Npc_UpdateAll(void) {
             case 1:
                 D_8007AB78[0] = 0.0f;
                 D_8007AB78[1] = 0.4f;
-                func_800271B4(obj->angle, D_8007AB78);
+                Math_RotateVec2(obj->angle, D_8007AB78);
                 Npc_Move(D_8007AB78[0], D_8007AB78[1], (Unk80009988 *)obj);
                 if (--npc->timer == 0) {
                     npc->state = 0;
@@ -377,11 +377,11 @@ void func_80009764(s32 arg0) {
     u32 end;
 
     D_8007AB70 = &D_80056880[arg0];
-    func_80028120(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
-    func_80028120(D_A70350, D_802A0000, D_A77F10 - D_A70350);
+    Dma_ReadRom(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
+    Dma_ReadRom(D_A70350, D_802A0000, D_A77F10 - D_A70350);
     start = D_8007AB70->start;
     end = D_8007AB70->end;
-    func_80028120(start, D_8020E6F0, end - start);
+    Dma_ReadRom(start, D_8020E6F0, end - start);
 }
 
 void Npc_SpawnForArea(NPCDef *def, s32 n) {
@@ -529,7 +529,7 @@ void Npc_StartTalk(s32 idx) {
         npc->timer = 15;
         dx = D_8007AA08.x - npc->x;
         dz = D_8007AA08.z - npc->z;
-        angle = func_800270D0(dx, dz) - npc->angle;
+        angle = Math_Atan2(dx, dz) - npc->angle;
         if (angle < -3.141592653589793) {
             angle += 6.283185307179586;
         }
@@ -542,7 +542,7 @@ void Npc_StartTalk(s32 idx) {
     }
     switch (npc->def->unk2) {
         case 2:
-            if (func_80024FF0(npc->def->u6.b.unk7) == 0) {
+            if (Item_CountInInventory(npc->def->u6.b.unk7) == 0) {
                 found = 0;
                 msg = npc->def->unk8;
             } else {
@@ -551,7 +551,7 @@ void Npc_StartTalk(s32 idx) {
             }
             Npc_LoadMessage(npc, msg);
             if (found == 0) {
-                func_80025094(npc->def->u6.b.unk7);
+                Item_AddToInventory(npc->def->u6.b.unk7);
                 D_8007AA08.unk8 |= 0x40;
             }
             break;
@@ -586,7 +586,7 @@ void Npc_EndTalk(s32 idx) {
 
     if (npc->def->unk4 == 2) {
         npc->state = 0;
-        npc->timer = func_80026E90(30) + 30;
+        npc->timer = Math_Rand(30) + 30;
     } else if (npc->def->flags & 2) {
         npc->state = 0;
         npc->timer = npc->def->unk10->unk2;
@@ -600,7 +600,7 @@ void Npc_EndTalk(s32 idx) {
 void Npc_LoadMessage(NPC *npc, s32 arg1) {
     s32 i;
 
-    func_80028120(arg1 + (u32)D_D2E2F0, D_8007B430, 0x4B0);
+    Dma_ReadRom(arg1 + (u32)D_D2E2F0, D_8007B430, 0x4B0);
     if (npc->def->name != NULL) {
         for (i = 0; i != 0x20; i++) {
             D_8007B8E0[i] = npc->def->name[i];

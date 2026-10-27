@@ -164,7 +164,7 @@ extern u16 D_80226AF8_ovl_title[];
 extern u8 D_80226D00_ovl_title[];
 extern u8 D_80226D18_ovl_title[];
 
-void func_80029A88(s32, s32, s32);
+void Sfx_Enqueue(s32, s32, s32);
 void Text_DrawTexturedRect(s32, s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, u8*);
 
@@ -284,7 +284,7 @@ void Title_DrawScreen(s32 arg0) {
                     D_8020F4D0_ovl_title = 0;
                 }
                 if (D_80226DBA != 0) {
-                    func_80029A88(0, 0xFF, 0x40);
+                    Sfx_Enqueue(0, 0xFF, 0x40);
                 }
                 D_8007A1CC &= 0xF;
                 D_8007A1CC |= (D_8020F4D8_ovl_title + 1) << 4;
@@ -295,7 +295,7 @@ void Title_DrawScreen(s32 arg0) {
             if (arg0 != 6) {
                 D_80226DB0_ovl_title += D_80226DB9;
                 if (D_80226DB9 != 0) {
-                    func_80029A88(0, 0xFF, 0x40);
+                    Sfx_Enqueue(0, 0xFF, 0x40);
                 }
                 if (D_80226DB0_ovl_title < 0) {
                     D_80226DB0_ovl_title = 0;

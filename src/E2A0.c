@@ -146,11 +146,11 @@ typedef struct {
     /* 0x0C */ Mtx mtx[1];
 } MtxBuf;
 
-u32 func_80026E90(u32);
-void func_80026A00(AnimInfo *, Unk80082020 *, s32);
-void func_800271B4(f32, f32 *);
+u32 Math_Rand(u32);
+void Math_EvalTcbSpline(AnimInfo *, Unk80082020 *, s32);
+void Math_RotateVec2(f32, f32 *);
 void Effect_AllocateSprite(SpriteObj *);
-void func_800273C0(Mtx *, f32, f32, f32, f32, f32, f32, f32);
+void Math_MtxRotScaleTrans(Mtx *, f32, f32, f32, f32, f32, f32, f32);
 
 extern AnimInfo D_800579F8;
 extern AnimInfo D_80057F80;
@@ -307,7 +307,7 @@ CollResult D_80082000;
 s32 D_8008201C;
 Unk80082020 D_80082020;
 
-void func_80028120();
+void Dma_ReadRom();
 void MapObjAnim_ClearAll(void);
 void MapObj_ClearSpinners(void);
 void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, CollResult *);
@@ -365,8 +365,8 @@ void MapObj_EmitDropSprite(Unk8000FA9C *);
 void MapObj_QueueSpinner(f32, f32, f32, f32, Unk8000FA9C *);
 extern f32 D_80085F50;
 f32 sqrtf(f32);
-f32 func_800270D0(f32, f32);
-void func_80027220(f32 (*)[4], f32, f32, f32, f32, f32, f32, f32);
+f32 Math_Atan2(f32, f32);
+void Math_MtxFRotScaleTrans(f32 (*)[4], f32, f32, f32, f32, f32, f32, f32);
 void guMtxF2L(f32 (*)[4], Mtx *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 extern u8 **D_8005E5AC[];
@@ -442,9 +442,9 @@ void Map_LoadArea(void) {
         }
     }
     if (D_800842BC == -1) {
-        func_80028120(D_753F0, D_80100000, D_851F0_end - D_753F0);
-        func_80028120(D_D86170, D_800814B0, 0x600);
-        func_80028120(D_D86770, D_80081AB0, 0x200);
+        Dma_ReadRom(D_753F0, D_80100000, D_851F0_end - D_753F0);
+        Dma_ReadRom(D_D86170, D_800814B0, 0x600);
+        Dma_ReadRom(D_D86770, D_80081AB0, 0x200);
     }
     if (D_800842BC != D_800842C4) {
         D_800842CC = D_800842BC;
@@ -452,20 +452,20 @@ void Map_LoadArea(void) {
         D_800842B8 = D_8007C284->flags;
         if (D_800842B8 & 7) {
             if (D_800842B8 & 2) {
-                func_80028120(D_851F0, D_8010FE00, D_C8DE0 - D_851F0);
+                Dma_ReadRom(D_851F0, D_8010FE00, D_C8DE0 - D_851F0);
             }
             q = &((u32 *)D_80057540)[D_8007C284->unk3C * 3];
             start = *q++;
             end = *q++;
-            func_80028120(start, *q, end - start);
+            Dma_ReadRom(start, *q, end - start);
         }
-        func_80028120(D_8007C284->romStart, D_8007C284->dst, D_8007C284->romEnd - D_8007C284->romStart);
+        Dma_ReadRom(D_8007C284->romStart, D_8007C284->dst, D_8007C284->romEnd - D_8007C284->romStart);
         switch (D_800842BC) {
             case 3:
             case 5:
             case 7:
             case 12:
-                func_80028120(D_3E1090, D_801E0000, D_3F1BA0 - D_3E1090);
+                Dma_ReadRom(D_3E1090, D_801E0000, D_3F1BA0 - D_3E1090);
                 break;
         }
     }
@@ -488,8 +488,8 @@ void Map_LoadArea(void) {
     D_8007C280 = D_80084994->unk18;
     if (D_8007C282 != D_80084994->unk1C) {
         D_8007C282 = D_80084994->unk1C;
-        func_80028120(D_80060C48[D_8007C282].start, D_800808B0, 0x800);
-        func_80028120(D_80060C48[D_8007C282].start + 0x800, D_8007C6B0, 0x4000);
+        Dma_ReadRom(D_80060C48[D_8007C282].start, D_800808B0, 0x800);
+        Dma_ReadRom(D_80060C48[D_8007C282].start + 0x800, D_8007C6B0, 0x4000);
     }
     if (D_80084308 != -1) {
         sp = &D_8007C288->unkC[D_80084308];
@@ -517,9 +517,9 @@ void Map_LoadArea(void) {
         } else if (kind == 0x83) {
             s->timer = 0;
         } else if (kind == 0x84) {
-            s->timer = func_80026E90(150) + 150;
+            s->timer = Math_Rand(150) + 150;
         } else if (s->unk16 >= 0x11 && s->unk16 < 0x15) {
-            s->timer = func_80026E90(16);
+            s->timer = Math_Rand(16);
         }
     }
     for (z = D_80082048; z < &D_80082048[4]; z++) {
@@ -574,8 +574,8 @@ void MapObj_CollectCell(s32, u16 *);
 void MapObj_DrawSpinners(MtxBuf *);
 void Map_BlendPaletteByClock(void);
 void func_80010768(void);
-void func_8002A410(void);
-void func_8002A890(s8, u8);
+void Sfx_StopChannel4(void);
+void Sfx_PlayIfAudible(s8, u8);
 s32 MapObjAnim_Find(s32);
 void MapObj_DrawBillboards(MtxBuf *, s32, s32, Unk8000FA9C **);
 
@@ -690,7 +690,7 @@ void MapObj_DrawNearby(MtxBuf *arg0) {
             anim = &D_8005839C[(flags & 0xF00) >> 8];
             t = flags;
             t = (t & 0xFF) + 1;
-            func_80026A00((AnimInfo *) anim, &D_80082020, flags & 0xFF);
+            Math_EvalTcbSpline((AnimInfo *) anim, &D_80082020, flags & 0xFF);
             x += D_80082020.x * s->scale;
             y += D_80082020.y * s->scale;
             z += D_80082020.z * s->scale;
@@ -704,7 +704,7 @@ void MapObj_DrawNearby(MtxBuf *arg0) {
             if (i != 0) {
                 D_80081FF0[1] = 0.0f;
                 D_80081FF0[0] = D_80084238[i - 1].x;
-                func_800271B4(s->angle * 0.017453292519943295, D_80081FF0);
+                Math_RotateVec2(s->angle * 0.017453292519943295, D_80081FF0);
                 x -= D_80081FF0[0];
                 z -= D_80081FF0[1];
                 rot += D_80084238[i - 1].z;
@@ -757,7 +757,7 @@ void MapObj_DrawNearby(MtxBuf *arg0) {
     func_80010768();
     if (D_800842B0 == -1) {
         if (D_800842B4 != D_800842B0) {
-            func_8002A410();
+            Sfx_StopChannel4();
         }
     } else {
         d = D_800842AC;
@@ -768,9 +768,9 @@ void MapObj_DrawNearby(MtxBuf *arg0) {
         }
         if (n >= 2) {
             /* retail reads the low (last) byte of the word: lb D_8004DD88 + 4 * i + 3 */
-            func_8002A890((s8) D_8004DD88[D_800842B0], n);
+            Sfx_PlayIfAudible((s8) D_8004DD88[D_800842B0], n);
         } else {
-            func_8002A410();
+            Sfx_StopChannel4();
             D_800842B0 = D_800842B4 = -1;
         }
     }
@@ -912,7 +912,7 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
 }
 
 void Map_DrawSky(MtxBuf *arg0) {
-    func_800273C0(&arg0->mtx[D_8007A180], 0.0f, 0.0f, 0.0f, 1.0f, D_80085E48.x, D_80085E48.y - 10.0f, D_80085E48.z);
+    Math_MtxRotScaleTrans(&arg0->mtx[D_8007A180], 0.0f, 0.0f, 0.0f, 1.0f, D_80085E48.x, D_80085E48.y - 10.0f, D_80085E48.z);
     gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
     D_8007A180++;
     gDPSetEnvColor(D_8007A184++, D_80084B60, D_80084B64, D_80084B68, 255);
@@ -1018,7 +1018,7 @@ void MapObjAnim_UpdateAll(void) {
                             anim = &D_80058008;
                             break;
                     }
-                    func_80026A00(anim, &D_80082020, p->frame++);
+                    Math_EvalTcbSpline(anim, &D_80082020, p->frame++);
                     p->x = D_80082020.x;
                     p->z = D_80082020.w;
                     break;
@@ -1051,7 +1051,7 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list
             dx = s->x - D_80085E48.x;
             dz = s->z - D_80085E48.z;
             if (sqrtf(dx * dx + dz * dz) < 1500.0f) {
-                a = func_800270D0(dx, dz) - D_80085E48.angle + 3.141592653589793;
+                a = Math_Atan2(dx, dz) - D_80085E48.angle + 3.141592653589793;
                 if (a < -3.141592653589793) {
                     a += 6.283185307179586;
                 } else if (a > 3.141592653589793) {
@@ -1067,7 +1067,7 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list
                         first++;
                         gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
                     }
-                    func_80027220(mf, 0.0f, D_80085E48.angle, 0.0f, s->scale, s->x, s->y, s->z);
+                    Math_MtxFRotScaleTrans(mf, 0.0f, D_80085E48.angle, 0.0f, s->scale, s->x, s->y, s->z);
                     guMtxF2L(mf, &arg0->mtx[D_8007A180]);
                     gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
                     D_8007A180++;
@@ -1101,13 +1101,13 @@ void MapObj_EmitArcSprite(Unk8000FA9C *arg0) {
         D_8004DE04.unk28 = D_8004DE04.unk2C = arg0->scale * 10.0;
         D_80081FF0[0] = arg0->scale * 2.0;
         D_80081FF0[1] = 0.0f;
-        func_800271B4(arg0->angle, D_80081FF0);
+        Math_RotateVec2(arg0->angle, D_80081FF0);
         D_8004DE04.unk30 = D_80081FF0[0];
         D_8004DE04.unk38 = D_80081FF0[1];
         D_8004DE04.unk10 = &D_8005E9F8[arg0->timer << 10];
         Effect_AllocateSprite(&D_8004DE04);
         if (arg0->timer >= 7) {
-            arg0->timer = func_80026E90(0x3C) - 0x78;
+            arg0->timer = Math_Rand(0x3C) - 0x78;
         }
     }
 }
@@ -1133,7 +1133,7 @@ void MapObj_EmitDropSprite(Unk8000FA9C *arg0) {
         D_8004DE44.z = arg0->z;
         D_8004DE44.unk28 = D_8004DE44.unk2C = arg0->scale;
         Effect_AllocateSprite(&D_8004DE44);
-        arg0->timer = func_80026E90(0x96) + 0x96;
+        arg0->timer = Math_Rand(0x96) + 0x96;
     }
 }
 
@@ -1185,7 +1185,7 @@ void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *ar
             cur->unk14 = prev->unk14;
         } else {
             cur->unk0 = 1;
-            cur->unk14 = (f32)func_80026E90(8) * 3.141592653589793 / 4.0f;
+            cur->unk14 = (f32)Math_Rand(8) * 3.141592653589793 / 4.0f;
         }
         cur->unk4 = arg0;
         cur->unk8 = arg1;
@@ -1208,7 +1208,7 @@ void MapObj_DrawSpinners(MtxBuf *arg0) {
         if (p->unk0 != 0) {
             s = p->unk18;
             p->unk14 -= 0.015707963267948967;
-            func_800273C0(&arg0->mtx[D_8007A180], 0.0f, p->unk10 * 0.017453292519943295, p->unk14, s->scale, s->x, s->y, s->z);
+            Math_MtxRotScaleTrans(&arg0->mtx[D_8007A180], 0.0f, p->unk10 * 0.017453292519943295, p->unk14, s->scale, s->x, s->y, s->z);
             gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
             D_8007A180++;
             gSPDisplayList(D_8007A184++, D_8007C294[s->timer].dl);
@@ -1239,7 +1239,7 @@ void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C
                 first++;
             }
             gDPLoadTextureBlock(D_8007A184++, tex[(s->timer >> 1) & 7], G_IM_FMT_CI, G_IM_SIZ_8b, D_8004DE84[type - 0x11], 32, 0, 0, 0, 0, 0, 0, 0);
-            func_800273C0(&arg0->mtx[D_8007A180], 0.0f, D_80085E74, 0.0f, s->scale, s->x, s->y, s->z);
+            Math_MtxRotScaleTrans(&arg0->mtx[D_8007A180], 0.0f, D_80085E74, 0.0f, s->scale, s->x, s->y, s->z);
             gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
             D_8007A180++;
             gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_8004DE88[s->timer & 3]);

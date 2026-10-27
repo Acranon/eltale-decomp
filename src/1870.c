@@ -108,14 +108,14 @@ void Boss_ClearDefeated(void);
 void Env_InitClock(void);
 void Chest_ClearOpenedFlags(void);
 void Spirit_ClearCollectedFlags(void);
-void func_80024F20(void);
-void func_80028120(u8 *romStart, void *dest, u32 size);
-void func_800285C4(void);
-void func_80028FA8(NNSched *sc);
-void func_80028FFC(u8 *arg0, u8 *arg1, u8 *arg2, u8 *arg3, u8 *arg4);
-void func_80029374(u8 *arg0, u8 *arg1, u8 *arg2);
-void func_8002A4F0(void);
-void func_8002A930(void);
+void Item_InitInventory(void);
+void Dma_ReadRom(u8 *romStart, void *dest, u32 size);
+void Audio_Init(void);
+void Audio_StartThread(NNSched *sc);
+void Audio_InitSeqPlayers(u8 *arg0, u8 *arg1, u8 *arg2, u8 *arg3, u8 *arg4);
+void Audio_InitSoundPlayer(u8 *arg0, u8 *arg1, u8 *arg2);
+void Bgm_Init(void);
+void Menu_Init(void);
 void Text_LoadFontAssets(void);
 void Input_InitializeControllers(void);
 void osCreateViManager(OSPri pri);
@@ -192,10 +192,10 @@ extern u16 D_803DA800[];
 void Core_MainThread(void *arg0) {
     osCreateViManager(0xFE);
     osCreateMesgQueue(&D_8007A1A8, &D_8007A1C0, 1);
-    func_800285C4();
+    Audio_Init();
     /* the ROM end symbols don't exist yet: ends are written start + size */
-    func_80028FFC(D_E5BF60, D_E5BF60 + 0x2E10, D_E98330, D_E98330 + 0x33480, D_E5ED70);
-    func_80029374(D_ECB7B0, D_ECB7B0 + 0x1CC0, D_ECD470);
+    Audio_InitSeqPlayers(D_E5BF60, D_E5BF60 + 0x2E10, D_E98330, D_E98330 + 0x33480, D_E5ED70);
+    Audio_InitSoundPlayer(D_ECB7B0, D_ECB7B0 + 0x1CC0, D_ECD470);
     nnScCreateScheduler(&D_8007A1E0, 1);
     Input_InitializeControllers();
     if (osTvType == OS_TV_NTSC) {
@@ -204,13 +204,13 @@ void Core_MainThread(void *arg0) {
         osViSetMode(&D_8006D6B0);
     }
     osViBlack(1);
-    func_80028120(D_DA4570, D_80100000, D_DAB5F0 - D_DA4570);
+    Dma_ReadRom(D_DA4570, D_80100000, D_DAB5F0 - D_DA4570);
     Text_LoadFontAssets();
     func_801009EC(&D_80092C90, &D_8007A254);
     osViBlack(1);
     osViSetSpecialFeatures(0x5A);
     nnScStartScheduler(&D_8007A1E0);
-    func_80028FA8(&D_8007A1E0);
+    Audio_StartThread(&D_8007A1E0);
     osCreateMesgQueue(&D_8007A870, D_8007A888, 8);
     nnScAddClient(&D_8007A1E0, &D_8007A868, &D_8007A870);
     D_8007A860 = nnScGetGfxMQ(&D_8007A1E0);
@@ -221,12 +221,12 @@ void Core_MainThread(void *arg0) {
         Chest_ClearOpenedFlags();
         Spirit_ClearCollectedFlags();
         Player_Init();
-        func_80024F20();
+        Item_InitInventory();
         Env_InitClock();
         Text_LoadFontAssets();
-        func_8002A4F0();
+        Bgm_Init();
         Core_ResetGameState();
-        func_8002A930();
+        Menu_Init();
     loop:
         D_8004DCA0 &= ~3;
         if (D_8007A170 == 0) {
@@ -297,11 +297,11 @@ void Gfx_InitializeFrames(void) {
     u16 *a;
     u32 i;
 
-    func_80028120(D_71920, D_80095AF0, D_753F0 - D_71920);
+    Dma_ReadRom(D_71920, D_80095AF0, D_753F0 - D_71920);
     D_8007A1D8 = D_80095AF0;
-    func_80028120(D_D490C0, D_800C0000, D_D74AC0 - D_D490C0);
+    Dma_ReadRom(D_D490C0, D_800C0000, D_D74AC0 - D_D490C0);
     a = D_8039ADB0;
-    func_80028120(D_D74AC0, a, D_D86170 - D_D74AC0);
+    Dma_ReadRom(D_D74AC0, a, D_D86170 - D_D74AC0);
     D_80301000[0].data.msg = 2;
     D_80301000[0].data.framebuffer = D_803B5000;
     Gfx_InitializeFrameTask(&D_80301000[0]);
@@ -372,9 +372,9 @@ void Camera_Update(void *arg0);
 void Effect_UpdateAndDrawAll(void *arg0);
 void Effect_DrawSprites(void *arg0);
 void Hud_Draw(void *arg0);
-void func_80025318(void);
-void func_80026774(void *arg0);
-void func_8002A984(void *arg0);
+void Item_UpdateInventoryMenu(void);
+void Fade_Draw(void *arg0);
+void Menu_Update(void *arg0);
 void SaveMenu_Init(s32 arg0);
 void Text_UpdateAndDrawWindows(void);
 void Cutscene_DrawImageCues(void);
@@ -435,7 +435,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         Shadow_DrawAll(sub);
         Effect_DrawSprites(sub);
         Effect_UpdateAndDrawAll(sub);
-        func_80026774(sub);
+        Fade_Draw(sub);
         if (D_8004DCA0 & 2) {
             Text_UpdateAndDrawWindows();
         }
@@ -443,13 +443,13 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
             Hud_Draw(sub);
         }
         if (D_8004DCA0 & 1) {
-            func_80025318();
+            Item_UpdateInventoryMenu();
         }
         if (D_8007A170 == 7) {
             Cutscene_DrawImageCues();
         }
     } else if (D_8007A170 == 2) {
-        func_8002A984(sub);
+        Menu_Update(sub);
     } else if (D_8007A170 == 3) {
         switch (func_8020C11C()) {
             case 0:
@@ -490,7 +490,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         }
     } else if (D_8007A170 == 5) {
         count = func_8020C15C();
-        func_80026774(sub);
+        Fade_Draw(sub);
         if (count == 0) {
             D_8007A170 = 7;
         }
@@ -517,15 +517,15 @@ extern s8 D_80092C80;
 extern u16 D_8008CA50;
 void Gfx_WaitForFrameMessage(s16 arg0);
 void Player_SetSpawnFromSaveTable(void);
-void func_8002A558(void);
-void func_8002A6B8(s32 arg0);
-void func_8002A6F4(s32 arg0, s32 arg1);
-void func_8002A900(void);
+void Bgm_Update(void);
+void Bgm_Play(s32 arg0);
+void Bgm_PlayDelayed(s32 arg0, s32 arg1);
+void Bgm_ApplyVolumeOption(void);
 void Input_ReadController(s8 arg0);
 void Overlay_LoadTitle(void);
 void Overlay_LoadIntro(void);
 void Overlay_LoadEnding(void);
-void func_800266D0(void);
+void Fade_Init(void);
 void func_8020C0D0(void);
 
 typedef struct {
@@ -554,9 +554,9 @@ void Env_InitForMap(void);
 void Env_Update(void);
 s32 Env_AllocLightSlot(void);
 void Shadow_ClearQueue(void);
-void func_800292DC(s32 arg0);
-s32 func_80029328(s32 arg0);
-void func_8002A38C(void);
+void Audio_StopSeq(s32 arg0);
+s32 Audio_GetSeqState(s32 arg0);
+void Sfx_StopAllChannels(void);
 void Cutscene_ResetSequence(void);
 void Cutscene_StartNextScene(void);
 void Cutscene_UpdateScene(void);
@@ -628,11 +628,11 @@ void Battle_UpdateTurnCamera(void);
 void Battle_UpdateTurnTransition(void);
 void Anim_SetCurrentAndNext(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 void Hud_ResetState(void);
-void func_80029198(s32 arg0, s32 arg1);
-void func_80029224(s32 arg0);
-void func_8002A744(s32 arg0, s32 arg1, s32 arg2);
-void func_8002A7C8(s32 arg0, s32 arg1, s32 arg2);
-void func_8002F87C(void);
+void Audio_LoadSeq(s32 arg0, s32 arg1);
+void Audio_PlaySeq(s32 arg0);
+void Bgm_PlayForMap(s32 arg0, s32 arg1, s32 arg2);
+void Sfx_Play(s32 arg0, s32 arg1, s32 arg2);
+void Menu_FindMapPageLocation(void);
 void SaveMenu_Init(s32 arg0);
 void Text_ResetAllWindows(s32 arg0);
 
@@ -655,7 +655,7 @@ void Core_RunGameplayLoop(void) {
         Chest_LoadForMap();
         Spirit_LoadForMap();
         TextSpot_LoadForMap();
-        func_8002F87C();
+        Menu_FindMapPageLocation();
         Player_Spawn();
         Npc_InitArea();
         Enemy_InitForArea();
@@ -670,7 +670,7 @@ void Core_RunGameplayLoop(void) {
         Magic_ResetEffectSystem();
         Effect_ResetAll();
         Effect_ResetSpritePool();
-        func_800266D0();
+        Fade_Init();
         Hud_ResetState();
         D_8004DCA0 &= ~0x840;
     }
@@ -682,7 +682,7 @@ void Core_RunGameplayLoop(void) {
         Transition_StartStateFadeIn();
     }
     if (D_8004DCA0 & 0x100) {
-        func_8002A744(D_800842BC, D_800842C0, 0);
+        Bgm_PlayForMap(D_800842BC, D_800842C0, 0);
         D_8004DCA0 &= ~0x100;
     }
     D_8004DCA0 &= ~0x480;
@@ -722,7 +722,7 @@ void Core_RunGameplayLoop(void) {
             } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (D_80092C86 & 0x1000) &&
                        !(D_8008BE52 & 1) && !(D_80092C84 & 0x2000) && !(D_8004DCA0 & 1)) {
                 D_8007A170 = 2;
-                func_8002A7C8(0, 1, 0xFF);
+                Sfx_Play(0, 1, 0xFF);
             }
         } else if ((D_8004DCA0 & 0x80) && !(D_8004DCA0 & 2)) {
             if (--D_8007A174 == 0) {
@@ -748,15 +748,15 @@ void Core_RunGameplayLoop(void) {
                     D_8007A178 = 2;
                 }
                 D_8004DCA0 |= 0x100;
-                func_8002A38C();
+                Sfx_StopAllChannels();
             } else if (D_8007A174 == D_8007A17A) {
                 Transition_StartStateFadeOut();
             }
         }
-        func_8002A558();
-        if (D_8008C170 != -1 && func_80029328(0) == 0) {
-            func_80029198(0, D_8008C170);
-            func_80029224(0);
+        Bgm_Update();
+        if (D_8008C170 != -1 && Audio_GetSeqState(0) == 0) {
+            Audio_LoadSeq(0, D_8008C170);
+            Audio_PlaySeq(0);
             D_8008C170 = -1;
         }
         D_8007A8B0 = osGetTime();
@@ -776,12 +776,12 @@ void Core_RunGameplayLoop(void) {
         D_8007A8A8 = osGetTime();
     }
     if (D_8004DCA0 & 0x200) {
-        func_800292DC(0);
+        Audio_StopSeq(0);
     }
     Gfx_WaitForFrameMessage(2);
     if (D_8004DCA0 & 0x200) {
         D_8004DCA0 &= ~0x200;
-        while (func_80029328(0) != 0) {
+        while (Audio_GetSeqState(0) != 0) {
         }
     }
     if (D_8004DCA0 & 0x400) {
@@ -796,7 +796,7 @@ void Core_RunSequentialMapScenes(void) {
 
     count = 0;
     msg = NULL;
-    func_80028120(D_E420D0, D_801C0000, D_E43780 - D_E420D0);
+    Dma_ReadRom(D_E420D0, D_801C0000, D_E43780 - D_E420D0);
     D_8007A174 = 0;
     D_8007A178 = 3;
     D_80084980 = 0x41EB;
@@ -809,7 +809,7 @@ void Core_RunSequentialMapScenes(void) {
             D_8007A1C4 = Env_AllocLightSlot();
             D_8007AB60 = Env_AllocLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
-            func_800266D0();
+            Fade_Init();
             D_8008CA50 |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
@@ -830,7 +830,7 @@ void Core_RunSequentialMapScenes(void) {
         frame = &D_80301000[D_8007A17C];
         if (D_8004DCA0 & 0x80) {
             if (--D_8007A174 == 0) {
-                func_8002A38C();
+                Sfx_StopAllChannels();
                 if (count >= 7) {
                     D_8007A170 = 5;
                     D_8004DCA0 |= 0x160;
@@ -841,7 +841,7 @@ void Core_RunSequentialMapScenes(void) {
                 Transition_StartStateFadeOut();
             }
         }
-        func_8002A558();
+        Bgm_Update();
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
             Gfx_WaitForFrameMessage(1);
@@ -860,11 +860,11 @@ void Core_RunSequentialMapScenes(void) {
         }
     }
     if (D_8004DCA0 & 0x200) {
-        func_800292DC(0);
+        Audio_StopSeq(0);
     }
     if (D_8004DCA0 & 0x200) {
         D_8004DCA0 &= ~0x200;
-        while (func_80029328(0) != 0) {
+        while (Audio_GetSeqState(0) != 0) {
         }
     }
 }
@@ -875,7 +875,7 @@ void Core_RunScriptedMapScenes(void) {
     GfxFrame *frame;
 
     msg = NULL;
-    func_80028120(D_E43780, D_801C0000, D_E5BF60 - D_E43780);
+    Dma_ReadRom(D_E43780, D_801C0000, D_E5BF60 - D_E43780);
     D_8007A174 = 0;
     D_8007A178 = 2;
     D_8008FAF4 = 0;
@@ -889,7 +889,7 @@ void Core_RunScriptedMapScenes(void) {
             D_8007A1C4 = Env_AllocLightSlot();
             D_8007AB60 = Env_AllocLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
-            func_800266D0();
+            Fade_Init();
             D_8008CA50 |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
@@ -908,13 +908,13 @@ void Core_RunScriptedMapScenes(void) {
         frame = &D_80301000[D_8007A17C];
         if (D_8004DCA0 & 0x80) {
             if (--D_8007A174 == 0) {
-                func_8002A38C();
+                Sfx_StopAllChannels();
                 Cutscene_EndScene();
             } else if (D_8007A174 == D_8007A17A) {
                 Transition_StartStateFadeOut();
             }
         }
-        func_8002A558();
+        Bgm_Update();
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
             Gfx_WaitForFrameMessage(1);
@@ -933,11 +933,11 @@ void Core_RunScriptedMapScenes(void) {
         }
     }
     if (D_8004DCA0 & 0x200) {
-        func_800292DC(0);
+        Audio_StopSeq(0);
     }
     if (D_8004DCA0 & 0x200) {
         D_8004DCA0 &= ~0x200;
-        while (func_80029328(0) != 0) {
+        while (Audio_GetSeqState(0) != 0) {
         }
     }
     D_8004DCA0 |= 0x20000;
@@ -949,14 +949,14 @@ void Core_RunMenuLoop(void) {
     D_8007A1D0 = 0;
     D_8008FB40 = 0;
     if (D_8004DCA0 & 0x400) {
-        func_8002A6B8(0x13);
+        Bgm_Play(0x13);
     }
     while (D_8007A170 == 2) {
         Input_ReadController(D_80092C80);
         D_8007A180 = 0;
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
-        func_8002A558();
+        Bgm_Update();
         if (D_8007A1D0 == 0) {
             D_8007A1D0++;
             Gfx_WaitForFrameMessage(1);
@@ -967,9 +967,9 @@ void Core_RunMenuLoop(void) {
         D_8007A17C ^= 1;
     }
     if (D_8004DCA0 & 0x400) {
-        func_8002A6B8(-1);
+        Bgm_Play(-1);
         while (D_8008FAF0 != -1) {
-            func_8002A558();
+            Bgm_Update();
         }
     }
     if (D_8008FB40 != 0) {
@@ -977,7 +977,7 @@ void Core_RunMenuLoop(void) {
         D_8007A172 = 2;
         D_8004DCA0 &= ~0x400;
     }
-    func_8002A900();
+    Bgm_ApplyVolumeOption();
     Gfx_WaitForFrameMessage(2);
 }
 
@@ -1013,7 +1013,7 @@ void Core_RunIntroLoop(void) {
     while (D_8007A170 == 4) {
         Input_ReadController(D_80092C80);
         D_8007A180 = 0;
-        func_8002A558();
+        Bgm_Update();
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8007A1D0 == 0) {
@@ -1025,8 +1025,8 @@ void Core_RunIntroLoop(void) {
         osSendMesg(D_8007A860, frame, OS_MESG_BLOCK);
         D_8007A17C ^= 1;
     }
-    func_8002A6B8(-1);
-    func_8002A558();
+    Bgm_Play(-1);
+    Bgm_Update();
     Gfx_WaitForFrameMessage(2);
 }
 
@@ -1036,13 +1036,13 @@ void Core_RunEndingLoop(void) {
     D_8007A1D0 = 0;
     Overlay_LoadEnding();
     func_8020C0D0();
-    func_800266D0();
+    Fade_Init();
     D_8008CA50 |= 8;
-    func_8002A6F4(0x14, 0x3C);
+    Bgm_PlayDelayed(0x14, 0x3C);
     while (D_8007A170 == 5) {
         Input_ReadController(D_80092C80);
         D_8007A180 = 0;
-        func_8002A558();
+        Bgm_Update();
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
         if (D_8007A1D0 == 0) {
@@ -1057,7 +1057,7 @@ void Core_RunEndingLoop(void) {
     Gfx_WaitForFrameMessage(2);
 }
 
-void func_800269B8(s32 arg0, s32 arg1, void *arg2);
+void Fade_Start(s32 arg0, s32 arg1, void *arg2);
 
 extern u8 D_8004F5A0[];
 extern u8 D_8004F5DC[];
@@ -1081,19 +1081,19 @@ void Gfx_WaitForFrameMessage(s16 arg0) {
 void Transition_StartStateFadeIn(void) {
     switch (D_8007A178) {
         case 0:
-            func_800269B8(0x10, 4, D_8004F5DC);
+            Fade_Start(0x10, 4, D_8004F5DC);
             break;
         case 1:
-            func_800269B8(0x10, 4, D_8004F61C);
+            Fade_Start(0x10, 4, D_8004F61C);
             break;
         case 2:
-            func_800269B8(0x20, 4, D_8004F69C);
+            Fade_Start(0x20, 4, D_8004F69C);
             break;
         case 3:
-            func_800269B8(0x20, 4, D_8004F73C);
+            Fade_Start(0x20, 4, D_8004F73C);
             break;
         case 4:
-            func_800269B8(0x100, 4, D_8008CE54);
+            Fade_Start(0x100, 4, D_8008CE54);
             break;
     }
 }
@@ -1101,19 +1101,19 @@ void Transition_StartStateFadeIn(void) {
 void Transition_StartStateFadeOut(void) {
     switch (D_8007A178) {
         case 0:
-            func_800269B8(0xF, 2, D_8004F5A0);
+            Fade_Start(0xF, 2, D_8004F5A0);
             break;
         case 1:
-            func_800269B8(0xF, 2, D_8004F5E0);
+            Fade_Start(0xF, 2, D_8004F5E0);
             break;
         case 2:
-            func_800269B8(0x1F, 2, D_8004F620);
+            Fade_Start(0x1F, 2, D_8004F620);
             break;
         case 3:
-            func_800269B8(0x1F, 2, D_8004F6C0);
+            Fade_Start(0x1F, 2, D_8004F6C0);
             break;
         case 4:
-            func_800269B8(0xFF, 2, D_8008CA58);
+            Fade_Start(0xFF, 2, D_8008CA58);
             break;
     }
 }

@@ -102,7 +102,7 @@ Color_RGBA8 D_8004F760[4] = {
     { 0xDC, 0xDC, 0xDC, 0x96 }, { 0xDC, 0xDC, 0xDC, 0x00 }, { 0xDC, 0xDC, 0xDC, 0x64 }, { 0xDC, 0xDC, 0xDC, 0x20 },
 };
 
-void func_800266D0(void) {
+void Fade_Init(void) {
     u32 i;
 
     D_8008CA50 = 0;
@@ -115,7 +115,7 @@ void func_800266D0(void) {
     }
 }
 
-void func_80026774(Struct_80026774* arg0) {
+void Fade_Draw(Struct_80026774* arg0) {
     if (D_8008CA50 & 8) {
         gSPDisplayList(D_8007A184++, D_8004F550);
     }
@@ -146,7 +146,7 @@ void func_80026774(Struct_80026774* arg0) {
     }
 }
 
-void func_800269B8(s32 arg0, u16 arg1, Color_RGBA8* arg2) {
+void Fade_Start(s32 arg0, u16 arg1, Color_RGBA8* arg2) {
     D_8008CE58 = arg0;
     D_8008CA50 = (arg1 | 1) | (D_8008CA50 & 8);
     D_8008CE5C = arg2;

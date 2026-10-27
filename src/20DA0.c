@@ -77,8 +77,8 @@ Vec3f D_8008BFC0[4];
 s32 D_8008BFF0;
 MtxF D_8008BFF8;
 
-void func_80026A00(Struct_80020A28*, Vec3f*, s32);
-void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
+void Math_EvalTcbSpline(Struct_80020A28*, Vec3f*, s32);
+void Math_MtxFRotScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32);
 void Anim_DrawNode(MtxF*, Vec3f, s32, s32, s32, s32, Struct_80020214_set*, Struct_80020A28*, s32);
 
 void Anim_SetCurrentAndNext(Struct_800201A0* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
@@ -135,7 +135,7 @@ void Anim_UpdateRootMotion(Struct_800201A0* arg0, Struct_80020214_set* arg1, f32
     } else {
         frame = 0;
     }
-    func_80026A00(anim, (Vec3f*)&pos, frame);
+    Math_EvalTcbSpline(anim, (Vec3f*)&pos, frame);
     if (arg0->unk60 & 0x200) {
         kf = anim->unk0;
         frame = anim->unk6;
@@ -177,7 +177,7 @@ void Anim_DrawModel(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, 
     Vec3f scale;
 
     D_8008BFF0 = 0;
-    func_80027220(&mtx, arg1->unkC.x, arg1->unkC.y, arg1->unkC.z, arg1->unk24, arg1->unk0.x, arg1->unk0.y, arg1->unk0.z);
+    Math_MtxFRotScaleTrans(&mtx, arg1->unkC.x, arg1->unkC.y, arg1->unkC.z, arg1->unk24, arg1->unk0.x, arg1->unk0.y, arg1->unk0.z);
     scale.x = arg1->unk24;
     scale.y = arg1->unk24;
     scale.z = arg1->unk24;
@@ -207,10 +207,10 @@ extern Gfx* D_8007A184;
 extern s32 D_8007A180;
 extern Unk2000000 D_2000000;
 extern Struct_80085E48 D_80085E48;
-void func_80027ADC(MtxF*, f32, f32, f32, f32, f32, f32, f32, f32, f32);
-void func_80027D40(MtxF*, MtxF*, MtxF*);
-void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
-void func_80027CB4(MtxF*, f32, f32, f32);
+void Math_MtxFRotDegScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32, f32, f32);
+void Math_MtxFMul(MtxF*, MtxF*, MtxF*);
+void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
+void Math_MtxFScaleAxes(MtxF*, f32, f32, f32);
 void Anim_ApplyPivotOffset(MtxF* arg0, Struct_80020A28* arg1);
 
 void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, Struct_80020214_set* set,
@@ -230,7 +230,7 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
     } else {
         fr = 0;
     }
-    func_80026A00(anim, (Vec3f*)&xf, fr);
+    Math_EvalTcbSpline(anim, (Vec3f*)&xf, fr);
     if (anim->unk14 == 0) {
         if (flags & 1) {
             xf.unk0.x = 0.0f;
@@ -240,20 +240,20 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
             xf.unk0.y = 0.0f;
         }
     }
-    func_80027ADC(&mtx, xf.unk0.x, xf.unk0.y, xf.unk0.z, xf.unkC.y, xf.unkC.x, xf.unkC.z, xf.unk18.x, xf.unk18.y,
+    Math_MtxFRotDegScaleTrans(&mtx, xf.unk0.x, xf.unk0.y, xf.unk0.z, xf.unkC.y, xf.unkC.x, xf.unkC.z, xf.unk18.x, xf.unk18.y,
                   xf.unk18.z);
     Anim_ApplyPivotOffset(&mtx, anim);
     scale.x *= xf.unk18.x;
     scale.y *= xf.unk18.y;
     scale.z *= xf.unk18.z;
     if (anim->unk16 & 1) {
-        func_80027D40(parent, &mtx, &mtx);
-        func_800275DC(&D_8008BFF8, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], D_80085E48.unkC, D_80085E48.unk10,
+        Math_MtxFMul(parent, &mtx, &mtx);
+        Math_MtxFAimAt(&D_8008BFF8, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], D_80085E48.unkC, D_80085E48.unk10,
                       D_80085E48.unk14);
-        func_80027CB4(&D_8008BFF8, scale.x, scale.y, scale.z);
+        Math_MtxFScaleAxes(&D_8008BFF8, scale.x, scale.y, scale.z);
         guMtxF2L(D_8008BFF8.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
     } else {
-        func_80027D40(parent, &mtx, &mtx);
+        Math_MtxFMul(parent, &mtx, &mtx);
         guMtxF2L(mtx.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
     }
     gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);

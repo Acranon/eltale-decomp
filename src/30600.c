@@ -153,7 +153,7 @@ void SaveMenu_RepairPak(void);
 void SaveMenu_DrawBackground(void);
 void SaveMenu_CaptureGameState(s32);
 void SaveMenu_RestoreGameState(s32);
-void func_8002DECC(s32, s32, s32, s32, s32);
+void Menu_DrawSprite(s32, s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, u8 *);
 void SaveMenu_SetTextDrawState(void);
 s8 Pak_AllocateGameFile(s32, u8);
@@ -176,15 +176,15 @@ extern u8 *D_8006C998[];
 extern s16 D_8006CAC4[][2];
 extern s8 D_80092C82;
 extern u16 D_80092C86;
-void func_8002A7C8(s32, s32, s32);
+void Sfx_Play(s32, s32, s32);
 
 #ifdef NON_MATCHING
 extern u8 *D_8006CC28[];
 extern s8 D_80060D64[];
 extern s32 D_8008FB44;
-void func_8002EED8(s32, s32, s32, u32, s32);
-void func_8002F2E4(s32, s32, s32, u32, s32);
-void func_8002F6D8(s32, s32, s32, u32);
+void Menu_DrawNumber(s32, s32, s32, u32, s32);
+void Menu_DrawNumberZeroPad(s32, s32, s32, u32, s32);
+void Menu_PrintNumber(s32, s32, s32, u32);
 #endif
 
 void SaveMenu_Init(s32 arg0) {
@@ -253,17 +253,17 @@ void SaveMenu_DrawOperationPanel(void) {
     s16 w = r[2];
     s16 h = r[3];
 
-    func_8002DECC(0, x, y, w, h);
-    func_8002DECC(0x37, x + 3, y + h, w, 3);
-    func_8002DECC(0x37, x + w + 1, y + 6, 2, h - 5);
-    func_8002DECC(0x37, x - 1, y - 1, w + 2, 1);
-    func_8002DECC(0x37, x - 1, y + h, w + 2, 1);
-    func_8002DECC(0x37, x - 1, y, 1, h);
-    func_8002DECC(0x37, x + w, y, 1, h);
-    func_8002DECC(0x38, x + 1, y + 1, w - 3, 1);
-    func_8002DECC(0x38, x + 1, y + 2, 1, h - 4);
-    func_8002DECC(0x39, x + 1, y + h - 2, w - 2, 1);
-    func_8002DECC(0x39, x + w - 2, y + 1, 1, h - 3);
+    Menu_DrawSprite(0, x, y, w, h);
+    Menu_DrawSprite(0x37, x + 3, y + h, w, 3);
+    Menu_DrawSprite(0x37, x + w + 1, y + 6, 2, h - 5);
+    Menu_DrawSprite(0x37, x - 1, y - 1, w + 2, 1);
+    Menu_DrawSprite(0x37, x - 1, y + h, w + 2, 1);
+    Menu_DrawSprite(0x37, x - 1, y, 1, h);
+    Menu_DrawSprite(0x37, x + w, y, 1, h);
+    Menu_DrawSprite(0x38, x + 1, y + 1, w - 3, 1);
+    Menu_DrawSprite(0x38, x + 1, y + 2, 1, h - 4);
+    Menu_DrawSprite(0x39, x + 1, y + h - 2, w - 2, 1);
+    Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
     Text_DrawEncodedString(x + 6, y + 6, D_8006C8F8[D_8008FB73]);
     SaveMenu_SetTextDrawState();
 }
@@ -382,17 +382,17 @@ void SaveMenu_UpdateDialog(void) {
     } else {
         msg = D_8006C998[D_8008FB72];
     }
-    func_8002DECC(0, x, y, w, h);
-    func_8002DECC(0x37, x + 3, y + h, w, 3);
-    func_8002DECC(0x37, x + w + 1, y + 6, 2, h - 5);
-    func_8002DECC(0x37, x - 1, y - 1, w + 2, 1);
-    func_8002DECC(0x37, x - 1, y + h, w + 2, 1);
-    func_8002DECC(0x37, x - 1, y, 1, h);
-    func_8002DECC(0x37, x + w, y, 1, h);
-    func_8002DECC(0x38, x + 1, y + 1, w - 3, 1);
-    func_8002DECC(0x38, x + 1, y + 2, 1, h - 4);
-    func_8002DECC(0x39, x + 1, y + h - 2, w - 2, 1);
-    func_8002DECC(0x39, x + w - 2, y + 1, 1, h - 3);
+    Menu_DrawSprite(0, x, y, w, h);
+    Menu_DrawSprite(0x37, x + 3, y + h, w, 3);
+    Menu_DrawSprite(0x37, x + w + 1, y + 6, 2, h - 5);
+    Menu_DrawSprite(0x37, x - 1, y - 1, w + 2, 1);
+    Menu_DrawSprite(0x37, x - 1, y + h, w + 2, 1);
+    Menu_DrawSprite(0x37, x - 1, y, 1, h);
+    Menu_DrawSprite(0x37, x + w, y, 1, h);
+    Menu_DrawSprite(0x38, x + 1, y + 1, w - 3, 1);
+    Menu_DrawSprite(0x38, x + 1, y + 2, 1, h - 4);
+    Menu_DrawSprite(0x39, x + 1, y + h - 2, w - 2, 1);
+    Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
     Text_DrawEncodedString(x + 6, y + 6, msg);
     SaveMenu_SetTextDrawState();
     if (D_8008FB79 >= 0) {
@@ -409,7 +409,7 @@ void SaveMenu_UpdateDialog(void) {
                 case 16:
                 case 20:
                     D_8008FB70 |= 0x8000;
-                    func_8002A7C8(0, 1, 0xFF);
+                    Sfx_Play(0, 1, 0xFF);
                     break;
                 case 24:
                     D_8008FB70 = 0x1000;
@@ -425,14 +425,14 @@ void SaveMenu_UpdateDialog(void) {
                     D_8008FB70 &= ~0x20;
                     D_8008FB7A = 0;
                     D_8008FB70 |= 0x1000;
-                    func_8002A7C8(0, 1, 0xFF);
+                    Sfx_Play(0, 1, 0xFF);
                     break;
                 case 17:
                     D_8008FB70 |= 0x10;
                     D_8008FB70 |= 0x800;
                     D_8008FB78 = 0;
                     D_8008FB79 = 10;
-                    func_8002A7C8(0, 1, 0xFF);
+                    Sfx_Play(0, 1, 0xFF);
                     break;
                 case 4:
                 case 5:
@@ -452,7 +452,7 @@ void SaveMenu_UpdateDialog(void) {
                         D_8008FB78 = 1;
                     }
                     D_8008FB79 = 10;
-                    func_8002A7C8(0, 1, 0xFF);
+                    Sfx_Play(0, 1, 0xFF);
                     break;
             }
         } else {
@@ -498,17 +498,17 @@ void SaveMenu_UpdateDialog(void) {
             w = D_8006C9FC[2][2];
             h = D_8006C9FC[2][3];
         }
-        func_8002DECC(0, x, y, w, h);
-        func_8002DECC(0x37, x + 3, y + h, w, 3);
-        func_8002DECC(0x37, x + w + 1, y + 6, 2, h - 5);
-        func_8002DECC(0x37, x - 1, y - 1, w + 2, 1);
-        func_8002DECC(0x37, x - 1, y + h, w + 2, 1);
-        func_8002DECC(0x37, x - 1, y, 1, h);
-        func_8002DECC(0x37, x + w, y, 1, h);
-        func_8002DECC(0x38, x + 1, y + 1, w - 3, 1);
-        func_8002DECC(0x38, x + 1, y + 2, 1, h - 4);
-        func_8002DECC(0x39, x + 1, y + h - 2, w - 2, 1);
-        func_8002DECC(0x39, x + w - 2, y + 1, 1, h - 3);
+        Menu_DrawSprite(0, x, y, w, h);
+        Menu_DrawSprite(0x37, x + 3, y + h, w, 3);
+        Menu_DrawSprite(0x37, x + w + 1, y + 6, 2, h - 5);
+        Menu_DrawSprite(0x37, x - 1, y - 1, w + 2, 1);
+        Menu_DrawSprite(0x37, x - 1, y + h, w + 2, 1);
+        Menu_DrawSprite(0x37, x - 1, y, 1, h);
+        Menu_DrawSprite(0x37, x + w, y, 1, h);
+        Menu_DrawSprite(0x38, x + 1, y + 1, w - 3, 1);
+        Menu_DrawSprite(0x38, x + 1, y + 2, 1, h - 4);
+        Menu_DrawSprite(0x39, x + 1, y + h - 2, w - 2, 1);
+        Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
         if (D_8008FB70 & 0x10) {
             msg = D_8006C934[1];
             Text_DrawEncodedString(x + 6, y + 6, msg);
@@ -524,20 +524,20 @@ void SaveMenu_UpdateDialog(void) {
                 if (!(D_8008FB70 & 8)) {
                     D_8008FB78 ^= 1;
                     D_8008FB70 |= 8;
-                    func_8002A7C8(0, 0, 0xFF);
+                    Sfx_Play(0, 0, 0xFF);
                 }
             } else {
                 D_8008FB70 &= ~8;
             }
             SaveMenu_SetTextDrawState();
             if (D_8008FB70 & 0x10) {
-                func_8002DECC(4, D_8006CAC4[D_8008FB78 + 2][0], D_8006CAC4[D_8008FB78 + 2][1], 12, 12);
+                Menu_DrawSprite(4, D_8006CAC4[D_8008FB78 + 2][0], D_8006CAC4[D_8008FB78 + 2][1], 12, 12);
             } else {
-                func_8002DECC(4, D_8006CAC4[D_8008FB78][0], D_8006CAC4[D_8008FB78][1], 12, 12);
+                Menu_DrawSprite(4, D_8006CAC4[D_8008FB78][0], D_8006CAC4[D_8008FB78][1], 12, 12);
             }
             if (D_80092C86 & 0x8000) {
                 if (D_8008FB78 == 0) {
-                    func_8002A7C8(0, 1, 0xFF);
+                    Sfx_Play(0, 1, 0xFF);
                     switch (D_8008FB72) {
                         case 17:
                             D_8008FB72 = 18;
@@ -584,7 +584,7 @@ void SaveMenu_UpdateDialog(void) {
                             break;
                     }
                 } else {
-                    func_8002A7C8(0, 2, 0xFF);
+                    Sfx_Play(0, 2, 0xFF);
                     switch (D_8008FB72) {
                         case 17:
                             D_8008FB72 = 6;
@@ -691,22 +691,22 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     if (ptr[0]->unk0 != -2) {
         if (ptr[0]->unk1 != -1) {
             if (idx == D_8008FB7A) {
-                func_8002EED8(2, 0x6F, 0x36, idx, 0xA);
-                func_8002DECC(0x36, 0x53, 0x35, 0x1C, 0xD);
-                func_8002DECC(0x19, 0x92, 0x36, 8, 0xA);
-                func_8002DECC(0x43, 0xD9, 0x35, 0x1C, 0xE);
+                Menu_DrawNumber(2, 0x6F, 0x36, idx, 0xA);
+                Menu_DrawSprite(0x36, 0x53, 0x35, 0x1C, 0xD);
+                Menu_DrawSprite(0x19, 0x92, 0x36, 8, 0xA);
+                Menu_DrawSprite(0x43, 0xD9, 0x35, 0x1C, 0xE);
                 colors[0] = 0xA;
             } else {
-                func_8002EED8(2, 0x6F, 0x36, idx, 0x48);
-                func_8002DECC(0x45, 0x53, 0x35, 0x1C, 0xD);
-                func_8002DECC(0x52, 0x92, 0x36, 8, 0xA);
-                func_8002DECC(0x44, 0xD9, 0x35, 0x1C, 0xE);
+                Menu_DrawNumber(2, 0x6F, 0x36, idx, 0x48);
+                Menu_DrawSprite(0x45, 0x53, 0x35, 0x1C, 0xD);
+                Menu_DrawSprite(0x52, 0x92, 0x36, 8, 0xA);
+                Menu_DrawSprite(0x44, 0xD9, 0x35, 0x1C, 0xE);
                 colors[0] = 0x48;
             }
-            func_8002EED8(2, 0x65, 0x6C, D_8008FBA8[idx].unk0.unk24, 0xA);
-            func_8002EED8(2, 0x8A, 0x6C, D_8008FBA8[idx].unk0.unk25, 0xA);
-            func_8002EED8(2, 0xAF, 0x6C, D_8008FBA8[idx].unk0.unk26, 0xA);
-            func_8002EED8(2, 0xD4, 0x6C, D_8008FBA8[idx].unk0.unk27, 0xA);
+            Menu_DrawNumber(2, 0x65, 0x6C, D_8008FBA8[idx].unk0.unk24, 0xA);
+            Menu_DrawNumber(2, 0x8A, 0x6C, D_8008FBA8[idx].unk0.unk25, 0xA);
+            Menu_DrawNumber(2, 0xAF, 0x6C, D_8008FBA8[idx].unk0.unk26, 0xA);
+            Menu_DrawNumber(2, 0xD4, 0x6C, D_8008FBA8[idx].unk0.unk27, 0xA);
             switch (D_8008FBA8[idx].unk3C) {
                 case 15:
                     if (D_8008FBA8[idx].unk40 == 5) {
@@ -776,11 +776,11 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 secs -= 60;
                 n++;
             }
-            func_8002EED8(3, 0x7E, 0x36, n, colors[0]);
-            func_8002F2E4(2, 0x9A, 0x36, secs, colors[0]);
-            func_8002EED8(3, 0xC0, 0x36, D_8008FBA8[idx].unk3A, colors[0]);
-            func_8002F6D8(3, 0x70, 0x58, D_8008FBA8[idx].unk0.unk4);
-            func_8002F6D8(3, 0xC0, 0x58, D_8008FBA8[idx].unk0.unk8);
+            Menu_DrawNumber(3, 0x7E, 0x36, n, colors[0]);
+            Menu_DrawNumberZeroPad(2, 0x9A, 0x36, secs, colors[0]);
+            Menu_DrawNumber(3, 0xC0, 0x36, D_8008FBA8[idx].unk3A, colors[0]);
+            Menu_PrintNumber(3, 0x70, 0x58, D_8008FBA8[idx].unk0.unk4);
+            Menu_PrintNumber(3, 0xC0, 0x58, D_8008FBA8[idx].unk0.unk8);
         }
     } else {
         flag = 1;
@@ -793,22 +793,22 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         if (ptr[0]->unk0 != -2) {
             if (ptr[0]->unk1 != -1) {
                     if (idx == D_8008FB7A) {
-                    func_8002EED8(2, 0x6F, 0x83, idx, 0xA);
-                    func_8002DECC(0x36, 0x53, 0x82, 0x1C, 0xD);
-                    func_8002DECC(0x19, 0x92, 0x83, 8, 0xA);
-                    func_8002DECC(0x43, 0xD9, 0x82, 0x1C, 0xE);
+                    Menu_DrawNumber(2, 0x6F, 0x83, idx, 0xA);
+                    Menu_DrawSprite(0x36, 0x53, 0x82, 0x1C, 0xD);
+                    Menu_DrawSprite(0x19, 0x92, 0x83, 8, 0xA);
+                    Menu_DrawSprite(0x43, 0xD9, 0x82, 0x1C, 0xE);
                     colors[0] = 0xA;
                 } else {
-                    func_8002EED8(2, 0x6F, 0x83, idx, 0x48);
-                    func_8002DECC(0x45, 0x53, 0x82, 0x1C, 0xD);
-                    func_8002DECC(0x52, 0x92, 0x83, 8, 0xA);
-                    func_8002DECC(0x44, 0xD9, 0x82, 0x1C, 0xE);
+                    Menu_DrawNumber(2, 0x6F, 0x83, idx, 0x48);
+                    Menu_DrawSprite(0x45, 0x53, 0x82, 0x1C, 0xD);
+                    Menu_DrawSprite(0x52, 0x92, 0x83, 8, 0xA);
+                    Menu_DrawSprite(0x44, 0xD9, 0x82, 0x1C, 0xE);
                     colors[0] = 0x48;
                 }
-                func_8002EED8(2, 0x65, 0xBA, D_8008FBA8[idx].unk0.unk24, 0xA);
-                func_8002EED8(2, 0x8A, 0xBA, D_8008FBA8[idx].unk0.unk25, 0xA);
-                func_8002EED8(2, 0xAF, 0xBA, D_8008FBA8[idx].unk0.unk26, 0xA);
-                func_8002EED8(2, 0xD4, 0xBA, D_8008FBA8[idx].unk0.unk27, 0xA);
+                Menu_DrawNumber(2, 0x65, 0xBA, D_8008FBA8[idx].unk0.unk24, 0xA);
+                Menu_DrawNumber(2, 0x8A, 0xBA, D_8008FBA8[idx].unk0.unk25, 0xA);
+                Menu_DrawNumber(2, 0xAF, 0xBA, D_8008FBA8[idx].unk0.unk26, 0xA);
+                Menu_DrawNumber(2, 0xD4, 0xBA, D_8008FBA8[idx].unk0.unk27, 0xA);
                 switch (D_8008FBA8[idx].unk3C) {
                     case 15:
                         if (D_8008FBA8[idx].unk40 == 5) {
@@ -878,11 +878,11 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     secs -= 60;
                     n++;
                 }
-                func_8002EED8(3, 0x7E, 0x83, n, colors[0]);
-                func_8002F2E4(2, 0x9A, 0x83, secs, colors[0]);
-                func_8002EED8(3, 0xC0, 0x83, D_8008FBA8[idx].unk3A, colors[0]);
-                func_8002F6D8(3, 0x70, 0xA6, D_8008FBA8[idx].unk0.unk4);
-                func_8002F6D8(3, 0xC0, 0xA6, D_8008FBA8[idx].unk0.unk8);
+                Menu_DrawNumber(3, 0x7E, 0x83, n, colors[0]);
+                Menu_DrawNumberZeroPad(2, 0x9A, 0x83, secs, colors[0]);
+                Menu_DrawNumber(3, 0xC0, 0x83, D_8008FBA8[idx].unk3A, colors[0]);
+                Menu_PrintNumber(3, 0x70, 0xA6, D_8008FBA8[idx].unk0.unk4);
+                Menu_PrintNumber(3, 0xC0, 0xA6, D_8008FBA8[idx].unk0.unk8);
             }
         } else {
             Text_DrawEncodedString(0x82, 0x7F, buf.b);
@@ -891,26 +891,26 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     SaveMenu_SetTextDrawState();
     flag = D_80060D64[(D_8008FB44 >> 2) & 0xF];
     if (D_8008FB7A >= 2) {
-        func_8002DECC(5, 0x38, 0x4D, 7, 7);
-        func_8002DECC(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
+        Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
+        Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
     } else if (D_8008FB7A == 1 && !(D_8008FB70 & 0x20)) {
-        func_8002DECC(5, 0x38, 0x4D, 7, 7);
-        func_8002DECC(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
+        Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
+        Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
     }
     if (ptr[0] < &D_8008FB80[16] && ptr[0][1].unk0 != -1) {
-        func_8002DECC(5, 0x38, 0xA4, 7, 7);
-        func_8002DECC(0x54, 0x36, 0xAC - flag, 0xE, 0xB);
+        Menu_DrawSprite(5, 0x38, 0xA4, 7, 7);
+        Menu_DrawSprite(0x54, 0x36, 0xAC - flag, 0xE, 0xB);
     }
     if (D_8008FB70 & 0x20) {
-        func_8002DECC(1, flag + 0x42, 0x80, 0x10, 0xD);
+        Menu_DrawSprite(1, flag + 0x42, 0x80, 0x10, 0xD);
     } else {
-        func_8002DECC(1, flag + 0x42, 0x37, 0x10, 0xD);
+        Menu_DrawSprite(1, flag + 0x42, 0x37, 0x10, 0xD);
     }
     if (arg0 != 1) {
         n = 0;
         if (D_80092C82 < -20) {
             if (D_8008FB7B == 0) {
-                func_8002A7C8(0, 0, 0xFF);
+                Sfx_Play(0, 0, 0xFF);
                 D_8008FB7A++;
                 if (D_8008FB80[D_8008FB7A].unk0 == -1) {
                     D_8008FB7A--;
@@ -928,7 +928,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
             D_8008FB7B &= 0xF;
         } else if (D_80092C82 > 20) {
             if (D_8008FB7B == 0) {
-                func_8002A7C8(0, 0, 0xFF);
+                Sfx_Play(0, 0, 0xFF);
                 D_8008FB7A--;
                 if (D_8008FB7A < 0) {
                     D_8008FB7A = 0;
@@ -949,7 +949,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         }
         if (D_80092C86 & 0x8000) {
             idx = D_8008FB3E & 0xC;
-            func_8002A7C8(0, 1, 0xFF);
+            Sfx_Play(0, 1, 0xFF);
             switch (idx) {
                 case 0:
                     D_8008FB70 |= 0x2000;
@@ -982,7 +982,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
             D_8008FB79 = 10;
             D_8008FB70 &= ~7;
             D_8008FB70 |= 5;
-            func_8002A7C8(0, 2, 0xFF);
+            Sfx_Play(0, 2, 0xFF);
         }
     }
 }
@@ -1259,27 +1259,27 @@ void SaveMenu_SetTextDrawState(void) {
 }
 
 void SaveMenu_DrawBackground(void) {
-    func_8002DECC(0, 0x3C, 0x22, 0xC8, 0xAB);
-    func_8002DECC(0x37, 0x3F, 0xCE, 0xC8, 3);
-    func_8002DECC(0x37, 0x105, 0x28, 2, 0xA9);
-    func_8002DECC(0x37, 0x3B, 0x21, 0xCA, 1);
-    func_8002DECC(0x37, 0x3B, 0xCD, 0xCA, 1);
-    func_8002DECC(0x37, 0x3B, 0x21, 1, 0xAD);
-    func_8002DECC(0x37, 0x104, 0x21, 1, 0xAD);
-    func_8002DECC(0x38, 0x3D, 0x23, 0xC5, 1);
-    func_8002DECC(0x38, 0x3D, 0x23, 1, 0xA8);
-    func_8002DECC(0x39, 0x3D, 0xCB, 0xC6, 1);
-    func_8002DECC(0x39, 0x102, 0x23, 1, 0xA9);
-    func_8002DECC(0x3F, 0x5A, 0x2E, 0x96, 2);
-    func_8002DECC(0x3F, 0x5A, 0x44, 0x96, 2);
-    func_8002DECC(0x3F, 0x5A, 0x7B, 0x96, 2);
-    func_8002DECC(0x3F, 0x5A, 0x91, 0x96, 2);
-    func_8002DECC(0x42, 0x5E, 0x67, 0x7C, 0xC);
-    func_8002DECC(0x42, 0x5E, 0xB5, 0x7C, 0xC);
-    func_8002DECC(0x46, 0x55, 0x58, 0x14, 0xE);
-    func_8002DECC(0x47, 0xA2, 0x58, 0x18, 0xE);
-    func_8002DECC(0x46, 0x55, 0xA6, 0x14, 0xE);
-    func_8002DECC(0x47, 0xA2, 0xA6, 0x18, 0xE);
+    Menu_DrawSprite(0, 0x3C, 0x22, 0xC8, 0xAB);
+    Menu_DrawSprite(0x37, 0x3F, 0xCE, 0xC8, 3);
+    Menu_DrawSprite(0x37, 0x105, 0x28, 2, 0xA9);
+    Menu_DrawSprite(0x37, 0x3B, 0x21, 0xCA, 1);
+    Menu_DrawSprite(0x37, 0x3B, 0xCD, 0xCA, 1);
+    Menu_DrawSprite(0x37, 0x3B, 0x21, 1, 0xAD);
+    Menu_DrawSprite(0x37, 0x104, 0x21, 1, 0xAD);
+    Menu_DrawSprite(0x38, 0x3D, 0x23, 0xC5, 1);
+    Menu_DrawSprite(0x38, 0x3D, 0x23, 1, 0xA8);
+    Menu_DrawSprite(0x39, 0x3D, 0xCB, 0xC6, 1);
+    Menu_DrawSprite(0x39, 0x102, 0x23, 1, 0xA9);
+    Menu_DrawSprite(0x3F, 0x5A, 0x2E, 0x96, 2);
+    Menu_DrawSprite(0x3F, 0x5A, 0x44, 0x96, 2);
+    Menu_DrawSprite(0x3F, 0x5A, 0x7B, 0x96, 2);
+    Menu_DrawSprite(0x3F, 0x5A, 0x91, 0x96, 2);
+    Menu_DrawSprite(0x42, 0x5E, 0x67, 0x7C, 0xC);
+    Menu_DrawSprite(0x42, 0x5E, 0xB5, 0x7C, 0xC);
+    Menu_DrawSprite(0x46, 0x55, 0x58, 0x14, 0xE);
+    Menu_DrawSprite(0x47, 0xA2, 0x58, 0x18, 0xE);
+    Menu_DrawSprite(0x46, 0x55, 0xA6, 0x14, 0xE);
+    Menu_DrawSprite(0x47, 0xA2, 0xA6, 0x18, 0xE);
 }
 
 void SaveMenu_CaptureGameState(s32 arg0) {

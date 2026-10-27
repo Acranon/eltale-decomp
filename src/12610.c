@@ -160,9 +160,9 @@ extern s16 D_8007A1A2;
 
 void Env_ClearLightSlots(void);
 void Env_ComputeLightDirs(void);
-void func_80027430(f32 (*)[4], f32, f32, f32);
+void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
 void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
-void func_800277A4(Mtx *, f32, f32, f32, f32 *, f32 *, f32 *);
+void Math_MtxFMulVecTransposed(Mtx *, f32, f32, f32, f32 *, f32 *, f32 *);
 extern Mtx D_80085F10;
 void Env_FillLights3(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
 extern s32 D_80084B60;
@@ -389,7 +389,7 @@ void Env_ComputeLightDirs(void) {
 
     if (D_8007C280 & 1) {
         angle = (f32)D_80084988 * 3.141592653589793 * 2 / (f32)D_8008498C - 3.141592653589793;
-        func_80027430(D_80084550, 0.0f, 0.0f, angle);
+        Math_MtxFRotate(D_80084550, 0.0f, 0.0f, angle);
         guMtxXFMF(D_80084550, 0.0f, 90.0f, 50.0f, &x, &y, &z);
         D_80084B48[0][0] = x;
         D_80084B48[0][1] = y;
@@ -403,7 +403,7 @@ void Env_ComputeLightDirs(void) {
         D_80084B48[0][1] = 89;
         D_80084B48[0][2] = 20;
     }
-    func_800277A4(&D_80085F10, -89.0f, 89.0f, 20.0f, &x, &y, &z);
+    Math_MtxFMulVecTransposed(&D_80085F10, -89.0f, 89.0f, 20.0f, &x, &y, &z);
     D_80084B48[1][0] = x;
     D_80084B48[1][1] = y;
     D_80084B48[1][2] = z;

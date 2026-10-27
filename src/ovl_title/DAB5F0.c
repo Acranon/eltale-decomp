@@ -30,7 +30,7 @@ extern s8 D_80226DB0_ovl_title;
 extern s32 D_80226DB4_ovl_title;
 extern s32 D_80226DC0_ovl_title;
 
-void func_80029A88(s32, s32, s32);
+void Sfx_Enqueue(s32, s32, s32);
 s32 Title_RunPhase(void);
 void Title_DrawScreen(s32);
 
@@ -268,21 +268,21 @@ void Title_UpdateScreen(void) {
     D_80226DB4_ovl_title = D_80226D9C_ovl_title;
     if (D_8020F4F0_ovl_title == 0) {
         if ((D_80226DA4_ovl_title == 0) && (D_80092C86 & 0x1000)) {
-            func_80029A88(1, 0xFF, 0x40);
+            Sfx_Enqueue(1, 0xFF, 0x40);
             D_80226D9C_ovl_title = 0;
             D_80226DA0_ovl_title = 0x80;
             D_80226DA4_ovl_title = 1;
             D_80226D94_ovl_title = 0x3C;
         } else if (D_80226DA4_ovl_title == 2) {
             if (D_80092C86 & 0xB000) {
-                func_80029A88(1, 0xFF, 0x40);
+                Sfx_Enqueue(1, 0xFF, 0x40);
                 D_80226D9C_ovl_title = 0;
                 D_80226DA0_ovl_title = 0x80;
                 D_80226DA4_ovl_title = 3;
                 D_80226D94_ovl_title = 0x3C;
                 D_8020F1E0_ovl_title = 1;
             } else if (D_80092C86 & 0x4000) {
-                func_80029A88(2, 0xFF, 0x40);
+                Sfx_Enqueue(2, 0xFF, 0x40);
                 D_80226D9C_ovl_title = 0xFF;
                 D_80226DA0_ovl_title = 0x80;
                 D_80226DA4_ovl_title = 4;
@@ -291,7 +291,7 @@ void Title_UpdateScreen(void) {
             }
         } else if ((D_80226DA4_ovl_title == 8) || (D_80226DA4_ovl_title == 7)) {
             if (D_80092C86 & 0xB000) {
-                func_80029A88(1, 0xFF, 0x40);
+                Sfx_Enqueue(1, 0xFF, 0x40);
                 D_80226D9C_ovl_title = 0;
                 D_80226DA0_ovl_title = 0x80;
                 D_8020F1E0_ovl_title = 1;
@@ -308,7 +308,7 @@ void Title_UpdateScreen(void) {
                     D_80226DA4_ovl_title = 0xE;
                 }
             } else if (D_80092C86 & 0x4000) {
-                func_80029A88(2, 0xFF, 0x40);
+                Sfx_Enqueue(2, 0xFF, 0x40);
                 D_80226D9C_ovl_title = 0xFF;
                 D_80226DA0_ovl_title = 0x80;
                 D_80226DA4_ovl_title = 2;
@@ -317,7 +317,7 @@ void Title_UpdateScreen(void) {
             }
         } else if (D_80226DA4_ovl_title == 6) {
             if (D_80092C86 & 0xF000) {
-                func_80029A88(2, 0xFF, 0x40);
+                Sfx_Enqueue(2, 0xFF, 0x40);
                 D_80226D9C_ovl_title = 0xFF;
                 D_80226DA0_ovl_title = 0x80;
                 D_80226DA4_ovl_title = 2;
@@ -325,11 +325,11 @@ void Title_UpdateScreen(void) {
             }
         } else if (D_80226DA4_ovl_title == 9) {
             if (D_80092C86 & 0xB000) {
-                func_80029A88(1, 0xFF, 0x40);
+                Sfx_Enqueue(1, 0xFF, 0x40);
                 D_8020F1E0_ovl_title = 1;
             }
         } else if ((D_80226DA4_ovl_title == 0xA) && (D_80092C86 & 0xB000)) {
-            func_80029A88(1, 0xFF, 0x40);
+            Sfx_Enqueue(1, 0xFF, 0x40);
             D_8020F1E0_ovl_title = 1;
         }
     }

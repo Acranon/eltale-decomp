@@ -94,10 +94,10 @@ extern u8 D_8007B8E0[];
 extern u8 D_8007B430[];
 extern f32 D_8007AB3C;
 
-void func_800271B4(f32, Unk80085AB0*);
-f32 func_800270D0(f32, f32);
+void Math_RotateVec2(f32, Unk80085AB0*);
+f32 Math_Atan2(f32, f32);
 f32 sqrtf(f32);
-void func_80028120(u8*, void*, s32);
+void Dma_ReadRom(u8*, void*, s32);
 
 void Spirit_SetCollected(u16 arg0) {
     D_80085A98[arg0 >> 3] |= D_8004F770[arg0 & 7];
@@ -131,8 +131,8 @@ Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
         if (sqrtf(dx * dx + dz * dz) < out->entry->unk14) {
             D_80085AB0.x = -dx;
             D_80085AB0.y = -dz;
-            func_800271B4(arg0->unk10, &D_80085AB0);
-            angle = func_800270D0(D_80085AB0.x, D_80085AB0.y);
+            Math_RotateVec2(arg0->unk10, &D_80085AB0);
+            angle = Math_Atan2(D_80085AB0.x, D_80085AB0.y);
             if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
                 out->unk4 = arg0->unk10 - angle;
                 if (out->entry->unk18 & 1) {
@@ -140,8 +140,8 @@ Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
                 }
                 D_80085AB0.x = dx;
                 D_80085AB0.y = dz;
-                func_800271B4(-out->entry->unk10, &D_80085AB0);
-                angle = func_800270D0(D_80085AB0.x, D_80085AB0.y);
+                Math_RotateVec2(-out->entry->unk10, &D_80085AB0);
+                angle = Math_Atan2(D_80085AB0.x, D_80085AB0.y);
                 if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
                     break;
                 }
@@ -157,8 +157,8 @@ Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
 }
 
 void TextSpot_LoadMessage(Unk80085AC0* arg0) {
-    func_80028120(&D_D37700[arg0->entry->unk1C], D_8007B8E0, 0x20);
-    func_80028120(&D_D37700[arg0->entry->unk1E], D_8007B430, 0x200);
+    Dma_ReadRom(&D_D37700[arg0->entry->unk1C], D_8007B8E0, 0x20);
+    Dma_ReadRom(&D_D37700[arg0->entry->unk1E], D_8007B430, 0x200);
     if (D_8007B8E0[2] == 0xFF) {
         D_8007B8E0[0] = 0xFF;
     }

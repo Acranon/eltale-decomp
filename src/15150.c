@@ -196,8 +196,8 @@ extern Gfx* D_8007A184;
 extern Unk15150Dyn D_2000000;
 void Camera_UpdateSway(Vec3f_15150*);
 
-f32 func_800270D0(f32, f32);
-void func_800271B4(f32, Vec2f_15150*);
+f32 Math_Atan2(f32, f32);
+void Math_RotateVec2(f32, Vec2f_15150*);
 f32 sinf(f32);
 f32 cosf(f32);
 f32 sqrtf(f32);
@@ -262,7 +262,7 @@ void Camera_InitForMap(void) {
             D_80085C10.x = 0.0f;
             D_80085C10.y = cam->unk4C * 0.8;
             cam->eyeY = pos->y + p->unk14;
-            func_800271B4(cam->unk84 + D_8007A994, &D_80085C10);
+            Math_RotateVec2(cam->unk84 + D_8007A994, &D_80085C10);
             cam->eyeX = pos->x - D_80085C10.x;
             cam->eyeZ = pos->z - D_80085C10.y;
             cam->unk54 = 0.0f;
@@ -497,11 +497,11 @@ void Camera_FollowTarget(Camera15150 *arg0)
   dist = sqrtf((dx * dx) + (dz * dz));
   if ((y != 0.0f) || (dist != 0.0f))
   {
-    arg0->unk24 = func_800270D0(y, dist);
+    arg0->unk24 = Math_Atan2(y, dist);
   }
   if ((dx != 0.0f) || (dz != 0.0f))
   {
-    arg0->unk2C = func_800270D0(dx, dz);
+    arg0->unk2C = Math_Atan2(dx, dz);
     if (!locked)
     {
       arg0->unk28 = arg0->unk2C;
@@ -528,10 +528,10 @@ void Camera_UpdateFixedEye(Camera15150* arg0) {
     dz = arg0->eyeZ - arg0->atZ;
     dist = sqrtf(dx * dx + dz * dz);
     if (dy != 0.0f || dist != 0.0f) {
-        arg0->unk24 = func_800270D0(dy, dist);
+        arg0->unk24 = Math_Atan2(dy, dist);
     }
     if (dx != 0.0f || dz != 0.0f) {
-        arg0->unk28 = func_800270D0(dx, dz);
+        arg0->unk28 = Math_Atan2(dx, dz);
     }
     if (arg0->unk60 != 0.0f || arg0->unk64 != 0.0f) {
         if (arg0->unk24 < arg0->unk60) {
@@ -549,14 +549,14 @@ void Camera_UpdateFixedEye(Camera15150* arg0) {
             arg0->unk28 = arg0->unk68;
             D_80085C10.x = 0.0f;
             D_80085C10.y = -dist;
-            func_800271B4(arg0->unk28, &D_80085C10);
+            Math_RotateVec2(arg0->unk28, &D_80085C10);
             arg0->atX = arg0->eyeX + D_80085C10.x;
             arg0->atZ = arg0->eyeZ + D_80085C10.y;
         } else if (arg0->unk6C < arg0->unk28) {
             arg0->unk28 = arg0->unk6C;
             D_80085C10.x = 0.0f;
             D_80085C10.y = -dist;
-            func_800271B4(arg0->unk28, &D_80085C10);
+            Math_RotateVec2(arg0->unk28, &D_80085C10);
             arg0->atX = arg0->eyeX + D_80085C10.x;
             arg0->atZ = arg0->eyeZ + D_80085C10.y;
         }
@@ -566,7 +566,7 @@ void Camera_UpdateFixedEye(Camera15150* arg0) {
                 arg0->unk28 = arg0->unk6C;
                 D_80085C10.x = 0.0f;
                 D_80085C10.y = -dist;
-                func_800271B4(arg0->unk28, &D_80085C10);
+                Math_RotateVec2(arg0->unk28, &D_80085C10);
                 arg0->atX = arg0->eyeX + D_80085C10.x;
                 arg0->atZ = arg0->eyeZ + D_80085C10.y;
             }
@@ -574,7 +574,7 @@ void Camera_UpdateFixedEye(Camera15150* arg0) {
             arg0->unk28 = arg0->unk68;
             D_80085C10.x = 0.0f;
             D_80085C10.y = -dist;
-            func_800271B4(arg0->unk28, &D_80085C10);
+            Math_RotateVec2(arg0->unk28, &D_80085C10);
             arg0->atX = arg0->eyeX + D_80085C10.x;
             arg0->atZ = arg0->eyeZ + D_80085C10.y;
         }
@@ -587,7 +587,7 @@ void Camera_UpdateHeading(Camera15150* arg0) {
     f32 dz = arg0->eyeZ - arg0->atZ;
 
     if (dx != 0.0f || dz != 0.0f) {
-        arg0->unk28 = arg0->unk2C = func_800270D0(dx, dz);
+        arg0->unk28 = arg0->unk2C = Math_Atan2(dx, dz);
     }
 }
 
@@ -603,7 +603,7 @@ void Camera_UpdateBattle(Camera15150* arg0) {
             *arg0 = D_80085B80;
         }
     } else {
-        a = func_800270D0(D_8008BE5C - arg0->target->x, D_8008BE60 - arg0->target->z) + 3.141592653589793;
+        a = Math_Atan2(D_8008BE5C - arg0->target->x, D_8008BE60 - arg0->target->z) + 3.141592653589793;
         if (a > 3.141592653589793) {
             a -= 6.283185307179586;
         } else if (a < -3.141592653589793) {
@@ -683,7 +683,7 @@ void Camera_OrbitTarget(Camera15150* arg0, Unk15150Target* arg1) {
     dx = arg0->eyeX - arg1->x;
     dz = arg0->eyeZ - arg1->z;
     if (arg0->flags & 0x14) {
-        angle = func_800270D0(dx, dz) - arg0->unk54;
+        angle = Math_Atan2(dx, dz) - arg0->unk54;
         if (angle > 3.141592653589793) {
             angle -= 6.283185307179586;
         } else if (angle < -3.141592653589793) {
@@ -696,7 +696,7 @@ void Camera_OrbitTarget(Camera15150* arg0, Unk15150Target* arg1) {
     arg0->unk3C = arg0->unk7C * speed;
     D_80085C10.x = dx;
     D_80085C10.y = dz;
-    func_800271B4(speed, &D_80085C10);
+    Math_RotateVec2(speed, &D_80085C10);
     arg0->eyeX = arg1->x - D_80085C10.x;
     arg0->eyeZ = arg1->z + D_80085C10.y;
 }
@@ -777,7 +777,7 @@ void Camera_StartBattleFocus(s32 arg0, Unk15150Target* arg1) {
     D_80085C10.x = 0.0f;
     D_80085E48.unk40 = D_80085E48.unk44;
     D_80085C10.y = h + 10.0;
-    func_800271B4(D_80085E48.unk54, &D_80085C10);
+    Math_RotateVec2(D_80085E48.unk54, &D_80085C10);
     D_80085E48.eyeX = arg1->x + D_80085C10.x;
     D_80085E48.eyeY = D_80085C40.y + D_80085E48.unk58 * 1.1;
     D_80085E48.eyeZ = arg1->z + D_80085C10.y;
@@ -822,7 +822,7 @@ void Camera_SetTargetView(Unk8001628C* arg0, Unk15150Target* arg1) {
         case 0:
             D_80085C10.x = 0.0f;
             D_80085C10.y = arg0->unk18 + 20.0;
-            func_800271B4(arg1->ry - 3.141592653589793 + 0.39269908169872414, &D_80085C10);
+            Math_RotateVec2(arg1->ry - 3.141592653589793 + 0.39269908169872414, &D_80085C10);
             D_80085E48.eyeX = arg1->x - D_80085C10.x;
             D_80085E48.eyeZ = arg1->z - D_80085C10.y;
             D_80085E48.eyeY = arg1->y + arg0->unk14;

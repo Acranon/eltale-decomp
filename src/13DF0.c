@@ -31,8 +31,8 @@ typedef struct {
 
 extern Unk2000000 D_2000000;
 
-void func_800278C8(f32 (*mf)[4], f32, f32, f32);
-void func_80027CB4(f32 (*mf)[4], f32, f32, f32);
+void Math_MtxFAlignYToVector(f32 (*mf)[4], f32, f32, f32);
+void Math_MtxFScaleAxes(f32 (*mf)[4], f32, f32, f32);
 
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
     Unk84B80* p;
@@ -59,11 +59,11 @@ void Shadow_DrawAll(Unk2000000* arg0) {
         gSPFogPosition(D_8007A184++, D_8007A1A2, D_8007A1A0);
     }
     while (n != 0) {
-        func_800278C8(mf, p->rx, p->ry, p->rz);
+        Math_MtxFAlignYToVector(mf, p->rx, p->ry, p->rz);
         mf[3][0] = p->x;
         mf[3][1] = p->y;
         mf[3][2] = p->z;
-        func_80027CB4(mf, p->scale, p->scale, p->scale);
+        Math_MtxFScaleAxes(mf, p->scale, p->scale, p->scale);
         guMtxF2L(mf, &arg0->unkC0[D_8007A180]);
         gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
         D_8007A180++;

@@ -1,9 +1,9 @@
-# func_8002DECC
+# Menu_DrawSprite
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/2B530.c`](../2B530.c)
-- Retail assembly: [`asm/nonmatchings/2B530/func_8002DECC.s`](../../asm/nonmatchings/2B530/func_8002DECC.s)
+- Retail assembly: [`asm/nonmatchings/2B530/Menu_DrawSprite.s`](../../asm/nonmatchings/2B530/Menu_DrawSprite.s)
 - Retail code size: `0x560` bytes
 - Current gap: 328 object words; code 0x55C vs 0x560, frame 0xD8 exact. Retail keeps w, s, lrs and lrt in stack homes and reloads them; the C promotes some to registers.
 - Specific blocker: Retail reloads w, s, lrs and lrt together from stack; compiler promotes some.
@@ -24,7 +24,7 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_8002DECC** (0x588 bytes)
+- **Menu_DrawSprite** (0x588 bytes)
   - w5 s2: Generic sprite blit. The draft has the right C, with the switch cases in source order 0, 0x3C, 0x3E, 0x37-39, 0x3D. The target frame is 0x20 larger (0xD8) and keeps w in its home slot plus many named locals on the stack.
   - w5 s3: Drafts c/DECC_a.c and c/DECC_c1.c. The named-local layout found: 17 named locals ordered (top down) ret, alpha, xr, masks(0xC8), maskt(0xC4), ult, uls, s(0xB8), t(0xB4), dsdx(0xB0), dtdy(0xAC), texH, ?, lrs(0xA0), lrt(0x9C), tex(0x98), texW(0x94). x in s0, w memory-resident. Relative layout matches, but my frame is 8 bytes smaller (fewer temp slots at the bottom), and s is a register in mine where the target keeps it in memory.
   - w5 s4: Best draft w5s4/c/DL_2.c (noreg 95; 60 with stack offsets masked). It uses the E42C trick in the clip (`d = -x; ...` with d as the 17th local at 0xA4) and `lrt = D_80060CB4[id][1] - 1` (so lrt is computed at init like the target). Left: s must be memory-resident (target sw/lw 0xB8 five times; mine keeps it in a register and spills 3 gfx temps instead of 1), lrs is memory in the target, and the frame is 0xD0 against 0xD8.

@@ -117,7 +117,7 @@ typedef struct {
 } Unk8007A9D0;
 
 f32 sqrtf(f32);
-void func_80028120();
+void Dma_ReadRom();
 void Boss_Spawn(s32, f32, f32, f32, Unk8007C148 *);
 u8 Boss_IsDefeated(u32);
 void Anim_DrawModel(s32, Unk8007C174 *, void *, s32);
@@ -189,7 +189,7 @@ void Boss_LoadForArea(void) {
                 start = D_803AB390[p->unk4].start;
                 end = D_803AB390[p->unk4].end;
                 size = end - start;
-                func_80028120(start, D_802A7BC0, size);
+                Dma_ReadRom(start, D_802A7BC0, size);
                 Boss_Spawn(i, p->unkC, p->unk10, p->unk14, &D_8007C148);
                 D_8007C140 = i + 1;
             }

@@ -16,7 +16,7 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 
 Verdict: **equivalent.**
 
-- Read the retail asm against the C and the compiled NON_MATCHING code: same loads (u16 index list, `lh` of `actor.unk50` against -1, the radius/scale floats), same double compares (`+ 10.0`, `* 1.5`), same `2.0 * unk18` (IDO's `add.d`), same `func_800271B4(arg0->rot, &D_8007A918)` call, same `u32` loop count against `D_8008BE5A` with the early exit storing `*idx + 1`. The 5 words are the s5/s7 swap and the addu operand order only.
+- Read the retail asm against the C and the compiled NON_MATCHING code: same loads (u16 index list, `lh` of `actor.unk50` against -1, the radius/scale floats), same double compares (`+ 10.0`, `* 1.5`), same `2.0 * unk18` (IDO's `add.d`), same `Math_RotateVec2(arg0->rot, &D_8007A918)` call, same `u32` loop count against `D_8008BE5A` with the early exit storing `*idx + 1`. The 5 words are the s5/s7 swap and the addu operand order only.
 - Fixed: the module prototype is `u16 Player_FindMeleeTarget(Actor *)`, but retail returns the unmasked `*idx + 1` in v0. The NON_MATCHING build declares it `s32` (inside the `#ifdef`); its one caller stores the result to a `u16` field with `sh`, so the caller behaves the same.
 - Open: nothing.
 

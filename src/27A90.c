@@ -19,7 +19,7 @@ typedef struct {
 } Vec2f;
 
 /* This file's .data, 8004F770..8004F780: a bit table (used by other files),
- * the random seed, and func_80027ADC's static degrees-to-radians factor
+ * the random seed, and Math_MtxFRotDegScaleTrans's static degrees-to-radians factor
  * (8004F77C), which must be a function-scope static for IDO to match. */
 u8 D_8004F770[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 u32 D_8004F778 = 0x9B0;
@@ -29,20 +29,20 @@ extern MtxF D_80085F10;
 extern f32 D_80085F54;
 extern f32 D_80085F5C;
 
-f32 func_80026EE8(f32 x);
-void func_80027220(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7);
-void func_80027430(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3);
-void func_800275DC(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6);
-void func_800278C8(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3);
+f32 Math_Atan(f32 x);
+void Math_MtxFRotScaleTrans(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7);
+void Math_MtxFRotate(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3);
+void Math_MtxFAimAt(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6);
+void Math_MtxFAlignYToVector(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3);
 
-u32 func_80026E90(u32 max) {
+u32 Math_Rand(u32 max) {
     if (max != 0) {
         return ((D_8004F778 = (D_8004F778 * 0x41C64E6D) + 0x3039) >> 0x10) % max;
     }
     return 0;
 }
 
-f32 func_80026EE8(f32 x) {
+f32 Math_Atan(f32 x) {
     f32 conv = 0.0f;
     s32 sector;
     s32 i;
@@ -70,7 +70,7 @@ f32 func_80026EE8(f32 x) {
     }
 }
 
-void func_80027070(f32* arg0, f32* arg1) {
+void Math_NormalizeVec2(f32* arg0, f32* arg1) {
     f32 temp_f2_2;
 
     temp_f2_2 = 1.0f / sqrtf((*arg0 * *arg0) + (*arg1 * *arg1));
@@ -78,22 +78,22 @@ void func_80027070(f32* arg0, f32* arg1) {
     *arg1 *= temp_f2_2;
 }
 
-f32 func_800270D0(f32 arg0, f32 arg1) {
+f32 Math_Atan2(f32 arg0, f32 arg1) {
     f32 var_f2;
 
     if (arg1 == 0.0f) {
         var_f2 = arg0 >= 0.0f ? (PI / 2) : -(PI / 2);
     } else if (arg1 > 0.0f) {
-        var_f2 = func_80026EE8(arg0 / arg1);
+        var_f2 = Math_Atan(arg0 / arg1);
     } else if ((arg1 < 0.0f) && (arg0 <= 0.0f)) {
-        var_f2 = func_80026EE8(arg0 / arg1) - PI;
+        var_f2 = Math_Atan(arg0 / arg1) - PI;
     } else {
-        var_f2 = func_80026EE8(arg0 / arg1) + PI;
+        var_f2 = Math_Atan(arg0 / arg1) + PI;
     }
     return var_f2;
 }
 
-void func_800271B4(f32 angle, Vec2f* coords) {
+void Math_RotateVec2(f32 angle, Vec2f* coords) {
     f32 sinAngle;
     f32 cosAngle;
     f32 x;
@@ -105,7 +105,7 @@ void func_800271B4(f32 angle, Vec2f* coords) {
     coords->y = (coords->y * cosAngle) + (x * sinAngle);
 }
 
-void func_80027220(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
+void Math_MtxFRotScaleTrans(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
     f32 sp4C;
     f32 sp48;
     f32 sp44;
@@ -137,12 +137,12 @@ void func_80027220(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5,
     arg0->mf[3][3] = 1.0f;
 }
 
-void func_800273C0(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
-    func_80027220(&D_8008CE60, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+void Math_MtxRotScaleTrans(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
+    Math_MtxFRotScaleTrans(&D_8008CE60, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     guMtxF2L(D_8008CE60.mf, arg0);
 }
 
-void func_80027430(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
+void Math_MtxFRotate(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
     f32 sin1;
     f32 sin2;
     f32 sin3;
@@ -178,12 +178,12 @@ void func_80027430(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
     arg0->mf[3][3] = 1.0f;
 }
 
-void func_8002758C(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
-    func_80027430(&D_8008CE60, arg1, arg2, arg3);
+void Math_MtxRotate(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
+    Math_MtxFRotate(&D_8008CE60, arg1, arg2, arg3);
     guMtxF2L(D_8008CE60.mf, arg0);
 }
 
-void func_800275DC(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
+void Math_MtxFAimAt(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
     f32 temp_f0_2;
     f32 temp_f16;
     f32 temp_f16_2;
@@ -237,24 +237,24 @@ void func_800275DC(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5,
     arg0->mf[3][3] = 1.0f;
 }
 
-void func_8002773C(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
-    func_800275DC(&D_8008CE60, arg1, arg2, arg3, arg4, arg5, arg6);
+void Math_MtxAimAt(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6) {
+    Math_MtxFAimAt(&D_8008CE60, arg1, arg2, arg3, arg4, arg5, arg6);
     guMtxF2L(D_8008CE60.mf, arg0);
 }
 
-void func_800277A4(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32* arg4, f32* arg5, f32* arg6) {
+void Math_MtxFMulVecTransposed(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32* arg4, f32* arg5, f32* arg6) {
     *arg4 = arg0->mf[0][0] * arg1 + arg0->mf[0][1] * arg2 + arg0->mf[0][2] * arg3;
     *arg5 = arg0->mf[1][0] * arg1 + arg0->mf[1][1] * arg2 + arg0->mf[1][2] * arg3;
     *arg6 = arg0->mf[2][0] * arg1 + arg0->mf[2][1] * arg2 + arg0->mf[2][2] * arg3;
 }
 
-void func_80027834(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32* arg4, f32* arg5, f32* arg6) {
+void Math_MtxFMulVecNegZ(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32* arg4, f32* arg5, f32* arg6) {
     *arg4 = arg0->mf[0][0] * arg1 + arg0->mf[1][0] * arg2 + arg0->mf[2][0] * arg3;
     *arg5 = arg0->mf[0][1] * arg1 + arg0->mf[1][1] * arg2 + arg0->mf[2][1] * arg3;
     *arg6 = -(arg0->mf[0][2] * arg1 + arg0->mf[1][2] * arg2 + arg0->mf[2][2] * arg3);
 }
 
-void func_800278C8(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
+void Math_MtxFAlignYToVector(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
     f32 sin1;
     f32 sin2;
     f32 sin3;
@@ -295,12 +295,12 @@ void func_800278C8(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
     arg0->mf[3][3] = 1.0;
 }
 
-void func_80027A8C(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
-    func_800278C8(&D_8008CE60, arg1, arg2, arg3);
+void Math_MtxAlignYToVector(Mtx* arg0, f32 arg1, f32 arg2, f32 arg3) {
+    Math_MtxFAlignYToVector(&D_8008CE60, arg1, arg2, arg3);
     guMtxF2L(D_8008CE60.mf, arg0);
 }
 
-void func_80027ADC(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8,
+void Math_MtxFRotDegScaleTrans(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8,
                    f32 arg9) {
     f32 sin1;
     f32 sin2;
@@ -341,7 +341,7 @@ void func_80027ADC(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5,
     arg0->mf[3][3] = 1.0f;
 }
 
-void func_80027CB4(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
+void Math_MtxFScaleAxes(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
     arg0->mf[0][0] *= arg1;
     arg0->mf[0][1] *= arg1;
     arg0->mf[0][2] *= arg1;
@@ -353,7 +353,7 @@ void func_80027CB4(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3) {
     arg0->mf[2][2] *= arg3;
 }
 
-void func_80027D40(MtxF* arg0, MtxF* arg1, MtxF* arg2) {
+void Math_MtxFMul(MtxF* arg0, MtxF* arg1, MtxF* arg2) {
     f32 temp_f2;
     f32 temp_f20;
     f32 temp_f14;
@@ -432,7 +432,7 @@ void func_80027D40(MtxF* arg0, MtxF* arg1, MtxF* arg2) {
     arg2->mf[3][3] = 1.0f;
 }
 
-s32 func_80027FFC(f32 arg0, f32 arg1, f32 arg2, s32* arg3, s32* arg4) {
+s32 Camera_WorldToScreen(f32 arg0, f32 arg1, f32 arg2, s32* arg3, s32* arg4) {
     s32 ret;
     f32 x;
     f32 y;

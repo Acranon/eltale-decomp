@@ -163,7 +163,7 @@ extern Gfx D_802122E0_ovl_intro[];
 extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
 void Intro_DrawSprites(s32);
-void func_8002A338(s32);
+void Audio_StartSeqFadeOut(s32);
 s32 Intro_CountActiveSprites();
 s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx);
 void Intro_SpawnSprite(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
@@ -206,8 +206,8 @@ s32 Pak_ClassifyError(s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 void func_8003D8EC(char *, ...);
-void func_80029A88(s32, s32, s32);
-void func_8002A6B8(s32);
+void Sfx_Enqueue(s32, s32, s32);
+void Bgm_Play(s32);
 s32 Intro_RunSpriteScript(void);
 void Intro_RunSplash1(void);
 void Intro_RunSplash2(void);
@@ -311,7 +311,7 @@ s32 Intro_Update(void) {
             case 1:
                 Intro_RunSplash2();
                 if (D_80092C86 & 0x1000) {
-                    func_80029A88(1, 0xFF, 0x40);
+                    Sfx_Enqueue(1, 0xFF, 0x40);
                     D_80212230_ovl_intro = 0;
                     D_8021223C_ovl_intro = 1;
                 }
@@ -330,7 +330,7 @@ s32 Intro_Update(void) {
             case 2:
                 Intro_RunSplash3();
                 if (D_80092C86 & 0x1000) {
-                    func_80029A88(1, 0xFF, 0x40);
+                    Sfx_Enqueue(1, 0xFF, 0x40);
                     D_80212230_ovl_intro = 0;
                     D_8021223C_ovl_intro = 1;
                 }
@@ -349,7 +349,7 @@ s32 Intro_Update(void) {
             case 3:
                 if (--D_80212230_ovl_intro == 0) {
                     D_80212240_ovl_intro++;
-                    func_8002A6B8(0x1B);
+                    Bgm_Play(0x1B);
                 }
                 break;
             case 4:
@@ -445,7 +445,7 @@ s32 Intro_RunSpriteScript(void) {
         } while (entries[D_802684CC_ovl_intro].unk2 == 0);
     }
     if (D_802684C0_ovl_intro == 0x1E00) {
-        func_8002A338(0x5A);
+        Audio_StartSeqFadeOut(0x5A);
     }
     Intro_DrawSprites(1);
     Intro_DrawSprites(0);

@@ -219,14 +219,14 @@ typedef struct {
 extern Gfx D_800EB6D0[];
 s32 Effect_DrawModelEffectGeometry(Unk80086798b*, s32);
 s32 Effect_ConfigureModelEffectTexture(Unk80086798b*);
-void func_80027430(MtxF*, f32, f32, f32);
-f32 func_800270D0(f32, f32);
-u32 func_80026E90(u32);
-s32 func_800281F0(s32, u8*, u16);
+void Math_MtxFRotate(MtxF*, f32, f32, f32);
+f32 Math_Atan2(f32, f32);
+u32 Math_Rand(u32);
+s32 Text_FormatNumber(s32, u8*, u16);
 extern s32 D_8007A180;
-void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
-void func_800278C8(MtxF*, f32, f32, f32);
-void func_80027CB4(MtxF*, f32, f32, f32);
+void Math_MtxFRotScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32);
+void Math_MtxFAlignYToVector(MtxF*, f32, f32, f32);
+void Math_MtxFScaleAxes(MtxF*, f32, f32, f32);
 f32 sqrtf(f32);
 typedef struct {
     /* 0x00 */ Mtx unk0[3];
@@ -298,7 +298,7 @@ void Effect_DrawRings(void*);
 void Effect_DrawModelEffects(void*);
 void Effect_DrawActorMarkers(void*);
 s32 Effect_AllocateSprite(void*);
-void func_800271B4(f32, Unk1B200Vec2*);
+void Math_RotateVec2(f32, Unk1B200Vec2*);
 
 void Effect_ResetAll(void) {
     Effect_ResetPulseEmitters();
@@ -362,7 +362,7 @@ void Effect_UpdatePulseEmitters(void) {
                 D_8004EE20.unk20 = pos->z;
                 D_80087E00.x = 0.0f;
                 D_80087E00.y = 0.7f;
-                func_800271B4(pos->unk10, &D_80087E00);
+                Math_RotateVec2(pos->unk10, &D_80087E00);
                 D_8004EE20.unk34 = 0.2f;
                 D_8004EE20.unk30 = D_80087E00.x;
                 D_8004EE20.unk38 = D_80087E00.y;
@@ -412,7 +412,7 @@ void Effect_QueueVisibleMarker(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
 
     cur = D_8007A17C ? D_80086440 : D_80086500;
     prev = D_8007A17C ? D_80086500 : D_80086440;
-    angle = func_800270D0(x - D_80085E48.eyeX, z - D_80085E48.eyeZ) - D_80085E48.yaw + 3.141592653589793;
+    angle = Math_Atan2(x - D_80085E48.eyeX, z - D_80085E48.eyeZ) - D_80085E48.yaw + 3.141592653589793;
     if (angle < -3.141592653589793) {
         angle += 6.283185307179586;
     } else if (angle > 3.141592653589793) {
@@ -428,7 +428,7 @@ void Effect_QueueVisibleMarker(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
         if (n != 0) {
             cur->unk0 = prev->unk0;
         } else {
-            cur->unk0 = func_80026E90(4) * 4 + 1;
+            cur->unk0 = Math_Rand(4) * 4 + 1;
         }
         cur->x = x;
         cur->y = y;
@@ -573,7 +573,7 @@ void Effect_AddFloatingNumber(void* arg0, s32 arg1, s32 arg2) {
         arg2 = -arg2;
     }
 
-    var_t0->numDigits = func_800281F0(arg2, var_t0->digits, 1U);
+    var_t0->numDigits = Text_FormatNumber(arg2, var_t0->digits, 1U);
     var_v1 = 0;
 
     for (i = 0; i < 10; i++) {
@@ -608,7 +608,7 @@ typedef struct {
 
 extern Gfx D_800C40C0[];
 extern u8 D_8039E290[];
-s32 func_80027FFC(f32, f32, f32, s32*, s32*);
+s32 Camera_WorldToScreen(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 
 void Effect_DrawFloatingNumbers(void) {
@@ -640,7 +640,7 @@ void Effect_DrawFloatingNumbers(void) {
             } else {
                 y = actor->y + 600.0 * actor->scale;
             }
-            if (func_80027FFC(actor->x, y, actor->z, &sx, &sy)) {
+            if (Camera_WorldToScreen(actor->x, y, actor->z, &sx, &sy)) {
                 if (!first) {
                     gSPDisplayList(D_8007A184++, D_800C40C0);
                     gDPLoadTextureBlock(D_8007A184++, D_8039E290, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 10, 0, G_TX_WRAP, G_TX_WRAP, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
@@ -732,9 +732,9 @@ void Effect_UpdateBurstEmitters(void) {
     do {
         if (p->unk0 != 0) {
             if (p->unk0 & 1) {
-                a = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
-                b = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
-                func_80027430(&mtx, a, b, 0.0f);
+                a = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
+                b = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
+                Math_MtxFRotate(&mtx, a, b, 0.0f);
                 guMtxXFMF(mtx.mf, 0.0f, 0.0f, p->unk14, &x, &y, &z);
                 spawn.unk18 = p->unk8 + x;
                 spawn.unk1C = p->unkC + y;
@@ -783,9 +783,9 @@ void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     spawn = D_8004EFE4;
     i = 15;
     do {
-        a = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
-        b = (f32)func_80026E90(32) * 3.141592653589793 / 16.0f;
-        func_80027430(&mtx, a, b, 0.0f);
+        a = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
+        b = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
+        Math_MtxFRotate(&mtx, a, b, 0.0f);
         guMtxXFMF(mtx.mf, 0.0f, 0.0f, arg4, &a, &b, &c);
         spawn.unk18 = arg1;
         spawn.unk1C = arg2;
@@ -860,12 +860,12 @@ void Effect_DrawStreaks(void* arg0) {
                 if (p->unk0 < 8) {
                     alpha = (p->unk0 * alpha) >> 3;
                 }
-                func_800278C8(&mtx, p->vx, p->vy, p->vz);
+                Math_MtxFAlignYToVector(&mtx, p->vx, p->vy, p->vz);
                 dx = p->x - p->x0;
                 dy = p->y - p->y0;
                 dz = p->z - p->z0;
                 dist = sqrtf(dx * dx + dy * dy + dz * dz);
-                func_80027CB4(&mtx, 0.35f, dist * 0.1, 0.35f);
+                Math_MtxFScaleAxes(&mtx, 0.35f, dist * 0.1, 0.35f);
                 mtx.mf[3][0] = p->x;
                 mtx.mf[3][1] = p->y;
                 mtx.mf[3][2] = p->z;
@@ -901,17 +901,17 @@ void Effect_SpawnStreakBurst(f32 x, f32 y, f32 z) {
             n--;
             p++;
         }
-        p->unk0 = func_80026E90(8) + 10;
+        p->unk0 = Math_Rand(8) + 10;
         p->x = x;
         p->x0 = x;
         p->y = y;
         p->y0 = y;
         p->z0 = z;
         p->z = z;
-        a = func_80026E90(20) * 3.141592653589793 / 10.0;
-        b = func_80026E90(20) * 3.141592653589793 / 10.0;
-        r = (f32)func_80026E90(10) / 3.0 + 3.0;
-        func_80027430(&mtx, a, b, 0.0f);
+        a = Math_Rand(20) * 3.141592653589793 / 10.0;
+        b = Math_Rand(20) * 3.141592653589793 / 10.0;
+        r = (f32)Math_Rand(10) / 3.0 + 3.0;
+        Math_MtxFRotate(&mtx, a, b, 0.0f);
         guMtxXFMF(mtx.mf, 0.0f, 0.0f, r, &p->vx, &p->vy, &p->vz);
         count--;
     } while (count != 0 && n != 0);
@@ -961,7 +961,7 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     do {
         D_80087E00.x = 0.0f;
         D_80087E00.y = arg4;
-        func_800271B4(angle, &D_80087E00);
+        Math_RotateVec2(angle, &D_80087E00);
         pt->x = D_80087E00.x + arg1;
         pt->z = D_80087E00.y + arg3;
         Coll_ResolveFloorAndWalls(pt->x, D_8007AA08.unk1C, pt->z, 0xA00, &D_80087E10);
@@ -1085,8 +1085,8 @@ void Effect_DrawRings(void* arg0) {
                 dz = z1 - z0;
                 len = sqrtf(dx * dx + dy * dy + dz * dz);
                 if (len != 0.0f) {
-                    func_800278C8(&mtx, dx, dy, dz);
-                    func_80027CB4(&mtx, 2.0f, len, 1.5f);
+                    Math_MtxFAlignYToVector(&mtx, dx, dy, dz);
+                    Math_MtxFScaleAxes(&mtx, 2.0f, len, 1.5f);
                     mtx.mf[3][0] = x0;
                     mtx.mf[3][1] = y0;
                     mtx.mf[3][2] = z0;
@@ -1219,14 +1219,14 @@ s32 Effect_DrawModelEffectGeometry(Unk80086798b* arg0, s32 arg1) {
 
     D_8008BFF0 = 0;
     if (arg0->unk8 & 4) {
-        func_800278C8(&mtx, arg0->unk28, arg0->unk2C, arg0->unk30);
+        Math_MtxFAlignYToVector(&mtx, arg0->unk28, arg0->unk2C, arg0->unk30);
         mtx.mf[3][0] = arg0->unkC;
         mtx.mf[3][1] = arg0->unk10;
         mtx.mf[3][2] = arg0->unk14;
-        func_80027CB4(&mtx, arg0->unk1C * 0.01, arg0->unk20 * 0.01, arg0->unk24 * 0.01);
+        Math_MtxFScaleAxes(&mtx, arg0->unk1C * 0.01, arg0->unk20 * 0.01, arg0->unk24 * 0.01);
     } else {
-        func_80027220(&mtx, 0.0f, arg0->unk18, 0.0f, 0.01f, arg0->unkC, arg0->unk10, arg0->unk14);
-        func_80027CB4(&mtx, arg0->unk1C, arg0->unk20, arg0->unk24);
+        Math_MtxFRotScaleTrans(&mtx, 0.0f, arg0->unk18, 0.0f, 0.01f, arg0->unkC, arg0->unk10, arg0->unk14);
+        Math_MtxFScaleAxes(&mtx, arg0->unk1C, arg0->unk20, arg0->unk24);
     }
     scale.x = arg0->unk1C * 0.01;
     scale.y = arg0->unk20 * 0.01;
@@ -1336,7 +1336,7 @@ extern Unk8007AB48 D_8007AB48;
 extern f32 D_8007AA44;
 extern Gfx D_800EB9C8[];
 extern Gfx D_800EB990[];
-void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
+void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
 void Effect_DrawActorMarkers(void* arg0) {
     s32 first;
     s32 i;
@@ -1356,7 +1356,7 @@ void Effect_DrawActorMarkers(void* arg0) {
                     gSPDisplayList(D_8007A184++, D_800EB990);
                     first++;
                 }
-                alpha = 200 - func_80026E90(32);
+                alpha = 200 - Math_Rand(32);
                 if (p->unk0 < 8) {
                     alpha = (p->unk0 * alpha) >> 3;
                 } else if (p->unk0 >= 22) {
@@ -1365,8 +1365,8 @@ void Effect_DrawActorMarkers(void* arg0) {
                 x = D_8007AB48.x;
                 y = D_8007AA44 * 70.0 + D_8007AB48.y;
                 z = D_8007AB48.z;
-                func_800275DC(&mtx, x, y, z, D_80085E48.eyeX, D_80085E48.eyeY, D_80085E48.eyeZ);
-                func_80027CB4(&mtx, D_8007AA44, D_8007AA44, D_8007AA44);
+                Math_MtxFAimAt(&mtx, x, y, z, D_80085E48.eyeX, D_80085E48.eyeY, D_80085E48.eyeZ);
+                Math_MtxFScaleAxes(&mtx, D_8007AA44, D_8007AA44, D_8007AA44);
                 guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[D_8007A180]);
                 /* Keep the index update in the matrix command's scope for IDO scheduling. */
                 {

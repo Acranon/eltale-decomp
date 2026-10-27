@@ -641,10 +641,10 @@ extern Unk801D8620 D_801D8620[];
 void Player_Spawn(void);
 void Map_LoadArea(void);
 void Camera_InitForMap(void);
-void func_8002A338(s32);
-void func_80026A00(Unk80092EDC *, f32 *, s32);
-void func_80027430(f32 (*)[4], f32, f32, f32);
-void func_80027834(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
+void Audio_StartSeqFadeOut(s32);
+void Math_EvalTcbSpline(Unk80092EDC *, f32 *, s32);
+void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
+void Math_MtxFMulVecNegZ(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
 void Text_ResetAllWindows(s32, Unk80092EDC **);
 void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame);
 
@@ -700,7 +700,7 @@ void Cutscene_UpdateScene(void) {
             if (D_80092ED0 >= 14) {
                 D_8007A174 = 0x14E;
                 D_8007A17A = 0x14C;
-                func_8002A338(0x12C);
+                Audio_StartSeqFadeOut(0x12C);
             } else {
                 D_8007A174 = 0x31;
                 D_8007A17A = 0x2F;
@@ -725,12 +725,12 @@ void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame) {
     if (arg0->unk6 < frame) {
         frame = arg0->unk6;
     }
-    func_80026A00(arg0, buf, frame);
+    Math_EvalTcbSpline(arg0, buf, frame);
     D_80085E48.unkC = buf[0];
     D_80085E48.unk10 = buf[1];
     D_80085E48.unk14 = buf[2];
-    func_80027430(m, -buf[4] * 0.0174532925199432955, -buf[3] * 0.0174532925199432955, buf[5] * 0.0174532925199432955);
-    func_80027834(m, 0.0f, 0.0f, -100.0f, &D_80085E48.unk18, &D_80085E48.unk1C, &D_80085E48.unk20);
+    Math_MtxFRotate(m, -buf[4] * 0.0174532925199432955, -buf[3] * 0.0174532925199432955, buf[5] * 0.0174532925199432955);
+    Math_MtxFMulVecNegZ(m, 0.0f, 0.0f, -100.0f, &D_80085E48.unk18, &D_80085E48.unk1C, &D_80085E48.unk20);
     D_80085E48.unk18 += D_80085E48.unkC;
     D_80085E48.unk1C += D_80085E48.unk10;
     D_80085E48.unk20 = D_80085E48.unk14 - D_80085E48.unk20;

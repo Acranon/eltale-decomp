@@ -257,7 +257,7 @@ void Anim_AdvanceFrame(s32, Obj *, u8 *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 extern Gfx *D_8007A184;
 void Enemy_StartAttackScript(s32, s32);
-f32 func_800270D0(f32, f32);
+f32 Math_Atan2(f32, f32);
 void Anim_SetCurrentAndNext(Obj *, s32, s32, s32, s32, u16);
 void Camera_StartBattleFocus(s32, Obj *);
 void Enemy_TurnToward(Obj *, f32, f32);
@@ -271,11 +271,11 @@ void Battle_EndTurn(Obj *);
 void Anim_UpdateRootMotion(Obj *, u8 *, f32, Vec3f *);
 void Hud_ClearActorStatusIndicators(Obj *);
 void Hud_ShowActorPopup(void);
-void func_800269B8(s32, u16, void *);
-u32 func_80026E90(u32);
-void func_800271B4(f32, Vec3f *);
-void func_80028120();
-void func_8002A7C8(u8, s8, u8);
+void Fade_Start(s32, u16, void *);
+u32 Math_Rand(u32);
+void Math_RotateVec2(f32, Vec3f *);
+void Dma_ReadRom();
+void Sfx_Play(u8, s8, u8);
 extern s32 D_8004DD38[];
 
 extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
@@ -428,7 +428,7 @@ void Enemy_LoadAreaSet(void) {
     D_8007C04C = D_8007C05C->unk10;
     start = D_8007C05C->start;
     end = D_8007C05C->end;
-    func_80028120(start, D_8020E6F0, end - start, &D_8007C05C);
+    Dma_ReadRom(start, D_8020E6F0, end - start, &D_8007C05C);
 }
 
 void Enemy_RemoveAll(void) {
@@ -453,7 +453,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Obj *obj, Enemy *e) {
     def = &D_8007C05C->unkC[idx];
     obj->unk50 = def->unk2;
     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
-    obj->unk54 = func_80026E90(16);
+    obj->unk54 = Math_Rand(16);
     obj->unk24 = def->unk20;
     obj->unk28 = def->unk18;
     obj->unk68 = (EnemyStats *)&e->unk98;
@@ -579,7 +579,7 @@ void Enemy_StateApproach(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
     if (D_8008BE52 & 0x100) {
         D_8007C070.x = 0.0f;
         D_8007C070.y = 0.4f;
-        func_800271B4(obj->angle, &D_8007C070);
+        Math_RotateVec2(obj->angle, &D_8007C070);
     } else {
         Enemy_GetAnimStep(obj, &D_8007C070);
     }
@@ -638,7 +638,7 @@ void Enemy_StateHurt(Obj *obj, EnemyAI *ai, s32 arg2) {
             D_8007B900--;
             D_8007A9B4 += obj->unk64->unk10;
             D_8007A9B8 += obj->unk64->unk14;
-            func_8002A7C8(0, 10, 0xFF);
+            Sfx_Play(0, 10, 0xFF);
         } else {
             ai->unk0 = 0;
             obj->unk60 &= 0xFFFC;
@@ -700,7 +700,7 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
                         n = Player_TakeDamage(n, atk, obj);
                         D_8007C070.x = 0.0f;
                         D_8007C070.y = 2.0f * (obj->unk64->unk18 * obj->unk24);
-                        func_800271B4(obj->angle, &D_8007C070);
+                        Math_RotateVec2(obj->angle, &D_8007C070);
                         Effect_SpawnStreakBurst(obj->x + D_8007C070.x, obj->y + obj->unk64->unk1C * obj->unk24 * 0.7f, obj->z + D_8007C070.y);
                         if (e->unk98 & 2) {
                             n = ((n + 3) >> 2) + 1;
@@ -851,7 +851,7 @@ Unk8000BA20 *Enemy_ChooseAttack(Enemy *e, Obj *obj) {
                 b = list[i + 1];
                 d = b->unk10 * obj->unk24;
                 if (dist < d) {
-                    if (func_80026E90(2) == 0) {
+                    if (Math_Rand(2) == 0) {
                         sel = b;
                     }
                     swapped = 1;
@@ -877,7 +877,7 @@ Unk8000BA20 *Enemy_ChooseAttack(Enemy *e, Obj *obj) {
         sel = NULL;
     }
     if (e->unk28->unk24 & 4) {
-        sel = &e->unk28->unk30[func_80026E90(e->unk28->unk2C)];
+        sel = &e->unk28->unk30[Math_Rand(e->unk28->unk2C)];
     }
     e->unk1C = sel;
     return sel;
@@ -901,7 +901,7 @@ void Enemy_StartAttack(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
     e->unk2 = arg2->unk4;
     e->flags &= 0xFFD7;
     obj->unk60 = 1;
-    obj->angle = func_800270D0(D_8007AA08.x - obj->x, D_8007AA08.z - obj->z);
+    obj->angle = Math_Atan2(D_8007AA08.x - obj->x, D_8007AA08.z - obj->z);
     Anim_SetCurrentAndNext(obj, arg2->unk8, 1, arg2->unkA == -1 ? 0 : arg2->unkA, 1, 1);
     Camera_StartBattleFocus(arg2->unk4 + 0xF, obj);
     if (e->unk2 == 0) {
@@ -917,7 +917,7 @@ void Enemy_TurnToward(Obj *obj, f32 x, f32 z) {
 
     x -= obj->x;
     z -= obj->z;
-    diff = func_800270D0(x, z) - obj->angle;
+    diff = Math_Atan2(x, z) - obj->angle;
     if (diff > 3.141592653589793) {
         diff -= 6.283185307179586;
     } else if (diff < -3.141592653589793) {
@@ -993,7 +993,7 @@ void Enemy_GetAnimStep(Obj *obj, Vec3f *out) {
     Anim_UpdateRootMotion(obj, anims + obj->unk52 * 0xC, obj->unk24, out);
     out->x = -obj->unk44;
     out->y = obj->unk4C;
-    func_800271B4(obj->angle, out);
+    Math_RotateVec2(obj->angle, out);
 }
 
 void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Obj *obj) {
@@ -1077,7 +1077,7 @@ s32 Enemy_RollHitOnPlayer(Obj *obj) {
     s16 chance;
 
     chance = (obj->unk68->unk86 * 100) / (obj->unk68->unk86 + ((D_8007AA88->unk86 + 7) >> 3));
-    return func_80026E90(100) < chance;
+    return Math_Rand(100) < chance;
 }
 
 u16 Enemy_CalcAttackDamage(Enemy *arg0) {
@@ -1085,9 +1085,9 @@ u16 Enemy_CalcAttackDamage(Enemy *arg0) {
 
     dmg = arg0->unk11C;
     dmg = (dmg * arg0->unk122) >> 4;
-    if (func_80026E90(32) == 0) {
+    if (Math_Rand(32) == 0) {
         dmg = dmg + (dmg >> 1);
-        func_800269B8(4, 0, D_8004F760);
+        Fade_Start(4, 0, D_8004F760);
         arg0->flags |= 0x20;
     }
     if (arg0->unk98 & 1) {
@@ -1121,7 +1121,7 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
                         break;
                 }
             } else {
-                a = func_800270D0(src->x - obj->x, src->z - obj->z) - obj->angle;
+                a = Math_Atan2(src->x - obj->x, src->z - obj->z) - obj->angle;
                 if (a > 3.141592653589793) {
                     a -= 6.283185307179586;
                 } else if (a < -3.141592653589793) {
@@ -1138,7 +1138,7 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
             a /= (f32)(src->unk68->unk84 + D_8007B908[idx].unk120);
             dmg = dmg * a;
             q = sqrtf(dmg);
-            dmg += func_80026E90(q * 0.75 + 1.0);
+            dmg += Math_Rand(q * 0.75 + 1.0);
             if (!dmg) {
                 dmg++;
             }
@@ -1171,7 +1171,7 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
         }
     }
     if (flags & 0x8000) {
-        func_8002A7C8(0, 0x18, 0xFF);
+        Sfx_Play(0, 0x18, 0xFF);
     }
     return dmg;
 }
@@ -1179,7 +1179,7 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
 
 void Enemy_PlayMissEffect(void) {
     Hud_ShowActorPopup();
-    func_8002A7C8(0, 0x17, 0xFF);
+    Sfx_Play(0, 0x17, 0xFF);
 }
 
 s32 Enemy_GetSlotIndex(Obj *arg0) {
@@ -1246,7 +1246,7 @@ void Enemy_RunAttackScript(void) {
             if (e->flags & 8) {
                 D_8007C070.x = e->unk8;
                 D_8007C070.y = e->unk10;
-                func_800271B4(obj->angle, &D_8007C070);
+                Math_RotateVec2(obj->angle, &D_8007C070);
                 en->unk20 = D_8007C070.x;
                 en->unk24 = D_8007C070.y;
             } else {
@@ -1254,7 +1254,7 @@ void Enemy_RunAttackScript(void) {
                 t = &D_800C18D8[d->unk0];
                 D_8007C070.x = e->unk8;
                 D_8007C070.y = e->unk10;
-                func_800271B4(obj->angle + e->unk14, &D_8007C070);
+                Math_RotateVec2(obj->angle + e->unk14, &D_8007C070);
                 if (e->flags & 2) {
                     x = D_8007AA20;
                     y = D_8007AA24;

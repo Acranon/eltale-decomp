@@ -236,12 +236,12 @@ void Battle_EndTurn(Actor *arg0);
 void Anim_SetCurrentAndNext(Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 void Anim_UpdateRootMotion(Actor *arg0, s32 arg1, f32 arg2);
 void Hud_ClearActorStatusIndicators(Actor *arg0);
-void func_80025094(u8 arg0);
-void func_800251CC(u8 arg0, Actor *arg1);
-void func_800271B4(f32 arg0, Vec2f *arg1);
-void func_8002A338(s32 arg0);
-void func_8002A6B8(s32 arg0);
-void func_8002A7C8(u8 arg0, s8 arg1, u8 arg2);
+void Item_AddToInventory(u8 arg0);
+void Item_ApplyEffect(u8 arg0, Actor *arg1);
+void Math_RotateVec2(f32 arg0, Vec2f *arg1);
+void Audio_StartSeqFadeOut(s32 arg0);
+void Bgm_Play(s32 arg0);
+void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 s32 Text_OpenWindow(s32 arg0);
 s32 Player_RollMeleeHit(s32 arg0, Actor *arg1);
 u16 Player_CalcMeleeDamage(PlayerState *arg0);
@@ -260,9 +260,9 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2);
 s32 Player_TakeDamage(s32 arg0, u16 arg1, Actor *arg2);
 #endif
 void Camera_StartBattleFocus(s32 arg0, Actor *arg1);
-u32 func_80026E90(s32 arg0);
-f32 func_800270D0(f32 arg0, f32 arg1);
-void func_80028120(u8 *romStart, void *dest, u32 size);
+u32 Math_Rand(s32 arg0);
+f32 Math_Atan2(f32 arg0, f32 arg1);
+void Dma_ReadRom(u8 *romStart, void *dest, u32 size);
 void Hud_ShowActorPopup(Actor *arg0);
 f32 sqrtf(f32 x);
 
@@ -390,7 +390,7 @@ extern f32 D_8007A8FC;
 extern f32 D_8007A900;
 
 void Player_Init(void) {
-    func_80028120(D_869620, D_80206000, D_86F6F0 - D_869620);
+    Dma_ReadRom(D_869620, D_80206000, D_86F6F0 - D_869620);
     D_8007A9D0 = D_80055D44;
     D_8007AA08.actor.scale = D_8007A9D0.unk20;
     D_8007AA08.actor.unk28 = D_8007A9D0.unk18;
@@ -476,12 +476,12 @@ void Player_Spawn(void) {
                 p->unk4 = 0xF;
                 D_8007A918.x = 0.0f;
                 D_8007A918.z = 20.0f;
-                func_800271B4(p->actor.rot, &D_8007A918);
+                Math_RotateVec2(p->actor.rot, &D_8007A918);
                 p->unk12C = D_8007A918.x;
                 p->unk130 = D_8007A918.z;
                 p->actor.unk60 = 1;
-                func_8002A7C8(5, 0x21, 0xFF);
-                func_8002A7C8(0xF, 0x21, 0xFF);
+                Sfx_Play(5, 0x21, 0xFF);
+                Sfx_Play(0xF, 0x21, 0xFF);
                 break;
             case 2:
                 p->unk0 = 10;
@@ -501,29 +501,29 @@ void Player_Spawn(void) {
                     D_8007A918.z = -120.681f;
                     n = 0x14;
                 }
-                func_800271B4(-pos->rot * 0.017453292519943295, &D_8007A918);
+                Math_RotateVec2(-pos->rot * 0.017453292519943295, &D_8007A918);
                 p->actor.x = pos->x - D_8007A918.x * p->actor.scale;
                 p->actor.z = pos->z + D_8007A918.z * p->actor.scale;
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
                 MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
-                func_8002A7C8(n, 8, 0xFF);
+                Sfx_Play(n, 8, 0xFF);
                 break;
             case 3:
                 p->unk0 = 8;
                 p->unk4 = 0xF;
                 D_8007A918.x = 0.0f;
                 D_8007A918.z = 20.0f;
-                func_800271B4(p->actor.rot, &D_8007A918);
+                Math_RotateVec2(p->actor.rot, &D_8007A918);
                 p->unk12C = D_8007A918.x;
                 p->unk130 = D_8007A918.z;
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
                 MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
-                func_8002A7C8(5, 0x21, 0xFF);
-                func_8002A7C8(0xF, 0x21, 0xFF);
+                Sfx_Play(5, 0x21, 0xFF);
+                Sfx_Play(0xF, 0x21, 0xFF);
                 break;
         }
     }
@@ -647,15 +647,15 @@ s32 Boss_CheckPlayerNear(void);
 void Boss_BeginEncounter(s32 arg0);
 void Npc_StartTalk(s32 idx);
 void Spirit_SetCollected(u16 arg0);
-s32 func_80024FC4(void);
+s32 Item_HasInventoryRoom(void);
 void Chest_Open(Actor *arg0);
 void TextSpot_LoadMessage(void *arg0);
 s32 Player_CanAct(PlayerState *arg0, Actor *arg1);
-void func_800269B8(s32 arg0, u16 arg1, void *arg2);
+void Fade_Start(s32 arg0, u16 arg1, void *arg2);
 s32 Player_HandleSpellInput(PlayerState *arg0);
 void Player_StartCastSpell(PlayerState *p, Actor *a, AnimEntry *anims);
-s32 func_80024FF0(u8 arg0);
-s32 func_8002504C(void);
+s32 Item_CountInInventory(u8 arg0);
+s32 Item_GetInventoryCount(void);
 void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2);
 void Player_StartOpenChest(PlayerState *arg0, Actor *arg1, s32 arg2);
 
@@ -731,13 +731,13 @@ void Player_Update(void) {
                         Spirit_SetCollected(((Unk8007A9C4 *) D_8007A9C4)->unk14);
                         ((Unk8007A9C4 *) D_8007A9C4)->unk10 |= 1;
                         D_8008C160 = 8;
-                        func_8002A7C8(0, 1, 0xFF);
+                        Sfx_Play(0, 1, 0xFF);
                     }
-                } else if (func_80024FC4() != 0 && D_8007A9C8 != NULL) {
+                } else if (Item_HasInventoryRoom() != 0 && D_8007A9C8 != NULL) {
                     Chest_Open(D_8007A9C8);
                     D_8007A918.x = 0.0f;
                     D_8007A918.z = p->actor.scale * 171.0f;
-                    func_800271B4(D_8007A9C8->rot, &D_8007A918);
+                    Math_RotateVec2(D_8007A9C8->rot, &D_8007A918);
                     p->actor.x = D_8007A9C8->x + D_8007A918.x;
                     p->actor.z = D_8007A9C8->z + D_8007A918.z;
                     p->actor.rot = D_8007A9C8->rot;
@@ -776,8 +776,8 @@ void Player_Update(void) {
         } else if (Player_CanAct(&D_8007AA08, &D_8007AA20) != 0) {
             if (!(D_8004DCA0 & 4) && (D_80092C86 & 0x10)) {
                 D_8004DCA0 ^= 1;
-                func_800269B8(6, 2, D_8004F5A0);
-                func_8002A7C8(0, 1, 0xFF);
+                Fade_Start(6, 2, D_8004F5A0);
+                Sfx_Play(0, 1, 0xFF);
                 p->actor.unk60 |= 1;
             }
             if (!(D_8004DCA0 & 1) && !(p->actor.unk68->unk0 & 0x40) && Player_HandleSpellInput(&D_8007AA08) != 0) {
@@ -791,8 +791,8 @@ void Player_Update(void) {
     } else if (D_8004DCA0 & 1) {
         if (D_80092C86 & 0x4010) {
             D_8004DCA0 ^= 1;
-            func_800269B8(6, 4, D_8004F5B4);
-            func_8002A7C8(0, 2, 0xFF);
+            Fade_Start(6, 4, D_8004F5B4);
+            Sfx_Play(0, 2, 0xFF);
             p->actor.unk60 &= ~1;
         }
     }
@@ -801,7 +801,7 @@ void Player_Update(void) {
         p->actor.unk64->unk10 += D_8007A9B4;
         p->actor.unk64->unk14 += D_8007A9B8;
         if (D_8007A9BC != 0xFF) {
-            if ((u32) func_80024FF0(D_8007A9BC) >= 3 || (u32) func_8002504C() >= 0x8D) {
+            if ((u32) Item_CountInInventory(D_8007A9BC) >= 3 || (u32) Item_GetInventoryCount() >= 0x8D) {
                 D_8007A9BC = 0xFF;
             }
         }
@@ -971,7 +971,7 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
     if (x != 0.0f || z != 0.0f) {
         D_8007A918.x = x;
         D_8007A918.z = z;
-        func_800271B4(D_80085E70, &D_8007A918);
+        Math_RotateVec2(D_80085E70, &D_8007A918);
         x = D_8007A918.x;
         z = D_8007A918.z;
     }
@@ -1029,7 +1029,7 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
         D_8007A90C += a->unk58;
         if (D_8007A90C >= 0x97) {
             D_8007A90C = 0;
-            func_8002A7C8(0, 0x21, 0xFF);
+            Sfx_Play(0, 0x21, 0xFF);
         }
         if (p->unk4 != 0) {
             if (!(p->unk4 & 3)) {
@@ -1081,7 +1081,7 @@ void Player_StateHurt(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             arg1->unk4 = 0xE6;
             Anim_SetCurrentAndNext(arg0, 9, 1, D_8007A910, 1, 1);
             Hud_ClearActorStatusIndicators(arg0);
-            func_8002A6B8(0x1E);
+            Bgm_Play(0x1E);
             D_8004DCA0 |= 0x880;
             D_8007A174 = arg1->unk4;
             D_8007A178 = 2;
@@ -1135,11 +1135,11 @@ void Player_StateTalk(Actor *arg0, PlayerState *arg1, CharData *arg2) {
                 arg1->unk0 = 3;
                 arg1->unk4 = 0x41;
                 arg0->unk60 |= 1;
-                func_8002A338(0x3C);
+                Audio_StartSeqFadeOut(0x3C);
             }
         } else if (arg1->unk8 & 0x40) {
             arg1->unk8 &= ~0x40;
-            func_8002A7C8(0, 0x3B, 0xFF);
+            Sfx_Play(0, 0x3B, 0xFF);
         }
         D_8007A9C0 = 0;
     }
@@ -1199,7 +1199,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
                 }
                 D_8007A918.x = 0.0f;
                 D_8007A918.z = 2.0f * (a->unk64->unk18 * a->scale);
-                func_800271B4(a->rot, &D_8007A918);
+                Math_RotateVec2(a->rot, &D_8007A918);
                 Effect_SpawnStreakBurst(a->x + D_8007A918.x, a->y + a->unk64->unk1C * a->scale * 0.7f, a->z + D_8007A918.z);
             }
             p->unk14->unk28++;
@@ -1290,7 +1290,7 @@ void Player_StateWalkToExitObject(Actor *arg0, PlayerState *arg1, s32 arg2) {
         Player_LoadAnim(arg0);
         Anim_UpdateRootMotion(arg0, arg0->unk52 * 0xC + arg2, arg0->scale);
         arg0->rot = arg1->unk138;
-        func_8002A7C8(0x1A, 8, 0xFF);
+        Sfx_Play(0x1A, 8, 0xFF);
     }
 }
 
@@ -1315,9 +1315,9 @@ void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
         if (arg1->unk4 == 0x20) {
             Item_BuildMessage(arg1->unk11C);
             Text_OpenWindow(1);
-            func_80025094(arg1->unk11C);
+            Item_AddToInventory(arg1->unk11C);
             D_8004DCA0 |= 2;
-            func_8002A7C8(0, 0x3B, 0xFF);
+            Sfx_Play(0, 0x3B, 0xFF);
         }
         if (--arg1->unk4 == 0) {
             arg0->rot = arg1->unk138;
@@ -1333,7 +1333,7 @@ void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
 
 void Player_StateUseItem(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     if (--arg1->unk4 == 0) {
-        func_800251CC(arg1->unk11C, arg0);
+        Item_ApplyEffect(arg1->unk11C, arg0);
         if (D_803AAAA2[arg1->unk11C].unk0 == 2) {
             Player_AddTurnMoveAgilityXP(arg1);
             arg1->unk2 = 0;
@@ -1357,7 +1357,7 @@ void Player_StateUseItem(Actor *arg0, PlayerState *arg1, CharData *arg2) {
 
 
 extern u16 D_8007A172;
-void func_8002A744(s32 arg0, s32 arg1, s32 arg2);
+void Bgm_PlayForMap(s32 arg0, s32 arg1, s32 arg2);
 
 void Player_StateBattleWon(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     f32 rot;
@@ -1385,7 +1385,7 @@ void Player_StateBattleWon(Actor *arg0, PlayerState *arg1, CharData *arg2) {
         arg1->unk0 = 0;
         arg0->unk60 &= 0xFFFD;
         if (D_8007A172 != 4) {
-            func_8002A744(D_800842BC, D_800842C0, 0x1E);
+            Bgm_PlayForMap(D_800842BC, D_800842C0, 0x1E);
         }
     }
 }
@@ -1474,7 +1474,7 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
             sz = sz * 2.0 / spd;
             spd = 2.0f;
         }
-        d = func_800270D0(sx, sz) - a->rot;
+        d = Math_Atan2(sx, sz) - a->rot;
         if (d > 3.141592653589793) {
             d -= 6.283185307179586;
         } else if (d < -3.141592653589793) {
@@ -1494,7 +1494,7 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         }
         D_8007A918.x = 0.0f;
         D_8007A918.z = cur + (spd - cur) * 0.85;
-        func_800271B4(a->rot, &D_8007A918);
+        Math_RotateVec2(a->rot, &D_8007A918);
         a->vx = D_8007A918.x;
         a->vz = D_8007A918.z;
         anim = 1;
@@ -1563,7 +1563,7 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p) {
             sz = sz * 2.0 / spd;
             spd = 2.0f;
         }
-        d = func_800270D0(sx, sz) - a->rot;
+        d = Math_Atan2(sx, sz) - a->rot;
         if (d > 3.141592653589793) {
             d -= 6.283185307179586;
         } else if (d < -3.141592653589793) {
@@ -1577,7 +1577,7 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         }
         D_8007A918.x = 0.0f;
         D_8007A918.z = newspd = cur + (spd - cur) * 0.2;
-        func_800271B4(a->rot, &D_8007A918);
+        Math_RotateVec2(a->rot, &D_8007A918);
         a->vx = D_8007A918.x;
         a->vz = D_8007A918.z;
         anim = 2;
@@ -1615,7 +1615,7 @@ void Player_GetAnimMotion(Actor *arg0, s32 arg1, Vec2f *arg2) {
     Anim_UpdateRootMotion(arg0, arg0->unk52 * 0xC + arg1, arg0->scale);
     arg2->x = -arg0->unk44;
     arg2->z = arg0->unk4C;
-    func_800271B4(arg0->rot, arg2);
+    Math_RotateVec2(arg0->rot, arg2);
 }
 
 void func_80006A50(void) {
@@ -1714,7 +1714,7 @@ s32 Player_FindNpcToTalk(PlayerState *arg0, Actor *arg1) {
                 if (dx * dx + dz * dz < r) {
                     D_8007A918.x = dx;
                     D_8007A918.z = dz;
-                    func_800271B4(arg1->rot, &D_8007A918);
+                    Math_RotateVec2(arg1->rot, &D_8007A918);
                     if (D_8007A918.z >= 0.0f && D_8007A918.x > -6.0 && D_8007A918.x < 6.0) {
                         ret++;
                         for (it = D_8007ABF0; &it->actor != a; it++) {
@@ -1884,12 +1884,12 @@ void Player_StartAreaExit(void) {
             D_8007A918.x = 0.0f;
             D_8007A918.z = 40.0f;
             p->actor.rot = r;
-            func_800271B4(r, &D_8007A918);
+            Math_RotateVec2(r, &D_8007A918);
             p->unk12C = D_8007A918.x;
             p->unk130 = D_8007A918.z;
             p->actor.unk60 |= 1;
-            func_8002A7C8(5, 0x21, 0xFF);
-            func_8002A7C8(0xF, 0x21, 0xFF);
+            Sfx_Play(5, 0x21, 0xFF);
+            Sfx_Play(0xF, 0x21, 0xFF);
             D_8007A174 = 0x13;
             break;
         case 2:
@@ -1934,7 +1934,7 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
         arg1->unk14 = 0.0f;
         arg1->vx = 0.0f;
         arg1->vz = 0.0f;
-        func_8002A7C8(0x1E, 9, 0xFF);
+        Sfx_Play(0x1E, 9, 0xFF);
     } else {
         arg0->unk0 = 9;
         arg0->unk4 = 8;
@@ -1952,7 +1952,7 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
         }
         arg0->unk6 = n;
         rot = pos->rot * 0.017453292519943295;
-        func_800271B4(-rot, &D_8007A918);
+        Math_RotateVec2(-rot, &D_8007A918);
         arg0->unk12C = (pos->x - D_8007A918.x * arg1->scale - arg1->x) / arg0->unk4;
         arg0->unk130 = (pos->z + D_8007A918.z * arg1->scale - arg1->z) / arg0->unk4;
         arg0->unk138 = rot;
@@ -2019,7 +2019,7 @@ void Player_LoadAnim(Actor *arg0) {
     if (D_8004DCF8 != arg0->unk52) {
         D_8004DCF8 = arg0->unk52;
         r = &D_80055F98[D_8004DCF8];
-        func_80028120(r->start, (void *) 0x80200000, r->end - r->start);
+        Dma_ReadRom(r->start, (void *) 0x80200000, r->end - r->start);
     }
 }
 
@@ -2072,7 +2072,7 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
                 }
                 dx -= dz * a->scale + arg0->unk64->unk1C * arg0->scale;
                 if (dx <= 0.0f) {
-                    func_800271B4(arg0->rot, &D_8007A918);
+                    Math_RotateVec2(arg0->rot, &D_8007A918);
                     r = r * 1.5;
                     if (D_8007A918.z >= 0.0f && -r < D_8007A918.x && D_8007A918.x < r) {
                         ret = *idx + 1;
@@ -2099,7 +2099,7 @@ void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     Anim_SetCurrentAndNext(arg1, 0xA, 1, D_8007A910, 1, 1);
     mon = &D_8007B908[arg0->unk2];
     dx = mon[-1].actor.x - arg1->x;
-    arg1->rot = func_800270D0(dx, mon[-1].actor.z - arg1->z);
+    arg1->rot = Math_Atan2(dx, mon[-1].actor.z - arg1->z);
     Camera_StartBattleFocus(0x23, arg1);
 }
 
@@ -2108,12 +2108,12 @@ s32 Player_RollMeleeHit(s32 arg0, Actor *arg1) {
     Monster *m = &D_8007B908[arg0];
 
     chance = (arg1->unk68->unk86 * 100) / (arg1->unk68->unk86 + ((m->actor.unk68->unk86 + 7) >> 3));
-    return func_80026E90(100) < chance;
+    return Math_Rand(100) < chance;
 }
 
 extern s32 D_8004DCFC[];
 extern u8 D_8004F760[];
-void func_800269B8(s32 arg0, u16 arg1, void *arg2);
+void Fade_Start(s32 arg0, u16 arg1, void *arg2);
 
 u16 Player_CalcMeleeDamage(PlayerState *arg0) {
     s32 n;
@@ -2137,9 +2137,9 @@ u16 Player_CalcMeleeDamage(PlayerState *arg0) {
         val = (D_8004DCFC[n] * val) >> 6;
     }
     val = (val * arg0->unk10E) >> 4;
-    if (func_80026E90((arg0->unk8 & 0x10000) ? 4 : 0x20) == 0) {
+    if (Math_Rand((arg0->unk8 & 0x10000) ? 4 : 0x20) == 0) {
         val += val >> 1;
-        func_800269B8(4, 0, D_8004F760);
+        Fade_Start(4, 0, D_8004F760);
         arg0->unk8 |= 0x400;
     }
     if (arg0->unk84 & 1) {
@@ -2163,7 +2163,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
         cd = D_80055D40[p->actor.unk50];
         if (dmg != 0) {
             if (arg1 & 0x8000) {
-                angle = func_800270D0(arg2->x - D_8007AA20.x, arg2->z - D_8007AA20.z) - D_8007AA20.rot;
+                angle = Math_Atan2(arg2->x - D_8007AA20.x, arg2->z - D_8007AA20.z) - D_8007AA20.rot;
                 if (angle > 3.141592653589793) {
                     angle -= 6.283185307179586;
                 } else if (angle < -3.141592653589793) {
@@ -2177,7 +2177,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
                 }
             }
             dmg = dmg * ((f32) arg2->unk68->unk84 / (f32) (arg2->unk68->unk84 + p->unk10C));
-            dmg += func_80026E90((u32) (sqrtf(dmg) * 0.75 + 1.0));
+            dmg += Math_Rand((u32) (sqrtf(dmg) * 0.75 + 1.0));
             if (dmg == 0) {
                 dmg++;
             }
@@ -2214,7 +2214,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
             Camera_Shake(2);
         }
         if (d != 0) {
-            func_8002A7C8(0, 0x18, 0xFF);
+            Sfx_Play(0, 0x18, 0xFF);
         }
     }
     return dmg;
@@ -2241,7 +2241,7 @@ void Player_StartDodge(void) {
             p->actor.unk60 |= 3;
             Anim_SetCurrentAndNext(&p->actor, 7, 1, D_8007A910, 1, 1);
             Hud_ShowActorPopup(&p->actor);
-            func_8002A7C8(0, 0x17, 0xFF);
+            Sfx_Play(0, 0x17, 0xFF);
         }
     }
 }
@@ -2299,7 +2299,7 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
         } else {
             sfx = 0x17;
         }
-        func_8002A7C8(0, sfx, 0xFF);
+        Sfx_Play(0, sfx, 0xFF);
         if (prev != arg0->unk120) {
             D_8008C15A = 8;
             D_8008C15C |= 1;
@@ -2324,7 +2324,7 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
         if (!arg0->unk120) {
             D_8004DCA0 &= ~4;
         }
-        func_8002A7C8(0, 0x13, 0xFF);
+        Sfx_Play(0, 0x13, 0xFF);
     }
     return ret;
 }
@@ -2482,21 +2482,21 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
                 D_8004DCA0 |= 8;
                 p->unk0 = 0;
                 D_8008C160 = 8;
-                func_8002A7C8(0, 1, 0xFF);
+                Sfx_Play(0, 1, 0xFF);
             }
         }
     }
     if (count != 0) {
-        func_8002A7C8(4, 0x35, 0xFF);
+        Sfx_Play(4, 0x35, 0xFF);
     }
     if (!(D_8004DCA0 & 0xA) && D_8007A9BC != 0xFF) {
         Item_BuildMessage(D_8007A9BC);
         Text_OpenWindow(1);
-        func_80025094(D_8007A9BF);
+        Item_AddToInventory(D_8007A9BF);
         D_8007A9BC = 0xFF;
         p->unk8 |= 2;
         D_8004DCA0 |= 2;
-        func_8002A7C8(0, 0x3B, 0xFF);
+        Sfx_Play(0, 0x3B, 0xFF);
     }
     if (!(D_8004DCA0 & 0xA)) {
         a->unk60 &= 0xFFFE;
