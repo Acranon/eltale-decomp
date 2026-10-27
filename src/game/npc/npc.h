@@ -3,11 +3,12 @@
 
 #include "common.h"
 #include "game/actor/actor.h"
+#include "game/math/math.h"
 
 struct CollResult;
 struct GfxFrameData; /* game/core/main.h */
 struct AnimSet;
-struct RomRange;
+struct MenuRomRange; /* game/ui/menu.h */
 
 /* An NPC definition record (the area's NPC list, NpcList). */
 typedef struct NpcDef {
@@ -55,9 +56,9 @@ typedef struct Npc {
 } Npc; /* 0x84 bytes */
 
 /* .bss 8007AB70..8007B900, in address order (unreferenced gaps included) */
-extern struct RomRange *npc_area_set_rom_range;
+extern struct MenuRomRange *npc_area_set_rom_range;
 extern u16 npc_walking_count;
-extern f32 npc_walk_step[2];
+extern Vec2f npc_walk_step;
 extern s32 D_8007AB80[2];
 extern struct CollResult npc_move_coll;
 extern s32 npc_count;
