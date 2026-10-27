@@ -1,35 +1,9 @@
-#include "common.h"
+#include "game/event/scene.h"
 
 /*
  * Scripted scene entry setup, timed messages, and transition audio.
  * Original file: 3B40.c (ROM 0x3B40).
  */
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ s32 unk2C;
-    /* 0x30 */ s32 unk30;
-    /* 0x34 */ void *unk34;
-    /* 0x38 */ s32 unk38;
-    /* 0x3C */ u16 unk3C;
-    /* 0x3E */ s16 unk3E;
-} Unk801C14E4; /* size 0x40 */
-
-typedef struct {
-    /* 0x0 */ u8 *unk0;
-    /* 0x4 */ u8 *unk4;
-    /* 0x8 */ u8 unk8;
-} Unk8007A8E8; /* size 0xC */
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -54,7 +28,6 @@ typedef struct {
 } Unk8007C288;
 
 void Player_Spawn(void);
-void Cutscene_CopyMessageBuffers(u8 *arg0, u8 *arg1);
 void func_80009764(u16 arg0);
 void Npc_SpawnForArea(s32 arg0, s32 arg1);
 void Map_LoadArea(void);
@@ -71,7 +44,7 @@ void Text_OpenWindow(u8 arg0);
 u8 D_8007A8C0[0x20];
 s32 cutscene_message_wait_frames;
 s32 cutscene_messages_remaining;
-Unk8007A8E8 *cutscene_next_message;
+SceneMessage *cutscene_next_message;
 s32 D_8007A8EC;
 
 extern s32 core_flags;
@@ -102,14 +75,14 @@ extern f32 D_80085E64;
 extern f32 D_80085E68;
 extern f32 camera_fovy;
 extern s32 text_active_window_count;
-extern Unk801C14E4 D_801C14E4[];
+extern SceneEntry D_801C14E4[];
 
 void Cutscene_StartEntry(s32 arg0) {
-    Unk801C14E4 *entry = &D_801C14E4[arg0];
+    SceneEntry *entry = &D_801C14E4[arg0];
     f32 mtx[4][4];
 
-    cutscene_next_message = entry->unk34;
-    cutscene_messages_remaining = entry->unk38;
+    cutscene_next_message = entry->messages;
+    cutscene_messages_remaining = entry->message_count;
     cutscene_message_wait_frames = 0x3C;
     map_id = -1;
     map_next_id = entry->unk0;
@@ -151,8 +124,8 @@ s32 Cutscene_UpdateMessageSequence(void) {
 
     if (cutscene_message_wait_frames == 0) {
         if (cutscene_messages_remaining != 0) {
-            Cutscene_CopyMessageBuffers(cutscene_next_message->unk0, cutscene_next_message->unk4);
-            Text_OpenWindow(cutscene_next_message->unk8);
+            Cutscene_CopyMessageBuffers(cutscene_next_message->text, cutscene_next_message->speaker_name);
+            Text_OpenWindow(cutscene_next_message->window_type);
             cutscene_message_wait_frames = 0xF;
             cutscene_next_message++;
             cutscene_messages_remaining--;
@@ -171,7 +144,7 @@ s32 Cutscene_UpdateMessageSequence(void) {
 }
 
 void Cutscene_StartAudioFadeForEntry(u32 arg0) {
-    Unk801C14E4 *entry;
+    SceneEntry *entry;
 
     if (arg0 > 6) {
         Audio_StartSeqFadeOut(0x40);

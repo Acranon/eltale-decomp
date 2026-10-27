@@ -1,45 +1,10 @@
-#include "common.h"
+#include "game/core/main.h"
 
 /*
  * Main runtime: game-state loops, graphics frame setup and submission,
  * plus the transition fades (style fade_transition_style).
  * Original file: 1870.c (ROM 0x1870).
  */
-
-typedef short NNScMsg;
-
-typedef struct SCClient_s {
-    struct SCClient_s *next;
-    OSMesgQueue *msgQ;
-} NNScClient;
-
-typedef struct SCTask_s {
-    struct SCTask_s *next;
-    u32 state;
-    u32 flags;
-    void *framebuffer;
-    OSTask list;
-    OSMesgQueue *msgQ;
-    OSMesg msg;
-} NNScTask;
-
-typedef struct {
-    u8 unk0[0x678];
-    u32 firstTime;
-} NNSched;
-
-/* one graphics frame: task + segment 2 data + display list */
-typedef struct {
-    /* 0x0000 */ u8 unk0[0x8A70]; /* matrices etc., segment 2 */
-    /* 0x8A70 */ Gfx dl[(0xDA70 - 0x8A70) / sizeof(Gfx)];
-    /* 0xDA70 */ s16 msg;
-    /* 0xDA74 */ u16 *framebuffer;
-} GfxFrameData; /* size 0xDA78 */
-
-typedef struct {
-    /* 0x0000 */ NNScTask task;
-    /* 0x0058 */ GfxFrameData data;
-} GfxFrame; /* size 0xDAD0 */
 
 #define OS_SC_SWAPBUFFER 0x0040
 
@@ -48,8 +13,9 @@ typedef struct {
  * that 1130.c increments) and 8007A8C0..8007A8F0 stay in the asm slab.
  * D_8007A254 (a queue inside core_sched) and the low words D_8007A8AC and
  * D_8007A8BC are aliases in undefined_syms.txt. D_8007A194..D_8007A19C,
- * D_8007A1A4, D_8007A1CE, D_8007A1DC, D_8007A85C and D_8007A864 are
- * unreferenced gaps. */
+ * D_8007A1A4, D_8007A1CE, D_8007A1DC and D_8007A864 are
+ * unreferenced gaps. core_sched (NNSched) is 8-aligned, so its size is 0x680:
+ * 8007A85C is its tail padding. */
 u16 core_game_mode; /* loop: 1 gameplay, 2 menu, 3 title, 4 intro, 5 ending, 6/7 cutscenes (0 = 1) */
 u16 D_8007A172;
 s32 core_transition_timer;
@@ -79,7 +45,6 @@ s32 gfx_dl_peak_len;
 void *gfx_segment1_base;
 s32 D_8007A1DC;
 NNSched core_sched;
-s32 D_8007A85C;
 OSMesgQueue *gfx_sched_mq;
 s32 D_8007A864;
 NNScClient gfx_sched_client;
@@ -93,16 +58,6 @@ void nnScCreateScheduler(NNSched *sc, u8 numFields);
 void nnScStartScheduler(NNSched *sc);
 OSMesgQueue *nnScGetGfxMQ(NNSched *sc);
 void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
-void Core_ResetGameState(void);
-void Gfx_InitFrames(void);
-void Gfx_InitFrameTask(GfxFrame *arg0);
-void Core_RunGameplayLoop(void);
-void Core_RunMessageCutsceneLoop(void);
-void Core_RunCameraCutsceneLoop(void);
-void Core_RunMenuLoop(void);
-void Core_RunTitleLoop(void);
-void Core_RunIntroLoop(void);
-void Core_RunEndingLoop(void);
 void Player_Init(void);
 void Boss_ClearDefeated(void);
 void Env_InitClock(void);
@@ -144,21 +99,7 @@ extern u64 D_80070260[]; /* gfx ucode data */
 s32 core_flags = 0;
 extern OSViMode D_8006CDF0;
 extern OSViMode D_8006D6B0;
-extern u16 core_game_mode;
-extern u16 D_8007A172;
-extern u16 fade_transition_style;
-extern s32 gfx_frame_index;
-extern OSMesgQueue dma_mesg_queue;
-extern OSMesg dma_mesg;
-extern u8 title_menu_choice;
-extern s8 D_8007A1CD;
-extern void *gfx_segment1_base;
-extern NNSched core_sched;
 extern OSMesgQueue D_8007A254;
-extern OSMesgQueue *gfx_sched_mq;
-extern NNScClient gfx_sched_client;
-extern OSMesgQueue gfx_mesg_queue;
-extern OSMesg gfx_mesgs[];
 extern f32 player_spawn_x;
 extern f32 player_spawn_z;
 extern f32 player_spawn_rot;
@@ -346,12 +287,6 @@ void Gfx_InitFrameTask(GfxFrame *arg0) {
     arg0->task.framebuffer = arg0->data.framebuffer;
 }
 
-extern Gfx *gfx_dl_head;
-extern s32 gfx_clear_r;
-extern s32 gfx_clear_g;
-extern u32 gfx_clear_b;
-extern s32 gfx_scene_light_slot;
-extern s32 gfx_dl_peak_len;
 extern s32 player_light_slot;
 extern u16 map_env_flags;
 s32 D_8004DCA4 = 0;
@@ -513,13 +448,10 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
     arg0->task.list.t.data_size = (gfx_dl_head - sub->dl) * sizeof(Gfx);
 }
 
-extern s32 gfx_mtx_index;
-extern s32 gfx_frame_sent;
 extern s8 bgm_current;
 extern s8 menu_save_loaded;
 extern s8 input_primary_port;
 extern u16 fade_flags;
-void Gfx_WaitForFrameMessage(s16 arg0);
 void Player_SetSpawnFromSaveTable(void);
 void Bgm_Update(void);
 void Bgm_Play(s32 arg0);
@@ -537,10 +469,6 @@ typedef struct {
     u8 unk4[0x2C];
 } Unk80084998;
 
-extern u16 nnsc_retrace_count;
-extern s32 core_transition_timer;
-extern u16 core_fade_out_time;
-extern s32 D_8007A1C4;
 extern s32 env_clock;
 extern Unk80084998 env_light_slots[];
 extern s32 effect_mapobj_emitter_count;
@@ -548,8 +476,6 @@ extern s8 sfx_master_volume;
 extern u8 D_801C0000[];
 extern u8 D_E420D0[];
 extern u8 D_E43780[];
-void Fade_StartTransitionIn(void);
-void Fade_StartTransitionOut(void);
 void Cutscene_StartEntry(s32 arg0);
 s32 Cutscene_UpdateMessageSequence(void);
 void Cutscene_StartAudioFadeForEntry(s32 arg0);
@@ -591,9 +517,6 @@ typedef struct {
     s32 unk4;
 } Unk80084300;
 
-extern u64 core_frame_start_time;
-extern u64 core_frame_end_time;
-extern u64 D_8007A8B8;
 extern PlayerState player_state;
 extern u8 D_8007AA20[];
 extern s32 map_subarea;

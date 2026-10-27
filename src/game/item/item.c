@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/item/item.h"
 
 /*
  * Items: the 150-slot inventory (item_inventory), the in-field inventory menu with its icon cache,
@@ -7,32 +7,9 @@
  */
 
 typedef struct {
-    /* 0x0 */ u16 unk0;
-    /* 0x2 */ u16 unk2;
-    /* 0x4 */ s16 unk4;
-    /* 0x6 */ s16 unk6;
-    /* 0x8 */ char unk8[4];
-} Struct_803AAAA0;
-
-typedef struct {
-    char unk0[4];
-    u16 unk4;
-    u16 unk6;
-    u16 unk8;
-    u16 unkA;
-} Struct_80026054_64;
-
-typedef struct {
-    char unk0[0x64];
-    Struct_80026054_64* unk64;
-} Struct_80026054;
-
-typedef struct {
     char unk0[0x14];
     u16 unk14;
 } Struct_8007C288;
-
-typedef s32 (*ItemFunc)(void*, Struct_803AAAA0*, u8);
 
 extern u8 D_D384B0[];
 extern u8 D_8007AA20[];
@@ -41,19 +18,11 @@ extern u16 map_flags;
 extern u16 battle_flags;
 extern u8 D_8008CA4E;
 extern u8 D_803AC460[];
-extern Struct_803AAAA0 D_803AAAA0[];
+extern ItemDef D_803AAAA0[];
 
 void Dma_ReadRom(void*, void*, s32);
 void Player_StartUseItem(u8);
 void Magic_CreateCastEffect(s32, s32, s32, s32);
-
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ char unkC[0x64 - 0xC];
-    /* 0x64 */ Struct_80026054_64* unk64;
-} Struct_80026140;
 
 typedef struct {
     /* 0x0 */ s16 unk0;
@@ -78,10 +47,6 @@ typedef struct {
 } Struct_80084300;
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
     char unk0[0xA];
 } Struct_803AB358;
 
@@ -98,18 +63,10 @@ extern Struct_803AAA40 D_803AAA40[];
 extern Struct_803AB358 D_803AB358[];
 extern Struct_803AB36C D_803AB36C[];
 
-void Effect_AddFloatingNumber(Struct_80026140*, s32, s32);
-void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AB358*, Vec3f*, Struct_80026140*);
+void Effect_AddFloatingNumber(Actor*, s32, s32);
+void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AB358*, Vec3f*, Actor*);
 void Sfx_Play(s32, s32, s32);
 
-s32 Item_CanUseNever(s32 arg0, Struct_803AAAA0* arg1);
-s32 Item_CanUseRestore(Struct_80026054* arg0, Struct_803AAAA0* arg1);
-s32 Item_CanUseWarp(s32 arg0, Struct_803AAAA0* arg1);
-s32 Item_CanUseSpell(s32 arg0, Struct_803AAAA0* arg1);
-void Item_UseNothing(s32 arg0, Struct_803AAAA0* arg1);
-void Item_UseRestore(Struct_80026140* arg0, Struct_803AAAA0* arg1);
-void Item_UseWarp(Struct_80026140* arg0, Struct_803AAAA0* arg1);
-void Item_UseSpell(s32 arg0, Struct_803AAAA0* arg1);
 
 /* .bss 8008C190..8008CA50, in address order (IDO emits .bss by first declaration). */
 Vec3f item_effect_scale;
@@ -123,17 +80,17 @@ u8 item_icon_cache_tex[0x800];
 u8 item_inventory[0x97];
 
 /* .data 8004F4A0..8004F4D0 */
-ItemFunc item_can_use_handlers[] = {
-    (ItemFunc) Item_CanUseNever,
-    (ItemFunc) Item_CanUseRestore,
-    (ItemFunc) Item_CanUseWarp,
-    (ItemFunc) Item_CanUseSpell,
+ItemHandler item_can_use_handlers[] = {
+    (ItemHandler) Item_CanUseNever,
+    (ItemHandler) Item_CanUseRestore,
+    (ItemHandler) Item_CanUseWarp,
+    (ItemHandler) Item_CanUseSpell,
 };
-ItemFunc item_use_handlers[] = {
-    (ItemFunc) Item_UseNothing,
-    (ItemFunc) Item_UseRestore,
-    (ItemFunc) Item_UseWarp,
-    (ItemFunc) Item_UseSpell,
+ItemHandler item_use_handlers[] = {
+    (ItemHandler) Item_UseNothing,
+    (ItemHandler) Item_UseRestore,
+    (ItemHandler) Item_UseWarp,
+    (ItemHandler) Item_UseSpell,
 };
 u16 item_menu_bob_phase = 0; /* only Item_UpdateInventoryMenu uses it */
 
@@ -213,7 +170,7 @@ void Item_AddToInventory(u8 arg0) {
 
 s32 Item_TryUse(u8 arg0) {
     s32 ret = 0;
-    Struct_803AAAA0* item = &D_803AAAA0[arg0];
+    ItemDef* item = &D_803AAAA0[arg0];
 
     if ((battle_flags & 1) && (item->unk0 & 2)) {
         ret = 1;
@@ -237,7 +194,7 @@ s32 func_80025228(u16 arg0) {
     s32 found = 0;
     u8* p = item_inventory;
     s32 i = 0x96;
-    Struct_803AAAA0* e;
+    ItemDef* e;
 
     while (!found && *p != 0xFF) {
         e = &D_803AAAA0[*p++];
@@ -260,7 +217,6 @@ s32 func_80025228(u16 arg0) {
 
 #ifdef NON_MATCHING
 /* stack homes, saved registers and frame differ; code is equivalent */
-void Item_DrawMenuFrame(s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, void*);
 void Fade_Start(s32, s32, void*);
 extern Gfx* gfx_dl_head;
@@ -460,13 +416,13 @@ void Item_UpdateInventoryMenu(void) {
 #pragma GLOBAL_ASM("asm/nonmatchings/game/item/item/Item_UpdateInventoryMenu.s")
 #endif
 
-s32 Item_CanUseNever(s32 arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseNever(s32 arg0, ItemDef* arg1) {
     return 0;
 }
 
-s32 Item_CanUseRestore(Struct_80026054* arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseRestore(Actor* arg0, ItemDef* arg1) {
     s32 ret = 0;
-    Struct_80026054_64* temp = arg0->unk64;
+    ActorStats* temp = arg0->unk64;
 
     if ((arg1->unk4 != 0) && (temp->unk6 != temp->unk4)) {
         ret = 1;
@@ -477,7 +433,7 @@ s32 Item_CanUseRestore(Struct_80026054* arg0, Struct_803AAAA0* arg1) {
     return ret;
 }
 
-s32 Item_CanUseWarp(s32 arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseWarp(s32 arg0, ItemDef* arg1) {
     s32 ret;
 
     if ((map_flags & 0xA) || (map_subarea_def->unk14 & 4)) {
@@ -488,7 +444,7 @@ s32 Item_CanUseWarp(s32 arg0, Struct_803AAAA0* arg1) {
     return ret;
 }
 
-s32 Item_CanUseSpell(s32 arg0, Struct_803AAAA0* arg1) {
+s32 Item_CanUseSpell(s32 arg0, ItemDef* arg1) {
     s32 ret = 1;
 
     if ((battle_flags & 0x100) && (arg1->unk0 & 8)) {
@@ -498,12 +454,12 @@ s32 Item_CanUseSpell(s32 arg0, Struct_803AAAA0* arg1) {
 }
 
 // empty
-void Item_UseNothing(s32 arg0, Struct_803AAAA0* arg1) {
+void Item_UseNothing(s32 arg0, ItemDef* arg1) {
 }
 
-void Item_UseRestore(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
+void Item_UseRestore(Actor* arg0, ItemDef* arg1) {
     u16 amt;
-    Struct_80026054_64* st = arg0->unk64;
+    ActorStats* st = arg0->unk64;
     Struct_803AB358* fx;
 
     if (arg1->unk4 != 0) {
@@ -526,11 +482,11 @@ void Item_UseRestore(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     item_effect_scale.y = D_803AB36C[0].unkC;
     fx = &D_803AB358[D_803AB36C[0].unk0];
     item_effect_scale.z = 1.0f;
-    Magic_CreateVisualEffect(D_803AB36C[0].unk2, D_803AB36C[0].unk4, arg0->unk0, arg0->unk4, arg0->unk8, 0.0f, fx, &item_effect_scale, arg0);
+    Magic_CreateVisualEffect(D_803AB36C[0].unk2, D_803AB36C[0].unk4, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
     Sfx_Play(0, 0xB, 0xFF);
 }
 
-void Item_UseWarp(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
+void Item_UseWarp(Actor* arg0, ItemDef* arg1) {
     Struct_803AB358* fx;
 
     core_flags |= 0x80;
@@ -548,11 +504,11 @@ void Item_UseWarp(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     item_effect_scale.y = D_803AB36C[1].unkC;
     fx = &D_803AB358[D_803AB36C[1].unk0];
     item_effect_scale.z = 1.0f;
-    Magic_CreateVisualEffect(D_803AB36C[1].unk2, D_803AB36C[1].unk4, arg0->unk0, arg0->unk4, arg0->unk8, 0.0f, fx, &item_effect_scale, arg0);
+    Magic_CreateVisualEffect(D_803AB36C[1].unk2, D_803AB36C[1].unk4, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
     Sfx_Play(0, 0x3B, 0xFF);
 }
 
-void Item_UseSpell(s32 arg0, Struct_803AAAA0* arg1) {
+void Item_UseSpell(s32 arg0, ItemDef* arg1) {
     Magic_CreateCastEffect(arg0, arg1->unk4, 0, 4);
 }
 

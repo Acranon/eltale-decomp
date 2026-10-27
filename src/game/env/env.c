@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/env/env.h"
 
 /*
  * World clock and environment: day counter, day-phase palette fades, the lighting/fog
@@ -6,16 +6,8 @@
  * Original file: 12610.c (ROM 0x12610).
  */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ u16 unkC;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ f32 unk14;
-} Unk80084300;
-
-typedef struct {
+/* This file's view of an exit record (h_world owns the type; H2 drops this copy). */
+typedef struct ExitDef {
     /* 0x00 */ u8 pad0[8];
     /* 0x08 */ f32 unk8;
     /* 0x0C */ u8 padC[8];
@@ -24,49 +16,15 @@ typedef struct {
     /* 0x1A */ u16 unk1A;
     /* 0x1C */ u8 pad1C[2];
     /* 0x1E */ u16 unk1E[3];
-} Unk80011A10Arg;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 *unk10;
-    /* 0x14 */ s32 *unk14;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s32 unk20;
-    /* 0x24 */ s32 *unk24;
-    /* 0x28 */ s32 *unk28;
-    /* 0x2C */ s32 *unk2C;
-} Unk80084998; /* size 0x30 */
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 pad4[0x38];
-} Unk80084994Elem; /* size 0x3C */
-
-typedef struct {
-    /* 0x00 */ Unk80084994Elem *unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ s32 unk14;
-} Unk80084994;
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 z;
-} Vec2f_12610;
+} ExitDef; /* 0x24 bytes */
 
 /* This file's .bss, 80084300..80084B80, in address order (first declaration fixes
  * the order). exit_local_offset is used only by 113F0 (it sits between this file's
  * objects). The asm's interior labels (D_80084308.., D_80084B1C..D_80084B44,
  * D_80084B24, D_80084B60..D_80084B74, D_80084B7C) are aliases in undefined_syms.txt. */
-Unk80084300 exit_destination;
+ExitDestination exit_destination;
 u16 *exit_destination_src;
-Vec2f_12610 exit_local_offset;
+Vec2f exit_local_offset;
 u8 D_80084328[8]; /* unreferenced */
 s32 env_next_phase;
 s32 env_last_phase_start;
@@ -87,19 +45,12 @@ s32 env_light_time;
 s32 env_light_period;
 u16 env_day_count;
 u16 env_play_time;
-Unk80084994 *env_area_settings;
-Unk80084998 env_light_slots[8];
+EnvAreaSettings *env_area_settings;
+EnvLightSlot env_light_slots[8];
 s32 env_light_colors[4][3];
 s32 env_light_dirs[4][3];
 s32 env_fog_range[2];
 extern s32 D_8008C164;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-} Unk8004DEF4; /* size 0xC */
-
 
 extern u16 map_backdrop_tlut[];
 extern u16 map_backdrop_phase_tluts[][0x100];
@@ -107,64 +58,26 @@ extern u16 map_flags;
 extern u16 battle_flags;
 extern s32 core_flags;
 extern s32 D_8008C168;
-typedef struct {
-    /* 0x00 */ s32 r;
-    /* 0x04 */ s32 g;
-    /* 0x08 */ s32 b;
-} Color3;
-
-typedef struct {
-    /* 0x00 */ s32 near;
-    /* 0x04 */ s32 far;
-} FogSet;
-
-typedef struct {
-    /* 0x00 */ s32 time;
-    /* 0x04 */ Color3 amb;
-    /* 0x10 */ struct {
-        Color3 l[3];
-    } lights;
-    /* 0x34 */ FogSet fog;
-} Keyframe; /* size 0x3C */
-
-typedef struct {
-    Color3 l[3];
-} LightSet3;
-
-extern LightSet3 D_80084B24;
-
-typedef struct {
-    /* 0x00 */ Keyframe *frames;
-    /* 0x04 */ s32 count;
-} KeyTrack;
 
 /* This file's .data, 8004DED0..8004DF00: the day-phase table (env_day_phase_last is
  * its last entry, named separately by the asm). */
-Unk8004DEF4 env_day_phases[3] = {
+EnvDayPhase env_day_phases[3] = {
     { 0x15F9, 0, 0x80 },
     { 0x2328, 1, 0x80 },
     { 0x4AB5, 2, 0x80 },
 };
-Unk8004DEF4 env_day_phase_last[1] = {
+EnvDayPhase env_day_phase_last[1] = {
     { 0x537F, 3, 0x80 },
 };
 
-void Env_InterpolateLighting(s32, Unk80084994 *);
-void Env_StepPaletteFade(s32);
-void Env_StartPaletteFade(s32, u16 *, u16 *);
 extern u16 map_env_flags;
 extern s32 gfx_frame_index;
 extern Gfx *gfx_dl_head;
 extern s16 gfx_fog_near;
 extern s16 gfx_fog_far;
 
-void Env_ClearLightSlots(void);
-void Env_ComputeLightDirs(void);
-void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
 void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
-void Math_MtxFMulVecTransposed(Mtx *, f32, f32, f32, f32 *, f32 *, f32 *);
 extern Mtx camera_view_mtx;
-void Env_FillLights3(Lights3 *arg0, s32 (*arg1)[3], s32 (*arg2)[3]);
 extern s32 D_80084B60;
 extern s32 D_80084B64;
 extern s32 D_80084B68;
@@ -175,7 +88,7 @@ extern s32 gfx_clear_r;
 extern s32 gfx_clear_g;
 extern s32 gfx_clear_b;
 
-void Exit_SetDestination(Unk80011A10Arg *arg0) {
+void Exit_SetDestination(ExitDef *arg0) {
     exit_destination_src = arg0->unk1E;
     exit_destination.unk0 = exit_destination_src[0];
     exit_destination.unk4 = exit_destination_src[1];
@@ -202,12 +115,12 @@ void Env_InitClock(void) {
 #ifdef NON_MATCHING
 /* &env_day_phase_last held in a register instead of separate %hi/%lo loads, temporaries rotated (register allocation); code is equivalent */
 void Env_InitForMap(void) {
-    Unk8004DEF4 *p;
+    EnvDayPhase *p;
     s32 i;
     s32 n;
     u16 *src;
     u16 *dst;
-    Unk80084994Elem *e;
+    EnvKeyframe *e;
 
     /* env_day_phases[0..2] and env_day_phase_last form one 4-entry table; the walk goes back from its last entry */
     env_last_phase_start = env_day_phase_last[0].unk0;
@@ -243,9 +156,9 @@ void Env_InitForMap(void) {
         env_light_time = env_clock;
         env_light_period = env_day_length;
     } else {
-        e = &env_area_settings->unk0[env_area_settings->unk4 - 1];
+        e = &env_area_settings->frames[env_area_settings->count - 1];
         env_light_time = 0;
-        env_light_period = e->unk0;
+        env_light_period = e->time;
     }
     Env_ClearLightSlots();
     env_play_time_ticks = 0;
@@ -255,7 +168,7 @@ void Env_InitForMap(void) {
 #endif
 
 void Env_Update(void) {
-    Unk8004DEF4 *p;
+    EnvDayPhase *p;
 
     Env_InterpolateLighting(env_light_time, env_area_settings);
     if (env_palette_fade_timer != 0) {
@@ -308,26 +221,25 @@ void Env_SetClock(s32 arg0) {
 
 #ifdef NON_MATCHING
 /* 8-byte frame with one saved register where retail is a no-frame leaf, light pointers rematerialized differently (register allocation); code is equivalent */
-void Env_InterpolateLighting(s32 t, Unk80084994 *arg1) {
-    KeyTrack *track = (KeyTrack *) arg1;
-    Keyframe *k;
-    Keyframe *prev;
+void Env_InterpolateLighting(s32 t, EnvAreaSettings *arg1) {
+    EnvKeyframe *k;
+    EnvKeyframe *prev;
     s32 span;
     s32 off;
     s32 rem;
-    Color3 *ambient = (Color3 *) env_light_colors[0];
-    Color3 *light;
-    FogSet *fog = (FogSet *) env_fog_range;
-    Color3 *before;
-    Color3 *after;
+    EnvColor *ambient = (EnvColor *) env_light_colors[0];
+    EnvColor *light;
+    EnvFogRange *fog = (EnvFogRange *) env_fog_range;
+    EnvColor *before;
+    EnvColor *after;
 
-    k = track->frames;
-    if (track->count == 1) {
+    k = arg1->frames;
+    if (arg1->count == 1) {
         *ambient = k->amb;
-        light = (Color3 *) env_light_colors[1]; /* D_80084B24 */
-        *light++ = k->lights.l[0];
-        *light++ = k->lights.l[1];
-        *light++ = k->lights.l[2];
+        light = (EnvColor *) env_light_colors[1]; /* D_80084B24 */
+        *light++ = k->lights[0];
+        *light++ = k->lights[1];
+        *light++ = k->lights[2];
         *fog = k->fog;
         return;
     }
@@ -338,7 +250,7 @@ void Env_InterpolateLighting(s32 t, Unk80084994 *arg1) {
     span = k->time - prev->time;
     off = t - prev->time;
     rem = span - off;
-    light = (Color3 *) env_light_colors[1]; /* D_80084B24 */
+    light = (EnvColor *) env_light_colors[1]; /* D_80084B24 */
     before = &prev->amb;
     after = &k->amb;
     ambient->r = (before->r * rem + after->r * off) / span;
@@ -389,7 +301,7 @@ void Env_ComputeLightDirs(void) {
 
     if (map_env_flags & 1) {
         angle = (f32)env_light_time * 3.141592653589793 * 2 / (f32)env_light_period - 3.141592653589793;
-        Math_MtxFRotate(env_light_rot_mtx, 0.0f, 0.0f, angle);
+        Math_MtxFRotate((MtxF *)env_light_rot_mtx, 0.0f, 0.0f, angle);
         guMtxXFMF(env_light_rot_mtx, 0.0f, 90.0f, 50.0f, &x, &y, &z);
         env_light_dirs[0][0] = x;
         env_light_dirs[0][1] = y;
@@ -403,7 +315,7 @@ void Env_ComputeLightDirs(void) {
         env_light_dirs[0][1] = 89;
         env_light_dirs[0][2] = 20;
     }
-    Math_MtxFMulVecTransposed(&camera_view_mtx, -89.0f, 89.0f, 20.0f, &x, &y, &z);
+    Math_MtxFMulVecTransposed((MtxF *)&camera_view_mtx, -89.0f, 89.0f, 20.0f, &x, &y, &z);
     env_light_dirs[1][0] = x;
     env_light_dirs[1][1] = y;
     env_light_dirs[1][2] = z;
@@ -465,7 +377,7 @@ void Env_StepPaletteFade(s32 arg0) {
 }
 
 void Env_ClearLightSlots(void) {
-    Unk80084998 *p = env_light_slots;
+    EnvLightSlot *p = env_light_slots;
     s32 i = 8;
 
     do {
@@ -476,7 +388,7 @@ void Env_ClearLightSlots(void) {
 }
 
 s32 Env_AllocateLightSlot(void) {
-    Unk80084998 *p = &env_light_slots[7];
+    EnvLightSlot *p = &env_light_slots[7];
     s32 i = 7;
 
     while (p->unk0 != 0) {
@@ -498,7 +410,7 @@ void Env_FreeLightSlot(s32 arg0) {
 }
 
 void Env_SetSlotEnvAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
-    Unk80084998 *p = &env_light_slots[arg0];
+    EnvLightSlot *p = &env_light_slots[arg0];
 
     p->unk4 = arg1;
     p->unk8 = p->unkC = arg2;
@@ -506,7 +418,7 @@ void Env_SetSlotEnvAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
 }
 
 void Env_SetSlotLightAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
-    Unk80084998 *p = &env_light_slots[arg0];
+    EnvLightSlot *p = &env_light_slots[arg0];
 
     p->unk18 = arg1;
     p->unk20 = p->unk1C = arg2;
@@ -525,7 +437,7 @@ void Env_ApplyLightSlot(s32 idx) {
     s32 g;
     Lights3 *l;
     s32 (*cols)[3];
-    Unk80084998 *p;
+    EnvLightSlot *p;
     s32 pad; /* Retain the original -g3 local stack home. */
     s32 (*dirs)[3];
     s32 tmp[4][3];

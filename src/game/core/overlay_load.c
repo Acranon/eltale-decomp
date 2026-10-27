@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/core/overlay_load.h"
 
 /*
  * Load the title, intro, and ending ROM overlays into the shared overlay region.

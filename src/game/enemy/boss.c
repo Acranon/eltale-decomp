@@ -1,4 +1,5 @@
 #include "common.h"
+#include "game/enemy/boss.h"
 
 /*
  * Bosses (8, one per map/sub-area in D_803AB3D0): defeated bits, the boss standing on
@@ -7,73 +8,16 @@
  * Original file: DAE0.c (ROM 0xDAE0).
  */
 
-typedef struct {
-    f32 x;
-    f32 y;
-    f32 z;
-} Vec3f;
-
-typedef struct {
+/* local copy of game/map/collision.h's CollResult until H2 */
+typedef struct CollResult {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ u8 pad14[0x10];
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
-    /* 0x34 */ f32 unk34;
-    /* 0x38 */ u8 pad38[0x18];
-    /* 0x50 */ s16 unk50;
-    /* 0x52 */ s16 unk52;
-    /* 0x54 */ u8 pad54[4];
-    /* 0x58 */ u16 unk58;
-    /* 0x5A */ u8 pad5A[4];
-    /* 0x5E */ u16 unk5E;
-    /* 0x60 */ s16 unk60;
-    /* 0x62 */ u8 pad62[2];
-    /* 0x64 */ u16 *unk64;
-    /* 0x68 */ void *unk68;
-} Unk8007C174; /* size 0x6C */
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ u8 pad4[2];
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u8 pad8[4];
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ u16 unkE;
-    /* 0x10 */ u8 pad10[8];
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ u8 pad1C[4];
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ u8 pad24[6];
-    /* 0x2A */ u16 unk2A;
-    /* 0x2C */ u8 pad2C[0xC];
-} Unk803AB820; /* size 0x38 */
-
-typedef struct {
-    /* 0x000 */ s16 unk0;
-    /* 0x002 */ u8 pad2[6];
-    /* 0x008 */ u16 unk8;
-    /* 0x00A */ u16 unkA;
-    /* 0x00C */ u16 unkC;
-    /* 0x00E */ u8 padE[2];
-    /* 0x010 */ f32 unk10;
-    /* 0x014 */ u8 pad14[0x14];
-    /* 0x028 */ Unk803AB820 *unk28;
-    /* 0x02C */ Unk8007C174 unk2C;
-    /* 0x098 */ s16 unk98;
-    /* 0x09A */ u8 pad9A[0x82];
-    /* 0x11C */ u16 unk11C;
-    /* 0x11E */ u16 unk11E;
-    /* 0x120 */ u16 unk120;
-    /* 0x122 */ u8 pad122[6];
-    /* 0x128 */ f32 unk128;
-} Unk8007C148;
+    /* 0x0C */ f32 nx;
+    /* 0x10 */ f32 ny;
+    /* 0x14 */ f32 nz;
+    /* 0x18 */ u16 flags;
+} CollResult;
 
 typedef struct {
     /* 0x00 */ u16 unk0;
@@ -89,15 +33,6 @@ typedef struct {
     /* 0x00 */ u32 start;
     /* 0x04 */ u32 end;
 } RomRange;
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-} Unk8007C0B0;
 
 typedef struct {
     /* 0x00 */ u8 pad0[8];
@@ -118,27 +53,22 @@ typedef struct {
 
 f32 sqrtf(f32);
 void Dma_ReadRom();
-void Boss_Spawn(s32, f32, f32, f32, Unk8007C148 *);
-u8 Boss_IsDefeated(u32);
-void Anim_DrawModel(s32, Unk8007C174 *, void *, s32);
-void Anim_AdvanceFrame(s32, Unk8007C174 *, void *);
+void Anim_DrawModel(s32, Actor *, void *, s32);
+void Anim_AdvanceFrame(s32, Actor *, void *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
-void Anim_SetCurrentAndNext(Unk8007C174 *, s32, s32, s32, s32, u16);
-void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, Unk8007C0B0 *);
+void Anim_SetCurrentAndNext(Actor *, s32, s32, s32, s32, u16);
+void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, CollResult *);
 
-/* This file's .bss, 8007C0B0..8007C280, in address order. D_8007C0C8,
- * D_8007C144, D_8007C274 and D_8007C278 are unreferenced gaps (boss_field_record is
- * probably an Enemy-like record of 0x130 bytes, like AEA0's enemy_slots[]).
- * Splat's labels inside boss_field_record (D_8007C174..D_8007C1D8, its unk2C object)
- * are aliases in undefined_syms.txt. */
-Unk8007C0B0 boss_spawn_coll;
-s32 D_8007C0C8[2];
-Unk8007C174 boss_camera_target;
+/* This file's .bss, 8007C0B0..8007C280, in address order (first declared in boss.h).
+ * D_8007C0CC, D_8007C144 and D_8007C278 are unreferenced gaps. Splat's labels inside
+ * boss_field_record (D_8007C174..D_8007C1D8, its actor) are aliases in undefined_syms.txt. */
+CollResult boss_spawn_coll;
+s32 D_8007C0CC;
+Actor boss_camera_target;
 u8 boss_defeated_bits[4];
 s32 boss_field_index;
 s32 D_8007C144;
-Unk8007C148 boss_field_record;
-s32 D_8007C274;
+Enemy boss_field_record;
 s32 D_8007C278[2];
 
 extern u8 math_bit_masks[];
@@ -148,8 +78,8 @@ extern u8 D_802A7BC0[];
 extern RomRange D_803AB390[];
 extern Unk803AB3D0 D_803AB3D0[];
 extern f32 D_803AB48C[];
-extern Unk803AB820 D_803AB820[];
-extern Unk803AB820 D_803AB9A8;
+extern EnemyDef D_803AB820[];
+extern EnemyDef D_803AB9A8;
 extern u8 *D_803ABA58[];
 extern s32 map_id;
 extern s32 map_subarea;
@@ -158,7 +88,7 @@ extern u8 text_message_buf[];
 extern u8 *D_803AC418[];
 extern u8 *D_803AC438[];
 extern u8 D_803AC328[];
-extern Unk803AB820 D_803AB4B0[];
+extern EnemyDef D_803AB4B0[];
 extern s32 core_flags;
 extern s16 D_8007A172;
 extern s32 core_transition_timer;
@@ -167,7 +97,7 @@ extern s16 core_fade_out_time;
 u16 boss_reward_max_hp[8] = { 10, 10, 15, 20, 20, 25, 25, 0 };
 u16 boss_reward_max_mp[8] = { 5, 5, 5, 10, 10, 15, 15, 0 };
 extern Unk8007A9D0 player_stats;
-void Camera_SetTargetView(Unk803AB820 *, Unk8007C174 *);
+void Camera_SetTargetView(EnemyDef *, Actor *);
 void Text_OpenWindow(s32);
 
 void Boss_ClearDefeated(void) {
@@ -199,18 +129,18 @@ void Boss_LoadForArea(void) {
 }
 
 void Boss_Draw(s32 arg0) {
-    Unk8007C148 *p = &boss_field_record;
+    Enemy *p = &boss_field_record;
     s32 pad;
     u8 *temp;
 
     if (boss_field_index != 0) {
-        temp = D_803ABA58[boss_field_record.unk2C.unk50];
+        temp = D_803ABA58[boss_field_record.actor.unk50];
         gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
-        Anim_DrawModel(1, &p->unk2C, temp + boss_field_record.unk2C.unk52 * 0xC, arg0);
-        Anim_AdvanceFrame(p->unk2C.unk58, &p->unk2C, temp + p->unk2C.unk52 * 0xC);
-        if (*p->unk2C.unk64 != 2) {
-            Shadow_Queue(p->unk2C.x, p->unk2C.y, p->unk2C.z, p->unk2C.unk2C, p->unk2C.unk30, p->unk2C.unk34,
-                          p->unk2C.unk28 * p->unk2C.unk24);
+        Anim_DrawModel(1, &p->actor, temp + boss_field_record.actor.unk52 * 0xC, arg0);
+        Anim_AdvanceFrame(p->actor.unk58, &p->actor, temp + p->actor.unk52 * 0xC);
+        if (p->actor.unk64->unk0 != 2) {
+            Shadow_Queue(p->actor.x, p->actor.y, p->actor.z, p->actor.nx, p->actor.ny, p->actor.nz,
+                          p->actor.unk28 * p->actor.scale);
         }
     }
 }
@@ -221,8 +151,8 @@ s32 Boss_CheckPlayerNear(void) {
     f32 dz;
 
     if (boss_field_index != 0) {
-        dx = boss_field_record.unk2C.x - player_state.x;
-        dz = boss_field_record.unk2C.z - player_state.z;
+        dx = boss_field_record.actor.x - player_state.x;
+        dz = boss_field_record.actor.z - player_state.z;
         if (sqrtf(dx * dx + dz * dz) < D_803AB48C[boss_field_index]) {
             ret = boss_field_index;
         }
@@ -230,40 +160,40 @@ s32 Boss_CheckPlayerNear(void) {
     return ret;
 }
 
-void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
-    Unk803AB820 *s2 = &D_803AB820[arg0];
-    Unk8007C174 *s1 = &arg4->unk2C;
+void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
+    EnemyDef *s2 = &D_803AB820[arg0];
+    Actor *s1 = &arg4->actor;
     s16 flags;
 
-    arg4->unk2C.unk50 = s2->unk2;
+    arg4->actor.unk50 = s2->unk2;
     Anim_SetCurrentAndNext(s1, 0, 1, 0, 1, 1);
-    s1->unk24 = s2->unk20;
+    s1->scale = s2->unk20;
     s1->unk28 = s2->unk18;
-    s1->unk64 = (u16 *)s2;
-    s1->unk68 = &arg4->unk98;
+    s1->unk64 = (ActorStats *)s2;
+    s1->unk68 = &arg4->battle;
     arg4->unk28 = s2;
     arg4->unkA = s2->unk6;
     arg4->unkC = s2->unk6;
-    arg4->unk0 = 0;
-    arg4->unk8 = 0;
+    arg4->type = 0;
+    arg4->flags = 0;
     arg4->unk10 = sqrtf((u32)s2->unkC) * 3.846 + 17.838;
-    arg4->unk98 = 0;
-    arg4->unk11C = arg4->unk28->unk2A;
-    arg4->unk11E = ((Unk803AB820 *)s1->unk64)->unkC;
-    arg4->unk120 = ((Unk803AB820 *)s1->unk64)->unkE;
-    arg4->unk128 = 1.0f;
+    arg4->battle.unk0 = 0;
+    arg4->battle.unk84 = arg4->unk28->unk2A;
+    arg4->battle.unk86 = ((EnemyDef *)s1->unk64)->unkC;
+    arg4->battle.unk88 = ((EnemyDef *)s1->unk64)->unkE;
+    arg4->battle.unk90 = 1.0f;
     Coll_ResolveFloorAndWalls(arg1, 0.0f, arg2, 0xA00, &boss_spawn_coll);
     s1->x = boss_spawn_coll.x;
     s1->y = boss_spawn_coll.y;
     s1->z = boss_spawn_coll.z;
     if (arg0 == 7) {
-        arg4->unk8 |= 4;
+        arg4->flags |= 4;
         s1->y -= 30.0;
     }
-    s1->unk10 = arg3;
-    s1->unk2C = boss_spawn_coll.unkC;
-    s1->unk30 = boss_spawn_coll.unk10;
-    s1->unk34 = boss_spawn_coll.unk14;
+    s1->rot = arg3;
+    s1->nx = boss_spawn_coll.nx;
+    s1->ny = boss_spawn_coll.ny;
+    s1->nz = boss_spawn_coll.nz;
     s1->unk5E = 1;
     s1->unk60 = 0;
     if (s2 == &D_803AB9A8) {
@@ -294,7 +224,7 @@ void Boss_BeginEncounter(s32 arg0) {
     for (i = 0x4B0; i != 0; i--) {
         *dst++ = *src++;
     }
-    boss_camera_target = boss_field_record.unk2C;
+    boss_camera_target = boss_field_record.actor;
     if (arg0 == 7) {
         boss_camera_target.x = -31.0f;
         boss_camera_target.y = 139.0f;
