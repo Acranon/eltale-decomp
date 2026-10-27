@@ -172,7 +172,11 @@ def write_ninja(linker_entries):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Configure the project")
     ap.add_argument("-c", "--clean", action="store_true", help="remove split and build output first")
+    ap.add_argument("--non-matching", action="store_true",
+                    help="compile the NON_MATCHING C of unmatched functions instead of their asm")
     args = ap.parse_args()
+    if args.non_matching:
+        DEFINES += " -DNON_MATCHING"
     if args.clean:
         clean()
     split.main([Path(YAML_FILE)], modes=["all"], verbose=False)
