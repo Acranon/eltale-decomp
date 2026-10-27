@@ -11,11 +11,11 @@ struct Enemy;
 
 /* One D_800C18D8 entry: a visual effect for Magic_CreateVisualEffect. */
 typedef struct MagicVisualDef {
-    /* 0x00 */ u16 unk0; /* x scale source: 0 ActorStats.unk18, 1 ActorStats.unk1C, 3 arg7->z (times scale) */
-    /* 0x02 */ u16 unk2; /* y scale source */
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u16 unk8;
+    /* 0x00 */ u16 x_scale_source; /* x scale source: 0 ActorStats.unk18, 1 ActorStats.unk1C, 3 arg7->z (times scale) */
+    /* 0x02 */ u16 y_scale_source; /* y scale source */
+    /* 0x04 */ u16 display_list_index;
+    /* 0x06 */ u16 texture_index;
+    /* 0x08 */ u16 anim_index;
 } MagicVisualDef; /* 0xA bytes */
 
 /* One spell definition (row of the D_800C185C tables, indexed [group][index]). */
@@ -89,12 +89,12 @@ typedef struct SpellFxDef {
  * presentation stages a kind (1: Effect_StartConvergeEmitter, 2: Effect_SpawnBurst, 0: none)
  * and the emitter argument. */
 typedef struct SpellParticleDef {
-    /* 0x00 */ u16 unk0; /* cast (Magic_CreateCastPresentation) */
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4; /* ground hit (Magic_CreateGroundHitPresentation) */
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u16 unk8; /* hit (Magic_CreateHitPresentation) */
-    /* 0x0A */ u16 unkA;
+    /* 0x00 */ u16 cast_kind; /* cast (Magic_CreateCastPresentation) */
+    /* 0x02 */ u16 cast_effect_arg;
+    /* 0x04 */ u16 ground_hit_kind; /* ground hit (Magic_CreateGroundHitPresentation) */
+    /* 0x06 */ u16 ground_hit_effect_arg;
+    /* 0x08 */ u16 hit_kind; /* hit (Magic_CreateHitPresentation) */
+    /* 0x0A */ u16 hit_effect_arg;
 } SpellParticleDef; /* 0xC bytes */
 
 /* One magic_effects slot: a live spell effect. */
@@ -121,15 +121,15 @@ typedef struct MagicEffect {
 
 /* One magic_cast_repeats slot: the remaining casts of a multi-cast spell. */
 typedef struct MagicCastRepeat {
-    /* 0x00 */ u16 unk0; /* casts left */
-    /* 0x02 */ u16 unk2; /* frames to the next cast */
-    /* 0x04 */ u16 unk4; /* casts done */
+    /* 0x00 */ u16 casts_left; /* casts left */
+    /* 0x02 */ u16 frames_until_next_cast; /* frames to the next cast */
+    /* 0x04 */ u16 casts_done; /* casts done */
     /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ s32 unk8; /* spell id */
-    /* 0x0C */ u16 unkC; /* cast flags */
+    /* 0x08 */ s32 spell_id; /* spell id */
+    /* 0x0C */ u16 cast_flags; /* cast flags */
     /* 0x0E */ u8 padE[2];
-    /* 0x10 */ SpellDef *unk10;
-    /* 0x14 */ Actor *unk14; /* caster */
+    /* 0x10 */ SpellDef *spell_def;
+    /* 0x14 */ Actor *caster; /* caster */
 } MagicCastRepeat; /* 0x18 bytes */
 
 typedef struct MagicSpeedTable {

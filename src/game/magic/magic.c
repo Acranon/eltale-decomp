@@ -46,7 +46,7 @@ void Magic_ResetEffectSystem(void) {
         magic_effects[i].unk4 = 0;
     }
     for (i = 0; i < 4; i++) {
-        magic_cast_repeats[i].unk0 = 0;
+        magic_cast_repeats[i].casts_left = 0;
     }
     magic_cast_state = 0;
 }
@@ -126,20 +126,20 @@ void Magic_CreateCastEffect(Actor* arg0, u32 arg1, s32 arg2, u16 arg3) {
     if (arg2 == 0 && def->cast_count >= 2) {
         r = (MagicCastRepeat*)magic_cast_repeats;
         i = 3;
-        while (i != 0 && r->unk0 != 0) {
+        while (i != 0 && r->casts_left != 0) {
             i--;
             r++;
         }
-        r->unk0 = def->cast_count - 1;
+        r->casts_left = def->cast_count - 1;
         if (arg3 & 0x10) {
-            r->unk0 *= 2;
+            r->casts_left *= 2;
         }
-        r->unk2 = def->repeat_interval + 1;
-        r->unk4 = 0;
-        r->unk8 = arg1;
-        r->unkC = arg3;
-        r->unk10 = (SpellDef*)def;
-        r->unk14 = arg0;
+        r->frames_until_next_cast = def->repeat_interval + 1;
+        r->casts_done = 0;
+        r->spell_id = arg1;
+        r->cast_flags = arg3;
+        r->spell_def = (SpellDef*)def;
+        r->caster = arg0;
     }
     p = (MagicEffect*)magic_effects;
     i = 15;
@@ -334,12 +334,12 @@ void Magic_UpdateEffects(void) {
 
     r = (MagicCastRepeat*)magic_cast_repeats;
     for (i = 4; i != 0; i--, r++) {
-        if (r->unk0 != 0) {
-            if (--r->unk2 == 0) {
-                r->unk0--;
-                r->unk4++;
-                Magic_CreateCastEffect(r->unk14, r->unk8, r->unk4, r->unkC);
-                r->unk2 = r->unk10->repeat_interval + 1;
+        if (r->casts_left != 0) {
+            if (--r->frames_until_next_cast == 0) {
+                r->casts_left--;
+                r->casts_done++;
+                Magic_CreateCastEffect(r->caster, r->spell_id, r->casts_done, r->cast_flags);
+                r->frames_until_next_cast = r->spell_def->repeat_interval + 1;
             }
         }
     }
@@ -1057,7 +1057,7 @@ EffectModel* Magic_CreateVisualEffect(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f3
     f32 sx;
     f32 sy;
 
-    switch (arg6->unk0) {
+    switch (arg6->x_scale_source) {
         case 0:
             sx = arg8->stats->unk18 * arg8->scale * arg7->x;
             break;
@@ -1072,7 +1072,7 @@ EffectModel* Magic_CreateVisualEffect(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f3
             sx = arg7->x;
             break;
     }
-    switch (arg6->unk2) {
+    switch (arg6->y_scale_source) {
         case 0:
             sy = arg8->stats->unk18 * arg8->scale * arg7->y;
             break;
@@ -1087,7 +1087,7 @@ EffectModel* Magic_CreateVisualEffect(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f3
             sy = arg7->y;
             break;
     }
-    return Effect_CreateModelEffect(arg6->unk8, arg6->unk4, arg6->unk6, arg0 & 0xFF, arg1, arg2, arg3, arg4, arg5, sx, sy, sx);
+    return Effect_CreateModelEffect(arg6->anim_index, arg6->display_list_index, arg6->texture_index, arg0 & 0xFF, arg1, arg2, arg3, arg4, arg5, sx, sy, sx);
 }
 
 void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
@@ -1120,15 +1120,15 @@ void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
         arg0->unk34 = NULL;
     }
     fx = &D_800C363C[arg0->unk0][arg0->unk2];
-    if (fx->unk0 != 0) {
+    if (fx->cast_kind != 0) {
         h = 2.0 * arg1->stats->unk18 * arg1->scale;
         y = arg1->y + arg1->stats->unk1C * arg1->scale;
-        switch (fx->unk0) {
+        switch (fx->cast_kind) {
             case 1:
-                Effect_StartConvergeEmitter(fx->unk2, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartConvergeEmitter(fx->cast_effect_arg, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
-                Effect_SpawnBurst(fx->unk2, arg1->x, y, arg1->z, h * 0.2);
+                Effect_SpawnBurst(fx->cast_effect_arg, arg1->x, y, arg1->z, h * 0.2);
                 break;
         }
     }
@@ -1204,15 +1204,15 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
         arg0->unk38 = NULL;
     }
     fx = &D_800C363C[arg0->unk0][arg0->unk2];
-    if (fx->unk8 != 0) {
+    if (fx->hit_kind != 0) {
         h = 2.0 * arg1->stats->unk18 * arg1->stats->scale;
         y = arg1->y + arg1->stats->unk1C * arg1->stats->scale;
-        switch (fx->unk8) {
+        switch (fx->hit_kind) {
             case 1:
-                Effect_StartConvergeEmitter(fx->unkA, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartConvergeEmitter(fx->hit_effect_arg, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
-                Effect_SpawnBurst(fx->unkA, arg1->x, y, arg1->z, h * 0.2);
+                Effect_SpawnBurst(fx->hit_effect_arg, arg1->x, y, arg1->z, h * 0.2);
                 break;
         }
     }
@@ -1245,15 +1245,15 @@ void Magic_CreateGroundHitPresentation(MagicEffect* arg0, Actor* arg1) {
         ret->upZ = arg0->vz;
     }
     fx = &D_800C363C[arg0->unk0][arg0->unk2];
-    if (fx->unk4 != 0) {
+    if (fx->ground_hit_kind != 0) {
         h = 2.0 * arg1->stats->unk18 * arg1->scale;
         y = arg1->y + arg1->stats->unk1C * arg1->scale;
-        switch (fx->unk4) {
+        switch (fx->ground_hit_kind) {
             case 1:
-                Effect_StartConvergeEmitter(fx->unk6, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartConvergeEmitter(fx->ground_hit_effect_arg, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
-                Effect_SpawnBurst(fx->unk6, arg1->x, y, arg1->z, h * 0.2);
+                Effect_SpawnBurst(fx->ground_hit_effect_arg, arg1->x, y, arg1->z, h * 0.2);
                 break;
         }
     }
