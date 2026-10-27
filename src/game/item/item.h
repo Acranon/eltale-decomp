@@ -35,7 +35,7 @@ s32 Item_GetInventoryCount(void);
 void Item_AddToInventory(u8 arg0);
 s32 Item_TryUse(u8 arg0);
 void Item_ApplyEffect(u8 arg0, void* arg1);
-s32 func_80025228(u16 arg0);
+s32 Item_RemoveMatchingInventoryEntry(u16 arg0);
 void Item_UpdateInventoryMenu(void);
 s32 Item_CanUseNever(s32 arg0, ItemDef* arg1);
 s32 Item_CanUseRestore(Actor* arg0, ItemDef* arg1);

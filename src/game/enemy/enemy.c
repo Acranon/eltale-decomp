@@ -365,7 +365,7 @@ void Enemy_StateHurt(Actor *obj, Enemy *ai, AnimSet *arg2) {
             obj->animFlags &= 0xFFFE;
             enemy_count--;
             player_battle_exp += obj->stats->exp;
-            D_8007A9B8 += obj->stats->unk14;
+            player_battle_extra_reward += obj->stats->unk14;
             Sfx_Play(0, 10, 0xFF);
         } else {
             ai->type = 0;

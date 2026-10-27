@@ -50,9 +50,9 @@ s32 Pak_WriteFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf);
 s32 Pak_TryRepair(s32 arg0, s32 arg1);
 s32 Pak_ClassifyError(s32 arg0);
 s32 Pak_CompareNameBytes(u8 *a, u8 *b, s32 n);
-void func_80036124(void);
+void Pak_QueryFileCounts(void);
 void Input_StartControllerQuery(OSMesgQueue *mq);
 void Input_GetControllerQuery(OSContStatus *status);
-void func_80036184(void);
+void Pak_InitGbPak(void);
 
 #endif

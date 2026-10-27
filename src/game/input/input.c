@@ -28,7 +28,7 @@ PakExtName pak_delete_extension_template = { { 0, 0, 0, 0 } };
 
 /* libultra functions that symbol_addrs.txt still calls func_ (libultra/io), so no SDK
  * header declares them under these names. K&R: func_8003D6B0 is called with three
- * arguments and with none (func_80036184). */
+ * arguments and with none (Pak_InitGbPak). */
 s32 func_8003D554();
 s32 func_8003D6B0();
 s32 func_8003D0F0();
@@ -306,7 +306,7 @@ s32 Pak_CompareNameBytes(u8 *a, u8 *b, s32 n) {
     return n;
 }
 
-void func_80036124(void) {
+void Pak_QueryFileCounts(void) {
     func_8003EDC0();
 }
 
@@ -318,6 +318,6 @@ void Input_GetControllerQuery(OSContStatus *status) {
     osContGetQuery(status);
 }
 
-void func_80036184(void) {
+void Pak_InitGbPak(void) {
     func_8003D6B0();
 }

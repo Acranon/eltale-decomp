@@ -93,7 +93,7 @@ extern u16 player_respawn_subarea;
 extern u16 player_respawn_entry;
 extern u16 D_8007A9B2;
 extern s32 player_battle_exp;
-extern s32 D_8007A9B8;
+extern s32 player_battle_extra_reward;
 extern s32 player_battle_drop_item;
 extern s32 player_talk_npc;
 extern struct SpiritObj *player_front_spirit;

@@ -84,7 +84,7 @@ u16 player_respawn_subarea;
 u16 player_respawn_entry;
 u16 D_8007A9B2;
 s32 player_battle_exp;
-s32 D_8007A9B8;
+s32 player_battle_extra_reward;
 s32 player_battle_drop_item;
 s32 player_talk_npc;
 SpiritObj *player_front_spirit;
@@ -417,7 +417,7 @@ void Player_Update(void) {
     if (battle_flags & 8) {
         battle_flags &= ~8;
         p->actor.stats->exp += player_battle_exp;
-        p->actor.stats->unk14 += D_8007A9B8;
+        p->actor.stats->unk14 += player_battle_extra_reward;
         if (player_battle_drop_item != 0xFF) {
             if ((u32) Item_CountInInventory(player_battle_drop_item) >= 3 || (u32) Item_GetInventoryCount() >= 0x8D) {
                 player_battle_drop_item = 0xFF;
@@ -491,7 +491,7 @@ void Player_InitBattle(void) {
     s32 quarter;
     s32 i;
 
-    player_battle_exp = D_8007A9B8 = 0;
+    player_battle_exp = player_battle_extra_reward = 0;
     stats = player_state.actor.stats;
     cd = player_char_data[player_state.actor.animSetIndex];
     player_state.unkC = (f32)(u32)stats->agility * 0.2857 + 17.0;

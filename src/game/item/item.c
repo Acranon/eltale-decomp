@@ -163,7 +163,7 @@ void Item_ApplyEffect(u8 arg0, void* arg1) {
     item_use_handlers[D_803AAAA0[arg0].handler_index](arg1, &D_803AAAA0[arg0], arg0);
 }
 
-s32 func_80025228(u16 arg0) {
+s32 Item_RemoveMatchingInventoryEntry(u16 arg0) {
     s32 found = 0;
     u8* p = item_inventory;
     s32 i = 0x96;

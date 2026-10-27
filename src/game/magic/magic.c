@@ -766,7 +766,7 @@ void func_80018968(s32 arg0, Actor* arg1) {
     }
 }
 
-void func_800189F0(s32 arg0, Actor* arg1) {
+void Magic_TryStartFlag4ReturnTransition(s32 arg0, Actor* arg1) {
     if (map_flags == 4 && map_flag4_return_map != -1 && !(map_subarea_def->flags & 4)) {
         exit_destination.map = map_flag4_return_map;
         exit_destination.subarea = map_flag4_return_subarea;
@@ -790,7 +790,7 @@ void Magic_ApplyZeroDamageHit(MagicEffect* arg0, Actor* arg1) {
     }
 }
 
-void func_80018B40(s32 arg0, Actor* arg1) {
+void Magic_TryStartFlag8ReturnTransition(s32 arg0, Actor* arg1) {
     if ((map_flags & 8) && map_flag8_return_map != -1 && !(map_subarea_def->flags & 8) && map_id != 0x1E &&
         map_id != 0x22) {
         exit_destination.map = map_flag8_return_map;
@@ -1396,9 +1396,9 @@ MagicHitFunc magic_hit_handlers[10] = {
     (MagicHitFunc) Magic_HealTarget,
     (MagicHitFunc) Magic_TransferTargetResource,
     (MagicHitFunc) func_80018968,
-    (MagicHitFunc) func_800189F0,
+    (MagicHitFunc) Magic_TryStartFlag4ReturnTransition,
     (MagicHitFunc) Magic_ApplyZeroDamageHit,
-    (MagicHitFunc) func_80018B40,
+    (MagicHitFunc) Magic_TryStartFlag8ReturnTransition,
     (MagicHitFunc) Magic_RemoveEnemyOrDamagePlayer,
     (MagicHitFunc) Magic_ClearActorStatuses,
     (MagicHitFunc) Magic_DamageAndClearStatuses,
