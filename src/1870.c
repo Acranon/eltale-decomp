@@ -176,7 +176,7 @@ extern s16 hud_panel_transition_frame;
 extern u16 hud_panel_transition_state;
 extern s16 hud_hp_meter_width;
 extern s16 hud_mp_meter_width[];
-extern OSMesgQueue D_80092C90;
+extern OSMesgQueue input_si_queue;
 extern u8 D_80095AF0[];
 extern u8 D_800C0000[];
 extern u8 D_80100000[];
@@ -206,7 +206,7 @@ void Core_MainThread(void *arg0) {
     osViBlack(1);
     Dma_ReadRom(D_DA4570, D_80100000, D_DAB5F0 - D_DA4570);
     Text_LoadFontAssets();
-    func_801009EC(&D_80092C90, &D_8007A254);
+    func_801009EC(&input_si_queue, &D_8007A254);
     osViBlack(1);
     osViSetSpecialFeatures(0x5A);
     nnScStartScheduler(&D_8007A1E0);
@@ -513,7 +513,7 @@ extern s32 D_8007A180;
 extern s32 D_8007A1D0;
 extern s8 D_8008FAF0;
 extern s8 D_8008FB40;
-extern s8 D_80092C80;
+extern s8 input_primary_port;
 extern u16 D_8008CA50;
 void Gfx_WaitForFrameMessage(s16 arg0);
 void Player_SetSpawnFromSaveTable(void);
@@ -597,9 +597,9 @@ extern u16 D_800842E8;
 extern Unk80084300 D_80084300;
 extern u16 battle_flags;
 extern s32 hud_pending_sequence_id;
-extern s32 D_80090450;
-extern u16 D_80092C84;
-extern u16 D_80092C86;
+extern s32 text_active_window_count;
+extern u16 input_held_buttons;
+extern u16 input_pressed_buttons;
 void Player_Spawn(void);
 void Player_SetSpawnFromSaveTable(void);
 void Player_Update(void);
@@ -650,7 +650,7 @@ void Core_RunGameplayLoop(void) {
             Player_SetSpawnFromSaveTable();
         }
         Text_ResetAllWindows(0);
-        D_80090450 = 0;
+        text_active_window_count = 0;
         Map_LoadArea();
         Chest_LoadForMap();
         Spirit_LoadForMap();
@@ -690,7 +690,7 @@ void Core_RunGameplayLoop(void) {
     D_8007A17A = 0x12;
     D_8007A172 = 0;
     while (D_8007A170 == 1) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
@@ -719,8 +719,8 @@ void Core_RunGameplayLoop(void) {
                 Camera_TurnForExit();
                 Player_StartAreaExit();
                 D_8007A178 = 0;
-            } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (D_80092C86 & 0x1000) &&
-                       !(battle_flags & 1) && !(D_80092C84 & 0x2000) && !(D_8004DCA0 & 1)) {
+            } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (input_pressed_buttons & 0x1000) &&
+                       !(battle_flags & 1) && !(input_held_buttons & 0x2000) && !(D_8004DCA0 & 1)) {
                 D_8007A170 = 2;
                 Sfx_Play(0, 1, 0xFF);
             }
@@ -817,7 +817,7 @@ void Core_RunMessageCutsceneLoop(void) {
             }
             D_8004DCA0 &= ~0x1C0;
         }
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
@@ -897,7 +897,7 @@ void Core_RunCameraCutsceneLoop(void) {
             }
             D_8004DCA0 &= ~0xC0;
         }
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
@@ -952,7 +952,7 @@ void Core_RunMenuLoop(void) {
         Bgm_Play(0x13);
     }
     while (D_8007A170 == 2) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
@@ -988,7 +988,7 @@ void Core_RunTitleLoop(void) {
     Overlay_LoadTitle();
     func_8020C0D0();
     while (D_8007A170 == 3) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
         frame = &D_80301000[D_8007A17C];
@@ -1011,7 +1011,7 @@ void Core_RunIntroLoop(void) {
     Overlay_LoadIntro();
     func_8020C0D0();
     while (D_8007A170 == 4) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Bgm_Update();
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);
@@ -1040,7 +1040,7 @@ void Core_RunEndingLoop(void) {
     D_8008CA50 |= 8;
     Bgm_PlayDelayed(0x14, 0x3C);
     while (D_8007A170 == 5) {
-        Input_ReadController(D_80092C80);
+        Input_ReadController(input_primary_port);
         D_8007A180 = 0;
         Bgm_Update();
         Gfx_BuildFrameDisplayList(&D_80301000[D_8007A17C]);

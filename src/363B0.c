@@ -18,25 +18,25 @@ typedef struct {
 } Ext4;
 
 /* .bss 80092C80..80092ED0 */
-s8 D_80092C80;
-s8 D_80092C81;
-s8 D_80092C82;
-u16 D_80092C84;
-u16 D_80092C86; /* button down edges for the selected controller */
-u16 D_80092C88;
-OSMesgQueue D_80092C90;
-OSPfs D_80092CA8[4];
-Unk80092E48 D_80092E48[4];
-u8 D_80092E98;
-OSContStatus D_80092EA0[4];
-OSMesg D_80092EB0;
-OSContPad D_80092EB8[4];
+s8 input_primary_port;
+s8 input_stick_x;
+s8 input_stick_y;
+u16 input_held_buttons;
+u16 input_pressed_buttons; /* button down edges for the selected controller */
+u16 input_previous_button_inverse;
+OSMesgQueue input_si_queue;
+OSPfs pak_port_states[4];
+Unk80092E48 pak_game_file_scans[4];
+u8 input_connected_port_bits;
+OSContStatus input_controller_statuses[4];
+OSMesg input_si_message;
+OSContPad input_pad_states[4];
 /* This file's .data, 80061810..80061850: the pak file's game_name, an
  * unreferenced digit string, and the two ext_name values. */
-u8 D_80061810[16] = "SxbQx";
+u8 pak_game_name[16] = "SxbQx";
 char D_80061820[] = "012345678901234567890123456789";
-Ext4 D_80061840 = { { 0, 0, 0, 0 } };
-Ext4 D_80061844 = { { 0, 0, 0, 0 } };
+Ext4 pak_allocate_extension_template = { { 0, 0, 0, 0 } };
+Ext4 pak_delete_extension_template = { { 0, 0, 0, 0 } };
 
 s32 osContInit();
 s32 osPfsFreeBlocks();
@@ -55,44 +55,44 @@ s32 Input_InitControllers(void) {
     s32 count;
     s32 i;
 
-    D_80092C88 = 0;
+    input_previous_button_inverse = 0;
     for (i = 0; i < 4; i++) {
-        D_80092E48[i].unk12 = -0x80;
+        pak_game_file_scans[i].unk12 = -0x80;
     }
     for (i = 0; i < 4; i++) {
-        D_80092EB8[i].button = 0;
-        D_80092EB8[i].stick_x = 0;
-        D_80092EB8[i].stick_y = 0;
+        input_pad_states[i].button = 0;
+        input_pad_states[i].stick_x = 0;
+        input_pad_states[i].stick_y = 0;
     }
-    osCreateMesgQueue(&D_80092C90, &D_80092EB0, 1);
-    osSetEventMesg(OS_EVENT_SI, &D_80092C90, &D_80092EB0);
-    osContInit(&D_80092C90, &D_80092E98, D_80092EA0);
+    osCreateMesgQueue(&input_si_queue, &input_si_message, 1);
+    osSetEventMesg(OS_EVENT_SI, &input_si_queue, &input_si_message);
+    osContInit(&input_si_queue, &input_connected_port_bits, input_controller_statuses);
     osContSetCh(4);
-    D_80092C80 = -1;
+    input_primary_port = -1;
     count = 0;
     for (i = 0; i != 4; i++) {
-        if (D_80092E98 & (1 << i)) {
-            if (D_80092EA0[i].errno & 4) {
-                D_80092E48[i].unk12 = -1;
-            } else if (D_80092EA0[i].type & 2) {
-                D_80092E48[i].unk12 = -2;
+        if (input_connected_port_bits & (1 << i)) {
+            if (input_controller_statuses[i].errno & 4) {
+                pak_game_file_scans[i].unk12 = -1;
+            } else if (input_controller_statuses[i].type & 2) {
+                pak_game_file_scans[i].unk12 = -2;
             } else {
-                D_80092E48[i].unk12 = 0;
+                pak_game_file_scans[i].unk12 = 0;
                 count++;
-                if (D_80092C80 == -1) {
-                    D_80092C80 = i;
+                if (input_primary_port == -1) {
+                    input_primary_port = i;
                 }
-                if (D_80092EA0[i].status & 1) {
-                    D_80092E48[i].unk0 |= 0x8000;
+                if (input_controller_statuses[i].status & 1) {
+                    pak_game_file_scans[i].unk0 |= 0x8000;
                 } else {
-                    D_80092E48[i].unk0 = 0;
-                    if (i == D_80092C80) {
+                    pak_game_file_scans[i].unk0 = 0;
+                    if (i == input_primary_port) {
                         ret = 1;
                     }
                 }
             }
         } else {
-            D_80092E48[i].unk12 = -3;
+            pak_game_file_scans[i].unk12 = -3;
         }
     }
     if (count == 0) {
@@ -106,17 +106,17 @@ void Input_ReadController(s32 cont) {
     u16 button;
 
     osContSetCh(4);
-    osContStartReadData(&D_80092C90);
-    if (osRecvMesg(&D_80092C90, NULL, 1) != -1) {
-        osContGetReadData(D_80092EB8);
+    osContStartReadData(&input_si_queue);
+    if (osRecvMesg(&input_si_queue, NULL, 1) != -1) {
+        osContGetReadData(input_pad_states);
     }
-    pad = &D_80092EB8[cont];
+    pad = &input_pad_states[cont];
     button = pad->button;
-    D_80092C84 = button;
-    D_80092C81 = pad->stick_x;
-    D_80092C82 = pad->stick_y;
-    D_80092C86 = button & D_80092C88;
-    D_80092C88 = ~button;
+    input_held_buttons = button;
+    input_stick_x = pad->stick_x;
+    input_stick_y = pad->stick_y;
+    input_pressed_buttons = button & input_previous_button_inverse;
+    input_previous_button_inverse = ~button;
 }
 
 s32 Pak_ScanGameFiles(s32 cont) {
@@ -131,19 +131,19 @@ s32 Pak_ScanGameFiles(s32 cont) {
 
     found = 0;
     cnt = 0;
-    D_80092E48[cont].unk13 = 0xFF;
-    D_80092E48[cont].unk0 = 0;
+    pak_game_file_scans[cont].unk13 = 0xFF;
+    pak_game_file_scans[cont].unk0 = 0;
     for (i = 0; i < 16; i++) {
-        D_80092E48[cont].unk2[i] = -1;
+        pak_game_file_scans[cont].unk2[i] = -1;
     }
-    pfs = &D_80092CA8[cont];
-    err = func_8003D0F0(&D_80092C90, pfs, cont);
+    pfs = &pak_port_states[cont];
+    err = func_8003D0F0(&input_si_queue, pfs, cont);
     if (err != 0) {
         if (err == 10) {
-            if (func_8003D554(&D_80092C90, pfs, cont) == 0) {
+            if (func_8003D554(&input_si_queue, pfs, cont) == 0) {
                 return 1;
             }
-            if (func_8003D6B0(&D_80092C90, pfs, cont) == 0) {
+            if (func_8003D6B0(&input_si_queue, pfs, cont) == 0) {
                 return 1;
             }
             err = 10;
@@ -154,38 +154,38 @@ s32 Pak_ScanGameFiles(s32 cont) {
         err = osPfsFileState(pfs, i, &st);
         if (err == 0) {
             if (st.game_code == 0x4E45544A && st.company_code == 0x3943) {
-                if (Pak_CompareNameBytes(D_80061810, st.game_name, 16) == 0) {
+                if (Pak_CompareNameBytes(pak_game_name, st.game_name, 16) == 0) {
                     found++;
-                    D_80092E48[cont].unk2[i] = ((u8 *) st.ext_name)[0];
-                    D_80092E48[cont].unk0 |= 0x4000;
+                    pak_game_file_scans[cont].unk2[i] = ((u8 *) st.ext_name)[0];
+                    pak_game_file_scans[cont].unk0 |= 0x4000;
                 } else {
-                    D_80092E48[cont].unk2[i] = 0x7F;
+                    pak_game_file_scans[cont].unk2[i] = 0x7F;
                 }
             } else {
-                D_80092E48[cont].unk2[i] = 0x7F;
+                pak_game_file_scans[cont].unk2[i] = 0x7F;
             }
             cnt++;
         } else if (err == 5) {
-            D_80092E48[cont].unk2[i] = -1;
+            pak_game_file_scans[cont].unk2[i] = -1;
             err = 0;
         } else {
             break;
         }
     }
     if (err == 0) {
-        D_80092E48[cont].unk0 &= 0xFFF0;
-        D_80092E48[cont].unk0 |= found;
+        pak_game_file_scans[cont].unk0 &= 0xFFF0;
+        pak_game_file_scans[cont].unk0 |= found;
         if (found >= 16) {
-            D_80092E48[cont].unk0 |= 0x2000;
+            pak_game_file_scans[cont].unk0 |= 0x2000;
         }
         if (cnt >= 16) {
-            D_80092E48[cont].unk0 |= 0x2000;
+            pak_game_file_scans[cont].unk0 |= 0x2000;
         }
         osPfsFreeBlocks(pfs, &i);
         i = i / 256;
-        D_80092E48[cont].unk13 = i;
+        pak_game_file_scans[cont].unk13 = i;
         if (i < 2) {
-            D_80092E48[cont].unk0 |= 0x2000;
+            pak_game_file_scans[cont].unk0 |= 0x2000;
         }
     }
     return err;
@@ -202,7 +202,7 @@ u8 func_80035CC8(s32 arg0) {
         j = 0;
         arg0 = 0;
         for (; j < 16; j++) {
-            if (i + 0x1A == D_80092E48[k].unk2[j]) {
+            if (i + 0x1A == pak_game_file_scans[k].unk2[j]) {
                 arg0 = -1;
                 break;
             }
@@ -224,13 +224,13 @@ u8 Pak_AllocateGameFile(s32 arg0, u8 arg1) {
     Ext4 ext;
     s32 ret;
 
-    ext = D_80061840;
+    ext = pak_allocate_extension_template;
     file_no = -1;
     ext.b[0] = arg1;
-    ret = osPfsAllocateFile(&D_80092CA8[arg0], 0x3943, 0x4E45544A, D_80061810, &ext, 0x200, &file_no);
+    ret = osPfsAllocateFile(&pak_port_states[arg0], 0x3943, 0x4E45544A, pak_game_name, &ext, 0x200, &file_no);
     if (ret == 0) {
         ret = file_no;
-        D_80092E48[arg0].unk2[ret] = arg1;
+        pak_game_file_scans[arg0].unk2[ret] = arg1;
     } else {
         ret = -ret;
     }
@@ -241,36 +241,36 @@ u8 Pak_DeleteGameFile(s32 arg0, u8 arg1) {
     u8 unused[4];
     Ext4 ext;
 
-    ext = D_80061844;
+    ext = pak_delete_extension_template;
     ext.b[0] = arg1;
-    return osPfsDeleteFile(&D_80092CA8[arg0], 0x3943, 0x4E45544A, D_80061810, &ext);
+    return osPfsDeleteFile(&pak_port_states[arg0], 0x3943, 0x4E45544A, pak_game_name, &ext);
 }
 
 void Pak_ReadFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
-    osPfsReadWriteFile(&D_80092CA8[arg0], file_no, 0, offset, nbytes, buf);
+    osPfsReadWriteFile(&pak_port_states[arg0], file_no, 0, offset, nbytes, buf);
 }
 
 s32 Pak_WriteFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
     s32 ret;
     s32 bytes;
 
-    ret = osPfsFreeBlocks(&D_80092CA8[arg0], &bytes);
+    ret = osPfsFreeBlocks(&pak_port_states[arg0], &bytes);
     if (ret != 0) {
         return ret;
     }
-    return osPfsReadWriteFile(&D_80092CA8[arg0], file_no, 1, offset, nbytes, buf);
+    return osPfsReadWriteFile(&pak_port_states[arg0], file_no, 1, offset, nbytes, buf);
 }
 
 s32 Pak_TryRepair(s32 arg0, s32 arg1) {
     s32 err;
-    s32 cont = D_80092C80;
+    s32 cont = input_primary_port;
 
     if (arg1 == 10) {
-        if (func_8003D554(&D_80092C90, &D_80092CA8[cont], cont) != 0) {
-            if (func_8003D6B0(&D_80092C90, &D_80092CA8[cont], cont) != 0) {
-                err = func_8003D0F0(&D_80092C90, &D_80092CA8[cont], cont);
+        if (func_8003D554(&input_si_queue, &pak_port_states[cont], cont) != 0) {
+            if (func_8003D6B0(&input_si_queue, &pak_port_states[cont], cont) != 0) {
+                err = func_8003D0F0(&input_si_queue, &pak_port_states[cont], cont);
                 if (err != 11 && err != 1 && err != 2) {
-                    err = osPfsRepairId(&D_80092CA8[cont]);
+                    err = osPfsRepairId(&pak_port_states[cont]);
                 }
             } else {
                 err = 4;
@@ -279,7 +279,7 @@ s32 Pak_TryRepair(s32 arg0, s32 arg1) {
             err = 4;
         }
     } else {
-        err = func_8003D0F0(&D_80092C90, &D_80092CA8[cont], cont);
+        err = func_8003D0F0(&input_si_queue, &pak_port_states[cont], cont);
     }
     return err;
 }

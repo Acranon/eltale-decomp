@@ -16,8 +16,8 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 
 Verdict: **equivalent.**
 
-- Checked: whole function side by side with retail (linked build). The local copies of D_800616D0 and
-  D_800616E4, every display-list word (E7, FD, F5 with masks/cms/maskt/cmt order, E6, F4, F2, E4/B4/B3) and
+- Checked: whole function side by side with retail (linked build). The local copies of text_rect_texture_ptrs and
+  text_rect_texture_params, every display-list word (E7, FD, F5 with masks/cms/maskt/cmt order, E6, F4, F2, E4/B4/B3) and
   the h argument read from the caller's stack are the same. Differences: frame 0xE0 vs 0xD8 (so h is read
   at sp+0xF0 instead of sp+0xE8, the same incoming argument); retail stores one more `_g` pointer to a dead
   stack home (sp+0x24); retail tests `type != 0` with `bnez a0`, the C compiles `type == 0` as
@@ -31,7 +31,7 @@ Verdict: **equivalent.**
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
 - **Text_DrawTexturedRect** (0x400 bytes)
-  - w6 s2: 337B0 tile loader using local struct copies of D_800616D0/D_800616E4 (TexPtrs5/TexParams5 are declared). Only the evaluation order of the OR terms in gDPSetTile/gDPLoadTile w1 differs: retail puts masks first and lrt before lrs. The permuter changed that order by going through a pointer (new_var=&t->h), but only got the score from 3015 to 1910.
+  - w6 s2: 337B0 tile loader using local struct copies of text_rect_texture_ptrs/text_rect_texture_params (TexPtrs5/TexParams5 are declared). Only the evaluation order of the OR terms in gDPSetTile/gDPLoadTile w1 differs: retail puts masks first and lrt before lrs. The permuter changed that order by going through a pointer (new_var=&t->h), but only got the score from 3015 to 1910.
   - w6 s3: Not retried this session beyond the previous notes; drafts unchanged in drafts/.
   - w6 s4: 337B0. Frame fixed by declaring `TexParam *t` first (tex at sp+192, prm at sp+72). Passing masks as prm.e[type].masks while the other fields go through t-> gives the retail SetTile w1 order (draft c9cc.c in scratchpad, struct 12). Left: LoadTile/SetTileSize compute lrt before lrs in retail. Also IDO turns `type == 0` into a pointer compare against &tex.p[0], where retail uses bnez a0.
   - w6 s5: 337B0. Passing lrt as `prm.e[type].h - 1` fixes the LoadTile/SetTileSize lrt-before-lrs order (struct 4, drafts/Text_DrawTexturedRect.c = c9e1.c). The frame is now 224 but retail is 216. Retail stores the PipeSync gfx pointer at sp+36 and tests `bnez a0` on type; mine compares a pointer reloaded from sp+8.

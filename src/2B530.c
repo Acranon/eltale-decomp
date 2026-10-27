@@ -26,24 +26,24 @@ f32 D_8008FB5C; /* only Menu_UpdateMapPage (asm) uses these two */
 f32 D_8008FB60;
 
 extern Gfx* D_8007A184;
-extern u16 D_8008FB70;
+extern u16 save_menu_flags;
 
 void Menu_Init(void) {
     D_8008FB3E = 0x8000;
-    D_8008FB70 = 0;
+    save_menu_flags = 0;
     D_8008FB3C = 0;
 }
 
 void Menu_ResetKeepPage(void) {
     D_8008FB3E = (D_8008FB3E & 3) | 0x8000;
-    D_8008FB70 = 0;
+    save_menu_flags = 0;
     D_8008FB3C = 0;
 }
 
 extern Gfx* D_8007A184;
-extern Gfx D_80061770[];
+extern Gfx text_glyph_setup_dl[];
 extern u16 D_8007A170;
-extern u16 D_80092C86;
+extern u16 input_pressed_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
 void Menu_UpdatePageSlide(void);
@@ -55,7 +55,7 @@ void Menu_DrawBackground();
 void SaveMenu_Update(void);
 
 void Menu_Update(s32 arg0) {
-    gSPDisplayList(D_8007A184++, D_80061770);
+    gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
     gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
     Menu_DrawBackground();
     D_8008FB44++;
@@ -82,7 +82,7 @@ void Menu_Update(s32 arg0) {
     D_8008FB3E &= ~0x10;
     gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
     gDPSetBlendColor(D_8007A184++, 0, 0, 0, 1);
-    if ((D_80092C86 & 0x5000) && !(D_8008FB3E & 0x6020)) {
+    if ((input_pressed_buttons & 0x5000) && !(D_8008FB3E & 0x6020)) {
         D_8008FB3E &= 0x7FFF;
         Sfx_Play(0, 1, 0xFF);
     }
@@ -90,7 +90,7 @@ void Menu_Update(s32 arg0) {
         if (D_8008FB3E & 0x4000) {
             switch ((u16)(D_8008FB3E & 0xC)) {
                 case 0:
-                    if (D_8008FB70 & 0x80) {
+                    if (save_menu_flags & 0x80) {
                         D_8007A170 = 1;
                         D_8008FB40 = 1;
                     } else {
@@ -204,8 +204,8 @@ extern u8 D_8007AA03;
 extern s32 D_8007AA10;
 extern u16 D_80055F0C[];
 extern s8 D_80060D64[];
-extern s8 D_80092C81;
-extern u16 D_80092C84;
+extern s8 input_stick_x;
+extern u16 input_held_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal);
@@ -308,11 +308,11 @@ void Menu_UpdateStatsPage(s32 x) {
     Menu_DrawSprite(0x15, x + 0xF6, 0x9E, 8, 0xA);
     Menu_DrawSprite(0x1A, x + 0x77, 0x19, 0x52, 0xD);
     if (!(D_8008FB3E & 0x2000)) {
-        if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
+        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
             D_8008FB3E |= 0x2000;
             D_8008FB38 = 31;
             Sfx_Play(0, 0, 0xFF);
-        } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
+        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
             D_8008FB3E |= 0x3000;
             D_8008FB38 = 31;
             Sfx_Play(0, 0, 0xFF);
@@ -332,7 +332,7 @@ typedef struct {
 extern Unk8007AA08_2B530 D_8007AA08;
 extern s8 D_80060CB0;
 extern s8 D_800616B0;
-extern s8 D_80092C82;
+extern s8 input_stick_y;
 extern s16 D_800615AC[][2];
 extern s16 D_800615CC[][2];
 extern f32 D_80060F28;
@@ -412,21 +412,21 @@ void Menu_UpdateOptionsPage(s32 x) {
         return;
     }
     if (!(D_8008FB3E & 0x800)) {
-        if (D_80092C81 > 0x14 || (D_80092C84 & 0x10)) {
+        if (input_stick_x > 0x14 || (input_held_buttons & 0x10)) {
             D_8008FB3E |= 0x2000;
             D_8008FB38 = 0x1F;
             Sfx_Play(0, 0, 0xFF);
-        } else if (D_80092C81 < -0x14 || (D_80092C84 & 0x2000)) {
+        } else if (input_stick_x < -0x14 || (input_held_buttons & 0x2000)) {
             D_8008FB3E |= 0x3000;
             D_8008FB38 = 0x1F;
             Sfx_Play(0, 0, 0xFF);
         }
-        if (D_80092C86 & 0x8000) {
+        if (input_pressed_buttons & 0x8000) {
             D_8008FB3E |= 0x820;
             Sfx_Play(0, 1, 0xFF);
         }
     } else {
-        if ((D_80092C86 & 0x8000) && !(D_8008FB3E & 0x200)) {
+        if ((input_pressed_buttons & 0x8000) && !(D_8008FB3E & 0x200)) {
             D_8008FB3E &= ~0x920;
             Sfx_Play(0, 2, 0xFF);
             D_800616B0 = 4 - D_800616B0;
@@ -445,7 +445,7 @@ void Menu_UpdateOptionsPage(s32 x) {
                         D_8008FB3E &= ~0x200;
                         D_8008FB3E &= ~0x400;
                         sel = ids[D_800615AC[D_800616B0][1]];
-                        if (D_80092C81 < 0x14 && D_80092C81 > -0x14) {
+                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
                             Menu_DrawSprite(sel, D_8008FB58 + x, 0x39, 8, 0xB);
                         }
                         y = 0x3A;
@@ -459,7 +459,7 @@ void Menu_UpdateOptionsPage(s32 x) {
                         D_8008FB3E &= ~0x200;
                         D_8008FB3E &= ~0x400;
                         sel = ids[D_800615CC[D_80060CB0][1]];
-                        if (D_80092C81 < 0x14 && D_80092C81 > -0x14) {
+                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
                             Menu_DrawSprite(sel, D_8008FB58 + x, 0x67, 8, 0xB);
                         }
                         y = 0x65;
@@ -472,14 +472,14 @@ void Menu_UpdateOptionsPage(s32 x) {
             switch (sel) {
                 case 0:
                     y = 0x3A;
-                    if (D_80092C82 < -0x1E || D_80092C82 > 0x1E) {
+                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
                         if (!(D_8008FB3E & 0x400)) {
                             D_8008FB3E &= ~0x100;
                             D_8008FB3E |= 0x100;
                             D_8008FB3E |= 0x400;
                             Sfx_Play(0, 0, 0xFF);
                         }
-                    } else if (D_80092C81 < -0x14) {
+                    } else if (input_stick_x < -0x14) {
                         if (!(D_8008FB3E & 0x400)) {
                             D_8008FB58 = D_800615AC[D_800616B0--][0];
                             if (D_800616B0 < 0) {
@@ -487,7 +487,7 @@ void Menu_UpdateOptionsPage(s32 x) {
                             }
                             D_8008FB3E |= 0x600;
                         }
-                    } else if (D_80092C81 > 0x14) {
+                    } else if (input_stick_x > 0x14) {
                         if (!(D_8008FB3E & 0x400)) {
                             D_8008FB58 = D_800615AC[D_800616B0++][0];
                             if (D_800616B0 > 4) {
@@ -501,14 +501,14 @@ void Menu_UpdateOptionsPage(s32 x) {
                     break;
                 case 0x100:
                     y = 0x65;
-                    if (D_80092C82 < -0x1E || D_80092C82 > 0x1E) {
+                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
                         if (!(D_8008FB3E & 0x400)) {
                             D_8008FB3E &= ~0x100;
                             D_8008FB3E |= 0;
                             D_8008FB3E |= 0x400;
                             Sfx_Play(0, 0, 0xFF);
                         }
-                    } else if (D_80092C81 < -0x14) {
+                    } else if (input_stick_x < -0x14) {
                         if (!(D_8008FB3E & 0x400)) {
                             D_8008FB58 = D_800615CC[D_80060CB0--][0];
                             if (D_80060CB0 < 0) {
@@ -517,7 +517,7 @@ void Menu_UpdateOptionsPage(s32 x) {
                             D_8008FB3E |= 0x400;
                             D_8008FB3E |= 0x200;
                         }
-                    } else if (D_80092C81 > 0x14) {
+                    } else if (input_stick_x > 0x14) {
                         if (!(D_8008FB3E & 0x400)) {
                             D_8008FB58 = D_800615CC[D_80060CB0++][0];
                             if (D_80060CB0 > 4) {
@@ -729,7 +729,7 @@ void Menu_UpdateMapPage(s32 arg0) {
                 D_80060F2C = cy;
             }
             if (D_8008FB3C != 0) {
-                f = D_80092C81;
+                f = input_stick_x;
                 if (f > 0.0f) {
                     f -= 5.0f;
                     if (f < 0.0f) {
@@ -742,7 +742,7 @@ void Menu_UpdateMapPage(s32 arg0) {
                     }
                 }
                 D_80060F28 += f * 0.08;
-                f = D_80092C82;
+                f = input_stick_y;
                 if (f > 0.0f) {
                     f -= 5.0f;
                     if (f < 0.0f) {
@@ -781,11 +781,11 @@ void Menu_UpdateMapPage(s32 arg0) {
     }
     if (!(D_8008FB3E & 0x2000)) {
         if (D_8008FB3C == 0) {
-            if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
+            if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
                 D_8008FB3E |= 0x2000;
                 D_8008FB38 = 31;
                 Sfx_Play(0, 0, 0xFF);
-            } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
+            } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
                 D_8008FB3E |= 0x3000;
                 D_8008FB38 = 31;
                 Sfx_Play(0, 0, 0xFF);
@@ -796,11 +796,11 @@ void Menu_UpdateMapPage(s32 arg0) {
                 D_8008FB5C = D_80060F28;
                 D_8008FB60 = D_80060F2C;
             }
-            if (D_80092C86 & 0x8000) {
+            if (input_pressed_buttons & 0x8000) {
                 D_8008FB3C ^= 1;
                 D_8008FB3E ^= 0x20;
                 Sfx_Play(0, 0x17, 0xFF);
-            } else if ((D_80092C86 & 0x4000) && D_8008FB3C != 0) {
+            } else if ((input_pressed_buttons & 0x4000) && D_8008FB3C != 0) {
                 D_80060F28 = D_8008FB5C;
                 D_80060F2C = D_8008FB60;
                 Sfx_Play(0, 0x13, 0xFF);
@@ -820,8 +820,8 @@ extern u8 D_8007A9F7;
 extern s32 D_8007A9E0;
 extern u8 D_8007AA04;
 extern u32 D_80055D7C[];
-extern s8 D_80092C81;
-extern u16 D_80092C84;
+extern s8 input_stick_x;
+extern u16 input_held_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h);
 void Menu_DrawExpGauge(s32 arg0, s32 arg1);
@@ -899,11 +899,11 @@ void Menu_UpdateElementsPage(s32 x) {
     Menu_DrawNumber(3, x + 0x91, 0x92, v, 0xA);
     Menu_DrawExpGauge(v, x);
     if (!(D_8008FB3E & 0x2000)) {
-        if (D_80092C81 > 20 || (D_80092C84 & 0x10)) {
+        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
             D_8008FB3E |= 0x2000;
             D_8008FB38 = 31;
             Sfx_Play(0, 0, 0xFF);
-        } else if (D_80092C81 < -20 || (D_80092C84 & 0x2000)) {
+        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
             D_8008FB3E |= 0x3000;
             D_8008FB38 = 31;
             Sfx_Play(0, 0, 0xFF);
@@ -917,7 +917,7 @@ extern u8 *D_80060D74[];
 extern u8 D_80060CB4[][2];
 extern Gfx D_80060ED8[];
 extern Gfx D_80060EF0[];
-extern u16 D_80061E98[];
+extern u16 menu_ui_tlut[];
 
 void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
     s32 ret;
@@ -1012,7 +1012,7 @@ void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
         }
         if (!(D_8008FB3E & 0x10)) {
             gDPPipeSync(D_8007A184++);
-            gDPLoadTLUT_pal256(D_8007A184++, D_80061E98);
+            gDPLoadTLUT_pal256(D_8007A184++, menu_ui_tlut);
             D_8008FB3E |= 0x10;
         }
         gDPLoadTextureTile(D_8007A184++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
@@ -1174,7 +1174,7 @@ void Menu_DrawBackground(void) {
 }
 
 extern u8* D_80060D74[];
-extern u16 D_80061E98[];
+extern u16 menu_ui_tlut[];
 
 void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     s32 i;
@@ -1209,7 +1209,7 @@ void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     i = 0;
     if (!(D_8008FB3E & 0x10)) {
         gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, D_80061E98);
+        gDPLoadTLUT_pal256(D_8007A184++, menu_ui_tlut);
         D_8008FB3E |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {
@@ -1257,7 +1257,7 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     digits[0] = v;
     if (!(D_8008FB3E & 0x10)) {
         gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, D_80061E98);
+        gDPLoadTLUT_pal256(D_8007A184++, menu_ui_tlut);
         D_8008FB3E |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {

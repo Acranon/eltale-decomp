@@ -268,7 +268,7 @@ f32 sqrtf(f32 x);
 
 extern s32 D_8004DCA0;
 extern u16 D_800842E8;
-extern u16 D_80092C86;
+extern u16 input_pressed_buttons;
 extern CharData *D_80055D40[];
 extern RomRange D_80055F98[];
 extern Monster D_8007B908[];
@@ -289,8 +289,8 @@ extern s32 D_800842C0;
 extern Unk80085E48 D_80085E48;
 extern s16 hud_panel_transition_frame;
 extern u16 hud_panel_transition_state;
-extern s32 D_80090450;
-extern s32 D_80090454;
+extern s32 text_active_window_count;
+extern s32 text_last_choice_index;
 extern Unk803AAAA2 D_803AAAA2[];
 extern u8 D_869620[];
 extern u8 D_86F6F0[];
@@ -699,7 +699,7 @@ void Player_Update(void) {
         }
     }
     if (!(D_8004DCA0 & 0xF)) {
-        if (D_80092C86 & 0xA000) {
+        if (input_pressed_buttons & 0xA000) {
             if ((battle_flags & 1) && !(p->actor.unk60 & 1)) {
                 if (!(battle_flags & 6) && Magic_IsAnyEffectActive() == 0) {
                     if (p->unk2 != 0) {
@@ -774,7 +774,7 @@ void Player_Update(void) {
                 }
             }
         } else if (Player_CanAct(&D_8007AA08, &D_8007AA20) != 0) {
-            if (!(D_8004DCA0 & 4) && (D_80092C86 & 0x10)) {
+            if (!(D_8004DCA0 & 4) && (input_pressed_buttons & 0x10)) {
                 D_8004DCA0 ^= 1;
                 Fade_Start(6, 2, D_8004F5A0);
                 Sfx_Play(0, 1, 0xFF);
@@ -789,7 +789,7 @@ void Player_Update(void) {
             Player_StartCastSpell(&D_8007AA08, &D_8007AA20, (AnimEntry *) cd);
         }
     } else if (D_8004DCA0 & 1) {
-        if (D_80092C86 & 0x4010) {
+        if (input_pressed_buttons & 0x4010) {
             D_8004DCA0 ^= 1;
             Fade_Start(6, 4, D_8004F5B4);
             Sfx_Play(0, 2, 0xFF);
@@ -951,8 +951,8 @@ extern s32 D_8007A908;
 extern f32 D_80085E70;
 extern s32 D_8008C168;
 extern s32 D_8008C16C;
-extern s8 D_80092C81;
-extern s8 D_80092C82;
+extern s8 input_stick_x;
+extern s8 input_stick_y;
 void Effect_AllocateSprite(Unk8004EE20 *arg0);
 void Battle_StartBossEncounter(void);
 
@@ -960,8 +960,8 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
     f32 x;
     f32 z;
 
-    x = -(f32)D_80092C81;
-    z = -(f32)D_80092C82;
+    x = -(f32)input_stick_x;
+    z = -(f32)input_stick_y;
     if (x > -8.0f && x < 8.0f) {
         x = 0.0f;
     }
@@ -997,18 +997,18 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
             if (--D_8007A908 == 0) {
                 Text_OpenWindow(0);
             }
-        } else if (D_80090450 == 0) {
+        } else if (text_active_window_count == 0) {
             p->unk8 &= ~1;
             D_8004DCA0 &= ~2;
             Battle_StartBossEncounter();
         }
     } else if (p->unk8 & 2) {
-        if (D_80090450 == 0) {
+        if (text_active_window_count == 0) {
             p->unk8 &= ~2;
             D_8004DCA0 &= ~2;
         }
     } else if (p->unk8 & 0x10) {
-        if (D_80090450 == 0) {
+        if (text_active_window_count == 0) {
             p->unk8 &= ~0x10;
             D_8004DCA0 &= ~2;
         }
@@ -1119,14 +1119,14 @@ void Player_StateDying(Actor *arg0, PlayerState *arg1, s32 arg2) {
 void Player_StateTalk(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     arg0->vz = 0.0f;
     arg0->vx = 0.0f;
-    if (D_80090450 == 0) {
+    if (text_active_window_count == 0) {
         Npc_EndTalk(D_8007A9C0);
         arg1->unk0 = 0;
         arg0->unk60 &= 0xFFFE;
         D_8004DCA0 &= ~2;
         if (D_8004DCA0 & 0x10) {
             D_8004DCA0 &= ~0x10;
-            if (*(u16 *)((u8 *)D_8007AC70[D_8007A9C0].unk0 + 2) == 6 && D_80090454 == 0) {
+            if (*(u16 *)((u8 *)D_8007AC70[D_8007A9C0].unk0 + 2) == 6 && text_last_choice_index == 0) {
                 D_8004DCA0 |= 0x480;
                 D_8007A174 = 0x23;
                 D_8007A17A = 0x1E;
@@ -1229,7 +1229,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
         Player_AddTurnMoveAgilityXP(p);
         p->unk2 = 0;
         Battle_EndTurn(a);
-    } else if (p->unk0 == 0xD && p->unk10 >= p->unk4 && (D_80092C86 & 0xA000)) {
+    } else if (p->unk0 == 0xD && p->unk10 >= p->unk4 && (input_pressed_buttons & 0xA000)) {
         p->unk8 |= 0x100;
     }
 }
@@ -1323,7 +1323,7 @@ void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
             arg0->rot = arg1->unk138;
             Anim_SetCurrentAndNext(arg0, D_8007A910, 1, D_8007A910, 1, 1);
         }
-    } else if (D_80090450 == 0) {
+    } else if (text_active_window_count == 0) {
         arg1->unk0 = 0;
         arg0->unk60 &= 0xFFFE;
         D_8004DCA0 &= ~2;
@@ -1414,7 +1414,7 @@ void Player_StateExamine(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             Text_OpenWindow(1);
             D_8004DCA0 |= 2;
         }
-    } else if (D_80090450 == 0) {
+    } else if (text_active_window_count == 0) {
         arg1->unk0 = 3;
         if (arg1->unk8 & 0x200) {
             arg1->unk4 = 2;
@@ -2265,7 +2265,7 @@ s32 Player_CanAct(PlayerState *arg0, Actor *arg1) {
 
 extern s16 hud_element_allocation_timer;
 extern u16 hud_element_allocation_mode_flags;
-extern u16 D_80092C86;
+extern u16 input_pressed_buttons;
 
 s32 Magic_GetSpellRestrictionFlags(s32 arg0, u16 arg1);
 s32 Magic_LookupSpellSequence(u16 count, u8 *seq);
@@ -2277,15 +2277,15 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
     s32 sfx;
 
     ret = 0;
-    if (arg0->unk120 < 3 && (D_80092C86 & 0xF)) {
+    if (arg0->unk120 < 3 && (input_pressed_buttons & 0xF)) {
         prev = arg0->unk120;
-        if (D_80092C86 & 8) {
+        if (input_pressed_buttons & 8) {
             dir = 0;
-        } else if (D_80092C86 & 4) {
+        } else if (input_pressed_buttons & 4) {
             dir = 2;
-        } else if (D_80092C86 & 2) {
+        } else if (input_pressed_buttons & 2) {
             dir = 1;
-        } else if (D_80092C86 & 1) {
+        } else if (input_pressed_buttons & 1) {
             dir = 3;
         }
         arg0->unk11D[arg0->unk120] = dir;
@@ -2309,13 +2309,13 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
                 hud_element_allocation_mode_flags &= 0xFFFD;
             }
         }
-    } else if (arg0->unk120 && (D_80092C86 & 0xA000)) {
+    } else if (arg0->unk120 && (input_pressed_buttons & 0xA000)) {
         arg0->unk122 = Magic_LookupSpellSequence(arg0->unk120, arg0->unk11D);
         if (Magic_GetSpellRestrictionFlags(arg0->unk122, arg0->unk14->unk8) == 0) {
             D_8004DCA0 &= ~4;
             ret = 1;
         }
-    } else if ((D_80092C86 & 0x4000) && (D_8004DCA0 & 4)) {
+    } else if ((input_pressed_buttons & 0x4000) && (D_8004DCA0 & 4)) {
         if (arg0->unk120) {
             arg0->unk120--;
             hud_element_allocation_timer = 8;

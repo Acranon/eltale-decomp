@@ -208,17 +208,17 @@ D_8008F7C4 = D_8008F7A8 + 0x1C;
 D_8008F960 = D_8008F7A8 + 0x1B8;
 
 /* D2: labels inside objects that src/30600.c defines (8008FB70..80090450). */
-D_8008FB81 = D_8008FB80 + 0x1;
-D_8008FBA0 = D_8008FB80 + 0x20;
-D_80090248 = D_80090228 + 0x20;
-D_80090258 = D_80090228 + 0x30;
-D_800902EF = D_80090228 + 0xC7;
+D_8008FB81 = save_menu_file_entries + 0x1;
+D_8008FBA0 = save_menu_file_entries + 0x20;
+D_80090248 = save_menu_game_state_block + 0x20;
+D_80090258 = save_menu_game_state_block + 0x30;
+D_800902EF = save_menu_game_state_block + 0xC7;
 
 /* D2: labels inside objects that src/337B0.c defines (80090450..80092C70). */
-D_800909BC = D_80090470 + 0x54C;
-D_80090E6C = D_80090470 + 0x9FC;
-D_80091868 = D_80090470 + 0x13F8;
-D_80092264 = D_80090470 + 0x1DF4;
+D_800909BC = text_window_slots + 0x54C;
+D_80090E6C = text_window_slots + 0x9FC;
+D_80091868 = text_window_slots + 0x13F8;
+D_80092264 = text_window_slots + 0x1DF4;
 
 /* D2: fields of D_80084300 (src/12610.c) that asm and other files name. */
 D_80084308 = D_80084300 + 0x8;

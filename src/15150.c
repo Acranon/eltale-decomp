@@ -190,7 +190,7 @@ extern Unk8007C288* D_8007C288;
 extern u16 battle_flags;
 extern s32 D_8004DCA0;
 extern s32 D_8008C168;
-extern u16 D_80092C86;
+extern u16 input_pressed_buttons;
 extern s32 D_8007A180;
 extern Gfx* D_8007A184;
 extern Unk15150Dyn D_2000000;
@@ -320,7 +320,7 @@ void Camera_Update(Unk15150Dyn* arg0) {
     }
     D_8004EC18[cam->mode](cam);
     if (!(D_8004DCA0 & 0x82) && D_8008C168 == 0 && !(battle_flags & 1) && !(D_8007C288->unk14 & 2) &&
-        (D_80092C86 & 0x20) && D_80085C08[0] >= 2) {
+        (input_pressed_buttons & 0x20) && D_80085C08[0] >= 2) {
         D_80085F60++;
         if (D_80085F60 >= D_80085C08[0]) {
             D_80085F60 = 0;
@@ -355,7 +355,7 @@ void Camera_Update(Unk15150Dyn* arg0) {
 }
 
 extern s32 D_8004DCA0;
-extern u16 D_80092C84;
+extern u16 input_held_buttons;
 extern u16 battle_flags;
 extern f32 D_8007AA24;
 void func_80015B88(Camera15150 *arg0);
@@ -379,7 +379,7 @@ void Camera_FollowTarget(Camera15150 *arg0)
   func_80015B88(arg0);
   if (((!(D_8004DCA0 & 0x82)) && (!(battle_flags & 0x200))) && (!(arg0->flags & 0x40)))
   {
-    if ((D_80092C84 & 0x4000) || (arg0->mode == 2))
+    if ((input_held_buttons & 0x4000) || (arg0->mode == 2))
     {
       arg0->flags |= 0x24;
     }
@@ -593,7 +593,7 @@ void Camera_UpdateHeading(Camera15150* arg0) {
 
 extern f32 battle_center_x;
 extern f32 battle_center_z;
-extern u16 D_80092C86;
+extern u16 input_pressed_buttons;
 void Camera_UpdateBattle(Camera15150* arg0) {
     f32 a;
 
@@ -622,7 +622,7 @@ void Camera_UpdateBattle(Camera15150* arg0) {
             a += 6.283185307179586;
         }
         arg0->unk54 = a;
-        if (D_80092C86 & 0x20) {
+        if (input_pressed_buttons & 0x20) {
             D_80085F84 += 0.7853981633974483;
             if (D_80085F84 > 3.141592653589793) {
                 D_80085F84 -= 6.283185307179586;

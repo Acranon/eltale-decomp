@@ -87,25 +87,25 @@ typedef struct {
 } Unk8008FB80;
 
 /* .bss 8008FB70..80090450 */
-u16 D_8008FB70; /* low three bits select the save-menu state */
-u8 D_8008FB72;
-u8 D_8008FB73;
-s32 D_8008FB74;
-u8 D_8008FB78;
-s8 D_8008FB79; /* save-menu delay, in frames */
-s8 D_8008FB7A;
+u16 save_menu_flags; /* low three bits select the save-menu state */
+u8 save_menu_dialog_index;
+u8 save_menu_choice_prompt_index;
+s32 save_menu_pak_error;
+u8 save_menu_choice_cursor;
+s8 save_menu_delay_frames; /* save-menu delay, in frames */
+s8 save_menu_selected_slot;
 #ifdef NON_MATCHING
-u8 D_8008FB7B; /* SaveMenu_UpdateSlotList reads it with lbu */
+u8 save_menu_stick_repeat_counter; /* SaveMenu_UpdateSlotList reads it with lbu */
 #else
-s8 D_8008FB7B;
+s8 save_menu_stick_repeat_counter;
 #endif
-u8 D_8008FB7C;
-Unk8008FB80 D_8008FB80[17];
-Unk8008FBA8 D_8008FBA8[16];
-Unk80090228 D_80090228;
-Unk8008FBA8 D_800902F0; /* Pak_ReadFile reads 0x80 bytes into it */
+u8 save_menu_repair_attempts;
+Unk8008FB80 save_menu_file_entries[17];
+Unk8008FBA8 save_menu_save_headers[16];
+Unk80090228 save_menu_game_state_block;
+Unk8008FBA8 save_menu_header_read_scratch; /* Pak_ReadFile reads 0x80 bytes into it */
 u8 D_80090358[0x18];    /* the rest of that 0x80-byte buffer: unreferenced */
-u8 D_80090370[0xE0];
+u8 save_menu_state_read_scratch[0xE0];
 
 extern s32 D_8004DCA0;
 extern s8 D_80060CB0;
@@ -128,18 +128,18 @@ extern u16 D_80084992;
 extern u8 D_80085988[];
 extern u8 D_80085A98[];
 extern u8 D_8008C9B8[];
-extern Unk80092E48 D_80092E48[];
-extern Gfx D_80061770[];
+extern Unk80092E48 pak_game_file_scans[];
+extern Gfx text_glyph_setup_dl[];
 extern s16 D_8007A170;
 extern Gfx *D_8007A184;
 extern u16 D_8008FB3E;
-extern s16 D_8006C90C[][4];
-extern u8 *D_8006C8F8[];
+extern s16 save_menu_choice_rects[][4];
+extern u8 *save_menu_choice_messages[];
 extern u8 D_8008FB81[];
 extern u8 D_80090248[];
 extern u8 D_80090258[];
 extern u8 D_800902EF[];
-extern s8 D_80092C80;
+extern s8 input_primary_port;
 
 void SaveMenu_DrawOperationPanel(void);
 void SaveMenu_CheckControllerPak(void);
@@ -163,23 +163,23 @@ s32 Pak_ReadFile(s32, s32, s32, s32, u8 *);
 s32 Pak_TryRepair(s32, s32);
 s32 Pak_ClassifyError(s32);
 void func_8003D8EC(const char *, ...);
-extern OSMesgQueue D_80092C90;
-extern OSPfs D_80092CA8[4];
+extern OSMesgQueue input_si_queue;
+extern OSPfs pak_port_states[4];
 s32 func_8003D0F0(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 s32 Pak_ScanGameFiles(s32);
 void SaveMenu_RefreshFileList(void);
-extern s16 D_8006C9FC[][4];
-extern u8 *D_8006C934[];
-extern u8 *D_8006C998[];
-extern s16 D_8006CAC4[][2];
-extern s8 D_80092C82;
-extern u16 D_80092C86;
+extern s16 save_menu_dialog_rects[][4];
+extern u8 *save_menu_dialog_messages_flag4[];
+extern u8 *save_menu_dialog_messages_default[];
+extern s16 save_menu_choice_cursor_positions[][2];
+extern s8 input_stick_y;
+extern u16 input_pressed_buttons;
 void Sfx_Play(s32, s32, s32);
 
 #ifdef NON_MATCHING
-extern u8 *D_8006CC28[];
+extern u8 *save_menu_slot_label_ptrs[];
 extern s8 D_80060D64[];
 extern s32 D_8008FB44;
 void Menu_DrawNumber(s32, s32, s32, u32, s32);
@@ -190,30 +190,30 @@ void Menu_PrintNumber(s32, s32, s32, u32);
 void SaveMenu_Init(s32 arg0) {
     D_8007A170 = 2;
     D_8008FB3E = D_8008FB3E | arg0 | 0x4000;
-    D_8008FB70 = 0x1000;
-    D_8008FB78 = 0xFF;
-    D_8008FB7A = 0;
-    D_8008FB79 = 0;
-    D_8008FB72 = 0;
-    D_8008FB7B = 0;
-    D_8008FB7C = 0;
+    save_menu_flags = 0x1000;
+    save_menu_choice_cursor = 0xFF;
+    save_menu_selected_slot = 0;
+    save_menu_delay_frames = 0;
+    save_menu_dialog_index = 0;
+    save_menu_stick_repeat_counter = 0;
+    save_menu_repair_attempts = 0;
 }
 
 void SaveMenu_Update(void) {
     SaveMenu_DrawBackground();
-    if (!(D_8008FB70 & 0x4000)) {
-        if (D_8008FB70 & 0x2000) {
+    if (!(save_menu_flags & 0x4000)) {
+        if (save_menu_flags & 0x2000) {
             SaveMenu_CheckControllerPak();
-            D_8008FB70 |= 0x4000;
-            D_8008FB70 &= ~0x2000;
-            D_8008FB7C = 0;
+            save_menu_flags |= 0x4000;
+            save_menu_flags &= ~0x2000;
+            save_menu_repair_attempts = 0;
         } else {
-            D_8008FB70 |= 0x2000;
-            D_8008FB73 = 0;
+            save_menu_flags |= 0x2000;
+            save_menu_choice_prompt_index = 0;
         }
     }
-    if (D_8008FB70 & 0x4000) {
-        switch (D_8008FB70 & 7) {
+    if (save_menu_flags & 0x4000) {
+        switch (save_menu_flags & 7) {
             case 5:
                 SaveMenu_UpdateDialog();
                 break;
@@ -237,17 +237,17 @@ void SaveMenu_Update(void) {
                 break;
         }
     }
-    if (D_8008FB70 & 0x2000) {
+    if (save_menu_flags & 0x2000) {
         SaveMenu_DrawOperationPanel();
     }
-    if (D_8008FB70 & 0x8000) {
+    if (save_menu_flags & 0x8000) {
         D_8008FB3E &= 0x7FFF;
     }
 }
 
 void SaveMenu_DrawOperationPanel(void) {
     u8 unused[4];
-    s16 *r = D_8006C90C[D_8008FB73];
+    s16 *r = save_menu_choice_rects[save_menu_choice_prompt_index];
     s16 x = r[0];
     s16 y = r[1];
     s16 w = r[2];
@@ -264,7 +264,7 @@ void SaveMenu_DrawOperationPanel(void) {
     Menu_DrawSprite(0x38, x + 1, y + 2, 1, h - 4);
     Menu_DrawSprite(0x39, x + 1, y + h - 2, w - 2, 1);
     Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
-    Text_DrawEncodedString(x + 6, y + 6, D_8006C8F8[D_8008FB73]);
+    Text_DrawEncodedString(x + 6, y + 6, save_menu_choice_messages[save_menu_choice_prompt_index]);
     SaveMenu_SetTextDrawState();
 }
 
@@ -273,93 +273,93 @@ void SaveMenu_CheckControllerPak(void) {
     s32 err;
     Unk80092E48 *p;
 
-    if (D_8008FB70 & 0x1000) {
-        err = func_8003D0F0(&D_80092C90, &D_80092CA8[D_80092C80], D_80092C80);
+    if (save_menu_flags & 0x1000) {
+        err = func_8003D0F0(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port);
         if (err == 2) {
             err = 0;
         } else if (err == 10) {
-            if (func_8003D554(&D_80092C90, &D_80092CA8[D_80092C80], D_80092C80) == 0) {
+            if (func_8003D554(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port) == 0) {
                 err = 1;
-            } else if (func_8003D6B0(&D_80092C90, &D_80092CA8[D_80092C80], D_80092C80) == 0) {
+            } else if (func_8003D6B0(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port) == 0) {
                 err = 1;
             } else {
                 err = 10;
             }
         }
-        D_8008FB70 &= ~0x1000;
+        save_menu_flags &= ~0x1000;
     }
     if (err == 0) {
-        err = Pak_ScanGameFiles(D_80092C80);
+        err = Pak_ScanGameFiles(input_primary_port);
     }
     if (err != 0) {
-        D_8008FB74 = err;
+        save_menu_pak_error = err;
         if (-Pak_ClassifyError(err) == 1) {
             if (mode == 4) {
-                D_8008FB72 = 13;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 13;
+                save_menu_delay_frames = 10;
             } else {
-                D_8008FB72 = 8;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 8;
+                save_menu_delay_frames = 10;
             }
         } else {
-            D_8008FB72 = 17;
-            D_8008FB79 = 10;
+            save_menu_dialog_index = 17;
+            save_menu_delay_frames = 10;
         }
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 5;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 5;
     } else {
         if (mode == 4) {
-            p = &D_80092E48[D_80092C80];
+            p = &pak_game_file_scans[input_primary_port];
             if (p->unk13 < 2) {
                 if (p->unk0 & 0x4000) {
-                    D_8008FB72 = 21;
+                    save_menu_dialog_index = 21;
                 } else {
-                    D_8008FB72 = 20;
+                    save_menu_dialog_index = 20;
                 }
-                D_8008FB79 = 10;
-                D_8008FB70 &= 0xFFF8;
-                D_8008FB70 |= 5;
+                save_menu_delay_frames = 10;
+                save_menu_flags &= 0xFFF8;
+                save_menu_flags |= 5;
                 return;
             }
             if (p->unk0 & 0x2000) {
                 if (p->unk0 & 0x4000) {
-                    D_8008FB72 = 21;
-                    D_8008FB7A = 0;
-                    D_8008FB70 &= ~0x20;
+                    save_menu_dialog_index = 21;
+                    save_menu_selected_slot = 0;
+                    save_menu_flags &= ~0x20;
                 } else {
-                    D_8008FB72 = 20;
+                    save_menu_dialog_index = 20;
                 }
-                D_8008FB79 = 10;
-                D_8008FB70 &= 0xFFF8;
-                D_8008FB70 |= 5;
+                save_menu_delay_frames = 10;
+                save_menu_flags &= 0xFFF8;
+                save_menu_flags |= 5;
                 return;
             }
-        } else if (D_8008FB7C != 0 && ((p = &D_80092E48[D_80092C80])->unk13 < 2 || p->unk0 & 0x2000)) {
-            D_8008FB72 = 24;
-            D_8008FB79 = 10;
+        } else if (save_menu_repair_attempts != 0 && ((p = &pak_game_file_scans[input_primary_port])->unk13 < 2 || p->unk0 & 0x2000)) {
+            save_menu_dialog_index = 24;
+            save_menu_delay_frames = 10;
             SaveMenu_RefreshFileList();
-            D_8008FB70 &= 0xFFF8;
-            D_8008FB70 |= 5;
-            D_8008FB7A = 0;
-            D_8008FB70 &= ~0x20;
+            save_menu_flags &= 0xFFF8;
+            save_menu_flags |= 5;
+            save_menu_selected_slot = 0;
+            save_menu_flags &= ~0x20;
             return;
-        } else if (!(D_80092E48[D_80092C80].unk0 & 0x4000)) {
+        } else if (!(pak_game_file_scans[input_primary_port].unk0 & 0x4000)) {
             if (mode == 0) {
-                D_8008FB72 = 9;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 9;
+                save_menu_delay_frames = 10;
             } else {
-                D_8008FB72 = 10;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 10;
+                save_menu_delay_frames = 10;
             }
-            D_8008FB70 &= 0xFFF8;
-            D_8008FB70 |= 5;
+            save_menu_flags &= 0xFFF8;
+            save_menu_flags |= 5;
             return;
         }
         SaveMenu_RefreshFileList();
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 0;
-        D_8008FB7A = 0;
-        D_8008FB70 &= ~0x20;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 0;
+        save_menu_selected_slot = 0;
+        save_menu_flags &= ~0x20;
     }
 }
 
@@ -370,17 +370,17 @@ void SaveMenu_UpdateDialog(void) {
     s32 h;
     u8 *msg;
 
-    if (D_8008FB72 == 4 || D_8008FB72 == 5 || D_8008FB72 == 22 || D_8008FB72 == 23) {
+    if (save_menu_dialog_index == 4 || save_menu_dialog_index == 5 || save_menu_dialog_index == 22 || save_menu_dialog_index == 23) {
         SaveMenu_UpdateSlotList(1);
     }
-    x = D_8006C9FC[D_8008FB72][0];
-    y = D_8006C9FC[D_8008FB72][1];
-    w = D_8006C9FC[D_8008FB72][2];
-    h = D_8006C9FC[D_8008FB72][3];
+    x = save_menu_dialog_rects[save_menu_dialog_index][0];
+    y = save_menu_dialog_rects[save_menu_dialog_index][1];
+    w = save_menu_dialog_rects[save_menu_dialog_index][2];
+    h = save_menu_dialog_rects[save_menu_dialog_index][3];
     if (D_8008FB3E & 4) {
-        msg = D_8006C934[D_8008FB72];
+        msg = save_menu_dialog_messages_flag4[save_menu_dialog_index];
     } else {
-        msg = D_8006C998[D_8008FB72];
+        msg = save_menu_dialog_messages_default[save_menu_dialog_index];
     }
     Menu_DrawSprite(0, x, y, w, h);
     Menu_DrawSprite(0x37, x + 3, y + h, w, 3);
@@ -395,12 +395,12 @@ void SaveMenu_UpdateDialog(void) {
     Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
     Text_DrawEncodedString(x + 6, y + 6, msg);
     SaveMenu_SetTextDrawState();
-    if (D_8008FB79 >= 0) {
-        D_8008FB79--;
+    if (save_menu_delay_frames >= 0) {
+        save_menu_delay_frames--;
     }
-    if (D_8008FB79 < 0 && !(D_8008FB70 & 0x800)) {
-        if (D_80092C86 & 0x8000) {
-            switch (D_8008FB72) {
+    if (save_menu_delay_frames < 0 && !(save_menu_flags & 0x800)) {
+        if (input_pressed_buttons & 0x8000) {
+            switch (save_menu_dialog_index) {
                 case 8:
                 case 9:
                 case 10:
@@ -408,30 +408,30 @@ void SaveMenu_UpdateDialog(void) {
                 case 12:
                 case 16:
                 case 20:
-                    D_8008FB70 |= 0x8000;
+                    save_menu_flags |= 0x8000;
                     Sfx_Play(0, 1, 0xFF);
                     break;
                 case 24:
-                    D_8008FB70 = 0x1000;
+                    save_menu_flags = 0x1000;
                     break;
             }
         }
-        if (D_80092C86 & 0xC000) {
-            switch (D_8008FB72) {
+        if (input_pressed_buttons & 0xC000) {
+            switch (save_menu_dialog_index) {
                 case 19:
-                    D_8008FB70 &= ~0x2000;
-                    D_8008FB70 &= 0xFFF8;
-                    D_8008FB70 &= ~0x4000;
-                    D_8008FB70 &= ~0x20;
-                    D_8008FB7A = 0;
-                    D_8008FB70 |= 0x1000;
+                    save_menu_flags &= ~0x2000;
+                    save_menu_flags &= 0xFFF8;
+                    save_menu_flags &= ~0x4000;
+                    save_menu_flags &= ~0x20;
+                    save_menu_selected_slot = 0;
+                    save_menu_flags |= 0x1000;
                     Sfx_Play(0, 1, 0xFF);
                     break;
                 case 17:
-                    D_8008FB70 |= 0x10;
-                    D_8008FB70 |= 0x800;
-                    D_8008FB78 = 0;
-                    D_8008FB79 = 10;
+                    save_menu_flags |= 0x10;
+                    save_menu_flags |= 0x800;
+                    save_menu_choice_cursor = 0;
+                    save_menu_delay_frames = 10;
                     Sfx_Play(0, 1, 0xFF);
                     break;
                 case 4:
@@ -444,24 +444,24 @@ void SaveMenu_UpdateDialog(void) {
                 case 21:
                 case 22:
                 case 23:
-                    D_8008FB70 &= ~0x10;
-                    D_8008FB70 |= 0x800;
-                    if (D_8008FB72 == 4 || D_8008FB72 == 5 || D_8008FB72 == 6) {
-                        D_8008FB78 = 0;
+                    save_menu_flags &= ~0x10;
+                    save_menu_flags |= 0x800;
+                    if (save_menu_dialog_index == 4 || save_menu_dialog_index == 5 || save_menu_dialog_index == 6) {
+                        save_menu_choice_cursor = 0;
                     } else {
-                        D_8008FB78 = 1;
+                        save_menu_choice_cursor = 1;
                     }
-                    D_8008FB79 = 10;
+                    save_menu_delay_frames = 10;
                     Sfx_Play(0, 1, 0xFF);
                     break;
             }
         } else {
-            switch (D_8008FB72) {
+            switch (save_menu_dialog_index) {
                 case 17:
-                    D_8008FB70 |= 0x10;
-                    D_8008FB70 |= 0x800;
-                    D_8008FB78 = 0;
-                    D_8008FB79 = 10;
+                    save_menu_flags |= 0x10;
+                    save_menu_flags |= 0x800;
+                    save_menu_choice_cursor = 0;
+                    save_menu_delay_frames = 10;
                     break;
                 case 4:
                 case 5:
@@ -474,29 +474,29 @@ void SaveMenu_UpdateDialog(void) {
                 case 21:
                 case 22:
                 case 23:
-                    D_8008FB70 &= ~0x10;
-                    D_8008FB70 |= 0x800;
-                    if (D_8008FB72 == 4 || D_8008FB72 == 5 || D_8008FB72 == 6 || D_8008FB72 == 18) {
-                        D_8008FB78 = 0;
+                    save_menu_flags &= ~0x10;
+                    save_menu_flags |= 0x800;
+                    if (save_menu_dialog_index == 4 || save_menu_dialog_index == 5 || save_menu_dialog_index == 6 || save_menu_dialog_index == 18) {
+                        save_menu_choice_cursor = 0;
                     } else {
-                        D_8008FB78 = 1;
+                        save_menu_choice_cursor = 1;
                     }
-                    D_8008FB79 = 10;
+                    save_menu_delay_frames = 10;
                     break;
             }
         }
     }
-    if (D_8008FB70 & 0x800) {
-        if (D_8008FB70 & 0x10) {
-            x = D_8006C9FC[0][0];
-            y = D_8006C9FC[0][1];
-            w = D_8006C9FC[0][2];
-            h = D_8006C9FC[0][3];
+    if (save_menu_flags & 0x800) {
+        if (save_menu_flags & 0x10) {
+            x = save_menu_dialog_rects[0][0];
+            y = save_menu_dialog_rects[0][1];
+            w = save_menu_dialog_rects[0][2];
+            h = save_menu_dialog_rects[0][3];
         } else {
-            x = D_8006C9FC[2][0];
-            y = D_8006C9FC[2][1];
-            w = D_8006C9FC[2][2];
-            h = D_8006C9FC[2][3];
+            x = save_menu_dialog_rects[2][0];
+            y = save_menu_dialog_rects[2][1];
+            w = save_menu_dialog_rects[2][2];
+            h = save_menu_dialog_rects[2][3];
         }
         Menu_DrawSprite(0, x, y, w, h);
         Menu_DrawSprite(0x37, x + 3, y + h, w, 3);
@@ -509,125 +509,125 @@ void SaveMenu_UpdateDialog(void) {
         Menu_DrawSprite(0x38, x + 1, y + 2, 1, h - 4);
         Menu_DrawSprite(0x39, x + 1, y + h - 2, w - 2, 1);
         Menu_DrawSprite(0x39, x + w - 2, y + 1, 1, h - 3);
-        if (D_8008FB70 & 0x10) {
-            msg = D_8006C934[1];
+        if (save_menu_flags & 0x10) {
+            msg = save_menu_dialog_messages_flag4[1];
             Text_DrawEncodedString(x + 6, y + 6, msg);
-            Text_DrawEncodedString(x + 6, y + 19, D_8006C934[0]);
+            Text_DrawEncodedString(x + 6, y + 19, save_menu_dialog_messages_flag4[0]);
         } else {
-            msg = D_8006C934[2];
+            msg = save_menu_dialog_messages_flag4[2];
             Text_DrawEncodedString(x + 6, y + 6, msg);
-            Text_DrawEncodedString(x + 6, y + 19, D_8006C934[3]);
+            Text_DrawEncodedString(x + 6, y + 19, save_menu_dialog_messages_flag4[3]);
         }
         SaveMenu_SetTextDrawState();
-        if (D_8008FB79 < 0) {
-            if (D_80092C82 < -20 || D_80092C82 > 20) {
-                if (!(D_8008FB70 & 8)) {
-                    D_8008FB78 ^= 1;
-                    D_8008FB70 |= 8;
+        if (save_menu_delay_frames < 0) {
+            if (input_stick_y < -20 || input_stick_y > 20) {
+                if (!(save_menu_flags & 8)) {
+                    save_menu_choice_cursor ^= 1;
+                    save_menu_flags |= 8;
                     Sfx_Play(0, 0, 0xFF);
                 }
             } else {
-                D_8008FB70 &= ~8;
+                save_menu_flags &= ~8;
             }
             SaveMenu_SetTextDrawState();
-            if (D_8008FB70 & 0x10) {
-                Menu_DrawSprite(4, D_8006CAC4[D_8008FB78 + 2][0], D_8006CAC4[D_8008FB78 + 2][1], 12, 12);
+            if (save_menu_flags & 0x10) {
+                Menu_DrawSprite(4, save_menu_choice_cursor_positions[save_menu_choice_cursor + 2][0], save_menu_choice_cursor_positions[save_menu_choice_cursor + 2][1], 12, 12);
             } else {
-                Menu_DrawSprite(4, D_8006CAC4[D_8008FB78][0], D_8006CAC4[D_8008FB78][1], 12, 12);
+                Menu_DrawSprite(4, save_menu_choice_cursor_positions[save_menu_choice_cursor][0], save_menu_choice_cursor_positions[save_menu_choice_cursor][1], 12, 12);
             }
-            if (D_80092C86 & 0x8000) {
-                if (D_8008FB78 == 0) {
+            if (input_pressed_buttons & 0x8000) {
+                if (save_menu_choice_cursor == 0) {
                     Sfx_Play(0, 1, 0xFF);
-                    switch (D_8008FB72) {
+                    switch (save_menu_dialog_index) {
                         case 17:
-                            D_8008FB72 = 18;
-                            D_8008FB79 = 10;
+                            save_menu_dialog_index = 18;
+                            save_menu_delay_frames = 10;
                             break;
                         case 5:
-                            D_8008FB70 &= 0xFFF8;
-                            D_8008FB70 |= 4;
-                            D_8008FB70 |= 0x2000;
-                            D_8008FB73 = 3;
+                            save_menu_flags &= 0xFFF8;
+                            save_menu_flags |= 4;
+                            save_menu_flags |= 0x2000;
+                            save_menu_choice_prompt_index = 3;
                             break;
                         case 4:
-                            D_8008FB70 |= 0x2000;
-                            D_8008FB73 = 2;
-                            D_8008FB70 &= 0xFFF8;
-                            D_8008FB70 |= 3;
+                            save_menu_flags |= 0x2000;
+                            save_menu_choice_prompt_index = 2;
+                            save_menu_flags &= 0xFFF8;
+                            save_menu_flags |= 3;
                             break;
                         case 6:
-                            D_8008FB70 |= 0x2000;
-                            D_8008FB73 = 4;
-                            D_8008FB70 &= 0xFFF8;
-                            D_8008FB70 |= 1;
+                            save_menu_flags |= 0x2000;
+                            save_menu_choice_prompt_index = 4;
+                            save_menu_flags &= 0xFFF8;
+                            save_menu_flags |= 1;
                             break;
                         case 21:
                             SaveMenu_RefreshFileList();
-                            D_8008FB70 &= 0xFFF8;
-                            D_8008FB70 |= 0;
+                            save_menu_flags &= 0xFFF8;
+                            save_menu_flags |= 0;
                             break;
                         case 14:
                         case 15:
                         case 18:
                         case 22:
                         case 23:
-                            D_8008FB70 &= ~0x2000;
-                            D_8008FB70 &= 0xFFF8;
-                            D_8008FB70 &= ~0x4000;
-                            D_8008FB70 |= 0x1000;
+                            save_menu_flags &= ~0x2000;
+                            save_menu_flags &= 0xFFF8;
+                            save_menu_flags &= ~0x4000;
+                            save_menu_flags |= 0x1000;
                             break;
                         case 13:
-                            D_8008FB70 |= 0x8000;
+                            save_menu_flags |= 0x8000;
                             break;
                         case 7:
-                            D_8008FB70 |= 0x8000;
+                            save_menu_flags |= 0x8000;
                             break;
                     }
                 } else {
                     Sfx_Play(0, 2, 0xFF);
-                    switch (D_8008FB72) {
+                    switch (save_menu_dialog_index) {
                         case 17:
-                            D_8008FB72 = 6;
+                            save_menu_dialog_index = 6;
                             break;
                         case 15:
                         case 18:
                         case 22:
                         case 23:
-                            D_8008FB70 |= 0x8000;
+                            save_menu_flags |= 0x8000;
                             break;
                         case 13:
-                            D_8008FB70 &= ~0x2000;
-                            D_8008FB70 &= 0xFFF8;
-                            D_8008FB70 &= ~0x4000;
-                            D_8008FB70 |= 0x1000;
+                            save_menu_flags &= ~0x2000;
+                            save_menu_flags &= 0xFFF8;
+                            save_menu_flags &= ~0x4000;
+                            save_menu_flags |= 0x1000;
                             break;
                         case 14:
                         case 21:
-                            D_8008FB72 = 15;
-                            D_8008FB79 = 10;
+                            save_menu_dialog_index = 15;
+                            save_menu_delay_frames = 10;
                             break;
                         case 4:
                         case 5:
                         case 7:
-                            D_8008FB70 &= 0xFFF8;
-                            if (D_8008FB70 & 0x1000) {
-                                D_8008FB70 &= ~0x4000;
-                                D_8008FB70 |= 0x2000;
+                            save_menu_flags &= 0xFFF8;
+                            if (save_menu_flags & 0x1000) {
+                                save_menu_flags &= ~0x4000;
+                                save_menu_flags |= 0x2000;
                             } else {
-                                D_8008FB70 |= 0;
+                                save_menu_flags |= 0;
                             }
                             break;
                         case 6:
-                            D_8008FB70 &= ~0x2000;
-                            D_8008FB70 &= 0xFFF8;
-                            D_8008FB70 |= 0x1005;
-                            D_8008FB72 = 7;
+                            save_menu_flags &= ~0x2000;
+                            save_menu_flags &= 0xFFF8;
+                            save_menu_flags |= 0x1005;
+                            save_menu_dialog_index = 7;
                             break;
                     }
                 }
-                D_8008FB70 &= ~0x800;
-            } else if (D_80092C86 & 0x4000) {
-                switch (D_8008FB72) {
+                save_menu_flags &= ~0x800;
+            } else if (input_pressed_buttons & 0x4000) {
+                switch (save_menu_dialog_index) {
                     case 6:
                     case 7:
                     case 13:
@@ -640,10 +640,10 @@ void SaveMenu_UpdateDialog(void) {
                     case 23:
                         break;
                     default:
-                        D_8008FB70 &= ~0x800;
-                        D_8008FB79 = 2;
-                        D_8008FB70 &= 0xFFF8;
-                        D_8008FB70 |= 0;
+                        save_menu_flags &= ~0x800;
+                        save_menu_delay_frames = 2;
+                        save_menu_flags &= 0xFFF8;
+                        save_menu_flags |= 0;
                         break;
                 }
             }
@@ -677,20 +677,20 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
 
     flag = 0;
     buf = D_80061650;
-    if (D_8008FB70 & 0x20) {
-        if (D_8008FB7A == 0) {
-            idx = D_8008FB7A;
-            D_8008FB70 &= 0xFFDF;
+    if (save_menu_flags & 0x20) {
+        if (save_menu_selected_slot == 0) {
+            idx = save_menu_selected_slot;
+            save_menu_flags &= 0xFFDF;
         } else {
-            idx = D_8008FB7A - 1;
+            idx = save_menu_selected_slot - 1;
         }
     } else {
-        idx = D_8008FB7A;
+        idx = save_menu_selected_slot;
     }
-    ptr[0] = &D_8008FB80[idx];
+    ptr[0] = &save_menu_file_entries[idx];
     if (ptr[0]->unk0 != -2) {
         if (ptr[0]->unk1 != -1) {
-            if (idx == D_8008FB7A) {
+            if (idx == save_menu_selected_slot) {
                 Menu_DrawNumber(2, 0x6F, 0x36, idx, 0xA);
                 Menu_DrawSprite(0x36, 0x53, 0x35, 0x1C, 0xD);
                 Menu_DrawSprite(0x19, 0x92, 0x36, 8, 0xA);
@@ -703,20 +703,20 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 Menu_DrawSprite(0x44, 0xD9, 0x35, 0x1C, 0xE);
                 colors[0] = 0x48;
             }
-            Menu_DrawNumber(2, 0x65, 0x6C, D_8008FBA8[idx].unk0.unk24, 0xA);
-            Menu_DrawNumber(2, 0x8A, 0x6C, D_8008FBA8[idx].unk0.unk25, 0xA);
-            Menu_DrawNumber(2, 0xAF, 0x6C, D_8008FBA8[idx].unk0.unk26, 0xA);
-            Menu_DrawNumber(2, 0xD4, 0x6C, D_8008FBA8[idx].unk0.unk27, 0xA);
-            switch (D_8008FBA8[idx].unk3C) {
+            Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].unk0.unk24, 0xA);
+            Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].unk0.unk25, 0xA);
+            Menu_DrawNumber(2, 0xAF, 0x6C, save_menu_save_headers[idx].unk0.unk26, 0xA);
+            Menu_DrawNumber(2, 0xD4, 0x6C, save_menu_save_headers[idx].unk0.unk27, 0xA);
+            switch (save_menu_save_headers[idx].unk3C) {
                 case 15:
-                    if (D_8008FBA8[idx].unk40 == 5) {
+                    if (save_menu_save_headers[idx].unk40 == 5) {
                         n = 0;
                     } else {
                         n = 0x10;
                     }
                     break;
                 case 16:
-                    if (D_8008FBA8[idx].unk40 == 7) {
+                    if (save_menu_save_headers[idx].unk40 == 7) {
                         n = 1;
                     } else {
                         n = 2;
@@ -726,7 +726,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     n = 4;
                     break;
                 case 18:
-                    if (D_8008FBA8[idx].unk40 == 6) {
+                    if (save_menu_save_headers[idx].unk40 == 6) {
                         n = 3;
                     } else {
                         n = 5;
@@ -736,14 +736,14 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     n = 6;
                     break;
                 case 22:
-                    if (D_8008FBA8[idx].unk40 == 0x16) {
+                    if (save_menu_save_headers[idx].unk40 == 0x16) {
                         n = 7;
                     } else {
                         n = 8;
                     }
                     break;
                 case 23:
-                    switch (D_8008FBA8[idx].unk40) {
+                    switch (save_menu_save_headers[idx].unk40) {
                         case 0:
                             n = 9;
                             break;
@@ -768,19 +768,19 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     n = 0xF;
                     break;
             }
-            Text_DrawEncodedString(0x51, 0x48, D_8006CC28[n]);
+            Text_DrawEncodedString(0x51, 0x48, save_menu_slot_label_ptrs[n]);
             SaveMenu_SetTextDrawState();
             n = 0;
-            secs = D_8008FBA8[idx].unk38;
+            secs = save_menu_save_headers[idx].unk38;
             while (secs >= 60) {
                 secs -= 60;
                 n++;
             }
             Menu_DrawNumber(3, 0x7E, 0x36, n, colors[0]);
             Menu_DrawNumberZeroPad(2, 0x9A, 0x36, secs, colors[0]);
-            Menu_DrawNumber(3, 0xC0, 0x36, D_8008FBA8[idx].unk3A, colors[0]);
-            Menu_PrintNumber(3, 0x70, 0x58, D_8008FBA8[idx].unk0.unk4);
-            Menu_PrintNumber(3, 0xC0, 0x58, D_8008FBA8[idx].unk0.unk8);
+            Menu_DrawNumber(3, 0xC0, 0x36, save_menu_save_headers[idx].unk3A, colors[0]);
+            Menu_PrintNumber(3, 0x70, 0x58, save_menu_save_headers[idx].unk0.unk4);
+            Menu_PrintNumber(3, 0xC0, 0x58, save_menu_save_headers[idx].unk0.unk8);
         }
     } else {
         flag = 1;
@@ -792,7 +792,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     if (ptr[0]->unk0 != -1 && flag == 0) {
         if (ptr[0]->unk0 != -2) {
             if (ptr[0]->unk1 != -1) {
-                    if (idx == D_8008FB7A) {
+                    if (idx == save_menu_selected_slot) {
                     Menu_DrawNumber(2, 0x6F, 0x83, idx, 0xA);
                     Menu_DrawSprite(0x36, 0x53, 0x82, 0x1C, 0xD);
                     Menu_DrawSprite(0x19, 0x92, 0x83, 8, 0xA);
@@ -805,20 +805,20 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     Menu_DrawSprite(0x44, 0xD9, 0x82, 0x1C, 0xE);
                     colors[0] = 0x48;
                 }
-                Menu_DrawNumber(2, 0x65, 0xBA, D_8008FBA8[idx].unk0.unk24, 0xA);
-                Menu_DrawNumber(2, 0x8A, 0xBA, D_8008FBA8[idx].unk0.unk25, 0xA);
-                Menu_DrawNumber(2, 0xAF, 0xBA, D_8008FBA8[idx].unk0.unk26, 0xA);
-                Menu_DrawNumber(2, 0xD4, 0xBA, D_8008FBA8[idx].unk0.unk27, 0xA);
-                switch (D_8008FBA8[idx].unk3C) {
+                Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].unk0.unk24, 0xA);
+                Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].unk0.unk25, 0xA);
+                Menu_DrawNumber(2, 0xAF, 0xBA, save_menu_save_headers[idx].unk0.unk26, 0xA);
+                Menu_DrawNumber(2, 0xD4, 0xBA, save_menu_save_headers[idx].unk0.unk27, 0xA);
+                switch (save_menu_save_headers[idx].unk3C) {
                     case 15:
-                        if (D_8008FBA8[idx].unk40 == 5) {
+                        if (save_menu_save_headers[idx].unk40 == 5) {
                             n = 0;
                         } else {
                             n = 0x10;
                         }
                         break;
                     case 16:
-                        if (D_8008FBA8[idx].unk40 == 7) {
+                        if (save_menu_save_headers[idx].unk40 == 7) {
                             n = 1;
                         } else {
                             n = 2;
@@ -828,7 +828,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                         n = 4;
                         break;
                     case 18:
-                        if (D_8008FBA8[idx].unk40 == 6) {
+                        if (save_menu_save_headers[idx].unk40 == 6) {
                             n = 3;
                         } else {
                             n = 5;
@@ -838,14 +838,14 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                         n = 6;
                         break;
                     case 22:
-                        if (D_8008FBA8[idx].unk40 == 0x16) {
+                        if (save_menu_save_headers[idx].unk40 == 0x16) {
                             n = 7;
                         } else {
                             n = 8;
                         }
                         break;
                     case 23:
-                        switch (D_8008FBA8[idx].unk40) {
+                        switch (save_menu_save_headers[idx].unk40) {
                             case 0:
                                 n = 9;
                                 break;
@@ -870,19 +870,19 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                         n = 0xF;
                         break;
                 }
-                Text_DrawEncodedString(0x51, 0x96, D_8006CC28[n]);
+                Text_DrawEncodedString(0x51, 0x96, save_menu_slot_label_ptrs[n]);
                 SaveMenu_SetTextDrawState();
                 n = 0;
-                secs = D_8008FBA8[idx].unk38;
+                secs = save_menu_save_headers[idx].unk38;
                 while (secs >= 60) {
                     secs -= 60;
                     n++;
                 }
                 Menu_DrawNumber(3, 0x7E, 0x83, n, colors[0]);
                 Menu_DrawNumberZeroPad(2, 0x9A, 0x83, secs, colors[0]);
-                Menu_DrawNumber(3, 0xC0, 0x83, D_8008FBA8[idx].unk3A, colors[0]);
-                Menu_PrintNumber(3, 0x70, 0xA6, D_8008FBA8[idx].unk0.unk4);
-                Menu_PrintNumber(3, 0xC0, 0xA6, D_8008FBA8[idx].unk0.unk8);
+                Menu_DrawNumber(3, 0xC0, 0x83, save_menu_save_headers[idx].unk3A, colors[0]);
+                Menu_PrintNumber(3, 0x70, 0xA6, save_menu_save_headers[idx].unk0.unk4);
+                Menu_PrintNumber(3, 0xC0, 0xA6, save_menu_save_headers[idx].unk0.unk8);
             }
         } else {
             Text_DrawEncodedString(0x82, 0x7F, buf.b);
@@ -890,98 +890,98 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     }
     SaveMenu_SetTextDrawState();
     flag = D_80060D64[(D_8008FB44 >> 2) & 0xF];
-    if (D_8008FB7A >= 2) {
+    if (save_menu_selected_slot >= 2) {
         Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
         Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
-    } else if (D_8008FB7A == 1 && !(D_8008FB70 & 0x20)) {
+    } else if (save_menu_selected_slot == 1 && !(save_menu_flags & 0x20)) {
         Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
         Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
     }
-    if (ptr[0] < &D_8008FB80[16] && ptr[0][1].unk0 != -1) {
+    if (ptr[0] < &save_menu_file_entries[16] && ptr[0][1].unk0 != -1) {
         Menu_DrawSprite(5, 0x38, 0xA4, 7, 7);
         Menu_DrawSprite(0x54, 0x36, 0xAC - flag, 0xE, 0xB);
     }
-    if (D_8008FB70 & 0x20) {
+    if (save_menu_flags & 0x20) {
         Menu_DrawSprite(1, flag + 0x42, 0x80, 0x10, 0xD);
     } else {
         Menu_DrawSprite(1, flag + 0x42, 0x37, 0x10, 0xD);
     }
     if (arg0 != 1) {
         n = 0;
-        if (D_80092C82 < -20) {
-            if (D_8008FB7B == 0) {
+        if (input_stick_y < -20) {
+            if (save_menu_stick_repeat_counter == 0) {
                 Sfx_Play(0, 0, 0xFF);
-                D_8008FB7A++;
-                if (D_8008FB80[D_8008FB7A].unk0 == -1) {
-                    D_8008FB7A--;
+                save_menu_selected_slot++;
+                if (save_menu_file_entries[save_menu_selected_slot].unk0 == -1) {
+                    save_menu_selected_slot--;
                     n = 1;
                 }
-                if (!(D_8008FB70 & 0x20) && n == 0) {
-                    D_8008FB70 |= 0x20;
+                if (!(save_menu_flags & 0x20) && n == 0) {
+                    save_menu_flags |= 0x20;
                 } else if (n == 0) {
-                    D_8008FB70 &= 0xFFF8;
-                    D_8008FB70 |= 6;
-                    D_8008FB79 = 4;
+                    save_menu_flags &= 0xFFF8;
+                    save_menu_flags |= 6;
+                    save_menu_delay_frames = 4;
                 }
             }
-            D_8008FB7B++;
-            D_8008FB7B &= 0xF;
-        } else if (D_80092C82 > 20) {
-            if (D_8008FB7B == 0) {
+            save_menu_stick_repeat_counter++;
+            save_menu_stick_repeat_counter &= 0xF;
+        } else if (input_stick_y > 20) {
+            if (save_menu_stick_repeat_counter == 0) {
                 Sfx_Play(0, 0, 0xFF);
-                D_8008FB7A--;
-                if (D_8008FB7A < 0) {
-                    D_8008FB7A = 0;
+                save_menu_selected_slot--;
+                if (save_menu_selected_slot < 0) {
+                    save_menu_selected_slot = 0;
                     n = 1;
                 }
-                if (D_8008FB70 & 0x20) {
-                    D_8008FB70 &= 0xFFDF;
+                if (save_menu_flags & 0x20) {
+                    save_menu_flags &= 0xFFDF;
                 } else if (n == 0) {
-                    D_8008FB70 &= 0xFFF8;
-                    D_8008FB70 |= 6;
-                    D_8008FB79 = 4;
+                    save_menu_flags &= 0xFFF8;
+                    save_menu_flags |= 6;
+                    save_menu_delay_frames = 4;
                 }
             }
-            D_8008FB7B++;
-            D_8008FB7B &= 0xF;
+            save_menu_stick_repeat_counter++;
+            save_menu_stick_repeat_counter &= 0xF;
         } else {
-            D_8008FB7B = 0;
+            save_menu_stick_repeat_counter = 0;
         }
-        if (D_80092C86 & 0x8000) {
+        if (input_pressed_buttons & 0x8000) {
             idx = D_8008FB3E & 0xC;
             Sfx_Play(0, 1, 0xFF);
             switch (idx) {
                 case 0:
-                    D_8008FB70 |= 0x2000;
-                    D_8008FB73 = 1;
-                    D_8008FB70 &= ~7;
-                    D_8008FB70 |= 2;
+                    save_menu_flags |= 0x2000;
+                    save_menu_choice_prompt_index = 1;
+                    save_menu_flags &= ~7;
+                    save_menu_flags |= 2;
                     break;
                 case 8:
-                    D_8008FB72 = 5;
-                    D_8008FB79 = 10;
-                    D_8008FB70 &= ~7;
-                    D_8008FB70 |= 5;
+                    save_menu_dialog_index = 5;
+                    save_menu_delay_frames = 10;
+                    save_menu_flags &= ~7;
+                    save_menu_flags |= 5;
                     break;
                 case 4:
-                    if (D_8008FB80[D_8008FB7A].unk0 == -2) {
-                        D_8008FB70 |= 0x2000;
-                        D_8008FB73 = 2;
-                        D_8008FB70 &= ~7;
-                        D_8008FB70 |= 3;
+                    if (save_menu_file_entries[save_menu_selected_slot].unk0 == -2) {
+                        save_menu_flags |= 0x2000;
+                        save_menu_choice_prompt_index = 2;
+                        save_menu_flags &= ~7;
+                        save_menu_flags |= 3;
                     } else {
-                        D_8008FB72 = 4;
-                        D_8008FB79 = 10;
-                        D_8008FB70 &= ~7;
-                        D_8008FB70 |= 5;
+                        save_menu_dialog_index = 4;
+                        save_menu_delay_frames = 10;
+                        save_menu_flags &= ~7;
+                        save_menu_flags |= 5;
                     }
                     break;
             }
-        } else if (D_80092C86 & 0x5000) {
-            D_8008FB72 = 7;
-            D_8008FB79 = 10;
-            D_8008FB70 &= ~7;
-            D_8008FB70 |= 5;
+        } else if (input_pressed_buttons & 0x5000) {
+            save_menu_dialog_index = 7;
+            save_menu_delay_frames = 10;
+            save_menu_flags &= ~7;
+            save_menu_flags |= 5;
             Sfx_Play(0, 2, 0xFF);
         }
     }
@@ -991,72 +991,72 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
 #endif
 
 void SaveMenu_UpdateDelay(void) {
-    D_8008FB79--;
-    if (D_8008FB79 < 0) {
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 0;
+    save_menu_delay_frames--;
+    if (save_menu_delay_frames < 0) {
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 0;
     }
 }
 
 void SaveMenu_DeleteSelectedFile(void) {
-    s32 err = Pak_DeleteGameFile(D_80092C80, D_8008FB81[D_8008FB7A * 2]);
+    s32 err = Pak_DeleteGameFile(input_primary_port, D_8008FB81[save_menu_selected_slot * 2]);
 
     if (err != 0) {
-        D_8008FB74 = err;
+        save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
             case 1:
-                D_8008FB72 = 8;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 8;
+                save_menu_delay_frames = 10;
                 break;
             case 4:
-                D_8008FB72 = 12;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 12;
+                save_menu_delay_frames = 10;
                 break;
             default:
-                D_8008FB72 = 17;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 17;
+                save_menu_delay_frames = 10;
                 break;
         }
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 5;
-        D_8008FB70 &= ~0x2000;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 5;
+        save_menu_flags &= ~0x2000;
     } else {
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 5;
-        D_8008FB70 &= ~0x2000;
-        D_8008FB72 = 22;
-        D_8008FB79 = 10;
-        ((s8 *)D_8008FB81)[D_8008FB7A * 2] = -1;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 5;
+        save_menu_flags &= ~0x2000;
+        save_menu_dialog_index = 22;
+        save_menu_delay_frames = 10;
+        ((s8 *)D_8008FB81)[save_menu_selected_slot * 2] = -1;
     }
 }
 
 void SaveMenu_LoadSelectedFile(void) {
-    s32 err = Pak_ReadFile(D_80092C80, D_8008FB80[D_8008FB7A].unk0, 0x80, 0xE0, D_80090370);
+    s32 err = Pak_ReadFile(input_primary_port, save_menu_file_entries[save_menu_selected_slot].unk0, 0x80, 0xE0, save_menu_state_read_scratch);
 
-    D_80090228 = *(Unk80090228 *)D_80090370;
+    save_menu_game_state_block = *(Unk80090228 *)save_menu_state_read_scratch;
     if (err != 0) {
-        D_8008FB74 = err;
+        save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
             case 1:
-                D_8008FB72 = 8;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 8;
+                save_menu_delay_frames = 10;
                 break;
             case 4:
-                D_8008FB72 = 11;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 11;
+                save_menu_delay_frames = 10;
                 break;
             default:
-                D_8008FB72 = 17;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 17;
+                save_menu_delay_frames = 10;
                 break;
         }
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 5;
-        D_8008FB70 &= ~0x2000;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 5;
+        save_menu_flags &= ~0x2000;
     } else {
-        SaveMenu_RestoreGameState(D_8008FB7A);
-        D_8008FB70 |= 0x80;
-        D_8008FB70 |= 0x8000;
+        SaveMenu_RestoreGameState(save_menu_selected_slot);
+        save_menu_flags |= 0x80;
+        save_menu_flags |= 0x8000;
     }
 }
 
@@ -1072,18 +1072,18 @@ void SaveMenu_SaveSelectedFile(void) {
     s32 k;
     s32 cont;
 
-    idx = D_8008FB7A;
-    p = &D_8008FB80[idx];
+    idx = save_menu_selected_slot;
+    p = &save_menu_file_entries[idx];
 
     if (p->unk0 == -2) {
-        cont = D_80092C80;
-        n = D_80092E48[cont].unk0 & 0xF;
+        cont = input_primary_port;
+        n = pak_game_file_scans[cont].unk0 & 0xF;
         id = 0xF;
         do {
             i = 0;
             id++;
             do {
-                if (id == D_8008FB80[i].unk1) {
+                if (id == save_menu_file_entries[i].unk1) {
                     i = 0x7F;
                     break;
                 }
@@ -1100,65 +1100,65 @@ void SaveMenu_SaveSelectedFile(void) {
         }
         err = Pak_AllocateGameFile(cont, n);
         if (err >= 0) {
-            idx = D_8008FB7A;
-            D_8008FB80[idx].unk0 = err;
+            idx = save_menu_selected_slot;
+            save_menu_file_entries[idx].unk0 = err;
         } else {
-            idx = D_8008FB7A;
+            idx = save_menu_selected_slot;
         }
         SaveMenu_CaptureGameState(idx);
     } else {
         SaveMenu_CaptureGameState(idx);
     }
-    id = D_8008FB7A;
-    err = Pak_WriteFile(D_80092C80, D_8008FB80[id].unk0, 0, 0x80, &D_8008FBA8[id]);
+    id = save_menu_selected_slot;
+    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[id].unk0, 0, 0x80, &save_menu_save_headers[id]);
     if (err != 0) {
-        D_8008FB74 = err;
+        save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
             case 1:
-                D_8008FB72 = 13;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 13;
+                save_menu_delay_frames = 10;
                 break;
             case 4:
-                D_8008FB72 = 14;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 14;
+                save_menu_delay_frames = 10;
                 break;
             default:
-                D_8008FB72 = 17;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 17;
+                save_menu_delay_frames = 10;
                 break;
         }
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 5;
-        D_8008FB70 &= ~0x2000;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 5;
+        save_menu_flags &= ~0x2000;
         return;
     }
-    err = Pak_WriteFile(D_80092C80, D_8008FB80[D_8008FB7A].unk0, 0x80, 0xE0, &D_80090228);
+    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[save_menu_selected_slot].unk0, 0x80, 0xE0, &save_menu_game_state_block);
     if (err != 0) {
-        D_8008FB74 = err;
+        save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
             case 1:
-                D_8008FB72 = 13;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 13;
+                save_menu_delay_frames = 10;
                 break;
             case 4:
-                D_8008FB72 = 14;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 14;
+                save_menu_delay_frames = 10;
                 break;
             default:
-                D_8008FB72 = 17;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 17;
+                save_menu_delay_frames = 10;
                 break;
         }
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 |= 5;
-        D_8008FB70 &= ~0x2000;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags |= 5;
+        save_menu_flags &= ~0x2000;
         return;
     }
-    D_8008FB70 &= 0xFFF8;
-    D_8008FB70 |= 5;
-    D_8008FB70 &= ~0x2000;
-    D_8008FB72 = 23;
-    D_8008FB79 = 10;
+    save_menu_flags &= 0xFFF8;
+    save_menu_flags |= 5;
+    save_menu_flags &= ~0x2000;
+    save_menu_dialog_index = 23;
+    save_menu_delay_frames = 10;
 }
 #else
 #pragma GLOBAL_ASM("asm/nonmatchings/30600/SaveMenu_SaveSelectedFile.s")
@@ -1167,33 +1167,33 @@ void SaveMenu_SaveSelectedFile(void) {
 void SaveMenu_RepairPak(void) {
     s32 err;
 
-    func_8003D8EC("Repair Info %d %d\n", D_8008FB7A, D_8008FB74);
-    err = Pak_TryRepair(D_8008FB80[D_8008FB7A].unk0, D_8008FB74);
+    func_8003D8EC("Repair Info %d %d\n", save_menu_selected_slot, save_menu_pak_error);
+    err = Pak_TryRepair(save_menu_file_entries[save_menu_selected_slot].unk0, save_menu_pak_error);
     if (err != 0) {
-        D_8008FB74 = err;
+        save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
             case 1:
-                D_8008FB72 = 8;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 8;
+                save_menu_delay_frames = 10;
                 break;
             case 3:
-                D_8008FB72 = 16;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 16;
+                save_menu_delay_frames = 10;
                 break;
             default:
-                D_8008FB72 = 17;
-                D_8008FB79 = 10;
+                save_menu_dialog_index = 17;
+                save_menu_delay_frames = 10;
                 break;
         }
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 &= ~0x4000;
-        D_8008FB70 |= 0x1000;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags &= ~0x4000;
+        save_menu_flags |= 0x1000;
     } else {
-        D_8008FB70 &= ~0x2000;
-        D_8008FB70 &= 0xFFF8;
-        D_8008FB70 &= ~0x4000;
-        D_8008FB70 |= 0x1000;
-        D_8008FB7C++;
+        save_menu_flags &= ~0x2000;
+        save_menu_flags &= 0xFFF8;
+        save_menu_flags &= ~0x4000;
+        save_menu_flags |= 0x1000;
+        save_menu_repair_attempts++;
     }
 }
 
@@ -1207,44 +1207,44 @@ void SaveMenu_RefreshFileList(void) {
     s32 ret;
 
     for (i = 0; i < 17; i++) {
-        D_8008FB80[i].unk0 = -1;
-        D_8008FB80[i].unk1 = -1;
+        save_menu_file_entries[i].unk0 = -1;
+        save_menu_file_entries[i].unk1 = -1;
     }
-    cont = D_80092C80;
+    cont = input_primary_port;
     n = 0;
     for (i = 0; i < 16; i++) {
-        if (D_80092E48[cont].unk2[i] == 0x7F) {
+        if (pak_game_file_scans[cont].unk2[i] == 0x7F) {
             continue;
         }
-        if (D_80092E48[cont].unk2[i] >= 0) {
-            D_8008FB80[n].unk0 = i;
-            D_8008FB80[n].unk1 = D_80092E48[cont].unk2[i];
+        if (pak_game_file_scans[cont].unk2[i] >= 0) {
+            save_menu_file_entries[n].unk0 = i;
+            save_menu_file_entries[n].unk1 = pak_game_file_scans[cont].unk2[i];
             n++;
         }
     }
     if (D_8008FB3E & 4) {
-        if (D_80092E48[cont].unk13 >= 2 && !(D_80092E48[cont].unk0 & 0x2000)) {
-            D_8008FB80[n].unk0 = -2;
+        if (pak_game_file_scans[cont].unk13 >= 2 && !(pak_game_file_scans[cont].unk0 & 0x2000)) {
+            save_menu_file_entries[n].unk0 = -2;
         }
     }
-    D_8008FB7A = 0;
+    save_menu_selected_slot = 0;
     for (i = 0; i < 16; i++) {
-        if (D_8008FB80[i].unk0 >= 0) {
-            e = &D_8008FBA8[i];
-            ret = Pak_ReadFile(D_80092C80, D_8008FB80[i].unk0, 0, 0x80, (u8 *)&D_800902F0);
-            *e = D_800902F0;
+        if (save_menu_file_entries[i].unk0 >= 0) {
+            e = &save_menu_save_headers[i];
+            ret = Pak_ReadFile(input_primary_port, save_menu_file_entries[i].unk0, 0, 0x80, (u8 *)&save_menu_header_read_scratch);
+            *e = save_menu_header_read_scratch;
             if (ret != 0) {
-                D_8008FB74 = err;
+                save_menu_pak_error = err;
                 err = -Pak_ClassifyError(err);
                 if (err == 1) {
-                    D_8008FB72 = 8;
-                    D_8008FB79 = 10;
+                    save_menu_dialog_index = 8;
+                    save_menu_delay_frames = 10;
                 } else {
-                    D_8008FB72 = 17;
-                    D_8008FB79 = 10;
+                    save_menu_dialog_index = 17;
+                    save_menu_delay_frames = 10;
                 }
-                D_8008FB70 &= 0xFFF8;
-                D_8008FB70 |= 5;
+                save_menu_flags &= 0xFFF8;
+                save_menu_flags |= 5;
             } else if (e->unk64 != 0) {
                 D_8004DCA0 |= 0x20000;
             }
@@ -1253,7 +1253,7 @@ void SaveMenu_RefreshFileList(void) {
 }
 
 void SaveMenu_SetTextDrawState(void) {
-    gSPDisplayList(D_8007A184++, D_80061770);
+    gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
     gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
     D_8008FB3E &= ~0x10;
 }
@@ -1283,7 +1283,7 @@ void SaveMenu_DrawBackground(void) {
 }
 
 void SaveMenu_CaptureGameState(s32 arg0) {
-    Unk8008FBA8 *e = &D_8008FBA8[arg0];
+    Unk8008FBA8 *e = &save_menu_save_headers[arg0];
     u8 *d;
     u8 *s;
     s32 n;
@@ -1309,26 +1309,26 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     } else {
         e->unk64 = 0;
     }
-    d = D_80090228.unk0.b;
-    for (s = D_80085988, n = sizeof(D_80090228.unk0); n != 0; n--) {
+    d = save_menu_game_state_block.unk0.b;
+    for (s = D_80085988, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
         *d++ = *s++;
     }
     d = D_80090248;
-    for (s = D_80085A98, n = sizeof(D_80090228.unk20); n != 0; n--) {
+    for (s = D_80085A98, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
         *d++ = *s++;
     }
     d = D_80090258;
-    for (s = D_8008C9B8, n = sizeof(D_80090228.unk30); n != 0; n--) {
+    for (s = D_8008C9B8, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
         *d++ = *s++;
     }
     d = D_800902EF;
-    for (s = D_8007C13C, n = sizeof(D_80090228.unkC7); n != 0; n--) {
+    for (s = D_8007C13C, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
         *d++ = *s++;
     }
 }
 
 void SaveMenu_RestoreGameState(s32 arg0) {
-    Unk8008FBA8 *e = &D_8008FBA8[arg0];
+    Unk8008FBA8 *e = &save_menu_save_headers[arg0];
     u8 *d;
     u8 *s;
     s32 n;
@@ -1352,19 +1352,19 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     if (e->unk64 != 0) {
         D_8004DCA0 |= 0x20000;
     }
-    for (s = D_80090228.unk0.b, d = D_80085988, n = sizeof(D_80090228.unk0); n != 0; n--) {
+    for (s = save_menu_game_state_block.unk0.b, d = D_80085988, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
         *d++ = *s++;
     }
     s = D_80090248;
-    for (d = D_80085A98, n = sizeof(D_80090228.unk20); n != 0; n--) {
+    for (d = D_80085A98, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
         *d++ = *s++;
     }
     s = D_80090258;
-    for (d = D_8008C9B8, n = sizeof(D_80090228.unk30); n != 0; n--) {
+    for (d = D_8008C9B8, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
         *d++ = *s++;
     }
     s = D_800902EF;
-    for (d = D_8007C13C, n = sizeof(D_80090228.unkC7); n != 0; n--) {
+    for (d = D_8007C13C, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
         *d++ = *s++;
     }
 }

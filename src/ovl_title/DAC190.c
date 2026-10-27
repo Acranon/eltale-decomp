@@ -139,9 +139,9 @@ s32 D_8020F488_ovl_title[18] = {
 
 
 extern u8 D_8007A1CC;
-extern s8 D_80092C81;
-extern s8 D_80092C82;
-extern u16 D_80061850[];
+extern s8 input_stick_x;
+extern s8 input_stick_y;
+extern u16 text_font_tlut[];
 extern u16 D_8020F510_ovl_title[];
 extern u8 D_8020F710_ovl_title[];
 extern u8 D_802105F8_ovl_title[];
@@ -231,15 +231,15 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
     gSPTextureRectangle(D_8007A184++, 85 << 2, 188 << 2, 232 << 2, 194 << 2, G_TX_RENDERTILE, 0, 10 << 5, 1 << 10, 1 << 10);
 
     held = 0;
-    if (D_80092C81 > 20) {
+    if (input_stick_x > 20) {
         held = 8;
-    } else if (D_80092C81 < -20) {
+    } else if (input_stick_x < -20) {
         held = 4;
     }
-    if (D_80092C82 > 20) {
+    if (input_stick_y > 20) {
         held |= 1;
     }
-    if (D_80092C82 < -20) {
+    if (input_stick_y < -20) {
         held |= 2;
     }
     D_80226DB9 = 0;
@@ -351,7 +351,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                     D_80226DBC = D_8021150C_ovl_title;
                 }
                 gDPPipeSync(D_8007A184++);
-                gDPLoadTLUT_pal256(D_8007A184++, D_80061850);
+                gDPLoadTLUT_pal256(D_8007A184++, text_font_tlut);
                 gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255);
                 Text_DrawTexturedRect(0, 0x3E, 0x28, 0xC4, 0x67);
                 Text_DrawTexturedRect(3, 0x102, 0x2A, 2, 0x67);

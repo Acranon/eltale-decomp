@@ -264,8 +264,8 @@ void Item_DrawMenuFrame(s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, void*);
 void Fade_Start(s32, s32, void*);
 extern Gfx* D_8007A184;
-extern s8 D_80092C81;
-extern u16 D_80092C86;
+extern s8 input_stick_x;
+extern u16 input_pressed_buttons;
 extern u8 D_8004F5B4[];
 extern Gfx D_1000388[];
 extern u8 D_8039AFB0[];
@@ -300,7 +300,7 @@ void Item_UpdateInventoryMenu(void) {
     Item_DrawMenuFrame(0x48, 0x44, 0xAD, 0x36);
     gSPDisplayList(D_8007A184++, D_803AA940);
     gSPDisplayList(D_8007A184++, D_803AA998);
-    x = D_80092C81;
+    x = input_stick_x;
     if (x > 5) {
         x -= 5;
     } else if (x < -5) {
@@ -433,7 +433,7 @@ void Item_UpdateInventoryMenu(void) {
         gSPDisplayList(D_8007A184++, D_1000388);
         Text_DrawEncodedString(0x77, 0x48, D_803AB288[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
         Text_DrawEncodedString(0x4E, 0x5A, D_803AB2F0[D_8008C9B8[D_8008C19C + D_8008C1A0]]);
-        if ((D_80092C86 & 0xA000) && Item_TryUse(D_8008C9B8[D_8008C19C + D_8008C1A0])) {
+        if ((input_pressed_buttons & 0xA000) && Item_TryUse(D_8008C9B8[D_8008C19C + D_8008C1A0])) {
             p = &D_8008C9B8[D_8008C19C + D_8008C1A0];
             for (n = 0x95 - D_8008C19C - D_8008C1A0; n != 0; n--) {
                 *p = p[1];

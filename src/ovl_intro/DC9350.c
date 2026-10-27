@@ -27,9 +27,9 @@ extern u16 D_80264E98_ovl_intro[];
 extern u16 D_802615A8_ovl_intro[];
 extern u16 D_80260288_ovl_intro[];
 extern u8 D_8025D500_ovl_intro[];
-extern u16 D_80092C86;
-extern s8 D_80092C81;
-extern s8 D_80092C82;
+extern u16 input_pressed_buttons;
+extern s8 input_stick_x;
+extern s8 input_stick_y;
 extern u16 D_80264538_ovl_intro[];
 extern u8 D_802617B0_ovl_intro[];
 extern u16 D_80268280_ovl_intro[];
@@ -217,15 +217,15 @@ s32 Intro_RunNoPakScreen(void) {
     GFX_WORDS(0xFCFFFFFF, 0xFFFCF279);
     GFX_WORDS(0xB900031D, 0x504240);
     dir = 0;
-    if (D_80092C81 > 20) {
+    if (input_stick_x > 20) {
         dir = 8;
-    } else if (D_80092C81 < -20) {
+    } else if (input_stick_x < -20) {
         dir = 4;
     }
-    if (D_80092C82 > 20) {
+    if (input_stick_y > 20) {
         dir |= 1;
     }
-    if (D_80092C82 < -20) {
+    if (input_stick_y < -20) {
         dir |= 2;
     }
     pressed = (dir ^ D_80277080_ovl_intro) & dir;
@@ -273,7 +273,7 @@ s32 Intro_RunNoPakScreen(void) {
             gDPLoadTLUT_pal16(D_8007A184++, 0, D_80268280_ovl_intro);
             gDPLoadTextureTile_4b(D_8007A184++, D_80268220_ovl_intro, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(D_8007A184++, (D_80212260_ovl_intro * 71 + 90) << 2, 157 << 2, (D_80212260_ovl_intro * 71 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-            if (D_80092C86 & 0xB000) {
+            if (input_pressed_buttons & 0xB000) {
                 if (D_80212260_ovl_intro == 1) {
                     D_80212258_ovl_intro = 1;
                 } else {
@@ -291,7 +291,7 @@ s32 Intro_RunNoPakScreen(void) {
             }
             gDPLoadTextureTile_4b(D_8007A184++, tex[0], G_IM_FMT_CI, 208, 0, 0, i * 10, 199, i * 10 + 1, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 10 + 99) << 2, 260 << 2, (i * 10 + 101) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
-            if (D_80092C86 & 0x4000) {
+            if (input_pressed_buttons & 0x4000) {
                 D_80212258_ovl_intro = 0;
             }
             break;
@@ -330,7 +330,7 @@ s32 Intro_RunPakFullScreen(void) {
     }
     gDPLoadTextureTile_4b(D_8007A184++, D_8025D500_ovl_intro, G_IM_FMT_CI, 208, 0, 0, i * 10, 199, i * 10 + 1, 0, 0, 0, 0, 0, 0, 0);
     gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 10 + 64) << 2, 260 << 2, (i * 10 + 66) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
-    if (D_80092C86 & 0x9000) {
+    if (input_pressed_buttons & 0x9000) {
         ret = 1;
     }
     return ret;
@@ -357,15 +357,15 @@ s32 Intro_RunPakErrorScreen(void) {
     GFX_WORDS(0xFCFFFFFF, 0xFFFCF279);
     GFX_WORDS(0xB900031D, 0x504240);
     dir = 0;
-    if (D_80092C81 > 20) {
+    if (input_stick_x > 20) {
         dir = 8;
-    } else if (D_80092C81 < -20) {
+    } else if (input_stick_x < -20) {
         dir = 4;
     }
-    if (D_80092C82 > 20) {
+    if (input_stick_y > 20) {
         dir |= 1;
     }
-    if (D_80092C82 < -20) {
+    if (input_stick_y < -20) {
         dir |= 2;
     }
     pressed = (dir ^ D_80277083_ovl_intro) & dir;
@@ -413,7 +413,7 @@ s32 Intro_RunPakErrorScreen(void) {
             gDPLoadTLUT_pal16(D_8007A184++, 0, D_80268280_ovl_intro);
             gDPLoadTextureTile_4b(D_8007A184++, D_80268220_ovl_intro, G_IM_FMT_CI, 16, 0, 0, 0, 10, 10, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(D_8007A184++, (D_8021226C_ovl_intro * 74 + 90) << 2, 157 << 2, (D_8021226C_ovl_intro * 74 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-            if (D_80092C86 & 0xB000) {
+            if (input_pressed_buttons & 0xB000) {
                 if (D_8021226C_ovl_intro == 1) {
                     D_80212264_ovl_intro = 1;
                 } else {
@@ -431,7 +431,7 @@ s32 Intro_RunPakErrorScreen(void) {
             }
             gDPLoadTextureTile_4b(D_8007A184++, tex[0], G_IM_FMT_CI, 208, 0, 0, i * 10, 199, i * 10 + 1, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 10 + 99) << 2, 260 << 2, (i * 10 + 101) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
-            if (D_80092C86 & 0x4000) {
+            if (input_pressed_buttons & 0x4000) {
                 D_80212264_ovl_intro = 0;
             }
             break;

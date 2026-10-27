@@ -192,11 +192,11 @@ typedef struct {
 
 extern Gfx *D_8007A184;
 extern Gfx D_80212270_ovl_intro[];
-extern s8 D_80092C80;
-extern u16 D_80092C86;
-extern OSMesgQueue D_80092C90;
-extern OSPfs D_80092CA8[4];
-extern Unk80092E48 D_80092E48[4];
+extern s8 input_primary_port;
+extern u16 input_pressed_buttons;
+extern OSMesgQueue input_si_queue;
+extern OSPfs pak_port_states[4];
+extern Unk80092E48 pak_game_file_scans[4];
 extern u8 D_8006CC74;
 extern u8 D_8006CC78;
 extern u8 D_8006CC7C;
@@ -243,17 +243,17 @@ s32 Intro_Update(void) {
     static u8 D_8021223C_ovl_intro = 0;
     static s32 D_80212240_ovl_intro = 1;
 
-    if (D_80092C80 == -1) {
+    if (input_primary_port == -1) {
         Intro_DrawNoControllerMessage();
         return 2;
     }
     if (D_8006CC7C == 0) {
         switch (D_80212238_ovl_intro) {
             case 0:
-                err = Pak_ClassifyError(Pak_ScanGameFiles(D_80092C80));
+                err = Pak_ClassifyError(Pak_ScanGameFiles(input_primary_port));
                 func_8003D8EC("pack_status = %d\n", err);
                 if (err != -1 && err != -2 && err != -3) {
-                    if (D_80092E48[D_80092C80].unk0 & 0x2000) {
+                    if (pak_game_file_scans[input_primary_port].unk0 & 0x2000) {
                         D_80212238_ovl_intro = 1;
                         return 2;
                     }
@@ -261,11 +261,11 @@ s32 Intro_Update(void) {
                     return 2;
                 }
                 if (err != -3) {
-                    if (func_8003D554(&D_80092C90, &D_80092CA8[D_80092C80], D_80092C80) == 0) {
+                    if (func_8003D554(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port) == 0) {
                         D_80212238_ovl_intro = 3;
                         return 2;
                     }
-                    if (func_8003D6B0(&D_80092C90, &D_80092CA8[D_80092C80], D_80092C80) == 0) {
+                    if (func_8003D6B0(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port) == 0) {
                         D_80212238_ovl_intro = 3;
                         return 2;
                     }
@@ -310,7 +310,7 @@ s32 Intro_Update(void) {
                 break;
             case 1:
                 Intro_RunSplash2();
-                if (D_80092C86 & 0x1000) {
+                if (input_pressed_buttons & 0x1000) {
                     Sfx_Enqueue(1, 0xFF, 0x40);
                     D_80212230_ovl_intro = 0;
                     D_8021223C_ovl_intro = 1;
@@ -329,7 +329,7 @@ s32 Intro_Update(void) {
                 break;
             case 2:
                 Intro_RunSplash3();
-                if (D_80092C86 & 0x1000) {
+                if (input_pressed_buttons & 0x1000) {
                     Sfx_Enqueue(1, 0xFF, 0x40);
                     D_80212230_ovl_intro = 0;
                     D_8021223C_ovl_intro = 1;
@@ -494,7 +494,7 @@ s32 Intro_RunSpriteScript(void) {
             }
         }
     }
-    if (D_80092C86 & 0x1000) {
+    if (input_pressed_buttons & 0x1000) {
         D_80277078_ovl_intro = 1;
     }
     if (D_80277078_ovl_intro != 0) {

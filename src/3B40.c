@@ -69,8 +69,8 @@ void Text_OpenWindow(u8 arg0);
 /* This file's .bss, 8007A8C0..8007A8F0, in address order. D_8007A8C0 and
  * D_8007A8EC are unreferenced gaps (D_8007A8C0 could as well be 1870.c's tail). */
 u8 D_8007A8C0[0x20];
-s32 D_8007A8E0;
-s32 D_8007A8E4;
+s32 cutscene_message_wait_frames;
+s32 cutscene_messages_remaining;
 Unk8007A8E8 *D_8007A8E8;
 s32 D_8007A8EC;
 
@@ -101,7 +101,7 @@ extern f32 D_80085E60;
 extern f32 D_80085E64;
 extern f32 D_80085E68;
 extern f32 D_80085F50;
-extern s32 D_80090450;
+extern s32 text_active_window_count;
 extern Unk801C14E4 D_801C14E4[];
 
 void Cutscene_StartEntry(s32 arg0) {
@@ -109,13 +109,13 @@ void Cutscene_StartEntry(s32 arg0) {
     f32 mtx[4][4];
 
     D_8007A8E8 = entry->unk34;
-    D_8007A8E4 = entry->unk38;
-    D_8007A8E0 = 0x3C;
+    cutscene_messages_remaining = entry->unk38;
+    cutscene_message_wait_frames = 0x3C;
     D_800842BC = -1;
     D_800842C4 = entry->unk0;
     D_800842C8 = entry->unk4;
     Text_ResetAllWindows(0, arg0);
-    D_80090450 = 0;
+    text_active_window_count = 0;
     D_80084308 = -1;
     Map_LoadArea();
     D_8007A98C = entry->unk20;
@@ -149,23 +149,23 @@ void Cutscene_StartEntry(s32 arg0) {
 s32 Cutscene_UpdateMessageSequence(void) {
     s32 ret = 0;
 
-    if (D_8007A8E0 == 0) {
-        if (D_8007A8E4 != 0) {
+    if (cutscene_message_wait_frames == 0) {
+        if (cutscene_messages_remaining != 0) {
             Cutscene_CopyMessageBuffers(D_8007A8E8->unk0, D_8007A8E8->unk4);
             Text_OpenWindow(D_8007A8E8->unk8);
-            D_8007A8E0 = 0xF;
+            cutscene_message_wait_frames = 0xF;
             D_8007A8E8++;
-            D_8007A8E4--;
+            cutscene_messages_remaining--;
         } else {
             D_8004DCA0 |= 0x80;
             D_8007A174 = 0x31;
             D_8007A178 = 2;
             D_8007A17A = 0x2F;
-            D_8007A8E0 = 0x32;
+            cutscene_message_wait_frames = 0x32;
             ret = 1;
         }
-    } else if (D_80090450 == 0) {
-        D_8007A8E0--;
+    } else if (text_active_window_count == 0) {
+        cutscene_message_wait_frames--;
     }
     return ret;
 }

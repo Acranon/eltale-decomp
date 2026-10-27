@@ -690,7 +690,7 @@ extern u8 D_8007A9F4;
 extern u8 D_8007A9F5;
 extern u8 D_8007A9F6;
 extern u8 D_8007A9F7;
-extern u16 D_80092C86;
+extern u16 input_pressed_buttons;
 extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
 void Sfx_Play(s32, s32, s32);
@@ -743,12 +743,12 @@ void Hud_UpdateElementAllocation(Unk2000000* buf, Struct_80022970* pl) {
         gSPDisplayList(D_8007A184++, D_803AA2F8);
     }
     if (hud_element_input_timer == 0) {
-        if (D_80092C86 & 0xF) {
-            if (D_80092C86 & 8) {
+        if (input_pressed_buttons & 0xF) {
+            if (input_pressed_buttons & 8) {
                 hud_selected_element_index = 0;
-            } else if (D_80092C86 & 2) {
+            } else if (input_pressed_buttons & 2) {
                 hud_selected_element_index = 1;
-            } else if (D_80092C86 & 4) {
+            } else if (input_pressed_buttons & 4) {
                 hud_selected_element_index = 2;
             } else {
                 hud_selected_element_index = 3;

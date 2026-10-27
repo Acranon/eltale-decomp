@@ -200,8 +200,8 @@ u8 D_8004DD18[8] = {
 #include "assets/D_8004DD18.inc.c"
 };
 extern s32 D_8007A174;
-extern s32 D_80090454;
-extern Unk80090458 D_80090458;
+extern s32 text_last_choice_index;
+extern Unk80090458 text_pending_choice_rows;
 
 void func_80009764(s32);
 void Npc_SpawnForArea(NPCDef *, s32);
@@ -569,10 +569,10 @@ void Npc_StartTalk(s32 idx) {
             break;
         case 6:
             Npc_LoadMessage(npc, npc->def->unk8);
-            D_80090458.unk0 = 2;
-            D_80090458.unk8 = D_8004DD10;
-            D_80090458.unkC = D_8004DD18;
-            D_80090454 = -1;
+            text_pending_choice_rows.unk0 = 2;
+            text_pending_choice_rows.unk8 = D_8004DD10;
+            text_pending_choice_rows.unkC = D_8004DD18;
+            text_last_choice_index = -1;
             D_8004DCA0 |= 0x10;
             break;
         default:
