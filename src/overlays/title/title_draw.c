@@ -166,7 +166,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         } else {
             title_menu_item = 0;
         }
-        title_current_message = D_802113A8_ovl_title;
+        title_current_message = title_menu_state6_message;
         title_draw_initialized = 1;
     }
 
@@ -308,15 +308,15 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                                 G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             if (arg0 == 6 || arg0 == 7 || arg0 == 8 || arg0 == 9 || arg0 == 10 || arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
                 if (arg0 == 6) {
-                    title_current_message = D_802113A8_ovl_title;
+                    title_current_message = title_menu_state6_message;
                 } else if (arg0 == 7) {
-                    title_current_message = D_80211428_ovl_title;
+                    title_current_message = title_menu_state7_message;
                 } else if (arg0 == 8) {
-                    title_current_message = D_80211464_ovl_title;
+                    title_current_message = title_menu_state8_message;
                 } else if (arg0 == 9) {
-                    title_current_message = D_802114E0_ovl_title;
+                    title_current_message = title_menu_state9_message;
                 } else if (arg0 == 10) {
-                    title_current_message = D_8021150C_ovl_title;
+                    title_current_message = title_menu_state10_message;
                 }
                 gDPPipeSync(gfx_dl_head++);
                 gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
@@ -349,8 +349,8 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                 gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, 255);
                 Text_DrawEncodedString(0x44, 0x2E, title_current_message);
                 if (arg0 == 8 || arg0 == 7 || arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
-                    Text_DrawEncodedString(0x94, 0x73, D_80211540_ovl_title);
-                    Text_DrawEncodedString(0x94, 0x80, D_80211548_ovl_title);
+                    Text_DrawEncodedString(0x94, 0x73, title_confirmation_row0_text);
+                    Text_DrawEncodedString(0x94, 0x80, title_confirmation_row1_text);
                     if (arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
                         gDPPipeSync(gfx_dl_head++);
                         GFX_WORDS(0xB900031D, 0x504240);

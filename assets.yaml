@@ -291,13 +291,13 @@
 - { name: title_menu_atlas_tex, rom: 0xDB0240, size: 0x420, type: u8 }      # texture
 - { name: title_menu_item_cursor_tex, rom: 0xDB0668, size: 0x58, type: u8 }       # texture
 - { name: title_menu_item_cursor_tlut, rom: 0xDB06C8, size: 0x200, type: u16 }     # palette, 256 colours
-- { name: D_802113A8_ovl_title, rom: 0xDB08C8, size: 0x80, type: u8 }       # message text
-- { name: D_80211428_ovl_title, rom: 0xDB0948, size: 0x3C, type: u8 }       # message text
-- { name: D_80211464_ovl_title, rom: 0xDB0984, size: 0x7C, type: u8 }       # message text
-- { name: D_802114E0_ovl_title, rom: 0xDB0A00, size: 0x2C, type: u8 }       # message text
-- { name: D_8021150C_ovl_title, rom: 0xDB0A2C, size: 0x34, type: u8 }       # message text
-- { name: D_80211540_ovl_title, rom: 0xDB0A60, size: 0x8, type: u8 }        # message text
-- { name: D_80211548_ovl_title, rom: 0xDB0A68, size: 0x8, type: u8 }        # message text
+- { name: title_menu_state6_message, rom: 0xDB08C8, size: 0x80, type: u8 }       # message text
+- { name: title_menu_state7_message, rom: 0xDB0948, size: 0x3C, type: u8 }       # message text
+- { name: title_menu_state8_message, rom: 0xDB0984, size: 0x7C, type: u8 }       # message text
+- { name: title_menu_state9_message, rom: 0xDB0A00, size: 0x2C, type: u8 }       # message text
+- { name: title_menu_state10_message, rom: 0xDB0A2C, size: 0x34, type: u8 }       # message text
+- { name: title_confirmation_row0_text, rom: 0xDB0A60, size: 0x8, type: u8 }        # message text
+- { name: title_confirmation_row1_text, rom: 0xDB0A68, size: 0x8, type: u8 }        # message text
 - { name: title_center_image_tlut, rom: 0xDB0A70, size: 0x200, type: u16 }     # palette, 256 colours
 - { name: title_center_image_tex, rom: 0xDB0C70, size: 0x39A0, type: u8 }     # texture
 - { name: title_background_tlut, rom: 0xDB4610, size: 0x200, type: u16 }     # palette, 256 colours

@@ -62,32 +62,32 @@ u16 title_menu_item_cursor_tlut[0x100] = {
 #include "assets/title_menu_item_cursor_tlut.inc.c"
 };
 /* message text */
-u8 D_802113A8_ovl_title[0x80] = {
-#include "assets/D_802113A8_ovl_title.inc.c"
+u8 title_menu_state6_message[0x80] = {
+#include "assets/title_menu_state6_message.inc.c"
 };
 /* message text */
-u8 D_80211428_ovl_title[0x3C] = {
-#include "assets/D_80211428_ovl_title.inc.c"
+u8 title_menu_state7_message[0x3C] = {
+#include "assets/title_menu_state7_message.inc.c"
 };
 /* message text */
-u8 D_80211464_ovl_title[0x7C] = {
-#include "assets/D_80211464_ovl_title.inc.c"
+u8 title_menu_state8_message[0x7C] = {
+#include "assets/title_menu_state8_message.inc.c"
 };
 /* message text */
-u8 D_802114E0_ovl_title[0x2C] = {
-#include "assets/D_802114E0_ovl_title.inc.c"
+u8 title_menu_state9_message[0x2C] = {
+#include "assets/title_menu_state9_message.inc.c"
 };
 /* message text */
-u8 D_8021150C_ovl_title[0x34] = {
-#include "assets/D_8021150C_ovl_title.inc.c"
+u8 title_menu_state10_message[0x34] = {
+#include "assets/title_menu_state10_message.inc.c"
 };
 /* message text */
-u8 D_80211540_ovl_title[0x8] = {
-#include "assets/D_80211540_ovl_title.inc.c"
+u8 title_confirmation_row0_text[0x8] = {
+#include "assets/title_confirmation_row0_text.inc.c"
 };
 /* message text */
-u8 D_80211548_ovl_title[0x8] = {
-#include "assets/D_80211548_ovl_title.inc.c"
+u8 title_confirmation_row1_text[0x8] = {
+#include "assets/title_confirmation_row1_text.inc.c"
 };
 /* palette, 256 colours */
 u16 title_center_image_tlut[0x100] = {
