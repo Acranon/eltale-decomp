@@ -18,18 +18,18 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`func_8002DECC`](func_8002DECC.md) | `src/2B530.c`, C under `NON_MATCHING` | 328 object words; code 0x55C vs 0x560, frame 0xD8 exact |
 | [`func_80030D5C`](func_80030D5C.md) | `src/30600.c`, C under `NON_MATCHING` | 309 object words; code 0xDB4 vs 0xDCC, frame 0x60 exact |
 | [`func_80031E10`](func_80031E10.md) | `src/30600.c`, C under `NON_MATCHING` | 20 register words; length and frame (0x40) exact |
-| [`func_80033050`](func_80033050.md) | `src/337B0.c` | 18 register words; length exact |
-| [`func_8003453C`](func_8003453C.md) | `src/337B0.c` | 221 object words; frame 0x40 vs 0x48 |
-| [`func_80034C9C`](func_80034C9C.md) | `src/337B0.c` | 92 valid object words; code 0x404 vs 0x400 |
+| [`func_80033050`](func_80033050.md) | `src/337B0.c`, C under `NON_MATCHING` | 18 object words; length exact, frame exact |
+| [`func_8003453C`](func_8003453C.md) | `src/337B0.c`, C under `NON_MATCHING` | 221 object words; length exact, frame 0x40 vs 0x48 |
+| [`func_80034C9C`](func_80034C9C.md) | `src/337B0.c`, C under `NON_MATCHING` | 92 object words; code 0x404 vs 0x400, frame 0xE0 vs 0xD8 |
 | [`func_80007A8C`](func_80007A8C.md) | `src/3F50.c`, C under `NON_MATCHING` | 5 object words |
 | [`func_80007FD8`](func_80007FD8.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
 | [`func_8000CC78`](func_8000CC78.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
 | [`func_8000DE54`](func_8000DE54.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
-| [`func_801009EC_ovl_DA4570`](func_801009EC_ovl_DA4570.md) | `src/ovl_DA4570/DA4570.c` | 37 linked ROM words; all register fields |
-| [`func_8020D98C_ovl_ending`](func_8020D98C_ovl_ending.md) | `src/ovl_ending/E22690.c` | 25 linked ROM words |
-| [`func_8020E9C8_ovl_ending`](func_8020E9C8_ovl_ending.md) | `src/ovl_ending/E22690.c` | 757 object words; frame 0x198 vs 0x1A8 |
-| [`func_8020C6A8_ovl_intro`](func_8020C6A8_ovl_intro.md) | `src/ovl_intro/DC62B0.c` | 2 linked ROM words; frame and BSS addresses exact |
-| [`func_8020E108_ovl_intro`](func_8020E108_ovl_intro.md) | `src/ovl_intro/DC62B0.c` | 23 linked ROM words; frame 0x648 exact |
+| [`func_801009EC_ovl_DA4570`](func_801009EC_ovl_DA4570.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
+| [`func_8020D98C_ovl_ending`](func_8020D98C_ovl_ending.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
+| [`func_8020E9C8_ovl_ending`](func_8020E9C8_ovl_ending.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |
+| [`func_8020C6A8_ovl_intro`](func_8020C6A8_ovl_intro.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 609 masked object words; code 0x9D4 vs 0x9D0, frame 0xF0 exact |
+| [`func_8020E108_ovl_intro`](func_8020E108_ovl_intro.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 23 linked ROM words; length and frame 0x648 exact |
 
 ## Recheck before promoting to a match
 

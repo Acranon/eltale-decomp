@@ -48,6 +48,33 @@ def retail_funcs():
     return {k: (v[0], v[1]) for k, v in out.items() if v[0] is not None}
 
 
+def non_matching_build() -> bool:
+    ninja = ROOT / "build.ninja"
+    return ninja.exists() and "-DNON_MATCHING" in ninja.read_text()
+
+
+def active_source(path: Path) -> str:
+    """The file's text without the #ifdef NON_MATCHING branch the current build leaves out,
+    so a function whose C is under NON_MATCHING counts as C in a NON_MATCHING=1 build."""
+    nm = non_matching_build()
+    out, stack = [], []  # per open #if: (is it NON_MATCHING, is its current branch skipped)
+    for ln in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        s = ln.strip()
+        outer = bool(stack) and stack[-1][1]
+        if s.startswith("#if"):
+            is_nm = s.split()[:2] == ["#ifdef", "NON_MATCHING"]
+            stack.append((is_nm, outer or (is_nm and not nm)))
+        elif s.startswith("#else") and stack:
+            is_nm = stack[-1][0]
+            parent = len(stack) > 1 and stack[-2][1]
+            stack[-1] = (is_nm, parent or (is_nm and nm))
+        elif s.startswith("#endif") and stack:
+            stack.pop()
+        elif not outer:
+            out.append(ln)
+    return "\n".join(out)
+
+
 def obj_path(src: Path) -> Path:
     return ROOT / "build" / src.with_suffix(".o")
 
@@ -59,7 +86,7 @@ def check(src: Path, funcs):
     if r.returncode != 0:
         print(r.stdout[-3000:], r.stderr[-3000:])
         return False
-    asm_included = set(re.findall(r'GLOBAL_ASM\("[^"]*/(\w+)\.s"\)', (ROOT / src).read_text(encoding="utf-8", errors="replace")))
+    asm_included = set(re.findall(r'GLOBAL_ASM\("[^"]*/(\w+)\.s"\)', active_source(ROOT / src)))
     ok = True
     with obj.open("rb") as f:
         elf = ELFFile(f)

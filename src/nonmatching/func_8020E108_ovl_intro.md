@@ -5,12 +5,24 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Live source: [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c)
 - Retail assembly: [`asm/nonmatchings/ovl_intro/DC62B0/func_8020E108_ovl_intro.s`](../../asm/nonmatchings/ovl_intro/DC62B0/func_8020E108_ovl_intro.s)
 - Retail code size: `0x1060` bytes
-- Current best gap: 23 linked ROM words; frame 0x648 exact.
+- Current gap: 23 linked ROM words (NON_MATCHING C in the source); length and frame 0x648 exact.
 - Specific blocker: Second texrect step folds one temporary differently and rotates t3/t4.
 - Next discriminating test: Find an equivalent C tree that releases the temp while preserving both packed command words.
-- Saved function-only C attempt: [`func_8020E108_ovl_intro.draft.c`](func_8020E108_ovl_intro.draft.c)
+- C: in [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/d1-overlay/func_8020E108_ovl_intro_23words.c` (SHA-256 `f30153240cc1b752691108033100c33ff5162d83ae85b6d67f47e7cc7ca54321`)
 - Detailed research reports: [ REPORT-resume.txt ](reports/codex__overlay-oct26__REPORT-resume.txt)
+
+## Equivalence
+
+Verdict: **equivalent.**
+
+- Checked: linked NON_MATCHING build against retail with asm-differ, every instruction. The 23 words are
+  t3/t4 swapped in the flipped (G_RDPHALF_2) texrect block; everything else is identical (jal targets
+  differ by the 4 bytes func_8020C6A8 grew in this build).
+- The draft used the pre-D2 names (D_802684E0, D_802684B0..BC): renamed to the module's `_ovl_intro`
+  objects. GFX_TEXRECT_STEPS is defined in the file's NON_MATCHING block.
+- Bugs fixed: none.
+- Open doubts: none.
 
 ## Prior attempts and findings
 
