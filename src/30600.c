@@ -87,12 +87,12 @@ typedef struct {
 } Unk8008FB80;
 
 /* .bss 8008FB70..80090450 */
-u16 D_8008FB70;
+u16 D_8008FB70; /* low three bits select the save-menu state */
 u8 D_8008FB72;
 u8 D_8008FB73;
 s32 D_8008FB74;
 u8 D_8008FB78;
-s8 D_8008FB79;
+s8 D_8008FB79; /* save-menu delay, in frames */
 s8 D_8008FB7A;
 #ifdef NON_MATCHING
 u8 D_8008FB7B; /* SaveMenu_UpdateSlotList reads it with lbu */

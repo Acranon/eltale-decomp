@@ -22,7 +22,7 @@ s8 D_80092C80;
 s8 D_80092C81;
 s8 D_80092C82;
 u16 D_80092C84;
-u16 D_80092C86;
+u16 D_80092C86; /* button down edges for the selected controller */
 u16 D_80092C88;
 OSMesgQueue D_80092C90;
 OSPfs D_80092CA8[4];

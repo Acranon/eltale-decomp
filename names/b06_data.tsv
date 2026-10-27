@@ -1,0 +1,66 @@
+# b06 round 3: data names owned by save menu, text, input/Pak and cutscene modules
+# old<TAB>new<TAB>evidence
+D_8008FB70	save_menu_flags	SaveMenu_Update dispatches on the low state bits and uses upper bits for save/load and dialog transition flags.
+D_8008FB72	save_menu_dialog_index	SaveMenu_UpdateDialog indexes dialog layout and message tables with this value.
+D_8008FB73	save_menu_choice_prompt_index	SaveMenu_UpdateDialog indexes five choice prompts and rectangles with this value.
+D_8008FB74	save_menu_pak_error	Save, load and delete paths store Pak errors here; SaveMenu_RepairPak passes it to Pak_TryRepair.
+D_8008FB78	save_menu_choice_cursor	Dialog input toggles this selection and SaveMenu_UpdateDialog uses it for cursor position.
+D_8008FB79	save_menu_delay_frames	Save-menu states assign frame delays and SaveMenu_UpdateDelay decrements this signed counter.
+D_8008FB7A	save_menu_selected_slot	SaveMenu_UpdateSlotList changes it with navigation; load, save and delete use it to index slots.
+D_8008FB7B	save_menu_stick_repeat_counter	SaveMenu_UpdateSlotList increments this modulo 16 to pace held-stick navigation.
+D_8008FB7C	save_menu_repair_attempts	The Pak error path increments it and tests it when deciding whether to retry or show an error.
+D_8008FB80	save_menu_file_entries	Seventeen entries map displayed slots to Pak file numbers and extension bytes.
+D_8008FBA8	save_menu_save_headers	Sixteen save-header records are displayed in the slot list and written as the first Pak block.
+D_80090228	save_menu_game_state_block	SaveMenu_CaptureGameState copies game globals into this block; SaveMenu_RestoreGameState copies them back.
+D_800902F0	save_menu_header_read_scratch	SaveMenu_RefreshFileList reads a Pak header here before copying it into a save-header slot.
+D_80090370	save_menu_state_read_scratch	SaveMenu_LoadSelectedFile reads the secondary Pak block here before copying it into game state.
+D_80061660	text_reveal_speed_steps	Text_OpenWindow and Text_UpdateAndDrawWindows use this eight-entry table for per-character reveal timing.
+D_80061668	text_window_default_rects	Text_OpenWindow copies X, Y, width and height from the indexed rectangle.
+D_800616A8	text_choice_window_rect	Text_MeasureChoiceWindow updates this rectangle from choice rows; Text_OpenWindow copies it for choice windows.
+D_800616D0	text_rect_texture_ptrs	Text_DrawTexturedRect copies this five-entry texture pointer table before selecting a texture.
+D_800616E4	text_rect_texture_params	Text_DrawTexturedRect copies these five tile width, height and mask records.
+D_80090450	text_active_window_count	Text_OpenWindow increments it and Text_UpdateAndDrawWindows decrements it as windows close.
+D_80090454	text_last_choice_index	Text_UpdateAndDrawWindows copies the selected row here; NPC code tests whether it is zero.
+D_80090458	text_pending_choice_rows	Text_OpenWindow copies its row count and row pointers into a new choice window.
+D_80090470	text_window_slots	Four records hold per-window geometry, text, choices, cursor and animation state.
+D_80092C60	text_font_load_flag	Text_LoadFontAssets clears it; Text_DrawEncodedString checks it before using font data.
+D_80092C62	text_stick_advance_frames	Text_IsStickAdvanceHeld increments this counter until five strong-stick frames, then resets it.
+D_80061760	text_font_metrics	Text_DrawEncodedString reads glyph width, height, advance and vertical offset from this table.
+D_80061770	text_glyph_setup_dl	Text_DrawEncodedString emits this display list before drawing textured glyph rectangles.
+D_80092C70	text_current_glyph_index	Text_DrawEncodedString stores the current encoded glyph index here for metric lookup.
+D_80092C74	text_extra_glyph_spacing	Text_DrawEncodedString adds this control-byte spacing to glyph advance.
+D_80092C80	input_primary_port	Input_InitializeControllers picks the first usable controller port; gameplay and Pak code use it.
+D_80092C81	input_stick_x	Input_ReadController copies the selected OSContPad stick_x here.
+D_80092C82	input_stick_y	Input_ReadController copies the selected OSContPad stick_y here.
+D_80092C84	input_held_buttons	Input_ReadController stores the selected pad button bits here each frame.
+D_80092C86	input_pressed_buttons	Input_ReadController masks current buttons with the inverted previous mask to retain new presses.
+D_80092C88	input_previous_button_inverse	Input_ReadController stores complement of current buttons here for next-frame edge detection.
+D_80092C90	input_si_queue	Input_InitializeControllers creates this SI event queue and controller/Pak calls pass it as their message queue.
+D_80092CA8	pak_port_states	Four OSPfs structs initialized or repaired per controller port and used for file operations.
+D_80092E48	pak_game_file_scans	Pak_ScanGameFiles records matching file IDs, extension bytes, note count and free-space flags per port.
+D_80092E98	input_connected_port_bits	osContInit fills this bitmask and Input_InitializeControllers scans set bits for usable ports.
+D_80092EA0	input_controller_statuses	osContInit and osContGetQuery fill four OSContStatus records read for controller and Pak state.
+D_80092EB0	input_si_message	OS_EVENT_SI sends this message through the controller SI queue.
+D_80092EB8	input_pad_states	Input_ReadController fills four OSContPad records via osContGetReadData.
+D_80061810	pak_game_name	Pak_ScanGameFiles compares this game-name byte field with Pak note names; allocation and deletion pass it to libultra.
+D_80061840	pak_allocate_extension_template	Pak_AllocateGameFile copies this zero extension template before osPfsAllocateFile.
+D_80061844	pak_delete_extension_template	Pak_DeleteGameFile copies this zero extension template before osPfsDeleteFile.
+D_80092ED0	cutscene_sequence_index	Cutscene_ResetSequence zeros it; Cutscene_StartNextScene increments it and stops at 14 entries.
+D_80092ED4	cutscene_camera_frame	Cutscene_StartNextScene zeros it; Cutscene_UpdateScene increments it when sampling the camera track.
+D_80092ED8	cutscene_camera_end_frame	Cutscene_StartNextScene copies the camera track duration here and UpdateScene compares it to the current frame.
+D_80092EDC	cutscene_camera_track	Cutscene_StartNextScene stores a pointer to the active camera track; UpdateScene samples it.
+D_80092EE0	cutscene_image_frame	Cutscene_DrawImageCues increments this frame counter and compares it to cue start frames.
+D_80092EE4	cutscene_next_image_cue	Cutscene_DrawImageCues advances this pointer when a cue's start frame is reached.
+D_80092EE8	cutscene_image_cue_slots	Thirty-two active image cue entries reset, allocated and drawn by Cutscene_DrawImageCues.
+D_80061850	text_font_tlut	Text_DrawWindow and related text rendering load this palette before drawing glyph textures.
+D_80061E98	menu_ui_tlut	Menu texture drawing and number rendering load this 256-color palette.
+D_8006C8F8	save_menu_choice_messages	SaveMenu_UpdateDialog indexes these five message pointers by choice prompt index.
+D_8006C90C	save_menu_choice_rects	SaveMenu_UpdateDialog indexes these five X/Y/width/height records for choice prompts.
+D_8006C934	save_menu_dialog_messages_flag4	SaveMenu_UpdateDialog selects messages from this contiguous table when menu bit 4 is set.
+D_8006C998	save_menu_dialog_messages_default	SaveMenu_UpdateDialog selects this 25-entry message table when menu bit 4 is clear.
+D_8006C9FC	save_menu_dialog_rects	SaveMenu_UpdateDialog indexes these 25 X/Y/width/height records by dialog index.
+D_8006CAC4	save_menu_choice_cursor_positions	SaveMenu_UpdateDialog uses these four X/Y pairs to draw its two-choice cursor.
+D_8006CC28	save_menu_slot_label_ptrs	SaveMenu_UpdateSlotList chooses one of these pointers for a slot summary label.
+D_8006CC90	cutscene_image_setup_dl	Cutscene_DrawImageCues emits this display list before drawing cue rectangles.
+D_8007A8E0	cutscene_message_wait_frames	Cutscene_StartEntry sets 60; Cutscene_UpdateMessageSequence decrements it between message windows.
+D_8007A8E4	cutscene_messages_remaining	Cutscene_StartEntry copies the entry's message count; UpdateMessageSequence decrements it per message.

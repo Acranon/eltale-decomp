@@ -77,7 +77,7 @@ extern f32 D_80085F50;
 extern s32 D_80090450;
 /* .bss 80092ED0..80092FF0 */
 s32 D_80092ED0;
-s32 D_80092ED4;
+s32 D_80092ED4; /* current camera-track frame */
 s32 D_80092ED8;
 Unk80092EDC *D_80092EDC;
 s32 D_80092EE0;
