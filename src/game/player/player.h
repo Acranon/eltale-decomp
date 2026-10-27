@@ -122,26 +122,26 @@ extern ActorStats *D_8007AA84; /* player_state.actor.stats */
 /* Labels inside player_stats and player_state (aliases in undefined_syms.txt) that the menu's
  * stats and elements pages address as their own symbols (through player_stats.x /
  * player_state.flags the code differs: Menu_UpdateStatsPage, Menu_UpdateElementsPage). */
-extern u16 D_8007A9D4; /* player_stats.unk4 */
-extern u16 D_8007A9D6; /* player_stats.unk6 */
-extern u16 D_8007A9D8; /* player_stats.unk8 */
-extern u16 D_8007A9DA; /* player_stats.unkA */
+extern u16 D_8007A9D4; /* player_stats.hp */
+extern u16 D_8007A9D6; /* player_stats.max_hp */
+extern u16 D_8007A9D8; /* player_stats.mp */
+extern u16 D_8007A9DA; /* player_stats.max_mp */
 extern u16 D_8007A9DC; /* player_stats.unkC */
 extern u16 D_8007A9DE; /* player_stats.unkE */
 extern s32 D_8007A9E0; /* player_stats.unk10 */
-extern u8 D_8007A9F4; /* player_stats.unk24[0] */
-extern u8 D_8007A9F5; /* player_stats.unk24[1] */
-extern u8 D_8007A9F6; /* player_stats.unk24[2] */
-extern u8 D_8007A9F7; /* player_stats.unk24[3] */
-extern u16 D_8007A9F8; /* player_stats.unk28 */
-extern u16 D_8007A9FA; /* player_stats.unk2A */
-extern u16 D_8007A9FC; /* player_stats.unk2C */
-extern u16 D_8007A9FE; /* player_stats.unk2E */
-extern u8 D_8007AA00; /* player_stats.unk30 */
-extern u8 D_8007AA01; /* player_stats.unk31 */
-extern u8 D_8007AA02; /* player_stats.unk32 */
-extern u8 D_8007AA03; /* player_stats.unk33 */
-extern u8 D_8007AA04; /* player_stats.unk34 */
+extern u8 D_8007A9F4; /* player_stats.element_levels[0] */
+extern u8 D_8007A9F5; /* player_stats.element_levels[1] */
+extern u8 D_8007A9F6; /* player_stats.element_levels[2] */
+extern u8 D_8007A9F7; /* player_stats.element_levels[3] */
+extern u16 D_8007A9F8; /* player_stats.hp_xp */
+extern u16 D_8007A9FA; /* player_stats.mp_xp */
+extern u16 D_8007A9FC; /* player_stats.agility_xp */
+extern u16 D_8007A9FE; /* player_stats.defense_xp */
+extern u8 D_8007AA00; /* player_stats.hp_growth_rank */
+extern u8 D_8007AA01; /* player_stats.mp_growth_rank */
+extern u8 D_8007AA02; /* player_stats.agility_growth_rank */
+extern u8 D_8007AA03; /* player_stats.defense_growth_rank */
+extern u8 D_8007AA04; /* player_stats.level */
 extern s32 D_8007AA10; /* player_state.flags */
 
 /* .data */

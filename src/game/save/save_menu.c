@@ -567,10 +567,10 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 Menu_DrawSprite(0x44, 0xD9, 0x35, 0x1C, 0xE);
                 colors[0] = 0x48;
             }
-            Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].player_stats.unk24[0], 0xA);
-            Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].player_stats.unk24[1], 0xA);
-            Menu_DrawNumber(2, 0xAF, 0x6C, save_menu_save_headers[idx].player_stats.unk24[2], 0xA);
-            Menu_DrawNumber(2, 0xD4, 0x6C, save_menu_save_headers[idx].player_stats.unk24[3], 0xA);
+            Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].player_stats.element_levels[0], 0xA);
+            Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].player_stats.element_levels[1], 0xA);
+            Menu_DrawNumber(2, 0xAF, 0x6C, save_menu_save_headers[idx].player_stats.element_levels[2], 0xA);
+            Menu_DrawNumber(2, 0xD4, 0x6C, save_menu_save_headers[idx].player_stats.element_levels[3], 0xA);
             switch (save_menu_save_headers[idx].map_id) {
                 case 15:
                     if (save_menu_save_headers[idx].subarea == 5) {
@@ -669,10 +669,10 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     Menu_DrawSprite(0x44, 0xD9, 0x82, 0x1C, 0xE);
                     colors[0] = 0x48;
                 }
-                Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].player_stats.unk24[0], 0xA);
-                Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].player_stats.unk24[1], 0xA);
-                Menu_DrawNumber(2, 0xAF, 0xBA, save_menu_save_headers[idx].player_stats.unk24[2], 0xA);
-                Menu_DrawNumber(2, 0xD4, 0xBA, save_menu_save_headers[idx].player_stats.unk24[3], 0xA);
+                Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].player_stats.element_levels[0], 0xA);
+                Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].player_stats.element_levels[1], 0xA);
+                Menu_DrawNumber(2, 0xAF, 0xBA, save_menu_save_headers[idx].player_stats.element_levels[2], 0xA);
+                Menu_DrawNumber(2, 0xD4, 0xBA, save_menu_save_headers[idx].player_stats.element_levels[3], 0xA);
                 switch (save_menu_save_headers[idx].map_id) {
                     case 15:
                         if (save_menu_save_headers[idx].subarea == 5) {

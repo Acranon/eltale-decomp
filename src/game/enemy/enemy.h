@@ -32,8 +32,8 @@ typedef struct EnemyDef {
     /* 0x06 */ u16 max_hp;
     /* 0x08 */ u8 pad8[2];
     /* 0x0A */ u16 max_mp;
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ u16 unkE;
+    /* 0x0C */ u16 agility;
+    /* 0x0E */ u16 defense;
     /* 0x10 */ s32 unk10;
     /* 0x14 */ s32 unk14;
     /* 0x18 */ f32 unk18;

@@ -202,7 +202,7 @@ void Npc_SpawnForArea(NpcDef *def, s32 n) {
             npc->actor.rotX = 0.0f;
             npc->actor.rotZ = 0.0f;
             npc->actor.scale = def->scale;
-            npc->actor.unk28 = 50.0f;
+            npc->actor.collisionRadius = 50.0f;
             Coll_ResolveFloorAndWalls(npc->actor.x, npc->actor.y, npc->actor.z, 0xA00, &out);
             npc->actor.y = out.y;
             npc->actor.nx = out.nx;
@@ -256,11 +256,11 @@ void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Actor *obj) {
 
     nx = *dx + obj->x;
     nz = *dz + obj->z;
-    radius = obj->unk28 * obj->scale;
+    radius = obj->collisionRadius * obj->scale;
     hit = 0;
     ddx = nx - player_state.actor.x;
     ddz = nz - player_state.actor.z;
-    r = player_state.actor.unk28 * player_state.actor.scale + radius;
+    r = player_state.actor.collisionRadius * player_state.actor.scale + radius;
     if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
         d = sqrtf(ddx * ddx + ddz * ddz);
         if (d < r) {
@@ -279,7 +279,7 @@ void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Actor *obj) {
             if (other != obj) {
                 ddx = nx - other->x;
                 ddz = nz - other->z;
-                r = other->unk28 * other->scale + radius;
+                r = other->collisionRadius * other->scale + radius;
                 if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
                     d = sqrtf(ddx * ddx + ddz * ddz);
                     if (d < r) {

@@ -20,23 +20,23 @@ typedef struct ActorStats {
     /* 0x06 */ u16 max_hp; /* cap of hp (Player_StateMeleeAttack) */
     /* 0x08 */ u16 mp;
     /* 0x0A */ u16 max_mp; /* cap of mp */
-    /* 0x0C */ u16 unkC; /* copied to ActorBattle.unk86 */
-    /* 0x0E */ u16 unkE; /* copied to ActorBattle.unk88 */
-    /* 0x10 */ u32 unk10;
+    /* 0x0C */ u16 agility; /* copied to ActorBattle.unk86 */
+    /* 0x0E */ u16 defense; /* copied to ActorBattle.unk88 */
+    /* 0x10 */ u32 exp;
     /* 0x14 */ s32 unk14;
     /* 0x18 */ f32 unk18; /* multiplied by Actor.scale for the collision radius */
     /* 0x1C */ f32 unk1C;
     /* 0x20 */ f32 scale; /* copied to Actor.scale */
-    /* 0x24 */ u8 unk24[4];
-    /* 0x28 */ u16 unk28;
-    /* 0x2A */ u16 unk2A;
-    /* 0x2C */ u16 unk2C;
-    /* 0x2E */ u16 unk2E;
-    /* 0x30 */ u8 unk30;
-    /* 0x31 */ u8 unk31;
-    /* 0x32 */ u8 unk32;
-    /* 0x33 */ u8 unk33;
-    /* 0x34 */ u8 unk34;
+    /* 0x24 */ u8 element_levels[4];
+    /* 0x28 */ u16 hp_xp;
+    /* 0x2A */ u16 mp_xp;
+    /* 0x2C */ u16 agility_xp;
+    /* 0x2E */ u16 defense_xp;
+    /* 0x30 */ u8 hp_growth_rank;
+    /* 0x31 */ u8 mp_growth_rank;
+    /* 0x32 */ u8 agility_growth_rank;
+    /* 0x33 */ u8 defense_growth_rank;
+    /* 0x34 */ u8 level;
     /* 0x35 */ u8 unk35[0x38 - 0x35];
 } ActorStats; /* 0x38 bytes */
 
@@ -50,10 +50,10 @@ typedef struct ActorBattle {
     /* 0x32 */ s8 status_effect_timers[0x12];
     /* 0x44 */ s32 status_effect_handles[4];
     /* 0x54 */ u8 pad54[0x84 - 0x54];
-    /* 0x84 */ u16 unk84;
-    /* 0x86 */ u16 unk86; /* from ActorStats.unkC (Player_InitBattle, Enemy_Spawn) */
-    /* 0x88 */ u16 unk88; /* from ActorStats.unkE */
-    /* 0x8A */ u16 unk8A; /* 0x10 normally (damage scale / 16) */
+    /* 0x84 */ u16 attack_power;
+    /* 0x86 */ u16 agility; /* from ActorStats.agility (Player_InitBattle, Enemy_Spawn) */
+    /* 0x88 */ u16 defense; /* from ActorStats.defense */
+    /* 0x8A */ u16 damage_scale_16ths; /* 0x10 normally (damage scale / 16) */
     /* 0x8C */ u16 magic_hit_slot_bits; /* magic_slot_bits of the effects that hit this actor */
     /* 0x8E */ u16 unk8E;
     /* 0x90 */ f32 unk90;
@@ -73,7 +73,7 @@ typedef struct Actor {
     /* 0x1C */ f32 unk1C; /* chest: facing angle of the open box */
     /* 0x20 */ f32 vz; /* chest: box half depth */
     /* 0x24 */ f32 scale;
-    /* 0x28 */ f32 unk28;
+    /* 0x28 */ f32 collisionRadius;
     /* 0x2C */ f32 nx; /* floor normal from Coll_ResolveFloorAndWalls */
     /* 0x30 */ f32 ny;
     /* 0x34 */ f32 nz;

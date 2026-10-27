@@ -100,7 +100,7 @@ void Boss_Draw(struct GfxFrameData *arg0) {
         Anim_AdvanceFrame(p->actor.animStep, &p->actor, &temp[p->actor.animIndex]);
         if (p->actor.stats->unk0 != 2) {
             Shadow_Queue(p->actor.x, p->actor.y, p->actor.z, p->actor.nx, p->actor.ny, p->actor.nz,
-                          p->actor.unk28 * p->actor.scale);
+                          p->actor.collisionRadius * p->actor.scale);
         }
     }
 }
@@ -128,7 +128,7 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     arg4->actor.animSetIndex = s2->anim_set_index;
     Anim_SetCurrentAndNext(s1, 0, 1, 0, 1, 1);
     s1->scale = s2->scale;
-    s1->unk28 = s2->unk18;
+    s1->collisionRadius = s2->unk18;
     s1->stats = (ActorStats *)s2;
     s1->battle = &arg4->battle;
     arg4->def = s2;
@@ -136,11 +136,11 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     arg4->unkC = s2->max_hp;
     arg4->type = 0;
     arg4->flags = 0;
-    arg4->unk10 = sqrtf((u32)s2->unkC) * 3.846 + 17.838;
+    arg4->unk10 = sqrtf((u32)s2->agility) * 3.846 + 17.838;
     arg4->battle.status_bits = 0;
-    arg4->battle.unk84 = arg4->def->unk2A;
-    arg4->battle.unk86 = ((EnemyDef *)s1->stats)->unkC;
-    arg4->battle.unk88 = ((EnemyDef *)s1->stats)->unkE;
+    arg4->battle.attack_power = arg4->def->unk2A;
+    arg4->battle.agility = ((EnemyDef *)s1->stats)->agility;
+    arg4->battle.defense = ((EnemyDef *)s1->stats)->defense;
     arg4->battle.unk90 = 1.0f;
     Coll_ResolveFloorAndWalls(arg1, 0.0f, arg2, 0xA00, &boss_spawn_coll);
     s1->x = boss_spawn_coll.x;

@@ -33,7 +33,7 @@ typedef struct SpellDef {
     /* 0x16 */ u16 find_target_handler_index; /* magic_find_target_handlers index */
     /* 0x18 */ u16 target_select_handler_index; /* magic_target_select_handlers index */
     /* 0x1A */ u8 pad1A[2];
-    /* 0x1C */ f32 hit_range; /* hit range */
+    /* 0x1C */ f32 effect_extent; /* target-distance threshold and visual placement offset */
     /* 0x20 */ u16 cast_count; /* cast count (repeats through magic_cast_repeats) */
     /* 0x22 */ u16 repeat_interval; /* frames between repeats */
     /* 0x24 */ u16 start_delay; /* start delay */
@@ -58,7 +58,7 @@ typedef struct SpellFxDef {
     /* 0x08 */ f32 cast_scale_x;
     /* 0x0C */ f32 cast_scale_y;
     /* 0x10 */ s16 timed_visual_index; /* timed */
-    /* 0x12 */ u16 timed_color_index;
+    /* 0x12 */ u16 timed_interval_color; /* high byte: presentation interval, low byte: color index */
     /* 0x14 */ u16 timed_flags;
     /* 0x16 */ u8 pad16[2];
     /* 0x18 */ f32 timed_scale_x;

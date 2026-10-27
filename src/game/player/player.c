@@ -104,7 +104,7 @@ void Player_Init(void) {
     Dma_ReadRom(D_869620, D_80206000, D_86F6F0 - D_869620);
     player_stats = player_default_stats;
     player_state.actor.scale = player_stats.scale;
-    player_state.actor.unk28 = player_stats.unk18;
+    player_state.actor.collisionRadius = player_stats.unk18;
     player_state.actor.animSetIndex = player_stats.anim_set_index;
     player_state.stats = (ActorStats *)&player_stats;
     player_state.unk6 = 0;
@@ -237,16 +237,16 @@ void Player_Spawn(void) {
     player_front_spirit = 0;
     player_front_chest = 0;
     player_front_text_spot = 0;
-    if (p->stats->unk24[0] == 50) {
+    if (p->stats->element_levels[0] == 50) {
         p->flags |= 0x1000;
     }
-    if (p->stats->unk24[1] == 50) {
+    if (p->stats->element_levels[1] == 50) {
         p->flags |= 0x2000;
     }
-    if (p->stats->unk24[2] == 50) {
+    if (p->stats->element_levels[2] == 50) {
         p->flags |= 0x4000;
     }
-    if (p->stats->unk24[3] == 50) {
+    if (p->stats->element_levels[3] == 50) {
         p->flags |= 0x8000;
     }
     if ((p->flags & 0xF000) == 0xF000) {
@@ -341,7 +341,7 @@ void Player_Update(void) {
                     Text_OpenWindow(hud_npc_marker_screen_y < 70 ? 0 : 1);
                     core_flags |= 2;
                 } else if (player_front_spirit != NULL) {
-                    s = p->stats->unk24;
+                    s = p->stats->element_levels;
                     if (s[0] == 50 && s[1] == 50 && s[2] == 50 && s[3] == 50) {
                     } else {
                         core_flags |= 8;
@@ -416,7 +416,7 @@ void Player_Update(void) {
     }
     if (battle_flags & 8) {
         battle_flags &= ~8;
-        p->actor.stats->unk10 += player_battle_exp;
+        p->actor.stats->exp += player_battle_exp;
         p->actor.stats->unk14 += D_8007A9B8;
         if (player_battle_drop_item != 0xFF) {
             if ((u32) Item_CountInInventory(player_battle_drop_item) >= 3 || (u32) Item_GetInventoryCount() >= 0x8D) {
@@ -480,7 +480,7 @@ void Player_Draw(struct GfxFrameData *arg0) {
     player_shadow_pos.y = player_coll.y;
     player_shadow_pos.z = anim_node_world_positions[0].z;
     Shadow_Queue(player_shadow_pos.x, player_shadow_pos.y, player_shadow_pos.z, p->actor.nx, p->actor.ny, p->actor.nz,
-                  p->actor.unk28 * p->actor.scale);
+                  p->actor.collisionRadius * p->actor.scale);
 }
 
 
@@ -494,20 +494,20 @@ void Player_InitBattle(void) {
     player_battle_exp = D_8007A9B8 = 0;
     stats = player_state.actor.stats;
     cd = player_char_data[player_state.actor.animSetIndex];
-    player_state.unkC = (f32)(u32)stats->unkC * 0.2857 + 17.0;
+    player_state.unkC = (f32)(u32)stats->agility * 0.2857 + 17.0;
     player_state.battle.status_bits = 0;
     player_state.battle.magic_hit_slot_bits = 0;
-    player_state.battle.unk84 = player_state.stats->unk24[0] + player_state.stats->unk24[1] + player_state.stats->unk24[2] +
-                        player_state.stats->unk24[3];
-    player_state.battle.unk8A = 0x10;
-    player_state.battle.unk86 = stats->unkC;
-    player_state.battle.unk88 = stats->unkE;
-    player_state.unk10 = player_state.battle.unk84;
+    player_state.battle.attack_power = player_state.stats->element_levels[0] + player_state.stats->element_levels[1] + player_state.stats->element_levels[2] +
+                        player_state.stats->element_levels[3];
+    player_state.battle.damage_scale_16ths = 0x10;
+    player_state.battle.agility = stats->agility;
+    player_state.battle.defense = stats->defense;
+    player_state.unk10 = player_state.battle.attack_power;
     player_state.battle.unk90 = 1.0f;
-    quarter = player_state.battle.unk84 >> 2;
+    quarter = player_state.battle.attack_power >> 2;
     for (i = 0; i < 4; i++) {
-        if (quarter < p->stats->unk24[i]) {
-            p->unk10 = p->unk10 - p->stats->unk24[i] + quarter;
+        if (quarter < p->stats->element_levels[i]) {
+            p->unk10 = p->unk10 - p->stats->element_levels[i] + quarter;
         }
     }
     p->unk10 = p->unk10 / 10 + 1;
@@ -766,7 +766,7 @@ void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd) {
                 Math_RotateVec2(a->rot, (Vec2f *)&player_temp_vec);
                 Effect_SpawnStreakBurst(a->x + player_temp_vec.x, a->y + a->stats->unk1C * a->scale * 0.7f, a->z + player_temp_vec.y);
             }
-            p->stats->unk28++;
+            p->stats->hp_xp++;
         } else {
             Enemy_PlayMissEffect(&enemy_slots[p->melee_target_plus_one - 1].actor);
         }
@@ -1290,7 +1290,7 @@ void Player_PushOutOfObjects(f32 *arg0, f32 *arg1, Actor *arg2) {
     f32 k;
 
     hit = 0;
-    size = arg2->unk28 * arg2->scale;
+    size = arg2->collisionRadius * arg2->scale;
     x = *arg0 + arg2->x;
     z = *arg1 + arg2->z;
     n = enemy_drawn_count;
@@ -1299,7 +1299,7 @@ void Player_PushOutOfObjects(f32 *arg0, f32 *arg1, Actor *arg2) {
             a = *list++;
             dx = x - a->x;
             dz = z - a->z;
-            r = a->unk28 * a->scale + size;
+            r = a->collisionRadius * a->scale + size;
             if (dx < r && -r < dx && dz < r && -r < dz) {
                 dist = sqrtf(dx * dx + dz * dz);
                 if (dist < r) {
@@ -1319,7 +1319,7 @@ void Player_PushOutOfObjects(f32 *arg0, f32 *arg1, Actor *arg2) {
             a = *list++;
             dx = x - a->x;
             dz = z - a->z;
-            r = a->unk28 * a->scale + size;
+            r = a->collisionRadius * a->scale + size;
             if (dx < r && -r < dx && dz < r && -r < dz) {
                 dist = sqrtf(dx * dx + dz * dz);
                 if (dist < r) {
@@ -1629,7 +1629,7 @@ s32 Player_RollHitOnEnemy(s32 arg0, Actor *arg1) {
     s16 chance;
     Enemy *m = &enemy_slots[arg0];
 
-    chance = (arg1->battle->unk86 * 100) / (arg1->battle->unk86 + ((m->actor.battle->unk86 + 7) >> 3));
+    chance = (arg1->battle->agility * 100) / (arg1->battle->agility + ((m->actor.battle->agility + 7) >> 3));
     return Math_Rand(100) < chance;
 }
 
@@ -1642,12 +1642,12 @@ u16 Player_CalcMeleeDamage(Player *arg0) {
     u16 sum;
 
     n = 0;
-    val = arg0->battle.unk84;
-    quarter = arg0->battle.unk84 >> 2;
-    sum = arg0->battle.unk84;
+    val = arg0->battle.attack_power;
+    quarter = arg0->battle.attack_power >> 2;
+    sum = arg0->battle.attack_power;
     for (i = 0; i < 4; i++) {
-        if (quarter < arg0->stats->unk24[i]) {
-            sum = sum - arg0->stats->unk24[i] + quarter;
+        if (quarter < arg0->stats->element_levels[i]) {
+            sum = sum - arg0->stats->element_levels[i] + quarter;
             n++;
         }
     }
@@ -1655,7 +1655,7 @@ u16 Player_CalcMeleeDamage(Player *arg0) {
     if (n != 0) {
         val = (player_melee_damage_scale[n] * val) >> 6;
     }
-    val = (val * arg0->battle.unk8A) >> 4;
+    val = (val * arg0->battle.damage_scale_16ths) >> 4;
     if (Math_Rand((arg0->flags & 0x10000) ? 4 : 0x20) == 0) {
         val += val >> 1;
         Fade_Start(4, 0, fade_damage_flash);
@@ -1694,7 +1694,7 @@ u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
                     dmg += dmg >> 1;
                 }
             }
-            dmg = dmg * ((f32) arg2->battle->unk84 / (f32) (arg2->battle->unk84 + p->battle.unk88));
+            dmg = dmg * ((f32) arg2->battle->attack_power / (f32) (arg2->battle->attack_power + p->battle.defense));
             dmg += Math_Rand((u32) (sqrtf(dmg) * 0.75 + 1.0));
             if (dmg == 0) {
                 dmg++;
@@ -1713,8 +1713,8 @@ u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
                 Hud_StartActorStatusIndicator(&player_state.actor, 0x200, 2, 0x1E);
             }
             flags = 0;
-            p->stats->unk28++;
-            p->stats->unk2E++;
+            p->stats->hp_xp++;
+            p->stats->defense_xp++;
             if (arg1 & 0x4000) {
                 flags = 0x8003;
             }
@@ -1874,7 +1874,7 @@ void Player_AddTurnMoveAgilityXP(Player *arg0) {
         player_battle_move_dist += sqrtf(dx * dx + dz * dz);
         while (player_battle_move_dist > 35.0) {
             player_battle_move_dist -= 35.0;
-            arg0->stats->unk2C++;
+            arg0->stats->agility_xp++;
         }
     }
 }
@@ -1890,93 +1890,93 @@ void Player_UpdateStatGrowth(Player *p, Actor *a) {
             player_agility_dist_enemy_area += player_move_dist;
             if (player_agility_dist_enemy_area > 800.0) {
                 player_agility_dist_enemy_area -= 800.0;
-                p->stats->unk2C++;
+                p->stats->agility_xp++;
             }
         } else {
             player_agility_dist_npc_area += player_move_dist;
             if (player_agility_dist_npc_area > 1500.0) {
                 player_agility_dist_npc_area -= 1500.0;
-                p->stats->unk2C++;
+                p->stats->agility_xp++;
             }
         }
     }
     if (a->stats->max_hp < 500) {
-        if (p->stats->unk28 >= player_stat_xp_costs[p->stats->unk30]) {
-            p->stats->unk28 -= player_stat_xp_costs[p->stats->unk30];
+        if (p->stats->hp_xp >= player_stat_xp_costs[p->stats->hp_growth_rank]) {
+            p->stats->hp_xp -= player_stat_xp_costs[p->stats->hp_growth_rank];
             a->stats->max_hp++;
             a->stats->hp++;
-            if (p->stats->unk30 < 0x36) {
-                p->stats->unk30++;
+            if (p->stats->hp_growth_rank < 0x36) {
+                p->stats->hp_growth_rank++;
             }
             Effect_StartStatUpMarker(0);
             count++;
         }
     } else {
-        p->stats->unk28 = 0;
+        p->stats->hp_xp = 0;
     }
     if (a->stats->max_mp < 500) {
-        cost = player_stat_xp_costs[p->stats->unk31];
+        cost = player_stat_xp_costs[p->stats->mp_growth_rank];
         if (p->flags & 0x4000) {
             cost *= 3;
         } else {
             cost *= 4;
         }
-        if (p->stats->unk2A >= cost) {
-            p->stats->unk2A -= cost;
+        if (p->stats->mp_xp >= cost) {
+            p->stats->mp_xp -= cost;
             a->stats->max_mp++;
             a->stats->mp++;
-            if (p->stats->unk31 < 0x36) {
-                p->stats->unk31++;
+            if (p->stats->mp_growth_rank < 0x36) {
+                p->stats->mp_growth_rank++;
             }
             Effect_StartStatUpMarker(2);
             count++;
         }
     } else {
-        p->stats->unk2A = 0;
+        p->stats->mp_xp = 0;
     }
-    if (a->stats->unkC < 0xFF) {
-        cost = player_stat_xp_costs[p->stats->unk32];
+    if (a->stats->agility < 0xFF) {
+        cost = player_stat_xp_costs[p->stats->agility_growth_rank];
         if (p->flags & 0x8000) {
             cost = (f32)cost * 0.8;
         }
-        if (p->stats->unk2C >= cost) {
-            p->stats->unk2C -= cost;
-            a->stats->unkC++;
-            if (p->stats->unk32 < 0x36) {
-                p->stats->unk32++;
+        if (p->stats->agility_xp >= cost) {
+            p->stats->agility_xp -= cost;
+            a->stats->agility++;
+            if (p->stats->agility_growth_rank < 0x36) {
+                p->stats->agility_growth_rank++;
             }
             Effect_StartStatUpMarker(3);
             count++;
         }
     } else {
-        p->stats->unk2C = 0;
+        p->stats->agility_xp = 0;
     }
-    if (a->stats->unkE < 0xFF) {
-        cost = player_stat_xp_costs[p->stats->unk33];
+    if (a->stats->defense < 0xFF) {
+        cost = player_stat_xp_costs[p->stats->defense_growth_rank];
         if (p->flags & 0x2000) {
             cost = (f32)cost * 0.8;
         }
-        if (p->stats->unk2E >= cost) {
-            p->stats->unk2E -= cost;
-            a->stats->unkE++;
-            if (p->stats->unk33 < 0x36) {
-                p->stats->unk33++;
+        if (p->stats->defense_xp >= cost) {
+            p->stats->defense_xp -= cost;
+            a->stats->defense++;
+            if (p->stats->defense_growth_rank < 0x36) {
+                p->stats->defense_growth_rank++;
             }
             Effect_StartStatUpMarker(1);
             count++;
         }
     } else {
-        p->stats->unk2E = 0;
+        p->stats->defense_xp = 0;
     }
     if (!(core_flags & 8)) {
-        if (p->stats->unk34 >= 0x62) {
-            a->stats->unk10 = 0;
-        } else if (a->stats->unk10 >= player_level_exp_table[p->stats->unk34]) {
-            a->stats->unk10 -= player_level_exp_table[p->stats->unk34];
-            if (p->stats->unk34 < 0x62) {
-                p->stats->unk34++;
+        if (p->stats->level >= 0x62) {
+            a->stats->exp = 0;
+        } else if (a->stats->exp >= player_level_exp_table[p->stats->level]) {
+            a->stats->exp -= player_level_exp_table[p->stats->level];
+            if (p->stats->level < 0x62) {
+                p->stats->level++;
             }
-            lv = p->stats->unk24;
+            lv = p->stats->element_levels;
             if (lv[0] != 0x32 || lv[1] != 0x32 || lv[2] != 0x32 || lv[3] != 0x32) {
                 core_flags |= 8;
                 p->state = 0;

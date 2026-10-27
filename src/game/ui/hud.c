@@ -544,10 +544,10 @@ void Hud_UpdateElementAllocation(GfxFrameData* buf, Player* pl) {
     Hud_DrawTextureTile(&D_803A8718, 0, yoff + 0x3C, 0x40, 0x14, 0, 0x3C, 0x400, 0x400);
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039ADB0);
-    Hud_DrawNumber(5, 0x1C, yoff + 0x24, player_stats.unk24[0]);
-    Hud_DrawNumber(5, 0xA, yoff + 0x34, player_stats.unk24[1]);
-    Hud_DrawNumber(5, 0x1C, yoff + 0x43, player_stats.unk24[2]);
-    Hud_DrawNumber(5, 0x2E, yoff + 0x34, player_stats.unk24[3]);
+    Hud_DrawNumber(5, 0x1C, yoff + 0x24, player_stats.element_levels[0]);
+    Hud_DrawNumber(5, 0xA, yoff + 0x34, player_stats.element_levels[1]);
+    Hud_DrawNumber(5, 0x1C, yoff + 0x43, player_stats.element_levels[2]);
+    Hud_DrawNumber(5, 0x2E, yoff + 0x34, player_stats.element_levels[3]);
     if (hud_element_input_timer && (hud_element_allocation_flags & 1)) {
         col = hud_element_colors[hud_selected_element_index];
         pos = (f32*)hud_element_icon_positions + hud_selected_element_index * 2;
@@ -570,9 +570,9 @@ void Hud_UpdateElementAllocation(GfxFrameData* buf, Player* pl) {
             } else {
                 hud_selected_element_index = 3;
             }
-            if (pl->stats->unk24[hud_selected_element_index] < 50) {
-                pl->stats->unk24[hud_selected_element_index]++;
-                if (pl->stats->unk24[hud_selected_element_index] == 50) {
+            if (pl->stats->element_levels[hud_selected_element_index] < 50) {
+                pl->stats->element_levels[hud_selected_element_index]++;
+                if (pl->stats->element_levels[hud_selected_element_index] == 50) {
                     pl->flags |= hud_element_max_level_set_masks[hud_selected_element_index];
                     if ((pl->flags & 0xF000) == 0xF000) {
                         pl->flags |= 0x10000;
@@ -917,9 +917,9 @@ void Hud_DrawEnemyInfoPanel(void) {
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039ADB0);
     if (enemy_turn_current->battle.status_bits & 0x80) {
         Hud_DrawNumber(3, 0x10, 0x1C, enemy_turn_current->def->max_hp);
-        Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->def->unkE);
+        Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->def->defense);
         Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->def->unk2A);
-        Hud_DrawNumber(3, 0x46, 0x26, enemy_turn_current->def->unkC);
+        Hud_DrawNumber(3, 0x46, 0x26, enemy_turn_current->def->agility);
         if (enemy_turn_current->def->element_index != 4) {
             Hud_DrawTextureTile(&D_803A86F8, 0x5B, 3, 0xC, 0xC, enemy_turn_current->def->element_index * 0xC + 0x20, 0x10, 0x400, 0x400);
         }

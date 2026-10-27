@@ -95,7 +95,7 @@ s32 Magic_GetSpellRestrictionFlags(u32 arg0, u16 arg1) {
     s32 grp = (arg0 >> 8) & 0xF;
     arg0 &= 0xFF;
     rec = &D_800C185C[grp][arg0];
-    if (player_state.stats->unk24[grp] < rec->required_level) {
+    if (player_state.stats->element_levels[grp] < rec->required_level) {
         flags = 4;
     }
     if (!(((battle_flags & 1) ? 1 : 2) & rec->flags)) {
@@ -217,15 +217,15 @@ void Magic_PlaceEffectAtActorUpperPoint(MagicEffect* arg0, Actor* arg1) {
     arg0->x = arg1->x;
     arg0->z = arg1->z;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
 void Magic_PlaceEffectAheadAtMiddlePoint(MagicEffect* arg0, Actor* arg1) {
     magic_temp_vec.x = 0.0f;
-    magic_temp_vec.y = arg1->stats->unk18 * arg1->scale + arg0->cfg->hit_range;
+    magic_temp_vec.y = arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
     Math_RotateVec2(arg1->rot, (Vec2f*)&magic_temp_vec);
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
@@ -238,27 +238,27 @@ void Magic_PlaceEffectAheadAtMiddlePoint(MagicEffect* arg0, Actor* arg1) {
 
 void Magic_PlaceEffectAheadAtUpperPoint(MagicEffect* arg0, Actor* arg1) {
     magic_temp_vec.x = 0.0f;
-    magic_temp_vec.y = arg1->stats->unk18 * arg1->scale + arg0->cfg->hit_range;
+    magic_temp_vec.y = arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
     Math_RotateVec2(arg1->rot, (Vec2f*)&magic_temp_vec);
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
 void Magic_PlaceEffectBehindAtUpperPoint(MagicEffect* arg0, Actor* arg1) {
     magic_temp_vec.x = 0.0f;
-    magic_temp_vec.y = -arg1->stats->unk18 * arg1->scale + arg0->cfg->hit_range;
+    magic_temp_vec.y = -arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
     Math_RotateVec2(arg1->rot, (Vec2f*)&magic_temp_vec);
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
@@ -284,9 +284,9 @@ void Magic_PlaceEffectAtRandomOffset(MagicEffect* arg0, Actor* arg1) {
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->hit_range;
+        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
@@ -587,7 +587,7 @@ Actor* Magic_FindTargetInRange(MagicEffect* arg0, s32 arg1) {
                 dz = ret->z - arg0->z;
                 dy = (ret->y + ret->stats->unk1C * ret->scale * 0.5 - arg0->y) * 0.5;
                 dist = sqrtf(dx * dx + dy * dy + dz * dz);
-                if (arg0->cfg->hit_range + ret->stats->unk18 * ret->scale < dist) {
+                if (arg0->cfg->effect_extent + ret->stats->unk18 * ret->scale < dist) {
                     ret = NULL;
                 }
             }
@@ -613,7 +613,7 @@ Actor* Magic_FindTargetInRange(MagicEffect* arg0, s32 arg1) {
                                 break;
                         }
                         dist = sqrtf(dx * dx + dy * dy + dz * dz);
-                        if (dist < arg0->cfg->hit_range + a->stats->unk18 * a->scale) {
+                        if (dist < arg0->cfg->effect_extent + a->stats->unk18 * a->scale) {
                             break;
                         }
                     }
@@ -688,7 +688,7 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
             }
         }
         if (Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), dmg, arg0->cfg->input_sequence[0], arg0->cfg->flags | flag, arg0->caster) != 0) {
-            player_state.stats->unk2A++;
+            player_state.stats->mp_xp++;
         }
     } else {
         if (Math_Rand(0x20) == 0) {
@@ -713,14 +713,14 @@ void Magic_HealTarget(MagicEffect* arg0, Actor* arg1) {
             magic_target_enemy_rec->hp = arg1->stats->max_hp;
         }
     } else {
-        amt = (player_state.stats->unk24[arg0->cfg->input_sequence[0]] >> 1) + arg1->stats->max_hp * arg0->cfg->unkC / 100;
+        amt = (player_state.stats->element_levels[arg0->cfg->input_sequence[0]] >> 1) + arg1->stats->max_hp * arg0->cfg->unkC / 100;
         amt += Math_Rand(amt >> 2);
         if (arg1->stats->hp != arg1->stats->max_hp) {
             arg1->stats->hp += amt;
             if (arg1->stats->hp > arg1->stats->max_hp) {
                 arg1->stats->hp = arg1->stats->max_hp;
             }
-            player_state.stats->unk2A++;
+            player_state.stats->mp_xp++;
         }
     }
     Effect_AddFloatingNumber(arg1, 1, amt);
@@ -740,7 +740,7 @@ void Magic_TransferTargetResource(MagicEffect* arg0, Actor* arg1) {
             if (pl->stats->mp > pl->stats->max_mp) {
                 pl->stats->mp = pl->stats->max_mp;
             }
-            player_state.stats->unk2A++;
+            player_state.stats->mp_xp++;
         }
     } else {
         amt = (arg1->stats->mp * 11 + 63) >> 6;
@@ -760,7 +760,7 @@ void func_80018968(s32 arg0, Actor* arg1) {
         enemy_count--;
     } else if (!(battle_flags & 0x100)) {
         battle_flags |= 0x10;
-        player_state.stats->unk2A++;
+        player_state.stats->mp_xp++;
     } else {
         Hud_ShowActorPopup(arg1);
     }
@@ -773,7 +773,7 @@ void func_800189F0(s32 arg0, Actor* arg1) {
         exit_destination.entry = map_flag4_return_entry;
         player_spawn_type = 0x108;
         player_state.unk6 = 0;
-        player_state.stats->unk2A++;
+        player_state.stats->mp_xp++;
         core_flags |= 0x80;
         core_transition_timer = 0x1E;
     }
@@ -783,7 +783,7 @@ void Magic_ApplyZeroDamageHit(MagicEffect* arg0, Actor* arg1) {
     if (arg0->cfg->target_select_handler_index != 2) {
         if (arg1->typeFlags & 1) {
             Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), 0, 0, 4, arg0->caster);
-            player_state.stats->unk2A++;
+            player_state.stats->mp_xp++;
         } else {
             Player_TakeDamage(0, 4, arg0->caster);
         }
@@ -798,7 +798,7 @@ void func_80018B40(s32 arg0, Actor* arg1) {
         exit_destination.entry = map_flag8_return_entry;
         player_spawn_type = 0x108;
         player_state.unk6 = 0;
-        player_state.stats->unk2A++;
+        player_state.stats->mp_xp++;
         core_flags |= 0x80;
         core_transition_timer = 0x1E;
     }
@@ -811,7 +811,7 @@ void Magic_RemoveEnemyOrDamagePlayer(MagicEffect* arg0, Actor* arg1) {
             arg1->animSetIndex = -1;
             arg1->animFlags &= ~1;
             enemy_count--;
-            player_state.stats->unk2A++;
+            player_state.stats->mp_xp++;
         } else {
             Hud_ShowActorPopup(arg1);
         }
@@ -826,12 +826,12 @@ void Magic_ClearActorStatuses(s32 arg0, Actor* arg1) {
         if (arg1->typeFlags & 1) {
             Enemy_GetSlotIndex(arg1);
         }
-        arg1->battle->unk8A = 0x10;
-        arg1->battle->unk88 = arg1->stats->unkE;
-        arg1->battle->unk86 = arg1->stats->unkC;
+        arg1->battle->damage_scale_16ths = 0x10;
+        arg1->battle->defense = arg1->stats->defense;
+        arg1->battle->agility = arg1->stats->agility;
         arg1->battle->unk90 = 1.0f;
         if (!(arg1->typeFlags & 1)) {
-            player_state.stats->unk2A++;
+            player_state.stats->mp_xp++;
         }
     }
 }
@@ -931,10 +931,10 @@ void func_80019104(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 4;
     switch (arg0) {
         case 1:
-            arg1->battle->unk8A = 0x18;
+            arg1->battle->damage_scale_16ths = 0x18;
             break;
         case 2:
-            arg1->battle->unk8A = 0x20;
+            arg1->battle->damage_scale_16ths = 0x20;
             break;
     }
     Hud_StartActorStatusIndicator(arg1, 4, 3, -1);
@@ -967,15 +967,15 @@ void func_800192C8(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x20;
     switch (arg0) {
         case 1:
-            arg1->battle->unk86 = arg1->stats->unkC * 2;
+            arg1->battle->agility = arg1->stats->agility * 2;
             Hud_StartActorStatusIndicator(arg1, 0x20, 7, -1);
             break;
         case 2:
-            arg1->battle->unk86 = arg1->stats->unkC * 4;
+            arg1->battle->agility = arg1->stats->agility * 4;
             Hud_StartActorStatusIndicator(arg1, 0x20, 7, -1);
             break;
         case 3:
-            arg1->battle->unk86 = arg1->stats->unkC >> 1;
+            arg1->battle->agility = arg1->stats->agility >> 1;
             Hud_StartActorStatusIndicator(arg1, 0x20, 0xC, -1);
             break;
     }
@@ -1009,19 +1009,19 @@ void func_800194E0(s32 arg0, Actor* arg1) {
     arg1->battle->status_bits |= 0x400;
     switch (arg0) {
         case 1:
-            arg1->battle->unk88 = arg1->stats->unkE >> 1;
+            arg1->battle->defense = arg1->stats->defense >> 1;
             break;
         case 2:
-            arg1->battle->unk88 = arg1->stats->unkE - (arg1->stats->unkE >> 2);
+            arg1->battle->defense = arg1->stats->defense - (arg1->stats->defense >> 2);
             break;
         case 3:
-            arg1->battle->unk88 = arg1->stats->unkE + (arg1->stats->unkE >> 1);
+            arg1->battle->defense = arg1->stats->defense + (arg1->stats->defense >> 1);
             break;
         case 4:
-            arg1->battle->unk88 = arg1->stats->unkE * 2;
+            arg1->battle->defense = arg1->stats->defense * 2;
             break;
     }
-    Hud_StartActorStatusIndicator(arg1, 0x400, (arg1->stats->unkE < arg1->battle->unk88) ? 5 : 6, -1);
+    Hud_StartActorStatusIndicator(arg1, 0x400, (arg1->stats->defense < arg1->battle->defense) ? 5 : 6, -1);
 }
 
 void func_800195E0(s32 arg0, Actor* arg1) {
@@ -1039,10 +1039,10 @@ u16 Magic_CalculateEffectDamage(SpellDef* arg0, Actor* arg1) {
         lv = enemy_slots[Enemy_GetSlotIndex(arg1)].def->unk2A;
     } else {
         p = &magic_damage_bonus_stats[arg0->input_sequence[0] * 2];
-        lv = player_stats.unk24[arg0->input_sequence[0]];
-        lv += player_stats.unk24[*p++] >> 4;
-        lv += player_stats.unk24[*p++] >> 3;
-        lv += player_stats.unk24[*p] >> 3;
+        lv = player_stats.element_levels[arg0->input_sequence[0]];
+        lv += player_stats.element_levels[*p++] >> 4;
+        lv += player_stats.element_levels[*p++] >> 3;
+        lv += player_stats.element_levels[*p] >> 3;
     }
     sum = arg0->unkC * 0.02;
     step = sum * 0.2;
@@ -1106,7 +1106,7 @@ void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
         tbl = &D_800C18D8[def->cast_visual_index];
         magic_temp_vec.x = def->cast_scale_x;
         magic_temp_vec.y = def->cast_scale_y;
-        magic_temp_vec.z = cfg->hit_range;
+        magic_temp_vec.z = cfg->effect_extent;
         if (arg0->vx != 0.0f || arg0->vz != 0.0f) {
             angle = Math_Atan2(arg0->vx, arg0->vz);
         } else {
@@ -1149,13 +1149,13 @@ void Magic_CreateTimedPresentation(MagicEffect* arg0, Actor* arg1) {
     tbl = &D_800C18D8[def->timed_visual_index];
     magic_temp_vec.x = def->timed_scale_x;
     magic_temp_vec.y = def->timed_scale_y;
-    magic_temp_vec.z = cfg->hit_range;
+    magic_temp_vec.z = cfg->effect_extent;
     if (def->timed_flags & 0x10) {
         angle = arg0->frames_left * 3.141592653589793 / 10.0;
     } else {
         angle = arg1->rot;
     }
-    ret = Magic_CreateVisualEffect(def->timed_color_index, def->timed_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->caster);
+    ret = Magic_CreateVisualEffect(def->timed_interval_color, def->timed_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->caster);
     ret->upX = arg0->vx;
     ret->upY = arg0->vy;
     ret->upZ = arg0->vz;
@@ -1180,7 +1180,7 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
         tbl = &D_800C18D8[def->hit_visual_index];
         magic_temp_vec.x = def->hit_scale_x;
         magic_temp_vec.y = def->hit_scale_y;
-        magic_temp_vec.z = cfg->hit_range;
+        magic_temp_vec.z = cfg->effect_extent;
         flags = def->hit_flags;
         if (flags & 0x40) {
             arg1 = arg0->caster;
@@ -1238,7 +1238,7 @@ void Magic_CreateGroundHitPresentation(MagicEffect* arg0, Actor* arg1) {
         tbl = &D_800C18D8[def->ground_hit_visual_index];
         magic_temp_vec.x = def->ground_hit_scale_x;
         magic_temp_vec.y = def->ground_hit_scale_y;
-        magic_temp_vec.z = cfg->hit_range;
+        magic_temp_vec.z = cfg->effect_extent;
         ret = Magic_CreateVisualEffect(def->ground_hit_color_index, def->ground_hit_flags, arg0->x, arg0->y, arg0->z, arg1->rot, tbl, &magic_temp_vec, arg0->caster);
         ret->upX = arg0->vx;
         ret->upY = arg0->vy;
@@ -1274,13 +1274,13 @@ void Magic_StepActorStatusTimers(Actor* arg0) {
                 if (bit & 1) {
                     arg0->scale = arg0->stats->scale;
                 } else if (bit & 4) {
-                    arg0->battle->unk8A = 0x10;
+                    arg0->battle->damage_scale_16ths = 0x10;
                 } else if (bit & 0x10) {
                     arg0->battle->unk90 = 1.0f;
                 } else if (bit & 0x20) {
-                    arg0->battle->unk86 = arg0->stats->unkC;
+                    arg0->battle->agility = arg0->stats->agility;
                 } else if (bit & 0x400) {
-                    arg0->battle->unk88 = arg0->stats->unkE;
+                    arg0->battle->defense = arg0->stats->defense;
                 } else if (bit & 8) {
                     arg0->animFlags &= ~1;
                 }

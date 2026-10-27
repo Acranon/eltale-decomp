@@ -90,7 +90,7 @@ void Battle_TryStartRandomEncounter(void) {
                         battle_flags = 0x205;
                         D_8008BE56 = 0;
                         battle_turn_delay = 20;
-                        if (player_state.stats->unkC < enemy_slots[enemy_turn_order[0]].def->unkC) {
+                        if (player_state.stats->agility < enemy_slots[enemy_turn_order[0]].def->agility) {
                             battle_turn_order_index = 0;
                             battle_flags |= 2;
                         } else {

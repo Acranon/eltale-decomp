@@ -137,7 +137,7 @@ void Enemy_DrawAll(struct GfxFrameData *arg0) {
             Anim_AdvanceFrame(obj->animStep, obj, &anims[obj->animIndex]);
             obj->y = y;
             if (obj->stats->unk0 != 2 && !(obj->floorFlags & 0x8000)) {
-                Shadow_Queue(obj->x, obj->y, obj->z, obj->nx, obj->ny, obj->nz, obj->unk28 * obj->scale);
+                Shadow_Queue(obj->x, obj->y, obj->z, obj->nx, obj->ny, obj->nz, obj->collisionRadius * obj->scale);
             }
             *list++ = obj;
             n--;
@@ -183,7 +183,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
     obj->frame = Math_Rand(16);
     obj->scale = def->scale;
-    obj->unk28 = def->unk18;
+    obj->collisionRadius = def->unk18;
     obj->battle = &e->battle;
     obj->stats = (ActorStats *)def;
     e->def = def;
@@ -191,7 +191,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     e->unkC = def->max_hp;
     e->type = 0;
     e->flags = 0;
-    e->unk10 = (f32)def->unkC * 0.2857 + 17.0;
+    e->unk10 = (f32)def->agility * 0.2857 + 17.0;
     e->unk20 = e->unk24 = 0;
     enemy_coll.x = obj->stats->unk18 * obj->stats->scale;
     Coll_ResolveFloorAndWalls(x, 0.0f, z, 0xA01, &enemy_coll);
@@ -217,10 +217,10 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     obj->animFlags = 0;
     e->battle.status_bits = 0;
     e->battle.magic_hit_slot_bits = 0;
-    e->battle.unk84 = e->def->unk2A;
-    e->battle.unk8A = 16;
-    e->battle.unk86 = obj->stats->unkC;
-    e->battle.unk88 = obj->stats->unkE;
+    e->battle.attack_power = e->def->unk2A;
+    e->battle.damage_scale_16ths = 16;
+    e->battle.agility = obj->stats->agility;
+    e->battle.defense = obj->stats->defense;
     e->battle.unk90 = 1.0f;
     e->battle.unk94 = obj->y;
 }
@@ -233,7 +233,7 @@ void Enemy_SortTurnOrder(void) {
 
     for (i = 0; i < enemy_count; i++) {
         enemy_turn_order[i] = i;
-        keys[i] = enemy_slots[i].def->unkC;
+        keys[i] = enemy_slots[i].def->agility;
     }
     do {
         swapped = 0;
@@ -364,7 +364,7 @@ void Enemy_StateHurt(Actor *obj, Enemy *ai, AnimSet *arg2) {
             obj->animSetIndex = -1;
             obj->animFlags &= 0xFFFE;
             enemy_count--;
-            player_battle_exp += obj->stats->unk10;
+            player_battle_exp += obj->stats->exp;
             D_8007A9B8 += obj->stats->unk14;
             Sfx_Play(0, 10, 0xFF);
         } else {
@@ -441,7 +441,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
                         }
                     } else {
                         Player_StartMissReaction();
-                        player_state.stats->unk2C++;
+                        player_state.stats->agility_xp++;
                     }
                     e->flags |= 8;
                 }
@@ -741,11 +741,11 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Actor *obj) {
 
     nx = *dx + obj->x;
     nz = *dz + obj->z;
-    radius = obj->unk28 * obj->scale;
+    radius = obj->collisionRadius * obj->scale;
     hit = 0;
     ddx = nx - player_state.actor.x;
     ddz = nz - player_state.actor.z;
-    r = player_state.actor.unk28 * player_state.actor.scale + radius;
+    r = player_state.actor.collisionRadius * player_state.actor.scale + radius;
     if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
         d = sqrtf(ddx * ddx + ddz * ddz);
         if (d < r) {
@@ -764,7 +764,7 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Actor *obj) {
             if (other != obj) {
                 ddx = nx - other->x;
                 ddz = nz - other->z;
-                r = other->unk28 * other->scale + radius;
+                r = other->collisionRadius * other->scale + radius;
                 if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
                     d = sqrtf(ddx * ddx + ddz * ddz);
                     if (d != 0.0f && d < r) {
@@ -804,15 +804,15 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Actor *obj) {
 s32 Enemy_RollHitOnPlayer(Actor *obj) {
     s16 chance;
 
-    chance = (obj->battle->unk86 * 100) / (obj->battle->unk86 + ((player_state.actor.battle->unk86 + 7) >> 3));
+    chance = (obj->battle->agility * 100) / (obj->battle->agility + ((player_state.actor.battle->agility + 7) >> 3));
     return Math_Rand(100) < chance;
 }
 
 u16 Enemy_CalcAttackDamage(Enemy *arg0) {
     u16 dmg;
 
-    dmg = arg0->battle.unk84;
-    dmg = (dmg * arg0->battle.unk8A) >> 4;
+    dmg = arg0->battle.attack_power;
+    dmg = (dmg * arg0->battle.damage_scale_16ths) >> 4;
     if (Math_Rand(32) == 0) {
         dmg = dmg + (dmg >> 1);
         Fade_Start(4, 0, fade_damage_flash);
@@ -862,8 +862,8 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Actor *src) {
                     dmg += dmg >> 1;
                 }
             }
-            a = src->battle->unk84;
-            a /= (f32)(src->battle->unk84 + enemy_slots[idx].battle.unk88);
+            a = src->battle->attack_power;
+            a /= (f32)(src->battle->attack_power + enemy_slots[idx].battle.defense);
             dmg = dmg * a;
             q = sqrtf(dmg);
             dmg += Math_Rand(q * 0.75 + 1.0);
@@ -928,7 +928,7 @@ void Enemy_SpawnDeathEffects(Actor *obj) {
     enemy_temp_vec.x = enemy_effect_defs[20].scale_x;
     enemy_temp_vec.y = enemy_effect_defs[20].scale_y;
     t = &D_800C18D8[enemy_effect_defs[20].visual_def_index];
-    enemy_temp_vec.z = obj->unk28;
+    enemy_temp_vec.z = obj->collisionRadius;
     if (obj->stats->unk0 == 1) {
         y = obj->battle->unk94;
     } else {
@@ -1000,9 +1000,9 @@ void Enemy_RunAttackScript(void) {
                 enemy_temp_vec.y = d->scale_y;
                 m = enemy_script_enemy->selected_attack->attack_code;
                 if (m & 0x8000) {
-                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].hit_range;
+                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].effect_extent;
                 } else {
-                    enemy_temp_vec.z = obj->unk28;
+                    enemy_temp_vec.z = obj->collisionRadius;
                 }
                 Magic_CreateVisualEffect(d->color_index, d->flags, x, y, z, obj->rot + e->yaw_offset, t, &enemy_temp_vec, obj);
             }
