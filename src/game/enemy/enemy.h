@@ -5,6 +5,7 @@
 #include "game/actor/actor.h"
 
 struct Vec3f;
+struct GfxFrameData; /* game/core/main.h */
 struct CollResult;
 struct AnimSet;
 
@@ -119,7 +120,7 @@ extern s32 enemy_element_bits[5];
 void Enemy_InitForArea(void);
 void Enemy_LoadAreaSet(void);
 void Enemy_UpdateAll(void);
-void Enemy_DrawAll(s32 arg0);
+void Enemy_DrawAll(struct GfxFrameData *arg0);
 void Enemy_RemoveAll(void);
 void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e);
 void Enemy_SortTurnOrder(void);

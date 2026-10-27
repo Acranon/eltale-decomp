@@ -23,7 +23,7 @@ extern u16 boss_reward_max_mp[8];
 
 void Boss_ClearDefeated(void);
 void Boss_LoadForArea(void);
-void Boss_Draw(s32 arg0);
+void Boss_Draw(struct GfxFrameData *arg0);
 s32 Boss_CheckPlayerNear(void);
 void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4);
 u8 Boss_IsDefeated(u32 arg0);

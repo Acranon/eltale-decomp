@@ -614,7 +614,7 @@ extern Vec3f anim_node_world_positions;
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
 void Env_ApplyLightSlot(s32 arg0);
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
-void Anim_DrawModel(s32 arg0, Actor *arg1, AnimSet *arg2, void *arg3);
+void Anim_DrawModel(s32 arg0, Actor *arg1, AnimSet *arg2, struct GfxFrameData *arg3);
 void Anim_AdvanceFrame(u16 arg0, Actor *arg1, AnimSet *arg2);
 
 /* fields of player_state.actor under their own names */
@@ -628,7 +628,7 @@ extern s16 D_8007AA70;
 extern s16 D_8007AA72;
 extern u16 D_8007AA78;
 
-void Player_Draw(void *arg0) {
+void Player_Draw(struct GfxFrameData *arg0) {
     s32 flag;
     s32 pad[2];
     AnimSet *anims;

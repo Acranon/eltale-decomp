@@ -116,7 +116,7 @@ typedef struct {
 void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, CollResult *);
 
 extern s16 hud_enemy_info_timer;
-void Anim_DrawModel(s32, Actor *, u8 *, s32);
+void Anim_DrawModel(s32, Actor *, u8 *, struct GfxFrameData *);
 void Anim_AdvanceFrame(s32, Actor *, u8 *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 extern Gfx *gfx_dl_head;
@@ -232,7 +232,7 @@ void Enemy_UpdateAll(void) {
     }
 }
 
-void Enemy_DrawAll(s32 arg0) {
+void Enemy_DrawAll(struct GfxFrameData *arg0) {
     Enemy *e;
     s32 n;
     Actor **list;

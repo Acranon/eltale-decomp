@@ -53,7 +53,7 @@ typedef struct {
 
 f32 sqrtf(f32);
 void Dma_ReadRom();
-void Anim_DrawModel(s32, Actor *, void *, s32);
+void Anim_DrawModel(s32, Actor *, void *, struct GfxFrameData *);
 void Anim_AdvanceFrame(s32, Actor *, void *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 void Anim_SetCurrentAndNext(Actor *, s32, s32, s32, s32, u16);
@@ -128,7 +128,7 @@ void Boss_LoadForArea(void) {
     }
 }
 
-void Boss_Draw(s32 arg0) {
+void Boss_Draw(struct GfxFrameData *arg0) {
     Enemy *p = &boss_field_record;
     s32 pad;
     u8 *temp;

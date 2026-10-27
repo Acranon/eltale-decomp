@@ -5,6 +5,7 @@
 #include "game/actor/actor.h"
 
 struct Vec3f;
+struct GfxFrameData; /* game/core/main.h */
 struct CollResult;
 struct AnimSet;
 
@@ -112,7 +113,7 @@ void Player_Init(void);
 void Player_Spawn(void);
 void Player_SetSpawnFromSaveTable(void);
 void Player_Update(void);
-void Player_Draw(void *arg0);
+void Player_Draw(struct GfxFrameData *arg0);
 void Player_InitBattle(void);
 void Player_StateMove(Actor *a, Player *p, PlayerAnimTable *cd);
 void Player_StateWait(Actor *arg0, Player *arg1, PlayerAnimTable *arg2);
