@@ -115,10 +115,10 @@ extern s32 core_flags;
 extern s32 core_transition_timer;
 extern Unk8007C288* map_subarea_def;
 s32 Player_RollHitOnEnemy(s32, Actor*);
-s32 Enemy_RollHitOnPlayer(Actor*, Actor*);
+s32 Enemy_RollHitOnPlayer(Actor*);
 s32 Enemy_GetSlotIndex(Actor*);
-s32 Enemy_TakeDamage(s32, u16, s32, u16, s32);
-void Player_TakeDamage(u16, u16, s32);
+u16 Enemy_TakeDamage(s32, u16, u16, u16, Actor*);
+u16 Player_TakeDamage(u16, u16, Actor*);
 void Hud_ClearActorStatusIndicators(Actor*);
 u32 Math_Rand(u32);
 f32 sqrtf(f32);
@@ -211,7 +211,7 @@ typedef struct {
 extern SpellFxDef* D_800C3268[];
 extern Unk800C1878 D_800C1878[];
 extern u8 D_800EB700[];
-void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
+void Magic_CreateCastEffect(Actor* arg0, u32 arg1, s32 arg2, u16 arg3) {
     MagicCastRepeat* r;
     SpellFxDef* def2;
     MagicEffect* p;
@@ -254,7 +254,7 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
     }
     p->unk0 = (arg1 >> 8) & 0xF;
     p->unk2 = arg1 & 0xFF;
-    p->unk24 = (Actor*)arg0;
+    p->unk24 = arg0;
     p->target = NULL;
     p->cfg = (SpellDef*)def;
     p->def = def2;
@@ -674,10 +674,7 @@ extern f32 D_8007AA24;
 extern f32 D_8007AA28;
 extern f32 D_8007AA44;
 extern ActorStats* D_8007AA84;
-s32 Magic_FindTargetInRange(arg0, arg1)
-    MagicEffect* arg0;
-    s32 arg1;
-{
+Actor* Magic_FindTargetInRange(MagicEffect* arg0, s32 arg1) {
     Actor* a;
     Unk8007B908_b* p;
     s32 n;
@@ -742,7 +739,7 @@ s32 Magic_FindTargetInRange(arg0, arg1)
     } else {
         ret = NULL;
     }
-    return (s32)ret;
+    return ret;
 }
 
 Actor* Magic_FindEligibleTarget(MagicEffect* arg0, s32 arg1) {
@@ -773,11 +770,11 @@ Actor* Magic_FindEligibleTarget(MagicEffect* arg0, s32 arg1) {
     return ret;
 }
 
-s32 Magic_FindTargetInRangeIfLanded(MagicEffect* arg0) {
-    s32 ret = 0;
+Actor* Magic_FindTargetInRangeIfLanded(MagicEffect* arg0, s32 arg1) {
+    Actor* ret = NULL;
 
     if (arg0->unkA & 1) {
-        ret = Magic_FindTargetInRange(arg0);
+        ret = Magic_FindTargetInRange(arg0, arg1);
     }
     return ret;
 }
@@ -802,7 +799,7 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
                 flag = 0x4000;
             }
         }
-        if (Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), dmg, arg0->cfg->unk6[0], arg0->cfg->unk2 | flag, (s32)arg0->unk24) != 0) {
+        if (Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), dmg, arg0->cfg->unk6[0], arg0->cfg->unk2 | flag, arg0->unk24) != 0) {
             D_8007AA1C->unk2A++;
         }
     } else {
@@ -811,7 +808,7 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
             Fade_Start(4, 0, fade_damage_flash);
             flag = 0x4000;
         }
-        Player_TakeDamage(dmg, arg0->cfg->unk2 | flag, (s32)arg0->unk24);
+        Player_TakeDamage(dmg, arg0->cfg->unk2 | flag, arg0->unk24);
     }
 }
 
@@ -1498,7 +1495,7 @@ s32 Magic_GetHitOutcome(MagicEffect* arg0, Actor* arg1) {
                 if (arg1->unk5E & 1) {
                     ret = Player_RollHitOnEnemy(Enemy_GetSlotIndex(arg1), arg0->unk24);
                 } else {
-                    ret = Enemy_RollHitOnPlayer(arg0->unk24, arg1);
+                    ret = Enemy_RollHitOnPlayer(arg0->unk24);
                 }
             }
             ret++;
@@ -1557,9 +1554,9 @@ MagicMoveFunc magic_move_handlers[3] = {
     (MagicMoveFunc) Magic_MoveVerticalEffect,
 };
 MagicFindTargetFunc magic_find_target_handlers[3] = {
-    (MagicFindTargetFunc) Magic_FindTargetInRange,
-    (MagicFindTargetFunc) Magic_FindEligibleTarget,
-    (MagicFindTargetFunc) Magic_FindTargetInRangeIfLanded,
+    Magic_FindTargetInRange,
+    Magic_FindEligibleTarget,
+    Magic_FindTargetInRangeIfLanded,
 };
 MagicHitFunc magic_hit_handlers[10] = {
     (MagicHitFunc) Magic_ApplyEffectDamage,

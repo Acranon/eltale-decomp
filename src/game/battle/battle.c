@@ -67,7 +67,7 @@ typedef struct {
 extern Struct_8007B908 enemy_slots[];
 extern u16 enemy_turn_order[];
 
-void Magic_StepActorStatusTimers(Vec3f*);
+void Magic_StepActorStatusTimers(Actor*);
 void Effect_FadeRing(u16, f32, f32, f32);
 
 
@@ -436,7 +436,7 @@ void Battle_UpdateTurnTransition(void) {
     }
 }
 
-void Battle_EndTurn(Vec3f* arg0) {
+void Battle_EndTurn(Actor* arg0) {
     s32 n;
     s32 max; s32 id;
     Struct_8007B908* e;

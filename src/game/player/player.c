@@ -85,7 +85,7 @@ typedef struct CollResult {
 
 void Npc_EndTalk(s32 arg0);
 void Item_BuildMessage(s32 arg0);
-void Magic_CreateCastEffect(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
+void Magic_CreateCastEffect(Actor *arg0, u32 arg1, s32 arg2, u16 arg3);
 s32 Magic_IsAnyEffectActive(void);
 void Effect_StartFootEmitter(Actor *arg0);
 void Battle_EndTurn(Actor *arg0);
@@ -202,7 +202,7 @@ void Player_Init(void) {
     player_state.unk8 = 0;
     player_state.unk120 = 0;
     player_state.actor.unk52 = -1;
-    player_state.actor.unk54 = 0;
+    player_state.actor.frame = 0;
     player_state.actor.unk58 = 1;
     player_state.actor.unk64 = &player_stats;
     player_state.actor.unk68 = &D_8007AA8C;
@@ -285,14 +285,14 @@ void Player_Spawn(void) {
                 p->unk138 = p->actor.rot = pos->rot * 0.017453292519943295;
                 if (player_spawn_type & 1) {
                     p->unk4 = 0x15;
-                    p->actor.unk54 = 0x55;
+                    p->actor.frame = 0x55;
                     player_temp_vec.x = -115.61f;
                     player_temp_vec.y = 15.746f;
                     n = 0xE;
                 } else {
                     p->unk4 = 0x1F;
                     p->unk138 = p->unk138 + 3.141592653589793;
-                    p->actor.unk54 = 0x3C;
+                    p->actor.frame = 0x3C;
                     player_temp_vec.x = -132.831f;
                     player_temp_vec.y = -120.681f;
                     n = 0x14;
@@ -303,7 +303,7 @@ void Player_Spawn(void) {
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
-                MapObjAnim_Start(1, (u16) p->actor.unk54, player_spawn_type, pos);
+                MapObjAnim_Start(1, p->actor.frame, player_spawn_type, pos);
                 Sfx_Play(n, 8, 0xFF);
                 break;
             case 3:
@@ -317,7 +317,7 @@ void Player_Spawn(void) {
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
-                MapObjAnim_Start(1, (u16) p->actor.unk54, player_spawn_type, pos);
+                MapObjAnim_Start(1, p->actor.frame, player_spawn_type, pos);
                 Sfx_Play(5, 0x21, 0xFF);
                 Sfx_Play(0xF, 0x21, 0xFF);
                 break;
@@ -1214,7 +1214,7 @@ void Player_MoveIdle(f32 arg0, f32 arg1, Actor *arg2, Player *arg3) {
         } else {
             arg3->unk0 = 1;
         }
-    } else if (player_idle_anim != arg2->unk52 && player_idle_anim != arg2->unk5A) {
+    } else if (player_idle_anim != arg2->unk52 && player_idle_anim != arg2->nextAnim) {
         Anim_SetCurrentAndNext(arg2, player_idle_anim, 1, player_idle_anim, 1, 1);
     }
 }
@@ -1300,9 +1300,9 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, Player *p) {
             }
         }
     }
-    if (anim != a->unk52 && anim != a->unk5A) {
+    if (anim != a->unk52 && anim != a->nextAnim) {
         Anim_SetCurrentAndNext(a, anim, speed, next, speed, flag);
-        a->unk54 = mode;
+        a->frame = mode;
     } else {
         a->unk58 = speed;
     }
@@ -1368,9 +1368,9 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, Player *p) {
         flag = 1;
         Effect_StartFootEmitter(a);
     }
-    if (anim != a->unk52 && anim != a->unk5A) {
+    if (anim != a->unk52 && anim != a->nextAnim) {
         Anim_SetCurrentAndNext(a, anim, speed, next, speed, flag);
-        a->unk54 = mode;
+        a->frame = mode;
     } else {
         a->unk58 = speed;
     }
@@ -1912,7 +1912,7 @@ u16 Player_CalcMeleeDamage(Player *arg0) {
 void Camera_Shake(s32 arg0);
 
 /* frame 0x50 vs 0x48: damage kept in an extra saved register, arg2 kept live (register allocation); code is equivalent */
-s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
+u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
     Player *p = &player_state;
     PlayerAnimTable *cd;
     f32 angle;

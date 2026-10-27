@@ -117,7 +117,7 @@ typedef struct MagicCastRepeat {
     /* 0x0C */ u16 unkC; /* cast flags */
     /* 0x0E */ u8 padE[2];
     /* 0x10 */ SpellDef *unk10;
-    /* 0x14 */ s32 unk14; /* caster */
+    /* 0x14 */ Actor *unk14; /* caster */
 } MagicCastRepeat; /* 0x18 bytes */
 
 typedef struct MagicSpeedTable {
@@ -160,7 +160,7 @@ extern s32 magic_status_time_range_self[12];
 void Magic_ResetEffectSystem(void);
 s32 Magic_LookupSpellSequence(u16 n, u8 *arg1);
 s32 Magic_GetSpellRestrictionFlags(u32 arg0, u16 arg1);
-void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3);
+void Magic_CreateCastEffect(Actor *arg0, u32 arg1, s32 arg2, u16 arg3);
 void Magic_PlaceEffectAtActorLowerPoint(MagicEffect *arg0, Actor *arg1);
 void Magic_PlaceEffectAtActorMiddlePoint(MagicEffect *arg0, Actor *arg1);
 void Magic_PlaceEffectAtActorUpperPoint(MagicEffect *arg0, Actor *arg1);
@@ -175,11 +175,9 @@ void Magic_UpdateEffects(void);
 s32 Magic_IsAnyEffectActive(void);
 void Magic_MoveHomingEffect(MagicEffect *arg0);
 void Magic_MoveVerticalEffect(MagicEffect *arg0);
-/* K&R definition (MagicEffect *arg0, s32 arg1); Magic_FindTargetInRangeIfLanded calls it
- * with one argument, so it has no prototype */
-s32 Magic_FindTargetInRange();
+Actor *Magic_FindTargetInRange(MagicEffect *arg0, s32 arg1);
 Actor *Magic_FindEligibleTarget(MagicEffect *arg0, s32 arg1);
-s32 Magic_FindTargetInRangeIfLanded(MagicEffect *arg0);
+Actor *Magic_FindTargetInRangeIfLanded(MagicEffect *arg0, s32 arg1);
 void Magic_ApplyEffectDamage(MagicEffect *arg0, Actor *arg1);
 void Magic_HealTarget(MagicEffect *arg0, Actor *arg1);
 void Magic_TransferTargetResource(MagicEffect *arg0, Actor *arg1);

@@ -143,23 +143,13 @@ void Player_StartObjectExit(Player *arg0, Actor *arg1);
 void Player_StartOpenChest(Player *arg0, Actor *arg1, s32 arg2);
 void Player_StartUseItem(u8 arg0);
 void Player_LoadAnim(Actor *arg0);
-#ifdef NON_MATCHING
-/* the C draft; retail returns the unmasked index + 1 in v0 */
+/* returns the enemy_slots index + 1 of the target, 0: none (retail returns it unmasked) */
 s32 Player_FindMeleeTarget(Actor *arg0);
-#else
-/* asm; its callers were compiled against a u16 return */
-u16 Player_FindMeleeTarget(Actor *arg0);
-#endif
 void Player_StartMeleeAttack(Player *arg0, Actor *arg1, PlayerAnimTable *arg2);
 s32 Player_RollHitOnEnemy(s32 arg0, Actor *arg1);
 u16 Player_CalcMeleeDamage(Player *arg0);
-#ifdef NON_MATCHING
-/* the C draft; retail masks the damage argument with 0xFFFF on entry */
-s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2);
-#else
-/* asm; the prototype its in-file callers were compiled against */
-s32 Player_TakeDamage(s32 arg0, u16 arg1, Actor *arg2);
-#endif
+/* returns the damage taken (dmg after the back-hit bonus, defence and random part) */
+u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2);
 void Player_StartMissReaction(void);
 s32 Player_CanAct(Player *arg0, Actor *arg1);
 s32 Player_HandleSpellInput(Player *arg0);

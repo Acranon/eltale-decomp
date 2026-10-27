@@ -139,7 +139,7 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Actor *obj);
 s32 Enemy_RollHitOnPlayer(Actor *obj);
 u16 Enemy_CalcAttackDamage(Enemy *arg0);
 u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Actor *src);
-void Enemy_PlayMissEffect(void); /* callers pass the actor (D3_PROTO.md) */
+void Enemy_PlayMissEffect(Actor *obj);
 s32 Enemy_GetSlotIndex(Actor *arg0);
 void Enemy_SpawnDeathEffects(Actor *obj);
 void Enemy_ClearAttackScript(void);
