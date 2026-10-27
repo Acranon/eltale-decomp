@@ -55,35 +55,38 @@ typedef struct ActorBattle {
     /* 0x94 */ f32 unk94;
 } ActorBattle; /* 0x98 bytes */
 
-/* A posed, animated actor model. */
+/* A posed, animated actor model. Anim_* (game/actor/anim.c) drive 0x38..0x60; chests
+ * (game/map/chest.c) reuse 0x18..0x20 and 0x44/0x4C for their open box. */
 typedef struct Actor {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ f32 unkC;
+    /* 0x0C */ f32 unkC; /* x rotation for Math_MtxFRotScaleTrans (Anim_DrawModel) */
     /* 0x10 */ f32 rot; /* yaw, radians: the angle Math_RotateVec2 turns movement by */
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 vx; /* this frame's x/z step, added to x/z by the move functions */
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 vz;
+    /* 0x14 */ f32 unk14; /* z rotation for Math_MtxFRotScaleTrans */
+    /* 0x18 */ f32 vx; /* this frame's x/z step, added to x/z by the move functions; chest: box half width */
+    /* 0x1C */ f32 unk1C; /* chest: facing angle of the open box */
+    /* 0x20 */ f32 vz; /* chest: box half depth */
     /* 0x24 */ f32 scale;
     /* 0x28 */ f32 unk28;
     /* 0x2C */ f32 nx; /* floor normal from Coll_ResolveFloorAndWalls */
     /* 0x30 */ f32 ny;
     /* 0x34 */ f32 nz;
-    /* 0x38 */ u8 unk38[0x44 - 0x38];
-    /* 0x44 */ f32 unk44;
-    /* 0x48 */ f32 unk48;
-    /* 0x4C */ f32 unk4C;
+    /* 0x38 */ f32 rootX; /* root node position * scale, from Anim_UpdateRootMotion */
+    /* 0x3C */ f32 rootY;
+    /* 0x40 */ f32 rootZ;
+    /* 0x44 */ f32 unk44; /* root motion since the last Anim_UpdateRootMotion (x); chest: box centre x */
+    /* 0x48 */ f32 unk48; /* root motion y */
+    /* 0x4C */ f32 unk4C; /* root motion z; chest: box centre z */
     /* 0x50 */ s16 unk50; /* anim set index; -1: slot unused (enemies) */
-    /* 0x52 */ s16 unk52;
-    /* 0x54 */ s16 unk54;
-    /* 0x56 */ s16 unk56;
-    /* 0x58 */ u16 unk58;
-    /* 0x5A */ s16 unk5A;
-    /* 0x5C */ s16 unk5C;
+    /* 0x52 */ s16 unk52; /* current animation (AnimSet index) */
+    /* 0x54 */ u16 frame; /* frame within the current animation */
+    /* 0x56 */ u16 ticks; /* frames since the animation was set (+1 per Anim_AdvanceFrame) */
+    /* 0x58 */ u16 unk58; /* animation step: frames per Anim_AdvanceFrame */
+    /* 0x5A */ s16 nextAnim; /* played when the current one ends */
+    /* 0x5C */ u16 nextAnimStep;
     /* 0x5E */ u16 unk5E; /* bit 0: enemy */
-    /* 0x60 */ u16 unk60;
+    /* 0x60 */ u16 unk60; /* flags: 0x200 animation looped this frame, 0x400 animation changed */
     /* 0x62 */ u16 unk62; /* floor flags from Coll_ResolveFloorAndWalls */
     /* 0x64 */ ActorStats *unk64;
     /* 0x68 */ ActorBattle *unk68;

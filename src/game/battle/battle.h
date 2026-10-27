@@ -4,6 +4,7 @@
 #include "common.h"
 
 struct Vec3f;
+struct Actor; /* game/actor/actor.h */
 
 /* Random-encounter data of a map area (MapAreaDef 0x30/0x34, indexed by sub-area). */
 
@@ -93,7 +94,7 @@ void Battle_TryStartRandomEncounter(void);
 void Battle_StartBossEncounter(void);
 void Battle_UpdateStartCamera(void);
 void Battle_UpdateTurnTransition(void);
-void Battle_EndTurn(struct Vec3f *arg0); /* callers pass the actor (D3_PROTO.md) */
+void Battle_EndTurn(struct Actor *arg0);
 EncounterRegion *Battle_FindEncounterRegion(f32 x, f32 y, EncounterRegionList *list);
 EncounterPoint *Battle_ChooseNearbyEncounterPoint(f32 x, f32 y);
 void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16 *list);

@@ -91,7 +91,7 @@ extern s32 mapobj_billboard_count;
 extern Unk8007C2A8 *mapobj_billboard_list[];
 
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
-void Anim_DrawModel(s32, Actor *, AnimSet *, s32);
+void Anim_DrawModel(s32, Actor *, AnimSet *, struct GfxFrameData *);
 void Anim_AdvanceFrame(s32, Actor *, AnimSet *);
 extern Gfx *gfx_dl_head;
 extern Unk8007AA08 player_state;
@@ -229,7 +229,7 @@ void Npc_UpdateAll(void) {
     }
 }
 
-void Npc_DrawAll(s32 arg0) {
+void Npc_DrawAll(struct GfxFrameData *arg0) {
     Npc *npc;
     s32 i;
     Actor **list;

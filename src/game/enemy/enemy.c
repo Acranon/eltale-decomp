@@ -116,7 +116,7 @@ typedef struct {
 void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, CollResult *);
 
 extern s16 hud_enemy_info_timer;
-void Anim_DrawModel(s32, Actor *, u8 *, s32);
+void Anim_DrawModel(s32, Actor *, u8 *, struct GfxFrameData *);
 void Anim_AdvanceFrame(s32, Actor *, u8 *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 extern Gfx *gfx_dl_head;
@@ -128,7 +128,7 @@ void Effect_StartConvergeEmitter(s32, s32, f32, f32, f32, f32);
 void Battle_EndTurn(Actor *);
 void Anim_UpdateRootMotion(Actor *, u8 *, f32, Vec3f *);
 void Hud_ClearActorStatusIndicators(Actor *);
-void Hud_ShowActorPopup(void);
+void Hud_ShowActorPopup(Actor *);
 void Fade_Start(s32, u16, void *);
 u32 Math_Rand(u32);
 void Math_RotateVec2(f32, Vec3f *);
@@ -176,8 +176,8 @@ typedef struct AnimSet {
     /* 0x04 */ u8 pad4[8];
 } AnimSet; /* size 0xC */
 
-void Magic_CreateCastEffect(Actor *, s32, s32, s32);
-s32 Player_TakeDamage(u16, s32, Actor *);
+void Magic_CreateCastEffect(Actor *, u32, s32, u16);
+u16 Player_TakeDamage(u16, u16, Actor *);
 void Effect_SpawnStreakBurst(f32, f32, f32);
 void Effect_AddFloatingNumber(Actor *, s32, s32);
 void Hud_StartActorStatusIndicator(Actor *, u16, u16, s16);
@@ -232,7 +232,7 @@ void Enemy_UpdateAll(void) {
     }
 }
 
-void Enemy_DrawAll(s32 arg0) {
+void Enemy_DrawAll(struct GfxFrameData *arg0) {
     Enemy *e;
     s32 n;
     Actor **list;
@@ -307,7 +307,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     def = &enemy_area_set->unkC[idx];
     obj->unk50 = def->unk2;
     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
-    obj->unk54 = Math_Rand(16);
+    obj->frame = Math_Rand(16);
     obj->scale = def->unk20;
     obj->unk28 = def->unk18;
     obj->unk68 = &e->battle;
@@ -517,7 +517,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
     f32 dx;
     f32 dz;
     f32 d;
-    s32 atk;
+    u16 atk;
     EnemyAttack *a;
     u16 attr;
 
@@ -1031,8 +1031,8 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Actor *src) {
 }
 
 
-void Enemy_PlayMissEffect(void) {
-    Hud_ShowActorPopup();
+void Enemy_PlayMissEffect(Actor *obj) {
+    Hud_ShowActorPopup(obj);
     Sfx_Play(0, 0x17, 0xFF);
 }
 

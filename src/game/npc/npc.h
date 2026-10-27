@@ -5,6 +5,7 @@
 #include "game/actor/actor.h"
 
 struct CollResult;
+struct GfxFrameData; /* game/core/main.h */
 struct AnimSet;
 struct RomRange;
 
@@ -73,7 +74,7 @@ extern u8 npc_rest_choice_row1[8];
 
 void Npc_InitArea(void);
 void Npc_UpdateAll(void);
-void Npc_DrawAll(s32 arg0);
+void Npc_DrawAll(struct GfxFrameData *arg0);
 void func_80009764(s32 arg0);
 void Npc_SpawnForArea(NpcDef *def, s32 n);
 void Npc_Move(f32 dx, f32 dz, Actor *obj);

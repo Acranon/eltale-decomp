@@ -5,6 +5,7 @@
 #include "game/actor/actor.h"
 
 struct Vec3f;
+struct GfxFrameData; /* game/core/main.h */
 struct CollResult;
 struct AnimSet;
 
@@ -119,7 +120,7 @@ extern s32 enemy_element_bits[5];
 void Enemy_InitForArea(void);
 void Enemy_LoadAreaSet(void);
 void Enemy_UpdateAll(void);
-void Enemy_DrawAll(s32 arg0);
+void Enemy_DrawAll(struct GfxFrameData *arg0);
 void Enemy_RemoveAll(void);
 void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e);
 void Enemy_SortTurnOrder(void);
@@ -139,7 +140,7 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Actor *obj);
 s32 Enemy_RollHitOnPlayer(Actor *obj);
 u16 Enemy_CalcAttackDamage(Enemy *arg0);
 u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Actor *src);
-void Enemy_PlayMissEffect(void); /* callers pass the actor (D3_PROTO.md) */
+void Enemy_PlayMissEffect(Actor *obj);
 s32 Enemy_GetSlotIndex(Actor *arg0);
 void Enemy_SpawnDeathEffects(Actor *obj);
 void Enemy_ClearAttackScript(void);
