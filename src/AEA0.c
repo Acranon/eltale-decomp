@@ -252,13 +252,13 @@ void Enemy_LoadAreaSet(void);
 Unk8000BA20 *Enemy_ChooseAttack(Enemy *, Obj *);
 void Enemy_StartAttack(Enemy *, Obj *, Unk8000BA20 *);
 extern s16 D_8008C162;
-void func_80020428(s32, Obj *, u8 *, s32);
-void func_8002099C(s32, Obj *, u8 *);
+void Anim_DrawModel(s32, Obj *, u8 *, s32);
+void Anim_AdvanceFrame(s32, Obj *, u8 *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 extern Gfx *D_8007A184;
 void Enemy_StartAttackScript(s32, s32);
 f32 func_800270D0(f32, f32);
-void func_800201A0(Obj *, s32, s32, s32, s32, u16);
+void Anim_SetCurrentAndNext(Obj *, s32, s32, s32, s32, u16);
 void Camera_StartBattleFocus(s32, Obj *);
 void Enemy_TurnToward(Obj *, f32, f32);
 void Enemy_Move(s32, f32, f32, Obj *, EnemyAI *);
@@ -266,11 +266,11 @@ void Enemy_GetAnimStep(Obj *, Vec3f *);
 void Enemy_SpawnDeathEffects(Obj *);
 void Enemy_RunAttackScript(void);
 void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Unk800C18D8 *, Vec3f *, Obj *);
-void func_8001B3FC(s32, s32, f32, f32, f32, f32);
-void func_8001FC14(Obj *);
-void func_80020214(Obj *, u8 *, f32, Vec3f *);
-void func_80023D28(Obj *);
-void func_8002433C(void);
+void Effect_StartBurstEmitter(s32, s32, f32, f32, f32, f32);
+void Battle_EndTurn(Obj *);
+void Anim_UpdateRootMotion(Obj *, u8 *, f32, Vec3f *);
+void Hud_ClearActorStatusIndicators(Obj *);
+void Hud_ShowActorPopup(void);
 void func_800269B8(s32, u16, void *);
 u32 func_80026E90(u32);
 void func_800271B4(f32, Vec3f *);
@@ -324,9 +324,9 @@ void Magic_CreateCastEffect(Obj *, s32, s32, s32);
 s32 Enemy_RollHitOnPlayer(Obj *obj);
 u16 Enemy_CalcAttackDamage(Enemy *arg0);
 s32 Player_TakeDamage(u16, s32, Obj *);
-void func_8001BE2C(f32, f32, f32);
-void func_8001AE24(Obj *, s32, s32);
-void func_8002373C(Obj *, u16, u16, s16);
+void Effect_SpawnStreakBurst(f32, f32, f32);
+void Effect_AddFloatingNumber(Obj *, s32, s32);
+void Hud_StartActorStatusIndicator(Obj *, u16, u16, s16);
 void Player_StartDodge(void);
 extern f32 D_8007C074;
 extern s32 D_8007A9B4;
@@ -405,8 +405,8 @@ void Enemy_DrawAll(s32 arg0) {
                 obj->y += h;
                 obj->unk68->unk94 = obj->y;
             }
-            func_80020428(1, obj, &anims[obj->unk52 * 12], arg0);
-            func_8002099C(obj->unk58, obj, &anims[obj->unk52 * 12]);
+            Anim_DrawModel(1, obj, &anims[obj->unk52 * 12], arg0);
+            Anim_AdvanceFrame(obj->unk58, obj, &anims[obj->unk52 * 12]);
             obj->y = y;
             if (obj->unk64->unk0 != 2 && !(obj->unk62 & 0x8000)) {
                 Shadow_Queue(obj->x, obj->y, obj->z, obj->unk2C, obj->unk30, obj->unk34, obj->unk28 * obj->unk24);
@@ -439,7 +439,7 @@ void Enemy_RemoveAll(void) {
     for (e = D_8007B908, i = 6; i != 0; i--, e++) {
         obj = &e->obj;
         if (e->obj.unk50 != -1) {
-            func_80023D28(obj);
+            Hud_ClearActorStatusIndicators(obj);
             obj->unk50 = -1;
         }
     }
@@ -452,7 +452,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Obj *obj, Enemy *e) {
 
     def = &D_8007C05C->unkC[idx];
     obj->unk50 = def->unk2;
-    func_800201A0(obj, 0, 1, 0, 1, 1);
+    Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
     obj->unk54 = func_80026E90(16);
     obj->unk24 = def->unk20;
     obj->unk28 = def->unk18;
@@ -537,7 +537,7 @@ void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
         D_8008C162 = 60;
         e->flags &= 0xFFFC;
         if (e->unk98 & 8) {
-            func_8001FC14(obj);
+            Battle_EndTurn(obj);
             return;
         }
         v = Enemy_ChooseAttack(e, obj);
@@ -550,20 +550,20 @@ void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
             e->unk4 = 4;
             if (D_8008BE52 & 0x100) {
                 e->unk2 = arg2->unkE;
-                func_800201A0(obj, 1, 1, 1, 1, 1);
+                Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
             } else {
                 e->unk2 = arg2->unkE / 10;
-                func_800201A0(obj, 1, 10, 1, 10, 1);
+                Anim_SetCurrentAndNext(obj, 1, 10, 1, 10, 1);
             }
         } else {
             e->type = 1;
             e->unk4 = 4;
             if (D_8008BE52 & 0x100) {
                 e->unk2 = arg2->unkE;
-                func_800201A0(obj, 1, 1, 1, 1, 1);
+                Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
             } else {
                 e->unk2 = arg2->unkE / 10;
-                func_800201A0(obj, 1, 10, 1, 10, 1);
+                Anim_SetCurrentAndNext(obj, 1, 10, 1, 10, 1);
             }
         }
     }
@@ -612,8 +612,8 @@ void Enemy_StateApproach(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
             }
             if (e->unk4 == 0 || (e->flags & 2)) {
                 e->type = 0;
-                func_800201A0(obj, 0, 1, 0, 1, 1);
-                func_8001FC14(obj);
+                Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
+                Battle_EndTurn(obj);
                 return;
             }
             if (D_8008BE52 & 0x100) {
@@ -631,7 +631,7 @@ void Enemy_StateHurt(Obj *obj, EnemyAI *ai, s32 arg2) {
     ai->unk2--;
     if (ai->unk2 == 0) {
         if (ai->unkA == 0) {
-            func_80023D28(obj);
+            Hud_ClearActorStatusIndicators(obj);
             Enemy_SpawnDeathEffects(obj);
             obj->unk50 = -1;
             obj->unk60 &= 0xFFFE;
@@ -654,7 +654,7 @@ void Enemy_StateFacePlayer(Obj *obj, EnemyAI *ai, s32 arg2) {
     if (ai->unk2 == 0) {
         ai->unk0 = 0;
         obj->unk60 &= 0xFFFE;
-        func_8001FC14(obj);
+        Battle_EndTurn(obj);
     }
 }
 
@@ -701,15 +701,15 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
                         D_8007C070.x = 0.0f;
                         D_8007C070.y = 2.0f * (obj->unk64->unk18 * obj->unk24);
                         func_800271B4(obj->angle, &D_8007C070);
-                        func_8001BE2C(obj->x + D_8007C070.x, obj->y + obj->unk64->unk1C * obj->unk24 * 0.7f, obj->z + D_8007C070.y);
+                        Effect_SpawnStreakBurst(obj->x + D_8007C070.x, obj->y + obj->unk64->unk1C * obj->unk24 * 0.7f, obj->z + D_8007C070.y);
                         if (e->unk98 & 2) {
                             n = ((n + 3) >> 2) + 1;
                             e->unkA += n;
                             if (obj->unk64->unk6 < e->unkA) {
                                 e->unkA = obj->unk64->unk6;
                             }
-                            func_8001AE24(obj, 1, n);
-                            func_8002373C(obj, 2, 1, 30);
+                            Effect_AddFloatingNumber(obj, 1, n);
+                            Hud_StartActorStatusIndicator(obj, 2, 1, 30);
                         }
                     } else {
                         Player_StartDodge();
@@ -726,13 +726,13 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
                     e->unk2 = anims[a->unk8].unk2 - a->unk4;
                 } else {
                     e->unk2 = anims[a->unkC].unk2;
-                    func_800201A0(obj, a->unkC, 1, 0, 1, 1);
+                    Anim_SetCurrentAndNext(obj, a->unkC, 1, 0, 1, 1);
                     Enemy_GetAnimStep(obj, &D_8007C070);
                 }
                 if (e->unk2 <= 0) {
                     e->unk2 = 1;
                 }
-                func_8001FC14(obj);
+                Battle_EndTurn(obj);
             }
             break;
         case 2:
@@ -770,7 +770,7 @@ void Enemy_StateCastSpell(Obj *obj, Enemy *e, AnimDef *anims) {
                 if (e->unk2 <= 0) {
                     e->unk2 = 15;
                 }
-                func_8001FC14(obj);
+                Battle_EndTurn(obj);
             }
             break;
         case 1:
@@ -795,7 +795,7 @@ void Enemy_StateCastSpell(Obj *obj, Enemy *e, AnimDef *anims) {
                 a = e->unk1C;
                 e->unk6--;
                 e->unk2 = anims[a->unkC].unk2;
-                func_800201A0(obj, a->unkC, 1, 0, 1, 1);
+                Anim_SetCurrentAndNext(obj, a->unkC, 1, 0, 1, 1);
             }
             if (e->unk2 <= 0) {
                 e->unk2 = 15;
@@ -888,8 +888,8 @@ void Enemy_StartAttack(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
 
     if (t && (e->unk98 & 0x40)) {
         e->type = 0;
-        func_800201A0(obj, 0, 1, 0, 1, 1);
-        func_8001FC14(obj);
+        Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
+        Battle_EndTurn(obj);
         return;
     }
     if (t) {
@@ -902,7 +902,7 @@ void Enemy_StartAttack(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
     e->flags &= 0xFFD7;
     obj->unk60 = 1;
     obj->angle = func_800270D0(D_8007AA08.x - obj->x, D_8007AA08.z - obj->z);
-    func_800201A0(obj, arg2->unk8, 1, arg2->unkA == -1 ? 0 : arg2->unkA, 1, 1);
+    Anim_SetCurrentAndNext(obj, arg2->unk8, 1, arg2->unkA == -1 ? 0 : arg2->unkA, 1, 1);
     Camera_StartBattleFocus(arg2->unk4 + 0xF, obj);
     if (e->unk2 == 0) {
         e->unk2 = 1;
@@ -990,7 +990,7 @@ void Enemy_GetAnimStep(Obj *obj, Vec3f *out) {
     u8 *anims;
 
     anims = D_8007C048[obj->unk50];
-    func_80020214(obj, anims + obj->unk52 * 0xC, obj->unk24, out);
+    Anim_UpdateRootMotion(obj, anims + obj->unk52 * 0xC, obj->unk24, out);
     out->x = -obj->unk44;
     out->y = obj->unk4C;
     func_800271B4(obj->angle, out);
@@ -1153,9 +1153,9 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
                 if (obj->unk64->unkA < enemies[idx].unkC) {
                     D_8007B908[idx].unkC = obj->unk64->unkA;
                 }
-                func_8002373C(obj, 0x200, 2, 30);
+                Hud_StartActorStatusIndicator(obj, 0x200, 2, 30);
             }
-            func_8001AE24(obj, (flags & 0x4000) ? 0x8003 : 0, dmg);
+            Effect_AddFloatingNumber(obj, (flags & 0x4000) ? 0x8003 : 0, dmg);
         }
         D_8007B908[idx].type = 2;
         obj->unk60 |= 1;
@@ -1164,10 +1164,10 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
         }
         if (D_8008BE52 & 0x100) {
             D_8007B908[idx].unk2 = ((AnimDef *)anims)[D_8007B908[idx].unk28->unk28].unk2;
-            func_800201A0(obj, D_8007B908[idx].unk28->unk28, 1, 0, 1, 1);
+            Anim_SetCurrentAndNext(obj, D_8007B908[idx].unk28->unk28, 1, 0, 1, 1);
         } else {
             D_8007B908[idx].unk2 = ((AnimDef *)anims)[D_8007B908[idx].unk28->unk28].unk2 / 10;
-            func_800201A0(obj, D_8007B908[idx].unk28->unk28, 10, 0, 1, 1);
+            Anim_SetCurrentAndNext(obj, D_8007B908[idx].unk28->unk28, 10, 0, 1, 1);
         }
     }
     if (flags & 0x8000) {
@@ -1178,7 +1178,7 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
 
 
 void Enemy_PlayMissEffect(void) {
-    func_8002433C();
+    Hud_ShowActorPopup();
     func_8002A7C8(0, 0x17, 0xFF);
 }
 
@@ -1207,7 +1207,7 @@ void Enemy_SpawnDeathEffects(Obj *obj) {
         y = obj->y + obj->unk64->unk1C * 0.5 * obj->unk24;
     }
     Magic_CreateVisualEffect(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &D_8007C070, obj);
-    func_8001B3FC(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
+    Effect_StartBurstEmitter(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
                   obj->unk64->unk18 * obj->unk24 * 3.6);
 }
 

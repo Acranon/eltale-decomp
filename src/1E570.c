@@ -64,13 +64,13 @@ extern Struct_80085E48 D_80085E48;
 s32 D_80087E30;
 Struct_80087E38 D_80087E38[0x100];
 
-void func_8001DCE8(u8, u8*, s32, s32, u8, u8);
+void Effect_LoadSpriteTexture(u8, u8*, s32, s32, u8, u8);
 void func_80027430(MtxF*, f32, f32, f32);
 void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
 void func_800278C8(MtxF*, f32, f32, f32);
 void func_80027CB4(MtxF*, f32, f32, f32);
 
-void func_8001D970(void) {
+void Effect_ResetSpritePool(void) {
     s32 var_v1;
     Struct_80087E38* var_v0;
 
@@ -84,7 +84,7 @@ void func_8001D970(void) {
     D_80087E30 = 0;
 }
 
-Struct_80087E38* func_8001D9A8(Struct_80087E38* arg0) {
+Struct_80087E38* Effect_AllocateSprite(Struct_80087E38* arg0) {
     Struct_80087E38* ret = D_80087E38;
     u32 i = 0x100;
 
@@ -102,7 +102,7 @@ Struct_80087E38* func_8001D9A8(Struct_80087E38* arg0) {
     return ret;
 }
 
-void func_8001DA3C(Struct_8001DA3C* arg0) {
+void Effect_DrawSprites(Struct_8001DA3C* arg0) {
     s32 i;
     u8* tex;
     Struct_80087E38* dust;
@@ -117,7 +117,7 @@ void func_8001DA3C(Struct_8001DA3C* arg0) {
             dust->unk0--;
             if (tex != dust->unk10) {
                 tex = dust->unk10;
-                func_8001DCE8(dust->unk8, tex, dust->unk9, dust->unkA, (s32) dust->unkB, (s32) dust->unkC);
+                Effect_LoadSpriteTexture(dust->unk8, tex, dust->unk9, dust->unkA, (s32) dust->unkB, (s32) dust->unkC);
             }
             if (dust->unk4 != NULL) {
                 ((void (*)(Struct_80087E38*)) dust->unk4)(dust);
@@ -155,7 +155,7 @@ void func_8001DA3C(Struct_8001DA3C* arg0) {
 
 u8 D_8004F0A0[8] = { 2, 4, 8, 16, 32, 64, 128, 0 };
 
-void func_8001DCE8(u8 fmt, u8* timg, s32 width, s32 height, u8 cms, u8 cmt) {
+void Effect_LoadSpriteTexture(u8 fmt, u8* timg, s32 width, s32 height, u8 cms, u8 cmt) {
     u8 masks;
     u8 maskt;
 

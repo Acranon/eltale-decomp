@@ -108,7 +108,7 @@ extern Struct_8007B908 D_8007B908[];
 extern u16 D_8007C050[];
 
 void Magic_TickActorStatuses(Vec3f*);
-void func_8001C298(u16, f32, f32, f32);
+void Effect_FadeRing(u16, f32, f32, f32);
 
 
 extern f32 D_8004F2A0[];
@@ -128,11 +128,11 @@ void Player_InitBattle(void);
 void Enemy_SortTurnOrder(void);
 void Enemy_ClearAttackScript(void);
 void Boss_Spawn(s32, f32, f32, f32, Struct_8007B908*);
-s16 func_8001C060(u16, f32, f32, f32, f32);
-void func_8002430C(void);
+s16 Effect_CreateTerrainRing(u16, f32, f32, f32, f32);
+void Hud_ResetPopups(void);
 void func_8002A6B8(s8);
 
-void func_8001EE00(void) {
+void Battle_ResetState(void) {
     D_8008BE52 &= 0x8000;
     D_8008BFAC = 0.0f;
     D_8008BFB0 = 0;
@@ -168,12 +168,12 @@ typedef struct {
 extern Struct_8007AA08 D_8007AA08;
 extern f32 D_8007A9A8;
 extern u16 D_8007AA80;
-Struct_8001FD44* func_8001FD44(f32 x, f32 y, Struct_8007C284_30* list);
-Struct_8001FE08* func_8001FE08(f32 x, f32 y);
-void func_8001FF10(f32 x, f32 y, f32 z, u16* list);
+Struct_8001FD44* Battle_FindEncounterRegion(f32 x, f32 y, Struct_8007C284_30* list);
+Struct_8001FE08* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y);
+void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list);
 f32 func_800270D0(f32, f32);
 
-void func_8001EE94(void) {
+void Battle_TryStartRandomEncounter(void) {
     f32 x;
     f32 y;
     f32 dx;
@@ -189,15 +189,15 @@ void func_8001EE94(void) {
             if (func_80026E90(2000) < D_8008BFB0) {
                 x = D_8007AA08.unk18;
                 y = D_8007AA08.unk20;
-                pt = func_8001FE08(x, y);
+                pt = Battle_ChooseNearbyEncounterPoint(x, y);
                 if (pt != NULL) {
-                    area = func_8001FD44(x, y, D_8008BF98);
+                    area = Battle_FindEncounterRegion(x, y, D_8008BF98);
                     if (area != NULL) {
                         D_8008BFB0 = 0;
                         dx = x - pt->unk0;
                         dy = y - pt->unk2;
                         ang = func_800270D0(dx, dy);
-                        func_8001FF10(pt->unk0, pt->unk2, ang, (u16*)area->unk8);
+                        Battle_SpawnEncounterGroup(pt->unk0, pt->unk2, ang, (u16*)area->unk8);
                         D_8008BE5C = pt->unk0;
                         D_8008BE60 = pt->unk2;
                         D_8008BE52 = 0x205;
@@ -210,9 +210,9 @@ void func_8001EE94(void) {
                             D_8008BE58 = D_8008BE5A - 1;
                         }
                         Player_InitBattle();
-                        func_8002430C();
+                        Hud_ResetPopups();
                         D_8008BE6C = 100.0f;
-                        D_8008BF94 = func_8001C060(0, D_8008BE5C, D_8007AA08.unk1C, D_8008BE60, D_8008BE6C * 1.04);
+                        D_8008BF94 = Effect_CreateTerrainRing(0, D_8008BE5C, D_8007AA08.unk1C, D_8008BE60, D_8008BE6C * 1.04);
                         D_8008BE4C = 0;
                         D_8008BE4E = 1;
                         D_8008BE50 = func_80026E90(D_8007B900);
@@ -225,7 +225,7 @@ void func_8001EE94(void) {
     }
 }
 
-void func_8001F164(void) {
+void Battle_StartBossEncounter(void) {
     s32 v;
 
     if (D_8007C140 == 7) {
@@ -261,9 +261,9 @@ void func_8001F164(void) {
     }
     func_8002A6B8(v);
     Player_InitBattle();
-    func_8002430C();
+    Hud_ResetPopups();
     D_8008BE6C = D_8004F2A0[D_8008BFA8 - 1];
-    D_8008BF94 = func_8001C060(0, D_8008BE5C, D_8007C178, D_8008BE60, D_8008BE6C * 1.04);
+    D_8008BF94 = Effect_CreateTerrainRing(0, D_8008BE5C, D_8007C178, D_8008BE60, D_8008BE6C * 1.04);
 }
 
 typedef struct {
@@ -320,7 +320,7 @@ typedef struct Actor {
 
 extern Actor D_8007AA20;
 
-void func_8001F36C(void) {
+void Battle_UpdateTurnCamera(void) {
     f32 dx;
     f32 dz;
     f32 ang;
@@ -428,7 +428,7 @@ s32 func_800200F8(void);
 void func_8002A6F4(s32, s32);
 void func_8002A744(s32, s32, s32);
 
-void func_8001F888(void) {
+void Battle_UpdateTurnTransition(void) {
     s32 done;
     f32 f;
     Actor* a;
@@ -464,7 +464,7 @@ void func_8001F888(void) {
             if (done) {
                 D_8008BE52 &= ~1;
                 D_8008C162 = 0;
-                func_8001C298(D_8008BF94, D_8007AA08.unk18, D_8007AA08.unk1C, D_8007AA08.unk20);
+                Effect_FadeRing(D_8008BF94, D_8007AA08.unk18, D_8007AA08.unk1C, D_8007AA08.unk20);
                 Enemy_RemoveAll();
                 Camera_SetPresetDelayedTurn(D_80085F60);
                 if (D_8008BE52 & 0x100) {
@@ -495,12 +495,12 @@ void func_8001F888(void) {
             }
             f *= a->unk68->unk90;
             f += a->unk64->unk18 * a->unk24;
-            D_8008BF96 = func_8001C060((D_8008BE52 & 2) ? 1 : 2, D_8008BE64, a->unk4, D_8008BE68, f * 1.04);
+            D_8008BF96 = Effect_CreateTerrainRing((D_8008BE52 & 2) ? 1 : 2, D_8008BE64, a->unk4, D_8008BE68, f * 1.04);
         }
     }
 }
 
-void func_8001FC14(Vec3f* arg0) {
+void Battle_EndTurn(Vec3f* arg0) {
     s32 n;
     s32 max; s32 id;
     Struct_8007B908* e;
@@ -528,13 +528,13 @@ void func_8001FC14(Vec3f* arg0) {
         } else {
             D_8008BE54 = 0;
         }
-        func_8001C298(D_8008BF96, arg0->x, arg0->y, arg0->z);
+        Effect_FadeRing(D_8008BF96, arg0->x, arg0->y, arg0->z);
         D_8008BE52 ^= 2;
         D_8008BE52 |= 4;
     }
 }
 
-Struct_8001FD44* func_8001FD44(f32 x, f32 y, Struct_8007C284_30* list) {
+Struct_8001FD44* Battle_FindEncounterRegion(f32 x, f32 y, Struct_8007C284_30* list) {
     Struct_8001FD44* r = NULL;
     s32 n;
 
@@ -555,7 +555,7 @@ Struct_8001FD44* func_8001FD44(f32 x, f32 y, Struct_8007C284_30* list) {
     return r;
 }
 
-Struct_8001FE08* func_8001FE08(f32 x, f32 y) {
+Struct_8001FE08* Battle_ChooseNearbyEncounterPoint(f32 x, f32 y) {
     s32 n;
     Struct_8001FE08* p;
     s32 cnt;
@@ -593,7 +593,7 @@ Struct_8001FE08* func_8001FE08(f32 x, f32 y) {
 void func_800271B4(f32, Struct_8001FF10_Pos*);
 void Enemy_Spawn(s32, f32, f32, f32, void*, Struct_8007B908*);
 
-void func_8001FF10(f32 x, f32 y, f32 z, u16* list) {
+void Battle_SpawnEncounterGroup(f32 x, f32 y, f32 z, u16* list) {
     Struct_8001FF10_8* e;
     s32 n;
     Struct_8001FF10_C* p;

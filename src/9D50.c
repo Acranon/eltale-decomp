@@ -174,8 +174,8 @@ extern s32 D_8007C2A4;
 extern Unk8007C2A8 *D_8007C2A8[];
 
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
-void func_80020428(s32, NPCObj *, AnimEntry *, s32);
-void func_8002099C(s32, NPCObj *, AnimEntry *);
+void Anim_DrawModel(s32, NPCObj *, AnimEntry *, s32);
+void Anim_AdvanceFrame(s32, NPCObj *, AnimEntry *);
 extern Gfx *D_8007A184;
 extern Unk8007AA08 D_8007AA08;
 
@@ -218,7 +218,7 @@ typedef struct {
 } CollResult;
 
 void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, void *);
-void func_800201A0(void *, s32, s32, s32, s32, u16);
+void Anim_SetCurrentAndNext(void *, s32, s32, s32, s32, u16);
 u32 func_80026E90(u32);
 void func_80028120();
 void func_80032D20(s32);
@@ -289,7 +289,7 @@ void Npc_UpdateAll(void) {
                         if (D_8007AB74 < 3) {
                             npc->state = 1;
                             npc->timer = (func_80026E90(2) + 1) * npc->def->unk10->unkE;
-                            func_800201A0(obj, 1, 1, 1, 1, 1);
+                            Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
                             dx = npc->homeX - obj->x;
                             dz = npc->homeZ - obj->z;
                             if (sqrtf(dx * dx + dz * dz) > 50.0) {
@@ -312,7 +312,7 @@ void Npc_UpdateAll(void) {
                 if (--npc->timer == 0) {
                     npc->state = 0;
                     npc->timer = npc->def->unk10->unk2;
-                    func_800201A0(obj, 0, 1, 0, 1, 1);
+                    Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
                     D_8007AB74--;
                 }
                 break;
@@ -321,7 +321,7 @@ void Npc_UpdateAll(void) {
                     npc->timer--;
                     obj->angle += npc->unk10 / 15.0f;
                     if (npc->timer == 0) {
-                        func_800201A0(obj, npc->def->unk18, 1, npc->def->unk18, 1, 1);
+                        Anim_SetCurrentAndNext(obj, npc->def->unk18, 1, npc->def->unk18, 1, 1);
                     }
                 }
                 break;
@@ -332,7 +332,7 @@ void Npc_UpdateAll(void) {
                     npc->state = 0;
                     npc->timer = npc->def->unk10->unk2;
                     obj->angle = npc->homeAngle;
-                    func_800201A0(obj, 0, 1, 0, 1, 1);
+                    Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
                 }
                 break;
         }
@@ -363,8 +363,8 @@ void Npc_DrawAll(s32 arg0) {
             filter = (dist < 20000.0f) ? G_TF_BILERP : G_TF_POINT;
             gDPSetTextureFilter(D_8007A184++, filter);
             anims = (AnimEntry *)npc->def->unk10;
-            func_80020428(0, obj, &anims[obj->unk52], arg0);
-            func_8002099C(obj->unk58, obj, &anims[obj->unk52]);
+            Anim_DrawModel(0, obj, &anims[obj->unk52], arg0);
+            Anim_AdvanceFrame(obj->unk58, obj, &anims[obj->unk52]);
             Shadow_Queue(obj->x, obj->y, obj->z, obj->rx, obj->ry, obj->rz, 5.0f);
             *list++ = obj;
             D_8007ABA8++;
@@ -405,7 +405,7 @@ void Npc_SpawnForArea(NPCDef *def, s32 n) {
             npc->nx = out.nx;
             npc->ny = out.ny;
             npc->nz = out.nz;
-            func_800201A0(&npc->x, 0, 1, 0, 1, 1);
+            Anim_SetCurrentAndNext(&npc->x, 0, 1, 0, 1, 1);
             npc->homeX = def->x;
             npc->homeZ = def->z;
             npc->homeAngle = def->angle;
@@ -538,7 +538,7 @@ void Npc_StartTalk(s32 idx) {
         }
         npc->unk10 = angle;
         npc->timer = 15;
-        func_800201A0(&npc->x, 1, 1, 1, 1, 1);
+        Anim_SetCurrentAndNext(&npc->x, 1, 1, 1, 1, 1);
     }
     switch (npc->def->unk2) {
         case 2:
@@ -593,7 +593,7 @@ void Npc_EndTalk(s32 idx) {
     } else {
         npc->state = 3;
         npc->timer = 15;
-        func_800201A0(&npc->x, 1, 1, 1, 1, 1);
+        Anim_SetCurrentAndNext(&npc->x, 1, 1, 1, 1, 1);
     }
 }
 

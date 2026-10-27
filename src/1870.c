@@ -369,9 +369,9 @@ void Shadow_DrawAll(void *arg0);
 void Chest_UpdateAll(void *arg0);
 void Spirit_SpawnSparkles(void);
 void Camera_Update(void *arg0);
-void func_8001A658(void *arg0);
-void func_8001DA3C(void *arg0);
-void func_80020B78(void *arg0);
+void Effect_UpdateAndDrawAll(void *arg0);
+void Effect_DrawSprites(void *arg0);
+void Hud_Draw(void *arg0);
 void func_80025318(void);
 void func_80026774(void *arg0);
 void func_8002A984(void *arg0);
@@ -433,14 +433,14 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         Spirit_SpawnSparkles();
         Env_ApplyLightSlot(D_8007AB60);
         Shadow_DrawAll(sub);
-        func_8001DA3C(sub);
-        func_8001A658(sub);
+        Effect_DrawSprites(sub);
+        Effect_UpdateAndDrawAll(sub);
         func_80026774(sub);
         if (D_8004DCA0 & 2) {
             func_80033050();
         }
         if (!(D_8004DCA0 & 0x4000) && (D_8007A172 != 4)) {
-            func_80020B78(sub);
+            Hud_Draw(sub);
         }
         if (D_8004DCA0 & 1) {
             func_80025318();
@@ -620,14 +620,14 @@ void Camera_InitForMap(void);
 void Camera_TurnForExit(void);
 void Magic_ResetEffectSystem(void);
 void Magic_UpdateEffects(void);
-void func_8001A600(void);
-void func_8001D970(void);
-void func_8001EE00(s32 *arg0);
-void func_8001EE94(void);
-void func_8001F36C(void);
-void func_8001F888(void);
-void func_800201A0(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
-void func_80020AE0(void);
+void Effect_ResetAll(void);
+void Effect_ResetSpritePool(void);
+void Battle_ResetState(s32 *arg0);
+void Battle_TryStartRandomEncounter(void);
+void Battle_UpdateTurnCamera(void);
+void Battle_UpdateTurnTransition(void);
+void Anim_SetCurrentAndNext(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+void Hud_ResetState(void);
 void func_80029198(s32 arg0, s32 arg1);
 void func_80029224(s32 arg0);
 void func_8002A744(s32 arg0, s32 arg1, s32 arg2);
@@ -666,16 +666,16 @@ void Core_RunGameplayLoop(void) {
         D_8007A1C4 = Env_AllocLightSlot();
         D_8007AB60 = Env_AllocLightSlot();
         D_80084998[D_8007AB60].unk0 = 2;
-        func_8001EE00(&D_8007AB60);
+        Battle_ResetState(&D_8007AB60);
         Magic_ResetEffectSystem();
-        func_8001A600();
-        func_8001D970();
+        Effect_ResetAll();
+        Effect_ResetSpritePool();
         func_800266D0();
-        func_80020AE0();
+        Hud_ResetState();
         D_8004DCA0 &= ~0x840;
     }
     if (D_8004DCA0 & 0x400) {
-        func_800201A0(D_8007AA20, 0, 1, 0, 1, 1);
+        Anim_SetCurrentAndNext(D_8007AA20, 0, 1, 0, 1, 1);
     }
     if (D_8004DCA0 & 0x20) {
         D_8004DCA0 &= ~0x20;
@@ -695,13 +695,13 @@ void Core_RunGameplayLoop(void) {
         D_800863F0 = 0;
         Shadow_ClearQueue();
         if (D_800842E8 & 1) {
-            func_8001EE94();
+            Battle_TryStartRandomEncounter();
         }
         if (D_8008BE52 & 1) {
             if (D_8008BE52 & 0x200) {
-                func_8001F36C();
+                Battle_UpdateTurnCamera();
             } else {
-                func_8001F888();
+                Battle_UpdateTurnTransition();
                 Enemy_UpdateAll();
             }
         }

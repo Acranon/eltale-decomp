@@ -82,16 +82,16 @@ extern u8 D_8004F498[];
 u32 Magic_LookupSpellSequence(u16, s32);
 s32 Magic_GetSpellRestrictionFlags(u32, u16);
 s32 func_800281F0(s32, u8*, u16);
-void func_80024694(s32, s32, s32, u8*);
-s32 func_80024904(u8*);
+void Hud_DrawGlyphString(s32, s32, s32, u8*);
+s32 Hud_MeasureGlyphString(u8*);
 typedef struct {
     /* 0x00 */ void* img;
     /* 0x04 */ u16 is4b;
     /* 0x08 */ u32 width;
 } Struct_80024A54;
 
-void func_80024A54(Struct_80024A54*, s32, s32, s32, s32);
-void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
+void Hud_LoadTextureTile(Struct_80024A54*, s32, s32, s32, s32);
+void Hud_DrawClippedTextureRect(s32, s32, s32, s32, s32, s32, s32, s32);
 
 typedef struct {
     /* 0x00 */ char unk0[0x1C];
@@ -117,7 +117,7 @@ extern Gfx D_803AA538[];
 
 s32 func_80027FFC(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
-void func_80024D40(s32, s32, s32, s32, s32, s32, s32, s32);
+void Hud_DrawClippedTextureRect(s32, s32, s32, s32, s32, s32, s32, s32);
 
 
 extern u8 D_803A4118[];
@@ -125,7 +125,7 @@ extern u8 D_803A8728[];
 extern u8* D_803A8778[];
 extern Struct_80024A54 D_803A8748;
 
-void func_80024EB0(void*, s32, s32, s32, s32, s32, s32, s32, s32);
+void Hud_DrawTextureTile(void*, s32, s32, s32, s32, s32, s32, s32, s32);
 
 typedef struct {
     /* 0x00 */ u16 unk0;
@@ -175,7 +175,7 @@ extern Struct_803AA6C4 D_803AA6C4[];
 
 s32 Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AA690*, Vec3f_216E0*, Struct_8002373C*);
 
-void func_80020AE0(void) {
+void Hud_ResetState(void) {
     D_8008C168 = 0;
     D_8008C16C = 0;
     D_8008C170 = -1;
@@ -231,25 +231,25 @@ extern u16 D_8008BE52;
 extern Gfx D_803A8788[];
 
 struct Struct_80021030;
-void func_80021030(struct Struct_80021030* arg0);
-void func_800213A8(Unk2000000* arg0, s32 arg1);
-void func_80021920(Unk2000000* buf);
+void Hud_DrawPlayerMeters(struct Struct_80021030* arg0);
+void Hud_DrawPlayerStatus(Unk2000000* arg0, s32 arg1);
+void Hud_DrawCompass(Unk2000000* buf);
 struct Struct_80021C04;
-void func_80021C04(Unk2000000* arg0, struct Struct_80021C04* arg1);
-void func_80022658(void* arg0);
+void Hud_DrawSpellInput(Unk2000000* arg0, struct Struct_80021C04* arg1);
+void Hud_DrawSpellName(void* arg0);
 struct Struct_80022970;
-void func_80022970(Unk2000000* arg0, struct Struct_80022970* arg1);
-void func_800230A8(void);
+void Hud_UpdateDirectionalAllocation(Unk2000000* arg0, struct Struct_80022970* arg1);
+void Hud_DrawWorldObjectMarker(void);
 void func_800231C4(void);
 void func_800232A8(void);
 void func_8002338C(void);
-void func_80023470(u16 arg0);
-void func_800235D8(void);
-void func_80023930(Struct_8002373C* arg0);
-void func_80023E14(void);
-void func_8002440C(void);
+void Hud_DrawEnemyMarker(u16 arg0);
+void Hud_DrawPlayerOverheadIcon(void);
+void Hud_DrawActorStatusIndicators(Struct_8002373C* arg0);
+void Hud_DrawInfoPanel(void);
+void Hud_DrawPopups(void);
 
-void func_80020B78(Unk2000000* buf) {
+void Hud_Draw(Unk2000000* buf) {
     s32 n;
     Struct_8007B908_216E0* e;
 
@@ -265,8 +265,8 @@ void func_80020B78(Unk2000000* buf) {
         D_8008C154 = 2;
     }
     if (!(D_8004DCA0 & 0xC00)) {
-        func_80021030((struct Struct_80021030*)D_8007AA20);
-        func_800213A8(buf, D_8007AA1C);
+        Hud_DrawPlayerMeters((struct Struct_80021030*)D_8007AA20);
+        Hud_DrawPlayerStatus(buf, D_8007AA1C);
         if (D_8008C154 == 1) {
             if (++D_8008C152 >= 13) {
                 D_8008C152 = 12;
@@ -278,34 +278,34 @@ void func_80020B78(Unk2000000* buf) {
         }
     }
     if ((D_800842B8 & 0xD) && !(D_8008BE52 & 1) && !(D_8007C288->unk14 & 8) && !(D_8004DCA0 & 2)) {
-        func_80021920(buf);
+        Hud_DrawCompass(buf);
     }
     if ((D_8008BE52 & 1) && D_8008C162) {
-        func_80023E14();
+        Hud_DrawInfoPanel();
         D_8008C162--;
     }
     D_8008C174 = D_8008C178 = 0;
     if (D_8008BE52 & 1) {
-        func_8002440C();
+        Hud_DrawPopups();
         if (!(D_8008BE52 & 2) && D_8007AA0A && !(D_8007AA80 & 1) && !(D_80085F90 & 1)) {
-            func_80023470(D_8007AA0A - 1);
+            Hud_DrawEnemyMarker(D_8007AA0A - 1);
         }
         if ((D_8007AA10 & 0x20) && !(D_8004DCA0 & 0x800)) {
-            func_800235D8();
+            Hud_DrawPlayerOverheadIcon();
         }
-        func_80023930((Struct_8002373C*)D_8007AA20);
+        Hud_DrawActorStatusIndicators((Struct_8002373C*)D_8007AA20);
         n = D_8007B900;
         e = D_8007B908;
         while (n != 0) {
             if (e->unk7C != -1) {
-                func_80023930((Struct_8002373C*)e->unk2C);
+                Hud_DrawActorStatusIndicators((Struct_8002373C*)e->unk2C);
                 n--;
             }
             e++;
         }
     } else if (!(D_8004DCA0 & 0x87) && !(D_8007AA80 & 1)) {
         if (D_8007A9C0) {
-            func_800230A8();
+            Hud_DrawWorldObjectMarker();
         } else if (D_8007A9C4 && !(D_8004DCA0 & 8)) {
             func_800231C4();
         } else if (D_8007A9C8) {
@@ -315,12 +315,12 @@ void func_80020B78(Unk2000000* buf) {
         }
     }
     if (D_8004DCA0 & 4) {
-        func_80021C04(buf, (struct Struct_80021C04*)&D_8007AA08);
+        Hud_DrawSpellInput(buf, (struct Struct_80021C04*)&D_8007AA08);
     } else if (D_8004DCA0 & 8) {
-        func_80022970(buf, (struct Struct_80022970*)&D_8007AA08);
+        Hud_UpdateDirectionalAllocation(buf, (struct Struct_80022970*)&D_8007AA08);
     }
     if (D_8008C15E) {
-        func_80022658(&D_8007AA08);
+        Hud_DrawSpellName(&D_8007AA08);
         D_8008C15E--;
     }
 }
@@ -339,9 +339,9 @@ typedef struct Struct_80021030 {
 } Struct_80021030;
 
 extern Struct_80024A54 D_803A86F8;
-void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
+void Hud_DrawNumber(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void func_80021030(Struct_80021030* arg0) {
+void Hud_DrawPlayerMeters(Struct_80021030* arg0) {
     Struct_80021030_64* st;
     s32 w;
     s32 d;
@@ -353,8 +353,8 @@ void func_80021030(Struct_80021030* arg0) {
         D_8008C174 -= w * 150 / 144;
     }
     st = arg0->unk64;
-    func_80024EB0(&D_803A86F8, 0, 1, 0x3E, 0x11, 0x20, 0x27, 0x400, 0x400);
-    func_80024EB0(&D_803A86F8, 0, 0x12, 0x3E, 0x12, 0x20, 0x38, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A86F8, 0, 1, 0x3E, 0x11, 0x20, 0x27, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A86F8, 0, 0x12, 0x3E, 0x12, 0x20, 0x38, 0x400, 0x400);
     w = st->unk4 * 56 / st->unk6;
     d = w - D_8008C156;
     if (d >= 2 || d < -1) {
@@ -363,7 +363,7 @@ void func_80021030(Struct_80021030* arg0) {
         D_8008C156 = w;
     }
     if (D_8008C156) {
-        func_80024EB0(&D_803A86F8, 3, 0xB, D_8008C156, 5, 0x5E, 0x27, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A86F8, 3, 0xB, D_8008C156, 5, 0x5E, 0x27, 0x400, 0x400);
     }
     w = st->unk8 * 56 / st->unkA;
     d = w - D_8008C158;
@@ -373,15 +373,15 @@ void func_80021030(Struct_80021030* arg0) {
         D_8008C158 = w;
     }
     if (D_8008C158) {
-        func_80024EB0(&D_803A86F8, 3, 0x15, D_8008C158, 5, 0x5E, 0x2C, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A86F8, 3, 0x15, D_8008C158, 5, 0x5E, 0x2C, 0x400, 0x400);
     }
-    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
-    func_80024974(3, 0xC, 0, st->unk4);
-    func_80024974(1, 0x36, 0, st->unk6);
-    func_80024974(3, 0xC, 0x1B, st->unk8);
-    func_80024974(1, 0x36, 0x1B, st->unkA);
-    func_80024D40(0x2F, 0, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
-    func_80024D40(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
+    Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    Hud_DrawNumber(3, 0xC, 0, st->unk4);
+    Hud_DrawNumber(1, 0x36, 0, st->unk6);
+    Hud_DrawNumber(3, 0xC, 0x1B, st->unk8);
+    Hud_DrawNumber(1, 0x36, 0x1B, st->unkA);
+    Hud_DrawClippedTextureRect(0x2F, 0, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
+    Hud_DrawClippedTextureRect(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
 }
 
 extern s32 D_8004F2F4[];
@@ -389,7 +389,7 @@ extern Gfx D_803AA3C8[];
 extern u8 D_8004F2CC[][4];
 extern Gfx D_803AA2F8[];
 
-void func_800213A8(Unk2000000* buf, s32 arg1) {
+void Hud_DrawPlayerStatus(Unk2000000* buf, s32 arg1) {
     s32 x;
     f32 fx;
     f32 fy;
@@ -404,14 +404,14 @@ void func_800213A8(Unk2000000* buf, s32 arg1) {
         i = D_8008C152 * D_8008C152;
         D_8008C174 -= i * 200 / 144;
     }
-    func_80024EB0(&D_803A86F8, 0, 0, 0xC, 0xC, 0x20, 0x10, 0x400, 0x400);
-    func_80024EB0(&D_803A86F8, 0x16, 0, 0xC, 0xC, 0x2C, 0x10, 0x400, 0x400);
-    func_80024EB0(&D_803A86F8, 0x2C, 0, 0xC, 0xC, 0x38, 0x10, 0x400, 0x400);
-    func_80024EB0(&D_803A86F8, 0x42, 0, 0xC, 0xC, 0x44, 0x10, 0x400, 0x400);
-    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    Hud_DrawTextureTile(&D_803A86F8, 0, 0, 0xC, 0xC, 0x20, 0x10, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A86F8, 0x16, 0, 0xC, 0xC, 0x2C, 0x10, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A86F8, 0x2C, 0, 0xC, 0xC, 0x38, 0x10, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A86F8, 0x42, 0, 0xC, 0xC, 0x44, 0x10, 0x400, 0x400);
+    Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     x = 6;
     for (i = 0, p = (u8*)arg1; i < 4; i++) {
-        func_80024974(1, x, 6, p[0x24]);
+        Hud_DrawNumber(1, x, 6, p[0x24]);
         p++;
         x += 0x16;
     }
@@ -454,7 +454,7 @@ f32 func_800270D0(f32, f32);
 void func_800271B4(f32, Vec3f_216E0*);
 void func_80027430(f32 (*)[4], f32, f32, f32);
 
-void func_80021920(Unk2000000* buf) {
+void Hud_DrawCompass(Unk2000000* buf) {
     f32 dx;
     f32 dz;
     f32 dist;
@@ -470,7 +470,7 @@ void func_80021920(Unk2000000* buf) {
     guMtxF2L(mf, &buf->unkC0[D_8007A180]);
     gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     gSPDisplayList(D_8007A184++, D_803AA758);
-    func_80024EB0(&D_803A86F8, 13, 10, 11, 14, 0x93, 0, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A86F8, 13, 10, 11, 14, 0x93, 0, 0x400, 0x400);
     if (D_8008FB50 < 6 && D_8008FB54 < 0 && !(D_8004DCA0 & 0x80)) {
         dx = D_8008FB48 - D_8007AA08.unk18;
         dz = D_8008FB4C - D_8007AA08.unk20;
@@ -485,7 +485,7 @@ void func_80021920(Unk2000000* buf) {
             D_8008C140.x = 0.0f;
             D_8008C140.y = 18.0f;
             func_800271B4(ang, &D_8008C140);
-            func_80024EB0(&D_803A86F8, D_8008C140.x + 14.0f, D_8008C140.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
+            Hud_DrawTextureTile(&D_803A86F8, D_8008C140.x + 14.0f, D_8008C140.y + 13.0f, 8, 8, 0, 0x32, 0x400, 0x400);
         }
     }
 }
@@ -511,12 +511,12 @@ typedef struct {
     /* 0x4 */ f32 y;
 } Struct_8004F324;
 
-void func_800245D0(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4);
+void Hud_DrawSpellLabel(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4);
 extern Struct_8004F324 D_8004F304[];
 extern u8 D_8004F2CC[][4];
 extern Gfx D_803AA2F8[];
 
-void func_80021C04(Unk2000000* buf, Struct_80021C04* arg1) {
+void Hud_DrawSpellInput(Unk2000000* buf, Struct_80021C04* arg1) {
     s32 i;
     s32 x1;
     u8* col;
@@ -563,21 +563,21 @@ void func_80021C04(Unk2000000* buf, Struct_80021C04* arg1) {
         gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255 - i * 255 / 64);
     }
     if (arg1->unk120 < 3) {
-        func_80024EB0(&D_803A8718, x0, y0, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, x1, y1, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, x2, y2, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, x3, y3, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, x0, y0, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, x1, y1, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, x2, y2, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, x3, y3, 0x6E, 0xE, 0x64, 0, 0x400, 0x400);
         for (i = 0; i < arg1->unk120; i++) {
             str[i] = arg1->unk11D[i];
         }
         str[i] = 0;
-        func_800245D0(x0, y0 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x0, y0 + 3, str, i + 1, arg1->unk14->unk8);
         str[i] = 1;
-        func_800245D0(x1, y1 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x1, y1 + 3, str, i + 1, arg1->unk14->unk8);
         str[i] = 2;
-        func_800245D0(x2, y2 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x2, y2 + 3, str, i + 1, arg1->unk14->unk8);
         str[i] = 3;
-        func_800245D0(x3, y3 + 3, str, i + 1, arg1->unk14->unk8);
+        Hud_DrawSpellLabel(x3, y3 + 3, str, i + 1, arg1->unk14->unk8);
     }
     D_8008C174 = 0x69;
     D_8008C178 = 0x32;
@@ -590,14 +590,14 @@ void func_80021C04(Unk2000000* buf, Struct_80021C04* arg1) {
     }
     gDPPipeSync(D_8007A184++);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
-    func_80024EB0(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
     x0 = 0x37 - arg1->unk120 * 6;
     for (i = 0; i < arg1->unk120; i++) {
         y0 = arg1->unk11D[i];
-        func_80024EB0(&D_803A8718, x0, yoff + 0xD, 0xB, 0xB, 0x40, y0 * 0xB + 0x24, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, x0, yoff + 0xD, 0xB, 0xB, 0x40, y0 * 0xB + 0x24, 0x400, 0x400);
         x0 += 0xC;
     }
-    func_800245D0(0, yoff + 3, arg1->unk11D, arg1->unk120, arg1->unk14->unk8);
+    Hud_DrawSpellLabel(0, yoff + 3, arg1->unk11D, arg1->unk120, arg1->unk14->unk8);
     D_8008C174 = 0x22;
     D_8008C178 = 0x8C;
     if (arg1->unk120 != 3) {
@@ -605,7 +605,7 @@ void func_80021C04(Unk2000000* buf, Struct_80021C04* arg1) {
         gDPSetRenderMode(D_8007A184++, 0x0F0A4000, 0);
         gDPSetCombine(D_8007A184++, 0xFFFFFF, 0xFFFCF279);
         gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
-        func_80024EB0(&D_803A8718, 0x6D, 0xD, 0x24, 0x24, 0x40, 0, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0x6D, 0xD, 0x24, 0x24, 0x40, 0, 0x400, 0x400);
     }
     if (D_8008C15A && (D_8008C15C & 1)) {
         col = D_8004F2CC[arg1->unk11D[arg1->unk120 - 1]];
@@ -634,7 +634,7 @@ extern Struct_80024A54 D_803A8718;
 
 #ifdef NON_MATCHING
 /* register-only: (u8)w lands in a2 instead of t9 and w >> 8 misses ra; code is equivalent */
-void func_80022658(void* arg0) {
+void Hud_DrawSpellName(void* arg0) {
     s32 tmp;
     volatile s32 id;
     s32 t;
@@ -660,14 +660,14 @@ void func_80022658(void* arg0) {
         gDPSetEnvColor(D_8007A184++, 0, 0, 0, 255 - t * 255 / 64);
         D_8008C15A--;
     }
-    func_80024EB0(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
-    func_80024694(0x37 - func_80024904(str) / 2, yoff + 3, 0, str);
+    Hud_DrawTextureTile(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
+    Hud_DrawGlyphString(0x37 - Hud_MeasureGlyphString(str) / 2, yoff + 3, 0, str);
     gDPPipeSync(D_8007A184++);
     gDPSetRenderMode(D_8007A184++, 0x0F0A4000, 0);
     gDPSetCombine(D_8007A184++, 0xFFFFFF, 0xFFFCF279);
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/216E0/func_80022658.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/216E0/Hud_DrawSpellName.s")
 #endif
 
 typedef struct {
@@ -695,7 +695,7 @@ extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
 void func_8002A7C8(s32, s32, s32);
 
-void func_80022970(Unk2000000* buf, Struct_80022970* pl) {
+void Hud_UpdateDirectionalAllocation(Unk2000000* buf, Struct_80022970* pl) {
     u16 alpha;
     s32 yoff;
     s32 t;
@@ -721,16 +721,16 @@ void func_80022970(Unk2000000* buf, Struct_80022970* pl) {
     }
     gDPPipeSync(D_8007A184++);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
-    func_80024EB0(&D_803A8718, 0, yoff, 0x40, 0x14, 0, 0, 0x400, 0x400);
-    func_80024EB0(&D_803A8718, 0, yoff + 0x14, 0x40, 0x14, 0, 0x14, 0x400, 0x400);
-    func_80024EB0(&D_803A8718, 0, yoff + 0x28, 0x40, 0x14, 0, 0x28, 0x400, 0x400);
-    func_80024EB0(&D_803A8718, 0, yoff + 0x3C, 0x40, 0x14, 0, 0x3C, 0x400, 0x400);
-    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    Hud_DrawTextureTile(&D_803A8718, 0, yoff, 0x40, 0x14, 0, 0, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A8718, 0, yoff + 0x14, 0x40, 0x14, 0, 0x14, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A8718, 0, yoff + 0x28, 0x40, 0x14, 0, 0x28, 0x400, 0x400);
+    Hud_DrawTextureTile(&D_803A8718, 0, yoff + 0x3C, 0x40, 0x14, 0, 0x3C, 0x400, 0x400);
+    Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039ADB0);
-    func_80024974(5, 0x1C, yoff + 0x24, D_8007A9F4);
-    func_80024974(5, 0xA, yoff + 0x34, D_8007A9F5);
-    func_80024974(5, 0x1C, yoff + 0x43, D_8007A9F6);
-    func_80024974(5, 0x2E, yoff + 0x34, D_8007A9F7);
+    Hud_DrawNumber(5, 0x1C, yoff + 0x24, D_8007A9F4);
+    Hud_DrawNumber(5, 0xA, yoff + 0x34, D_8007A9F5);
+    Hud_DrawNumber(5, 0x1C, yoff + 0x43, D_8007A9F6);
+    Hud_DrawNumber(5, 0x2E, yoff + 0x34, D_8007A9F7);
     if (D_8008C160 && (D_8008C042 & 1)) {
         col = D_8004F2CC[D_8008C13C];
         pos = (f32*)D_8004F324 + D_8008C13C * 2;
@@ -786,7 +786,7 @@ typedef struct {
 extern s32 D_8007A9C0;
 extern Struct_8007ABF0 D_8007ABF0[];
 
-void func_800230A8(void) {
+void Hud_DrawWorldObjectMarker(void) {
     s32 sx;
     s32 bob;
     Vec3f_216E0* p;
@@ -800,7 +800,7 @@ void func_800230A8(void) {
         }
         *angle += 0x600;
         gSPDisplayList(D_8007A184++, D_803AA448);
-        func_80024D40(sx, D_8008C17C - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
+        Hud_DrawClippedTextureRect(sx, D_8008C17C - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
     } else {
         D_8008C17C = 0xF0;
     }
@@ -819,7 +819,7 @@ void func_800231C4(void) {
         }
         *angle += 0x600;
         gSPDisplayList(D_8007A184++, D_803AA538);
-        func_80024D40(sx, sy - bob - 30, 24, 30, 0, 0, 0x400, 0x400);
+        Hud_DrawClippedTextureRect(sx, sy - bob - 30, 24, 30, 0, 0, 0x400, 0x400);
     }
 }
 
@@ -836,7 +836,7 @@ void func_800232A8(void) {
         }
         *angle += 0x600;
         gSPDisplayList(D_8007A184++, D_803AA4C0);
-        func_80024D40(sx, sy - bob - 30, 0x10, 30, 0, 0, 0x400, 0x400);
+        Hud_DrawClippedTextureRect(sx, sy - bob - 30, 0x10, 30, 0, 0, 0x400, 0x400);
     }
 }
 
@@ -853,14 +853,14 @@ void func_8002338C(void) {
         }
         *angle += 0x800;
         gSPDisplayList(D_8007A184++, D_803AA448);
-        func_80024D40(sx, sy - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
+        Hud_DrawClippedTextureRect(sx, sy - bob - 30, 0x40, 29, 0, 0, 0x400, 0x400);
     }
 }
 
 
 extern Gfx D_803AA5B0[];
 
-void func_80023470(u16 arg0) {
+void Hud_DrawEnemyMarker(u16 arg0) {
     s32 sx;
     s32 sy;
     s32 bob;
@@ -883,11 +883,11 @@ void func_80023470(u16 arg0) {
         }
         *angle += 0x800;
         gSPDisplayList(D_8007A184++, D_803AA5B0);
-        func_80024D40(sx - 4, sy - bob - 42, 24, 42, 0, 0, 0x400, 0x400);
+        Hud_DrawClippedTextureRect(sx - 4, sy - bob - 42, 24, 42, 0, 0, 0x400, 0x400);
     }
 }
 
-void func_800235D8(void) {
+void Hud_DrawPlayerOverheadIcon(void) {
     s32 sx;
     s32 sy;
     f32 y;
@@ -898,11 +898,11 @@ void func_800235D8(void) {
     if (func_80027FFC(D_8007AA08.unk18, y, D_8007AA08.unk20, &sx, &sy) != 0) {
         gDPPipeSync(D_8007A184++);
         gDPLoadTLUT_pal256(D_8007A184++, D_803A4118);
-        func_80024EB0(D_803A8728, sx - 0x17, sy - 0xF, 0x2E, 0xF, 0x51, 0x31, 0x400, 0x400);
+        Hud_DrawTextureTile(D_803A8728, sx - 0x17, sy - 0xF, 0x2E, 0xF, 0x51, 0x31, 0x400, 0x400);
     }
 }
 
-void func_8002373C(Struct_8002373C* arg0, u16 mask, u16 idx, s16 val) {
+void Hud_StartActorStatusIndicator(Struct_8002373C* arg0, u16 mask, u16 idx, s16 val) {
     Struct_8002373C_68* s = arg0->unk68;
     u32 i;
     Struct_803AA6C4* e;
@@ -959,7 +959,7 @@ typedef struct {
 
 extern Struct_803AA628 D_803AA628[];
 
-void func_80023930(Struct_8002373C* arg0) {
+void Hud_DrawActorStatusIndicators(Struct_8002373C* arg0) {
     Struct_8002373C_68* s = arg0->unk68;
     f32 y;
     s32 vis;
@@ -997,7 +997,7 @@ void func_80023930(Struct_8002373C* arg0) {
                 w = e->unk4;
                 h = e->unk6;
                 if (vis) {
-                    func_80024EB0(D_803A8728, sx + ox - (w >> 1), sy + oy - (h >> 1), w, h, u, v, 0x400, 0x400);
+                    Hud_DrawTextureTile(D_803A8728, sx + ox - (w >> 1), sy + oy - (h >> 1), w, h, u, v, 0x400, 0x400);
                 }
                 if (!(D_8004F2DC[i] & s->unk0)) {
                     s->unk12[i] = 0;
@@ -1046,7 +1046,7 @@ void func_80023930(Struct_8002373C* arg0) {
     }
 }
 
-void func_80023D28(Struct_8002373C* arg0) {
+void Hud_ClearActorStatusIndicators(Struct_8002373C* arg0) {
     Struct_8002373C_68* s = arg0->unk68;
     u32 i;
     Struct_80023930_fx* fx;
@@ -1108,9 +1108,9 @@ extern u8 D_8039ADB0[];
 extern u8 D_8039EC90[];
 extern Struct_80024A54 D_803A86F8;
 extern Struct_80024A54 D_803A8718;
-void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
+void Hud_DrawNumber(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void func_80023E14(void) {
+void Hud_DrawInfoPanel(void) {
     s32 d;
 
     D_8008C174 = 0xB5;
@@ -1123,30 +1123,30 @@ void func_80023E14(void) {
     gDPPipeSync(D_8007A184++);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039EC90);
     if (D_8007C028->unk98 & 0x80) {
-        func_80024EB0(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, 0, 0x10, 0x6E, 0x10, 0x64, 0x2C, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, 0, 0x20, 0x6E, 0x10, 0x64, 0x3C, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, 0, 0x30, 0x6E, 4, 0x64, 0x4C, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0x10, 0x64, 0x2C, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0, 0x20, 0x6E, 0x10, 0x64, 0x3C, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0, 0x30, 0x6E, 4, 0x64, 0x4C, 0x400, 0x400);
     } else {
-        func_80024EB0(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, 0, 0x10, 0x6E, 0xA, 0x64, 0x2C, 0x400, 0x400);
-        func_80024EB0(&D_803A8718, 0, 0x1A, 0x6E, 2, 0x64, 0x4E, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0xA, 0x64, 0x2C, 0x400, 0x400);
+        Hud_DrawTextureTile(&D_803A8718, 0, 0x1A, 0x6E, 2, 0x64, 0x4E, 0x400, 0x400);
     }
-    func_80024694(4, 0x11, 0, D_8007C04C[D_8007C028->unk28->unk2]);
-    func_80024A54(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
+    Hud_DrawGlyphString(4, 0x11, 0, D_8007C04C[D_8007C028->unk28->unk2]);
+    Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(D_8007A184++, D_8039ADB0);
     if (D_8007C028->unk98 & 0x80) {
-        func_80024974(3, 0x10, 0x1C, D_8007C028->unk28->unk6);
-        func_80024974(3, 0x10, 0x26, D_8007C028->unk28->unkE);
-        func_80024974(3, 0x46, 0x1C, D_8007C028->unk28->unk2A);
-        func_80024974(3, 0x46, 0x26, D_8007C028->unk28->unkC);
+        Hud_DrawNumber(3, 0x10, 0x1C, D_8007C028->unk28->unk6);
+        Hud_DrawNumber(3, 0x10, 0x26, D_8007C028->unk28->unkE);
+        Hud_DrawNumber(3, 0x46, 0x1C, D_8007C028->unk28->unk2A);
+        Hud_DrawNumber(3, 0x46, 0x26, D_8007C028->unk28->unkC);
         if (D_8007C028->unk28->unk26 != 4) {
-            func_80024EB0(&D_803A86F8, 0x5B, 3, 0xC, 0xC, D_8007C028->unk28->unk26 * 0xC + 0x20, 0x10, 0x400, 0x400);
+            Hud_DrawTextureTile(&D_803A86F8, 0x5B, 3, 0xC, 0xC, D_8007C028->unk28->unk26 * 0xC + 0x20, 0x10, 0x400, 0x400);
         }
     }
 }
 
-void func_8002430C(void) {
+void Hud_ResetPopups(void) {
     Struct_8008C058* p = D_8008C058;
     s32 i = 8;
 
@@ -1157,7 +1157,7 @@ void func_8002430C(void) {
     }
 }
 
-void func_8002433C(Struct_8002433C_arg* arg0) {
+void Hud_ShowActorPopup(Struct_8002433C_arg* arg0) {
     Struct_8008C058* p = D_8008C058;
     s32 i = 7;
 
@@ -1182,7 +1182,7 @@ void func_8002433C(Struct_8002433C_arg* arg0) {
     p->unk1A = 0xE;
 }
 
-void func_8002440C(void) {
+void Hud_DrawPopups(void) {
     s32 i;
     Struct_8008C058* p;
     f32 x;
@@ -1206,7 +1206,7 @@ void func_8002440C(void) {
                 z += ((Vec3f_216E0*) p->unk4)->z;
             }
             func_80027FFC(x, y, z, &sx, &sy);
-            func_80024EB0(D_803A8728, sx - (p->unk18 >> 1), sy - p->unk1A, p->unk18, p->unk1A, p->unk14, p->unk16, 0x400, 0x400);
+            Hud_DrawTextureTile(D_803A8728, sx - (p->unk18 >> 1), sy - p->unk1A, p->unk18, p->unk1A, p->unk14, p->unk16, 0x400, 0x400);
             p->unk0--;
         }
         i--;
@@ -1214,7 +1214,7 @@ void func_8002440C(void) {
     } while (i != 0);
 }
 
-void func_800245D0(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4) {
+void Hud_DrawSpellLabel(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4) {
     u32 id;
     s32 w;
     u8 flags;
@@ -1229,12 +1229,12 @@ void func_800245D0(s32 arg0, s32 arg1, u8* arg2, s32 arg3, u16 arg4) {
     if (flags & 4) {
         str = D_8004F2C4;
     }
-    w = func_80024904(str);
+    w = Hud_MeasureGlyphString(str);
     arg0 = arg0 - w / 2 + 0x37;
-    func_80024694(arg0, arg1, D_8004F498[flags], str);
+    Hud_DrawGlyphString(arg0, arg1, D_8004F498[flags], str);
 }
 
-void func_80024694(s32 x, s32 y, s32 pal, u8* str) {
+void Hud_DrawGlyphString(s32 x, s32 y, s32 pal, u8* str) {
     s32 cur = 8;
     s32 col;
     s32 row;
@@ -1243,10 +1243,10 @@ void func_80024694(s32 x, s32 y, s32 pal, u8* str) {
     gDPLoadTLUT_pal16(D_8007A184++, 0, D_803A8778[pal]);
     while (*str != 0xFF) {
         if (*str == 0x80) {
-            func_80024D40(x - 2, y - 1, 8, 9, 0x78, row, 0x400, 0x400);
+            Hud_DrawClippedTextureRect(x - 2, y - 1, 8, 9, 0x78, row, 0x400, 0x400);
             x += 1;
         } else if (*str == 0x81) {
-            func_80024D40(x - 2, y - 1, 8, 9, 0x80, row, 0x400, 0x400);
+            Hud_DrawClippedTextureRect(x - 2, y - 1, 8, 9, 0x80, row, 0x400, 0x400);
             x += 1;
         } else if (*str == 0x82) {
             x += 4;
@@ -1254,18 +1254,18 @@ void func_80024694(s32 x, s32 y, s32 pal, u8* str) {
             col = (*str & 0xF) * 8;
             row = (*str & 0x70) >> 4;
             if (row != cur) {
-                func_80024A54(&D_803A8748, 0, row * 9, 0xA0, 9);
+                Hud_LoadTextureTile(&D_803A8748, 0, row * 9, 0xA0, 9);
                 cur = row;
             }
             row *= 9;
-            func_80024D40(x, y, 8, 9, col, row, 0x400, 0x400);
+            Hud_DrawClippedTextureRect(x, y, 8, 9, col, row, 0x400, 0x400);
             x += 8;
         }
         str++;
     }
 }
 
-s32 func_80024904(u8* str) {
+s32 Hud_MeasureGlyphString(u8* str) {
     s32 w = 0;
 
     while (*str != 0xFF) {
@@ -1281,7 +1281,7 @@ s32 func_80024904(u8* str) {
     return w;
 }
 
-void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3) {
+void Hud_DrawNumber(u16 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 n;
     u8* p;
     u8 buf[8];
@@ -1289,7 +1289,7 @@ void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3) {
     p = buf;
     for (n = func_800281F0(arg3, buf, arg0); n != 0; n--) {
         if (*p != 0x20) {
-            func_80024D40(arg1, arg2, 8, 0xA, *p * 8 + 0x20, 0x1D, 0x400, 0x400);
+            Hud_DrawClippedTextureRect(arg1, arg2, 8, 0xA, *p * 8 + 0x20, 0x1D, 0x400, 0x400);
             arg1 += 7;
         } else if (arg0 & 6) {
             arg1 += 7;
@@ -1301,7 +1301,7 @@ void func_80024974(u16 arg0, s32 arg1, s32 arg2, s32 arg3) {
 void func_80024A4C(void) {
 }
 
-void func_80024A54(Struct_80024A54* tex, s32 x, s32 y, s32 w, s32 h) {
+void Hud_LoadTextureTile(Struct_80024A54* tex, s32 x, s32 y, s32 w, s32 h) {
     if (tex->is4b == 0) {
         gDPLoadTextureTile(D_8007A184++, tex->img, G_IM_FMT_CI, G_IM_SIZ_8b, tex->width, 0, x, y, x + w, y + h, 0,
                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
@@ -1313,7 +1313,7 @@ void func_80024A54(Struct_80024A54* tex, s32 x, s32 y, s32 w, s32 h) {
     }
 }
 
-void func_80024D40(s32 x, s32 y, s32 x2, s32 y2, s32 s, s32 t, s32 dsdx, s32 dtdy) {
+void Hud_DrawClippedTextureRect(s32 x, s32 y, s32 x2, s32 y2, s32 s, s32 t, s32 dsdx, s32 dtdy) {
     x += D_8008C174;
     x2 += x;
     y += D_8008C178;
@@ -1347,9 +1347,9 @@ void func_80024D40(s32 x, s32 y, s32 x2, s32 y2, s32 s, s32 t, s32 dsdx, s32 dtd
     gSPTextureRectangle(D_8007A184++, x << 2, y << 2, x2 << 2, y2 << 2, 0, s << 5, t << 5, dsdx, dtdy);
 }
 
-void func_80024EB0(void* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
-    func_80024A54(arg0, arg5, arg6, arg3, arg4);
-    func_80024D40(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+void Hud_DrawTextureTile(void* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
+    Hud_LoadTextureTile(arg0, arg5, arg6, arg3, arg4);
+    Hud_DrawClippedTextureRect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }
 
 #pragma GLOBAL_ASM("asm/nonmatchings/216E0/D_8006F530.s")

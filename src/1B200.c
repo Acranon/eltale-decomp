@@ -203,7 +203,7 @@ typedef struct {
 } Unk80086798b; // size = 0x58
 
 /* This file's .bss, 800863F0..80087E30 (in address order; first declaration
- * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds D_80087798 (func_8001D688 shares a lui between its pairs only when it
+ * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds D_80087798 (Effect_ResetActorMarkers shares a lui between its pairs only when it
  * is defined here). Labels splat put inside these arrays (D_800865CC..,
  * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
 
@@ -217,8 +217,8 @@ typedef struct {
 } MtxF;
 
 extern Gfx D_800EB6D0[];
-s32 func_8001CBD0(Unk80086798b*, s32);
-s32 func_8001CDF4(Unk80086798b*);
+s32 Effect_DrawModelEffectGeometry(Unk80086798b*, s32);
+s32 Effect_ConfigureModelEffectTexture(Unk80086798b*);
 void func_80027430(MtxF*, f32, f32, f32);
 f32 func_800270D0(f32, f32);
 u32 func_80026E90(u32);
@@ -236,20 +236,20 @@ extern Unk2000000_1B200 D_2000000;
 extern Gfx D_800EB880[];
 extern Gfx D_800EB8E8[];
 
-void func_8001A828(Unk1B200Particle* arg0);
-void func_8001AC20(Unk1B200Particle* arg0);
-void func_8001AD64(Unk1B200Particle* arg0);
-void func_8001B688(Unk1B200Spark* arg0);
-void func_8001B9C0(Unk1B200Spark* arg0);
+void Effect_UpdatePulseParticle(Unk1B200Particle* arg0);
+void Effect_UpdateMarkerParticle(Unk1B200Particle* arg0);
+void Effect_UpdateSmallParticle(Unk1B200Particle* arg0);
+void Effect_UpdateBurstParticle(Unk1B200Spark* arg0);
+void Effect_UpdateBurstParticleWithDrag(Unk1B200Spark* arg0);
 
 /* This file's .data, 8004EE20..8004F060: effect descriptors (Unk8004EE20,
  * 0x40 bytes each) and their tables, in source order: these first, then
- * func_8001AB44's static descriptor (8004EE9C), D_8004EEDC, func_8001AD28's
- * static descriptor (8004EF0C) and the tables after func_8001AD28. Both
+ * Effect_UpdateMarkerEmitters's static descriptor (8004EE9C), D_8004EEDC, Effect_SpawnSmallParticle's
+ * static descriptor (8004EF0C) and the tables after Effect_SpawnSmallParticle. Both
  * descriptors must be function statics: IDO then stores their fields through
  * lui/%lo instead of the descriptor's address register. */
 Unk8004EE20 D_8004EE20 = {
-    0x000C, 0, (void*)func_8001A828, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C3790,
+    0x000C, 0, (void*)Effect_UpdatePulseParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C3790,
     0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
 };
 f32 D_8004EE60[12] = {
@@ -281,48 +281,48 @@ Unk1B200Vec2 D_80087E00;
 u8 D_80087E08[8]; /* unreferenced */
 Coll1B200 D_80087E10;
 
-void func_8001A6B4(void);
-void func_8001A8F4(void);
-void func_8001ADE4(void);
-void func_8001B3CC(void);
-void func_8001BB18(void);
-void func_8001C038(void);
-void func_8001C7E8(void);
-void func_8001D688(void);
-void func_8001A728(void);
-void func_8001AB44(void);
-void func_8001AF90(void);
-void func_8001B45C(void);
-void func_8001BB48(void*);
-void func_8001C2F8(void*);
-void func_8001C948(void*);
-void func_8001D6A8(void*);
-s32 func_8001D9A8(void*);
+void Effect_ResetPulseEmitters(void);
+void Effect_ResetMarkerEmitters(void);
+void Effect_ResetFloatingNumbers(void);
+void Effect_ResetBurstEmitters(void);
+void Effect_ResetStreaks(void);
+void Effect_ResetRings(void);
+void Effect_ResetModelEffects(void);
+void Effect_ResetActorMarkers(void);
+void Effect_UpdatePulseEmitters(void);
+void Effect_UpdateMarkerEmitters(void);
+void Effect_DrawFloatingNumbers(void);
+void Effect_UpdateBurstEmitters(void);
+void Effect_DrawStreaks(void*);
+void Effect_DrawRings(void*);
+void Effect_DrawModelEffects(void*);
+void Effect_DrawActorMarkers(void*);
+s32 Effect_AllocateSprite(void*);
 void func_800271B4(f32, Unk1B200Vec2*);
 
-void func_8001A600(void) {
-    func_8001A6B4();
-    func_8001A8F4();
-    func_8001B3CC();
-    func_8001BB18();
-    func_8001D688();
-    func_8001ADE4();
-    func_8001C7E8();
-    func_8001C038();
+void Effect_ResetAll(void) {
+    Effect_ResetPulseEmitters();
+    Effect_ResetMarkerEmitters();
+    Effect_ResetBurstEmitters();
+    Effect_ResetStreaks();
+    Effect_ResetActorMarkers();
+    Effect_ResetFloatingNumbers();
+    Effect_ResetModelEffects();
+    Effect_ResetRings();
 }
 
-void func_8001A658(void* arg0) {
-    func_8001A728();
-    func_8001AB44();
-    func_8001B45C();
-    func_8001BB48(arg0);
-    func_8001D6A8(arg0);
-    func_8001C2F8(arg0);
-    func_8001C948(arg0);
-    func_8001AF90();
+void Effect_UpdateAndDrawAll(void* arg0) {
+    Effect_UpdatePulseEmitters();
+    Effect_UpdateMarkerEmitters();
+    Effect_UpdateBurstEmitters();
+    Effect_DrawStreaks(arg0);
+    Effect_DrawActorMarkers(arg0);
+    Effect_DrawRings(arg0);
+    Effect_DrawModelEffects(arg0);
+    Effect_DrawFloatingNumbers();
 }
 
-void func_8001A6B4(void) {
+void Effect_ResetPulseEmitters(void) {
     s32 i = 8;
     Unk80086400* p = D_80086400;
 
@@ -333,7 +333,7 @@ void func_8001A6B4(void) {
     } while (i != 0);
 }
 
-void func_8001A6E4(Unk1B200Pos* arg0) {
+void Effect_StartPulseEmitter(Unk1B200Pos* arg0) {
     s32 i = 7;
     Unk80086400* p = D_80086400;
 
@@ -345,7 +345,7 @@ void func_8001A6E4(Unk1B200Pos* arg0) {
     p->pos = arg0;
 }
 
-void func_8001A728(void) {
+void Effect_UpdatePulseEmitters(void) {
     s32 i;
     Unk80086400* p;
     Unk1B200Pos* pos;
@@ -366,7 +366,7 @@ void func_8001A728(void) {
                 D_8004EE20.unk34 = 0.2f;
                 D_8004EE20.unk30 = D_80087E00.x;
                 D_8004EE20.unk38 = D_80087E00.y;
-                func_8001D9A8(&D_8004EE20);
+                Effect_AllocateSprite(&D_8004EE20);
             }
         }
         i--;
@@ -374,7 +374,7 @@ void func_8001A728(void) {
     } while (i != 0);
 }
 
-void func_8001A828(Unk1B200Particle* arg0) {
+void Effect_UpdatePulseParticle(Unk1B200Particle* arg0) {
     arg0->unk18 += arg0->unk30;
     arg0->unk1C += arg0->unk34;
     arg0->unk20 += arg0->unk38;
@@ -385,7 +385,7 @@ void func_8001A828(Unk1B200Particle* arg0) {
     gDPSetEnvColor(D_8007A184++, 255, 255, 255, D_8004EE90[arg0->unk0]);
 }
 
-void func_8001A8F4(void) {
+void Effect_ResetMarkerEmitters(void) {
     s32 i;
     Unk80086440* a;
     Unk80086440* b;
@@ -403,7 +403,7 @@ void func_8001A8F4(void) {
     } while (i != 0);
 }
 
-void func_8001A948(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
+void Effect_QueueVisibleMarker(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     s32 pad[4];
     Unk80086440* cur;
     Unk80086440* prev;
@@ -439,9 +439,9 @@ void func_8001A948(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     }
 }
 
-void func_8001AB44(void) {
+void Effect_UpdateMarkerEmitters(void) {
     static Unk8004EE20 D_8004EE9C = {
-        0x002D, 0, (void*)func_8001AC20, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
+        0x002D, 0, (void*)Effect_UpdateMarkerParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
         0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.25f, 0.05f, 0,
     };
     Unk80086440* p;
@@ -456,7 +456,7 @@ void func_8001AB44(void) {
             D_8004EE9C.unk1C = p->y;
             D_8004EE9C.unk20 = p->z;
             D_8004EE9C.unk28 = D_8004EE9C.unk2C = p->unk10;
-            func_8001D9A8(&D_8004EE9C);
+            Effect_AllocateSprite(&D_8004EE9C);
             p->unk0 = 0x19;
         }
         n--;
@@ -464,13 +464,13 @@ void func_8001AB44(void) {
     }
 }
 
-/* func_8001AC20's table sits between the two function statics. */
+/* Effect_UpdateMarkerParticle's table sits between the two function statics. */
 u8 D_8004EEDC[48] = {
     0x08, 0x1C, 0x30, 0x44, 0x58, 0x6C, 0x80, 0x94, 0xA8, 0xBC, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
     0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xC0, 0xB0, 0xA0, 0x90, 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10, 0x00, 0x00, 0x00,
 };
 
-void func_8001AC20(Unk1B200Particle* arg0) {
+void Effect_UpdateMarkerParticle(Unk1B200Particle* arg0) {
     s32 r;
     s32 g;
     s32 b;
@@ -495,16 +495,16 @@ void func_8001AC20(Unk1B200Particle* arg0) {
     gDPSetEnvColor(D_8007A184++, r, g, b, D_8004EEDC[arg0->unk0]);
 }
 
-void func_8001AD28(f32 x, f32 y, f32 z) {
+void Effect_SpawnSmallParticle(f32 x, f32 y, f32 z) {
     static Unk8004EE20 D_8004EF0C = {
-        0x000C, 0, (void*)func_8001AD64, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
+        0x000C, 0, (void*)Effect_UpdateSmallParticle, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
         0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.4f, 0.0f, 0.0f, 0.0f, 0,
     };
 
     D_8004EF0C.unk18 = x;
     D_8004EF0C.unk1C = y;
     D_8004EF0C.unk20 = z;
-    func_8001D9A8(&D_8004EF0C);
+    Effect_AllocateSprite(&D_8004EF0C);
 }
 
 /* The rest of this file's .data (each table belongs to one of the functions below). */
@@ -517,11 +517,11 @@ u8 D_8004EF94[4][4] = {
     { 0xFF, 0xFF, 0xFF, 0xFF }, { 0xC8, 0xFF, 0xC8, 0xFF }, { 0xC8, 0xC8, 0xFF, 0xFF }, { 0xFF, 0x7F, 0x7F, 0xFF },
 };
 Unk8004EE20 D_8004EFA4 = {
-    0x0014, 0, (void*)func_8001B688, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0x0014, 0, (void*)Effect_UpdateBurstParticle, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
     0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
 };
 Unk8004EE20 D_8004EFE4 = {
-    0x0014, 0, (void*)func_8001B9C0, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0x0014, 0, (void*)Effect_UpdateBurstParticleWithDrag, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
     0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
 };
 u16 D_8004F024[4] = { 0x14, 0xC, 0xC, 0 };
@@ -532,7 +532,7 @@ u8 D_8004F04C[5][4] = {
     { 0xFF, 0x00, 0x00, 0x00 }, { 0xFF, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0xFF, 0x00 }, { 0x00, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0x00, 0x00 },
 };
 
-void func_8001AD64(Unk1B200Particle* arg0) {
+void Effect_UpdateSmallParticle(Unk1B200Particle* arg0) {
     u16 v = arg0->unk0;
 
     if (!(v & 3)) {
@@ -542,7 +542,7 @@ void func_8001AD64(Unk1B200Particle* arg0) {
     gDPSetEnvColor(D_8007A184++, 255, 255, 255, D_8004EF88[arg0->unk0]);
 }
 
-void func_8001ADE4(void) {
+void Effect_ResetFloatingNumbers(void) {
     s32 i = 10;
     Unk800865C0* p = D_800865C0;
 
@@ -553,7 +553,7 @@ void func_8001ADE4(void) {
     } while (i != 0);
 }
 
-void func_8001AE24(void* arg0, s32 arg1, s32 arg2) {
+void Effect_AddFloatingNumber(void* arg0, s32 arg1, s32 arg2) {
     s32 pad[2];
     Unk800865C0* var_t0;
     s32 var_v1;
@@ -611,7 +611,7 @@ extern u8 D_8039E290[];
 s32 func_80027FFC(f32, f32, f32, s32*, s32*);
 s16 sins(u16);
 
-void func_8001AF90(void) {
+void Effect_DrawFloatingNumbers(void) {
     s32 n;
     Unk800865C0* d;
     s32 first;
@@ -688,7 +688,7 @@ void func_8001AF90(void) {
 }
 
 
-void func_8001B3CC(void) {
+void Effect_ResetBurstEmitters(void) {
     Unk800866D8* p = D_800866D8;
     s32 i = 8;
 
@@ -699,7 +699,7 @@ void func_8001B3CC(void) {
     } while (i != 0);
 }
 
-void func_8001B3FC(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
+void Effect_StartBurstEmitter(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
     Unk800866D8* p = D_800866D8;
     s32 i = 7;
 
@@ -715,7 +715,7 @@ void func_8001B3FC(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
     p->unk14 = arg5;
 }
 
-void func_8001B45C(void) {
+void Effect_UpdateBurstEmitters(void) {
     Unk800866D8* p;
     f32 x;
     f32 y;
@@ -743,7 +743,7 @@ void func_8001B45C(void) {
                 spawn.unk34 = y * -0.03;
                 spawn.unk38 = z * -0.03;
                 spawn.unk3C = p->unk4;
-                func_8001D9A8(&spawn);
+                Effect_AllocateSprite(&spawn);
             }
             p->unk0--;
         }
@@ -752,7 +752,7 @@ void func_8001B45C(void) {
     } while (i != 0);
 }
 
-void func_8001B688(Unk1B200Spark* arg0) {
+void Effect_UpdateBurstParticle(Unk1B200Spark* arg0) {
     u8* c;
 
     arg0->unk18 += arg0->unk30;
@@ -773,7 +773,7 @@ void func_8001B688(Unk1B200Spark* arg0) {
     }
 }
 
-void func_8001B7E0(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
+void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     s32 i;
     f32 a;
     f32 b;
@@ -794,12 +794,12 @@ void func_8001B7E0(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
         spawn.unk34 = b;
         spawn.unk38 = c;
         spawn.unk3C = arg0;
-        func_8001D9A8(&spawn);
+        Effect_AllocateSprite(&spawn);
         i--;
     } while (i != 0);
 }
 
-void func_8001B9C0(Unk1B200Spark* arg0) {
+void Effect_UpdateBurstParticleWithDrag(Unk1B200Spark* arg0) {
     u8* c;
 
     arg0->unk18 += arg0->unk30;
@@ -820,7 +820,7 @@ void func_8001B9C0(Unk1B200Spark* arg0) {
     }
 }
 
-void func_8001BB18(void) {
+void Effect_ResetStreaks(void) {
     s32 i;
 
     for (i = 0; i < 32; i++) {
@@ -828,7 +828,7 @@ void func_8001BB18(void) {
     }
 }
 
-void func_8001BB48(void* arg0) {
+void Effect_DrawStreaks(void* arg0) {
     s32 n;
     Unk80087298* p;
     s32 first;
@@ -884,7 +884,7 @@ void func_8001BB48(void* arg0) {
     } while (n != 0);
 }
 
-void func_8001BE2C(f32 x, f32 y, f32 z) {
+void Effect_SpawnStreakBurst(f32 x, f32 y, f32 z) {
     s32 n;
     Unk80087298* p;
     s32 count;
@@ -917,7 +917,7 @@ void func_8001BE2C(f32 x, f32 y, f32 z) {
     } while (count != 0 && n != 0);
 }
 
-void func_8001C038(void) {
+void Effect_ResetRings(void) {
     s32 i = 4;
     Unk800877A8* p = D_800877A8;
 
@@ -934,7 +934,7 @@ typedef struct {
 } Unk8007AA08_1B200;
 extern Unk8007AA08_1B200 D_8007AA08;
 void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Coll1B200*);
-s32 func_8001C060(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
+s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     s32 i;
     Unk800877A8* p;
     Unk1B200Vec3* pt;
@@ -991,7 +991,7 @@ s32 func_8001C060(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     return i;
 }
 
-void func_8001C298(s32 arg0, f32 arg1, f32 arg2, f32 arg3) {
+void Effect_FadeRing(s32 arg0, f32 arg1, f32 arg2, f32 arg3) {
     Unk800877A8* p = &D_800877A8[arg0];
 
     p->unk0 = 3;
@@ -1006,7 +1006,7 @@ extern Gfx D_800C4780[];
 extern u8 D_800C47C0[];
 extern Gfx D_800C4840[];
 
-void func_8001C2F8(void* arg0) {
+void Effect_DrawRings(void* arg0) {
     s32 cnt;
     Unk800877A8* p;
     s32 first;
@@ -1100,7 +1100,7 @@ void func_8001C2F8(void* arg0) {
     } while (--cnt != 0);
 }
 
-void func_8001C7E8(void) {
+void Effect_ResetModelEffects(void) {
     s32 i = 32;
     Unk80086798b* p = D_80086798;
 
@@ -1111,7 +1111,7 @@ void func_8001C7E8(void) {
     } while (i != 0);
 }
 
-Unk80086798b* func_8001C818(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 arg10, f32 arg11) {
+Unk80086798b* Effect_CreateModelEffect(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 arg10, f32 arg11) {
     s32 i;
     Unk80086798b* p;
 
@@ -1142,7 +1142,7 @@ Unk80086798b* func_8001C818(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f3
     return p;
 }
 
-void func_8001C948(void* arg0) {
+void Effect_DrawModelEffects(void* arg0) {
     Unk80086798b* p;
     s32 i;
     u32 alpha;
@@ -1156,7 +1156,7 @@ void func_8001C948(void* arg0) {
     p = D_80086798;
     do {
         if (p->unk0 != 0) {
-            func_8001CDF4(p);
+            Effect_ConfigureModelEffectTexture(p);
             if (p->unk8 & 2) {
                 if (*cnt & 1) {
                     alpha = 240;
@@ -1178,7 +1178,7 @@ void func_8001C948(void* arg0) {
             } else {
                 gSPClearGeometryMode(D_8007A184++, G_CULL_BACK);
             }
-            func_8001CBD0(p, (s32)arg0);
+            Effect_DrawModelEffectGeometry(p, (s32)arg0);
             p->unk34++;
             if (--p->unk0 == 0) {
                 if (p->unk8 & 1) {
@@ -1209,8 +1209,8 @@ typedef struct {
     /* 0x04 */ Anim1B200* unk4;
 } AnimSet1B200;
 extern s32 D_8008BFF0;
-void func_80020568(MtxF*, Vec3f_1B200, s32, s32, s32, s32, AnimSet1B200*, Anim1B200*, s32);
-s32 func_8001CBD0(Unk80086798b* arg0, s32 arg1) {
+void Anim_DrawNode(MtxF*, Vec3f_1B200, s32, s32, s32, s32, AnimSet1B200*, Anim1B200*, s32);
+s32 Effect_DrawModelEffectGeometry(Unk80086798b* arg0, s32 arg1) {
     u32 i;
     Anim1B200* anims;
     s32 frame;
@@ -1236,13 +1236,13 @@ s32 func_8001CBD0(Unk80086798b* arg0, s32 arg1) {
     if (D_8007A180 < 0x1E6) {
         for (i = 0; i < ((AnimSet1B200*)&arg0->unk38)->unk0; i++) {
             if (anims[i].unk14 == 0) {
-                func_80020568(&mtx, scale, 0, i, frame, 0, (AnimSet1B200*)&arg0->unk38, anims, arg1);
+                Anim_DrawNode(&mtx, scale, 0, i, frame, 0, (AnimSet1B200*)&arg0->unk38, anims, arg1);
             }
         }
     }
 }
 
-s32 func_8001CDF4(Unk80086798b* arg0) {
+s32 Effect_ConfigureModelEffectTexture(Unk80086798b* arg0) {
     Unk800DA0F0* t;
     u32 mask;
     u32 size;
@@ -1319,7 +1319,7 @@ s32 func_8001CDF4(Unk80086798b* arg0) {
     }
 }
 
-void func_8001D688(void) {
+void Effect_ResetActorMarkers(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
@@ -1337,7 +1337,7 @@ extern f32 D_8007AA44;
 extern Gfx D_800EB9C8[];
 extern Gfx D_800EB990[];
 void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
-void func_8001D6A8(void* arg0) {
+void Effect_DrawActorMarkers(void* arg0) {
     s32 first;
     s32 i;
     Unk80087798* p;
@@ -1384,6 +1384,6 @@ void func_8001D6A8(void* arg0) {
 }
 
 
-void func_8001D94C(s32 arg0) {
+void Effect_ActivateActorMarker(s32 arg0) {
     D_80087798[arg0].unk0 = 25;
 }

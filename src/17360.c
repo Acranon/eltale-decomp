@@ -239,7 +239,7 @@ s32 Enemy_RollHitOnPlayer(Actor17360*, Actor17360*);
 s32 Enemy_GetSlotIndex(Actor17360*);
 s32 Enemy_TakeDamage(s32, u16, s32, u16, s32);
 void Player_TakeDamage(u16, u16, s32);
-void func_80023D28(Actor17360*);
+void Hud_ClearActorStatusIndicators(Actor17360*);
 u32 func_80026E90(u32);
 f32 sqrtf(f32);
 void func_800271B4(f32, Unk17360Vec2*);
@@ -247,8 +247,8 @@ void func_800271B4(f32, Unk17360Vec2*);
 void Magic_ApplyEffectDamage();
 void Magic_ClearActorStatuses(s32, Actor17360*);
 s32 Magic_FindTargetInRange();
-void func_8002373C(Actor17360*, s32, u16, s32);
-void func_8002433C(Actor17360*);
+void Hud_StartActorStatusIndicator(Actor17360*, s32, u16, s32);
+void Hud_ShowActorPopup(Actor17360*);
 
 void Magic_ResetEffectSystem(void) {
     s32 i;
@@ -703,7 +703,7 @@ void Magic_UpdateEffects(void) {
                 if (!(a->unk68->unk0 & 0x100) || p->cfg->unk18 == 2) {
                     if (Magic_GetHitOutcome(p, a)) {
                         if (a == p->unk24) {
-                            func_8002433C(p->unk24);
+                            Hud_ShowActorPopup(p->unk24);
                         } else if (a->unk5E & 1) {
                             Enemy_PlayMissEffect(a);
                         } else {
@@ -723,7 +723,7 @@ void Magic_UpdateEffects(void) {
                             }
                         }
                         if (p->cfg->unk10 == 5 && tries != 0 && hits == 0) {
-                            func_8002433C(a);
+                            Hud_ShowActorPopup(a);
                         }
                     }
                 }
@@ -1086,7 +1086,7 @@ typedef struct {
     /* 0x00 */ u8 pad0[0xA];
     /* 0x0A */ u16 unkA;
 } Unk8001860CRec;
-void func_8001AE24(Actor17360*, s32, s32);
+void Effect_AddFloatingNumber(Actor17360*, s32, s32);
 void Magic_HealTarget(Unk80018480* arg0, Actor17360* arg1) {
     u16 amt;
     s32 pad;
@@ -1110,7 +1110,7 @@ void Magic_HealTarget(Unk80018480* arg0, Actor17360* arg1) {
             D_8007AA1C->unk2A++;
         }
     }
-    func_8001AE24(arg1, 1, amt);
+    Effect_AddFloatingNumber(arg1, 1, amt);
 }
 
 void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
@@ -1138,7 +1138,7 @@ void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
             D_800863C4->unkC = arg0->unk24->unk64->unkA;
         }
     }
-    func_8001AE24(arg1, 1, amt);
+    Effect_AddFloatingNumber(arg1, 1, amt);
 }
 
 void func_80018968(s32 arg0, Actor17360* arg1) {
@@ -1149,7 +1149,7 @@ void func_80018968(s32 arg0, Actor17360* arg1) {
         D_8008BE52 |= 0x10;
         D_8007AA1C->unk2A++;
     } else {
-        func_8002433C(arg1);
+        Hud_ShowActorPopup(arg1);
     }
 }
 
@@ -1194,13 +1194,13 @@ void func_80018B40(s32 arg0, Actor17360* arg1) {
 void Magic_RemoveEnemyOrDamagePlayer(Unk17360Cam* arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
         if (!(D_8008BE52 & 0x100)) {
-            func_80023D28(arg1);
+            Hud_ClearActorStatusIndicators(arg1);
             arg1->unk50 = -1;
             arg1->unk60 &= ~1;
             D_8007B900--;
             D_8007AA1C->unk2A++;
         } else {
-            func_8002433C(arg1);
+            Hud_ShowActorPopup(arg1);
         }
     } else {
         Player_TakeDamage(arg1->unk64->unk4 * 4, 4, arg0->unk24);
@@ -1326,15 +1326,15 @@ void Magic_ApplyShrinkStatus(s32 arg0, Actor17360* arg1) {
     if (!(D_8008BE52 & 0x100)) {
         arg1->unk68->unk0 |= 1;
         arg1->scale = arg1->unk64->unk20 * 0.5;
-        func_8002373C(arg1, 1, 4, -1);
+        Hud_StartActorStatusIndicator(arg1, 1, 4, -1);
     } else {
-        func_8002433C(arg1);
+        Hud_ShowActorPopup(arg1);
     }
 }
 
 void func_800190BC(s32 arg0, Actor17360* arg1) {
     arg1->unk68->unk0 |= 2;
-    func_8002373C(arg1, 2, 2, -1);
+    Hud_StartActorStatusIndicator(arg1, 2, 2, -1);
 }
 
 void func_80019104(s32 arg0, Actor17360* arg1) {
@@ -1347,16 +1347,16 @@ void func_80019104(s32 arg0, Actor17360* arg1) {
             arg1->unk68->unk8A = 0x20;
             break;
     }
-    func_8002373C(arg1, 4, 3, -1);
+    Hud_StartActorStatusIndicator(arg1, 4, 3, -1);
 }
 
 void func_80019184(s32 arg0, Actor17360* arg1) {
     if (!(D_8008BE52 & 0x100)) {
         arg1->unk68->unk0 |= 8;
         arg1->unk60 |= 1;
-        func_8002373C(arg1, 8, arg0 - 1, -1);
+        Hud_StartActorStatusIndicator(arg1, 8, arg0 - 1, -1);
     } else {
-        func_8002433C(arg1);
+        Hud_ShowActorPopup(arg1);
     }
 }
 
@@ -1370,7 +1370,7 @@ void func_8001920C(s32 arg0, Actor17360* arg1) {
             arg1->unk68->unk90 = 2.0f;
             break;
     }
-    func_8002373C(arg1, 0x10, (arg1->unk68->unk90 > 1.0) ? 8 : 9, -1);
+    Hud_StartActorStatusIndicator(arg1, 0x10, (arg1->unk68->unk90 > 1.0) ? 8 : 9, -1);
 }
 
 void func_800192C8(s32 arg0, Actor17360* arg1) {
@@ -1378,15 +1378,15 @@ void func_800192C8(s32 arg0, Actor17360* arg1) {
     switch (arg0) {
         case 1:
             arg1->unk68->unk86 = arg1->unk64->unkC * 2;
-            func_8002373C(arg1, 0x20, 7, -1);
+            Hud_StartActorStatusIndicator(arg1, 0x20, 7, -1);
             break;
         case 2:
             arg1->unk68->unk86 = arg1->unk64->unkC * 4;
-            func_8002373C(arg1, 0x20, 7, -1);
+            Hud_StartActorStatusIndicator(arg1, 0x20, 7, -1);
             break;
         case 3:
             arg1->unk68->unk86 = arg1->unk64->unkC >> 1;
-            func_8002373C(arg1, 0x20, 0xC, -1);
+            Hud_StartActorStatusIndicator(arg1, 0x20, 0xC, -1);
             break;
     }
 }
@@ -1394,25 +1394,25 @@ void func_800192C8(s32 arg0, Actor17360* arg1) {
 void func_800193A4(s32 arg0, Actor17360* arg1) {
     if (!(D_8008BE52 & 0x100)) {
         arg1->unk68->unk0 |= 0x40;
-        func_8002373C(arg1, 0x40, 0xB, -1);
+        Hud_StartActorStatusIndicator(arg1, 0x40, 0xB, -1);
     } else {
-        func_8002433C(arg1);
+        Hud_ShowActorPopup(arg1);
     }
 }
 
 void func_80019408(s32 arg0, Actor17360* arg1) {
     arg1->unk68->unk0 |= 0x80;
-    func_8002373C(arg1, 0x80, 0xA, -1);
+    Hud_StartActorStatusIndicator(arg1, 0x80, 0xA, -1);
 }
 
 void func_80019450(s32 arg0, Actor17360* arg1) {
     arg1->unk68->unk0 |= 0x100;
-    func_8002373C(arg1, 0x100, 4, -1);
+    Hud_StartActorStatusIndicator(arg1, 0x100, 4, -1);
 }
 
 void func_80019498(s32 arg0, Actor17360* arg1) {
     arg1->unk68->unk0 |= 0x200;
-    func_8002373C(arg1, 0x200, 3, -1);
+    Hud_StartActorStatusIndicator(arg1, 0x200, 3, -1);
 }
 
 void func_800194E0(s32 arg0, Actor17360* arg1) {
@@ -1431,7 +1431,7 @@ void func_800194E0(s32 arg0, Actor17360* arg1) {
             arg1->unk68->unk88 = arg1->unk64->unkE * 2;
             break;
     }
-    func_8002373C(arg1, 0x400, (arg1->unk64->unkE < arg1->unk68->unk88) ? 5 : 6, -1);
+    Hud_StartActorStatusIndicator(arg1, 0x400, (arg1->unk64->unkE < arg1->unk68->unk88) ? 5 : 6, -1);
 }
 
 void func_800195E0(s32 arg0, Actor17360* arg1) {
@@ -1530,7 +1530,7 @@ Unk80019BFCRet* Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Unk800C18
 void func_8002A7C8(u8, s8, s32);
 
 
-Unk80019BFCRet* func_8001C818(u16, u16, u16, s32, u16, f32, f32, f32, f32, f32, f32, f32);
+Unk80019BFCRet* Effect_CreateModelEffect(u16, u16, u16, s32, u16, f32, f32, f32, f32, f32, f32, f32);
 Unk80019BFCRet* Magic_CreateVisualEffect(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, Unk800C18D8* arg6, Unk17360Vec2* arg7, Actor17360* arg8) {
     f32 sx;
     f32 sy;
@@ -1565,7 +1565,7 @@ Unk80019BFCRet* Magic_CreateVisualEffect(u16 arg0, u16 arg1, f32 arg2, f32 arg3,
             sy = arg7->y;
             break;
     }
-    return func_8001C818(arg6->unk8, arg6->unk4, arg6->unk6, arg0 & 0xFF, arg1, arg2, arg3, arg4, arg5, sx, sy, sx);
+    return Effect_CreateModelEffect(arg6->unk8, arg6->unk4, arg6->unk6, arg0 & 0xFF, arg1, arg2, arg3, arg4, arg5, sx, sy, sx);
 }
 
 typedef struct {
@@ -1587,8 +1587,8 @@ typedef struct {
     /* 0x08 */ u8 pad8[4];
 } Unk800C363C; // size = 0xC
 extern Unk800C363C* D_800C363C[];
-void func_8001B3FC(s32, s32, f32, f32, f32, f32);
-void func_8001B7E0(s32, f32, f32, f32, f32);
+void Effect_StartBurstEmitter(s32, s32, f32, f32, f32, f32);
+void Effect_SpawnBurst(s32, f32, f32, f32, f32);
 typedef struct {
     /* 0x00 */ s16 unk0;
     /* 0x02 */ u16 unk2;
@@ -1658,10 +1658,10 @@ void Magic_CreateCastPresentation(Unk800199C0* arg0, Actor17360* arg1) {
         y = arg1->y + arg1->unk64->unk1C * arg1->scale;
         switch (fx->unk0) {
             case 1:
-                func_8001B3FC(fx->unk2, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartBurstEmitter(fx->unk2, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
-                func_8001B7E0(fx->unk2, arg1->x, y, arg1->z, h * 0.2);
+                Effect_SpawnBurst(fx->unk2, arg1->x, y, arg1->z, h * 0.2);
                 break;
         }
     }
@@ -1759,10 +1759,10 @@ void Magic_CreateHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
         y = arg1->y + arg1->unk64->unk1C * arg1->unk64->unk20;
         switch (fx->unk8) {
             case 1:
-                func_8001B3FC(fx->unkA, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartBurstEmitter(fx->unkA, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
-                func_8001B7E0(fx->unkA, arg1->x, y, arg1->z, h * 0.2);
+                Effect_SpawnBurst(fx->unkA, arg1->x, y, arg1->z, h * 0.2);
                 break;
         }
     }
@@ -1800,10 +1800,10 @@ void Magic_CreateGroundHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
         y = arg1->y + arg1->unk64->unk1C * arg1->scale;
         switch (fx->unk4) {
             case 1:
-                func_8001B3FC(fx->unk6, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartBurstEmitter(fx->unk6, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
-                func_8001B7E0(fx->unk6, arg1->x, y, arg1->z, h * 0.2);
+                Effect_SpawnBurst(fx->unk6, arg1->x, y, arg1->z, h * 0.2);
                 break;
         }
     }

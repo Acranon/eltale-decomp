@@ -92,7 +92,7 @@ extern Struct_803AAA40 D_803AAA40[];
 extern Struct_803AB358 D_803AB358[];
 extern Struct_803AB36C D_803AB36C[];
 
-void func_8001AE24(Struct_80026140*, s32, s32);
+void Effect_AddFloatingNumber(Struct_80026140*, s32, s32);
 void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Struct_803AB358*, Vec3f*, Struct_80026140*);
 void func_8002A7C8(s32, s32, s32);
 
@@ -505,7 +505,7 @@ void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
             amt = arg1->unk4;
         }
         st->unk4 += amt;
-        func_8001AE24(arg0, 1, amt);
+        Effect_AddFloatingNumber(arg0, 1, amt);
     }
     if (arg1->unk6 != 0) {
         amt = st->unkA - st->unk8;
@@ -513,7 +513,7 @@ void func_80026140(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
             amt = arg1->unk6;
         }
         st->unk8 += amt;
-        func_8001AE24(arg0, 2, amt);
+        Effect_AddFloatingNumber(arg0, 2, amt);
     }
     D_8008C190.x = D_803AB36C[0].unk8;
     D_8008C190.y = D_803AB36C[0].unkC;

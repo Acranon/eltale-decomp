@@ -140,9 +140,9 @@ void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Unk80085968*);
 u8 Chest_IsOpened(u16);
 void Chest_SetOpened(u16);
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
-void func_800201A0(Unk80085290*, s32, s32, s32, s32, u16);
-void func_80020428(s32, Unk80085290*, Unk8010FDC4*, s32);
-void func_8002099C(u16, Unk80085290*, Unk8010FDC4*);
+void Anim_SetCurrentAndNext(Unk80085290*, s32, s32, s32, s32, u16);
+void Anim_DrawModel(s32, Unk80085290*, Unk8010FDC4*, s32);
+void Anim_AdvanceFrame(u16, Unk80085290*, Unk8010FDC4*);
 void func_800271B4(f32, Unk80085958*);
 void func_8002A7C8(u8, s8, u8);
 
@@ -199,7 +199,7 @@ void Chest_LoadForMap(void) {
             } else {
                 mode = 0;
             }
-            func_800201A0(p, mode, 1, mode, 1, 1);
+            Anim_SetCurrentAndNext(p, mode, 1, mode, 1, 1);
             i--;
             p++;
             def++;
@@ -222,13 +222,13 @@ void Chest_UpdateAll(s32 arg0) {
             t--;
             if (!t) {
                 p->unk60 = 0;
-                func_800201A0(p, 3, 1, 3, 1, 1);
+                Anim_SetCurrentAndNext(p, 3, 1, 3, 1, 1);
             } else {
                 p->unk60 = t | 0x8000;
             }
         }
-        func_80020428(0, p, &D_8010FDC4[p->unk52], arg0);
-        func_8002099C(p->unk58, p, &D_8010FDC4[p->unk52]);
+        Anim_DrawModel(0, p, &D_8010FDC4[p->unk52], arg0);
+        Anim_AdvanceFrame(p->unk58, p, &D_8010FDC4[p->unk52]);
         Shadow_Queue(p->x, p->y, p->z, p->unk2C, p->unk30, p->unk34, 6.0f);
         n--;
         p++;
@@ -283,7 +283,7 @@ Unk80085290* Chest_FindInFront(Unk80013808Arg* arg0) {
 void Chest_Open(Unk80085290* arg0) {
     Chest_SetOpened(arg0->unk62);
     arg0->unk60 = 0x805B;
-    func_800201A0(arg0, 1, 1, 2, 1, 1);
+    Anim_SetCurrentAndNext(arg0, 1, 1, 2, 1, 1);
     func_8002A7C8(0x1A, 8, 0xFF);
 }
 

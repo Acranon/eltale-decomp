@@ -231,11 +231,11 @@ void Npc_EndTalk(s32 arg0);
 void Item_BuildMessage(s32 arg0);
 void Magic_CreateCastEffect(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
 s32 func_80017AB0(void);
-void func_8001A6E4(Actor *arg0);
-void func_8001FC14(Actor *arg0);
-void func_800201A0(Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
-void func_80020214(Actor *arg0, s32 arg1, f32 arg2);
-void func_80023D28(Actor *arg0);
+void Effect_StartPulseEmitter(Actor *arg0);
+void Battle_EndTurn(Actor *arg0);
+void Anim_SetCurrentAndNext(Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+void Anim_UpdateRootMotion(Actor *arg0, s32 arg1, f32 arg2);
+void Hud_ClearActorStatusIndicators(Actor *arg0);
 void func_80025094(u8 arg0);
 void func_800251CC(u8 arg0, Actor *arg1);
 void func_800271B4(f32 arg0, Vec2f *arg1);
@@ -263,7 +263,7 @@ void Camera_StartBattleFocus(s32 arg0, Actor *arg1);
 u32 func_80026E90(s32 arg0);
 f32 func_800270D0(f32 arg0, f32 arg1);
 void func_80028120(u8 *romStart, void *dest, u32 size);
-void func_8002433C(Actor *arg0);
+void Hud_ShowActorPopup(Actor *arg0);
 f32 sqrtf(f32 x);
 
 extern s32 D_8004DCA0;
@@ -463,7 +463,7 @@ void Player_Spawn(void) {
     } else {
         p->actor.unk62 = D_8007A928.unk18;
     }
-    func_800201A0(&D_8007AA20, p->unk6 ? p->unk6 : D_8007A910, 1, D_8007A910, 1, 1);
+    Anim_SetCurrentAndNext(&D_8007AA20, p->unk6 ? p->unk6 : D_8007A910, 1, D_8007A910, 1, 1);
     if (D_8007A998 & 8) {
         p->unk0 = 3;
         p->unk4 = 0xF;
@@ -506,7 +506,7 @@ void Player_Spawn(void) {
                 p->actor.z = pos->z + D_8007A918.z * p->actor.scale;
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
-                func_80020214(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
+                Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
                 MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
                 func_8002A7C8(n, 8, 0xFF);
                 break;
@@ -520,7 +520,7 @@ void Player_Spawn(void) {
                 p->unk130 = D_8007A918.z;
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
-                func_80020214(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
+                Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
                 MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
                 func_8002A7C8(5, 0x21, 0xFF);
                 func_8002A7C8(0xF, 0x21, 0xFF);
@@ -707,7 +707,7 @@ void Player_Update(void) {
                     } else {
                         Player_AddTurnMoveAgilityXP(&D_8007AA08);
                         p->unk2 = 0;
-                        func_8001FC14(&D_8007AA20);
+                        Battle_EndTurn(&D_8007AA20);
                     }
                 }
             } else if (!(p->actor.unk60 & 1)) {
@@ -718,7 +718,7 @@ void Player_Update(void) {
                     p->actor.vx = 0.0f;
                     p->actor.unk14 = 0.0f;
                     p->actor.unkC = 0.0f;
-                    func_800201A0(&D_8007AA20, D_8007A910, 1, D_8007A910, 1, 1);
+                    Anim_SetCurrentAndNext(&D_8007AA20, D_8007A910, 1, D_8007A910, 1, 1);
                     Npc_StartTalk(D_8007A9C0);
                     func_80032D20(D_8008C17C < 70 ? 0 : 1);
                     D_8004DCA0 |= 2;
@@ -756,10 +756,10 @@ void Player_Update(void) {
                     if (((Unk8007A9CC *) D_8007A9CC)->entry->unk18 & 2) {
                         p->unk4 = 0xF;
                         p->unk8 |= 0x200;
-                        func_800201A0(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
+                        Anim_SetCurrentAndNext(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
                     } else {
                         p->unk4 = 0xF;
-                        func_800201A0(&D_8007AA20, 0xC, 1, 0xD, 1, 1);
+                        Anim_SetCurrentAndNext(&D_8007AA20, 0xC, 1, 0xD, 1, 1);
                     }
                     D_8007A9CC = NULL;
                 } else {
@@ -770,7 +770,7 @@ void Player_Update(void) {
                     p->actor.unk14 = 0.0f;
                     p->actor.unkC = 0.0f;
                     p->actor.unk60 |= 1;
-                    func_800201A0(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
+                    Anim_SetCurrentAndNext(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
                 }
             }
         } else if (Player_CanAct(&D_8007AA08, &D_8007AA20) != 0) {
@@ -805,7 +805,7 @@ void Player_Update(void) {
                 D_8007A9BC = 0xFF;
             }
         }
-        func_80023D28(&D_8007AA20);
+        Hud_ClearActorStatusIndicators(&D_8007AA20);
         D_8007AA8C.unk0 = 0;
         p->unk0 = 0xF;
         p->unk4 = cd->unkC2;
@@ -814,9 +814,9 @@ void Player_Update(void) {
         p->actor.vx = 0.0f;
         p->actor.unk14 = 0.0f;
         p->actor.unkC = 0.0f;
-        func_800201A0(&D_8007AA20, 0x10, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(&D_8007AA20, 0x10, 1, D_8007A910, 1, 1);
     } else if (D_8008BE52 & 0x10) {
-        func_80023D28(&D_8007AA20);
+        Hud_ClearActorStatusIndicators(&D_8007AA20);
         D_8007AA8C.unk0 = 0;
     }
     D_8004DCB0[p->unk0](&D_8007AA20, &D_8007AA08, cd);
@@ -843,8 +843,8 @@ extern Vec3f D_8008BFC0;
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
 void Env_ApplyLightSlot(s32 arg0);
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
-void func_80020428(s32 arg0, Actor *arg1, AnimEntry *arg2, void *arg3);
-void func_8002099C(u16 arg0, Actor *arg1, AnimEntry *arg2);
+void Anim_DrawModel(s32 arg0, Actor *arg1, AnimEntry *arg2, void *arg3);
+void Anim_AdvanceFrame(u16 arg0, Actor *arg1, AnimEntry *arg2);
 
 /* fields of D_8007AA08.actor under their own names */
 extern f32 D_8007AA24;
@@ -872,8 +872,8 @@ void Player_Draw(void *arg0) {
     }
     anims = (AnimEntry *)D_80055D40[D_8007AA70];
     Player_LoadAnim(&D_8007AA20);
-    func_80020428(flag, &D_8007AA20, &anims[D_8007AA72], arg0);
-    func_8002099C(D_8007AA78, &D_8007AA20, &anims[D_8007AA72]);
+    Anim_DrawModel(flag, &D_8007AA20, &anims[D_8007AA72], arg0);
+    Anim_AdvanceFrame(D_8007AA78, &D_8007AA20, &anims[D_8007AA72]);
     Player_LoadAnim(&D_8007AA20);
     Coll_ResolveFloorAndWalls(D_8008BFC0.x, D_8007AA24, D_8008BFC0.z, 0xA00, &D_8007A928);
     D_8007AB48.x = D_8008BFC0.x;
@@ -931,7 +931,7 @@ void Player_InitBattle(void) {
     if (D_8007A910 != 0x19) {
         D_8007A910 = 0x11;
     }
-    func_800201A0(&p->actor, 0x12, 1, D_8007A910, 1, 1);
+    Anim_SetCurrentAndNext(&p->actor, 0x12, 1, D_8007A910, 1, 1);
 }
 
 /* particle/effect spawn parameters */
@@ -953,8 +953,8 @@ extern s32 D_8008C168;
 extern s32 D_8008C16C;
 extern s8 D_80092C81;
 extern s8 D_80092C82;
-void func_8001D9A8(Unk8004EE20 *arg0);
-void func_8001F164(void);
+void Effect_AllocateSprite(Unk8004EE20 *arg0);
+void Battle_StartBossEncounter(void);
 
 void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
     f32 x;
@@ -1000,7 +1000,7 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
         } else if (D_80090450 == 0) {
             p->unk8 &= ~1;
             D_8004DCA0 &= ~2;
-            func_8001F164();
+            Battle_StartBossEncounter();
         }
     } else if (p->unk8 & 2) {
         if (D_80090450 == 0) {
@@ -1039,7 +1039,7 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
                 D_8004EE20.unk30 = 0.0f;
                 D_8004EE20.unk34 = 0.2f;
                 D_8004EE20.unk38 = 0.0f;
-                func_8001D9A8(&D_8004EE20);
+                Effect_AllocateSprite(&D_8004EE20);
             }
             p->unk4--;
         }
@@ -1079,8 +1079,8 @@ void Player_StateHurt(Actor *arg0, PlayerState *arg1, CharData *arg2) {
         if (sub->unk4 == 0) {
             arg1->unk0 = 6;
             arg1->unk4 = 0xE6;
-            func_800201A0(arg0, 9, 1, D_8007A910, 1, 1);
-            func_80023D28(arg0);
+            Anim_SetCurrentAndNext(arg0, 9, 1, D_8007A910, 1, 1);
+            Hud_ClearActorStatusIndicators(arg0);
             func_8002A6B8(0x1E);
             D_8004DCA0 |= 0x880;
             D_8007A174 = arg1->unk4;
@@ -1158,9 +1158,9 @@ void Player_StateAutoWalk(Actor *arg0, PlayerState *arg1, CharData *arg2) {
 
 extern s32 D_80085E4C;
 void Enemy_PlayMissEffect(Actor *arg0);
-void func_8001AE24(Actor *arg0, s32 arg1, s32 arg2);
-void func_8001BE2C(f32 x, f32 y, f32 z);
-void func_8002373C(Actor *arg0, u16 arg1, u16 arg2, s16 arg3);
+void Effect_AddFloatingNumber(Actor *arg0, s32 arg1, s32 arg2);
+void Effect_SpawnStreakBurst(f32 x, f32 y, f32 z);
+void Hud_StartActorStatusIndicator(Actor *arg0, u16 arg1, u16 arg2, s16 arg3);
 
 u16 Enemy_TakeDamage(s32 target, u16 dmg, u16 elem, u16 flags, Actor *arg4);
 void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
@@ -1194,13 +1194,13 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
                     if (a->unk64->unk6 < a->unk64->unk4) {
                         a->unk64->unk4 = a->unk64->unk6;
                     }
-                    func_8001AE24(a, 1, dmg);
-                    func_8002373C(a, 2, 1, 0x1E);
+                    Effect_AddFloatingNumber(a, 1, dmg);
+                    Hud_StartActorStatusIndicator(a, 2, 1, 0x1E);
                 }
                 D_8007A918.x = 0.0f;
                 D_8007A918.z = 2.0f * (a->unk64->unk18 * a->scale);
                 func_800271B4(a->rot, &D_8007A918);
-                func_8001BE2C(a->x + D_8007A918.x, a->y + a->unk64->unk1C * a->scale * 0.7f, a->z + D_8007A918.z);
+                Effect_SpawnStreakBurst(a->x + D_8007A918.x, a->y + a->unk64->unk1C * a->scale * 0.7f, a->z + D_8007A918.z);
             }
             p->unk14->unk28++;
         } else {
@@ -1214,7 +1214,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
             p->unk4 = 0x12;
             p->unk8 &= ~0x100;
             a->unk60 |= 1;
-            func_800201A0(a, 0xB, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(a, 0xB, 1, D_8007A910, 1, 1);
             D_80085E4C = 0x23;
             return;
         }
@@ -1228,7 +1228,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
         p->unk8 &= ~0x100;
         Player_AddTurnMoveAgilityXP(p);
         p->unk2 = 0;
-        func_8001FC14(a);
+        Battle_EndTurn(a);
     } else if (p->unk0 == 0xD && p->unk10 >= p->unk4 && (D_80092C86 & 0xA000)) {
         p->unk8 |= 0x100;
     }
@@ -1251,13 +1251,13 @@ void Player_StateCastSpell(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             arg1->unk0 = 3;
             arg1->unk4 = arg2->unk122;
             arg1->unk8 &= ~4;
-            func_800201A0(arg0, 0x18, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(arg0, 0x18, 1, D_8007A910, 1, 1);
         } else {
             arg1->unk0 = 0;
         }
         Player_AddTurnMoveAgilityXP(arg1);
         arg1->unk2 = 0;
-        func_8001FC14(arg0);
+        Battle_EndTurn(arg0);
     }
 }
 
@@ -1286,9 +1286,9 @@ void Player_StateWalkToExitObject(Actor *arg0, PlayerState *arg1, s32 arg2) {
     if (--arg1->unk4 == 0) {
         arg1->unk0 = 0xA;
         arg1->unk4 = 0x50;
-        func_800201A0(arg0, arg1->unk6, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(arg0, arg1->unk6, 1, D_8007A910, 1, 1);
         Player_LoadAnim(arg0);
-        func_80020214(arg0, arg0->unk52 * 0xC + arg2, arg0->scale);
+        Anim_UpdateRootMotion(arg0, arg0->unk52 * 0xC + arg2, arg0->scale);
         arg0->rot = arg1->unk138;
         func_8002A7C8(0x1A, 8, 0xFF);
     }
@@ -1321,7 +1321,7 @@ void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
         }
         if (--arg1->unk4 == 0) {
             arg0->rot = arg1->unk138;
-            func_800201A0(arg0, D_8007A910, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(arg0, D_8007A910, 1, D_8007A910, 1, 1);
         }
     } else if (D_80090450 == 0) {
         arg1->unk0 = 0;
@@ -1337,7 +1337,7 @@ void Player_StateUseItem(Actor *arg0, PlayerState *arg1, CharData *arg2) {
         if (D_803AAAA2[arg1->unk11C].unk0 == 2) {
             Player_AddTurnMoveAgilityXP(arg1);
             arg1->unk2 = 0;
-            func_8001FC14(arg0);
+            Battle_EndTurn(arg0);
         } else {
             arg1->unk124 = 0xF;
             Player_AddTurnMoveAgilityXP(arg1);
@@ -1349,9 +1349,9 @@ void Player_StateUseItem(Actor *arg0, PlayerState *arg1, CharData *arg2) {
         }
         arg1->unk0 = 3;
         arg1->unk4 = 0xF;
-        func_800201A0(arg0, 0x18, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(arg0, 0x18, 1, D_8007A910, 1, 1);
         arg1->unk2 = 0;
-        func_8001FC14(arg0);
+        Battle_EndTurn(arg0);
     }
 }
 
@@ -1420,7 +1420,7 @@ void Player_StateExamine(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             arg1->unk4 = 2;
         } else {
             arg1->unk4 = 8;
-            func_800201A0(arg0, 0xE, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(arg0, 0xE, 1, D_8007A910, 1, 1);
         }
         arg1->unk8 &= ~0x200;
         D_8004DCA0 &= ~2;
@@ -1448,7 +1448,7 @@ void Player_MoveIdle(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
             arg3->unk0 = 1;
         }
     } else if (D_8007A910 != arg2->unk52 && D_8007A910 != arg2->unk5A) {
-        func_800201A0(arg2, D_8007A910, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(arg2, D_8007A910, 1, D_8007A910, 1, 1);
     }
 }
 
@@ -1521,7 +1521,7 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
             a->vz *= 0.9;
             speed = 1;
             flag = 1;
-            func_8001A6E4(a);
+            Effect_StartPulseEmitter(a);
         } else {
             anim = 1;
             next = 1;
@@ -1535,7 +1535,7 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         }
     }
     if (anim != a->unk52 && anim != a->unk5A) {
-        func_800201A0(a, anim, speed, next, speed, flag);
+        Anim_SetCurrentAndNext(a, anim, speed, next, speed, flag);
         a->unk54 = mode;
     } else {
         a->unk58 = speed;
@@ -1600,10 +1600,10 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         a->vz *= 0.9;
         speed = 1;
         flag = 1;
-        func_8001A6E4(a);
+        Effect_StartPulseEmitter(a);
     }
     if (anim != a->unk52 && anim != a->unk5A) {
-        func_800201A0(a, anim, speed, next, speed, flag);
+        Anim_SetCurrentAndNext(a, anim, speed, next, speed, flag);
         a->unk54 = mode;
     } else {
         a->unk58 = speed;
@@ -1612,7 +1612,7 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p) {
 
 void Player_GetAnimMotion(Actor *arg0, s32 arg1, Vec2f *arg2) {
     Player_LoadAnim(arg0);
-    func_80020214(arg0, arg0->unk52 * 0xC + arg1, arg0->scale);
+    Anim_UpdateRootMotion(arg0, arg0->unk52 * 0xC + arg1, arg0->scale);
     arg2->x = -arg0->unk44;
     arg2->z = arg0->unk4C;
     func_800271B4(arg0->rot, arg2);
@@ -1869,7 +1869,7 @@ void Player_StartAreaExit(void) {
         p->unk4 = 0x1E;
         p->unk6 = 0;
         p->actor.unk60 |= 1;
-        func_800201A0(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
         D_8007A174 = 0x13;
         return;
     }
@@ -1909,7 +1909,7 @@ void Player_StartAreaExit(void) {
             p->unk4 = 0x1E;
             p->unk6 = 0;
             p->actor.unk60 |= 1;
-            func_800201A0(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
             D_8007A174 = 0x19;
             break;
     }
@@ -1927,7 +1927,7 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
     hi = D_80084300.unkC >> 8;
     if ((hi & 0xF) == 3) {
         arg0->unk6 = 0;
-        func_800201A0(arg1, 0x1A, 1, 1, 0xA, 1);
+        Anim_SetCurrentAndNext(arg1, 0x1A, 1, 1, 0xA, 1);
         arg0->unk0 = 3;
         arg0->unk4 = 0x4B;
         arg1->unkC = 0.0f;
@@ -1938,7 +1938,7 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
     } else {
         arg0->unk0 = 9;
         arg0->unk4 = 8;
-        func_800201A0(arg1, 1, 0xA, 1, 0xA, 1);
+        Anim_SetCurrentAndNext(arg1, 1, 0xA, 1, 0xA, 1);
         if (D_80084300.unkC & 1) {
             n = 0x15;
             D_8007A918.x = -133.0f;
@@ -1970,9 +1970,9 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
 }
 
 void Player_StartOpenChest(PlayerState *arg0, Actor *arg1, s32 arg2) {
-    func_800201A0(arg1, 0x1C, 1, 0x1D, 1, 1);
+    Anim_SetCurrentAndNext(arg1, 0x1C, 1, 0x1D, 1, 1);
     Player_LoadAnim(arg1);
-    func_80020214(arg1, arg1->unk52 * 0xC + arg2, arg1->scale);
+    Anim_UpdateRootMotion(arg1, arg1->unk52 * 0xC + arg2, arg1->scale);
     arg0->unk0 = 0xB;
     arg0->unk4 = 0x5A;
     arg1->unk60 |= 1;
@@ -1985,7 +1985,7 @@ void Player_StartUseItem(u8 arg0) {
     D_8007AA08.unk0 = 0xC;
     D_8007AA08.unk4 = cd->unk116;
     D_8007AA08.actor.unk60 |= 1;
-    func_800201A0(&D_8007AA20, 0x17, 1, 0x16, 1, 1);
+    Anim_SetCurrentAndNext(&D_8007AA20, 0x17, 1, 0x16, 1, 1);
 }
 
 /* .data 8004DCB0..8004DD10 in source order: this table (after the functions it
@@ -2096,7 +2096,7 @@ void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     arg0->unk4 = 0x14;
     arg0->unk8 &= ~0x400;
     arg1->unk60 |= 1;
-    func_800201A0(arg1, 0xA, 1, D_8007A910, 1, 1);
+    Anim_SetCurrentAndNext(arg1, 0xA, 1, D_8007A910, 1, 1);
     mon = &D_8007B908[arg0->unk2];
     dx = mon[-1].actor.x - arg1->x;
     arg1->rot = func_800270D0(dx, mon[-1].actor.z - arg1->z);
@@ -2192,7 +2192,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
                 if (p->actor.unk64->unkA < p->actor.unk64->unk8) {
                     p->actor.unk64->unk8 = p->actor.unk64->unkA;
                 }
-                func_8002373C(&D_8007AA20, 0x200, 2, 0x1E);
+                Hud_StartActorStatusIndicator(&D_8007AA20, 0x200, 2, 0x1E);
             }
             flags = 0;
             p->unk14->unk28++;
@@ -2200,7 +2200,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
             if (arg1 & 0x4000) {
                 flags = 0x8003;
             }
-            func_8001AE24(&D_8007AA20, flags, d);
+            Effect_AddFloatingNumber(&D_8007AA20, flags, d);
         }
         p->unk0 = 5;
         p->unk4 = *(s16 *) ((u8 *) cd + 0x62); /* CharData field 0x62 (lh) */
@@ -2209,7 +2209,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
         if (arg1 & 4) {
             D_8007AA20.unk60 |= 2;
         }
-        func_800201A0(&D_8007AA20, 8, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(&D_8007AA20, 8, 1, D_8007A910, 1, 1);
         if (dmg != 0) {
             Camera_Shake(2);
         }
@@ -2239,8 +2239,8 @@ void Player_StartDodge(void) {
             p->unk0 = 3;
             p->unk4 = cd->unk56;
             p->actor.unk60 |= 3;
-            func_800201A0(&p->actor, 7, 1, D_8007A910, 1, 1);
-            func_8002433C(&p->actor);
+            Anim_SetCurrentAndNext(&p->actor, 7, 1, D_8007A910, 1, 1);
+            Hud_ShowActorPopup(&p->actor);
             func_8002A7C8(0, 0x17, 0xFF);
         }
     }
@@ -2352,7 +2352,7 @@ void Player_StartCastSpell(PlayerState *p, Actor *a, AnimEntry *anims) {
     p->unk4 = t;
     a->vx = a->vz = 0.0f;
     a->unk60 |= 1;
-    func_800201A0(a, anim, 1, next, 1, 1);
+    Anim_SetCurrentAndNext(a, anim, 1, next, 1, 1);
     Camera_StartBattleFocus(0x2D, a);
     D_8008C15E = 0x1E;
 }
@@ -2379,7 +2379,7 @@ extern s32 D_8007A9BC;
 extern u8 D_8007A9BF;
 extern s16 D_8008C160;
 
-void func_8001D94C(s32 arg0);
+void Effect_ActivateActorMarker(s32 arg0);
 void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
     u16 cost;
     s32 count;
@@ -2409,7 +2409,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk30 < 0x36) {
                 p->unk14->unk30++;
             }
-            func_8001D94C(0);
+            Effect_ActivateActorMarker(0);
             count++;
         }
     } else {
@@ -2429,7 +2429,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk31 < 0x36) {
                 p->unk14->unk31++;
             }
-            func_8001D94C(2);
+            Effect_ActivateActorMarker(2);
             count++;
         }
     } else {
@@ -2446,7 +2446,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk32 < 0x36) {
                 p->unk14->unk32++;
             }
-            func_8001D94C(3);
+            Effect_ActivateActorMarker(3);
             count++;
         }
     } else {
@@ -2463,7 +2463,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk33 < 0x36) {
                 p->unk14->unk33++;
             }
-            func_8001D94C(1);
+            Effect_ActivateActorMarker(1);
             count++;
         }
     } else {
