@@ -443,10 +443,10 @@ void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
 
 
 extern f32 D_80085E74;
-extern f32 D_8008FB48;
-extern f32 D_8008FB4C;
-extern s32 D_8008FB50;
-extern s32 D_8008FB54;
+extern f32 menu_map_marker_x;
+extern f32 menu_map_marker_z;
+extern s32 menu_map_region;
+extern s32 menu_map_spot;
 extern Gfx D_803AA758[];
 extern Struct_80024A54 D_803A86F8;
 f32 sqrtf(f32);
@@ -471,9 +471,9 @@ void Hud_DrawCompass(Unk2000000* buf) {
     gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     gSPDisplayList(D_8007A184++, D_803AA758);
     Hud_DrawTextureTile(&D_803A86F8, 13, 10, 11, 14, 0x93, 0, 0x400, 0x400);
-    if (D_8008FB50 < 6 && D_8008FB54 < 0 && !(D_8004DCA0 & 0x80)) {
-        dx = D_8008FB48 - D_8007AA08.unk18;
-        dz = D_8008FB4C - D_8007AA08.unk20;
+    if (menu_map_region < 6 && menu_map_spot < 0 && !(D_8004DCA0 & 0x80)) {
+        dx = menu_map_marker_x - D_8007AA08.unk18;
+        dz = menu_map_marker_z - D_8007AA08.unk20;
         dist = sqrtf(dx * dx + dz * dz);
         if (dist > 10.0) {
             ang = Math_Atan2(dx, dz) - D_80085E74;

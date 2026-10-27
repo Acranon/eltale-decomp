@@ -279,9 +279,9 @@ void Sfx_Play(u8, s8, u8);
 extern s32 D_8004DD38[];
 
 extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
-extern u8 D_8004F760[];
-extern Unk800561A0 D_800561A0[];
-extern u32 D_800566C8[];
+extern u8 fade_damage_flash[];
+extern Unk800561A0 enemy_area_sets[];
+extern u32 enemy_attack_scripts[];
 typedef struct {
     /* 0x00 */ s16 unk0;
     /* 0x02 */ u16 unk2;
@@ -297,7 +297,7 @@ typedef struct {
     /* 0x20 */ u8 pad20[0x24];
 } Unk800C185C; /* size 0x44 */
 
-extern Unk80056718 D_80056718;
+extern Unk80056718 enemy_effect_defs;
 extern u16 D_8005685A;
 extern u16 D_8005685C;
 extern Unk800C185C *D_800C185C[];
@@ -423,7 +423,7 @@ void Enemy_LoadAreaSet(void) {
     u32 start;
     u32 end;
 
-    D_8007C05C = &D_800561A0[D_8007C288->unk12];
+    D_8007C05C = &enemy_area_sets[D_8007C288->unk12];
     D_8007C048 = D_8007C05C->unk8;
     D_8007C04C = D_8007C05C->unk10;
     start = D_8007C05C->start;
@@ -1087,7 +1087,7 @@ u16 Enemy_CalcAttackDamage(Enemy *arg0) {
     dmg = (dmg * arg0->unk122) >> 4;
     if (Math_Rand(32) == 0) {
         dmg = dmg + (dmg >> 1);
-        Fade_Start(4, 0, D_8004F760);
+        Fade_Start(4, 0, fade_damage_flash);
         arg0->flags |= 0x20;
     }
     if (arg0->unk98 & 1) {
@@ -1197,9 +1197,9 @@ void Enemy_SpawnDeathEffects(Obj *obj) {
     f32 y;
     Unk800C18D8 *t;
 
-    D_8007C070.x = D_80056718.unk148;
-    D_8007C070.y = D_80056718.unk14C;
-    t = &D_800C18D8[D_80056718.unk140];
+    D_8007C070.x = enemy_effect_defs.unk148;
+    D_8007C070.y = enemy_effect_defs.unk14C;
+    t = &D_800C18D8[enemy_effect_defs.unk140];
     D_8007C070.z = obj->unk28;
     if (obj->unk64->unk0 == 1) {
         y = obj->unk68->unk94;
@@ -1217,7 +1217,7 @@ void Enemy_ClearAttackScript(void) {
 
 void Enemy_StartAttackScript(s32 arg0, s32 arg1) {
     ((Unk8007C060 *)&D_8007C060)->unk0 = 0;
-    ((Unk8007C060 *)&D_8007C060)->unk4 = D_800566C8[arg0];
+    ((Unk8007C060 *)&D_8007C060)->unk4 = enemy_attack_scripts[arg0];
     ((Unk8007C060 *)&D_8007C060)->unk8 = arg1;
     ((Unk8007C060 *)&D_8007C060)->unkC = &D_8007B908[0].obj;
 }
@@ -1250,7 +1250,7 @@ void Enemy_RunAttackScript(void) {
                 en->unk20 = D_8007C070.x;
                 en->unk24 = D_8007C070.y;
             } else {
-                d = &((SpawnDef *) &D_80056718)[e->unk2];
+                d = &((SpawnDef *) &enemy_effect_defs)[e->unk2];
                 t = &D_800C18D8[d->unk0];
                 D_8007C070.x = e->unk8;
                 D_8007C070.y = e->unk10;

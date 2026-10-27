@@ -511,10 +511,10 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
 
 extern s32 D_8007A180;
 extern s32 D_8007A1D0;
-extern s8 D_8008FAF0;
-extern s8 D_8008FB40;
+extern s8 bgm_current;
+extern s8 menu_save_loaded;
 extern s8 input_primary_port;
-extern u16 D_8008CA50;
+extern u16 fade_flags;
 void Gfx_WaitForFrameMessage(s16 arg0);
 void Player_SetSpawnFromSaveTable(void);
 void Bgm_Update(void);
@@ -540,7 +540,7 @@ extern s32 D_8007A1C4;
 extern s32 D_80084980;
 extern Unk80084998 D_80084998[];
 extern s32 effect_mapobj_emitter_count;
-extern s8 D_8008FAF4;
+extern s8 sfx_master_volume;
 extern u8 D_801C0000[];
 extern u8 D_E420D0[];
 extern u8 D_E43780[];
@@ -810,7 +810,7 @@ void Core_RunMessageCutsceneLoop(void) {
             D_8007AB60 = Env_AllocateLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
             Fade_Init();
-            D_8008CA50 |= 8;
+            fade_flags |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
                 Fade_StartTransitionIn();
@@ -878,7 +878,7 @@ void Core_RunCameraCutsceneLoop(void) {
     Dma_ReadRom(D_E43780, D_801C0000, D_E5BF60 - D_E43780);
     D_8007A174 = 0;
     D_8007A178 = 2;
-    D_8008FAF4 = 0;
+    sfx_master_volume = 0;
     Cutscene_ResetSequence();
     while (D_8007A170 == 7) {
         if (D_8004DCA0 & 0x40) {
@@ -890,7 +890,7 @@ void Core_RunCameraCutsceneLoop(void) {
             D_8007AB60 = Env_AllocateLightSlot();
             D_80084998[D_8007AB60].unk0 = 2;
             Fade_Init();
-            D_8008CA50 |= 8;
+            fade_flags |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
                 Fade_StartTransitionIn();
@@ -947,7 +947,7 @@ void Core_RunMenuLoop(void) {
     GfxFrame *frame;
 
     D_8007A1D0 = 0;
-    D_8008FB40 = 0;
+    menu_save_loaded = 0;
     if (D_8004DCA0 & 0x400) {
         Bgm_Play(0x13);
     }
@@ -968,11 +968,11 @@ void Core_RunMenuLoop(void) {
     }
     if (D_8004DCA0 & 0x400) {
         Bgm_Play(-1);
-        while (D_8008FAF0 != -1) {
+        while (bgm_current != -1) {
             Bgm_Update();
         }
     }
-    if (D_8008FB40 != 0) {
+    if (menu_save_loaded != 0) {
         Player_SetSpawnFromSaveTable();
         D_8007A172 = 2;
         D_8004DCA0 &= ~0x400;
@@ -1037,7 +1037,7 @@ void Core_RunEndingLoop(void) {
     Overlay_LoadEnding();
     func_8020C0D0();
     Fade_Init();
-    D_8008CA50 |= 8;
+    fade_flags |= 8;
     Bgm_PlayDelayed(0x14, 0x3C);
     while (D_8007A170 == 5) {
         Input_ReadController(input_primary_port);
@@ -1059,15 +1059,15 @@ void Core_RunEndingLoop(void) {
 
 void Fade_Start(s32 arg0, s32 arg1, void *arg2);
 
-extern u8 D_8004F5A0[];
-extern u8 D_8004F5DC[];
-extern u8 D_8004F5E0[];
-extern u8 D_8004F61C[];
-extern u8 D_8004F620[];
-extern u8 D_8004F69C[];
-extern u8 D_8004F6C0[];
-extern u8 D_8004F73C[];
-extern u8 D_8008CA58[];
+extern u8 fade_black_ramp[];
+extern u8 fade_black_ramp_end[];
+extern u8 fade_grey_ramp[];
+extern u8 fade_grey_ramp_end[];
+extern u8 fade_black_ramp_slow[];
+extern u8 fade_black_ramp_slow_end[];
+extern u8 fade_grey_ramp_slow[];
+extern u8 fade_grey_ramp_slow_end[];
+extern u8 fade_grey_ramp_256[];
 extern u8 D_8008CE54[];
 
 void Gfx_WaitForFrameMessage(s16 arg0) {
@@ -1081,16 +1081,16 @@ void Gfx_WaitForFrameMessage(s16 arg0) {
 void Fade_StartTransitionIn(void) {
     switch (D_8007A178) {
         case 0:
-            Fade_Start(0x10, 4, D_8004F5DC);
+            Fade_Start(0x10, 4, fade_black_ramp_end);
             break;
         case 1:
-            Fade_Start(0x10, 4, D_8004F61C);
+            Fade_Start(0x10, 4, fade_grey_ramp_end);
             break;
         case 2:
-            Fade_Start(0x20, 4, D_8004F69C);
+            Fade_Start(0x20, 4, fade_black_ramp_slow_end);
             break;
         case 3:
-            Fade_Start(0x20, 4, D_8004F73C);
+            Fade_Start(0x20, 4, fade_grey_ramp_slow_end);
             break;
         case 4:
             Fade_Start(0x100, 4, D_8008CE54);
@@ -1101,19 +1101,19 @@ void Fade_StartTransitionIn(void) {
 void Fade_StartTransitionOut(void) {
     switch (D_8007A178) {
         case 0:
-            Fade_Start(0xF, 2, D_8004F5A0);
+            Fade_Start(0xF, 2, fade_black_ramp);
             break;
         case 1:
-            Fade_Start(0xF, 2, D_8004F5E0);
+            Fade_Start(0xF, 2, fade_grey_ramp);
             break;
         case 2:
-            Fade_Start(0x1F, 2, D_8004F620);
+            Fade_Start(0x1F, 2, fade_black_ramp_slow);
             break;
         case 3:
-            Fade_Start(0x1F, 2, D_8004F6C0);
+            Fade_Start(0x1F, 2, fade_grey_ramp_slow);
             break;
         case 4:
-            Fade_Start(0xFF, 2, D_8008CA58);
+            Fade_Start(0xFF, 2, fade_grey_ramp_256);
             break;
     }
 }

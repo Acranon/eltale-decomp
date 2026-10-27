@@ -231,8 +231,8 @@ extern u8 D_A77F10[];
 extern u8 D_D2E2F0[];
 extern u8 D_802A0000[];
 extern u8 D_8020E6F0[];
-extern RomRange D_80056880[];
-extern u8 D_800568B8[];
+extern RomRange npc_area_set_rom_ranges[];
+extern u8 npc_area_entry_message[];
 extern u16 D_8007A172;
 void Math_RotateVec2(f32, f32 *);
 
@@ -265,7 +265,7 @@ void Npc_InitArea(void) {
         }
         D_8007AB74 = 0;
         if (D_8007A172 == 1) {
-            Npc_SetMessage(0, D_800568B8);
+            Npc_SetMessage(0, npc_area_entry_message);
             Text_OpenWindow(1);
         }
     }
@@ -376,7 +376,7 @@ void func_80009764(s32 arg0) {
     u32 start;
     u32 end;
 
-    D_8007AB70 = &D_80056880[arg0];
+    D_8007AB70 = &npc_area_set_rom_ranges[arg0];
     Dma_ReadRom(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
     Dma_ReadRom(D_A70350, D_802A0000, D_A77F10 - D_A70350);
     start = D_8007AB70->start;

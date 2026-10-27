@@ -1049,7 +1049,7 @@ typedef struct {
     /* 0x2C */ Unk80018480Cfg* cfg;
 } Unk80018480;
 extern s32 D_8007AA10;
-extern u8 D_8004F760[];
+extern u8 fade_damage_flash[];
 u16 Magic_CalculateEffectDamage(Unk80018480Cfg*, Actor17360*);
 void Fade_Start(s32, s32, u8*);
 void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
@@ -1065,7 +1065,7 @@ void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
         if (D_8007AA10 & 0x1000) {
             if (Math_Rand((D_8007AA10 & 0x10000) ? 4 : 0x20) == 0) {
                 dmg += (dmg + 1) >> 1;
-                Fade_Start(4, 0, D_8004F760);
+                Fade_Start(4, 0, fade_damage_flash);
                 flag = 0x4000;
             }
         }
@@ -1075,7 +1075,7 @@ void Magic_ApplyEffectDamage(Unk80018480* arg0, Actor17360* arg1) {
     } else {
         if (Math_Rand(0x20) == 0) {
             dmg += (dmg + 1) >> 1;
-            Fade_Start(4, 0, D_8004F760);
+            Fade_Start(4, 0, fade_damage_flash);
             flag = 0x4000;
         }
         Player_TakeDamage(dmg, arg0->cfg->unk2 | flag, (s32)arg0->unk24);

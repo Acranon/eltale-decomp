@@ -151,7 +151,7 @@ typedef struct {
     /* 0x13C */ u8 unk13C[4];
 } PlayerState; /* size 0x140 */
 
-/* per-character data, from the D_80055D40 table */
+/* per-character data, from the player_char_data table */
 typedef struct {
     /* 0x000 */ u8 unk0[0x56];
     /* 0x056 */ s16 unk56;
@@ -269,8 +269,8 @@ f32 sqrtf(f32 x);
 extern s32 D_8004DCA0;
 extern u16 D_800842E8;
 extern u16 input_pressed_buttons;
-extern CharData *D_80055D40[];
-extern RomRange D_80055F98[];
+extern CharData *player_char_data[];
+extern RomRange player_anim_rom_ranges[];
 extern Monster D_8007B908[];
 extern u16 battle_flags;
 extern u16 battle_turn_delay;
@@ -295,7 +295,7 @@ extern Unk803AAAA2 D_803AAAA2[];
 extern u8 D_869620[];
 extern u8 D_86F6F0[];
 extern u8 D_80206000[];
-extern ActorStats D_80055D44;
+extern ActorStats player_default_stats;
 
 /* This file's .bss, 8007A8F0..8007AB70, in address order. IDO lays .bss out
  * in the order names are first declared, so this block comes before any other
@@ -391,7 +391,7 @@ extern f32 D_8007A900;
 
 void Player_Init(void) {
     Dma_ReadRom(D_869620, D_80206000, D_86F6F0 - D_869620);
-    D_8007A9D0 = D_80055D44;
+    D_8007A9D0 = player_default_stats;
     D_8007AA08.actor.scale = D_8007A9D0.unk20;
     D_8007AA08.actor.unk28 = D_8007A9D0.unk18;
     D_8007AA08.actor.unk50 = D_8007A9D0.unk2;
@@ -441,7 +441,7 @@ void Player_Spawn(void) {
     Unk8007C290 *pos;
 
     D_8004DCA0 &= ~0x10000;
-    cd = D_80055D40[D_8007AA08.actor.unk50];
+    cd = player_char_data[D_8007AA08.actor.unk50];
     D_8007AA08.unk0 = 0;
     D_8007AA08.unk128 = 0;
     D_8007AA08.actor.x = D_8007A98C;
@@ -571,7 +571,7 @@ typedef struct {
     /* 0xC */ f32 rot;
 } Unk80056088; /* size 0x10 */
 
-extern Unk80056088 D_80056088[];
+extern Unk80056088 player_save_spawn_points[];
 extern Unk80056088 D_80056198[];
 extern s32 D_800842C4;
 extern s32 D_800842C8;
@@ -584,10 +584,10 @@ void Player_SetSpawnFromSaveTable(void) {
     D_800842C8 = D_800842C0;
     D_80084300.unk8 = 0;
     for (i = 0; i < 17; i++) {
-        if (D_800842BC == D_80056088[i].unk0 && D_800842C0 == D_80056088[i].unk2) {
-            D_8007A98C = D_80056088[i].x;
-            D_8007A990 = D_80056088[i].y;
-            D_8007A994 = D_80056088[i].rot;
+        if (D_800842BC == player_save_spawn_points[i].unk0 && D_800842C0 == player_save_spawn_points[i].unk2) {
+            D_8007A98C = player_save_spawn_points[i].x;
+            D_8007A990 = player_save_spawn_points[i].y;
+            D_8007A994 = player_save_spawn_points[i].rot;
             D_80084300.unk8 = -1;
             break;
         }
@@ -630,8 +630,8 @@ extern s32 D_8007A9BC;
 extern f32 D_8007A8F0;
 extern s32 hud_npc_marker_screen_y;
 extern s16 hud_element_input_timer;
-extern u8 D_8004F5A0[];
-extern u8 D_8004F5B4[];
+extern u8 fade_black_ramp[];
+extern u8 fade_black_ramp_dim[];
 extern void (*D_8004DCB0[])(Actor *, PlayerState *, CharData *);
 #ifdef NON_MATCHING
 /* retail returns the unmasked index + 1 in v0 */
@@ -665,7 +665,7 @@ void Player_Update(void) {
     CharData *cd;
     u8 *s;
 
-    cd = D_80055D40[p->actor.unk50];
+    cd = player_char_data[p->actor.unk50];
     if (p->unk14->unk4 * 3 < p->unk14->unk6) {
         D_8007A910 = 0x19;
     } else {
@@ -776,7 +776,7 @@ void Player_Update(void) {
         } else if (Player_CanAct(&D_8007AA08, &D_8007AA20) != 0) {
             if (!(D_8004DCA0 & 4) && (input_pressed_buttons & 0x10)) {
                 D_8004DCA0 ^= 1;
-                Fade_Start(6, 2, D_8004F5A0);
+                Fade_Start(6, 2, fade_black_ramp);
                 Sfx_Play(0, 1, 0xFF);
                 p->actor.unk60 |= 1;
             }
@@ -791,7 +791,7 @@ void Player_Update(void) {
     } else if (D_8004DCA0 & 1) {
         if (input_pressed_buttons & 0x4010) {
             D_8004DCA0 ^= 1;
-            Fade_Start(6, 4, D_8004F5B4);
+            Fade_Start(6, 4, fade_black_ramp_dim);
             Sfx_Play(0, 2, 0xFF);
             p->actor.unk60 &= ~1;
         }
@@ -870,7 +870,7 @@ void Player_Draw(void *arg0) {
     } else {
         flag = 0;
     }
-    anims = (AnimEntry *)D_80055D40[D_8007AA70];
+    anims = (AnimEntry *)player_char_data[D_8007AA70];
     Player_LoadAnim(&D_8007AA20);
     Anim_DrawModel(flag, &D_8007AA20, &anims[D_8007AA72], arg0);
     Anim_AdvanceFrame(D_8007AA78, &D_8007AA20, &anims[D_8007AA72]);
@@ -901,7 +901,7 @@ void Player_InitBattle(void) {
 
     D_8007A9B4 = D_8007A9B8 = 0;
     stats = D_8007AA08.actor.unk64;
-    cd = D_80055D40[D_8007AA08.actor.unk50];
+    cd = player_char_data[D_8007AA08.actor.unk50];
     D_8007AA08.unkC = (f32)(u32)stats->unkC * 0.2857 + 17.0;
     D_8007AA08.unk84 = 0;
     D_8007AA08.unk110 = 0;
@@ -1979,7 +1979,7 @@ void Player_StartOpenChest(PlayerState *arg0, Actor *arg1, s32 arg2) {
 }
 
 void Player_StartUseItem(u8 arg0) {
-    CharData *cd = D_80055D40[D_8007AA08.actor.unk50];
+    CharData *cd = player_char_data[D_8007AA08.actor.unk50];
 
     D_8007AA08.unk11C = arg0;
     D_8007AA08.unk0 = 0xC;
@@ -2018,7 +2018,7 @@ void Player_LoadAnim(Actor *arg0) {
 
     if (D_8004DCF8 != arg0->unk52) {
         D_8004DCF8 = arg0->unk52;
-        r = &D_80055F98[D_8004DCF8];
+        r = &player_anim_rom_ranges[D_8004DCF8];
         Dma_ReadRom(r->start, (void *) 0x80200000, r->end - r->start);
     }
 }
@@ -2112,7 +2112,7 @@ s32 Player_RollHitOnEnemy(s32 arg0, Actor *arg1) {
 }
 
 extern s32 D_8004DCFC[];
-extern u8 D_8004F760[];
+extern u8 fade_damage_flash[];
 void Fade_Start(s32 arg0, u16 arg1, void *arg2);
 
 u16 Player_CalcMeleeDamage(PlayerState *arg0) {
@@ -2139,7 +2139,7 @@ u16 Player_CalcMeleeDamage(PlayerState *arg0) {
     val = (val * arg0->unk10E) >> 4;
     if (Math_Rand((arg0->unk8 & 0x10000) ? 4 : 0x20) == 0) {
         val += val >> 1;
-        Fade_Start(4, 0, D_8004F760);
+        Fade_Start(4, 0, fade_damage_flash);
         arg0->unk8 |= 0x400;
     }
     if (arg0->unk84 & 1) {
@@ -2160,7 +2160,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
     s32 flags;
 
     if (p->unk0 != 6) {
-        cd = D_80055D40[p->actor.unk50];
+        cd = player_char_data[p->actor.unk50];
         if (dmg != 0) {
             if (arg1 & 0x8000) {
                 angle = Math_Atan2(arg2->x - D_8007AA20.x, arg2->z - D_8007AA20.z) - D_8007AA20.rot;
@@ -2235,7 +2235,7 @@ void Player_StartMissReaction(void) {
 
     if (p->unk0 != 6) {
         if (p->unk14->unk4 != 0) {
-            cd = D_80055D40[p->actor.unk50];
+            cd = player_char_data[p->actor.unk50];
             p->unk0 = 3;
             p->unk4 = cd->unk56;
             p->actor.unk60 |= 3;
@@ -2372,8 +2372,8 @@ void Player_AddTurnMoveAgilityXP(PlayerState *arg0) {
     }
 }
 
-extern u32 D_80055D7C[];
-extern u16 D_80055F0C[];
+extern u32 player_level_exp_table[];
+extern u16 player_stat_xp_costs[];
 extern f32 D_8007A9A8;
 extern s32 D_8007A9BC;
 extern u8 D_8007A9BF;
@@ -2402,8 +2402,8 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
         }
     }
     if (a->unk64->unk6 < 500) {
-        if (p->unk14->unk28 >= D_80055F0C[p->unk14->unk30]) {
-            p->unk14->unk28 -= D_80055F0C[p->unk14->unk30];
+        if (p->unk14->unk28 >= player_stat_xp_costs[p->unk14->unk30]) {
+            p->unk14->unk28 -= player_stat_xp_costs[p->unk14->unk30];
             a->unk64->unk6++;
             a->unk64->unk4++;
             if (p->unk14->unk30 < 0x36) {
@@ -2416,7 +2416,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
         p->unk14->unk28 = 0;
     }
     if (a->unk64->unkA < 500) {
-        cost = D_80055F0C[p->unk14->unk31];
+        cost = player_stat_xp_costs[p->unk14->unk31];
         if (p->unk8 & 0x4000) {
             cost *= 3;
         } else {
@@ -2436,7 +2436,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
         p->unk14->unk2A = 0;
     }
     if (a->unk64->unkC < 0xFF) {
-        cost = D_80055F0C[p->unk14->unk32];
+        cost = player_stat_xp_costs[p->unk14->unk32];
         if (p->unk8 & 0x8000) {
             cost = (f32)cost * 0.8;
         }
@@ -2453,7 +2453,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
         p->unk14->unk2C = 0;
     }
     if (a->unk64->unkE < 0xFF) {
-        cost = D_80055F0C[p->unk14->unk33];
+        cost = player_stat_xp_costs[p->unk14->unk33];
         if (p->unk8 & 0x2000) {
             cost = (f32)cost * 0.8;
         }
@@ -2472,8 +2472,8 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
     if (!(D_8004DCA0 & 8)) {
         if (p->unk14->unk34 >= 0x62) {
             a->unk64->unk10 = 0;
-        } else if (a->unk64->unk10 >= D_80055D7C[p->unk14->unk34]) {
-            a->unk64->unk10 -= D_80055D7C[p->unk14->unk34];
+        } else if (a->unk64->unk10 >= player_level_exp_table[p->unk14->unk34]) {
+            a->unk64->unk10 -= player_level_exp_table[p->unk14->unk34];
             if (p->unk14->unk34 < 0x62) {
                 p->unk14->unk34++;
             }

@@ -99,7 +99,7 @@ Unk80085968 D_80085968;
 u8 D_80085988[0x20];
 u8 D_800859A8[8];
 
-extern u8 D_8004F770[];
+extern u8 math_bit_masks[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
 extern Unk8010FDC4 D_8010FDC4[];
@@ -309,5 +309,5 @@ void Item_BuildMessage(s32 arg0) {
 }
 
 u8 Chest_IsOpened(u16 arg0) {
-    return D_80085988[arg0 >> 3] & D_8004F770[arg0 & 7];
+    return D_80085988[arg0 >> 3] & math_bit_masks[arg0 & 7];
 }

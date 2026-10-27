@@ -108,7 +108,7 @@ u8 D_80090358[0x18];    /* the rest of that 0x80-byte buffer: unreferenced */
 u8 save_menu_state_read_scratch[0xE0];
 
 extern s32 D_8004DCA0;
-extern s8 D_80060CB0;
+extern s8 menu_bgm_volume_option;
 extern s8 D_800616B0;
 extern u16 D_8007A9AC;
 extern u16 D_8007A9AE;
@@ -127,12 +127,12 @@ extern u16 D_80084990;
 extern u16 D_80084992;
 extern u8 D_80085988[];
 extern u8 D_80085A98[];
-extern u8 D_8008C9B8[];
+extern u8 item_inventory[];
 extern Unk80092E48 pak_game_file_scans[];
 extern Gfx text_glyph_setup_dl[];
 extern s16 D_8007A170;
 extern Gfx *D_8007A184;
-extern u16 D_8008FB3E;
+extern u16 menu_flags;
 extern s16 save_menu_choice_rects[][4];
 extern u8 *save_menu_choice_messages[];
 extern u8 D_8008FB81[];
@@ -180,8 +180,8 @@ void Sfx_Play(s32, s32, s32);
 
 #ifdef NON_MATCHING
 extern u8 *save_menu_slot_label_ptrs[];
-extern s8 D_80060D64[];
-extern s32 D_8008FB44;
+extern s8 menu_wobble_offsets[];
+extern s32 menu_frame_counter;
 void Menu_DrawNumber(s32, s32, s32, u32, s32);
 void Menu_DrawNumberZeroPad(s32, s32, s32, u32, s32);
 void Menu_PrintNumber(s32, s32, s32, u32);
@@ -189,7 +189,7 @@ void Menu_PrintNumber(s32, s32, s32, u32);
 
 void SaveMenu_Init(s32 arg0) {
     D_8007A170 = 2;
-    D_8008FB3E = D_8008FB3E | arg0 | 0x4000;
+    menu_flags = menu_flags | arg0 | 0x4000;
     save_menu_flags = 0x1000;
     save_menu_choice_cursor = 0xFF;
     save_menu_selected_slot = 0;
@@ -241,7 +241,7 @@ void SaveMenu_Update(void) {
         SaveMenu_DrawOperationPanel();
     }
     if (save_menu_flags & 0x8000) {
-        D_8008FB3E &= 0x7FFF;
+        menu_flags &= 0x7FFF;
     }
 }
 
@@ -269,7 +269,7 @@ void SaveMenu_DrawOperationPanel(void) {
 }
 
 void SaveMenu_CheckControllerPak(void) {
-    s32 mode = D_8008FB3E & 0xC;
+    s32 mode = menu_flags & 0xC;
     s32 err;
     Unk80092E48 *p;
 
@@ -377,7 +377,7 @@ void SaveMenu_UpdateDialog(void) {
     y = save_menu_dialog_rects[save_menu_dialog_index][1];
     w = save_menu_dialog_rects[save_menu_dialog_index][2];
     h = save_menu_dialog_rects[save_menu_dialog_index][3];
-    if (D_8008FB3E & 4) {
+    if (menu_flags & 4) {
         msg = save_menu_dialog_messages_flag4[save_menu_dialog_index];
     } else {
         msg = save_menu_dialog_messages_default[save_menu_dialog_index];
@@ -889,7 +889,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         }
     }
     SaveMenu_SetTextDrawState();
-    flag = D_80060D64[(D_8008FB44 >> 2) & 0xF];
+    flag = menu_wobble_offsets[(menu_frame_counter >> 2) & 0xF];
     if (save_menu_selected_slot >= 2) {
         Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
         Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
@@ -948,7 +948,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
             save_menu_stick_repeat_counter = 0;
         }
         if (input_pressed_buttons & 0x8000) {
-            idx = D_8008FB3E & 0xC;
+            idx = menu_flags & 0xC;
             Sfx_Play(0, 1, 0xFF);
             switch (idx) {
                 case 0:
@@ -1222,7 +1222,7 @@ void SaveMenu_RefreshFileList(void) {
             n++;
         }
     }
-    if (D_8008FB3E & 4) {
+    if (menu_flags & 4) {
         if (pak_game_file_scans[cont].unk13 >= 2 && !(pak_game_file_scans[cont].unk0 & 0x2000)) {
             save_menu_file_entries[n].unk0 = -2;
         }
@@ -1255,7 +1255,7 @@ void SaveMenu_RefreshFileList(void) {
 void SaveMenu_SetTextDrawState(void) {
     gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
     gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
-    D_8008FB3E &= ~0x10;
+    menu_flags &= ~0x10;
 }
 
 void SaveMenu_DrawBackground(void) {
@@ -1303,7 +1303,7 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     e->unk5E = D_8007A9AE;
     e->unk60 = D_8007A9B0;
     e->unk62 = D_800616B0;
-    e->unk63 = D_80060CB0;
+    e->unk63 = menu_bgm_volume_option;
     if (D_8004DCA0 & 0x20000) {
         e->unk64 = 1;
     } else {
@@ -1318,7 +1318,7 @@ void SaveMenu_CaptureGameState(s32 arg0) {
         *d++ = *s++;
     }
     d = D_80090258;
-    for (s = D_8008C9B8, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
+    for (s = item_inventory, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
         *d++ = *s++;
     }
     d = D_800902EF;
@@ -1348,7 +1348,7 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     D_8007A9AE = e->unk5E;
     D_8007A9B0 = e->unk60;
     D_800616B0 = e->unk62;
-    D_80060CB0 = e->unk63;
+    menu_bgm_volume_option = e->unk63;
     if (e->unk64 != 0) {
         D_8004DCA0 |= 0x20000;
     }
@@ -1360,7 +1360,7 @@ void SaveMenu_RestoreGameState(s32 arg0) {
         *d++ = *s++;
     }
     s = D_80090258;
-    for (d = D_8008C9B8, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
+    for (d = item_inventory, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
         *d++ = *s++;
     }
     s = D_800902EF;

@@ -127,7 +127,7 @@ extern s32 D_800842C0;
 f32 D_800842F0;
 extern Vec2f D_80084320;
 extern u16 battle_flags;
-extern u8 D_8008C9B8[];
+extern u8 item_inventory[];
 
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) {
     u16 *list;
@@ -527,7 +527,7 @@ s32 Exit_IsEnabled(Unk24 *arg0) {
 
     if (flags & 0x30) {
         for (i = 0; i < 0x96; i++) {
-            if (arg0->id == D_8008C9B8[i]) {
+            if (arg0->id == item_inventory[i]) {
                 break;
             }
         }

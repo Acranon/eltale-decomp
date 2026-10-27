@@ -4,36 +4,36 @@
 # type = element type of the C array (u8, u16, u32; big-endian).
 
 # main .data 80055B40..8006CD00 (ROM = vram - 0x7FFFF400)
-- { name: D_800568B8, rom: 0x574B8, size: 0x2F8, type: u8 }            # message text
-- { name: D_800577BC, rom: 0x583BC, size: 0x23C, type: u32 }           # animation keyframes
+- { name: npc_area_entry_message, rom: 0x574B8, size: 0x2F8, type: u8 }            # message text
+- { name: mapobjanim_type23_keys, rom: 0x583BC, size: 0x23C, type: u32 }           # animation keyframes
 - { name: D_80057A18, rom: 0x58618, size: 0x30C, type: u32 }           # animation keyframes
-- { name: D_80057D44, rom: 0x58944, size: 0x23C, type: u32 }           # animation keyframes
-- { name: D_80057FA0, rom: 0x58BA0, size: 0x68, type: u32 }            # animation keyframes
-- { name: D_80058028, rom: 0x58C28, size: 0x9C, type: u32 }            # animation keyframes
-- { name: D_800580C4, rom: 0x58CC4, size: 0xD0, type: u32 }            # animation keyframes
-- { name: D_80058194, rom: 0x58D94, size: 0x104, type: u32 }           # animation keyframes
-- { name: D_80058298, rom: 0x58E98, size: 0x104, type: u32 }           # animation keyframes
-- { name: D_8005841C, rom: 0x5901C, size: 0x400, type: u16 }           # palette, 512 colours
-- { name: D_8005881C, rom: 0x5941C, size: 0x600, type: u8 }            # texture
-- { name: D_80058E1C, rom: 0x59A1C, size: 0x600, type: u8 }            # texture
-- { name: D_8005941C, rom: 0x5A01C, size: 0x600, type: u8 }            # texture
-- { name: D_80059A1C, rom: 0x5A61C, size: 0x600, type: u8 }            # texture
-- { name: D_8005A01C, rom: 0x5AC1C, size: 0x600, type: u8 }            # texture
-- { name: D_8005A61C, rom: 0x5B21C, size: 0x600, type: u8 }            # texture
-- { name: D_8005AC1C, rom: 0x5B81C, size: 0x600, type: u8 }            # texture
-- { name: D_8005B21C, rom: 0x5BE1C, size: 0x200, type: u8 }            # texture
-- { name: D_8005B41C, rom: 0x5C01C, size: 0x400, type: u16 }           # palette, 512 colours
-- { name: D_8005B81C, rom: 0x5C41C, size: 0x600, type: u8 }            # texture
-- { name: D_8005BE1C, rom: 0x5CA1C, size: 0x600, type: u8 }            # texture
-- { name: D_8005C41C, rom: 0x5D01C, size: 0x600, type: u8 }            # texture
-- { name: D_8005CA1C, rom: 0x5D61C, size: 0x600, type: u8 }            # texture
-- { name: D_8005D01C, rom: 0x5DC1C, size: 0x600, type: u8 }            # texture
-- { name: D_8005D61C, rom: 0x5E21C, size: 0x600, type: u8 }            # texture
-- { name: D_8005DC1C, rom: 0x5E81C, size: 0x600, type: u8 }            # texture
-- { name: D_8005E21C, rom: 0x5EE1C, size: 0x200, type: u8 }            # texture
-- { name: D_8005E5F8, rom: 0x5F1F8, size: 0x400, type: u16 }           # palette, 512 colours
-- { name: D_8005E9F8, rom: 0x5F5F8, size: 0x2000, type: u8 }           # texture
-- { name: D_80060AB8, rom: 0x616B8, size: 0x100, type: u8 }            # texture
+- { name: mapobjanim_type23_odd_keys, rom: 0x58944, size: 0x23C, type: u32 }           # animation keyframes
+- { name: mapobjanim_type4_keys, rom: 0x58BA0, size: 0x68, type: u32 }            # animation keyframes
+- { name: mapobj_loop_anim0_keys, rom: 0x58C28, size: 0x9C, type: u32 }            # animation keyframes
+- { name: mapobj_loop_anim1_keys, rom: 0x58CC4, size: 0xD0, type: u32 }            # animation keyframes
+- { name: mapobj_loop_anim2_keys, rom: 0x58D94, size: 0x104, type: u32 }           # animation keyframes
+- { name: mapobj_loop_anim3_keys, rom: 0x58E98, size: 0x104, type: u32 }           # animation keyframes
+- { name: mapobj_kind11_tlut, rom: 0x5901C, size: 0x400, type: u16 }           # palette, 512 colours
+- { name: mapobj_kind11_tex_0, rom: 0x5941C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind11_tex_1, rom: 0x59A1C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind11_tex_2, rom: 0x5A01C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind11_tex_3, rom: 0x5A61C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind11_tex_4, rom: 0x5AC1C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind11_tex_5, rom: 0x5B21C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind11_tex_6, rom: 0x5B81C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind11_tex_7, rom: 0x5BE1C, size: 0x200, type: u8 }            # texture
+- { name: mapobj_kind12_tlut, rom: 0x5C01C, size: 0x400, type: u16 }           # palette, 512 colours
+- { name: mapobj_kind12_tex_0, rom: 0x5C41C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind12_tex_1, rom: 0x5CA1C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind12_tex_2, rom: 0x5D01C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind12_tex_3, rom: 0x5D61C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind12_tex_4, rom: 0x5DC1C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind12_tex_5, rom: 0x5E21C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind12_tex_6, rom: 0x5E81C, size: 0x600, type: u8 }            # texture
+- { name: mapobj_kind12_tex_7, rom: 0x5EE1C, size: 0x200, type: u8 }            # texture
+- { name: mapobj_arc_sprite_tlut, rom: 0x5F1F8, size: 0x400, type: u16 }           # palette, 512 colours
+- { name: mapobj_arc_sprite_tex, rom: 0x5F5F8, size: 0x2000, type: u8 }           # texture
+- { name: mapobj_drop_sprite_tex, rom: 0x616B8, size: 0x100, type: u8 }            # texture
 - { name: D_80061644, rom: 0x62244, size: 0x5, type: u8 }              # message text
 - { name: D_80061650, rom: 0x62250, size: 0xE, type: u8 }                  # message text (func_80030D5C)
 - { name: text_font_tlut, rom: 0x62450, size: 0x200, type: u16 }           # palette, 256 colours
@@ -270,8 +270,8 @@
 - { name: D_8004F284, rom: 0x4FE84, size: 0x1C, type: u8 }                 # message text
 - { name: hud_digit_glyph_data, rom: 0x4FEC4, size: 0x8, type: u8 }                  # message text
 - { name: D_8004F488, rom: 0x50088, size: 0x10, type: u8 }                 # message text
-- { name: D_8004F780, rom: 0x50380, size: 0x124, type: f32 }                # 73 pitch ratios, 0.25 .. 2.0
-- { name: D_8004F8A4, rom: 0x504A4, size: 0x6084, type: u32 }               # sound sequence records (D_80055A24 points into it)
+- { name: sfx_pitch_table, rom: 0x50380, size: 0x124, type: f32 }                # 73 pitch ratios, 0.25 .. 2.0
+- { name: sfx_script_data, rom: 0x504A4, size: 0x6084, type: u32 }               # sound sequence records (sfx_scripts points into it)
 
 # ovl_ending .data (ROM = vram - 0x8020F690 + 0xE25C50)
 - { name: D_80210810_ovl_ending, rom: 0xE26DD0, size: 0x200, type: u16 }    # palette, 256 colours

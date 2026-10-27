@@ -136,19 +136,19 @@ D_80084B7C = D_80084B78 + 0x04;
 /* D2: labels inside objects that src/E2A0.c defines (8004DD70..8004DED0). */
 D_8004DD8B = D_8004DD88 + 0x3;
 /* D2: labels inside objects that src/29150.c defines (80055930..80055B40). */
-D_800559B6 = D_800559B4 + 0x2;
-D_800559C8 = D_800559C4 + 0x4;
-D_800559E4 = D_800559D4 + 0x10;
-D_800559F8 = D_800559E8 + 0x10;
-D_80055A13 = D_80055A10 + 0x3;
+D_800559B6 = audio_seq_volume_limit + 0x2;
+D_800559C8 = audio_seq_volumes + 0x4;
+D_800559E4 = sfx_channel_sound + 0x10;
+D_800559F8 = sfx_channel_timer + 0x10;
+D_80055A13 = sfx_channel_pan + 0x3;
 
 /* D2: labels inside objects that src/25B20.c defines (8008C190..8008CA50):
- * D_8008C1B8[0x800], D_8008C9B8[0x97]. */
-D_8008C9B7 = D_8008C1B8 + 0x7FF;
-D_8008C9B9 = D_8008C9B8 + 0x1;
-D_8008C9C0 = D_8008C9B8 + 0x8;
-D_8008CA4D = D_8008C9B8 + 0x95;
-D_8008CA4E = D_8008C9B8 + 0x96;
+ * item_icon_cache_tex[0x800], item_inventory[0x97]. */
+D_8008C9B7 = item_icon_cache_tex + 0x7FF;
+D_8008C9B9 = item_inventory + 0x1;
+D_8008C9C0 = item_inventory + 0x8;
+D_8008CA4D = item_inventory + 0x95;
+D_8008CA4E = item_inventory + 0x96;
 
 /* 15150.c: interior labels of D_80085B80, D_80085C10, the camera D_80085E48 and D_80085F68. */
 D_80085C00 = D_80085B80 + 0x80;
@@ -193,19 +193,19 @@ D_8006CDF0 = osViModeTable + 0xA0;
 D_8006D6B0 = osViModeTable + 0x960;
 
 /* D2: labels inside objects that src/2B530.c defines (80055D40..80061650). */
-D_8005685A = D_80056718 + 0x142;
-D_8005685C = D_80056718 + 0x144;
-D_8005E51C = D_8005E508 + 0x14;
-D_8005E5AC = D_8005E5A0 + 0xC;
-D_80060C4C = D_80060C48 + 0x4;
+D_8005685A = enemy_effect_defs + 0x142;
+D_8005685C = enemy_effect_defs + 0x144;
+D_8005E51C = mapobj_kind12_setup_dl + 0x14;
+D_8005E5AC = mapobj_animtex_dls + 0xC;
+D_80060C4C = map_backdrop_defs + 0x4;
 
 /* D2: labels inside objects that src/272D0.c defines (8008CA50..8008CE60). */
-D_8008CE54 = D_8008CA58 + 0x3FC;
+D_8008CE54 = fade_grey_ramp_256 + 0x3FC;
 
 /* D2: labels inside objects that src/29150.c defines (8008CEC0..8008FAF0), used by Audio_ThreadMain. */
-D_8008F440 = D_8008F428 + 0x18;
-D_8008F7C4 = D_8008F7A8 + 0x1C;
-D_8008F960 = D_8008F7A8 + 0x1B8;
+D_8008F440 = audio_syn_config + 0x18;
+D_8008F7C4 = audio_seq_slots + 0x1C;
+D_8008F960 = audio_seq_slots + 0x1B8;
 
 /* D2: labels inside objects that src/30600.c defines (8008FB70..80090450). */
 D_8008FB81 = save_menu_file_entries + 0x1;

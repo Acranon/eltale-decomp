@@ -6,8 +6,8 @@
  */
 
 extern u8 D_80085988[];
-extern u8 D_8004F770[];
+extern u8 math_bit_masks[];
 
 void Chest_SetOpened(u16 arg0) {
-    D_80085988[arg0 >> 3] |= D_8004F770[arg0 & 7];
+    D_80085988[arg0 >> 3] |= math_bit_masks[arg0 & 7];
 }
