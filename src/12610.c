@@ -193,7 +193,60 @@ void func_80011A60(void) {
     }
 }
 
+#ifdef NON_MATCHING
+/* &D_8004DEF4 held in a register instead of separate %hi/%lo loads, temporaries rotated (register allocation); code is equivalent */
+void func_80011AE0(void) {
+    Unk8004DEF4 *p;
+    s32 i;
+    s32 n;
+    u16 *src;
+    u16 *dst;
+    Unk80084994Elem *e;
+
+    /* D_8004DED0[0..2] and D_8004DEF4 form one 4-entry table; the walk goes back from its last entry */
+    D_80084334 = D_8004DEF4[0].unk0;
+    p = D_8004DEF4;
+    i = 3;
+    if (D_80084980 < D_8004DEF4[0].unk0) {
+        do {
+            p--;
+            n = i--;
+            if (n == 0) {
+                break;
+            }
+        } while (D_80084980 < p->unk0);
+    }
+    if (i < 0) {
+        p = D_8004DEF4;
+        D_80084330 = 3;
+    } else {
+        D_80084330 = i;
+    }
+    src = D_800808B0[p->unk4];
+    dst = D_800806B0;
+    i = 0x100;
+    do {
+        *dst++ = *src++;
+        i--;
+    } while (i != 0);
+    D_8008433C = 0;
+    if (++D_80084330 >= 4) {
+        D_80084330 = 0;
+    }
+    if (D_8007C280 & 2) {
+        D_80084988 = D_80084980;
+        D_8008498C = D_80084984;
+    } else {
+        e = &D_80084994->unk0[D_80084994->unk4 - 1];
+        D_80084988 = 0;
+        D_8008498C = e->unk0;
+    }
+    func_80012A60();
+    D_80084338 = 0;
+}
+#else
 #pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011AE0.s")
+#endif
 
 void func_80011C60(void) {
     Unk8004DEF4 *p;
@@ -247,7 +300,67 @@ void func_80011EA0(s32 arg0) {
     D_80084988 = D_80084980;
 }
 
+#ifdef NON_MATCHING
+/* 8-byte frame with one saved register where retail is a no-frame leaf, light pointers rematerialized differently (register allocation); code is equivalent */
+void func_80011EF4(s32 t, Unk80084994 *arg1) {
+    KeyTrack *track = (KeyTrack *) arg1;
+    Keyframe *k;
+    Keyframe *prev;
+    s32 span;
+    s32 off;
+    s32 rem;
+    Color3 *ambient = (Color3 *) D_80084B18[0];
+    Color3 *light;
+    FogSet *fog = (FogSet *) D_80084B78;
+    Color3 *before;
+    Color3 *after;
+
+    k = track->frames;
+    if (track->count == 1) {
+        *ambient = k->amb;
+        light = (Color3 *) D_80084B18[1]; /* D_80084B24 */
+        *light++ = k->lights.l[0];
+        *light++ = k->lights.l[1];
+        *light++ = k->lights.l[2];
+        *fog = k->fog;
+        return;
+    }
+    while (t >= k->time) {
+        k++;
+    }
+    prev = k - 1;
+    span = k->time - prev->time;
+    off = t - prev->time;
+    rem = span - off;
+    light = (Color3 *) D_80084B18[1]; /* D_80084B24 */
+    before = &prev->amb;
+    after = &k->amb;
+    ambient->r = (before->r * rem + after->r * off) / span;
+    ambient->g = (before->g * rem + after->g * off) / span;
+    ambient->b = (before->b * rem + after->b * off) / span;
+    before++;
+    after++;
+    light->r = (before->r * rem + after->r * off) / span;
+    light->g = (before->g * rem + after->g * off) / span;
+    light->b = (before->b * rem + after->b * off) / span;
+    light++;
+    before++;
+    after++;
+    light->r = (before->r * rem + after->r * off) / span;
+    light->g = (before->g * rem + after->g * off) / span;
+    light->b = (before->b * rem + after->b * off) / span;
+    light++;
+    before++;
+    after++;
+    light->r = (before->r * rem + after->r * off) / span;
+    light->g = (before->g * rem + after->g * off) / span;
+    light->b = (before->b * rem + after->b * off) / span;
+    fog->near = (prev->fog.near * rem + k->fog.near * off) / span;
+    fog->far = (prev->fog.far * rem + k->fog.far * off) / span;
+}
+#else
 #pragma GLOBAL_ASM("asm/nonmatchings/12610/func_80011EF4.s")
+#endif
 
 void func_800124E8(void) {
     Lights3 *l;
