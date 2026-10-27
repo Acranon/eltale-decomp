@@ -542,7 +542,7 @@ void Player_StateMove(Actor *a, Player *p, PlayerAnimTable *cd) {
     if (x != 0.0f || z != 0.0f) {
         player_temp_vec.x = x;
         player_temp_vec.y = z;
-        Math_RotateVec2(camera_state.unk28, (Vec2f *)&player_temp_vec);
+        Math_RotateVec2(camera_state.followYaw, (Vec2f *)&player_temp_vec);
         x = player_temp_vec.x;
         z = player_temp_vec.y;
     }
@@ -683,7 +683,7 @@ void Player_StateDying(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
     if (--arg1->unk4 == arg1->unk124) {
         camera_state.distance = 250.0f;
         camera_state.eyeHeight = 150.0f;
-        camera_state.unk70 = 0.01f;
+        camera_state.followGain = 0.01f;
     }
 }
 
@@ -779,7 +779,7 @@ void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd) {
             p->unk8 &= ~0x100;
             a->unk60 |= 1;
             Anim_SetCurrentAndNext(a, 0xB, 1, player_idle_anim, 1, 1);
-            camera_state.unk4 = 0x23;
+            camera_state.focusFramesLeft = 0x23;
             return;
         }
         p->unk0 = 3;

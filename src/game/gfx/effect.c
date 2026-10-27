@@ -157,8 +157,8 @@ void Effect_ResetMapObjEmitters(void) {
     b = effect_mapobj_emitter_buf0;
     do {
         i--;
-        b->unk0 = 0;
-        a->unk0 = 0;
+        b->particleCountdown = 0;
+        a->particleCountdown = 0;
         a++;
         b++;
     } while (i != 0);
@@ -182,20 +182,20 @@ void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, MapObj* arg3) {
     if (angle > -1.5707963267948966 && angle < 1.5707963267948966 && effect_mapobj_emitter_count < 8) {
         n = effect_mapobj_emitter_prev_count;
         cur += effect_mapobj_emitter_count;
-        while (n != 0 && arg3 != prev->unk14) {
+        while (n != 0 && arg3 != prev->mapObj) {
             n--;
             prev++;
         }
         if (n != 0) {
-            cur->unk0 = prev->unk0;
+            cur->particleCountdown = prev->particleCountdown;
         } else {
-            cur->unk0 = Math_Rand(4) * 4 + 1;
+            cur->particleCountdown = Math_Rand(4) * 4 + 1;
         }
         cur->x = x;
         cur->y = y;
         cur->z = z;
-        cur->unk10 = arg3->scale;
-        cur->unk14 = arg3;
+        cur->particleScale = arg3->scale;
+        cur->mapObj = arg3;
         effect_mapobj_emitter_count++;
     }
 }
@@ -212,13 +212,13 @@ void Effect_UpdateMapObjEmitters(void) {
     p = gfx_frame_index ? effect_mapobj_emitter_buf1 : effect_mapobj_emitter_buf0;
     n = effect_mapobj_emitter_prev_count;
     while (n != 0) {
-        if (p->unk0 != 0 && --p->unk0 == 0) {
+        if (p->particleCountdown != 0 && --p->particleCountdown == 0) {
             effect_mapobj_particle_template.x = p->x;
             effect_mapobj_particle_template.y = p->y;
             effect_mapobj_particle_template.z = p->z;
-            effect_mapobj_particle_template.scaleX = effect_mapobj_particle_template.scaleY = p->unk10;
+            effect_mapobj_particle_template.scaleX = effect_mapobj_particle_template.scaleY = p->particleScale;
             Effect_AllocateSprite(&effect_mapobj_particle_template);
-            p->unk0 = 0x19;
+            p->particleCountdown = 0x19;
         }
         n--;
         p++;
@@ -328,7 +328,7 @@ void Effect_AddFloatingNumber(Actor* arg0, s32 arg1, s32 arg2) {
     }
     var_t0->timer = 0x2D;
     var_t0->target = arg0;
-    var_t0->unk10 = arg1;
+    var_t0->styleAndColor = arg1;
 
     if (arg2 < 0) {
         arg2 = -arg2;
@@ -342,7 +342,7 @@ void Effect_AddFloatingNumber(Actor* arg0, s32 arg1, s32 arg2) {
             var_v1++;
         }
     }
-    var_t0->unk18 = var_v1 - 1;
+    var_t0->stackIndex = var_v1 - 1;
 }
 
 
@@ -385,7 +385,7 @@ void Effect_DrawFloatingNumbers(void) {
                     gDPLoadTextureBlock(gfx_dl_head++, D_8039E290, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 10, 0, G_TX_WRAP, G_TX_WRAP, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
                     first++;
                 }
-                if (d->unk10 & 0x8000) {
+                if (d->styleAndColor & 0x8000) {
                     dsdx = 0x280;
                     dtdy = 0x280;
                     w = 6;
@@ -403,9 +403,9 @@ void Effect_DrawFloatingNumbers(void) {
                     }
                     sy -= a;
                 }
-                sx -= d->unk18 * w;
-                sy = sy - d->unk18 * 5 - 8;
-                c = effect_floating_number_colors[d->unk10 & 0xF];
+                sx -= d->stackIndex * w;
+                sy = sy - d->stackIndex * 5 - 8;
+                c = effect_floating_number_colors[d->styleAndColor & 0xF];
                 gDPPipeSync(gfx_dl_head++);
                 gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 255);
                 dp = d->digits;
@@ -433,7 +433,7 @@ void Effect_ResetConvergeEmitters(void) {
 
     do {
         i--;
-        p->unk0 = 0;
+        p->framesLeft = 0;
         p++;
     } while (i != 0);
 }
@@ -442,16 +442,16 @@ void Effect_StartConvergeEmitter(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg
     EffectConvergeEmitter* p = effect_converge_emitter_slots;
     s32 i = 7;
 
-    while (i != 0 && p->unk0 != 0) {
+    while (i != 0 && p->framesLeft != 0) {
         i--;
         p++;
     }
-    p->unk0 = arg1;
-    p->unk4 = arg0;
-    p->unk8 = arg2;
-    p->unkC = arg3;
-    p->unk10 = arg4;
-    p->unk14 = arg5;
+    p->framesLeft = arg1;
+    p->colorIndex = arg0;
+    p->centerX = arg2;
+    p->centerY = arg3;
+    p->centerZ = arg4;
+    p->radius = arg5;
 }
 
 void Effect_UpdateConvergeEmitters(void) {
@@ -469,22 +469,22 @@ void Effect_UpdateConvergeEmitters(void) {
     p = effect_converge_emitter_slots;
     i = 8;
     do {
-        if (p->unk0 != 0) {
-            if (p->unk0 & 1) {
+        if (p->framesLeft != 0) {
+            if (p->framesLeft & 1) {
                 a = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
                 b = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
                 Math_MtxFRotate(&mtx, a, b, 0.0f);
-                guMtxXFMF(mtx.mf, 0.0f, 0.0f, p->unk14, &x, &y, &z);
-                spawn.x = p->unk8 + x;
-                spawn.y = p->unkC + y;
-                spawn.z = p->unk10 + z;
+                guMtxXFMF(mtx.mf, 0.0f, 0.0f, p->radius, &x, &y, &z);
+                spawn.x = p->centerX + x;
+                spawn.y = p->centerY + y;
+                spawn.z = p->centerZ + z;
                 spawn.unk30 = x * -0.03;
                 spawn.unk34 = y * -0.03;
                 spawn.unk38 = z * -0.03;
-                spawn.unk3C = p->unk4;
+                spawn.unk3C = p->colorIndex;
                 Effect_AllocateSprite(&spawn);
             }
-            p->unk0--;
+            p->framesLeft--;
         }
         i--;
         p++;
@@ -563,7 +563,7 @@ void Effect_ResetStreaks(void) {
     s32 i;
 
     for (i = 0; i < 32; i++) {
-        effect_streak_slots[i].unk0 = 0;
+        effect_streak_slots[i].framesLeft = 0;
     }
 }
 
@@ -582,7 +582,7 @@ void Effect_UpdateAndDrawStreaks(struct GfxFrameData* arg0) {
     p = effect_streak_slots;
     n = 32;
     do {
-        if (p->unk0 != 0) {
+        if (p->framesLeft != 0) {
             p->x += p->vx;
             p->y += p->vy;
             p->z += p->vz;
@@ -591,13 +591,13 @@ void Effect_UpdateAndDrawStreaks(struct GfxFrameData* arg0) {
                     gSPDisplayList(gfx_dl_head++, D_800EB880);
                     first++;
                 }
-                if (p->unk0 & 1) {
+                if (p->framesLeft & 1) {
                     alpha = 250;
                 } else {
                     alpha = 150;
                 }
-                if (p->unk0 < 8) {
-                    alpha = (p->unk0 * alpha) >> 3;
+                if (p->framesLeft < 8) {
+                    alpha = (p->framesLeft * alpha) >> 3;
                 }
                 Math_MtxFAlignYToVector(&mtx, p->vx, p->vy, p->vz);
                 dx = p->x - p->x0;
@@ -613,7 +613,7 @@ void Effect_UpdateAndDrawStreaks(struct GfxFrameData* arg0) {
                 gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, alpha);
                 gSPDisplayList(gfx_dl_head++, D_800EB8E8);
             }
-            p->unk0--;
+            p->framesLeft--;
             p->vx *= 0.6;
             p->vy *= 0.6;
             p->vz *= 0.6;
@@ -636,11 +636,11 @@ void Effect_SpawnStreakBurst(f32 x, f32 y, f32 z) {
     n = 31;
     count = 16;
     do {
-        while (n != 0 && p->unk0 != 0) {
+        while (n != 0 && p->framesLeft != 0) {
             n--;
             p++;
         }
-        p->unk0 = Math_Rand(8) + 10;
+        p->framesLeft = Math_Rand(8) + 10;
         p->x = x;
         p->x0 = x;
         p->y = y;
@@ -662,7 +662,7 @@ void Effect_ResetRings(void) {
 
     do {
         i--;
-        p->unk0 = 0;
+        p->state = 0;
         p++;
     } while (i != 0);
 }
@@ -678,17 +678,17 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
 
     p = effect_ring_slots;
     for (i = 0; i != 3; i++, p++) {
-        if (p->unk0 == 0) {
+        if (p->state == 0) {
             break;
         }
     }
-    p->unk6 = arg0;
-    p->unk0 = 1;
-    p->unk2 = 0;
-    p->unk4 = effect_ring_grow_frames[arg0];
-    p->unk8 = arg1;
-    p->unkC = arg2;
-    p->unk10 = arg3;
+    p->colorIndex = arg0;
+    p->state = 1;
+    p->stateFrames = 0;
+    p->stateLength = effect_ring_grow_frames[arg0];
+    p->centerX = arg1;
+    p->centerY = arg2;
+    p->centerZ = arg3;
     pt = p->pts; n = p->norms; j = 16;
     angle = 0.0f;
     do {
@@ -727,12 +727,12 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
 void Effect_FadeRing(s32 arg0, f32 arg1, f32 arg2, f32 arg3) {
     EffectRing* p = &effect_ring_slots[arg0];
 
-    p->unk0 = 3;
-    p->unk2 = 0;
-    p->unk4 = 10;
-    p->unk8 = arg1;
-    p->unkC = arg2;
-    p->unk10 = arg3;
+    p->state = 3;
+    p->stateFrames = 0;
+    p->stateLength = 10;
+    p->centerX = arg1;
+    p->centerY = arg2;
+    p->centerZ = arg3;
 }
 
 extern Gfx D_800C4780[];
@@ -764,33 +764,33 @@ void Effect_UpdateAndDrawRings(struct GfxFrameData* arg0) {
     p = effect_ring_slots;
     cnt = 4;
     do {
-        if (p->unk0) {
+        if (p->state) {
             if (first == 0) {
                 gSPDisplayList(gfx_dl_head++, D_800C4780);
                 gDPLoadTextureBlock(gfx_dl_head++, D_800C47C0, G_IM_FMT_I, G_IM_SIZ_8b, 8, 8, 0, G_TX_WRAP, G_TX_WRAP, 3, 0, G_TX_NOLOD, G_TX_NOLOD);
                 first++;
             }
-            p->unk2++;
-            alpha = effect_ring_alpha_values[p->unk2 & 1];
-            switch (p->unk0) {
+            p->stateFrames++;
+            alpha = effect_ring_alpha_values[p->stateFrames & 1];
+            switch (p->state) {
                 case 1:
-                    if (p->unk2 < 4) {
-                        alpha = (alpha * p->unk2) >> 2;
+                    if (p->stateFrames < 4) {
+                        alpha = (alpha * p->stateFrames) >> 2;
                     }
-                    if (p->unk4 < p->unk2) {
-                        p->unk0++;
+                    if (p->stateLength < p->stateFrames) {
+                        p->state++;
                     } else {
-                        scale = sinf(p->unk2 * 3.141592653589793 / (p->unk4 * 2));
+                        scale = sinf(p->stateFrames * 3.141592653589793 / (p->stateLength * 2));
                     }
                     break;
                 case 3:
-                    alpha = (alpha * (p->unk4 - p->unk2)) / p->unk4;
-                    if (!(p->unk2 < p->unk4)) {
-                        p->unk0 = 0;
+                    alpha = (alpha * (p->stateLength - p->stateFrames)) / p->stateLength;
+                    if (!(p->stateFrames < p->stateLength)) {
+                        p->state = 0;
                     }
                     break;
             }
-            color = effect_ring_colors[p->unk6];
+            color = effect_ring_colors[p->colorIndex];
             gDPSetEnvColor(gfx_dl_head++, color[0], color[1], color[2], alpha);
             pt = p->pts;
             j = 16;
@@ -805,13 +805,13 @@ void Effect_UpdateAndDrawRings(struct GfxFrameData* arg0) {
                 x1 = pt->x;
                 y1 = pt->y + 5.0f;
                 z1 = pt->z;
-                if (p->unk0 == 1) {
-                    x0 = (x0 - p->unk8) * scale + p->unk8;
-                    y0 = (y0 - p->unkC) * scale + p->unkC;
-                    z0 = (z0 - p->unk10) * scale + p->unk10;
-                    x1 = (x1 - p->unk8) * scale + p->unk8;
-                    y1 = (y1 - p->unkC) * scale + p->unkC;
-                    z1 = (z1 - p->unk10) * scale + p->unk10;
+                if (p->state == 1) {
+                    x0 = (x0 - p->centerX) * scale + p->centerX;
+                    y0 = (y0 - p->centerY) * scale + p->centerY;
+                    z0 = (z0 - p->centerZ) * scale + p->centerZ;
+                    x1 = (x1 - p->centerX) * scale + p->centerX;
+                    y1 = (y1 - p->centerY) * scale + p->centerY;
+                    z1 = (z1 - p->centerZ) * scale + p->centerZ;
                 }
                 dx = x1 - x0;
                 dy = y1 - y0;
@@ -839,7 +839,7 @@ void Effect_ResetModelEffects(void) {
 
     do {
         i--;
-        p->unk0 = 0;
+        p->framesLeft = 0;
         p++;
     } while (i != 0);
 }
@@ -850,27 +850,27 @@ EffectModel* Effect_CreateModelEffect(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s3
 
     i = 31;
     p = effect_model_slots;
-    while (i != 0 && p->unk0 != 0) {
+    while (i != 0 && p->framesLeft != 0) {
         i--;
         p++;
     }
-    p->unkC = arg5;
-    p->unk10 = arg6;
-    p->unk14 = arg7;
-    p->unk18 = arg8;
-    p->unk1C = arg9;
-    p->unk20 = arg10;
-    p->unk24 = arg11;
-    p->unk28 = 0.0f;
-    p->unk2C = 0.0f;
-    p->unk30 = 1.0f;
+    p->x = arg5;
+    p->y = arg6;
+    p->z = arg7;
+    p->rotationY = arg8;
+    p->scaleX = arg9;
+    p->scaleY = arg10;
+    p->scaleZ = arg11;
+    p->upX = 0.0f;
+    p->upY = 0.0f;
+    p->upZ = 1.0f;
     p->anim = D_800EB2B4[arg0];
-    p->unk4 = 0;
-    p->unk6 = arg3;
+    p->age = 0;
+    p->colorIndex = arg3;
     p->anim.dls = (Gfx**)D_800CADA8[arg1];
-    p->unk0 = p->unk2 = p->anim.length;
-    p->unk8 = arg4;
-    p->unk34 = 0;
+    p->framesLeft = p->loopLength = p->anim.length;
+    p->flags = arg4;
+    p->animFrame = 0;
     p->tex = D_800DA0F0[arg2];
     return p;
 }
@@ -888,9 +888,9 @@ void Effect_UpdateAndDrawModelEffects(struct GfxFrameData* arg0) {
     i = 32;
     p = effect_model_slots;
     do {
-        if (p->unk0 != 0) {
+        if (p->framesLeft != 0) {
             Effect_ConfigureModelEffectTexture(p);
-            if (p->unk8 & 2) {
+            if (p->flags & 2) {
                 if (*cnt & 1) {
                     alpha = 240;
                 } else {
@@ -899,26 +899,26 @@ void Effect_UpdateAndDrawModelEffects(struct GfxFrameData* arg0) {
             } else {
                 alpha = 250;
             }
-            if (!(p->unk8 & 1) && p->unk0 < 8) {
-                alpha = (p->unk0 * alpha) >> 3;
-            } else if ((p->unk8 & 0x80) && p->unk4 < 8) {
-                alpha = (p->unk4 * alpha) >> 3;
+            if (!(p->flags & 1) && p->framesLeft < 8) {
+                alpha = (p->framesLeft * alpha) >> 3;
+            } else if ((p->flags & 0x80) && p->age < 8) {
+                alpha = (p->age * alpha) >> 3;
             }
-            col = D_800EB5E4[p->unk6 & 0xFF];
+            col = D_800EB5E4[p->colorIndex & 0xFF];
             gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], alpha);
-            if (p->unk8 & 8) {
+            if (p->flags & 8) {
                 gSPSetGeometryMode(gfx_dl_head++, G_CULL_BACK);
             } else {
                 gSPClearGeometryMode(gfx_dl_head++, G_CULL_BACK);
             }
             Effect_DrawModelEffectGeometry(p, arg0);
-            p->unk34++;
-            if (--p->unk0 == 0) {
-                if (p->unk8 & 1) {
-                    p->unk0 = p->unk2;
+            p->animFrame++;
+            if (--p->framesLeft == 0) {
+                if (p->flags & 1) {
+                    p->framesLeft = p->loopLength;
                 }
             }
-            p->unk4++;
+            p->age++;
         }
         i--;
         p++;
@@ -937,21 +937,21 @@ s32 Effect_DrawModelEffectGeometry(EffectModel* arg0, struct GfxFrameData* arg1)
     Vec3f scale;
 
     anim_node_position_count = 0;
-    if (arg0->unk8 & 4) {
-        Math_MtxFAlignYToVector(&mtx, arg0->unk28, arg0->unk2C, arg0->unk30);
-        mtx.mf[3][0] = arg0->unkC;
-        mtx.mf[3][1] = arg0->unk10;
-        mtx.mf[3][2] = arg0->unk14;
-        Math_MtxFScaleAxes(&mtx, arg0->unk1C * 0.01, arg0->unk20 * 0.01, arg0->unk24 * 0.01);
+    if (arg0->flags & 4) {
+        Math_MtxFAlignYToVector(&mtx, arg0->upX, arg0->upY, arg0->upZ);
+        mtx.mf[3][0] = arg0->x;
+        mtx.mf[3][1] = arg0->y;
+        mtx.mf[3][2] = arg0->z;
+        Math_MtxFScaleAxes(&mtx, arg0->scaleX * 0.01, arg0->scaleY * 0.01, arg0->scaleZ * 0.01);
     } else {
-        Math_MtxFRotScaleTrans(&mtx, 0.0f, arg0->unk18, 0.0f, 0.01f, arg0->unkC, arg0->unk10, arg0->unk14);
-        Math_MtxFScaleAxes(&mtx, arg0->unk1C, arg0->unk20, arg0->unk24);
+        Math_MtxFRotScaleTrans(&mtx, 0.0f, arg0->rotationY, 0.0f, 0.01f, arg0->x, arg0->y, arg0->z);
+        Math_MtxFScaleAxes(&mtx, arg0->scaleX, arg0->scaleY, arg0->scaleZ);
     }
-    scale.x = arg0->unk1C * 0.01;
-    scale.y = arg0->unk20 * 0.01;
-    scale.z = arg0->unk24 * 0.01;
+    scale.x = arg0->scaleX * 0.01;
+    scale.y = arg0->scaleY * 0.01;
+    scale.z = arg0->scaleZ * 0.01;
     anims = arg0->anim.nodes;
-    frame = arg0->unk34;
+    frame = arg0->animFrame;
     if (gfx_mtx_index < 0x1E6) {
         for (i = 0; i < arg0->anim.nodeCount; i++) {
             if (anims[i].parent == 0) {
@@ -971,7 +971,7 @@ s32 Effect_ConfigureModelEffectTexture(EffectModel* arg0) {
 
     if (arg0->tex.img != 0) {
         t = &arg0->tex;
-        if (arg0->unk8 & 0x20) {
+        if (arg0->flags & 0x20) {
             geom = G_LIGHTING;
         }
         t->s += t->ds;
@@ -984,9 +984,9 @@ s32 Effect_ConfigureModelEffectTexture(EffectModel* arg0) {
             mask = 5;
         }
         if (t->flags & 4) {
-            img += (arg0->unk4 >> t->shift) * size * size;
+            img += (arg0->age >> t->shift) * size * size;
         } else if (t->flags & 8) {
-            img += ((arg0->unk4 >> t->shift) & t->mask) * size * size;
+            img += ((arg0->age >> t->shift) & t->mask) * size * size;
         }
         if (t->flags & 0x10) {
             clamp = 1;
@@ -997,12 +997,12 @@ s32 Effect_ConfigureModelEffectTexture(EffectModel* arg0) {
             gDPLoadTextureBlock(gfx_dl_head++, img, G_IM_FMT_I, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
             gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             if (t->flags & 0x40) {
-                if (arg0->unk8 & 0x20) {
+                if (arg0->flags & 0x20) {
                     gDPSetCombine(gfx_dl_head++, 0x629A04, 0x1F10FFFF);
                 } else {
                     gDPSetCombine(gfx_dl_head++, 0x629BFF, 0x1F10FE3F);
                 }
-            } else if (arg0->unk8 & 0x20) {
+            } else if (arg0->flags & 0x20) {
                 gDPSetCombine(gfx_dl_head++, 0x62FE04, 0x1F10FBFF);
             } else {
                 gDPSetCombine(gfx_dl_head++, 0x62FFFF, 0x1F10FA3F);
@@ -1010,7 +1010,7 @@ s32 Effect_ConfigureModelEffectTexture(EffectModel* arg0) {
         } else {
             gDPLoadTextureBlock(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
             gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
-            if (arg0->unk8 & 0x20) {
+            if (arg0->flags & 0x20) {
                 gDPSetCombine(gfx_dl_head++, 0x129804, 0xFF17FFFF);
             } else {
                 gDPSetCombine(gfx_dl_head++, 0x1299FF, 0xFF17FE3F);
@@ -1042,7 +1042,7 @@ void Effect_ResetStatUpMarkers(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        effect_stat_up_marker_slots[i].unk0 = 0;
+        effect_stat_up_marker_slots[i].framesLeft = 0;
     }
 }
 
@@ -1062,17 +1062,17 @@ void Effect_DrawStatUpMarkers(struct GfxFrameData* arg0) {
 
     first = 0;
     for (i = 0, p = effect_stat_up_marker_slots; i < 4; i++, p++) {
-        if (p->unk0 != 0) {
+        if (p->framesLeft != 0) {
             if (gfx_mtx_index < 0x1E6) {
                 if (first == 0) {
                     gSPDisplayList(gfx_dl_head++, D_800EB990);
                     first++;
                 }
                 alpha = 200 - Math_Rand(32);
-                if (p->unk0 < 8) {
-                    alpha = (p->unk0 * alpha) >> 3;
-                } else if (p->unk0 >= 22) {
-                    alpha = ((25 - p->unk0) * alpha) >> 2;
+                if (p->framesLeft < 8) {
+                    alpha = (p->framesLeft * alpha) >> 3;
+                } else if (p->framesLeft >= 22) {
+                    alpha = ((25 - p->framesLeft) * alpha) >> 2;
                 }
                 x = player_shadow_pos.x;
                 y = player_state.actor.scale * 70.0 + player_shadow_pos.y;
@@ -1090,12 +1090,12 @@ void Effect_DrawStatUpMarkers(struct GfxFrameData* arg0) {
                 gDPSetEnvColor(gfx_dl_head++, effect_stat_up_marker_colors[i / 1][0], effect_stat_up_marker_colors[i / 1][1], effect_stat_up_marker_colors[i / 1][2], alpha);
                 gSPDisplayList(gfx_dl_head++, D_800EB9C8);
             }
-            p->unk0--;
+            p->framesLeft--;
         }
     }
 }
 
 
 void Effect_StartStatUpMarker(s32 arg0) {
-    effect_stat_up_marker_slots[arg0].unk0 = 25;
+    effect_stat_up_marker_slots[arg0].framesLeft = 25;
 }

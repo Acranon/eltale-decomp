@@ -11,7 +11,7 @@ struct GfxFrameData;
 /* The camera (camera_state; camera_saved_state holds a copy during a battle focus). */
 typedef struct Camera {
     /* 0x00 */ s32 mode; /* index into camera_mode_handlers */
-    /* 0x04 */ s32 unk4; /* battle focus: frames until camera_saved_state is restored */
+    /* 0x04 */ s32 focusFramesLeft; /* battle focus: frames until camera_saved_state is restored */
     /* 0x08 */ u16 flags; /* 0x40 battle focus active */
     /* 0x0A */ u8 padA[2];
     /* 0x0C */ f32 eyeX;
@@ -21,7 +21,7 @@ typedef struct Camera {
     /* 0x1C */ f32 atY;
     /* 0x20 */ f32 atZ;
     /* 0x24 */ f32 pitch; /* Math_Atan2(eye - at height, ground distance) */
-    /* 0x28 */ f32 unk28; /* the heading clamped to yawMin..yawMax (fixed eye) */
+    /* 0x28 */ f32 followYaw; /* the heading clamped to yawMin..yawMax (fixed eye) */
     /* 0x2C */ f32 yaw; /* Math_Atan2(eye - at, x and z) */
     /* 0x30 */ f32 unk30;
     /* 0x34 */ f32 atVelY;
@@ -39,12 +39,12 @@ typedef struct Camera {
     /* 0x64 */ f32 pitchMax;
     /* 0x68 */ f32 yawMin;
     /* 0x6C */ f32 yawMax;
-    /* 0x70 */ f32 unk70; /* follow gain */
-    /* 0x74 */ f32 unk74; /* velocity damping */
-    /* 0x78 */ f32 unk78; /* orbit gain */
-    /* 0x7C */ f32 unk7C; /* orbit damping */
+    /* 0x70 */ f32 followGain; /* follow gain */
+    /* 0x74 */ f32 velocityDamping; /* velocity damping */
+    /* 0x78 */ f32 orbitGain; /* orbit gain */
+    /* 0x7C */ f32 orbitDamping; /* orbit damping */
     /* 0x80 */ struct Actor *target;
-    /* 0x84 */ f32 unk84; /* angle added to the spawn heading by Camera_InitForMap */
+    /* 0x84 */ f32 spawnHeadingOffset; /* angle added to the spawn heading by Camera_InitForMap */
 } Camera; /* 0x88 bytes */
 
 /* One camera preset (a map sub-area's list, or camera_default_presets). */
@@ -80,8 +80,8 @@ typedef struct CameraDelayedTurn {
     /* 0x0C */ u16 flags;
     /* 0x0E */ u8 padE[2];
     /* 0x10 */ f32 orbitAngle;
-    /* 0x14 */ f32 unk14; /* Camera.unk78 to restore */
-    /* 0x18 */ f32 unk18; /* Camera.unk7C to restore */
+    /* 0x14 */ f32 orbitGain; /* Camera.orbitGain to restore */
+    /* 0x18 */ f32 orbitDamping; /* Camera.orbitDamping to restore */
 } CameraDelayedTurn; /* 0x1C bytes */
 
 /* .bss 80085B80..80085F90 */

@@ -200,7 +200,7 @@ void Battle_UpdateStartCamera(void) {
             camera_state.eyeVelX = camera_state.eyeVelY;
             camera_state.eyeHeight = 15.0f;
             camera_state.target = a;
-            camera_state.unk70 = 0.01f;
+            camera_state.followGain = 0.01f;
             camera_delayed_turn.orbitAngle = camera_state.yaw;
             battle_camera_phase++;
             battle_camera_phase_timer = 60;
@@ -238,7 +238,7 @@ void Battle_UpdateStartCamera(void) {
                     camera_state.distance += battle_camera_offsets[map_id].unk4;
                 }
                 camera_state.target = &player_state.actor;
-                camera_state.unk70 = 0.02f;
+                camera_state.followGain = 0.02f;
                 camera_battle_angle_offset = 0.0f;
             }
             break;

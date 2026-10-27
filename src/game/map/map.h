@@ -54,7 +54,7 @@ typedef struct MapGrid {
     /* 0x1C */ u16 *cells; /* per cell: offset into lists */
     /* 0x20 */ u16 *lists; /* per cell: count, then object indices */
     /* 0x24 */ u16 *alwaysList;
-    /* 0x28 */ u16 unk28; /* 0: one list for the whole grid */
+    /* 0x28 */ u16 searchPattern; /* 0: one list for the whole grid */
     /* 0x2A */ u8 pad2A[2];
 } MapGrid; /* 0x2C bytes */
 
@@ -85,7 +85,7 @@ typedef struct MapEntryPoint {
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
     /* 0x0C */ u8 padC[2];
-    /* 0x0E */ u16 unkE;
+    /* 0x0E */ u16 spawnObj;
     /* 0x10 */ u8 pad10[4];
 } MapEntryPoint; /* 0x14 bytes */
 
@@ -163,7 +163,7 @@ typedef struct MapObjWavePhase {
 /* map_clock_tlut_schedule entry. */
 typedef struct MapClockTlutStep {
     /* 0x00 */ s32 start;
-    /* 0x04 */ u16 unk4;
+    /* 0x04 */ u16 blendFrames;
     /* 0x06 */ u16 id;
 } MapClockTlutStep; /* 0x8 bytes */
 
@@ -239,12 +239,12 @@ extern u16 mapobj_noanim_list[0x200];
  * .bss by declaration number mod 256). */
 /* A spinning object queued by MapObj_QueueSpinner (mapobj_spinner_buf0/1). */
 typedef struct MapObjSpinner {
-    /* 0x00 */ s32 unk0;
+    /* 0x00 */ s32 active;
     /* 0x04 */ f32 unk4;
     /* 0x08 */ f32 unk8;
     /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
+    /* 0x10 */ f32 yawDegrees;
+    /* 0x14 */ f32 spinAngle;
     /* 0x18 */ MapObj *obj;
 } MapObjSpinner; /* 0x1C bytes */
 

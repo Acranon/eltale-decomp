@@ -388,9 +388,9 @@ void Magic_UpdateEffects(void) {
                 Magic_CreateHitPresentation(p, a);
                 if (!(p->cfg->unk2 & 4)) {
                     p->unk4 = 0;
-                    if (p->unk34 != NULL && (p->unk34->unk8 & 1)) {
-                        p->unk34->unk0 = 7;
-                        p->unk34->unk8 &= ~1;
+                    if (p->unk34 != NULL && (p->unk34->flags & 1)) {
+                        p->unk34->framesLeft = 7;
+                        p->unk34->flags &= ~1;
                     }
                 } else {
                     p->unkA |= 2;
@@ -398,15 +398,15 @@ void Magic_UpdateEffects(void) {
             }
         }
         if (p->unk34 != NULL) {
-            p->unk34->unkC = p->x;
-            p->unk34->unk10 = p->y;
-            p->unk34->unk14 = p->z;
-            p->unk34->unk28 = p->vx;
-            p->unk34->unk2C = p->vy;
-            p->unk34->unk30 = p->vz;
-            if (p->unk4 == 0 && (p->unk34->unk8 & 1)) {
-                p->unk34->unk0 = 7;
-                p->unk34->unk8 &= ~1;
+            p->unk34->x = p->x;
+            p->unk34->y = p->y;
+            p->unk34->z = p->z;
+            p->unk34->upX = p->vx;
+            p->unk34->upY = p->vy;
+            p->unk34->upZ = p->vz;
+            if (p->unk4 == 0 && (p->unk34->flags & 1)) {
+                p->unk34->framesLeft = 7;
+                p->unk34->flags &= ~1;
             }
         }
         if (((s16 *)p->def)[8] >= 0) {
@@ -519,8 +519,8 @@ void Magic_MoveHomingEffect(MagicEffect* arg0) {
                     arg0->vy = 0.0f;
                     arg0->vx = 0.0f;
                     if (arg0->unk34 != NULL) {
-                        arg0->unk34->unk0 = 15;
-                        arg0->unk34->unk8 &= ~1;
+                        arg0->unk34->framesLeft = 15;
+                        arg0->unk34->flags &= ~1;
                     }
                     Camera_Shake(1);
                     if (((s16 *)arg0->def)[0x10] >= 0) {
@@ -551,8 +551,8 @@ void Magic_MoveVerticalEffect(MagicEffect* arg0) {
                 arg0->vy = 0.0f;
                 arg0->vx = 0.0f;
                 if (arg0->unk34 != NULL) {
-                    arg0->unk34->unk0 = 15;
-                    arg0->unk34->unk8 &= ~1;
+                    arg0->unk34->framesLeft = 15;
+                    arg0->unk34->flags &= ~1;
                 }
                 Camera_Shake(1);
                 Magic_CreateGroundHitPresentation(arg0, arg0->target);
@@ -1113,9 +1113,9 @@ void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
             angle = arg1->rot;
         }
         arg0->unk34 = Magic_CreateVisualEffect(def->unk2, def->unk4, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg1);
-        arg0->unk34->unk28 = arg0->vx;
-        arg0->unk34->unk2C = arg0->vy;
-        arg0->unk34->unk30 = arg0->vz;
+        arg0->unk34->upX = arg0->vx;
+        arg0->unk34->upY = arg0->vy;
+        arg0->unk34->upZ = arg0->vz;
     } else {
         arg0->unk34 = NULL;
     }
@@ -1156,9 +1156,9 @@ void Magic_CreateTimedPresentation(MagicEffect* arg0, Actor* arg1) {
         angle = arg1->rot;
     }
     ret = Magic_CreateVisualEffect(def->unk12, def->unk14, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->unk24);
-    ret->unk28 = arg0->vx;
-    ret->unk2C = arg0->vy;
-    ret->unk30 = arg0->vz;
+    ret->upX = arg0->vx;
+    ret->upY = arg0->vy;
+    ret->upZ = arg0->vz;
     if (def->unk46 >= 0) {
         Sfx_Play(def->unk47, def->unk46, 0xFF);
     }
@@ -1197,9 +1197,9 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
             y = arg1->y;
         }
         arg0->unk38 = Magic_CreateVisualEffect(def->unk32, flags, arg1->x, y, arg1->z, arg1->rot, tbl, &magic_temp_vec, arg1);
-        arg0->unk38->unk28 = arg0->vx;
-        arg0->unk38->unk2C = arg0->vy;
-        arg0->unk38->unk30 = arg0->vz;
+        arg0->unk38->upX = arg0->vx;
+        arg0->unk38->upY = arg0->vy;
+        arg0->unk38->upZ = arg0->vz;
     } else {
         arg0->unk38 = NULL;
     }
@@ -1240,9 +1240,9 @@ void Magic_CreateGroundHitPresentation(MagicEffect* arg0, Actor* arg1) {
         magic_temp_vec.y = def->unk2C;
         magic_temp_vec.z = cfg->unk1C;
         ret = Magic_CreateVisualEffect(def->unk22, def->unk24, arg0->x, arg0->y, arg0->z, arg1->rot, tbl, &magic_temp_vec, arg0->unk24);
-        ret->unk28 = arg0->vx;
-        ret->unk2C = arg0->vy;
-        ret->unk30 = arg0->vz;
+        ret->upX = arg0->vx;
+        ret->upY = arg0->vy;
+        ret->upZ = arg0->vz;
     }
     fx = &D_800C363C[arg0->unk0][arg0->unk2];
     if (fx->unk4 != 0) {

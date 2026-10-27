@@ -816,31 +816,31 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
     for (i = 0; i < 4; i++) {
         if (s->unk44[i] != 0) {
             fx = (EffectModel*)((Struct_8002373C_68*)arg0->unk68)->unk44[i];
-            fx->unkC = arg0->x;
-            fx->unk14 = arg0->z;
+            fx->x = arg0->x;
+            fx->z = arg0->z;
             if (arg0->unk64->unk0 == 1) {
-                if (fx->unk8 & 0x100) {
-                    fx->unk10 = arg0->unk68->unk94;
+                if (fx->flags & 0x100) {
+                    fx->y = arg0->unk68->unk94;
                 } else {
-                    fx->unk10 = arg0->unk68->unk94 - arg0->unk64->unk18 * arg0->scale;
+                    fx->y = arg0->unk68->unk94 - arg0->unk64->unk18 * arg0->scale;
                 }
-            } else if (fx->unk8 & 0x100) {
-                fx->unk10 = arg0->y + arg0->unk64->unk1C * 0.5 * arg0->scale;
+            } else if (fx->flags & 0x100) {
+                fx->y = arg0->y + arg0->unk64->unk1C * 0.5 * arg0->scale;
             } else {
-                fx->unk10 = arg0->y;
+                fx->y = arg0->y;
             }
             if (!(hud_actor_status_effect_masks[i] & s->unk0)) {
                 s->unk44[i] = 0;
-                if (fx->unk8 & 1) {
-                    fx->unk8 &= ~1;
-                    fx->unk0 = 8;
+                if (fx->flags & 1) {
+                    fx->flags &= ~1;
+                    fx->framesLeft = 8;
                 }
             } else if (s->unk32[i] > 0) {
                 if (--s->unk32[i] == 0) {
                     s->unk44[i] = 0;
-                    if (fx->unk8 & 1) {
-                        fx->unk8 &= ~1;
-                        fx->unk0 = 8;
+                    if (fx->flags & 1) {
+                        fx->flags &= ~1;
+                        fx->framesLeft = 8;
                     }
                 }
             }
@@ -861,8 +861,8 @@ void Hud_ClearActorStatusIndicators(Actor* arg0) {
     for (i = 0; i < 4; i++) {
         if (s->unk44[i] != 0) {
             fx = (EffectModel*)s->unk44[i];
-            fx->unk0 = 8;
-            fx->unk8 &= ~1;
+            fx->framesLeft = 8;
+            fx->flags &= ~1;
             s->unk44[i] = 0;
         }
     }

@@ -241,9 +241,9 @@ void Map_LoadArea(void) {
     map_actor_walls = map_area_def->actorWalls;
     map_camera_walls = map_area_def->cameraWalls;
     map_subarea_flags = map_subarea_def->flags;
-    map_env_flags = env_area_settings->unk18;
-    if (map_backdrop_id != env_area_settings->unk1C) {
-        map_backdrop_id = env_area_settings->unk1C;
+    map_env_flags = env_area_settings->mapFlags;
+    if (map_backdrop_id != env_area_settings->backdropId) {
+        map_backdrop_id = env_area_settings->backdropId;
         Dma_ReadRom(map_backdrop_defs[map_backdrop_id].start, map_backdrop_phase_tluts, 0x800);
         Dma_ReadRom(map_backdrop_defs[map_backdrop_id].start + 0x800, map_backdrop_tex, 0x4000);
     }
@@ -252,7 +252,7 @@ void Map_LoadArea(void) {
         player_spawn_x = sp->x;
         player_spawn_z = sp->y;
         player_spawn_rot = sp->z;
-        player_spawn_obj = sp->unkE;
+        player_spawn_obj = sp->spawnObj;
     }
     n = map_subarea_grid->count;
     s = map_objs;
@@ -357,7 +357,7 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     *pB0 = -1;
     px = camera_state.eyeX;
     pz = camera_state.eyeZ;
-    switch (map_subarea_grid->unk28) {
+    switch (map_subarea_grid->searchPattern) {
         case 1:
             off = mapobj_cell_disc_r7;
             n = 0x9D;
@@ -645,7 +645,7 @@ void Map_DrawBackdrop(GfxFrameData *arg0) {
     gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
     gfx_mtx_index++;
     gDPSetEnvColor(gfx_dl_head++, D_80084B60, D_80084B64, D_80084B68, 255);
-    gSPDisplayList(gfx_dl_head++, map_backdrop_defs[env_area_settings->unk1C].dl);
+    gSPDisplayList(gfx_dl_head++, map_backdrop_defs[env_area_settings->backdropId].dl);
 }
 
 void MapObjAnim_ClearAll(void) {
@@ -881,8 +881,8 @@ void MapObj_ClearSpinners(void) {
     q = mapobj_spinner_buf1;
     p = mapobj_spinner_buf0;
     do {
-        p->unk0 = 0;
-        q->unk0 = 0;
+        p->active = 0;
+        q->active = 0;
         i--;
         q++;
         p++;
@@ -904,16 +904,16 @@ void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, MapObj *arg4) {
             prev++;
         }
         if (i != 0) {
-            cur->unk0 = prev->unk0;
-            cur->unk14 = prev->unk14;
+            cur->active = prev->active;
+            cur->spinAngle = prev->spinAngle;
         } else {
-            cur->unk0 = 1;
-            cur->unk14 = (f32)Math_Rand(8) * 3.141592653589793 / 4.0f;
+            cur->active = 1;
+            cur->spinAngle = (f32)Math_Rand(8) * 3.141592653589793 / 4.0f;
         }
         cur->unk4 = arg0;
         cur->unk8 = arg1;
         cur->unkC = arg2;
-        cur->unk10 = arg3;
+        cur->yawDegrees = arg3;
         cur->obj = arg4;
         mapobj_spinner_count++;
     }
@@ -928,10 +928,10 @@ void MapObj_DrawSpinners(GfxFrameData *arg0) {
     p = gfx_frame_index ? mapobj_spinner_buf1 : mapobj_spinner_buf0;
     i = mapobj_spinner_prev_count;
     while (i--) {
-        if (p->unk0 != 0) {
+        if (p->active != 0) {
             s = p->obj;
-            p->unk14 -= 0.015707963267948967;
-            Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, p->unk10 * 0.017453292519943295, p->unk14, s->scale, s->x, s->y, s->z);
+            p->spinAngle -= 0.015707963267948967;
+            Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, p->yawDegrees * 0.017453292519943295, p->spinAngle, s->scale, s->x, s->y, s->z);
             gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
             gfx_mtx_index++;
             gSPDisplayList(gfx_dl_head++, map_obj_models[s->model].dl);
@@ -1002,7 +1002,7 @@ void Map_BlendPaletteByClock(void) {
     }
     if (map_clock_tlut_id != map_clock_tlut_prev_id) {
         map_clock_blend_from = (u16 *)map_clock_tlut_srcs + map_clock_tlut_prev_id * 0x100;
-        map_clock_blend_left = map_clock_blend_len = p->unk4;
+        map_clock_blend_left = map_clock_blend_len = p->blendFrames;
         map_clock_blend_to = (u16 *)map_clock_tlut_srcs + map_clock_tlut_id * 0x100;
         map_clock_blend_out = map_clock_tlut;
     }

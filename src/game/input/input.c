@@ -42,7 +42,7 @@ s32 Input_InitControllers(void) {
 
     input_previous_button_inverse = 0;
     for (i = 0; i < 4; i++) {
-        pak_game_file_scans[i].unk12 = -0x80;
+        pak_game_file_scans[i].port_status = -0x80;
     }
     for (i = 0; i < 4; i++) {
         input_pad_states[i].button = 0;
@@ -58,26 +58,26 @@ s32 Input_InitControllers(void) {
     for (i = 0; i != 4; i++) {
         if (input_connected_port_bits & (1 << i)) {
             if (input_controller_statuses[i].errno & 4) {
-                pak_game_file_scans[i].unk12 = -1;
+                pak_game_file_scans[i].port_status = -1;
             } else if (input_controller_statuses[i].type & 2) {
-                pak_game_file_scans[i].unk12 = -2;
+                pak_game_file_scans[i].port_status = -2;
             } else {
-                pak_game_file_scans[i].unk12 = 0;
+                pak_game_file_scans[i].port_status = 0;
                 count++;
                 if (input_primary_port == -1) {
                     input_primary_port = i;
                 }
                 if (input_controller_statuses[i].status & 1) {
-                    pak_game_file_scans[i].unk0 |= 0x8000;
+                    pak_game_file_scans[i].flags |= 0x8000;
                 } else {
-                    pak_game_file_scans[i].unk0 = 0;
+                    pak_game_file_scans[i].flags = 0;
                     if (i == input_primary_port) {
                         ret = 1;
                     }
                 }
             }
         } else {
-            pak_game_file_scans[i].unk12 = -3;
+            pak_game_file_scans[i].port_status = -3;
         }
     }
     if (count == 0) {
@@ -116,10 +116,10 @@ s32 Pak_ScanGameFiles(s32 cont) {
 
     found = 0;
     cnt = 0;
-    pak_game_file_scans[cont].unk13 = 0xFF;
-    pak_game_file_scans[cont].unk0 = 0;
+    pak_game_file_scans[cont].free_pages = 0xFF;
+    pak_game_file_scans[cont].flags = 0;
     for (i = 0; i < 16; i++) {
-        pak_game_file_scans[cont].unk2[i] = -1;
+        pak_game_file_scans[cont].note_ext_first_bytes[i] = -1;
     }
     pfs = &pak_port_states[cont];
     err = func_8003D0F0(&input_si_queue, pfs, cont);
@@ -141,36 +141,36 @@ s32 Pak_ScanGameFiles(s32 cont) {
             if (st.game_code == 0x4E45544A && st.company_code == 0x3943) {
                 if (Pak_CompareNameBytes(pak_game_name, st.game_name, 16) == 0) {
                     found++;
-                    pak_game_file_scans[cont].unk2[i] = ((u8 *) st.ext_name)[0];
-                    pak_game_file_scans[cont].unk0 |= 0x4000;
+                    pak_game_file_scans[cont].note_ext_first_bytes[i] = ((u8 *) st.ext_name)[0];
+                    pak_game_file_scans[cont].flags |= 0x4000;
                 } else {
-                    pak_game_file_scans[cont].unk2[i] = 0x7F;
+                    pak_game_file_scans[cont].note_ext_first_bytes[i] = 0x7F;
                 }
             } else {
-                pak_game_file_scans[cont].unk2[i] = 0x7F;
+                pak_game_file_scans[cont].note_ext_first_bytes[i] = 0x7F;
             }
             cnt++;
         } else if (err == 5) {
-            pak_game_file_scans[cont].unk2[i] = -1;
+            pak_game_file_scans[cont].note_ext_first_bytes[i] = -1;
             err = 0;
         } else {
             break;
         }
     }
     if (err == 0) {
-        pak_game_file_scans[cont].unk0 &= 0xFFF0;
-        pak_game_file_scans[cont].unk0 |= found;
+        pak_game_file_scans[cont].flags &= 0xFFF0;
+        pak_game_file_scans[cont].flags |= found;
         if (found >= 16) {
-            pak_game_file_scans[cont].unk0 |= 0x2000;
+            pak_game_file_scans[cont].flags |= 0x2000;
         }
         if (cnt >= 16) {
-            pak_game_file_scans[cont].unk0 |= 0x2000;
+            pak_game_file_scans[cont].flags |= 0x2000;
         }
         osPfsFreeBlocks(pfs, &i);
         i = i / 256;
-        pak_game_file_scans[cont].unk13 = i;
+        pak_game_file_scans[cont].free_pages = i;
         if (i < 2) {
-            pak_game_file_scans[cont].unk0 |= 0x2000;
+            pak_game_file_scans[cont].flags |= 0x2000;
         }
     }
     return err;
@@ -187,7 +187,7 @@ u8 func_80035CC8(s32 arg0) {
         j = 0;
         arg0 = 0;
         for (; j < 16; j++) {
-            if (i + 0x1A == pak_game_file_scans[k].unk2[j]) {
+            if (i + 0x1A == pak_game_file_scans[k].note_ext_first_bytes[j]) {
                 arg0 = -1;
                 break;
             }
@@ -215,7 +215,7 @@ u8 Pak_AllocateGameFile(s32 arg0, u8 arg1) {
     ret = osPfsAllocateFile(&pak_port_states[arg0], 0x3943, 0x4E45544A, pak_game_name, &ext, 0x200, &file_no);
     if (ret == 0) {
         ret = file_no;
-        pak_game_file_scans[arg0].unk2[ret] = arg1;
+        pak_game_file_scans[arg0].note_ext_first_bytes[ret] = arg1;
     } else {
         ret = -ret;
     }

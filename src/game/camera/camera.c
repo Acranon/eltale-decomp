@@ -66,7 +66,7 @@ void Camera_InitForMap(void) {
     guOrtho(&D_80301000[0].data.ortho, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
     guOrtho(&D_80301000[1].data.ortho, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
     if (exit_destination.entry < 0) {
-        cam->unk84 = 3.1415927f;
+        cam->spawnHeadingOffset = 3.1415927f;
     }
     camera_preset_index = (player_state.actor.unk62 >> 1) & 7;
     if (map_area_def->cameraPresets != NULL) {
@@ -79,7 +79,7 @@ void Camera_InitForMap(void) {
     p = &camera_presets[camera_preset_index];
     cam->mode = p->mode;
     cam->flags = 1;
-    cam->unk4 = 0;
+    cam->focusFramesLeft = 0;
     cam->target = pos;
     cam->pitchMin = p->pitchMin;
     cam->pitchMax = p->pitchMax;
@@ -95,7 +95,7 @@ void Camera_InitForMap(void) {
             camera_temp_vec.x = 0.0f;
             camera_temp_vec.y = cam->distance * 0.8;
             cam->eyeY = pos->y + p->eyeHeight;
-            Math_RotateVec2(cam->unk84 + player_spawn_rot, &camera_temp_vec);
+            Math_RotateVec2(cam->spawnHeadingOffset + player_spawn_rot, &camera_temp_vec);
             cam->eyeX = pos->x - camera_temp_vec.x;
             cam->eyeZ = pos->z - camera_temp_vec.y;
             cam->orbitAngle = 0.0f;
@@ -109,7 +109,7 @@ void Camera_InitForMap(void) {
     }
     cam->pitch = 0.0f;
     cam->yaw = 0.0f;
-    cam->unk28 = 0.0f;
+    cam->followYaw = 0.0f;
     cam->atX = pos->x;
     cam->atY = pos->y + cam->atHeight;
     cam->atZ = pos->z;
@@ -119,11 +119,11 @@ void Camera_InitForMap(void) {
     cam->eyeVelX = cam->eyeVelY = cam->eyeVelZ = 0.0f;
     cam->orbitSpeed = 0.0f;
     if (cam) {}
-    cam->unk70 = 0.02f;
+    cam->followGain = 0.02f;
     if (cam) {}
-    cam->unk74 = 0.8f;
-    cam->unk78 = 0.005f;
-    cam->unk7C = 0.8f;
+    cam->velocityDamping = 0.8f;
+    cam->orbitGain = 0.005f;
+    cam->orbitDamping = 0.8f;
     camera_shake_timer = 0;
     D_80085C3C = 0;
     camera_fovy = p->fovy;
@@ -225,15 +225,15 @@ void Camera_FollowTarget(Camera *arg0)
     if (arg0->distance < dist)
     {
       a = arg0->distance / dist;
-      vx = (dx - (dx * a)) * arg0->unk70;
-      vz = (dz - (dz * a)) * arg0->unk70;
+      vx = (dx - (dx * a)) * arg0->followGain;
+      vz = (dz - (dz * a)) * arg0->followGain;
     }
     else
       if (dist <= arg0->distance)
     {
       a = arg0->distance / dist;
-      vx = ((dx - (dx * a)) * arg0->unk70) * 0.5;
-      vz = ((dz - (dz * a)) * arg0->unk70) * 0.5;
+      vx = ((dx - (dx * a)) * arg0->followGain) * 0.5;
+      vz = ((dz - (dz * a)) * arg0->followGain) * 0.5;
     }
   }
   else
@@ -245,12 +245,12 @@ void Camera_FollowTarget(Camera *arg0)
   arg0->eyeVelZ += vz;
   arg0->eyeX += arg0->eyeVelX;
   arg0->eyeZ += arg0->eyeVelZ;
-  arg0->eyeVelX *= arg0->unk74;
-  arg0->eyeVelZ *= arg0->unk74;
+  arg0->eyeVelX *= arg0->velocityDamping;
+  arg0->eyeVelZ *= arg0->velocityDamping;
   locked = 0;
   if ((dist < 25.0f) && (!(core_flags & 0x80)))
   {
-    a = target->rot - arg0->unk28;
+    a = target->rot - arg0->followYaw;
     if (a > 3.141592653589793)
     {
       a -= 6.283185307179586;
@@ -306,10 +306,10 @@ void Camera_FollowTarget(Camera *arg0)
     y = player_state.actor.y;
   }
   ny = y - arg0->eyeY;
-  ny *= arg0->unk70 * ((ny < 0.0f) ? (0.2) : (0.8));
+  ny *= arg0->followGain * ((ny < 0.0f) ? (0.2) : (0.8));
   arg0->eyeVelY += ny;
   arg0->eyeY += arg0->eyeVelY;
-  arg0->eyeVelY *= arg0->unk74;
+  arg0->eyeVelY *= arg0->velocityDamping;
   Camera_UpdateLookAt(arg0, target);
   dx = arg0->eyeX - arg0->atX;
   y = arg0->eyeY - arg0->atY;
@@ -329,7 +329,7 @@ void Camera_FollowTarget(Camera *arg0)
     arg0->yaw = Math_Atan2(dx, dz);
     if (!locked)
     {
-      arg0->unk28 = arg0->yaw;
+      arg0->followYaw = arg0->yaw;
     }
   }
 }
@@ -352,7 +352,7 @@ void Camera_UpdateFixedEye(Camera* arg0) {
         arg0->pitch = Math_Atan2(dy, dist);
     }
     if (dx != 0.0f || dz != 0.0f) {
-        arg0->unk28 = Math_Atan2(dx, dz);
+        arg0->followYaw = Math_Atan2(dx, dz);
     }
     if (arg0->pitchMin != 0.0f || arg0->pitchMax != 0.0f) {
         if (arg0->pitch < arg0->pitchMin) {
@@ -366,41 +366,41 @@ void Camera_UpdateFixedEye(Camera* arg0) {
         }
     }
     if (arg0->yawMin < arg0->yawMax) {
-        if (arg0->unk28 < arg0->yawMin) {
-            arg0->unk28 = arg0->yawMin;
+        if (arg0->followYaw < arg0->yawMin) {
+            arg0->followYaw = arg0->yawMin;
             camera_temp_vec.x = 0.0f;
             camera_temp_vec.y = -dist;
-            Math_RotateVec2(arg0->unk28, &camera_temp_vec);
+            Math_RotateVec2(arg0->followYaw, &camera_temp_vec);
             arg0->atX = arg0->eyeX + camera_temp_vec.x;
             arg0->atZ = arg0->eyeZ + camera_temp_vec.y;
-        } else if (arg0->yawMax < arg0->unk28) {
-            arg0->unk28 = arg0->yawMax;
+        } else if (arg0->yawMax < arg0->followYaw) {
+            arg0->followYaw = arg0->yawMax;
             camera_temp_vec.x = 0.0f;
             camera_temp_vec.y = -dist;
-            Math_RotateVec2(arg0->unk28, &camera_temp_vec);
+            Math_RotateVec2(arg0->followYaw, &camera_temp_vec);
             arg0->atX = arg0->eyeX + camera_temp_vec.x;
             arg0->atZ = arg0->eyeZ + camera_temp_vec.y;
         }
     } else if (arg0->yawMax < arg0->yawMin) {
-        if (arg0->unk28 < 0.0) {
-            if (arg0->yawMax < arg0->unk28) {
-                arg0->unk28 = arg0->yawMax;
+        if (arg0->followYaw < 0.0) {
+            if (arg0->yawMax < arg0->followYaw) {
+                arg0->followYaw = arg0->yawMax;
                 camera_temp_vec.x = 0.0f;
                 camera_temp_vec.y = -dist;
-                Math_RotateVec2(arg0->unk28, &camera_temp_vec);
+                Math_RotateVec2(arg0->followYaw, &camera_temp_vec);
                 arg0->atX = arg0->eyeX + camera_temp_vec.x;
                 arg0->atZ = arg0->eyeZ + camera_temp_vec.y;
             }
-        } else if (arg0->unk28 < arg0->yawMin) {
-            arg0->unk28 = arg0->yawMin;
+        } else if (arg0->followYaw < arg0->yawMin) {
+            arg0->followYaw = arg0->yawMin;
             camera_temp_vec.x = 0.0f;
             camera_temp_vec.y = -dist;
-            Math_RotateVec2(arg0->unk28, &camera_temp_vec);
+            Math_RotateVec2(arg0->followYaw, &camera_temp_vec);
             arg0->atX = arg0->eyeX + camera_temp_vec.x;
             arg0->atZ = arg0->eyeZ + camera_temp_vec.y;
         }
     }
-    arg0->yaw = arg0->unk28;
+    arg0->yaw = arg0->followYaw;
 }
 
 void Camera_UpdateHeading(Camera* arg0) {
@@ -408,7 +408,7 @@ void Camera_UpdateHeading(Camera* arg0) {
     f32 dz = arg0->eyeZ - arg0->atZ;
 
     if (dx != 0.0f || dz != 0.0f) {
-        arg0->unk28 = arg0->yaw = Math_Atan2(dx, dz);
+        arg0->followYaw = arg0->yaw = Math_Atan2(dx, dz);
     }
 }
 
@@ -416,7 +416,7 @@ void Camera_UpdateBattle(Camera* arg0) {
     f32 a;
 
     if (arg0->flags & 0x40) {
-        if (--arg0->unk4 == 0) {
+        if (--arg0->focusFramesLeft == 0) {
             arg0->flags &= ~0x40;
             *arg0 = camera_saved_state;
         }
@@ -465,8 +465,8 @@ void Camera_UpdateDelayedTurn(Camera* arg0) {
             if (--camera_delayed_turn.timer == 0) {
                 arg0->mode = camera_delayed_turn.mode;
                 arg0->flags = camera_delayed_turn.flags;
-                camera_state.unk78 = camera_delayed_turn.unk14;
-                camera_state.unk7C = camera_delayed_turn.unk18;
+                camera_state.orbitGain = camera_delayed_turn.orbitGain;
+                camera_state.orbitDamping = camera_delayed_turn.orbitDamping;
             }
             break;
     }
@@ -487,9 +487,9 @@ void Camera_UpdateLookAt(Camera* arg0, Actor* arg1) {
         y = arg1->y;
     }
     y += arg0->atHeight - arg0->atY;
-    arg0->atVelY += y * arg0->unk70 * 2;
+    arg0->atVelY += y * arg0->followGain * 2;
     arg0->atY += arg0->atVelY;
-    arg0->atVelY = arg0->atVelY * (arg0->unk74 * 0.8);
+    arg0->atVelY = arg0->atVelY * (arg0->velocityDamping * 0.8);
 }
 
 void Camera_OrbitTarget(Camera* arg0, Actor* arg1) {
@@ -507,11 +507,11 @@ void Camera_OrbitTarget(Camera* arg0, Actor* arg1) {
         } else if (angle < -3.141592653589793) {
             angle += 6.283185307179586;
         }
-        speed = arg0->unk78 * angle + arg0->orbitSpeed;
+        speed = arg0->orbitGain * angle + arg0->orbitSpeed;
     } else {
         speed = arg0->orbitSpeed;
     }
-    arg0->orbitSpeed = arg0->unk7C * speed;
+    arg0->orbitSpeed = arg0->orbitDamping * speed;
     camera_temp_vec.x = dx;
     camera_temp_vec.y = dz;
     Math_RotateVec2(speed, &camera_temp_vec);
@@ -587,7 +587,7 @@ void Camera_StartBattleFocus(s32 arg0, Actor* arg1) {
     camera_state.eyeHeight = (arg1->unk5E & 4) ? 20.0 : 15.0;
     camera_state.eyeVelZ = 0.0f;
     camera_state.distance = h;
-    camera_state.unk4 = arg0;
+    camera_state.focusFramesLeft = arg0;
     camera_state.eyeVelY = camera_state.eyeVelZ;
     camera_state.orbitSpeed = 0.0f;
     camera_temp_vec.x = 0.0f;
@@ -608,8 +608,8 @@ void Camera_SetPresetDelayedTurn(s32 arg0) {
     camera_delayed_turn.timer = 15;
     camera_delayed_turn.mode = camera_state.mode;
     camera_delayed_turn.flags = camera_state.flags;
-    camera_delayed_turn.unk14 = 0.005f;
-    camera_delayed_turn.unk18 = 0.9f;
+    camera_delayed_turn.orbitGain = 0.005f;
+    camera_delayed_turn.orbitDamping = 0.9f;
     camera_state.mode = 5;
     camera_state.orbitAngle = camera_delayed_turn.orbitAngle;
 }
@@ -650,7 +650,7 @@ void Camera_SetTargetView(CameraPreset* arg0, Actor* arg1) {
 void Camera_TurnForExit(void) {
     f32 a;
 
-    a = camera_state.unk28 - player_state.actor.rot;
+    a = camera_state.followYaw - player_state.actor.rot;
     if (a < -3.141592653589793) {
         a += 6.283185307179586;
     } else if (a > 3.141592653589793) {
@@ -668,7 +668,7 @@ void Camera_TurnForExit(void) {
     } else if (a > 3.141592653589793) {
         a -= 6.283185307179586;
     }
-    camera_state.unk84 = a;
+    camera_state.spawnHeadingOffset = a;
     camera_state.orbitAngle = exit_destination.angle + 3.141592653589793;
     if (camera_state.orbitAngle > 3.141592653589793) {
         camera_state.orbitAngle -= 6.283185307179586;
