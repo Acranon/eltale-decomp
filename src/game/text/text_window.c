@@ -1,78 +1,16 @@
-#include "common.h"
+#include "game/text/text_window.h"
 
 /*
  * Text windows: slot lifecycle, message and choice layout, input, and drawing.
  * Original file: 337B0.c (ROM 0x337B0).
  */
 
-typedef struct {
-    /* 0x000 */ s32 unk0;
-    /* 0x004 */ s16 unk4;
-    /* 0x006 */ s16 unk6;
-    /* 0x008 */ s16 unk8;
-    /* 0x00A */ s16 unkA;
-    /* 0x00C */ s16 unkC;
-    /* 0x00E */ u8 unkE;
-    /* 0x00F */ u8 unkF;
-#ifdef NON_MATCHING
-    /* Text_UpdateAndDrawWindows reads these with lb/lhu/lb (the matched functions only store
-       them or compile the same with these widths) */
-    /* 0x010 */ s8 unk10;
-    /* 0x012 */ u16 unk12;
-    /* 0x014 */ u8 unk14;
-    /* 0x015 */ s8 unk15;
-#else
-    /* 0x010 */ u8 unk10;
-    /* 0x012 */ s16 unk12;
-    /* 0x014 */ u8 unk14;
-    /* 0x015 */ u8 unk15;
-#endif
-    /* 0x016 */ u8 unk16;
-    /* 0x017 */ u8 unk17[32];
-    /* 0x038 */ s16 unk38;
-    /* 0x03A */ s16 unk3A;
-    /* 0x03C */ u8 unk3C[4][24];
-    /* 0x09C */ u8 unk9C[0x4B0];
-    /* 0x54C */ u8 unk54C[0x4B0];
-} Unk80090470; /* size = 0x9FC */
 
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-} Unk800616A8;
 
-typedef struct {
-    /* 0x00 */ s32 n;
-    /* 0x04 */ s32 m;
-    /* 0x08 */ u8 *rows[4];
-} Unk80090458;
 
-typedef struct {
-    /* 0x0 */ u8 v[8];
-} Unk8Bytes;
 
-typedef struct {
-    /* 0x00 */ u8 v[32];
-} Bytes32;
 
-typedef struct {
-    /* 0x00 */ u8 *p[5];
-} TexPtrs5;
 
-typedef struct {
-    /* 0x00 */ s32 w;
-    /* 0x04 */ s32 h;
-    /* 0x08 */ s32 cms;
-    /* 0x0C */ s32 cmt;
-    /* 0x10 */ s32 masks;
-    /* 0x14 */ s32 maskt;
-} TexParam; /* size = 0x18 */
-
-typedef struct {
-    /* 0x00 */ TexParam e[5];
-} TexParams5;
 
 extern Gfx *gfx_dl_head;
 extern u16 text_window_tlut[];
@@ -80,40 +18,37 @@ extern u16 text_window_tlut[];
 s8 text_reveal_delay_steps[8] = {
     -1, 0, 1, 2, 4, 8, 16, 30,
 };
-Unk800616A8 text_window_default_rects[8] = {
+TextWindowRect text_window_default_rects[8] = {
     { 34, 148, 252, 68 }, { 34, 20, 252, 68 }, { 40, 30, 240, 52 }, { 40, 150, 240, 52 },
     { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
 };
-Unk800616A8 text_choice_window_rect = { 180, 110, 30, 40 };
+TextWindowRect text_choice_window_rect = { 180, 110, 30, 40 };
 s8 menu_text_delay_option = 2;
 s32 D_800616B4 = -1;
-Unk8Bytes D_800616B8 = { { 5, 3, 1, 0, 1, 2, 3, 4 } };
-Unk8Bytes D_800616C0 = { { 7, 5, 3, 0, 1, 3, 5, 7 } };
-Unk8Bytes D_800616C8 = { { 3, 1, 0, 0, 0, 1, 2, 3 } };
+TextAnimSteps D_800616B8 = { { 5, 3, 1, 0, 1, 2, 3, 4 } };
+TextAnimSteps D_800616C0 = { { 7, 5, 3, 0, 1, 3, 5, 7 } };
+TextAnimSteps D_800616C8 = { { 3, 1, 0, 0, 0, 1, 2, 3 } };
 extern u8 text_window_fill_tex[];
 extern u8 text_speaker_name_bg_tex[];
 extern u8 text_advance_icon_tex[];
 extern u8 text_window_line_tex[];
 extern u8 text_choice_cursor_tex[];
-TexPtrs5 text_rect_texture_ptrs = { { text_window_fill_tex, text_speaker_name_bg_tex, text_advance_icon_tex, text_window_line_tex, text_choice_cursor_tex } };
-TexParams5 text_rect_texture_params = { { { 16, 16, 0, 0, 4, 4 }, { 40, 13, 0, 0, 0, 0 }, { 12, 12, 0, 0, 0, 0 }, { 1, 1, 2, 2, 0, 0 }, { 12, 12, 0, 0, 0, 0 } } };
+TextTexturePointers text_rect_texture_ptrs = { { text_window_fill_tex, text_speaker_name_bg_tex, text_advance_icon_tex, text_window_line_tex, text_choice_cursor_tex } };
+TextTextureTiles text_rect_texture_params = { { { 16, 16, 0, 0, 4, 4 }, { 40, 13, 0, 0, 0, 0 }, { 12, 12, 0, 0, 0, 0 }, { 1, 1, 2, 2, 0, 0 }, { 12, 12, 0, 0, 0, 0 } } };
 extern u8 text_speaker_name[32];
 extern u8 text_message_buf[0x4B0];
 extern s32 core_flags;
 /* .bss 80090450..80092C70 */
 s32 text_active_window_count;
 s32 text_last_choice_index;
-Unk80090458 text_pending_choice_rows;
-Unk80090470 text_window_slots[4];
+TextChoiceRows text_pending_choice_rows;
+TextWindow text_window_slots[4];
 u8 text_stick_advance_enabled;
 u16 text_stick_advance_frames;
 extern s8 input_stick_x;
 extern s8 input_stick_y;
 
-void Text_ResetWindow(s32 arg0, u8 arg1);
-void Text_DrawTexturedRect(s32, s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, u8 *);
-void Text_ResetStickAdvanceTimer(void);
 
 #ifdef NON_MATCHING
 typedef union {
@@ -126,14 +61,6 @@ extern Gfx text_glyph_setup_dl[];
 extern u16 input_pressed_buttons;
 extern u8 save_menu_choice_cursor;
 void Sfx_Play(u8, s8, u8);
-s32 Text_AnimateWindowSize(s32);
-void Text_DrawWindowFrame(s32);
-void Text_BuildVisiblePage(s32);
-void Text_DrawAdvanceIndicator(s32);
-void Text_MeasureChoiceWindow(s32);
-void Text_DrawWindowContents(s32);
-s32 Text_IsStickAdvanceHeld(void);
-s32 Text_OpenWindow(s32);
 #endif
 
 void Text_ResetAllWindows(s32 arg0) {
@@ -596,7 +523,7 @@ void Text_UpdateAndDrawWindows(void) {
 #endif
 
 s32 Text_AnimateWindowSize(s32 idx) {
-    Unk80090470 *p = &text_window_slots[idx];
+    TextWindow *p = &text_window_slots[idx];
     s32 ret;
     s32 ww;
     s32 hh;
@@ -664,7 +591,7 @@ void Text_DrawWindowContents(s32 arg0) {
 }
 
 void Text_DrawWindowFrame(s32 idx) {
-    Unk80090470 *p;
+    TextWindow *p;
     s32 x;
     s32 y;
 
@@ -687,7 +614,7 @@ void Text_DrawWindowFrame(s32 idx) {
 #ifdef NON_MATCHING
 /* frame 0x40 vs 0x48, one more saved register, row loop tested as row != rows + 1; code is equivalent */
 void Text_BuildVisiblePage(s32 idx) {
-    Unk80090470 *p = &text_window_slots[idx];
+    TextWindow *p = &text_window_slots[idx];
     s32 cols = (p->unk8 - 20) / 10 + 1;
     s32 rows = (p->unkA - 20) / 13;
     s32 k = 0;
@@ -761,9 +688,9 @@ void Text_DrawAdvanceIndicator(s32 idx) {
     s32 x;
     s32 y;
     s32 i;
-    Unk8Bytes a = D_800616B8;
-    Unk8Bytes b = D_800616C0;
-    Unk8Bytes c = D_800616C8;
+    TextAnimSteps a = D_800616B8;
+    TextAnimSteps b = D_800616C0;
+    TextAnimSteps c = D_800616C8;
 
     gDPPipeSync(gfx_dl_head++);
     gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -836,9 +763,9 @@ void Text_DrawTexturedRect(s32 type, s32 x, s32 y, s32 w, s32 h)
 {
   u32 new_var;
   Gfx *new_var2;
-  TexParam *t;
-  TexPtrs5 tex = text_rect_texture_ptrs;
-  TexParams5 prm = text_rect_texture_params;
+  TextTextureTile *t;
+  TextTexturePointers tex = text_rect_texture_ptrs;
+  TextTextureTiles prm = text_rect_texture_params;
 
   { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
   ;

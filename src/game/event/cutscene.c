@@ -1,41 +1,16 @@
-#include "common.h"
+#include "game/event/cutscene.h"
+
+/* Temporary full view until the math owner's keyframe.h lands. */
+struct KfAnim {
+    /* 0x00 */ void *kfs;
+    /* 0x04 */ u16 count;
+    /* 0x06 */ u16 last;
+};
 
 /*
  * Cutscene scene sequencing, camera tracks, and timed image cue drawing.
  * Original file: 36E60.c (ROM 0x36E60).
  */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[6];
-    /* 0x06 */ u16 unk6;
-} Unk80092EDC;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ Unk80092EDC *unk18;
-    /* 0x1C */ void *unk1C;
-} Unk801D8620; /* size = 0x20 */
-
-typedef struct {
-    /* 0x00 */ u16 frame;
-    /* 0x02 */ u16 dur;
-    /* 0x04 */ s16 x;
-    /* 0x06 */ s16 y;
-    /* 0x08 */ s16 w;
-    /* 0x0A */ s16 h;
-    /* 0x0C */ u16 *tlut;
-    /* 0x10 */ u8 *img;
-} Cue; /* size = 0x14 */
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x04 */ Cue *unk4;
-} Unk80092EE8; /* size = 0x8 */
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -79,10 +54,10 @@ extern s32 text_active_window_count;
 s32 cutscene_sequence_index;
 s32 cutscene_camera_frame; /* current camera-track frame */
 s32 cutscene_camera_end_frame;
-Unk80092EDC *cutscene_camera_track;
+KfAnim *cutscene_camera_track;
 s32 cutscene_image_frame;
-Cue *cutscene_next_image_cue;
-Unk80092EE8 cutscene_image_cue_slots[32];
+CutsceneImageCue *cutscene_next_image_cue;
+CutsceneImageCueSlot cutscene_image_cue_slots[32];
 extern Gfx *gfx_dl_head;
 /* This file's .data, 80061850..8006CD00: textures and palettes (assets; the
  * converter put a gsSPEndDisplayList word after most images), message text
@@ -636,17 +611,16 @@ Gfx cutscene_image_setup_dl[14] = {
     {{ 0xB8000000, 0x00000000 }},
     {{ 0x00000000, 0x00000000 }},
 };
-extern Unk801D8620 D_801D8620[];
+extern CutsceneSequenceEntry D_801D8620[];
 
 void Player_Spawn(void);
 void Map_LoadArea(void);
 void Camera_InitForMap(void);
 void Audio_StartSeqFadeOut(s32);
-void Math_EvalTcbSpline(Unk80092EDC *, f32 *, s32);
+void Math_EvalTcbSpline(KfAnim *, f32 *, s32);
 void Math_MtxFRotate(f32 (*)[4], f32, f32, f32);
 void Math_MtxFMulVecNegZ(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
-void Text_ResetAllWindows(s32, Unk80092EDC **);
-void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame);
+void Text_ResetAllWindows(s32, KfAnim **);
 
 void Cutscene_ResetSequence(void) {
     cutscene_sequence_index = 0;
@@ -654,12 +628,12 @@ void Cutscene_ResetSequence(void) {
 }
 
 void Cutscene_StartNextScene(void) {
-    Unk801D8620 *e = &D_801D8620[cutscene_sequence_index++];
+    CutsceneSequenceEntry *e = &D_801D8620[cutscene_sequence_index++];
     s32 i;
 
-    cutscene_camera_track = e->unk18;
+    cutscene_camera_track = e->camera_track;
     cutscene_camera_frame = 0;
-    cutscene_camera_end_frame = cutscene_camera_track->unk6;
+    cutscene_camera_end_frame = cutscene_camera_track->last;
     map_id = -1;
     map_next_id = e->unk0;
     map_next_subarea = e->unk4;
@@ -685,9 +659,9 @@ void Cutscene_StartNextScene(void) {
     npc_count = 0;
     enemy_count = 0;
     cutscene_image_frame = 0;
-    cutscene_next_image_cue = e->unk1C;
+    cutscene_next_image_cue = e->image_cues;
     for (i = 0; i < 32; i++) {
-        cutscene_image_cue_slots[i].unk0 = 0;
+        cutscene_image_cue_slots[i].remaining_frames = 0;
     }
 }
 
@@ -718,12 +692,12 @@ void Cutscene_EndScene(void) {
     }
 }
 
-void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame) {
+void Cutscene_ApplyCameraFrame(KfAnim *arg0, s32 frame) {
     f32 buf[9];
     f32 m[4][4];
 
-    if (arg0->unk6 < frame) {
-        frame = arg0->unk6;
+    if (arg0->last < frame) {
+        frame = arg0->last;
     }
     Math_EvalTcbSpline(arg0, buf, frame);
     camera_state.unkC = buf[0];
@@ -737,8 +711,8 @@ void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame) {
 }
 
 void Cutscene_UpdateAndDrawImageCues(void) {
-    Cue *cue;
-    Unk80092EE8 *slot;
+    CutsceneImageCue *cue;
+    CutsceneImageCueSlot *slot;
     s32 n;
     s32 a;
     u16 d;
@@ -749,13 +723,13 @@ void Cutscene_UpdateAndDrawImageCues(void) {
     slot = cutscene_image_cue_slots;
     if (cutscene_image_frame == cutscene_next_image_cue->frame) {
         do {
-            while (n != 0 && slot->unk0 != 0) {
+            while (n != 0 && slot->remaining_frames != 0) {
                 n--;
                 slot++;
             }
             cutscene_next_image_cue->tlut[0] = 0;
-            slot->unk0 = cutscene_next_image_cue->dur;
-            slot->unk4 = cutscene_next_image_cue;
+            slot->remaining_frames = cutscene_next_image_cue->dur;
+            slot->cue = cutscene_next_image_cue;
             cutscene_next_image_cue++;
         } while (cutscene_image_frame == cutscene_next_image_cue->frame);
     }
@@ -763,9 +737,9 @@ void Cutscene_UpdateAndDrawImageCues(void) {
     gSPDisplayList(gfx_dl_head++, cutscene_image_setup_dl);
     for (n = 32; n != 0; slot++) {
         n--;
-        d = slot->unk0;
-        if (slot->unk0) {
-            cue = slot->unk4;
+        d = slot->remaining_frames;
+        if (slot->remaining_frames) {
+            cue = slot->cue;
             if (d < 16) {
                 a = d * 16;
             } else {
@@ -781,7 +755,7 @@ void Cutscene_UpdateAndDrawImageCues(void) {
             gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, a);
             xr = (cue->x + cue->w) & ~1;
             gSPTextureRectangle(gfx_dl_head++, cue->x << 2, cue->y << 2, xr << 2, (cue->y + cue->h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-            slot->unk0--;
+            slot->remaining_frames--;
         }
     }
     cutscene_image_frame++;
