@@ -925,9 +925,9 @@ void Enemy_SpawnDeathEffects(Actor *obj) {
     f32 y;
     MagicVisualDef *t;
 
-    enemy_temp_vec.x = enemy_effect_defs[20].unk8;
-    enemy_temp_vec.y = enemy_effect_defs[20].unkC;
-    t = &D_800C18D8[enemy_effect_defs[20].unk0];
+    enemy_temp_vec.x = enemy_effect_defs[20].scale_x;
+    enemy_temp_vec.y = enemy_effect_defs[20].scale_y;
+    t = &D_800C18D8[enemy_effect_defs[20].visual_def_index];
     enemy_temp_vec.z = obj->unk28;
     if (obj->stats->unk0 == 1) {
         y = obj->battle->unk94;
@@ -979,7 +979,7 @@ void Enemy_RunAttackScript(void) {
                 en->unk24 = enemy_temp_vec.y;
             } else {
                 d = &enemy_effect_defs[e->unk2];
-                t = &D_800C18D8[d->unk0];
+                t = &D_800C18D8[d->visual_def_index];
                 enemy_temp_vec.x = e->unk8;
                 enemy_temp_vec.y = e->unk10;
                 Math_RotateVec2(obj->rot + e->unk14, (Vec2f *)&enemy_temp_vec);
@@ -996,8 +996,8 @@ void Enemy_RunAttackScript(void) {
                 x += enemy_temp_vec.x * s;
                 y += e->unkC * s;
                 z += enemy_temp_vec.y * s;
-                enemy_temp_vec.x = d->unk8;
-                enemy_temp_vec.y = d->unkC;
+                enemy_temp_vec.x = d->scale_x;
+                enemy_temp_vec.y = d->scale_y;
                 m = enemy_script_enemy->unk1C->unk0;
                 if (m & 0x8000) {
                     enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C;

@@ -264,7 +264,7 @@ void Player_SetSpawnFromSaveTable(void) {
     map_next_subarea = map_subarea;
     exit_destination.entry = 0;
     for (i = 0; i < 17; i++) {
-        if (map_id == player_save_spawn_points[i].unk0 && map_subarea == player_save_spawn_points[i].unk2) {
+        if (map_id == player_save_spawn_points[i].map_id && map_subarea == player_save_spawn_points[i].subarea) {
             player_spawn_x = player_save_spawn_points[i].x;
             player_spawn_z = player_save_spawn_points[i].y;
             player_spawn_rot = player_save_spawn_points[i].rot;

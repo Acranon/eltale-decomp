@@ -40,8 +40,8 @@ typedef struct SaveHeader {
 } SaveHeader; /* 0x68 bytes */
 
 typedef struct SaveFileEntry {
-    /* 0x00 */ s8 unk0;
-    /* 0x01 */ s8 unk1;
+    /* 0x00 */ s8 file_no;
+    /* 0x01 */ s8 extension_id;
 } SaveFileEntry; /* 0x2 bytes */
 
 extern u16 save_menu_flags;

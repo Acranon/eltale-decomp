@@ -777,7 +777,7 @@ void PakMenu_DrawNoteRow(s32 arg0) {
             PakMenu_DrawChar((&pak_menu_note_states[arg0])[pak_menu_list_offset].unkA);
         }
         PakMenu_SetCursor(0x100, y);
-        PakMenu_FormatNumber(((&pak_menu_note_states[arg0])[pak_menu_list_offset].unk0 + 0xFF) >> 8, buf);
+        PakMenu_FormatNumber(((&pak_menu_note_states[arg0])[pak_menu_list_offset].file_size + 0xFF) >> 8, buf);
         PakMenu_DrawString(buf, 3);
     }
     y = arg0 * 13 + 0x58;
@@ -1048,7 +1048,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     PakMenu_DrawCursor();
                 }
                 if ((pak_menu_dialog_selection == 0) && (btn & 0x8000)) {
-                    sub = 0; file = &pak_menu_note_states[ret2]; ret = osPfsDeleteFile(&pfs, file->unk8, file->unk4, file->name, &file->unkA);
+                    sub = 0; file = &pak_menu_note_states[ret2]; ret = osPfsDeleteFile(&pfs, file->company_code, file->game_code, file->name, &file->unkA);
                     if (ret != 0) {
                         if (ret == 1) {
                             pak_menu_state = 8;
@@ -1056,7 +1056,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             pak_menu_state = 7;
                         }
                     } else {
-                        count--; pak_menu_note_errors[ret2] = -1; pak_menu_free_pages += (u8) ((pak_menu_note_states[ret2].unk0 + 0xFF) >> 8); if (count != 0) {
+                        count--; pak_menu_note_errors[ret2] = -1; pak_menu_free_pages += (u8) ((pak_menu_note_states[ret2].file_size + 0xFF) >> 8); if (count != 0) {
                             pak_menu_state = 2;
                         } else {
                             pak_menu_state = 1;

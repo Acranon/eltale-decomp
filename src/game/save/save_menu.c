@@ -552,8 +552,8 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         idx = save_menu_selected_slot;
     }
     ptr[0] = &save_menu_file_entries[idx];
-    if (ptr[0]->unk0 != -2) {
-        if (ptr[0]->unk1 != -1) {
+    if (ptr[0]->file_no != -2) {
+        if (ptr[0]->extension_id != -1) {
             if (idx == save_menu_selected_slot) {
                 Menu_DrawNumber(2, 0x6F, 0x36, idx, 0xA);
                 Menu_DrawSprite(0x36, 0x53, 0x35, 0x1C, 0xD);
@@ -653,9 +653,9 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     SaveMenu_SetTextDrawState();
     idx++;
     ptr[0]++;
-    if (ptr[0]->unk0 != -1 && flag == 0) {
-        if (ptr[0]->unk0 != -2) {
-            if (ptr[0]->unk1 != -1) {
+    if (ptr[0]->file_no != -1 && flag == 0) {
+        if (ptr[0]->file_no != -2) {
+            if (ptr[0]->extension_id != -1) {
                     if (idx == save_menu_selected_slot) {
                     Menu_DrawNumber(2, 0x6F, 0x83, idx, 0xA);
                     Menu_DrawSprite(0x36, 0x53, 0x82, 0x1C, 0xD);
@@ -761,7 +761,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
         Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
     }
-    if (ptr[0] < &save_menu_file_entries[16] && ptr[0][1].unk0 != -1) {
+    if (ptr[0] < &save_menu_file_entries[16] && ptr[0][1].file_no != -1) {
         Menu_DrawSprite(5, 0x38, 0xA4, 7, 7);
         Menu_DrawSprite(0x54, 0x36, 0xAC - flag, 0xE, 0xB);
     }
@@ -776,7 +776,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
             if (save_menu_stick_repeat_counter == 0) {
                 Sfx_Play(0, 0, 0xFF);
                 save_menu_selected_slot++;
-                if (save_menu_file_entries[save_menu_selected_slot].unk0 == -1) {
+                if (save_menu_file_entries[save_menu_selected_slot].file_no == -1) {
                     save_menu_selected_slot--;
                     n = 1;
                 }
@@ -828,7 +828,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     save_menu_flags |= 5;
                     break;
                 case 4:
-                    if (save_menu_file_entries[save_menu_selected_slot].unk0 == -2) {
+                    if (save_menu_file_entries[save_menu_selected_slot].file_no == -2) {
                         save_menu_flags |= 0x2000;
                         save_menu_operation_panel_index = 2;
                         save_menu_flags &= ~7;
@@ -863,7 +863,7 @@ void SaveMenu_UpdateDelay(void) {
 }
 
 void SaveMenu_DeleteSelectedFile(void) {
-    s32 err = Pak_DeleteGameFile(input_primary_port, (u8)save_menu_file_entries[save_menu_selected_slot].unk1);
+    s32 err = Pak_DeleteGameFile(input_primary_port, (u8)save_menu_file_entries[save_menu_selected_slot].extension_id);
 
     if (err != 0) {
         save_menu_pak_error = err;
@@ -890,12 +890,12 @@ void SaveMenu_DeleteSelectedFile(void) {
         save_menu_flags &= ~0x2000;
         save_menu_dialog_index = 22;
         save_menu_delay_frames = 10;
-        save_menu_file_entries[save_menu_selected_slot].unk1 = -1;
+        save_menu_file_entries[save_menu_selected_slot].extension_id = -1;
     }
 }
 
 void SaveMenu_LoadSelectedFile(void) {
-    s32 err = Pak_ReadFile(input_primary_port, save_menu_file_entries[save_menu_selected_slot].unk0, 0x80, 0xE0, save_menu_state_read_scratch);
+    s32 err = Pak_ReadFile(input_primary_port, save_menu_file_entries[save_menu_selected_slot].file_no, 0x80, 0xE0, save_menu_state_read_scratch);
 
     save_menu_game_state_block = *(SaveGameStateBlock *)save_menu_state_read_scratch;
     if (err != 0) {
@@ -939,7 +939,7 @@ void SaveMenu_SaveSelectedFile(void) {
     idx = save_menu_selected_slot;
     p = &save_menu_file_entries[idx];
 
-    if (p->unk0 == -2) {
+    if (p->file_no == -2) {
         cont = input_primary_port;
         n = pak_game_file_scans[cont].unk0 & 0xF;
         id = 0xF;
@@ -947,7 +947,7 @@ void SaveMenu_SaveSelectedFile(void) {
             i = 0;
             id++;
             do {
-                if (id == save_menu_file_entries[i].unk1) {
+                if (id == save_menu_file_entries[i].extension_id) {
                     i = 0x7F;
                     break;
                 }
@@ -958,14 +958,14 @@ void SaveMenu_SaveSelectedFile(void) {
                 id = -1;
             }
         } while (id >= 0);
-        p->unk1 = n;
+        p->extension_id = n;
         if (idx + 1 < 16) {
-            p[1].unk1 = -2;
+            p[1].extension_id = -2;
         }
         err = Pak_AllocateGameFile(cont, n);
         if (err >= 0) {
             idx = save_menu_selected_slot;
-            save_menu_file_entries[idx].unk0 = err;
+            save_menu_file_entries[idx].file_no = err;
         } else {
             idx = save_menu_selected_slot;
         }
@@ -974,7 +974,7 @@ void SaveMenu_SaveSelectedFile(void) {
         SaveMenu_CaptureGameState(idx);
     }
     id = save_menu_selected_slot;
-    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[id].unk0, 0, 0x80, &save_menu_save_headers[id]);
+    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[id].file_no, 0, 0x80, &save_menu_save_headers[id]);
     if (err != 0) {
         save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
@@ -996,7 +996,7 @@ void SaveMenu_SaveSelectedFile(void) {
         save_menu_flags &= ~0x2000;
         return;
     }
-    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[save_menu_selected_slot].unk0, 0x80, 0xE0, &save_menu_game_state_block);
+    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[save_menu_selected_slot].file_no, 0x80, 0xE0, &save_menu_game_state_block);
     if (err != 0) {
         save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
@@ -1032,7 +1032,7 @@ void SaveMenu_RepairPak(void) {
     s32 err;
 
     func_8003D8EC("Repair Info %d %d\n", save_menu_selected_slot, save_menu_pak_error);
-    err = Pak_TryRepair(save_menu_file_entries[save_menu_selected_slot].unk0, save_menu_pak_error);
+    err = Pak_TryRepair(save_menu_file_entries[save_menu_selected_slot].file_no, save_menu_pak_error);
     if (err != 0) {
         save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
@@ -1071,8 +1071,8 @@ void SaveMenu_RefreshFileList(void) {
     s32 ret;
 
     for (i = 0; i < 17; i++) {
-        save_menu_file_entries[i].unk0 = -1;
-        save_menu_file_entries[i].unk1 = -1;
+        save_menu_file_entries[i].file_no = -1;
+        save_menu_file_entries[i].extension_id = -1;
     }
     cont = input_primary_port;
     n = 0;
@@ -1081,21 +1081,21 @@ void SaveMenu_RefreshFileList(void) {
             continue;
         }
         if (pak_game_file_scans[cont].unk2[i] >= 0) {
-            save_menu_file_entries[n].unk0 = i;
-            save_menu_file_entries[n].unk1 = pak_game_file_scans[cont].unk2[i];
+            save_menu_file_entries[n].file_no = i;
+            save_menu_file_entries[n].extension_id = pak_game_file_scans[cont].unk2[i];
             n++;
         }
     }
     if (menu_flags & 4) {
         if (pak_game_file_scans[cont].unk13 >= 2 && !(pak_game_file_scans[cont].unk0 & 0x2000)) {
-            save_menu_file_entries[n].unk0 = -2;
+            save_menu_file_entries[n].file_no = -2;
         }
     }
     save_menu_selected_slot = 0;
     for (i = 0; i < 16; i++) {
-        if (save_menu_file_entries[i].unk0 >= 0) {
+        if (save_menu_file_entries[i].file_no >= 0) {
             e = &save_menu_save_headers[i];
-            ret = Pak_ReadFile(input_primary_port, save_menu_file_entries[i].unk0, 0, 0x80, (u8 *)&save_menu_header_read_scratch);
+            ret = Pak_ReadFile(input_primary_port, save_menu_file_entries[i].file_no, 0, 0x80, (u8 *)&save_menu_header_read_scratch);
             *e = save_menu_header_read_scratch;
             if (ret != 0) {
                 save_menu_pak_error = err;

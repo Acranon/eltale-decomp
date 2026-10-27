@@ -21,20 +21,20 @@ typedef struct MenuRomRange {
 } MenuRomRange; /* 0x8 bytes */
 
 typedef struct SaveSpawnPoint {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
+    /* 0x00 */ u16 map_id;
+    /* 0x02 */ u16 subarea;
     /* 0x04 */ f32 x;
     /* 0x08 */ f32 y;
     /* 0x0C */ f32 rot;
 } SaveSpawnPoint; /* 0x10 bytes */
 
 typedef struct EnemyEffectDef {
-    /* 0x00 */ s16 unk0; /* index into D_800C18D8 (MagicVisualDef, magic.h); read with lh */
+    /* 0x00 */ s16 visual_def_index; /* index into D_800C18D8 (MagicVisualDef, magic.h); read with lh */
     /* 0x02 */ u16 unk2;
     /* 0x04 */ u16 unk4;
     /* 0x06 */ u16 unk6;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
+    /* 0x08 */ f32 scale_x;
+    /* 0x0C */ f32 scale_y;
 } EnemyEffectDef; /* 0x10 bytes */
 
 typedef struct MenuMapLocation {

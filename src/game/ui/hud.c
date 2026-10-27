@@ -77,23 +77,23 @@ extern HudTextureDesc D_803A8748;
 
 
 typedef struct {
-    /* 0x00 */ u16 unk0;
+    /* 0x00 */ u16 status_bits;
     /* 0x02 */ char unk2[0x12 - 0x2];
-    /* 0x12 */ u8 unk12[0x10];
-    /* 0x22 */ s8 unk22[0x10];
-    /* 0x32 */ s8 unk32[0x12];
-    /* 0x44 */ s32 unk44[4];
+    /* 0x12 */ u8 status_icon_ids[0x10];
+    /* 0x22 */ s8 status_icon_timers[0x10];
+    /* 0x32 */ s8 status_effect_timers[0x12];
+    /* 0x44 */ s32 status_effect_handles[4];
     /* 0x54 */ char unk54[0x94 - 0x54];
     /* 0x94 */ f32 unk94;
 } Struct_8002373C_68; /* view of ActorBattle opaque status/icon fields */
 
 
 typedef struct {
-    /* 0x0 */ s16 unk0;
+    /* 0x0 */ s16 visual_def_index;
     /* 0x2 */ u16 unk2;
     /* 0x4 */ u16 unk4;
-    /* 0x8 */ f32 unk8;
-    /* 0xC */ f32 unkC;
+    /* 0x8 */ f32 scale_x;
+    /* 0xC */ f32 scale_y;
 } Struct_803AA6C4;
 
 extern MagicVisualDef D_803AA690[];
@@ -721,19 +721,19 @@ void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
 
     for (i = 0; i < 7; i++) {
         if (hud_actor_status_masks[i] & mask) {
-            s->unk12[i] = idx;
-            s->unk22[i] = val;
+            s->status_icon_ids[i] = idx;
+            s->status_icon_timers[i] = val;
             break;
         }
     }
     for (i = 0; i < 4; i++) {
-        if ((hud_actor_status_effect_masks[i] & mask) && s->unk44[i] == 0) {
-            s->unk32[i] = val;
+        if ((hud_actor_status_effect_masks[i] & mask) && s->status_effect_handles[i] == 0) {
+            s->status_effect_timers[i] = val;
             e = &D_803AA6C4[idx];
-            hud_temp_vec.x = e->unk8;
-            hud_temp_vec.y = e->unkC;
+            hud_temp_vec.x = e->scale_x;
+            hud_temp_vec.y = e->scale_y;
             hud_temp_vec.z = 1.0f;
-            fx = &D_803AA690[e->unk0];
+            fx = &D_803AA690[e->visual_def_index];
             if (arg0->stats->unk0 == 1) {
                 if (e->unk4 & 0x100) {
                     y = arg0->battle->unk94;
@@ -745,17 +745,17 @@ void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
             } else {
                 y = arg0->y;
             }
-            s->unk44[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->x, y, arg0->z, 0.0f, fx, &hud_temp_vec, arg0);
+            s->status_effect_handles[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->x, y, arg0->z, 0.0f, fx, &hud_temp_vec, arg0);
             return;
         }
     }
 }
 
 typedef struct {
-    /* 0x0 */ s16 unk0;
-    /* 0x2 */ s16 unk2;
-    /* 0x4 */ u16 unk4;
-    /* 0x6 */ u16 unk6;
+    /* 0x0 */ s16 s;
+    /* 0x2 */ s16 t;
+    /* 0x4 */ u16 width;
+    /* 0x6 */ u16 height;
 } Struct_803AA628;
 
 
@@ -792,20 +792,20 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
         oy = 0;
         ox = 0;
         for (i = 0; i < 7; i++) {
-            if (s->unk12[i] != 0) {
-                e = &D_803AA628[s->unk12[i]];
-                u = e->unk0;
-                v = e->unk2;
-                w = e->unk4;
-                h = e->unk6;
+            if (s->status_icon_ids[i] != 0) {
+                e = &D_803AA628[s->status_icon_ids[i]];
+                u = e->s;
+                v = e->t;
+                w = e->width;
+                h = e->height;
                 if (vis) {
                     Hud_DrawTextureTile(D_803A8728, sx + ox - (w >> 1), sy + oy - (h >> 1), w, h, u, v, 0x400, 0x400);
                 }
-                if (!(hud_actor_status_masks[i] & s->unk0)) {
-                    s->unk12[i] = 0;
-                } else if (s->unk22[i] > 0) {
-                    if (--s->unk22[i] == 0) {
-                        s->unk12[i] = 0;
+                if (!(hud_actor_status_masks[i] & s->status_bits)) {
+                    s->status_icon_ids[i] = 0;
+                } else if (s->status_icon_timers[i] > 0) {
+                    if (--s->status_icon_timers[i] == 0) {
+                        s->status_icon_ids[i] = 0;
                     }
                 }
                 ox += w >> 1;
@@ -814,8 +814,8 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
         }
     }
     for (i = 0; i < 4; i++) {
-        if (s->unk44[i] != 0) {
-            fx = (EffectModel*)((Struct_8002373C_68*)arg0->battle)->unk44[i];
+        if (s->status_effect_handles[i] != 0) {
+            fx = (EffectModel*)((Struct_8002373C_68*)arg0->battle)->status_effect_handles[i];
             fx->unkC = arg0->x;
             fx->unk14 = arg0->z;
             if (arg0->stats->unk0 == 1) {
@@ -829,15 +829,15 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
             } else {
                 fx->unk10 = arg0->y;
             }
-            if (!(hud_actor_status_effect_masks[i] & s->unk0)) {
-                s->unk44[i] = 0;
+            if (!(hud_actor_status_effect_masks[i] & s->status_bits)) {
+                s->status_effect_handles[i] = 0;
                 if (fx->unk8 & 1) {
                     fx->unk8 &= ~1;
                     fx->unk0 = 8;
                 }
-            } else if (s->unk32[i] > 0) {
-                if (--s->unk32[i] == 0) {
-                    s->unk44[i] = 0;
+            } else if (s->status_effect_timers[i] > 0) {
+                if (--s->status_effect_timers[i] == 0) {
+                    s->status_effect_handles[i] = 0;
                     if (fx->unk8 & 1) {
                         fx->unk8 &= ~1;
                         fx->unk0 = 8;
@@ -854,16 +854,16 @@ void Hud_ClearActorStatusIndicators(Actor* arg0) {
     EffectModel* fx;
 
     for (i = 0; i < 7; i++) {
-        if (s->unk12[i] != 0) {
-            s->unk12[i] = 0;
+        if (s->status_icon_ids[i] != 0) {
+            s->status_icon_ids[i] = 0;
         }
     }
     for (i = 0; i < 4; i++) {
-        if (s->unk44[i] != 0) {
-            fx = (EffectModel*)s->unk44[i];
+        if (s->status_effect_handles[i] != 0) {
+            fx = (EffectModel*)s->status_effect_handles[i];
             fx->unk0 = 8;
             fx->unk8 &= ~1;
-            s->unk44[i] = 0;
+            s->status_effect_handles[i] = 0;
         }
     }
 }

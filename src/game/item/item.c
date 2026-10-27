@@ -25,19 +25,19 @@ extern ItemDef D_803AAAA0[];
 
 
 typedef struct {
-    /* 0x0 */ s16 unk0;
+    /* 0x0 */ s16 visual_def_index;
     /* 0x2 */ u16 unk2;
     /* 0x4 */ u16 unk4;
-    /* 0x8 */ f32 unk8;
-    /* 0xC */ f32 unkC;
+    /* 0x8 */ f32 scale_x;
+    /* 0xC */ f32 scale_y;
 } Struct_803AB36C;
 
 typedef struct {
-    /* 0x0 */ u16 unk0;
-    /* 0x2 */ u16 unk2;
-    /* 0x4 */ f32 unk4;
-    /* 0x8 */ f32 unk8;
-    /* 0xC */ f32 unkC;
+    /* 0x0 */ u16 map_id;
+    /* 0x2 */ u16 subarea;
+    /* 0x4 */ f32 spawn_x;
+    /* 0x8 */ f32 spawn_z;
+    /* 0xC */ f32 spawn_rot;
 } Struct_803AAA40;
 
 
@@ -451,9 +451,9 @@ void Item_UseRestore(Actor* arg0, ItemDef* arg1) {
         st->unk8 += amt;
         Effect_AddFloatingNumber(arg0, 2, amt);
     }
-    item_effect_scale.x = D_803AB36C[0].unk8;
-    item_effect_scale.y = D_803AB36C[0].unkC;
-    fx = &D_803AB358[D_803AB36C[0].unk0];
+    item_effect_scale.x = D_803AB36C[0].scale_x;
+    item_effect_scale.y = D_803AB36C[0].scale_y;
+    fx = &D_803AB358[D_803AB36C[0].visual_def_index];
     item_effect_scale.z = 1.0f;
     Magic_CreateVisualEffect(D_803AB36C[0].unk2, D_803AB36C[0].unk4, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
     Sfx_Play(0, 0xB, 0xFF);
@@ -464,18 +464,18 @@ void Item_UseWarp(Actor* arg0, ItemDef* arg1) {
 
     core_flags |= 0x80;
     core_transition_timer = 0x16;
-    exit_destination.map = D_803AAA40[arg1->unk4].unk0;
-    exit_destination.subarea = D_803AAA40[arg1->unk4].unk2;
+    exit_destination.map = D_803AAA40[arg1->unk4].map_id;
+    exit_destination.subarea = D_803AAA40[arg1->unk4].subarea;
     exit_destination.entry = -1;
-    player_spawn_x = D_803AAA40[arg1->unk4].unk4;
-    player_spawn_z = D_803AAA40[arg1->unk4].unk8;
-    player_spawn_rot = D_803AAA40[arg1->unk4].unkC;
+    player_spawn_x = D_803AAA40[arg1->unk4].spawn_x;
+    player_spawn_z = D_803AAA40[arg1->unk4].spawn_z;
+    player_spawn_rot = D_803AAA40[arg1->unk4].spawn_rot;
     player_spawn_type = 0x108;
     player_state.unk6 = 0;
     fade_transition_style = 1;
-    item_effect_scale.x = D_803AB36C[1].unk8;
-    item_effect_scale.y = D_803AB36C[1].unkC;
-    fx = &D_803AB358[D_803AB36C[1].unk0];
+    item_effect_scale.x = D_803AB36C[1].scale_x;
+    item_effect_scale.y = D_803AB36C[1].scale_y;
+    fx = &D_803AB358[D_803AB36C[1].visual_def_index];
     item_effect_scale.z = 1.0f;
     Magic_CreateVisualEffect(D_803AB36C[1].unk2, D_803AB36C[1].unk4, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
     Sfx_Play(0, 0x3B, 0xFF);

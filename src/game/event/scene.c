@@ -56,14 +56,14 @@ void Cutscene_StartEntry(s32 arg0) {
     }
     npc_count = 0;
     func_80009764(map_subarea_def->unk12);
-    Npc_SpawnForArea(entry->unk2C, entry->unk30);
+    Npc_SpawnForArea(entry->npc_defs_addr, entry->npc_count);
     enemy_count = 0;
     Camera_InitForMap();
     camera_state.mode = 3;
     camera_state.eyeX = entry->camera_eye_x;
     camera_state.eyeY = entry->camera_eye_y;
     camera_state.eyeZ = entry->camera_eye_z;
-    Math_MtxFRotate(mtx, -entry->unk14 * 0.017453292519943295, -entry->unk18 * 0.017453292519943295, 0.0f);
+    Math_MtxFRotate(mtx, -entry->camera_pitch_deg * 0.017453292519943295, -entry->camera_yaw_deg * 0.017453292519943295, 0.0f);
     Math_MtxFMulVecNegZ(mtx, 0.0f, 0.0f, -100.0f, &camera_state.atX, &camera_state.atY, &camera_state.atZ);
     camera_state.atX = camera_state.atX + camera_state.eyeX;
     camera_state.atY = camera_state.atY + camera_state.eyeY;

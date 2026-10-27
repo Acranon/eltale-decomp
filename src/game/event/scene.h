@@ -15,14 +15,14 @@ typedef struct SceneEntry {
     /* 0x08 */ f32 camera_eye_x;
     /* 0x0C */ f32 camera_eye_y;
     /* 0x10 */ f32 camera_eye_z;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 unk18;
+    /* 0x14 */ f32 camera_pitch_deg;
+    /* 0x18 */ f32 camera_yaw_deg;
     /* 0x1C */ f32 camera_fovy;
     /* 0x20 */ f32 spawn_x;
     /* 0x24 */ f32 spawn_z;
     /* 0x28 */ f32 spawn_rot;
-    /* 0x2C */ s32 unk2C;
-    /* 0x30 */ s32 unk30;
+    /* 0x2C */ s32 npc_defs_addr;
+    /* 0x30 */ s32 npc_count;
     /* 0x34 */ SceneMessage *messages;
     /* 0x38 */ s32 message_count;
     /* 0x3C */ u16 unk3C;
