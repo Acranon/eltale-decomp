@@ -26,8 +26,8 @@ typedef struct {
 
 
 /* .data 8020F200..8020F510. The data before it (8020F1E0..F200) is DAB5F0.c's, still asm. */
-s32 D_8020F200_ovl_title = 0;
-Gfx D_8020F208_ovl_title[11] = {
+s32 title_draw_initialized = 0;
+Gfx title_frame_setup_dl[11] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xBA001402, 0x00000000 }},
     {{ 0xB6000000, 0xFFFFFFFF }},
@@ -40,13 +40,13 @@ Gfx D_8020F208_ovl_title[11] = {
     {{ 0xBA000C02, 0x00000000 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_8020F260_ovl_title[4] = {
+Gfx title_menu_draw_setup_dl[4] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xB900031D, 0x0F0A4000 }},
     {{ 0xFCFFFFFF, 0xFFFCF279 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_8020F280_ovl_title[5] = {
+Gfx title_menu_sprite_setup_dl[5] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xB900031D, 0x00504240 }},
     {{ 0xFCFFFFFF, 0xFFFCF279 }},
@@ -115,12 +115,12 @@ Gfx D_8020F3B0_ovl_title[21] = {
     {{ 0xB3000000, 0x04000400 }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_8020F458_ovl_title[3] = {
+Gfx title_cursor_combine_dl[3] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xFCFF9BFF, 0xFF34FE7F }},
     {{ 0xB8000000, 0x00000000 }},
 };
-Gfx D_8020F470_ovl_title[3] = {
+Gfx title_screen_fade_combine_dl[3] = {
     {{ 0xE7000000, 0x00000000 }},
     {{ 0xFC32FFFF, 0x1FFFF6FB }},
     {{ 0xB8000000, 0x00000000 }},
@@ -158,7 +158,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
     s8 dx;
     s8 dy;
 
-    if (D_8020F200_ovl_title == 0) {
+    if (title_draw_initialized == 0) {
         title_cursor_anim_frame = 0;
         title_confirmation_row = 0;
         if (title_menu_choice & 0xF0) {
@@ -167,10 +167,10 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
             title_menu_item = 0;
         }
         title_current_message = D_802113A8_ovl_title;
-        D_8020F200_ovl_title = 1;
+        title_draw_initialized = 1;
     }
 
-    gSPDisplayList(gfx_dl_head++, D_8020F260_ovl_title);
+    gSPDisplayList(gfx_dl_head++, title_menu_draw_setup_dl);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     GFX_WORDS(0xB900031D, 0x504240);
     gDPPipeSync(gfx_dl_head++);
@@ -281,7 +281,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         case 13:
         case 14:
         case 15:
-            gSPDisplayList(gfx_dl_head++, D_8020F280_ovl_title);
+            gSPDisplayList(gfx_dl_head++, title_menu_sprite_setup_dl);
             gDPPipeSync(gfx_dl_head++);
             gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_80210D00_ovl_title);
             gSPDisplayList(gfx_dl_head++, D_8020F2A8_ovl_title);
@@ -290,7 +290,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
             if (arg0 == 3 || arg0 == 5) {
                 gDPPipeSync(gfx_dl_head++);
                 GFX_WORDS(0xB900031D, 0x504240);
-                gSPDisplayList(gfx_dl_head++, D_8020F458_ovl_title);
+                gSPDisplayList(gfx_dl_head++, title_cursor_combine_dl);
             }
             if (++title_cursor_anim_frame >= 32) {
                 title_cursor_anim_frame = 0;
@@ -354,11 +354,11 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                     if (arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
                         gDPPipeSync(gfx_dl_head++);
                         GFX_WORDS(0xB900031D, 0x504240);
-                        gSPDisplayList(gfx_dl_head++, D_8020F458_ovl_title);
+                        gSPDisplayList(gfx_dl_head++, title_cursor_combine_dl);
                         gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, title_confirm_cursor_alpha);
                     }
                     gDPPipeSync(gfx_dl_head++);
-                    gSPDisplayList(gfx_dl_head++, D_8020F458_ovl_title);
+                    gSPDisplayList(gfx_dl_head++, title_cursor_combine_dl);
                     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
                     GFX_WORDS(0xB900031D, 0x504240);
                     gDPLoadTLUT_pal256(gfx_dl_head++, title_confirm_cursor_tlut);
@@ -460,7 +460,7 @@ void Title_StepAndDrawScreenFade(TitleFade* arg0) {
     gDPPipeSync(gfx_dl_head++);
     gDPSetPrimColor(gfx_dl_head++, 0, 0, rgbColorValue, rgbColorValue, rgbColorValue, alpha);
     gDPSetRenderMode(gfx_dl_head++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-    gSPDisplayList(gfx_dl_head++, D_8020F470_ovl_title);
+    gSPDisplayList(gfx_dl_head++, title_screen_fade_combine_dl);
     gDPFillRectangle(gfx_dl_head++, 0, 0, 336, 960);
 
     D_80226DC0_ovl_title = rgbColorValue;

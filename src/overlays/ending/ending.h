@@ -74,9 +74,9 @@ extern f32 ending_scroll_offset;
 extern s32 ending_backdrop_frame;
 extern f32 ending_first_fade_alpha;
 extern f32 ending_second_fade_alpha;
-extern u8 D_8020F6AC_ovl_ending;
-extern u8 D_8020F6B0_ovl_ending;
-extern u8 D_8020F6B4_ovl_ending;
+extern u8 ending_first_backdrop_fade_mode;
+extern u8 ending_second_backdrop_fade_mode;
+extern u8 ending_backdrop_completion_state;
 
 void Ending_Init(void);
 s32 Ending_Update(void);

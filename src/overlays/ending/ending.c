@@ -938,10 +938,10 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
             }
             gDPPipeSync(gfx_dl_head++);
             if ((flags & 0xF0) || fadeDone) {
-                gSPDisplayList(gfx_dl_head++, D_8020F748_ovl_ending);
+                gSPDisplayList(gfx_dl_head++, ending_sprite_fade_combine_dl);
                 gDPSetEnvColor(gfx_dl_head++, rect.brightness, rect.brightness, rect.brightness, rect.alpha);
             } else {
-                gSPDisplayList(gfx_dl_head++, D_8020F718_ovl_ending);
+                gSPDisplayList(gfx_dl_head++, ending_sprite_default_combine_dl);
             }
             gDPPipeSync(gfx_dl_head++);
             if (obj->flags & 0x0C000000) {
@@ -992,9 +992,9 @@ f32 ending_scroll_offset = 32767.0f;
 s32 ending_backdrop_frame = 0;
 f32 ending_first_fade_alpha = 0.0f;
 f32 ending_second_fade_alpha = 0.0f;
-u8 D_8020F6AC_ovl_ending = 1;
-u8 D_8020F6B0_ovl_ending = 0;
-u8 D_8020F6B4_ovl_ending = 0;
+u8 ending_first_backdrop_fade_mode = 1;
+u8 ending_second_backdrop_fade_mode = 0;
+u8 ending_backdrop_completion_state = 0;
 
 #ifdef NON_MATCHING
 /* code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8: arg0/width homes, the B3/B4 hoists and allocation differ; the statics are the module's globals; code is equivalent */
@@ -1011,25 +1011,25 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
 
     if (arg0 == 0) {
         ending_scroll_offset = D_8022BAF0_ovl_ending;
-        D_8020F6B4_ovl_ending = 0;
+        ending_backdrop_completion_state = 0;
         return 0;
     }
-    if (D_8020F6B4_ovl_ending == 2) {
+    if (ending_backdrop_completion_state == 2) {
         return 1;
     }
     gDPPipeSync(gfx_dl_head++);
     gDPSetRenderMode(gfx_dl_head++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-    gSPDisplayList(gfx_dl_head++, D_8020F730_ovl_ending);
+    gSPDisplayList(gfx_dl_head++, ending_scroll_backdrop_combine_dl);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     if (ending_backdrop_frame == 0x26AC) {
-        D_8020F6AC_ovl_ending = 2;
-        D_8020F6B0_ovl_ending = 1;
+        ending_first_backdrop_fade_mode = 2;
+        ending_second_backdrop_fade_mode = 1;
     } else if (ending_backdrop_frame == D_8022BAF8_ovl_ending) {
-        D_8020F6B0_ovl_ending = 2;
+        ending_second_backdrop_fade_mode = 2;
         Audio_StartSeqFadeOut(0x1E0);
     }
 
-    switch (D_8020F6AC_ovl_ending) {
+    switch (ending_first_backdrop_fade_mode) {
         case 0:
             delta = 0.0f;
             break;
@@ -1046,10 +1046,10 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     alpha = ending_first_fade_alpha + delta;
     if (alpha > 255.0f) {
         alpha = 255.0f;
-        D_8020F6AC_ovl_ending = 0;
+        ending_first_backdrop_fade_mode = 0;
     } else if (alpha <= 0.0f) {
         alpha = 0.0f;
-        D_8020F6AC_ovl_ending = 0;
+        ending_first_backdrop_fade_mode = 0;
     }
     ending_first_fade_alpha = alpha;
     if (ending_backdrop_frame < 0x2814) {
@@ -1074,7 +1074,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     }
 
     scroll = ending_scroll_offset;
-    switch (D_8020F6B0_ovl_ending) {
+    switch (ending_second_backdrop_fade_mode) {
         case 0:
             delta = 0.0f;
             break;
@@ -1091,12 +1091,12 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     alpha = ending_second_fade_alpha + delta;
     if (alpha > 255.0f) {
         alpha = 255.0f;
-        D_8020F6B0_ovl_ending = 0;
+        ending_second_backdrop_fade_mode = 0;
     } else if (alpha <= 0.0f) {
         alpha = 0.0f;
-        D_8020F6B0_ovl_ending = 0;
-        if (D_8020F6B4_ovl_ending == 1) {
-            D_8020F6B4_ovl_ending = 2;
+        ending_second_backdrop_fade_mode = 0;
+        if (ending_backdrop_completion_state == 1) {
+            ending_backdrop_completion_state = 2;
         }
     }
     ending_second_fade_alpha = alpha;
@@ -1127,7 +1127,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
         return 0;
     }
     if (ending_backdrop_frame == 0x26E8) {
-        D_8020F6B4_ovl_ending = 1;
+        ending_backdrop_completion_state = 1;
     }
     return 0;
 }

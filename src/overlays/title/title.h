@@ -9,7 +9,7 @@ extern s32 D_80226D98_ovl_title;
 extern s32 title_pulse_alpha;
 extern s32 title_pulse_step;
 extern s32 title_menu_state;
-extern s32 D_8020F1E0_ovl_title;
+extern s32 title_transition_state;
 
 void Title_Init(void);
 s32 Title_Update(void);

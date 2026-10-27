@@ -10,16 +10,16 @@ typedef struct TitleFade {
     /* 0x08 */ f32 alpha;
 } TitleFade; /* 0xC bytes */
 
-extern s32 D_8020F200_ovl_title;
-extern Gfx D_8020F208_ovl_title[11];
-extern Gfx D_8020F260_ovl_title[4];
-extern Gfx D_8020F280_ovl_title[5];
+extern s32 title_draw_initialized;
+extern Gfx title_frame_setup_dl[11];
+extern Gfx title_menu_draw_setup_dl[4];
+extern Gfx title_menu_sprite_setup_dl[5];
 extern Gfx D_8020F2A8_ovl_title[11];
 extern Gfx D_8020F300_ovl_title[11];
 extern Gfx D_8020F358_ovl_title[11];
 extern Gfx D_8020F3B0_ovl_title[21];
-extern Gfx D_8020F458_ovl_title[3];
-extern Gfx D_8020F470_ovl_title[3];
+extern Gfx title_cursor_combine_dl[3];
+extern Gfx title_screen_fade_combine_dl[3];
 extern s32 D_8020F488_ovl_title[18];
 extern s8 title_confirmation_row;
 extern s32 title_confirm_cursor_alpha;

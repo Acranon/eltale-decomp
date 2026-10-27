@@ -100,22 +100,22 @@ s32 Intro_Update(void) {
     s32 ret;
     s32 err;
     static s32 intro_display_buffer_index = 0;
-    static u8 D_80212238_ovl_intro = 0;
-    static u8 D_8021223C_ovl_intro = 0;
-    static s32 D_80212240_ovl_intro = 1;
+    static u8 intro_pak_check_state = 0;
+    static u8 intro_skip_splash_requested = 0;
+    static s32 intro_sequence_phase = 1;
 
     if (input_primary_port == -1) {
         Intro_DrawNoControllerMessage();
         return 2;
     }
     if (intro_pak_check_done == 0) {
-        switch (D_80212238_ovl_intro) {
+        switch (intro_pak_check_state) {
             case 0:
                 err = Pak_ClassifyError(Pak_ScanGameFiles(input_primary_port));
                 func_8003D8EC("pack_status = %d\n", err);
                 if (err != -1 && err != -2 && err != -3) {
                     if (pak_game_file_scans[input_primary_port].flags & 0x2000) {
-                        D_80212238_ovl_intro = 1;
+                        intro_pak_check_state = 1;
                         return 2;
                     }
                     intro_pak_check_done = 1;
@@ -123,17 +123,17 @@ s32 Intro_Update(void) {
                 }
                 if (err != -3) {
                     if (func_8003D554(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port) == 0) {
-                        D_80212238_ovl_intro = 3;
+                        intro_pak_check_state = 3;
                         return 2;
                     }
                     if (func_8003D6B0(&input_si_queue, &pak_port_states[input_primary_port], input_primary_port) == 0) {
-                        D_80212238_ovl_intro = 3;
+                        intro_pak_check_state = 3;
                         return 2;
                     }
-                    D_80212238_ovl_intro = 2;
+                    intro_pak_check_state = 2;
                     return 2;
                 }
-                D_80212238_ovl_intro = 3;
+                intro_pak_check_state = 3;
                 return 2;
             case 1:
                 if (Intro_RunPakFullScreen() != 0) {
@@ -159,14 +159,14 @@ s32 Intro_Update(void) {
     if (intro_first_frame_skipped == 0) {
         intro_first_frame_skipped++;
     } else {
-        switch (D_80212240_ovl_intro) {
+        switch (intro_sequence_phase) {
             case 0:
                 Intro_RunSplash1();
                 if (intro_phase_timer == 0) {
                     intro_phase_timer = 150;
                     intro_splash_fade_alpha = 0;
                     intro_splash_phase = 0;
-                    D_80212240_ovl_intro++;
+                    intro_sequence_phase++;
                 }
                 break;
             case 1:
@@ -174,18 +174,18 @@ s32 Intro_Update(void) {
                 if (input_pressed_buttons & 0x1000) {
                     Sfx_Enqueue(1, 0xFF, 0x40);
                     intro_phase_timer = 0;
-                    D_8021223C_ovl_intro = 1;
+                    intro_skip_splash_requested = 1;
                 }
                 if (intro_phase_timer == 0) {
                     intro_splash_fade_alpha = 0;
-                    if (D_8021223C_ovl_intro != 0) {
+                    if (intro_skip_splash_requested != 0) {
                         intro_phase_timer = 10;
                         ret = 1;
                     } else {
                         intro_phase_timer = 150;
-                        D_80212240_ovl_intro++;
+                        intro_sequence_phase++;
                     }
-                    D_8021223C_ovl_intro = 0;
+                    intro_skip_splash_requested = 0;
                 }
                 break;
             case 2:
@@ -193,23 +193,23 @@ s32 Intro_Update(void) {
                 if (input_pressed_buttons & 0x1000) {
                     Sfx_Enqueue(1, 0xFF, 0x40);
                     intro_phase_timer = 0;
-                    D_8021223C_ovl_intro = 1;
+                    intro_skip_splash_requested = 1;
                 }
                 if (intro_phase_timer == 0) {
                     intro_splash_fade_alpha = 0;
-                    if (D_8021223C_ovl_intro != 0) {
+                    if (intro_skip_splash_requested != 0) {
                         intro_phase_timer = 10;
                         ret = 1;
                     } else {
                         intro_phase_timer = 45;
-                        D_80212240_ovl_intro++;
+                        intro_sequence_phase++;
                     }
-                    D_8021223C_ovl_intro = 0;
+                    intro_skip_splash_requested = 0;
                 }
                 break;
             case 3:
                 if (--intro_phase_timer == 0) {
-                    D_80212240_ovl_intro++;
+                    intro_sequence_phase++;
                     Bgm_Play(0x1B);
                 }
                 break;

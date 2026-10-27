@@ -24,9 +24,9 @@ typedef struct PakMenuNoteState {
 
 extern u16 pak_menu_cursor_tlut[0x10];
 extern u8 pak_menu_cursor_tex[0x70];
-extern u16 D_80102030_ovl_DA4570[0x10];
-extern u8 D_80102050_ovl_DA4570[0x200];
-extern u8 D_80102250_ovl_DA4570[0x200];
+extern u16 pak_menu_screen_frame_tlut[0x10];
+extern u8 pak_menu_screen_frame_main_tex[0x200];
+extern u8 pak_menu_screen_frame_right_tex[0x200];
 extern u16 D_80102450_ovl_DA4570[0x10];
 extern u8 D_80102470_ovl_DA4570[0x80];
 extern u8 D_801024F0_ovl_DA4570[0x80];
@@ -78,10 +78,10 @@ extern PakMenuSprite pak_menu_message_window_sprites[75];
 extern PakMenuSprite pak_menu_message_lower_window_sprites[22];
 extern PakMenuSprite pak_menu_previous_rows_sprite[1];
 extern PakMenuSprite pak_menu_more_rows_sprite[1];
-extern u8 D_80105408_ovl_DA4570[0x40];
-extern u8 D_80105448_ovl_DA4570[0x68];
-extern u8 D_801054B0_ovl_DA4570[0x38];
-extern u8 D_801054E8_ovl_DA4570[0x90];
+extern u8 pak_menu_delete_confirmation_message[0x40];
+extern u8 pak_menu_reinitialize_confirmation_message[0x68];
+extern u8 pak_menu_operation_error_message[0x38];
+extern u8 pak_menu_repair_confirmation_message[0x90];
 extern u8 D_80105578_ovl_DA4570[0x90];
 extern u8 D_80105608_ovl_DA4570[0x58];
 extern s32 pak_menu_framebuffer_index;

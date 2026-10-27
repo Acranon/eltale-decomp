@@ -182,7 +182,7 @@ s32 Intro_RunNoPakScreen(void) {
     s8 pressed;
     s8 dx;
     s8 dy;
-    static u8 D_80212258_ovl_intro = 0;
+    static u8 intro_nopak_screen_state = 0;
     static s8 D_8021225C_ovl_intro = 0;
     static s8 intro_nopak_choice = 0;
     static s8 intro_nopak_prev_direction;
@@ -235,7 +235,7 @@ s32 Intro_RunNoPakScreen(void) {
     } else if (intro_nopak_choice > 1) {
         intro_nopak_choice = 1;
     }
-    switch (D_80212258_ovl_intro) {
+    switch (intro_nopak_screen_state) {
         case 0:
             gDPPipeSync(gfx_dl_head++);
             gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_8025BFD8_ovl_intro);
@@ -252,7 +252,7 @@ s32 Intro_RunNoPakScreen(void) {
             gSPTextureRectangle(gfx_dl_head++, (intro_nopak_choice * 71 + 90) << 2, 157 << 2, (intro_nopak_choice * 71 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             if (input_pressed_buttons & 0xB000) {
                 if (intro_nopak_choice == 1) {
-                    D_80212258_ovl_intro = 1;
+                    intro_nopak_screen_state = 1;
                 } else {
                     ret = 1;
                 }
@@ -269,7 +269,7 @@ s32 Intro_RunNoPakScreen(void) {
             gDPLoadTextureTile_4b(gfx_dl_head++, tex[0], G_IM_FMT_CI, 208, 0, 0, i * 10, 199, i * 10 + 1, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(gfx_dl_head++, 60 << 2, (i * 10 + 99) << 2, 260 << 2, (i * 10 + 101) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
             if (input_pressed_buttons & 0x4000) {
-                D_80212258_ovl_intro = 0;
+                intro_nopak_screen_state = 0;
             }
             break;
     }
@@ -322,7 +322,7 @@ s32 Intro_RunPakErrorScreen(void) {
     s8 pressed;
     s8 dx;
     s8 dy;
-    static u8 D_80212264_ovl_intro = 0;
+    static u8 intro_pak_error_screen_state = 0;
     static s8 D_80212268_ovl_intro = 0;
     static s8 intro_pak_error_choice = 0;
     static s8 intro_pak_error_prev_direction;
@@ -375,7 +375,7 @@ s32 Intro_RunPakErrorScreen(void) {
     } else if (intro_pak_error_choice > 1) {
         intro_pak_error_choice = 1;
     }
-    switch (D_80212264_ovl_intro) {
+    switch (intro_pak_error_screen_state) {
         case 0:
             gDPPipeSync(gfx_dl_head++);
             gDPLoadTLUT_pal16(gfx_dl_head++, 0, D_80264538_ovl_intro);
@@ -392,7 +392,7 @@ s32 Intro_RunPakErrorScreen(void) {
             gSPTextureRectangle(gfx_dl_head++, (intro_pak_error_choice * 74 + 90) << 2, 157 << 2, (intro_pak_error_choice * 74 + 101) << 2, 168 << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             if (input_pressed_buttons & 0xB000) {
                 if (intro_pak_error_choice == 1) {
-                    D_80212264_ovl_intro = 1;
+                    intro_pak_error_screen_state = 1;
                 } else {
                     ret = 1;
                 }
@@ -409,7 +409,7 @@ s32 Intro_RunPakErrorScreen(void) {
             gDPLoadTextureTile_4b(gfx_dl_head++, tex[0], G_IM_FMT_CI, 208, 0, 0, i * 10, 199, i * 10 + 1, 0, 0, 0, 0, 0, 0, 0);
             gSPTextureRectangle(gfx_dl_head++, 60 << 2, (i * 10 + 99) << 2, 260 << 2, (i * 10 + 101) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
             if (input_pressed_buttons & 0x4000) {
-                D_80212264_ovl_intro = 0;
+                intro_pak_error_screen_state = 0;
             }
             break;
     }

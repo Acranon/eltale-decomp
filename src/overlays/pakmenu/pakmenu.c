@@ -20,16 +20,16 @@ u8 pak_menu_cursor_tex[0x70] = {
 #include "assets/pak_menu_cursor_tex.inc.c"
 };
 /* palette, 16 colours */
-u16 D_80102030_ovl_DA4570[0x10] = {
-#include "assets/D_80102030_ovl_DA4570.inc.c"
+u16 pak_menu_screen_frame_tlut[0x10] = {
+#include "assets/pak_menu_screen_frame_tlut.inc.c"
 };
 /* texture */
-u8 D_80102050_ovl_DA4570[0x200] = {
-#include "assets/D_80102050_ovl_DA4570.inc.c"
+u8 pak_menu_screen_frame_main_tex[0x200] = {
+#include "assets/pak_menu_screen_frame_main_tex.inc.c"
 };
 /* texture */
-u8 D_80102250_ovl_DA4570[0x200] = {
-#include "assets/D_80102250_ovl_DA4570.inc.c"
+u8 pak_menu_screen_frame_right_tex[0x200] = {
+#include "assets/pak_menu_screen_frame_right_tex.inc.c"
 };
 /* palette, 16 colours */
 u16 D_80102450_ovl_DA4570[0x10] = {
@@ -216,41 +216,41 @@ u8 D_80103EB8_ovl_DA4570[0x70] = {
 #include "assets/D_80103EB8_ovl_DA4570.inc.c"
 };
 PakMenuSprite pak_menu_screen_sprites[235] = {
-    { 23, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 55, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 87, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 119, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 151, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 183, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 215, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 247, 22, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 279, 22, 0x20, 0x20, { 0 }, (u8*) D_80102250_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 23, 54, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 23, 86, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 23, 118, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 23, 150, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 279, 54, 0x20, 0x20, { 0 }, (u8*) D_80102250_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 279, 86, 0x20, 0x20, { 0 }, (u8*) D_80102250_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 279, 118, 0x20, 0x20, { 0 }, (u8*) D_80102250_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 279, 150, 0x20, 0x20, { 0 }, (u8*) D_80102250_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 23, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 55, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 87, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 119, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 151, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 183, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 215, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 247, 182, 0x20, 0x20, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 279, 182, 0x20, 0x20, { 0 }, (u8*) D_80102250_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 23, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 55, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 87, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 119, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 151, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 183, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 215, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 247, 214, 0x20, 0x4, { 0 }, (u8*) D_80102050_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
-    { 279, 214, 0x20, 0x4, { 0 }, (u8*) D_80102250_ovl_DA4570, (u16*) D_80102030_ovl_DA4570 },
+    { 23, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 55, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 87, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 119, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 151, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 183, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 215, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 247, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 279, 22, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_right_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 23, 54, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 23, 86, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 23, 118, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 23, 150, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 279, 54, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_right_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 279, 86, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_right_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 279, 118, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_right_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 279, 150, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_right_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 23, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 55, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 87, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 119, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 151, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 183, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 215, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 247, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 279, 182, 0x20, 0x20, { 0 }, (u8*) pak_menu_screen_frame_right_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 23, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 55, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 87, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 119, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 151, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 183, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 215, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 247, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_main_tex, (u16*) pak_menu_screen_frame_tlut },
+    { 279, 214, 0x20, 0x4, { 0 }, (u8*) pak_menu_screen_frame_right_tex, (u16*) pak_menu_screen_frame_tlut },
     { 28, 49, 0x10, 0x10, { 0 }, (u8*) D_80102470_ovl_DA4570, (u16*) D_80102450_ovl_DA4570 },
     { 44, 49, 0x10, 0x10, { 0 }, (u8*) D_801024F0_ovl_DA4570, (u16*) D_80102450_ovl_DA4570 },
     { 60, 49, 0x10, 0x10, { 0 }, (u8*) D_801024F0_ovl_DA4570, (u16*) D_80102450_ovl_DA4570 },
@@ -560,20 +560,20 @@ PakMenuSprite pak_menu_more_rows_sprite[1] = {
     { 22, 144, 0x10, 0x16, { 0 }, (u8*) D_80102FD8_ovl_DA4570, (u16*) D_80102F40_ovl_DA4570 },
 };
 /* message text */
-u8 D_80105408_ovl_DA4570[0x40] = {
-#include "assets/D_80105408_ovl_DA4570.inc.c"
+u8 pak_menu_delete_confirmation_message[0x40] = {
+#include "assets/pak_menu_delete_confirmation_message.inc.c"
 };
 /* message text */
-u8 D_80105448_ovl_DA4570[0x68] = {
-#include "assets/D_80105448_ovl_DA4570.inc.c"
+u8 pak_menu_reinitialize_confirmation_message[0x68] = {
+#include "assets/pak_menu_reinitialize_confirmation_message.inc.c"
 };
 /* message text */
-u8 D_801054B0_ovl_DA4570[0x38] = {
-#include "assets/D_801054B0_ovl_DA4570.inc.c"
+u8 pak_menu_operation_error_message[0x38] = {
+#include "assets/pak_menu_operation_error_message.inc.c"
 };
 /* message text */
-u8 D_801054E8_ovl_DA4570[0x90] = {
-#include "assets/D_801054E8_ovl_DA4570.inc.c"
+u8 pak_menu_repair_confirmation_message[0x90] = {
+#include "assets/pak_menu_repair_confirmation_message.inc.c"
 };
 /* message text */
 u8 D_80105578_ovl_DA4570[0x90] = {
@@ -1044,7 +1044,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     sub++;
                     pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0xA6 : 0x60;
                     PakMenu_DrawScreen();
-                    PakMenu_DrawMessageBox(D_80105408_ovl_DA4570);
+                    PakMenu_DrawMessageBox(pak_menu_delete_confirmation_message);
                     PakMenu_DrawCursor();
                 }
                 if ((pak_menu_dialog_selection == 0) && (btn & 0x8000)) {
@@ -1075,7 +1075,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         pak_menu_cursor_x = 0xA6;
                     }
                     PakMenu_DrawScreen();
-                    PakMenu_DrawMessageBox(D_80105408_ovl_DA4570);
+                    PakMenu_DrawMessageBox(pak_menu_delete_confirmation_message);
                     PakMenu_DrawCursor();
                 }
                 break;
@@ -1118,7 +1118,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     }
                     pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
-                    PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
+                    PakMenu_DrawMessageBox(pak_menu_repair_confirmation_message);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
@@ -1140,7 +1140,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
-                        PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
+                        PakMenu_DrawMessageBox(pak_menu_repair_confirmation_message);
                         PakMenu_DrawCursor();
                     }
                     break;
@@ -1150,7 +1150,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0xA6 : 0x60;
                         pak_menu_cursor_y = 0xA2;
                         PakMenu_DrawScreen();
-                        PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
+                        PakMenu_DrawMessageBox(pak_menu_repair_confirmation_message);
                         if (pak_menu_framebuffer_index & 1) {
                             PakMenu_DrawCursor();
                         }
@@ -1179,7 +1179,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         pak_menu_cursor_x = (pak_menu_dialog_selection != 0) ? 0xA6 : 0x60;
                         pak_menu_cursor_y = 0xA2;
                         PakMenu_DrawScreen();
-                        PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
+                        PakMenu_DrawMessageBox(pak_menu_repair_confirmation_message);
                         if (pak_menu_framebuffer_index & 1) {
                             PakMenu_DrawCursor();
                         }
@@ -1203,7 +1203,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     sub++;
                     pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
-                    PakMenu_DrawMessageBox(D_801054B0_ovl_DA4570);
+                    PakMenu_DrawMessageBox(pak_menu_operation_error_message);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
@@ -1236,7 +1236,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     }
                     pak_menu_cursor_y = 0xA2;
                     PakMenu_DrawScreen();
-                    PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
+                    PakMenu_DrawMessageBox(pak_menu_reinitialize_confirmation_message);
                     PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
@@ -1251,14 +1251,14 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             pak_menu_cursor_x = 0xA6;
                         }
                         PakMenu_DrawScreen();
-                        PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
+                        PakMenu_DrawMessageBox(pak_menu_reinitialize_confirmation_message);
                         PakMenu_DrawCursor();
                     }
                 } else if (sub == 2) {
                     if (pak_menu_dialog_selection == 0) {
                         if (blink == 0) {
                             PakMenu_DrawScreen();
-                            PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
+                            PakMenu_DrawMessageBox(pak_menu_reinitialize_confirmation_message);
                             if (pak_menu_framebuffer_index & 1) {
                                 PakMenu_DrawCursor();
                             }

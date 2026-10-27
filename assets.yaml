@@ -201,9 +201,9 @@
 # ovl_DA4570 .data (ROM = vram - 0x80101FA0 + 0xDA6510)
 - { name: pak_menu_cursor_tlut, rom: 0xDA6510, size: 0x20, type: u16 }     # palette, 16 colours
 - { name: pak_menu_cursor_tex, rom: 0xDA6530, size: 0x70, type: u8 }      # texture
-- { name: D_80102030_ovl_DA4570, rom: 0xDA65A0, size: 0x20, type: u16 }     # palette, 16 colours
-- { name: D_80102050_ovl_DA4570, rom: 0xDA65C0, size: 0x200, type: u8 }     # texture
-- { name: D_80102250_ovl_DA4570, rom: 0xDA67C0, size: 0x200, type: u8 }     # texture
+- { name: pak_menu_screen_frame_tlut, rom: 0xDA65A0, size: 0x20, type: u16 }     # palette, 16 colours
+- { name: pak_menu_screen_frame_main_tex, rom: 0xDA65C0, size: 0x200, type: u8 }     # texture
+- { name: pak_menu_screen_frame_right_tex, rom: 0xDA67C0, size: 0x200, type: u8 }     # texture
 - { name: D_80102450_ovl_DA4570, rom: 0xDA69C0, size: 0x20, type: u16 }     # palette, 16 colours
 - { name: D_80102470_ovl_DA4570, rom: 0xDA69E0, size: 0x80, type: u8 }      # texture
 - { name: D_801024F0_ovl_DA4570, rom: 0xDA6A60, size: 0x80, type: u8 }      # texture
@@ -250,10 +250,10 @@
 - { name: D_80103DD8_ovl_DA4570, rom: 0xDA8348, size: 0xC0, type: u8 }      # texture
 - { name: D_80103E98_ovl_DA4570, rom: 0xDA8408, size: 0x20, type: u16 }     # palette, 16 colours
 - { name: D_80103EB8_ovl_DA4570, rom: 0xDA8428, size: 0x70, type: u8 }      # texture
-- { name: D_80105408_ovl_DA4570, rom: 0xDA9978, size: 0x40, type: u8 }      # message text
-- { name: D_80105448_ovl_DA4570, rom: 0xDA99B8, size: 0x68, type: u8 }      # message text
-- { name: D_801054B0_ovl_DA4570, rom: 0xDA9A20, size: 0x38, type: u8 }      # message text
-- { name: D_801054E8_ovl_DA4570, rom: 0xDA9A58, size: 0x90, type: u8 }      # message text
+- { name: pak_menu_delete_confirmation_message, rom: 0xDA9978, size: 0x40, type: u8 }      # message text
+- { name: pak_menu_reinitialize_confirmation_message, rom: 0xDA99B8, size: 0x68, type: u8 }      # message text
+- { name: pak_menu_operation_error_message, rom: 0xDA9A20, size: 0x38, type: u8 }      # message text
+- { name: pak_menu_repair_confirmation_message, rom: 0xDA9A58, size: 0x90, type: u8 }      # message text
 - { name: D_80105578_ovl_DA4570, rom: 0xDA9AE8, size: 0x90, type: u8 }      # message text
 - { name: D_80105608_ovl_DA4570, rom: 0xDA9B78, size: 0x58, type: u8 }      # message text
 - { name: D_8010567C_ovl_DA4570, rom: 0xDA9BEC, size: 0x10, type: u16 }    # font palette, 8 colours
@@ -274,9 +274,9 @@
 - { name: sfx_script_data, rom: 0x504A4, size: 0x6084, type: u32 }               # sound sequence records (sfx_scripts points into it)
 
 # ovl_ending .data (ROM = vram - 0x8020F690 + 0xE25C50)
-- { name: D_80210810_ovl_ending, rom: 0xE26DD0, size: 0x200, type: u16 }    # palette, 256 colours
-- { name: D_80210A10_ovl_ending, rom: 0xE26FD0, size: 0x10A00, type: u8 }   # texture
-- { name: D_80221410_ovl_ending, rom: 0xE379D0, size: 0x200, type: u16 }    # palette, 256 colours
+- { name: ending_scroll_backdrop_first_tlut, rom: 0xE26DD0, size: 0x200, type: u16 }    # palette, 256 colours
+- { name: ending_scroll_backdrop_tex, rom: 0xE26FD0, size: 0x10A00, type: u8 }   # texture
+- { name: ending_scroll_backdrop_second_tlut, rom: 0xE379D0, size: 0x200, type: u16 }    # palette, 256 colours
 - { name: D_80221618_ovl_ending, rom: 0xE37BD8, size: 0xA4B0, type: u8 }    # texture
 - { name: D_8022BAD0_ovl_ending, rom: 0xE42090, size: 0x20, type: u16 }     # palette, 16 colours
 

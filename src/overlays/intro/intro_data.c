@@ -38,225 +38,225 @@ Gfx D_802122E0_ovl_intro[4] = {
     {{ 0xB8000000, 0x00000000 }},
     {{ 0x00000000, 0x00000000 }},
 };
-IntroAnimStep D_80212300_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_0[3] = {
     { 0x00800010, 0, 0, 60 },
     { 0x00801000, 0, 120, 480 },
     { 0x00800020, 0, 0, 90 },
 };
-IntroAnimStep D_80212324_ovl_intro[4] = {
+IntroAnimStep intro_sprite_anim_steps_1[4] = {
     { 0x10800000, 0, 0, 456 },
     { 0x00800010, 0, 0, 90 },
     { 0x00801000, 0, 0, 435 },
     { 0x00800020, 0, 0, 150 },
 };
-IntroAnimStep D_80212354_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_2[3] = {
     { 0x00000010, 0, 0, 90 },
     { 0x00001000, 0, 0, 840 },
     { 0x00000020, 0, 0, 60 },
 };
-IntroAnimStep D_80212378_ovl_intro[4] = {
+IntroAnimStep intro_sprite_anim_steps_3[4] = {
     { 0x20000010, 0, 0, 120 },
     { 0x00008000, 0, 63, 30 },
     { 0x00001000, 0, 0, 675 },
     { 0x00000020, 0, 0, 150 },
 };
-IntroAnimStep D_802123A8_ovl_intro[2] = {
+IntroAnimStep intro_sprite_anim_steps_4[2] = {
     { 0x00800010, 0, 0, 90 },
     { 0x00800020, 0, 0, 90 },
 };
-IntroAnimStep D_802123C0_ovl_intro[1] = {
+IntroAnimStep intro_sprite_anim_steps_5[1] = {
     { 0x00001000, 0, 0, 390 },
 };
-IntroAnimStep D_802123CC_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_6[3] = {
     { 0x00000010, 0, 0, 138 },
     { 0x00001000, 0, 0, 4680 },
     { 0x00000020, 0, 0, 318 },
 };
-IntroAnimStep D_802123F0_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_7[3] = {
     { 0x00800010, 0, 0, 138 },
     { 0x00801000, 0, 0, 1128 },
     { 0x00800020, 0, 0, 60 },
 };
-IntroAnimStep D_80212414_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_8[3] = {
     { 0x00000010, 0, 0, 120 },
     { 0x00001000, 0, 0, 618 },
     { 0x00000020, 0, 0, 120 },
 };
-IntroAnimStep D_80212438_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_33[3] = {
     { 0x00000010, 0, 0, 120 },
     { 0x00001000, 0, 0, 225 },
     { 0x00000020, 0, 0, 105 },
 };
-IntroAnimStep D_8021245C_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_9[3] = {
     { 0x00000010, 0, 0, 78 },
     { 0x00001000, 0, 0, 156 },
     { 0x00000020, 0, 0, 78 },
 };
-IntroAnimStep D_80212480_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_10[3] = {
     { 0x00800010, 0, 0, 60 },
     { 0x00801000, 0, 0, 654 },
     { 0x00800020, 0, 0, 90 },
 };
-IntroAnimStep D_802124A4_ovl_intro[4] = {
+IntroAnimStep intro_sprite_anim_steps_11[4] = {
     { 0x00004010, 115, 0, 60 },
     { 0x00004000, 190, 0, 120 },
     { 0x00001000, 0, 0, 396 },
     { 0x00000020, 0, 0, 72 },
 };
-IntroAnimStep D_802124D4_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_12[3] = {
     { 0x00000010, 0, 0, 90 },
     { 0x00001000, 0, 0, 300 },
     { 0x00000020, 0, 0, 108 },
 };
-IntroAnimStep D_802124F8_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_13[3] = {
     { 0x00800010, 0, 0, 90 },
     { 0x00801000, 0, 0, 264 },
     { 0x00800020, 0, 0, 60 },
 };
-IntroAnimStep D_8021251C_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_14[3] = {
     { 0x00000010, 0, 0, 78 },
     { 0x00001000, 0, 0, 150 },
     { 0x00000020, 0, 0, 60 },
 };
-IntroAnimStep D_80212540_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_15[3] = {
     { 0x00800010, 0, 0, 60 },
     { 0x00801000, 0, 0, 660 },
     { 0x00800020, 0, 0, 60 },
 };
-IntroAnimStep D_80212564_ovl_intro[4] = {
+IntroAnimStep intro_sprite_anim_steps_16[4] = {
     { 0x00004010, 97, 0, 60 },
     { 0x00004000, 22, 0, 120 },
     { 0x00001000, 0, 0, 396 },
     { 0x00000020, 0, 0, 90 },
 };
-IntroAnimStep D_80212594_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_17[3] = {
     { 0x00000010, 0, 0, 90 },
     { 0x00001000, 0, 0, 276 },
     { 0x00000020, 0, 0, 102 },
 };
-IntroAnimStep D_802125B8_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_18[3] = {
     { 0x00800010, 0, 0, 60 },
     { 0x00801000, 0, 0, 294 },
     { 0x00800020, 0, 0, 60 },
 };
-IntroAnimStep D_802125DC_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_19[3] = {
     { 0x00000010, 0, 0, 90 },
     { 0x00001000, 0, 0, 150 },
     { 0x00000020, 0, 0, 60 },
 };
-IntroAnimStep D_80212600_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_20[3] = {
     { 0x00800010, 0, 0, 60 },
     { 0x00801000, 0, 0, 660 },
     { 0x00800020, 0, 0, 60 },
 };
-IntroAnimStep D_80212624_ovl_intro[4] = {
+IntroAnimStep intro_sprite_anim_steps_21[4] = {
     { 0x00004010, 115, 0, 72 },
     { 0x00004000, 190, 0, 120 },
     { 0x00001000, 0, 0, 396 },
     { 0x00000020, 0, 0, 90 },
 };
-IntroAnimStep D_80212654_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_22[3] = {
     { 0x00000010, 0, 0, 96 },
     { 0x00001000, 0, 0, 276 },
     { 0x00000020, 0, 0, 108 },
 };
-IntroAnimStep D_80212678_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_23[3] = {
     { 0x00800010, 0, 0, 60 },
     { 0x00801000, 0, 0, 642 },
     { 0x00800020, 0, 0, 318 },
 };
-IntroAnimStep D_8021269C_ovl_intro[4] = {
+IntroAnimStep intro_sprite_anim_steps_24[4] = {
     { 0x10800000, 0, 0, 690 },
     { 0x00800010, 0, 0, 324 },
     { 0x00801000, 0, 0, 972 },
     { 0x00800020, 0, 0, 60 },
 };
-IntroAnimStep D_802126CC_ovl_intro[1] = {
+IntroAnimStep intro_sprite_anim_steps_25[1] = {
     { 0x00001000, 0, 0, 882 },
 };
-IntroAnimStep D_802126D8_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_26[3] = {
     { 0x10000000, 0, 0, 599 },
     { 0x00800010, 0, 0, 150 },
     { 0x00000820, -52, -78, 360 },
 };
-IntroAnimStep D_802126FC_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_27[3] = {
     { 0x10000000, 0, 0, 598 },
     { 0x00800010, 0, 0, 149 },
     { 0x00000820, 198, -78, 360 },
 };
-IntroAnimStep D_80212720_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_28[3] = {
     { 0x10000000, 0, 0, 597 },
     { 0x00800010, 0, 0, 148 },
     { 0x00008020, 0, 172, 360 },
 };
-IntroAnimStep D_80212744_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_29[3] = {
     { 0x00000010, 0, 0, 120 },
     { 0x00001000, 0, 0, 306 },
     { 0x00000020, 0, 0, 120 },
 };
-IntroAnimStep D_80212768_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_34[3] = {
     { 0x00000010, 0, 0, 120 },
     { 0x00001000, 0, 0, 306 },
     { 0x00000020, 0, 0, 120 },
 };
-IntroAnimStep D_8021278C_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_30[3] = {
     { 0x00800010, 0, 0, 30 },
     { 0x00801000, 0, 0, 120 },
     { 0x00800020, 0, 0, 60 },
 };
-IntroAnimStep D_802127B0_ovl_intro[2] = {
+IntroAnimStep intro_sprite_anim_steps_31[2] = {
     { 0x00000010, 0, 0, 60 },
     { 0x00000020, 0, 0, 30 },
 };
-IntroAnimStep D_802127C8_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_32[3] = {
     { 0x00000010, 0, 0, 120 },
     { 0x00001000, 0, 0, 426 },
     { 0x00000020, 0, 0, 120 },
 };
-IntroAnimStep D_802127EC_ovl_intro[3] = {
+IntroAnimStep intro_sprite_anim_steps_35[3] = {
     { 0x00000010, 0, 0, 120 },
     { 0x00001000, 0, 0, 306 },
     { 0x00000020, 0, 0, 120 },
 };
 IntroAnim intro_sprite_anim_table[36] = {
-    { (IntroAnimStep*) D_80212300_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212324_ovl_intro, 0x4 },
-    { (IntroAnimStep*) D_80212354_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212378_ovl_intro, 0x4 },
-    { (IntroAnimStep*) D_802123A8_ovl_intro, 0x2 },
-    { (IntroAnimStep*) D_802123C0_ovl_intro, 0x1 },
-    { (IntroAnimStep*) D_802123CC_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802123F0_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212414_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_8021245C_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212480_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802124A4_ovl_intro, 0x4 },
-    { (IntroAnimStep*) D_802124D4_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802124F8_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_8021251C_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212540_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212564_ovl_intro, 0x4 },
-    { (IntroAnimStep*) D_80212594_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802125B8_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802125DC_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212600_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212624_ovl_intro, 0x4 },
-    { (IntroAnimStep*) D_80212654_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212678_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_8021269C_ovl_intro, 0x4 },
-    { (IntroAnimStep*) D_802126CC_ovl_intro, 0x1 },
-    { (IntroAnimStep*) D_802126D8_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802126FC_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212720_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212744_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_8021278C_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802127B0_ovl_intro, 0x2 },
-    { (IntroAnimStep*) D_802127C8_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212438_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_80212768_ovl_intro, 0x3 },
-    { (IntroAnimStep*) D_802127EC_ovl_intro, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_0, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_1, 0x4 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_2, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_3, 0x4 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_4, 0x2 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_5, 0x1 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_6, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_7, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_8, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_9, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_10, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_11, 0x4 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_12, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_13, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_14, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_15, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_16, 0x4 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_17, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_18, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_19, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_20, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_21, 0x4 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_22, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_23, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_24, 0x4 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_25, 0x1 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_26, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_27, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_28, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_29, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_30, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_31, 0x2 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_32, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_33, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_34, 0x3 },
+    { (IntroAnimStep*) intro_sprite_anim_steps_35, 0x3 },
 };
-IntroSpriteCue D_80212930_ovl_intro[459] = {
+IntroSpriteCue intro_sprite_cues[459] = {
     { 0x0, 0, 0x08000000, 8, 0, 304, 6, 0, 0, 304, 224, (s32) D_8021C3A0_ovl_intro, (s32) D_80218400_ovl_intro, 0, -1, 0x0 },
     { 0x0, 0, 0x08000000, 8, 6, 304, 6, 0, 6, 304, 224, (s32) D_8021C3A0_ovl_intro, (s32) D_80218400_ovl_intro, 0, -1, 0x0 },
     { 0x0, 0, 0x08000000, 8, 12, 304, 6, 0, 12, 304, 224, (s32) D_8021C3A0_ovl_intro, (s32) D_80218400_ovl_intro, 0, -1, 0x0 },
@@ -718,7 +718,7 @@ IntroSpriteCue D_80212930_ovl_intro[459] = {
     { 0x1E, 0, 0x08000000, 243, 69, 14, 76, 180, 0, 194, 76, (s32) D_80218800_ovl_intro, (s32) D_80218600_ovl_intro, 0, -1, 0x0 },
 };
 IntroCueGroup intro_cue_groups[1] = {
-    { (IntroSpriteCue*) D_80212930_ovl_intro, 0x1CB },
+    { (IntroSpriteCue*) intro_sprite_cues, 0x1CB },
 };
 u32 intro_cue_group_count = 0x00000001;
 /* not referenced by name */
