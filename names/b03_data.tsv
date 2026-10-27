@@ -1,3 +1,4 @@
+# r3b reviewed 2026-10-26: kept 27, renamed 0, reverted 0
 # b03 data (round 3): D_ objects defined in 1870 (prefixes as the functions that use them: core_ loop state, gfx_ frame building, fade_, dma_, title_)
 # old	new	evidence
 D_8007A170	core_game_mode	Core_MainThread runs the loop it selects (1 gameplay, 2 menu, 3 title, 4 intro, 5 ending, 6 message cutscene, 7 camera cutscene) and each Core_Run*Loop runs while it keeps its value; Gfx_BuildFrameDisplayList draws by it; Menu_Update, SaveMenu_Init, Cutscene_EndScene set it

@@ -1,3 +1,4 @@
+# r3b reviewed 2026-10-26: kept 90, renamed 2, reverted 0
 # b01_core data (round 3): D_ objects defined in 1050, 1130, 113F0, 12610, 13DF0, 140D0, 147A0, 14CF0, 15150 (13DE0 and 14760 define none)
 # old	new	evidence
 # --- 1050: boot
@@ -39,7 +40,7 @@ D_80084348	env_palette_fade_dest	Env_StartPaletteFade's destination palette (arg
 D_80084350	env_palette_fade_start	256 RGBA5551 colours: Env_StartPaletteFade copies the destination palette here; Env_StepPaletteFade blends from it
 # --- 12610: lighting and fog
 D_80084550	env_light_rot_mtx	Env_ComputeLightDirs builds a rotation by an angle from env_light_time into it and transforms (0, 90, 50) by it to get light direction 0
-D_80084B18	env_light_colors	4 RGB triples, [0] ambient and [1..3] the light colours: Env_InterpolateLighting writes them from the keyframe track, Env_PrepareFrameLighting and Env_ApplyLightSlot build Lights3 from them
+D_80084B18	env_light_colors	4 RGB triples from the keyframe track (Env_InterpolateLighting): [0] ambient and [1],[2] the light colours that Env_FillLights3 puts into Lights3 (via Env_PrepareFrameLighting and Env_ApplyLightSlot); [3] is the fog colour Env_ApplyLightSlot emits with gDPSetFogColor (and the clear colour when map_flags & 0x80)
 D_80084B48	env_light_dirs	light directions (3 ints each): Env_ComputeLightDirs writes [0] (rotating, the area's fixed one, or -89,89,20) and [1] (view-transformed); passed to Env_FillLights3
 D_80084B78	env_fog_range	FogSet {near, far}: Env_InterpolateLighting writes it; Env_PrepareFrameLighting copies it to gfx_fog_near and gfx_fog_far and emits gSPFogPosition
 D_80084590	env_lights_frame0	the Lights3 Env_PrepareFrameLighting fills when gfx_frame_index is 0
@@ -54,7 +55,7 @@ D_80085280	shadow_count	entries in shadow_queue: Shadow_ClearQueue zeroes it, Sh
 D_80085290	chest_objects	16 chest instances (0x6C each): Chest_LoadForMap fills them from the map's placements, Chest_UpdateAll animates and draws them, Chest_FindInFront searches them
 D_80085950	chest_count	number of chest_objects in use: set by Chest_LoadForMap (0 when the map has none), loop count of Chest_UpdateAll and Chest_FindInFront
 D_80085958	chest_local_offset	Chest_FindInFront stores the player-to-chest offset here, rotates it by the chest angle and compares |x|, |z| with the chest's half sizes
-D_80085968	chest_floor_result	the Coll_ResolveFloorAndWalls result Chest_LoadForMap uses to set each chest's y and floor normal
+D_80085968	chest_coll	Coll_ResolveFloorAndWalls out-record (same type as the Coll_* result) Chest_LoadForMap passes for each chest; it takes the chest's y (+4) and floor normal (+0xC..+0x14) from it
 D_80085988	chest_opened_flags	0x20-byte bitset: Chest_ClearOpenedFlags zeroes it, Chest_SetOpened sets and Chest_IsOpened tests bit n; saved and restored by SaveMenu_CaptureGameState/RestoreGameState
 D_8004DF1C	chest_map_placements	19 {map id, placement groups} entries: Chest_LoadForMap finds the current map (D_800842BC) and takes group [sub-area D_800842C0]
 D_8004DF00	item_message_prefix	text bytes (0xFF-terminated) Item_BuildMessage copies before the item name
@@ -62,7 +63,7 @@ D_8004DF08	item_message_suffix	text bytes (0xFF-terminated) Item_BuildMessage co
 # --- 147A0/14CF0: spirits (prefix from Spirit_*; "spirit" and "sparkle" are round 1's readings)
 D_800859B8	spirit_objects	8 spirit instances: Spirit_LoadForMap fills them from the map's placements, Spirit_FindInFront and Spirit_SpawnSparkles walk them
 D_800859B0	spirit_count	number of spirit_objects in use: set by Spirit_LoadForMap (0 when none), loop count of Spirit_FindInFront and Spirit_SpawnSparkles
-D_80085A78	spirit_floor_result	the Coll_ResolveFloorAndWalls result Spirit_LoadForMap uses to set each spirit's y
+D_80085A78	spirit_coll	Coll_ResolveFloorAndWalls out-record (same type as the Coll_* result) Spirit_LoadForMap passes for each spirit; it takes the spirit's y (+4) from it
 D_80085A98	spirit_collected_flags	0x10-byte bitset: Spirit_ClearCollectedFlags zeroes it, Spirit_SetCollected sets and Spirit_IsCollected tests bit n; saved and restored by the save menu
 D_8004DFC0	spirit_map_placements	0x2B {map id, sub-area, count, defs} entries: Spirit_LoadForMap takes the one matching D_800842BC and D_800842C0
 D_8004E658	spirit_sparkle_template	function-scope static of Spirit_SpawnSparkles: the sprite record (Spirit_MoveSparkle callback, texture, display list) it fills with a position and texture frame and passes to Effect_AllocateSprite

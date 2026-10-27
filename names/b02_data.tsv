@@ -1,3 +1,4 @@
+# r3b reviewed 2026-10-26: kept 21, renamed 1, reverted 0
 # b02 data (round 3): D_ objects defined in 17360 (prefix magic_, as the Magic_* functions)
 # old	new	evidence
 D_80085F98	magic_effects	16 effect instances (0x3C each): Magic_ResetEffectSystem clears them, Magic_CreateCastEffect takes a free one, Magic_UpdateEffects runs them, Magic_IsAnyEffectActive counts them
@@ -6,7 +7,7 @@ D_80085F90	magic_cast_state	bit 1 set by Magic_CreateCastEffect on a first cast 
 D_80085F94	magic_cast_state_timer	frame counter of magic_cast_state: Magic_UpdateEffects sets 30 when the state becomes 2 and clears the state when it reaches 0 (Magic_CreateCastEffect also sets 8)
 D_800863B8	magic_temp_vec	scratch vector: rotated with Math_RotateVec2 by the Magic_PlaceEffect* functions and Magic_CreateCastEffect, and passed (x, y, z) to Magic_CreateVisualEffect by the presentation functions
 D_800863C4	magic_target_enemy_rec	pointer to the target's enemy record (a D_8007B908 entry): set by Magic_FindTargetInRange/FindEligibleTarget, Magic_HealTarget and Magic_TransferTargetResource, which then change its +0xA/+0xC values through it
-D_800863C8	magic_floor_result	Coll_ResolveFloorAndWalls result that Magic_CreateCastEffect, Magic_MoveHomingEffect and Magic_MoveVerticalEffect use to keep effects at or above the floor
+D_800863C8	magic_coll	Coll_ResolveFloorAndWalls out-record (same type as the Coll_* result) that Magic_CreateCastEffect, Magic_MoveHomingEffect and Magic_MoveVerticalEffect pass; they put the effect on the floor y or stop it when it goes below it
 D_8004EC90	magic_place_handlers	the 10 Magic_PlaceEffect* functions; Magic_CreateCastEffect calls one by def +0x26 to place a new effect
 D_8004ECB8	magic_target_select_handlers	Magic_SelectClosestAimTarget, Magic_SelectFirstActiveTarget, Magic_TargetCaster; Magic_CreateCastEffect calls one by def +0x18
 D_8004ECC4	magic_move_handlers	Magic_MoveHomingEffect, Magic_MoveVerticalEffect (twice); Magic_UpdateEffects calls one by cfg +0x12 each frame
