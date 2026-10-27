@@ -327,7 +327,7 @@ s32 Player_TakeDamage(u16, s32, Obj *);
 void Effect_SpawnStreakBurst(f32, f32, f32);
 void Effect_AddFloatingNumber(Obj *, s32, s32);
 void Hud_StartActorStatusIndicator(Obj *, u16, u16, s16);
-void Player_StartDodge(void);
+void Player_StartMissReaction(void);
 extern f32 D_8007C074;
 extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
@@ -712,7 +712,7 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
                             Hud_StartActorStatusIndicator(obj, 2, 1, 30);
                         }
                     } else {
-                        Player_StartDodge();
+                        Player_StartMissReaction();
                         D_8007AA08.unk14->unk2C++;
                     }
                     e->flags |= 8;

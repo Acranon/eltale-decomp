@@ -243,7 +243,7 @@ void Audio_StartSeqFadeOut(s32 arg0);
 void Bgm_Play(s32 arg0);
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 s32 Text_OpenWindow(s32 arg0);
-s32 Player_RollMeleeHit(s32 arg0, Actor *arg1);
+s32 Player_RollHitOnEnemy(s32 arg0, Actor *arg1);
 u16 Player_CalcMeleeDamage(PlayerState *arg0);
 void Player_MoveIdle(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3);
 void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p);
@@ -1171,7 +1171,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
     a->vz = 0.0f;
     a->vx = 0.0f;
     if (--p->unk4 == 0) {
-        if (Player_RollMeleeHit(p->unk2 - 1, a) != 0) {
+        if (Player_RollHitOnEnemy(p->unk2 - 1, a) != 0) {
             dmg = Player_CalcMeleeDamage(p);
             if (p->unk0 == 0x10) {
                 dmg *= 0.5;
@@ -2103,7 +2103,7 @@ void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     Camera_StartBattleFocus(0x23, arg1);
 }
 
-s32 Player_RollMeleeHit(s32 arg0, Actor *arg1) {
+s32 Player_RollHitOnEnemy(s32 arg0, Actor *arg1) {
     s16 chance;
     Monster *m = &D_8007B908[arg0];
 
@@ -2229,7 +2229,7 @@ extern PlayerStateSub14 *D_8007AA1C; /* .unk14 */
 extern s16 D_8007AA70;    /* .actor.unk50 */
 extern u16 D_8007AA80;    /* .actor.unk60 */
 
-void Player_StartDodge(void) {
+void Player_StartMissReaction(void) {
     PlayerState *p = &D_8007AA08;
     CharData *cd;
 

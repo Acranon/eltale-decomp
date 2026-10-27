@@ -234,7 +234,7 @@ extern Unk8007C288* D_8007C288;
 extern u8 D_8004EDB0[];
 extern s32 D_8004EDBC[];
 extern s32 D_8004EDEC[];
-s32 Player_RollMeleeHit(s32, Actor17360*);
+s32 Player_RollHitOnEnemy(s32, Actor17360*);
 s32 Enemy_RollHitOnPlayer(Actor17360*, Actor17360*);
 s32 Enemy_GetSlotIndex(Actor17360*);
 s32 Enemy_TakeDamage(s32, u16, s32, u16, s32);
@@ -401,7 +401,7 @@ s32 Magic_GetHitOutcome();
 s32 Magic_ShouldApplyStatus();
 void Magic_StartStatusTimer();
 void Enemy_PlayMissEffect(Actor17360*);
-void Player_StartDodge(void);
+void Player_StartMissReaction(void);
 void Env_SetSlotLightAnim(s32, s32, s32, u8*);
 void Magic_CreateHitPresentation();
 void Magic_CreateTimedPresentation();
@@ -707,7 +707,7 @@ void Magic_UpdateEffects(void) {
                         } else if (a->unk5E & 1) {
                             Enemy_PlayMissEffect(a);
                         } else {
-                            Player_StartDodge();
+                            Player_StartMissReaction();
                         }
                     } else {
                         D_8004ECDC[p->cfg->unk10](p, a);
@@ -1876,7 +1876,7 @@ s32 Magic_GetHitOutcome(Unk8001A3EC* arg0, Actor17360* arg1) {
         if (ret != 0) {
             if (arg1 != arg0->unk24) {
                 if (arg1->unk5E & 1) {
-                    ret = Player_RollMeleeHit(Enemy_GetSlotIndex(arg1), arg0->unk24);
+                    ret = Player_RollHitOnEnemy(Enemy_GetSlotIndex(arg1), arg0->unk24);
                 } else {
                     ret = Enemy_RollHitOnPlayer(arg0->unk24, arg1);
                 }

@@ -117,7 +117,7 @@ void Audio_InitSoundPlayer(u8 *arg0, u8 *arg1, u8 *arg2);
 void Bgm_Init(void);
 void Menu_Init(void);
 void Text_LoadFontAssets(void);
-void Input_InitializeControllers(void);
+void Input_InitControllers(void);
 void osCreateViManager(OSPri pri);
 void func_801009EC(OSMesgQueue *arg0, OSMesgQueue *arg1);
 
@@ -197,7 +197,7 @@ void Core_MainThread(void *arg0) {
     Audio_InitSeqPlayers(D_E5BF60, D_E5BF60 + 0x2E10, D_E98330, D_E98330 + 0x33480, D_E5ED70);
     Audio_InitSoundPlayer(D_ECB7B0, D_ECB7B0 + 0x1CC0, D_ECD470);
     nnScCreateScheduler(&D_8007A1E0, 1);
-    Input_InitializeControllers();
+    Input_InitControllers();
     if (osTvType == OS_TV_NTSC) {
         osViSetMode(&D_8006CDF0);
     } else {

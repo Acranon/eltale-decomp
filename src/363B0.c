@@ -49,7 +49,7 @@ s32 osPfsFileState();
 s32 Pak_CompareNameBytes();
 s32 osPfsFreeBlocks();
 
-s32 Input_InitializeControllers(void) {
+s32 Input_InitControllers(void) {
     s32 pad[2];
     s32 ret = 0;
     s32 count;
