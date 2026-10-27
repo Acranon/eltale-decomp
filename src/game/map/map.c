@@ -488,7 +488,7 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
             }
             s->kind = (s->kind & 0xFF00) | flags;
         } else if (flags & 0x100) {
-            i = MapObjAnim_Find((s32) s);
+            i = MapObjAnim_Find(s);
             if (i != 0) {
                 mapobj_temp_vec[1] = 0.0f;
                 mapobj_temp_vec[0] = mapobj_anim_slots[i - 1].x;
@@ -717,14 +717,14 @@ void MapObjAnim_ClearAll(void) {
     }
 }
 
-s32 MapObjAnim_Find(s32 id) {
+s32 MapObjAnim_Find(MapObj *obj) {
     MapObjAnimSlot *p;
     s32 i;
 
     i = 4;
     p = mapobj_anim_slots;
     for (; i != 0; i--, p++) {
-        if (p->timer != 0 && id == p->id) {
+        if (p->timer != 0 && obj == p->obj) {
             i = 5 - i;
             break;
         }
@@ -732,7 +732,7 @@ s32 MapObjAnim_Find(s32 id) {
     return i;
 }
 
-void MapObjAnim_Start(s32 state, s32 frame, s32 type, s32 id) {
+void MapObjAnim_Start(s32 state, s32 frame, s32 type, MapObj *obj) {
     MapObjAnimSlot *p;
     s32 i;
     AnimNode *anim;
@@ -752,7 +752,7 @@ void MapObjAnim_Start(s32 state, s32 frame, s32 type, s32 id) {
     p->state = state;
     p->frame = frame;
     p->type = type;
-    p->id = id;
+    p->obj = obj;
     p->z = 0.0f;
     p->x = 0.0f;
     if (state != 0) {
