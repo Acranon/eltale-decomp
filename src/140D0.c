@@ -95,7 +95,7 @@ Unk80085290 chest_objects[16];
 s32 chest_count;
 Unk80085958 chest_local_offset;
 u8 D_80085960[8]; /* unreferenced */
-Unk80085968 chest_floor_result;
+Unk80085968 chest_coll;
 u8 chest_opened_flags[0x20];
 u8 D_800859A8[8];
 
@@ -180,11 +180,11 @@ void Chest_LoadForMap(void) {
             p->rx = 0.0f;
             p->rz = 0.0f;
             p->ry = def->ry;
-            Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &chest_floor_result);
-            p->y = chest_floor_result.unk4;
-            p->unk2C = chest_floor_result.unkC;
-            p->unk30 = chest_floor_result.unk10;
-            p->unk34 = chest_floor_result.unk14;
+            Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &chest_coll);
+            p->y = chest_coll.unk4;
+            p->unk2C = chest_coll.unkC;
+            p->unk30 = chest_coll.unk10;
+            p->unk34 = chest_coll.unk14;
             p->unk1C = def->unk14;
             p->unk18 = def->unk18;
             p->unk20 = def->unk1C;

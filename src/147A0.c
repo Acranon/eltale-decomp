@@ -99,7 +99,7 @@ typedef struct {
  * the order). Splat's D_80085AA8 is Spirit_ClearCollectedFlags's loop end, &spirit_collected_flags[0x10]. */
 s32 spirit_count;
 Unk800859B8 spirit_objects[8];
-Unk80085A78 spirit_floor_result;
+Unk80085A78 spirit_coll;
 u8 spirit_collected_flags[0x10];
 
 extern u8 math_bit_masks[];
@@ -213,8 +213,8 @@ void Spirit_LoadForMap(void) {
             obj->unk10 = Spirit_IsCollected(def->unk8);
             obj->x = def->x;
             obj->z = -def->z;
-            Coll_ResolveFloorAndWalls(obj->x, 0.0f, obj->z, 0xA00, &spirit_floor_result);
-            obj->y = spirit_floor_result.unk4;
+            Coll_ResolveFloorAndWalls(obj->x, 0.0f, obj->z, 0xA00, &spirit_coll);
+            obj->y = spirit_coll.unk4;
             obj->unkC = 0.0f;
             obj->unk14 = def->unk8;
             i--;

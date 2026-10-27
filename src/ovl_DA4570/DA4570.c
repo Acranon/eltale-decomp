@@ -36,8 +36,8 @@ typedef struct {
 extern u16 pak_menu_cursor_tlut[];
 extern u8 pak_menu_cursor_tex[];
 extern UnkStruct_801004E8 pak_menu_screen_sprites[];
-extern UnkStruct_801004E8 pak_menu_message_frame_sprites[];
-extern UnkStruct_801004E8 pak_menu_message_detail_sprites[];
+extern UnkStruct_801004E8 pak_menu_message_window_sprites[];
+extern UnkStruct_801004E8 pak_menu_message_lower_window_sprites[];
 extern UnkStruct_801004E8 pak_menu_previous_rows_sprite[];
 extern UnkStruct_801004E8 pak_menu_more_rows_sprite[];
 extern u8 D_803245A0[];
@@ -484,7 +484,7 @@ UnkStruct_801004E8 pak_menu_screen_sprites[235] = {
     { 60, 190, 0x70, 0x2, { 0 }, (u8*) D_80103EB8_ovl_DA4570, (u16*) D_80103E98_ovl_DA4570 },
     { 160, 190, 0x70, 0x2, { 0 }, (u8*) D_80103EB8_ovl_DA4570, (u16*) D_80103E98_ovl_DA4570 },
 };
-UnkStruct_801004E8 pak_menu_message_frame_sprites[75] = {
+UnkStruct_801004E8 pak_menu_message_window_sprites[75] = {
     { 44, 72, 0x10, 0x10, { 0 }, (u8*) D_80102AC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 60, 72, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 76, 72, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
@@ -561,7 +561,7 @@ UnkStruct_801004E8 pak_menu_message_frame_sprites[75] = {
     { 252, 136, 0x10, 0x10, { 0 }, (u8*) D_80102E40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 268, 136, 0x10, 0x10, { 0 }, (u8*) D_80102EC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
 };
-UnkStruct_801004E8 pak_menu_message_detail_sprites[22] = {
+UnkStruct_801004E8 pak_menu_message_lower_window_sprites[22] = {
     { 76, 158, 0x10, 0x10, { 0 }, (u8*) D_80102AC0_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 92, 158, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
     { 108, 158, 0x10, 0x10, { 0 }, (u8*) D_80102B40_ovl_DA4570, (u16*) D_80102AA0_ovl_DA4570 },
@@ -649,7 +649,7 @@ s32 pak_menu_redraw_pending;
 u16* pak_menu_draw_framebuffer;
 OSMesgQueue* pak_menu_si_queue;
 OSMesgQueue* pak_menu_vi_queue;
-OSMesg pak_menu_message;
+OSMesg pak_menu_mesg;
 u16* pak_menu_text_pixel_cursor;
 s16 pak_menu_text_x;
 s16 pak_menu_text_y;
@@ -793,8 +793,8 @@ void PakMenu_DrawSprites(UnkStruct_801004E8* arg0, s32 arg1) {
 
 void PakMenu_WaitFrame(void) {
     osWritebackDCacheAll();
-    osRecvMesg(pak_menu_vi_queue, &pak_menu_message, OS_MESG_BLOCK);
-    if ((s32) pak_menu_message == 0x29D) {
+    osRecvMesg(pak_menu_vi_queue, &pak_menu_mesg, OS_MESG_BLOCK);
+    if ((s32) pak_menu_mesg == 0x29D) {
         osViBlack(1);
         return;
     }
@@ -864,8 +864,8 @@ void PakMenu_DrawMessageBox(u8* arg0) {
 void PakMenu_DrawMessageBox(s32 arg0) {
 #endif
     PakMenu_DrawScreen();
-    PakMenu_DrawSprites(pak_menu_message_frame_sprites, 75);
-    PakMenu_DrawSprites(pak_menu_message_detail_sprites, 22);
+    PakMenu_DrawSprites(pak_menu_message_window_sprites, 75);
+    PakMenu_DrawSprites(pak_menu_message_lower_window_sprites, 22);
     PakMenu_DrawText(0x34, 0x4E, arg0);
 }
 
@@ -917,7 +917,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         return 0;
     }
     osContStartReadData(mq);
-    osRecvMesg(mq, &pak_menu_message, 1);
+    osRecvMesg(mq, &pak_menu_mesg, 1);
     osContGetReadData(pads);
     if (!(input_controller_statuses[input_primary_port].status & 1)) {
         return 0;
@@ -1417,7 +1417,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         }
         if ((pak_menu_state != 0) && (pak_menu_state < 5)) {
             osContStartQuery(mq);
-            osRecvMesg(mq, &pak_menu_message, 1);
+            osRecvMesg(mq, &pak_menu_mesg, 1);
             osContGetQuery(input_controller_statuses);
             if (input_controller_statuses[input_primary_port].status & 2) {
                 pak_menu_state = 8;
@@ -1430,7 +1430,7 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         }
         osContStartReadData(mq);
         PakMenu_WaitFrame();
-        osRecvMesg(mq, &pak_menu_message, 1);
+        osRecvMesg(mq, &pak_menu_mesg, 1);
         unused3 = pads[input_primary_port].stick_y;
         dir = (((unused3 < 33) ^ 1) << 3) | ((pads[input_primary_port].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[input_primary_port].stick_x < -32) << 1);
         btn = pads[input_primary_port].button | dir;
