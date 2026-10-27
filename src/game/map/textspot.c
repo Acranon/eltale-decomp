@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/map/textspot.h"
 
 /*
  * Spirits: sets a collected flag. Text spots: fixed per-map points that show a message
@@ -6,42 +6,20 @@
  * Original file: 14CF0.c (ROM 0x14CF0).
  */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 x;
-    /* 0x0C */ f32 z;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ u16 unk1C;
-    /* 0x1E */ u16 unk1E;
-} Unk8004E6A0; // size = 0x20
-
-typedef struct {
-    /* 0x00 */ Unk8004E6A0* entry;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ s32 unk8;
-} Unk80085AC0; // size = 0xC
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-} Unk80085AB0;
-
-typedef struct {
+/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
+typedef struct Actor {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-} Unk80014318Arg;
+    /* 0x0C */ f32 rx;
+    /* 0x10 */ f32 ry;
+} Actor;
 
 extern u8 spirit_collected_flags[];
 extern u8 math_bit_masks[];
 extern s32 map_id;
 extern s32 map_subarea;
-Unk8004E6A0 textspot_table[0x26] = {
+TextSpotDef textspot_table[0x26] = {
     { 0x00, 3, 58.0f, -324.0f, -1.5707964f, 10.0f, 0, 0x0070, 0x0078 },
     { 0x00, 3, 168.0f, -295.0f, 1.2217305f, 10.0f, 0, 0x0070, 0x0078 },
     { 0x00, 3, -384.0f, -146.0f, -2.3561945f, 10.0f, 0, 0x0070, 0x0078 },
@@ -85,17 +63,15 @@ s32 D_8004EB60 = 0x26; /* the entry count; nothing reads it */
 /* This file's .bss, 80085AB0..80085B80, in address order (first declaration fixes
  * the order). Splat's D_80085AC8/D_80085ACC are TextSpot_LoadForMap's textspot_list[0].unk8
  * and &textspot_list[1]. */
-Unk80085AB0 textspot_local_dir;
+Vec2f textspot_local_dir;
 s32 D_80085AB8; /* unreferenced */
 s32 textspot_count;
-Unk80085AC0 textspot_list[16];
+TextSpot textspot_list[16];
 extern u8 D_D37700[];
 extern u8 text_speaker_name[];
 extern u8 text_message_buf[];
 extern f32 D_8007AB3C;
 
-void Math_RotateVec2(f32, Unk80085AB0*);
-f32 Math_Atan2(f32, f32);
 f32 sqrtf(f32);
 void Dma_ReadRom(u8*, void*, s32);
 
@@ -104,12 +80,12 @@ void Spirit_SetCollected(u16 arg0) {
 }
 
 void TextSpot_LoadForMap(void) {
-    Unk80085AC0* out = textspot_list;
+    TextSpot* out = textspot_list;
     s32 i;
 
     textspot_count = 0;
     for (i = 0; i < 0x26; i++) {
-        if (map_id == textspot_table[i].unk0 && map_subarea == textspot_table[i].unk4) {
+        if (map_id == textspot_table[i].mapId && map_subarea == textspot_table[i].subarea) {
             out->entry = &textspot_table[i];
             out->unk8 = 0;
             out++;
@@ -118,9 +94,9 @@ void TextSpot_LoadForMap(void) {
     }
 }
 
-Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
+TextSpot* TextSpot_FindInFront(Actor* arg0) {
     s32 n = textspot_count;
-    Unk80085AC0* out = textspot_list;
+    TextSpot* out = textspot_list;
     f32 dx;
     f32 dz;
     f32 angle;
@@ -128,19 +104,19 @@ Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
     while (n != 0) {
         dx = arg0->x - out->entry->x;
         dz = arg0->z - out->entry->z;
-        if (sqrtf(dx * dx + dz * dz) < out->entry->unk14) {
+        if (sqrtf(dx * dx + dz * dz) < out->entry->radius) {
             textspot_local_dir.x = -dx;
             textspot_local_dir.y = -dz;
-            Math_RotateVec2(arg0->unk10, &textspot_local_dir);
+            Math_RotateVec2(arg0->ry, &textspot_local_dir);
             angle = Math_Atan2(textspot_local_dir.x, textspot_local_dir.y);
             if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
-                out->unk4 = arg0->unk10 - angle;
-                if (out->entry->unk18 & 1) {
+                out->unk4 = arg0->ry - angle;
+                if (out->entry->flags & 1) {
                     break;
                 }
                 textspot_local_dir.x = dx;
                 textspot_local_dir.y = dz;
-                Math_RotateVec2(-out->entry->unk10, &textspot_local_dir);
+                Math_RotateVec2(-out->entry->angle, &textspot_local_dir);
                 angle = Math_Atan2(textspot_local_dir.x, textspot_local_dir.y);
                 if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
                     break;
@@ -156,9 +132,9 @@ Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
     return out;
 }
 
-void TextSpot_LoadMessage(Unk80085AC0* arg0) {
-    Dma_ReadRom(&D_D37700[arg0->entry->unk1C], text_speaker_name, 0x20);
-    Dma_ReadRom(&D_D37700[arg0->entry->unk1E], text_message_buf, 0x200);
+void TextSpot_LoadMessage(TextSpot* arg0) {
+    Dma_ReadRom(&D_D37700[arg0->entry->nameOffset], text_speaker_name, 0x20);
+    Dma_ReadRom(&D_D37700[arg0->entry->textOffset], text_message_buf, 0x200);
     if (text_speaker_name[2] == 0xFF) {
         text_speaker_name[0] = 0xFF;
     }

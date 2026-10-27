@@ -1,4 +1,7 @@
-#include "common.h"
+#include "game/map/chest.h"
+#include "game/map/chest_flag.h"
+#include "game/actor/anim.h"
+#include "game/gfx/shadow.h"
 
 /*
  * Chests: per-map placement, opened flags, the open interaction and animation, and the
@@ -6,7 +9,8 @@
  * Original file: 140D0.c (ROM 0x140D0).
  */
 
-typedef struct {
+/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
+typedef struct Actor {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
@@ -38,71 +42,21 @@ typedef struct {
     /* 0x60 */ u16 unk60;
     /* 0x62 */ u16 unk62;
     /* 0x64 */ u8 unk64[0x8];
-} Unk80085290; // size = 0x6C
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 z;
-    /* 0x08 */ f32 ry;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ u8 unk20;
-    /* 0x21 */ u8 unk21;
-} Unk140D0Def; // size = 0x24
-
-typedef struct {
-    /* 0x00 */ u16 count;
-    /* 0x04 */ Unk140D0Def* defs;
-} Unk140D0Group; // size = 0x8
-
-typedef struct {
-    /* 0x00 */ s32 id;
-    /* 0x04 */ Unk140D0Group* groups;
-} Unk8004DF1C; // size = 0x8
-
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ u16 unk18;
-} Unk80085968; // size = 0x1C (Coll_ResolveFloorAndWalls's result)
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-} Unk80085958;
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-} Unk80013808Arg;
-
-typedef struct {
-    u8 unk0[0xC];
-} Unk8010FDC4;
+} Actor; /* 0x6C bytes */
 
 /* This file's .bss, 80085290..800859B0, in address order (first declaration fixes the order). */
-Unk80085290 chest_objects[16];
+Actor chest_objects[16];
 s32 chest_count;
-Unk80085958 chest_local_offset;
+Vec2f chest_local_offset;
 u8 D_80085960[8]; /* unreferenced */
-Unk80085968 chest_coll;
+CollResult chest_coll;
 u8 chest_opened_flags[0x20];
 u8 D_800859A8[8];
 
 extern u8 math_bit_masks[];
 extern s32 map_id;
 extern s32 map_subarea;
-extern Unk8010FDC4 D_8010FDC4[];
+extern AnimSet D_8010FDC4[];
 /* Message text around the name in Item_BuildMessage. */
 u8 item_message_prefix[8] = {
 #include "assets/item_message_prefix.inc.c"
@@ -111,39 +65,31 @@ u8 item_message_suffix[20] = {
 #include "assets/item_message_suffix.inc.c"
 };
 /* Per-map placement groups (the group arrays are in the map overlays). */
-Unk8004DF1C chest_map_placements[19] = {
-    { 0x0D, (Unk140D0Group*) 0x80199140 },
-    { 0x0E, (Unk140D0Group*) 0x801A3B44 },
-    { 0x0F, (Unk140D0Group*) 0x801697A4 },
-    { 0x11, (Unk140D0Group*) 0x8016AA24 },
-    { 0x13, (Unk140D0Group*) 0x8015EB40 },
-    { 0x15, (Unk140D0Group*) 0x801A6C18 },
-    { 0x16, (Unk140D0Group*) 0x80183200 },
-    { 0x17, (Unk140D0Group*) 0x8018CBAC },
-    { 0x18, (Unk140D0Group*) 0x80166608 },
-    { 0x19, (Unk140D0Group*) 0x80171794 },
-    { 0x1A, (Unk140D0Group*) 0x8016D584 },
-    { 0x1B, (Unk140D0Group*) 0x8016E9E4 },
-    { 0x1C, (Unk140D0Group*) 0x80169D7C },
-    { 0x1D, (Unk140D0Group*) 0x80133504 },
-    { 0x1E, (Unk140D0Group*) 0x801527CC },
-    { 0x1F, (Unk140D0Group*) 0x8014C030 },
-    { 0x20, (Unk140D0Group*) 0x8013D5D4 },
-    { 0x21, (Unk140D0Group*) 0x80143378 },
-    { 0x09, (Unk140D0Group*) 0x8015F1E4 },
+ChestPlacement chest_map_placements[19] = {
+    { 0x0D, (ChestGroup*) 0x80199140 },
+    { 0x0E, (ChestGroup*) 0x801A3B44 },
+    { 0x0F, (ChestGroup*) 0x801697A4 },
+    { 0x11, (ChestGroup*) 0x8016AA24 },
+    { 0x13, (ChestGroup*) 0x8015EB40 },
+    { 0x15, (ChestGroup*) 0x801A6C18 },
+    { 0x16, (ChestGroup*) 0x80183200 },
+    { 0x17, (ChestGroup*) 0x8018CBAC },
+    { 0x18, (ChestGroup*) 0x80166608 },
+    { 0x19, (ChestGroup*) 0x80171794 },
+    { 0x1A, (ChestGroup*) 0x8016D584 },
+    { 0x1B, (ChestGroup*) 0x8016E9E4 },
+    { 0x1C, (ChestGroup*) 0x80169D7C },
+    { 0x1D, (ChestGroup*) 0x80133504 },
+    { 0x1E, (ChestGroup*) 0x801527CC },
+    { 0x1F, (ChestGroup*) 0x8014C030 },
+    { 0x20, (ChestGroup*) 0x8013D5D4 },
+    { 0x21, (ChestGroup*) 0x80143378 },
+    { 0x09, (ChestGroup*) 0x8015F1E4 },
 };
 extern u8 text_message_buf[];
 extern u8 text_speaker_name;
 extern u8* D_803AB288[];
 
-void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Unk80085968*);
-u8 Chest_IsOpened(u16);
-void Chest_SetOpened(u16);
-void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
-void Anim_SetCurrentAndNext(Unk80085290*, s32, s32, s32, s32, u16);
-void Anim_DrawModel(s32, Unk80085290*, Unk8010FDC4*, s32);
-void Anim_AdvanceFrame(u16, Unk80085290*, Unk8010FDC4*);
-void Math_RotateVec2(f32, Unk80085958*);
 void Sfx_Play(u8, s8, u8);
 
 void Chest_ClearOpenedFlags(void) {
@@ -155,16 +101,16 @@ void Chest_ClearOpenedFlags(void) {
 }
 
 void Chest_LoadForMap(void) {
-    Unk8004DF1C* entry;
-    Unk140D0Group* group;
-    Unk140D0Def* def;
-    Unk80085290* p;
+    ChestPlacement* entry;
+    ChestGroup* group;
+    ChestDef* def;
+    Actor* p;
     u32 i;
     s32 id;
     s32 mode;
 
     for (id = map_id, entry = chest_map_placements, i = 0; i < 19; i++, entry++) {
-        if (id == entry->id) {
+        if (id == entry->mapId) {
             break;
         }
     }
@@ -181,17 +127,17 @@ void Chest_LoadForMap(void) {
             p->rz = 0.0f;
             p->ry = def->ry;
             Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &chest_coll);
-            p->y = chest_coll.unk4;
-            p->unk2C = chest_coll.unkC;
-            p->unk30 = chest_coll.unk10;
-            p->unk34 = chest_coll.unk14;
-            p->unk1C = def->unk14;
-            p->unk18 = def->unk18;
-            p->unk20 = def->unk1C;
-            p->unk44 = def->unkC;
-            p->unk4C = def->unk10;
+            p->y = chest_coll.y;
+            p->unk2C = chest_coll.nx;
+            p->unk30 = chest_coll.ny;
+            p->unk34 = chest_coll.nz;
+            p->unk1C = def->boxAngle;
+            p->unk18 = def->boxHalfW;
+            p->unk20 = def->boxHalfD;
+            p->unk44 = def->boxX;
+            p->unk4C = def->boxZ;
             p->scale = 0.07f;
-            p->unk62 = def->unk20;
+            p->unk62 = def->flagId;
             p->unk50 = def->unk21;
             p->unk60 = 0;
             if (Chest_IsOpened(p->unk62)) {
@@ -211,7 +157,7 @@ void Chest_LoadForMap(void) {
 
 void Chest_UpdateAll(s32 arg0) {
     s32 n;
-    Unk80085290* p;
+    Actor* p;
     u16 t;
 
     n = chest_count;
@@ -235,16 +181,16 @@ void Chest_UpdateAll(s32 arg0) {
     }
 }
 
-Unk80085290* Chest_FindInFront(Unk80013808Arg* arg0) {
+Actor* Chest_FindInFront(Actor* arg0) {
     s32 n = chest_count;
-    Unk80085290* obj = chest_objects;
+    Actor* obj = chest_objects;
     f32 d;
     f32 dx;
     f32 dz;
 
     while (n != 0) {
         if (Chest_IsOpened(obj->unk62) == 0) {
-            d = arg0->unk10 - obj->unk1C;
+            d = arg0->ry - obj->unk1C;
             if (d > 3.141592653589793) {
                 d = d - 3.141592653589793;
             } else if (d < -3.141592653589793) {
@@ -280,7 +226,7 @@ Unk80085290* Chest_FindInFront(Unk80013808Arg* arg0) {
     return obj;
 }
 
-void Chest_Open(Unk80085290* arg0) {
+void Chest_Open(Actor* arg0) {
     Chest_SetOpened(arg0->unk62);
     arg0->unk60 = 0x805B;
     Anim_SetCurrentAndNext(arg0, 1, 1, 2, 1, 1);
