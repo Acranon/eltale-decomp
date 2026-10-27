@@ -423,12 +423,12 @@ void Audio_LoadSeqFileHeader(u32 devAddr) {
     Audio_DmaReadRom(devAddr, audio_seq_file, size);
 }
 
-void Audio_StartThread(void* arg) {
-    osCreateThread(&audio_thread, 5, Audio_ThreadMain, arg, &audio_heap, 0x32);
+void Audio_StartThread(struct NNSched* sc) {
+    osCreateThread(&audio_thread, 5, Audio_ThreadMain, sc, &audio_heap, 0x32);
     osStartThread(&audio_thread);
 }
 
-void Audio_InitSeqPlayers(u32 bankStart, u32 bankEnd, u32 seqFile, s32 arg3, u8* table) {
+void Audio_InitSeqPlayers(u8* bankStart, u8* bankEnd, u8* seqFile, u8* seqFileEnd, u8* table) {
     s32 size;
     ALBank* bank;
 
@@ -452,11 +452,11 @@ void Audio_InitSeqPlayers(u32 bankStart, u32 bankEnd, u32 seqFile, s32 arg3, u8*
     audio_seq_slots[1].config.stopOsc = 0;
     audio_seq_slots[1].config.debugFlags = 0;
     alCSPNew(&audio_seq_slots[1].player, &audio_seq_slots[1].config);
-    Audio_LoadSeqFileHeader(seqFile);
-    alSeqFileNew(audio_seq_file, (u8*) seqFile);
+    Audio_LoadSeqFileHeader((u32) seqFile);
+    alSeqFileNew(audio_seq_file, seqFile);
     size = bankEnd - bankStart;
     audio_seq_bank_file = alHeapAlloc(&audio_heap, 1, size);
-    Audio_DmaReadRom(bankStart, audio_seq_bank_file, size);
+    Audio_DmaReadRom((u32) bankStart, audio_seq_bank_file, size);
     alBnkfNew(audio_seq_bank_file, table);
     bank = audio_seq_bank_file->bankArray[0];
     alSeqpSetBank((ALSeqPlayer*) &audio_seq_slots[0].player, bank);
@@ -503,13 +503,13 @@ s32 Audio_GetSeqState(s32 slot) {
     return alSeqpGetState((ALSeqPlayer*) &audio_seq_slots[slot].player);
 }
 
-void Audio_InitSoundPlayer(u32 start, u32 end, u8* table) {
+void Audio_InitSoundPlayer(u8* start, u8* end, u8* table) {
     s32 size;
     u32 i;
 
     size = end - start;
     audio_sound_bank_file = alHeapAlloc(&audio_heap, 1, size);
-    Audio_DmaReadRom(start, audio_sound_bank_file, size);
+    Audio_DmaReadRom((u32) start, audio_sound_bank_file, size);
     audio_sound_player_config.maxSounds = 0x50;
     audio_sound_player_config.maxEvents = 0x20;
     audio_sound_player_config.heap = &audio_heap;

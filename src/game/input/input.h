@@ -45,7 +45,7 @@ s32 Pak_ScanGameFiles(s32 cont);
 u8 func_80035CC8(s32 arg0);
 u8 Pak_AllocateGameFile(s32 arg0, u8 arg1);
 u8 Pak_DeleteGameFile(s32 arg0, u8 arg1);
-void Pak_ReadFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf);
+s32 Pak_ReadFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf);
 s32 Pak_WriteFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf);
 s32 Pak_TryRepair(s32 arg0, s32 arg1);
 s32 Pak_ClassifyError(s32 arg0);

@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+struct NNSched;
+
 /* Sample DMA cache (the libultra audio sample's DMA buffer list). */
 typedef struct AMDMABuffer {
     /* 0x00 */ ALLink node;
@@ -101,13 +103,13 @@ ALDMAproc Audio_DmaNew(AMDMAState** state);
 void Audio_FreeOldDmaBuffers(void);
 void Audio_ThreadMain(void* arg);
 void Audio_LoadSeqFileHeader(u32 devAddr);
-void Audio_StartThread(void* arg);
-void Audio_InitSeqPlayers(u32 bankStart, u32 bankEnd, u32 seqFile, s32 arg3, u8* table);
+void Audio_StartThread(struct NNSched* sc);
+void Audio_InitSeqPlayers(u8* bankStart, u8* bankEnd, u8* seqFile, u8* seqFileEnd, u8* table);
 void Audio_LoadSeq(s32 slot, s32 seqNo);
 s32 Audio_PlaySeq(s32 slot);
 void Audio_StopSeq(s32 slot);
 s32 Audio_GetSeqState(s32 slot);
-void Audio_InitSoundPlayer(u32 start, u32 end, u8* table);
+void Audio_InitSoundPlayer(u8* start, u8* end, u8* table);
 void Audio_PlaySound(s32 id);
 void Audio_StopSound(s32 id);
 void Audio_GetSoundState(s32 id);

@@ -1,22 +1,12 @@
 #include "game/env/env.h"
+#include "game/map/map.h"
+#include "game/camera/camera.h"
 
 /*
  * World clock and environment: day counter, day-phase palette fades, the lighting/fog
  * keyframe track, and the light slots that emit env colour, Lights3 and fog colour.
  * Original file: 12610.c (ROM 0x12610).
  */
-
-/* This file's view of an exit record (h_world owns the type; H2 drops this copy). */
-typedef struct ExitDef {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ u8 padC[8];
-    /* 0x14 */ u16 unk14;
-    /* 0x16 */ u8 pad16[4];
-    /* 0x1A */ u16 unk1A;
-    /* 0x1C */ u8 pad1C[2];
-    /* 0x1E */ u16 unk1E[3];
-} ExitDef; /* 0x24 bytes */
 
 /* This file's .bss, 80084300..80084B80, in address order (first declaration fixes
  * the order). exit_local_offset is used only by 113F0 (it sits between this file's
@@ -52,9 +42,6 @@ s32 env_light_dirs[4][3];
 s32 env_fog_range[2];
 extern s32 D_8008C164;
 
-extern u16 map_backdrop_tlut[];
-extern u16 map_backdrop_phase_tluts[][0x100];
-extern u16 map_flags;
 extern u16 battle_flags;
 extern s32 core_flags;
 extern s32 D_8008C168;
@@ -70,14 +57,12 @@ EnvDayPhase env_day_phase_last[1] = {
     { 0x537F, 3, 0x80 },
 };
 
-extern u16 map_env_flags;
 extern s32 gfx_frame_index;
 extern Gfx *gfx_dl_head;
 extern s16 gfx_fog_near;
 extern s16 gfx_fog_far;
 
 void guMtxXFMF(f32 (*)[4], f32, f32, f32, f32 *, f32 *, f32 *);
-extern Mtx camera_view_mtx;
 extern s32 D_80084B60;
 extern s32 D_80084B64;
 extern s32 D_80084B68;
@@ -88,14 +73,14 @@ extern s32 gfx_clear_r;
 extern s32 gfx_clear_g;
 extern s32 gfx_clear_b;
 
-void Exit_SetDestination(ExitDef *arg0) {
-    exit_destination_src = arg0->unk1E;
-    exit_destination.unk0 = exit_destination_src[0];
-    exit_destination.unk4 = exit_destination_src[1];
-    exit_destination.unk8 = exit_destination_src[2];
-    exit_destination.unkC = arg0->unk14;
-    exit_destination.unk10 = arg0->unk1A;
-    exit_destination.unk14 = arg0->unk8;
+void Exit_SetDestination(MapExit *arg0) {
+    exit_destination_src = arg0->dest;
+    exit_destination.map = exit_destination_src[0];
+    exit_destination.subarea = exit_destination_src[1];
+    exit_destination.entry = exit_destination_src[2];
+    exit_destination.flags = arg0->flags;
+    exit_destination.mapObj = arg0->unk1A;
+    exit_destination.angle = arg0->angle;
 }
 
 void Env_InitClock(void) {
@@ -141,7 +126,8 @@ void Env_InitForMap(void) {
     } else {
         env_next_phase = i;
     }
-    src = map_backdrop_phase_tluts[p->unk4];
+    /* map.h declares the four phase palettes as u8[0x800]; they are u16[4][0x100] (D3_HINTS). */
+    src = ((u16(*)[0x100]) map_backdrop_phase_tluts)[p->unk4];
     dst = map_backdrop_tlut;
     i = 0x100;
     do {
@@ -179,7 +165,7 @@ void Env_Update(void) {
     } else {
         p = &env_day_phases[env_next_phase];
         if (env_light_time >= p->unk0 && (env_next_phase != 0 || env_light_time < env_last_phase_start)) {
-            Env_StartPaletteFade(p->unk8, map_backdrop_phase_tluts[0] + p->unk4 * 256, map_backdrop_tlut);
+            Env_StartPaletteFade(p->unk8, (u16 *) map_backdrop_phase_tluts + p->unk4 * 256, map_backdrop_tlut);
             if (++env_next_phase >= 4) {
                 env_next_phase = 0;
             }
@@ -315,7 +301,7 @@ void Env_ComputeLightDirs(void) {
         env_light_dirs[0][1] = 89;
         env_light_dirs[0][2] = 20;
     }
-    Math_MtxFMulVecTransposed((MtxF *)&camera_view_mtx, -89.0f, 89.0f, 20.0f, &x, &y, &z);
+    Math_MtxFMulVecTransposed(&camera_view_mtx, -89.0f, 89.0f, 20.0f, &x, &y, &z);
     env_light_dirs[1][0] = x;
     env_light_dirs[1][1] = y;
     env_light_dirs[1][2] = z;

@@ -4,9 +4,17 @@
 #include "common.h"
 #include "game/core/sched.h"
 
-/* One graphics frame's segment 2 data and display list. */
+/* One graphics frame's segment 2 data (D_2000000 in segment 2) and display list.
+ * proj and view come from camera_proj_mtx / camera_view_mtx (Camera_Update), ortho is the
+ * 2D projection built by guOrtho (Camera_InitForMap; HUD and fade load it), mtx[] the
+ * per-draw matrices handed out by gfx_mtx_index, lookAt Camera_Update's guLookAtReflectF. */
 typedef struct GfxFrameData {
-    /* 0x0000 */ u8 unk0[0x8A70]; /* matrices etc., segment 2 */
+    /* 0x0000 */ Mtx proj;
+    /* 0x0040 */ Mtx ortho;
+    /* 0x0080 */ Mtx view;
+    /* 0x00C0 */ Mtx mtx[0x226];
+    /* 0x8A40 */ LookAt lookAt;
+    /* 0x8A60 */ u8 unk8A60[0x10];
     /* 0x8A70 */ Gfx dl[(0xDA70 - 0x8A70) / sizeof(Gfx)];
     /* 0xDA70 */ s16 msg;
     /* 0xDA74 */ u16 *framebuffer;

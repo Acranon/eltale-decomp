@@ -233,8 +233,8 @@ u8 Pak_DeleteGameFile(s32 arg0, u8 arg1) {
     return osPfsDeleteFile(&pak_port_states[arg0], 0x3943, 0x4E45544A, pak_game_name, &ext);
 }
 
-void Pak_ReadFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
-    osPfsReadWriteFile(&pak_port_states[arg0], file_no, 0, offset, nbytes, buf);
+s32 Pak_ReadFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {
+    return osPfsReadWriteFile(&pak_port_states[arg0], file_no, 0, offset, nbytes, buf);
 }
 
 s32 Pak_WriteFile(s32 arg0, s32 file_no, s32 offset, s32 nbytes, u8 *buf) {

@@ -4,19 +4,22 @@
 #include "common.h"
 #include "game/math/math.h"
 
-/* An exit record (h_world's type; see D3_HINTS.md). */
-struct ExitDef;
+/* An exit record: map.h's MapExit (h_world). */
+struct MapExit;
 
-/* Where the current exit leads: Exit_SetDestination fills it from the exit record; the
- * gameplay loop takes the next map from unk0 and the next subarea from unk4. */
+/* Where the current exit leads: Exit_SetDestination fills it from the exit record (or the
+ * player's respawn point, Player_*): the gameplay loop takes the next map and subarea,
+ * the player spawns at entry (-1: none) facing angle; flags are the exit's flags (bits 8..11
+ * the arrival kind, Player_StartAreaEntry) and mapObj the door object it opens
+ * (map_objs[mapObj]). */
 typedef struct ExitDestination {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ u16 unkC;
+    /* 0x00 */ s32 map;
+    /* 0x04 */ s32 subarea;
+    /* 0x08 */ s32 entry;
+    /* 0x0C */ u16 flags;
     /* 0x0E */ u16 unkE;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ f32 unk14;
+    /* 0x10 */ s32 mapObj;
+    /* 0x14 */ f32 angle;
 } ExitDestination; /* 0x18 bytes */
 
 /* An RGB triple of the lighting track (ambient or one light), 0..255 per channel. */
@@ -111,7 +114,7 @@ extern s32 env_fog_range[2];
 extern EnvDayPhase env_day_phases[3];
 extern EnvDayPhase env_day_phase_last[1];
 
-void Exit_SetDestination(struct ExitDef *arg0);
+void Exit_SetDestination(struct MapExit *arg0);
 void Env_InitClock(void);
 void Env_InitForMap(void);
 void Env_Update(void);
