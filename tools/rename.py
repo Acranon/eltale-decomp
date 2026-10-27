@@ -13,7 +13,7 @@ A table row is:  old<TAB>new<TAB>evidence   (lines starting with # are comments)
 The tables are the truth. A sync compares them with the game section of symbol_addrs.txt
 (what was applied before) and, for every symbol whose name differs, replaces the current
 name with the wanted one as a whole word in src/, include/ (not include/ultra64),
-undefined_syms.txt and the src/nonmatching records (renaming record files too). So:
+undefined_syms.txt, assets.yaml and the src/nonmatching records (renaming record files too). So:
   - a new row names a func_/D_ symbol;
   - editing a row's `new` renames it again;
   - deleting a row (or commenting it out) turns the name back into func_/D_.
@@ -56,6 +56,7 @@ def text_files(root: Path):
         if "ultra64" not in p.parts:
             yield p
     yield root / "undefined_syms.txt"
+    yield root / "assets.yaml"
 
 
 def sym_line(old: str, new: str) -> str:
