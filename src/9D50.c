@@ -1,8 +1,8 @@
 #include "common.h"
 
 /*
- * Town NPCs: spawn from the area's def list, per-frame wander/turn update, draw, collision,
- * start/end of a talk and loading the message and speaker name into the text buffers.
+ * NPCs (non-encounter areas): spawn from the area's def list, per-frame wander/turn update, draw,
+ * collision, start/end of a talk and loading the message and speaker name into the text buffers.
  * Folder: src/game/npc/   (proposed for round 4)
  */
 

@@ -1,9 +1,9 @@
-# Menu_DrawOptionsPage
+# Menu_UpdateOptionsPage
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/2B530.c`](../2B530.c)
-- Retail assembly: [`asm/nonmatchings/2B530/Menu_DrawOptionsPage.s`](../../asm/nonmatchings/2B530/Menu_DrawOptionsPage.s)
+- Retail assembly: [`asm/nonmatchings/2B530/Menu_UpdateOptionsPage.s`](../../asm/nonmatchings/2B530/Menu_UpdateOptionsPage.s)
 - Retail code size: `0xd54` bytes
 - Current gap: 112 object words; length and frame (0x48) exact. Stack homes and register choice differ in the cursor-slide part (about +0x6E0 on).
 - Specific blocker: An extra pos home shifts repeated x+constant spills by 4 bytes; later register/scheduling gaps remain.
@@ -25,7 +25,7 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **Menu_DrawOptionsPage** (0xD54 bytes)
+- **Menu_UpdateOptionsPage** (0xD54 bytes)
   - w5 s2: Only skimmed, no real attempt: large menu/cursor logic (853 and 1167 instructions). B844 copies a 3-byte local array from D_800615A8.
   - w5 s3: Draft c/B844_g.c and c/B844_st.c (853 instructions). The first ~200 instructions match exactly. D_8008FB58 is used only by this function, and the target code is the promoted-static pattern: lui/%lo access, write-back at merges, reload after calls. Making it `static s32` inside B844 reproduces that, so it needs D2. Two issues remain: wob should get t1 for the whole function but my build uses v0 or memory, and in the 3rd part the target puts per-branch write-backs and computes a1 = pos + x before the branch. Frame: 4 named locals plus the reserved switch slot (0x34). Locals ids (3-byte struct copy), sel and y are memory-resident.
   - w5 s4: Rechecked: blocked on D2. D_8008FB58 is clearly a promoted static: kept in t2, written back at merges, reloaded after calls.

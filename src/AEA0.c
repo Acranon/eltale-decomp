@@ -266,7 +266,7 @@ void Enemy_GetAnimStep(Obj *, Vec3f *);
 void Enemy_SpawnDeathEffects(Obj *);
 void Enemy_RunAttackScript(void);
 void Magic_CreateVisualEffect(u16, u16, f32, f32, f32, f32, Unk800C18D8 *, Vec3f *, Obj *);
-void Effect_StartBurstEmitter(s32, s32, f32, f32, f32, f32);
+void Effect_StartConvergeEmitter(s32, s32, f32, f32, f32, f32);
 void Battle_EndTurn(Obj *);
 void Anim_UpdateRootMotion(Obj *, u8 *, f32, Vec3f *);
 void Hud_ClearActorStatusIndicators(Obj *);
@@ -1207,7 +1207,7 @@ void Enemy_SpawnDeathEffects(Obj *obj) {
         y = obj->y + obj->unk64->unk1C * 0.5 * obj->unk24;
     }
     Magic_CreateVisualEffect(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &D_8007C070, obj);
-    Effect_StartBurstEmitter(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
+    Effect_StartConvergeEmitter(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
                   obj->unk64->unk18 * obj->unk24 * 3.6);
 }
 

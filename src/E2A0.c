@@ -359,7 +359,7 @@ typedef struct {
     /* 0x20 */ f32 z;
 } Unk8007AA08;
 extern Unk8007AA08 D_8007AA08;
-void Effect_QueueVisibleMarker(f32, f32, f32, Unk8000FA9C *);
+void Effect_QueueMapObjEmitter(f32, f32, f32, Unk8000FA9C *);
 void MapObj_EmitArcSprite(Unk8000FA9C *);
 void MapObj_EmitDropSprite(Unk8000FA9C *);
 void MapObj_QueueSpinner(f32, f32, f32, f32, Unk8000FA9C *);
@@ -384,7 +384,7 @@ extern s32 D_80084980;
  * the static sprite descriptors of MapObj_EmitArcSprite (8004DE04) and MapObj_EmitDropSprite
  * (8004DE44), then the tables defined after MapObj_EmitDropSprite. IDO stores a
  * function-static descriptor's fields with lui/%lo (sharing the lui inside a
- * 16-byte line), which both functions need. D_8004DD8B (MapObj_DrawNearby's asm
+ * 16-byte line), which both functions need. D_8004DD8B (MapObj_UpdateAndDrawNearby's asm
  * name for D_8004DD88 + 3) is an alias in undefined_syms.txt. */
 u16 D_8004DD70 = 0;
 s32 D_8004DD74[4] = { 0x00000000, 0x01600160, 0x01600160, 0x01600100 };
@@ -580,7 +580,7 @@ s32 MapObjAnim_Find(s32);
 void MapObj_DrawBillboards(MtxBuf *, s32, s32, Unk8000FA9C **);
 
 /* &D_80082058 kept in a saved register instead of rematerialized, 8 bytes short, register allocation; code is equivalent */
-void MapObj_DrawNearby(MtxBuf *arg0) {
+void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
     CellOffset *off;
     s32 n;
     s32 cx;
@@ -777,7 +777,7 @@ void MapObj_DrawNearby(MtxBuf *arg0) {
     D_800842B4 = D_800842B0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/MapObj_DrawNearby.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/E2A0/MapObj_UpdateAndDrawNearby.s")
 #endif
 
 void MapObj_DrawTranslucent(MtxBuf *arg0) {
@@ -897,7 +897,7 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
             *D_80081CD4++ = s;
             D_80081CBC++;
         } else if (kind == 0x81) {
-            Effect_QueueVisibleMarker(s->x, s->y, s->z, s);
+            Effect_QueueMapObjEmitter(s->x, s->y, s->z, s);
         } else if (kind == 0x83) {
             MapObj_EmitArcSprite(s);
         } else if (kind == 0x84) {
@@ -911,7 +911,7 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
     }
 }
 
-void Map_DrawSky(MtxBuf *arg0) {
+void Map_DrawBackdrop(MtxBuf *arg0) {
     Math_MtxRotScaleTrans(&arg0->mtx[D_8007A180], 0.0f, 0.0f, 0.0f, 1.0f, D_80085E48.x, D_80085E48.y - 10.0f, D_80085E48.z);
     gSPMatrix(D_8007A184++, &D_2000000.mtx[D_8007A180], G_MTX_LOAD);
     D_8007A180++;

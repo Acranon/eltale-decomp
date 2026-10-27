@@ -736,7 +736,7 @@ void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame) {
     D_80085E48.unk20 = D_80085E48.unk14 - D_80085E48.unk20;
 }
 
-void Cutscene_DrawImageCues(void) {
+void Cutscene_UpdateAndDrawImageCues(void) {
     Cue *cue;
     Unk80092EE8 *slot;
     s32 n;

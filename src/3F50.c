@@ -231,7 +231,7 @@ void Npc_EndTalk(s32 arg0);
 void Item_BuildMessage(s32 arg0);
 void Magic_CreateCastEffect(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
 s32 func_80017AB0(void);
-void Effect_StartPulseEmitter(Actor *arg0);
+void Effect_StartFootEmitter(Actor *arg0);
 void Battle_EndTurn(Actor *arg0);
 void Anim_SetCurrentAndNext(Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 void Anim_UpdateRootMotion(Actor *arg0, s32 arg1, f32 arg2);
@@ -1521,7 +1521,7 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
             a->vz *= 0.9;
             speed = 1;
             flag = 1;
-            Effect_StartPulseEmitter(a);
+            Effect_StartFootEmitter(a);
         } else {
             anim = 1;
             next = 1;
@@ -1600,7 +1600,7 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         a->vz *= 0.9;
         speed = 1;
         flag = 1;
-        Effect_StartPulseEmitter(a);
+        Effect_StartFootEmitter(a);
     }
     if (anim != a->unk52 && anim != a->unk5A) {
         Anim_SetCurrentAndNext(a, anim, speed, next, speed, flag);
@@ -2379,7 +2379,7 @@ extern s32 D_8007A9BC;
 extern u8 D_8007A9BF;
 extern s16 D_8008C160;
 
-void Effect_ActivateActorMarker(s32 arg0);
+void Effect_StartStatUpMarker(s32 arg0);
 void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
     u16 cost;
     s32 count;
@@ -2409,7 +2409,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk30 < 0x36) {
                 p->unk14->unk30++;
             }
-            Effect_ActivateActorMarker(0);
+            Effect_StartStatUpMarker(0);
             count++;
         }
     } else {
@@ -2429,7 +2429,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk31 < 0x36) {
                 p->unk14->unk31++;
             }
-            Effect_ActivateActorMarker(2);
+            Effect_StartStatUpMarker(2);
             count++;
         }
     } else {
@@ -2446,7 +2446,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk32 < 0x36) {
                 p->unk14->unk32++;
             }
-            Effect_ActivateActorMarker(3);
+            Effect_StartStatUpMarker(3);
             count++;
         }
     } else {
@@ -2463,7 +2463,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (p->unk14->unk33 < 0x36) {
                 p->unk14->unk33++;
             }
-            Effect_ActivateActorMarker(1);
+            Effect_StartStatUpMarker(1);
             count++;
         }
     } else {

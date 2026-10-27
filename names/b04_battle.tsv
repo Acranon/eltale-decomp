@@ -1,11 +1,12 @@
+# r2 reviewed 2026-10-26: kept 8, renamed 1, reverted 0
 # D3 b04 battle
 # old<TAB>new<TAB>evidence
-func_8001EE00	Battle_ResetState	Clears battle state, encounter accumulator, and battle pointers, then selects map encounter tables when enabled.
-func_8001EE94	Battle_TryStartRandomEncounter	Accumulates player travel, chooses a nearby encounter point and region, spawns a group, and calls Player_InitBattle.
-func_8001F164	Battle_StartBossEncounter	Spawns the selected boss, initializes turn order and battle state, and calls Player_InitBattle.
-func_8001F36C	Battle_UpdateTurnCamera	Changes the camera to an enemy position for one timed phase, then restores a player-facing preset.
-func_8001F888	Battle_UpdateTurnTransition	After a turn timer, checks battle completion and rewards or starts the next enemy turn.
-func_8001FC14	Battle_EndTurn	Ticks actor statuses, advances the turn-order index, toggles the active side, and starts the turn transition.
-func_8001FD44	Battle_FindEncounterRegion	Returns the rectangular encounter record containing the supplied X and Y point.
-func_8001FE08	Battle_ChooseNearbyEncounterPoint	Collects up to six encounter points at a squared distance of 2500 through 8100 and randomly chooses one.
-func_8001FF10	Battle_SpawnEncounterGroup	Chooses a group entry, spawns its listed enemies around a point, and sorts their turn order.
+func_8001EE00	Battle_ResetState	Clears the battle flags D_8008BE52 (except 0x8000) and the encounter accumulators D_8008BFAC/B0, and when D_800842E8 & 1 selects the area's encounter-region and group tables (D_8007C284 +0x30/+0x34).
+func_8001EE94	Battle_TryStartRandomEncounter	Outside battle, accumulates the player's per-frame travel D_8007A9A8; every 50 units raises the odds (rand(2000) < count), then picks a point 50..90 units away and the region under the player, spawns a group, sets battle flags 0x205, rings, Player_InitBattle and battle BGM 13.
+func_8001F164	Battle_StartBossEncounter	Spawns boss D_8007C140 - 1 (Boss_Spawn) at its point, swaps in the boss name/data tables, sets battle flags 0x305, turn order, BGM and the battle ring, and calls Player_InitBattle; called from Player_StateMove after the boss's opening text closes.
+func_8001F36C	Battle_UpdateStartCamera	Phase counter D_8008BE4C is set only at encounter start (0 random, 1 boss): phase 0 points the camera at a random enemy for 60 frames, phase 1 restores the player camera preset behind the player and clears battle flag 0x200 (which blocks Player_CanAct).
+func_8001F888	Battle_UpdateTurnTransition	While a turn change is pending (flag 4) and its delay has run out: ends the battle when all enemies are gone (flag 8, boss reward) or on escape (flag 0x10, player outside the circle) -- remove enemies, fade ring, BGM -- else starts the next turn (Enemy_StartTurn for the enemy side) with a ring at the actor's move range.
+func_8001FC14	Battle_EndTurn	Ticks actor statuses, on the enemy side advances to the next live enemy in turn order (flag 0x400 when none), fades the turn ring, toggles the active side (flag 2) and sets the turn-change flag 4.
+func_8001FD44	Battle_FindEncounterRegion	Returns the rectangular encounter record containing the supplied X and Z point, or NULL.
+func_8001FE08	Battle_ChooseNearbyEncounterPoint	Collects up to six encounter points at a squared distance of 2500 through 8100 (50..90 units) and randomly chooses one.
+func_8001FF10	Battle_SpawnEncounterGroup	Chooses a group entry from the region's list, spawns its listed enemies (random extra count) at formation offsets rotated around the point, and sorts their turn order.

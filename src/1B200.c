@@ -203,7 +203,7 @@ typedef struct {
 } Unk80086798b; // size = 0x58
 
 /* This file's .bss, 800863F0..80087E30 (in address order; first declaration
- * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds D_80087798 (Effect_ResetActorMarkers shares a lui between its pairs only when it
+ * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds D_80087798 (Effect_ResetStatUpMarkers shares a lui between its pairs only when it
  * is defined here). Labels splat put inside these arrays (D_800865CC..,
  * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
 
@@ -236,20 +236,20 @@ extern Unk2000000_1B200 D_2000000;
 extern Gfx D_800EB880[];
 extern Gfx D_800EB8E8[];
 
-void Effect_UpdatePulseParticle(Unk1B200Particle* arg0);
-void Effect_UpdateMarkerParticle(Unk1B200Particle* arg0);
-void Effect_UpdateSmallParticle(Unk1B200Particle* arg0);
+void Effect_UpdateFootParticle(Unk1B200Particle* arg0);
+void Effect_UpdateMapObjParticle(Unk1B200Particle* arg0);
+void Effect_UpdateFlipbookSprite(Unk1B200Particle* arg0);
+void Effect_UpdateConvergeParticle(Unk1B200Spark* arg0);
 void Effect_UpdateBurstParticle(Unk1B200Spark* arg0);
-void Effect_UpdateBurstParticleWithDrag(Unk1B200Spark* arg0);
 
 /* This file's .data, 8004EE20..8004F060: effect descriptors (Unk8004EE20,
  * 0x40 bytes each) and their tables, in source order: these first, then
- * Effect_UpdateMarkerEmitters's static descriptor (8004EE9C), D_8004EEDC, Effect_SpawnSmallParticle's
- * static descriptor (8004EF0C) and the tables after Effect_SpawnSmallParticle. Both
+ * Effect_UpdateMapObjEmitters's static descriptor (8004EE9C), D_8004EEDC, Effect_SpawnFlipbookSprite's
+ * static descriptor (8004EF0C) and the tables after Effect_SpawnFlipbookSprite. Both
  * descriptors must be function statics: IDO then stores their fields through
  * lui/%lo instead of the descriptor's address register. */
 Unk8004EE20 D_8004EE20 = {
-    0x000C, 0, (void*)Effect_UpdatePulseParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C3790,
+    0x000C, 0, (void*)Effect_UpdateFootParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C3790,
     0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
 };
 f32 D_8004EE60[12] = {
@@ -281,48 +281,48 @@ Unk1B200Vec2 D_80087E00;
 u8 D_80087E08[8]; /* unreferenced */
 Coll1B200 D_80087E10;
 
-void Effect_ResetPulseEmitters(void);
-void Effect_ResetMarkerEmitters(void);
+void Effect_ResetFootEmitters(void);
+void Effect_ResetMapObjEmitters(void);
 void Effect_ResetFloatingNumbers(void);
-void Effect_ResetBurstEmitters(void);
+void Effect_ResetConvergeEmitters(void);
 void Effect_ResetStreaks(void);
 void Effect_ResetRings(void);
 void Effect_ResetModelEffects(void);
-void Effect_ResetActorMarkers(void);
-void Effect_UpdatePulseEmitters(void);
-void Effect_UpdateMarkerEmitters(void);
+void Effect_ResetStatUpMarkers(void);
+void Effect_UpdateFootEmitters(void);
+void Effect_UpdateMapObjEmitters(void);
 void Effect_DrawFloatingNumbers(void);
-void Effect_UpdateBurstEmitters(void);
-void Effect_DrawStreaks(void*);
-void Effect_DrawRings(void*);
-void Effect_DrawModelEffects(void*);
-void Effect_DrawActorMarkers(void*);
+void Effect_UpdateConvergeEmitters(void);
+void Effect_UpdateAndDrawStreaks(void*);
+void Effect_UpdateAndDrawRings(void*);
+void Effect_UpdateAndDrawModelEffects(void*);
+void Effect_DrawStatUpMarkers(void*);
 s32 Effect_AllocateSprite(void*);
 void Math_RotateVec2(f32, Unk1B200Vec2*);
 
 void Effect_ResetAll(void) {
-    Effect_ResetPulseEmitters();
-    Effect_ResetMarkerEmitters();
-    Effect_ResetBurstEmitters();
+    Effect_ResetFootEmitters();
+    Effect_ResetMapObjEmitters();
+    Effect_ResetConvergeEmitters();
     Effect_ResetStreaks();
-    Effect_ResetActorMarkers();
+    Effect_ResetStatUpMarkers();
     Effect_ResetFloatingNumbers();
     Effect_ResetModelEffects();
     Effect_ResetRings();
 }
 
 void Effect_UpdateAndDrawAll(void* arg0) {
-    Effect_UpdatePulseEmitters();
-    Effect_UpdateMarkerEmitters();
-    Effect_UpdateBurstEmitters();
-    Effect_DrawStreaks(arg0);
-    Effect_DrawActorMarkers(arg0);
-    Effect_DrawRings(arg0);
-    Effect_DrawModelEffects(arg0);
+    Effect_UpdateFootEmitters();
+    Effect_UpdateMapObjEmitters();
+    Effect_UpdateConvergeEmitters();
+    Effect_UpdateAndDrawStreaks(arg0);
+    Effect_DrawStatUpMarkers(arg0);
+    Effect_UpdateAndDrawRings(arg0);
+    Effect_UpdateAndDrawModelEffects(arg0);
     Effect_DrawFloatingNumbers();
 }
 
-void Effect_ResetPulseEmitters(void) {
+void Effect_ResetFootEmitters(void) {
     s32 i = 8;
     Unk80086400* p = D_80086400;
 
@@ -333,7 +333,7 @@ void Effect_ResetPulseEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_StartPulseEmitter(Unk1B200Pos* arg0) {
+void Effect_StartFootEmitter(Unk1B200Pos* arg0) {
     s32 i = 7;
     Unk80086400* p = D_80086400;
 
@@ -345,7 +345,7 @@ void Effect_StartPulseEmitter(Unk1B200Pos* arg0) {
     p->pos = arg0;
 }
 
-void Effect_UpdatePulseEmitters(void) {
+void Effect_UpdateFootEmitters(void) {
     s32 i;
     Unk80086400* p;
     Unk1B200Pos* pos;
@@ -374,7 +374,7 @@ void Effect_UpdatePulseEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_UpdatePulseParticle(Unk1B200Particle* arg0) {
+void Effect_UpdateFootParticle(Unk1B200Particle* arg0) {
     arg0->unk18 += arg0->unk30;
     arg0->unk1C += arg0->unk34;
     arg0->unk20 += arg0->unk38;
@@ -385,7 +385,7 @@ void Effect_UpdatePulseParticle(Unk1B200Particle* arg0) {
     gDPSetEnvColor(D_8007A184++, 255, 255, 255, D_8004EE90[arg0->unk0]);
 }
 
-void Effect_ResetMarkerEmitters(void) {
+void Effect_ResetMapObjEmitters(void) {
     s32 i;
     Unk80086440* a;
     Unk80086440* b;
@@ -403,7 +403,7 @@ void Effect_ResetMarkerEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_QueueVisibleMarker(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
+void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     s32 pad[4];
     Unk80086440* cur;
     Unk80086440* prev;
@@ -439,9 +439,9 @@ void Effect_QueueVisibleMarker(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     }
 }
 
-void Effect_UpdateMarkerEmitters(void) {
+void Effect_UpdateMapObjEmitters(void) {
     static Unk8004EE20 D_8004EE9C = {
-        0x002D, 0, (void*)Effect_UpdateMarkerParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
+        0x002D, 0, (void*)Effect_UpdateMapObjParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
         0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.25f, 0.05f, 0,
     };
     Unk80086440* p;
@@ -464,13 +464,13 @@ void Effect_UpdateMarkerEmitters(void) {
     }
 }
 
-/* Effect_UpdateMarkerParticle's table sits between the two function statics. */
+/* Effect_UpdateMapObjParticle's table sits between the two function statics. */
 u8 D_8004EEDC[48] = {
     0x08, 0x1C, 0x30, 0x44, 0x58, 0x6C, 0x80, 0x94, 0xA8, 0xBC, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0,
     0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xC0, 0xB0, 0xA0, 0x90, 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10, 0x00, 0x00, 0x00,
 };
 
-void Effect_UpdateMarkerParticle(Unk1B200Particle* arg0) {
+void Effect_UpdateMapObjParticle(Unk1B200Particle* arg0) {
     s32 r;
     s32 g;
     s32 b;
@@ -495,9 +495,9 @@ void Effect_UpdateMarkerParticle(Unk1B200Particle* arg0) {
     gDPSetEnvColor(D_8007A184++, r, g, b, D_8004EEDC[arg0->unk0]);
 }
 
-void Effect_SpawnSmallParticle(f32 x, f32 y, f32 z) {
+void Effect_SpawnFlipbookSprite(f32 x, f32 y, f32 z) {
     static Unk8004EE20 D_8004EF0C = {
-        0x000C, 0, (void*)Effect_UpdateSmallParticle, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
+        0x000C, 0, (void*)Effect_UpdateFlipbookSprite, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
         0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.4f, 0.0f, 0.0f, 0.0f, 0,
     };
 
@@ -517,11 +517,11 @@ u8 D_8004EF94[4][4] = {
     { 0xFF, 0xFF, 0xFF, 0xFF }, { 0xC8, 0xFF, 0xC8, 0xFF }, { 0xC8, 0xC8, 0xFF, 0xFF }, { 0xFF, 0x7F, 0x7F, 0xFF },
 };
 Unk8004EE20 D_8004EFA4 = {
-    0x0014, 0, (void*)Effect_UpdateBurstParticle, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0x0014, 0, (void*)Effect_UpdateConvergeParticle, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
     0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
 };
 Unk8004EE20 D_8004EFE4 = {
-    0x0014, 0, (void*)Effect_UpdateBurstParticleWithDrag, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+    0x0014, 0, (void*)Effect_UpdateBurstParticle, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
     0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
 };
 u16 D_8004F024[4] = { 0x14, 0xC, 0xC, 0 };
@@ -532,7 +532,7 @@ u8 D_8004F04C[5][4] = {
     { 0xFF, 0x00, 0x00, 0x00 }, { 0xFF, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0xFF, 0x00 }, { 0x00, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0x00, 0x00 },
 };
 
-void Effect_UpdateSmallParticle(Unk1B200Particle* arg0) {
+void Effect_UpdateFlipbookSprite(Unk1B200Particle* arg0) {
     u16 v = arg0->unk0;
 
     if (!(v & 3)) {
@@ -688,7 +688,7 @@ void Effect_DrawFloatingNumbers(void) {
 }
 
 
-void Effect_ResetBurstEmitters(void) {
+void Effect_ResetConvergeEmitters(void) {
     Unk800866D8* p = D_800866D8;
     s32 i = 8;
 
@@ -699,7 +699,7 @@ void Effect_ResetBurstEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_StartBurstEmitter(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
+void Effect_StartConvergeEmitter(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
     Unk800866D8* p = D_800866D8;
     s32 i = 7;
 
@@ -715,7 +715,7 @@ void Effect_StartBurstEmitter(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, 
     p->unk14 = arg5;
 }
 
-void Effect_UpdateBurstEmitters(void) {
+void Effect_UpdateConvergeEmitters(void) {
     Unk800866D8* p;
     f32 x;
     f32 y;
@@ -752,7 +752,7 @@ void Effect_UpdateBurstEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_UpdateBurstParticle(Unk1B200Spark* arg0) {
+void Effect_UpdateConvergeParticle(Unk1B200Spark* arg0) {
     u8* c;
 
     arg0->unk18 += arg0->unk30;
@@ -799,7 +799,7 @@ void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     } while (i != 0);
 }
 
-void Effect_UpdateBurstParticleWithDrag(Unk1B200Spark* arg0) {
+void Effect_UpdateBurstParticle(Unk1B200Spark* arg0) {
     u8* c;
 
     arg0->unk18 += arg0->unk30;
@@ -828,7 +828,7 @@ void Effect_ResetStreaks(void) {
     }
 }
 
-void Effect_DrawStreaks(void* arg0) {
+void Effect_UpdateAndDrawStreaks(void* arg0) {
     s32 n;
     Unk80087298* p;
     s32 first;
@@ -1006,7 +1006,7 @@ extern Gfx D_800C4780[];
 extern u8 D_800C47C0[];
 extern Gfx D_800C4840[];
 
-void Effect_DrawRings(void* arg0) {
+void Effect_UpdateAndDrawRings(void* arg0) {
     s32 cnt;
     Unk800877A8* p;
     s32 first;
@@ -1142,7 +1142,7 @@ Unk80086798b* Effect_CreateModelEffect(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s
     return p;
 }
 
-void Effect_DrawModelEffects(void* arg0) {
+void Effect_UpdateAndDrawModelEffects(void* arg0) {
     Unk80086798b* p;
     s32 i;
     u32 alpha;
@@ -1319,7 +1319,7 @@ s32 Effect_ConfigureModelEffectTexture(Unk80086798b* arg0) {
     }
 }
 
-void Effect_ResetActorMarkers(void) {
+void Effect_ResetStatUpMarkers(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
@@ -1337,7 +1337,7 @@ extern f32 D_8007AA44;
 extern Gfx D_800EB9C8[];
 extern Gfx D_800EB990[];
 void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
-void Effect_DrawActorMarkers(void* arg0) {
+void Effect_DrawStatUpMarkers(void* arg0) {
     s32 first;
     s32 i;
     Unk80087798* p;
@@ -1384,6 +1384,6 @@ void Effect_DrawActorMarkers(void* arg0) {
 }
 
 
-void Effect_ActivateActorMarker(s32 arg0) {
+void Effect_StartStatUpMarker(s32 arg0) {
     D_80087798[arg0].unk0 = 25;
 }

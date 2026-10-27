@@ -1,6 +1,7 @@
+# r2 reviewed 2026-10-26: kept 17, renamed 0, reverted 0
 # b05_item (25B20 items/inventory). Pad bits of D_80092C86 as in b07_player.tsv (A 0x8000, B 0x4000, Z 0x2000, Start 0x1000, R 0x10).
 # --- 25B20: items. Inventory = D_8008C9B8[0x96] item ids, 0xFF = empty (b07 hint); item records D_803AAAA0[id] (+0 flags, +2 kind, +4/+6 params); Quest 64 US twin file: inventory.c
-func_80024F20	Item_InitInventory	called once from Core_MainThread: DMAs the 0x400-byte icon palettes (ROM D_D384B0) to D_803AC460, fills the 8-entry icon cache D_8008C1B0 and all 0x97 inventory bytes with 0xFF, zeroes the menu scroll/cursor/stick accumulators D_8008C19C/A0/A4
+func_80024F20	Item_InitInventory	called at the top of every Core_MainThread pass (new game): DMAs the 0x400-byte icon palettes (ROM D_D384B0) to D_803AC460, fills the 8-entry icon cache D_8008C1B0 and all 0x97 inventory bytes with 0xFF, zeroes the menu scroll/cursor/stick accumulators D_8008C19C/A0/A4
 func_80024FC4	Item_HasInventoryRoom	returns 1 iff the last inventory slot D_8008C9B8[0x95] is 0xFF; Player_Update tests it before Chest_Open
 func_80024FF0	Item_CountInInventory	counts entries equal to arg0 in D_8008C9B8 up to the first 0xFF; Player_Update drops the pending item D_8007A9BC when 3 copies are held; Npc_StartTalk uses it too
 func_8002504C	Item_GetInventoryCount	counts filled entries of D_8008C9B8 up to the first 0xFF (max 0x96); Player_Update compares it with 0x8D
@@ -9,11 +10,11 @@ func_800250D8	Item_TryUse	checks the record's flags (+0 & 2 in battle (D_8008BE5
 func_800251CC	Item_ApplyEffect	calls the kind's use handler D_8004F4B0[D_803AAAA0[id].kind](actor, record, id); called from Player_StateUseItem
 func_80025318	Item_UpdateInventoryMenu	drawn by Gfx_BuildFrameDisplayList while D_8004DCA0 bit 0 (toggled by Player_Update): scrolls 8 visible inventory icons with the stick (sound 3), caches icons in D_8008C1B8, draws cursor, item name D_803AB288[id] and text D_803AB2F0[id]; on A or Z Item_TryUse, then removes the item and closes the menu (clears D_8004DCA0 bit 0, Fade_Start)
 func_80026040	Item_CanUseNever	kind 0 entry of the can-use table D_8004F4A0: returns 0
-func_80026054	Item_CanUseRestore	kind 1 can-use (D_8004F4A0[1]): 1 if the item restores HP (+4 != 0) and stats +4 (HP) < +6 (max HP), or restores MP (+6 != 0) and +8 (MP) < +0xA (max MP); stats layout from b07 Player_TakeDamage / Player_UpdateStatGrowth
+func_80026054	Item_CanUseRestore	kind 1 can-use (D_8004F4A0[1]): 1 if the item restores HP (+4 != 0) and stats +4 != +6, or restores MP (+6 != 0) and stats +8 != +0xA; Item_UseRestore adds to +4/+8 clamped to +6/+0xA (HP/MP and their max per b07)
 func_800260A8	Item_CanUseWarp	kind 2 can-use (D_8004F4A0[2]): 0 when D_800842B8 & 0xA or the area record D_8007C288->unk14 bit 2 is set, else 1; pairs with Item_UseWarp
 func_800260F4	Item_CanUseSpell	kind 3 can-use (D_8004F4A0[3]): 0 when D_8008BE52 bit 0x100 is set and the item's flag bit 8 is set, else 1; pairs with Item_UseSpell
 func_80026130	Item_UseNothing	empty kind 0 entry of the use table D_8004F4B0 (the other three entries are named)
-func_80026140	Item_UseRestore	kind 1 use (D_8004F4B0[1]): adds the item's HP (+4) and MP (+6) amounts to stats +4/+8 clamped to max +6/+0xA, reports each with func_8001AE24(actor, 1|2, amount), spawns visual effect D_803AB36C[0] (Magic_CreateVisualEffect) and plays sound 0xB
-func_80026284	Item_UseWarp	kind 2 use (D_8004F4B0[2]): copies map/submap of D_803AAA40[param] into the exit destination D_80084300 (entrance -1, see Exit_SetDestination) and its position into D_8007A98C..94, sets D_8004DCA0 |= 0x80 and D_8007A174 = 0x16, effect D_803AB36C[1], sound 0x3B
+func_80026140	Item_UseRestore	kind 1 use (D_8004F4B0[1]): adds the item's +4 and +6 amounts to stats +4/+8 clamped to +6/+0xA, shows each with Effect_AddFloatingNumber(actor, 1|2, amount), spawns visual effect D_803AB36C[0] (Magic_CreateVisualEffect) and plays sound 0xB
+func_80026284	Item_UseWarp	kind 2 use (D_8004F4B0[2]): copies map/submap of D_803AAA40[param] into the exit destination D_80084300 (entrance -1) and its position into D_8007A98C..94, sets the area-exit flag D_8004DCA0 |= 0x80 with countdown D_8007A174 = 0x16 and transition style 1, effect D_803AB36C[1], sound 0x3B
 func_80026400	Item_UseSpell	kind 3 use (D_8004F4B0[3]): Magic_CreateCastEffect(actor, item param +4, 0, 4)
 func_80026430	Item_DrawMenuFrame	draws a box at (x, y, w, h): fill-mode 1-pixel outline, a 2-pixel drop shadow on the right/bottom, then a textured rectangle inside (D_803AA8A8); only Item_UpdateInventoryMenu uses it (twice)

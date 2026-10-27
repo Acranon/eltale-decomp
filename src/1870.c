@@ -2,7 +2,7 @@
 
 /*
  * Main runtime: game-state loops, graphics frame setup and submission,
- * plus scene transitions.
+ * plus the transition fades (style D_8007A178).
  * Folder: src/game/core/
  */
 
@@ -94,11 +94,11 @@ void nnScStartScheduler(NNSched *sc);
 OSMesgQueue *nnScGetGfxMQ(NNSched *sc);
 void nnScAddClient(NNSched *sc, NNScClient *c, OSMesgQueue *msgQ);
 void Core_ResetGameState(void);
-void Gfx_InitializeFrames(void);
-void Gfx_InitializeFrameTask(GfxFrame *arg0);
+void Gfx_InitFrames(void);
+void Gfx_InitFrameTask(GfxFrame *arg0);
 void Core_RunGameplayLoop(void);
-void Core_RunSequentialMapScenes(void);
-void Core_RunScriptedMapScenes(void);
+void Core_RunMessageCutsceneLoop(void);
+void Core_RunCameraCutsceneLoop(void);
 void Core_RunMenuLoop(void);
 void Core_RunTitleLoop(void);
 void Core_RunIntroLoop(void);
@@ -214,7 +214,7 @@ void Core_MainThread(void *arg0) {
     osCreateMesgQueue(&D_8007A870, D_8007A888, 8);
     nnScAddClient(&D_8007A1E0, &D_8007A868, &D_8007A870);
     D_8007A860 = nnScGetGfxMQ(&D_8007A1E0);
-    Gfx_InitializeFrames();
+    Gfx_InitFrames();
 
     while (1) {
         Boss_ClearDefeated();
@@ -237,10 +237,10 @@ void Core_MainThread(void *arg0) {
                 Core_RunGameplayLoop();
                 break;
             case 6:
-                Core_RunSequentialMapScenes();
+                Core_RunMessageCutsceneLoop();
                 break;
             case 7:
-                Core_RunScriptedMapScenes();
+                Core_RunCameraCutsceneLoop();
                 break;
             case 2:
                 Core_RunMenuLoop();
@@ -292,7 +292,7 @@ void Core_ResetGameState(void) {
     D_8007A1CD = 0;
 }
 
-void Gfx_InitializeFrames(void) {
+void Gfx_InitFrames(void) {
     u16 *b;
     u16 *a;
     u32 i;
@@ -304,10 +304,10 @@ void Gfx_InitializeFrames(void) {
     Dma_ReadRom(D_D74AC0, a, D_D86170 - D_D74AC0);
     D_80301000[0].data.msg = 2;
     D_80301000[0].data.framebuffer = D_803B5000;
-    Gfx_InitializeFrameTask(&D_80301000[0]);
+    Gfx_InitFrameTask(&D_80301000[0]);
     D_80301000[1].data.msg = 2;
     D_80301000[1].data.framebuffer = D_803DA800;
-    Gfx_InitializeFrameTask(&D_80301000[1]);
+    Gfx_InitFrameTask(&D_80301000[1]);
     D_8007A17C = 0;
     i = 320 * 240;
     b = D_803B5000;
@@ -321,7 +321,7 @@ void Gfx_InitializeFrames(void) {
     }
 }
 
-void Gfx_InitializeFrameTask(GfxFrame *arg0) {
+void Gfx_InitFrameTask(GfxFrame *arg0) {
     arg0->task.list.t.type = M_GFXTASK;
     arg0->task.list.t.flags = 0;
     arg0->task.list.t.ucode_boot = D_8004B980;
@@ -360,9 +360,9 @@ void Player_Draw(void *arg0);
 void Npc_DrawAll(void *arg0);
 void Enemy_DrawAll(void *arg0);
 void Boss_Draw(void *arg0);
-void MapObj_DrawNearby(void *arg0);
+void MapObj_UpdateAndDrawNearby(void *arg0);
 void MapObj_DrawTranslucent(void *arg0);
-void Map_DrawSky(void *arg0);
+void Map_DrawBackdrop(void *arg0);
 void Env_PrepareFrameLighting(void);
 void Env_ApplyLightSlot(s32 arg0);
 void Shadow_DrawAll(void *arg0);
@@ -370,14 +370,14 @@ void Chest_UpdateAll(void *arg0);
 void Spirit_SpawnSparkles(void);
 void Camera_Update(void *arg0);
 void Effect_UpdateAndDrawAll(void *arg0);
-void Effect_DrawSprites(void *arg0);
+void Effect_UpdateAndDrawSprites(void *arg0);
 void Hud_Draw(void *arg0);
 void Item_UpdateInventoryMenu(void);
-void Fade_Draw(void *arg0);
+void Fade_UpdateAndDraw(void *arg0);
 void Menu_Update(void *arg0);
 void SaveMenu_Init(s32 arg0);
 void Text_UpdateAndDrawWindows(void);
-void Cutscene_DrawImageCues(void);
+void Cutscene_UpdateAndDrawImageCues(void);
 s32 func_8020C11C(void);
 s32 func_8020C15C(void);
 s32 func_8020C16C(void);
@@ -418,10 +418,10 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         Env_PrepareFrameLighting();
         if (D_8007C280 & 4) {
             Env_ApplyLightSlot(D_8007A1C8);
-            Map_DrawSky(sub);
+            Map_DrawBackdrop(sub);
         }
         Env_ApplyLightSlot(D_8007A1C8);
-        MapObj_DrawNearby(sub);
+        MapObj_UpdateAndDrawNearby(sub);
         if (!(D_8004DCA0 & 0x10000)) {
             Player_Draw(sub);
         }
@@ -433,9 +433,9 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         Spirit_SpawnSparkles();
         Env_ApplyLightSlot(D_8007AB60);
         Shadow_DrawAll(sub);
-        Effect_DrawSprites(sub);
+        Effect_UpdateAndDrawSprites(sub);
         Effect_UpdateAndDrawAll(sub);
-        Fade_Draw(sub);
+        Fade_UpdateAndDraw(sub);
         if (D_8004DCA0 & 2) {
             Text_UpdateAndDrawWindows();
         }
@@ -446,7 +446,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
             Item_UpdateInventoryMenu();
         }
         if (D_8007A170 == 7) {
-            Cutscene_DrawImageCues();
+            Cutscene_UpdateAndDrawImageCues();
         }
     } else if (D_8007A170 == 2) {
         Menu_Update(sub);
@@ -490,7 +490,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         }
     } else if (D_8007A170 == 5) {
         count = func_8020C15C();
-        Fade_Draw(sub);
+        Fade_UpdateAndDraw(sub);
         if (count == 0) {
             D_8007A170 = 7;
         }
@@ -544,8 +544,8 @@ extern s8 D_8008FAF4;
 extern u8 D_801C0000[];
 extern u8 D_E420D0[];
 extern u8 D_E43780[];
-void Transition_StartStateFadeIn(void);
-void Transition_StartStateFadeOut(void);
+void Fade_StartTransitionIn(void);
+void Fade_StartTransitionOut(void);
 void Cutscene_StartEntry(s32 arg0);
 s32 Cutscene_UpdateMessageSequence(void);
 void Cutscene_StartAudioFadeForEntry(s32 arg0);
@@ -624,7 +624,7 @@ void Effect_ResetAll(void);
 void Effect_ResetSpritePool(void);
 void Battle_ResetState(s32 *arg0);
 void Battle_TryStartRandomEncounter(void);
-void Battle_UpdateTurnCamera(void);
+void Battle_UpdateStartCamera(void);
 void Battle_UpdateTurnTransition(void);
 void Anim_SetCurrentAndNext(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 void Hud_ResetState(void);
@@ -679,7 +679,7 @@ void Core_RunGameplayLoop(void) {
     }
     if (D_8004DCA0 & 0x20) {
         D_8004DCA0 &= ~0x20;
-        Transition_StartStateFadeIn();
+        Fade_StartTransitionIn();
     }
     if (D_8004DCA0 & 0x100) {
         Bgm_PlayForMap(D_800842BC, D_800842C0, 0);
@@ -699,7 +699,7 @@ void Core_RunGameplayLoop(void) {
         }
         if (D_8008BE52 & 1) {
             if (D_8008BE52 & 0x200) {
-                Battle_UpdateTurnCamera();
+                Battle_UpdateStartCamera();
             } else {
                 Battle_UpdateTurnTransition();
                 Enemy_UpdateAll();
@@ -750,7 +750,7 @@ void Core_RunGameplayLoop(void) {
                 D_8004DCA0 |= 0x100;
                 Sfx_StopAllChannels();
             } else if (D_8007A174 == D_8007A17A) {
-                Transition_StartStateFadeOut();
+                Fade_StartTransitionOut();
             }
         }
         Bgm_Update();
@@ -789,7 +789,7 @@ void Core_RunGameplayLoop(void) {
     }
 }
 
-void Core_RunSequentialMapScenes(void) {
+void Core_RunMessageCutsceneLoop(void) {
     s32 count;
     GfxFrame *frame;
     OSMesg msg;
@@ -813,7 +813,7 @@ void Core_RunSequentialMapScenes(void) {
             D_8008CA50 |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
-                Transition_StartStateFadeIn();
+                Fade_StartTransitionIn();
             }
             D_8004DCA0 &= ~0x1C0;
         }
@@ -838,7 +838,7 @@ void Core_RunSequentialMapScenes(void) {
                     D_8004DCA0 |= 0x160;
                 }
             } else if (D_8007A174 == D_8007A17A) {
-                Transition_StartStateFadeOut();
+                Fade_StartTransitionOut();
             }
         }
         Bgm_Update();
@@ -869,7 +869,7 @@ void Core_RunSequentialMapScenes(void) {
     }
 }
 
-void Core_RunScriptedMapScenes(void) {
+void Core_RunCameraCutsceneLoop(void) {
     s32 count;
     OSMesg msg;
     GfxFrame *frame;
@@ -893,7 +893,7 @@ void Core_RunScriptedMapScenes(void) {
             D_8008CA50 |= 8;
             if (D_8004DCA0 & 0x20) {
                 D_8004DCA0 &= ~0x20;
-                Transition_StartStateFadeIn();
+                Fade_StartTransitionIn();
             }
             D_8004DCA0 &= ~0xC0;
         }
@@ -911,7 +911,7 @@ void Core_RunScriptedMapScenes(void) {
                 Sfx_StopAllChannels();
                 Cutscene_EndScene();
             } else if (D_8007A174 == D_8007A17A) {
-                Transition_StartStateFadeOut();
+                Fade_StartTransitionOut();
             }
         }
         Bgm_Update();
@@ -1078,7 +1078,7 @@ void Gfx_WaitForFrameMessage(s16 arg0) {
     } while (arg0 != *(s16 *)msg);
 }
 
-void Transition_StartStateFadeIn(void) {
+void Fade_StartTransitionIn(void) {
     switch (D_8007A178) {
         case 0:
             Fade_Start(0x10, 4, D_8004F5DC);
@@ -1098,7 +1098,7 @@ void Transition_StartStateFadeIn(void) {
     }
 }
 
-void Transition_StartStateFadeOut(void) {
+void Fade_StartTransitionOut(void) {
     switch (D_8007A178) {
         case 0:
             Fade_Start(0xF, 2, D_8004F5A0);

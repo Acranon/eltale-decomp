@@ -1,27 +1,31 @@
+# r2 reviewed 2026-10-26: kept 18, renamed 7, reverted 0 (3 func_ named)
 # D3 b04 hud
 # old<TAB>new<TAB>evidence
-func_80020AE0	Hud_ResetState	Resets the HUD offsets, clip bounds, popups, indicator timers, and animation counters.
-func_80020B78	Hud_Draw	Sets the HUD projection and draws status meters, compass, spell UI, actor icons, and popups according to game state.
-func_80021030	Hud_DrawPlayerMeters	Draws two model-stat ratios as animated bars with numeric current and maximum values.
-func_800213A8	Hud_DrawPlayerStatus	Draws four player values and pulsing status symbols beside the meters.
-func_80021920	Hud_DrawCompass	Draws the rotating compass graphic and, when a target is available, a relative-direction marker.
-func_80021C04	Hud_DrawSpellInput	Draws four input choices and the current three-element sequence, including transition effects.
-func_80022658	Hud_DrawSpellName	Looks up the encoded name from the actor's spell ID and draws it in a centered panel.
-func_80022970	Hud_UpdateDirectionalAllocation	Draws four spirit values and consumes directional input to increase one capped value and set milestone flags.
-func_800230A8	Hud_DrawWorldObjectMarker	Projects the selected D_8007ABF0 world object to screen and draws a bobbing sprite above it.
-func_80023470	Hud_DrawEnemyMarker	Projects an indexed enemy to screen and draws a bobbing marker above its model-dependent height.
-func_800235D8	Hud_DrawPlayerOverheadIcon	Projects the player's upper position and draws a palette-textured icon above it.
-func_8002373C	Hud_StartActorStatusIndicator	Records a status-icon index and optionally creates a visual effect attached to the actor.
-func_80023930	Hud_DrawActorStatusIndicators	Draws active actor status icons and updates or expires their attached visual effects.
+func_80020AE0	Hud_ResetState	Resets the HUD origin and clip bounds, the info-panel, spell-name and allocation timers, and other HUD counters; called from 1870 on area setup.
+func_80020B78	Hud_Draw	Sets the HUD projection and, by game/battle flags, draws the HP/MP bars, element levels, compass, popups, target/prompt markers, status icons, spell input and element allocation; in 1870's frame display-list build.
+func_80021030	Hud_DrawPlayerMeters	Draws the player's HP (stats +4 of +6) and MP (+8 of +A) as bars (widths ease toward value*56/max) with current/max numbers; HP/MP per Q64 PlayerMainData (b07 header).
+func_800213A8	Hud_DrawElementLevels	Draws the four element levels (stats +0x24..+0x27, the values Hud_UpdateElementAllocation raises) with icons, a pulsing symbol for each element flagged at 50 (player flags 0x1000 << i) and a fading highlight on the last raised one.
+func_80021920	Hud_DrawCompass	Draws a graphic rotated by the camera yaw D_80085E74 and, when a target point D_8008FB48/4C is set and over 10 units away, a marker at its direction relative to the camera.
+func_80021C04	Hud_DrawSpellInput	Draws the four choices (the spell the sequence would become with each element appended, Hud_DrawSpellLabel) and the current up-to-three-element sequence, with slide/fade transitions.
+func_80022658	Hud_DrawSpellName	Looks up the name of the spell id at player +0x122 (D_800C03D8 table) and draws it centered in a panel; shown for 30 frames after Player_StartCastSpell.
+func_80022970	Hud_UpdateElementAllocation	Active while D_8004DCA0 & 8 (set on spirit pickup or spirit-level up): draws the four element levels; a C button raises that element by 1 (cap 50, sets flag 0x1000 << i at 50, 0x10000 when all four are), plays a sound and clears the mode.
+func_800230A8	Hud_DrawNpcTalkMarker	D_8007A9C0 is Player_FindNpcToTalk's result: projects that NPC (D_8007ABF0 entry) to screen and draws a bobbing sprite above it.
+func_800231C4	Hud_DrawSpiritMarker	Drawn by Hud_Draw while D_8007A9C4 (Spirit_FindInFront's result) is set: a bobbing sprite above the player.
+func_800232A8	Hud_DrawChestMarker	Drawn by Hud_Draw while D_8007A9C8 (Chest_FindInFront's result) is set: a bobbing sprite above the player.
+func_8002338C	Hud_DrawTextSpotMarker	Drawn by Hud_Draw while D_8007A9CC (TextSpot_FindInFront's result) is set: a bobbing sprite above the player.
+func_80023470	Hud_DrawMeleeTargetMarker	Hud_Draw passes the player's melee target (PlayerState.unk2 = Player_FindMeleeTarget's 1 + index) on the player's turn: projects that enemy's top to screen and draws a bobbing marker.
+func_800235D8	Hud_DrawOutOfRangeIcon	Drawn while player flag 0x20 is set, which Player_MoveAndCollide sets when the player is outside the battle circle D_8008BE6C in a non-boss battle (Battle_UpdateTurnTransition then ends the battle without rewards); icon above the player's head.
+func_8002373C	Hud_StartActorStatusIndicator	For a status mask: records an icon index and duration in the actor's slot and, for the four effect masks, creates an attached visual effect (Magic_CreateVisualEffect).
+func_80023930	Hud_UpdateAndDrawActorStatusIndicators	Draws the actor's active status icons above it, expires icons and attached effects whose status bit is gone or whose duration ran out, and moves the attached effects with the actor.
 func_80023D28	Hud_ClearActorStatusIndicators	Clears all status-icon slots and ends any attached visual effects.
-func_80023E14	Hud_DrawInfoPanel	Draws a timed panel with a name pointer and numeric values from D_8007C028.
+func_80023E14	Hud_DrawEnemyInfoPanel	Draws for 60 frames the enemy whose turn just started (Enemy_StateIdle sets D_8007C028 = that enemy and D_8008C162 = 60): its name from D_8007C04C (the enemy name table Battle_StartBossEncounter swaps for bosses) and, for enemies flagged 0x80, four stat values.
 func_8002430C	Hud_ResetPopups	Clears every entry in the eight-slot popup pool.
-func_8002433C	Hud_ShowActorPopup	Allocates a 45-frame popup attached to an actor and sets its sprite and height.
-func_8002440C	Hud_DrawPopups	Projects each timed popup's world position and draws its sprite.
-func_800245D0	Hud_DrawSpellLabel	Looks up a spell from input bytes, computes restriction flags, and draws its label with a matching palette.
-func_80024694	Hud_DrawGlyphString	Consumes encoded glyph bytes and emits textured rectangles with control-byte spacing.
-func_80024904	Hud_MeasureGlyphString	Sums glyph widths and control-byte spacing until the encoded string terminator.
-func_80024974	Hud_DrawNumber	Formats an integer into digits and draws each digit from the HUD texture.
-func_80024A54	Hud_LoadTextureTile	Loads either an 8-bit or 4-bit color-indexed texture tile from a texture descriptor.
-func_80024D40	Hud_DrawClippedTextureRect	Offsets and clips the rectangle to HUD bounds, then emits a texture-rectangle command.
+func_8002433C	Hud_ShowActorPopup	Allocates a 45-frame popup attached to an actor (fixed sprite region 41x14) at its top; called by Player_StartDodge and Enemy_PlayMissEffect.
+func_8002440C	Hud_DrawPopups	Projects each timed popup's world position and draws its sprite, counting the timer down.
+func_800245D0	Hud_DrawSpellLabel	Looks up the spell for an element sequence, gets its restriction flags, and draws its name (or a placeholder when flag 4) with a palette by flags.
+func_80024694	Hud_DrawGlyphString	Draws 0xFF-terminated glyph bytes from the HUD font texture, with control bytes 0x80/0x81 (marks) and 0x82 (space).
+func_80024904	Hud_MeasureGlyphString	Sums glyph widths and control-byte spacing until the 0xFF terminator.
+func_80024974	Hud_DrawNumber	Formats an integer (Text_FormatNumber) and draws each digit from the HUD texture.
+func_80024A54	Hud_LoadTextureTile	Loads an 8-bit or 4-bit color-indexed texture tile from a texture descriptor.
+func_80024D40	Hud_DrawClippedTextureRect	Offsets the rectangle by the HUD origin D_8008C174/178, clips it to the HUD bounds and emits a texture-rectangle command.
 func_80024EB0	Hud_DrawTextureTile	Loads a texture tile and draws it at the requested rectangle.
