@@ -1,0 +1,78 @@
+# D3 cleanup C: only meanings supported by code; raw assets/stubs stay unnamed
+D_80212300_ovl_intro	intro_sprite_anim_steps_0	Entry 0 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212324_ovl_intro	intro_sprite_anim_steps_1	Entry 1 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212354_ovl_intro	intro_sprite_anim_steps_2	Entry 2 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212378_ovl_intro	intro_sprite_anim_steps_3	Entry 3 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802123A8_ovl_intro	intro_sprite_anim_steps_4	Entry 4 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802123C0_ovl_intro	intro_sprite_anim_steps_5	Entry 5 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802123CC_ovl_intro	intro_sprite_anim_steps_6	Entry 6 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802123F0_ovl_intro	intro_sprite_anim_steps_7	Entry 7 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212414_ovl_intro	intro_sprite_anim_steps_8	Entry 8 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_8021245C_ovl_intro	intro_sprite_anim_steps_9	Entry 9 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212480_ovl_intro	intro_sprite_anim_steps_10	Entry 10 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802124A4_ovl_intro	intro_sprite_anim_steps_11	Entry 11 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802124D4_ovl_intro	intro_sprite_anim_steps_12	Entry 12 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802124F8_ovl_intro	intro_sprite_anim_steps_13	Entry 13 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_8021251C_ovl_intro	intro_sprite_anim_steps_14	Entry 14 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212540_ovl_intro	intro_sprite_anim_steps_15	Entry 15 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212564_ovl_intro	intro_sprite_anim_steps_16	Entry 16 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212594_ovl_intro	intro_sprite_anim_steps_17	Entry 17 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802125B8_ovl_intro	intro_sprite_anim_steps_18	Entry 18 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802125DC_ovl_intro	intro_sprite_anim_steps_19	Entry 19 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212600_ovl_intro	intro_sprite_anim_steps_20	Entry 20 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212624_ovl_intro	intro_sprite_anim_steps_21	Entry 21 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212654_ovl_intro	intro_sprite_anim_steps_22	Entry 22 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212678_ovl_intro	intro_sprite_anim_steps_23	Entry 23 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_8021269C_ovl_intro	intro_sprite_anim_steps_24	Entry 24 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802126CC_ovl_intro	intro_sprite_anim_steps_25	Entry 25 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802126D8_ovl_intro	intro_sprite_anim_steps_26	Entry 26 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802126FC_ovl_intro	intro_sprite_anim_steps_27	Entry 27 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212720_ovl_intro	intro_sprite_anim_steps_28	Entry 28 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212744_ovl_intro	intro_sprite_anim_steps_29	Entry 29 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_8021278C_ovl_intro	intro_sprite_anim_steps_30	Entry 30 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802127B0_ovl_intro	intro_sprite_anim_steps_31	Entry 31 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802127C8_ovl_intro	intro_sprite_anim_steps_32	Entry 32 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212438_ovl_intro	intro_sprite_anim_steps_33	Entry 33 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_80212768_ovl_intro	intro_sprite_anim_steps_34	Entry 34 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_802127EC_ovl_intro	intro_sprite_anim_steps_35	Entry 35 of intro_sprite_anim_table; Intro_RunSpriteScript selects its steps by cue.anim_index
+D_8020F760_ovl_ending	ending_sprite_anim_steps_0	Entry 0 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_8020F784_ovl_ending	ending_sprite_anim_steps_1	Entry 1 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_8020F7A8_ovl_ending	ending_sprite_anim_steps_2	Entry 2 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_8020F7D8_ovl_ending	ending_sprite_anim_steps_3	Entry 3 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_8020F7FC_ovl_ending	ending_sprite_anim_steps_4	Entry 4 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_8020F820_ovl_ending	ending_sprite_anim_steps_5	Entry 5 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_8020F844_ovl_ending	ending_sprite_anim_steps_6	Entry 6 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_8020F868_ovl_ending	ending_sprite_anim_steps_7	Entry 7 of ending_sprite_anim_table; Ending_RunSpriteScript selects its steps by cue.anim_index
+D_80212930_ovl_intro	intro_sprite_cues	intro_cue_groups[0].cues points to this 459-entry script; Intro_RunSpriteScript walks it
+D_8020F8C0_ovl_ending	ending_sprite_cues	ending_cue_groups[0].cues points to this 97-entry script; Ending_RunSpriteScript walks it
+D_80212238_ovl_intro	intro_pak_check_state	Intro_Update switches 0 scan, 1 full-pak screen, 2 no-pak screen, 3 error screen before intro_pak_check_done
+D_8021223C_ovl_intro	intro_skip_splash_requested	Intro_Update sets it on Start press in splash phases 1/2, then returns 1 and clears it when the phase timer expires
+D_80212240_ovl_intro	intro_sequence_phase	Intro_Update switches it across splash and later sequence phases; increments at phase transitions
+D_80212258_ovl_intro	intro_nopak_screen_state	Intro_RunNoPakScreen switches it between main choice screen (0) and secondary screen (1)
+D_80212264_ovl_intro	intro_pak_error_screen_state	Intro_RunPakErrorScreen switches it between main choice screen (0) and secondary screen (1)
+D_8020F6AC_ovl_ending	ending_first_backdrop_fade_mode	Ending_UpdateAndDrawScrollingBackdrop switches 0 hold, 1 increase first alpha, 2 decrease first alpha
+D_8020F6B0_ovl_ending	ending_second_backdrop_fade_mode	Ending_UpdateAndDrawScrollingBackdrop switches 0 hold, 1 increase second alpha, 2 decrease second alpha
+D_8020F6B4_ovl_ending	ending_backdrop_completion_state	Ending_UpdateAndDrawScrollingBackdrop sets 1 when final fade starts and 2 when alpha reaches zero, then returns done
+D_8020F200_ovl_title	title_draw_initialized	Title_DrawScreenAndMoveCursor initializes cursor frame, row, item and message only when zero, then sets it to one
+D_8020F1F0_ovl_title	title_flow_initialized	Title_RunPhase initializes flow/menu/timer on first call when zero, then increments this latch
+D_8020F1EC_ovl_title	title_input_was_active	Title_RunPhase counts idle frames when zero, then sets it from current button/stick activity for the next call
+D_8020F1E0_ovl_title	title_transition_state	Title_RunPhase and Title_UpdateScreen set 0/1/2 for fade or menu transition handling
+D_80105408_ovl_DA4570	pak_menu_delete_confirmation_message	PakMenu_Run state 3 displays it before optional osPfsDeleteFile call
+D_801054E8_ovl_DA4570	pak_menu_repair_confirmation_message	PakMenu_Run state 5 displays it before and during osPfsRepairId operation
+D_801054B0_ovl_DA4570	pak_menu_operation_error_message	PakMenu_Run state 7 displays it after operation error and waits for acknowledgement
+D_80105448_ovl_DA4570	pak_menu_reinitialize_confirmation_message	PakMenu_Run state 8 displays it before retrying Pak initialization
+D_80210810_ovl_ending	ending_scroll_backdrop_first_tlut	Ending sprite cues use this palette with the repeated 304-pixel backdrop strips before the second fade phase
+D_80210A10_ovl_ending	ending_scroll_backdrop_tex	Ending sprite cues use this texture for repeated 304-pixel strips; Ending_UpdateAndDrawScrollingBackdrop scrolls those strips
+D_80221410_ovl_ending	ending_scroll_backdrop_second_tlut	Later ending sprite cues use this palette with the same backdrop texture during the second fade phase
+D_80102030_ovl_DA4570	pak_menu_screen_frame_tlut	pak_menu_screen_sprites uses this palette for the repeated 32-pixel screen-edge sprites drawn by PakMenu_DrawSprites
+D_80102050_ovl_DA4570	pak_menu_screen_frame_main_tex	pak_menu_screen_sprites places this 32-pixel tile across top, left and bottom screen edges
+D_80102250_ovl_DA4570	pak_menu_screen_frame_right_tex	pak_menu_screen_sprites places this 32-pixel tile repeatedly on the right screen edge
+D_8020F1E4_ovl_title	title_exit_wait_frames	Title_RunPhase state 6 increments this up to two before starting the selection exit fade
+D_8020F208_ovl_title	title_frame_setup_dl	Title_UpdateScreen and Title_UpdateSelectionExit submit this state-setting display list before drawing the frame
+D_8020F260_ovl_title	title_menu_draw_setup_dl	Title_DrawScreenAndMoveCursor submits this render-mode/combine display list before any menu drawing
+D_8020F280_ovl_title	title_menu_sprite_setup_dl	Title_DrawScreenAndMoveCursor submits this render-mode/combine display list before the menu sprite display lists
+D_8020F458_ovl_title	title_cursor_combine_dl	Title_DrawScreenAndMoveCursor submits this combiner display list before drawing menu and confirmation cursors
+D_8020F470_ovl_title	title_screen_fade_combine_dl	Title_StepAndDrawScreenFade submits this combiner display list before the full-screen fade rectangle
+D_8020F718_ovl_ending	ending_sprite_default_combine_dl	Ending_UpdateAndDrawSprites selects this combiner display list when no fade flag is active
+D_8020F730_ovl_ending	ending_scroll_backdrop_combine_dl	Ending_UpdateAndDrawScrollingBackdrop submits this combiner display list before scrolling texture strips
+D_8020F748_ovl_ending	ending_sprite_fade_combine_dl	Ending_UpdateAndDrawSprites selects this combiner display list when fade flags are active, then sets env color
