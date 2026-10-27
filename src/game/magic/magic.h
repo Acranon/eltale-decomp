@@ -3,8 +3,8 @@
 
 #include "common.h"
 #include "game/actor/actor.h"
+#include "game/math/math.h"
 
-struct Vec3f;
 struct CollResult;
 struct EffectModel;
 struct Enemy;
@@ -85,6 +85,18 @@ typedef struct SpellFxDef {
     /* 0x47 */ u8 unk47;
 } SpellFxDef; /* 0x48 bytes */
 
+/* A spell's particle record (D_800C363C tables, same index as SpellDef): for three
+ * presentation stages a kind (1: Effect_StartConvergeEmitter, 2: Effect_SpawnBurst, 0: none)
+ * and the emitter argument. */
+typedef struct SpellParticleDef {
+    /* 0x00 */ u16 unk0; /* cast (Magic_CreateCastPresentation) */
+    /* 0x02 */ u16 unk2;
+    /* 0x04 */ u16 unk4; /* ground hit (Magic_CreateGroundHitPresentation) */
+    /* 0x06 */ u16 unk6;
+    /* 0x08 */ u16 unk8; /* hit (Magic_CreateHitPresentation) */
+    /* 0x0A */ u16 unkA;
+} SpellParticleDef; /* 0xC bytes */
+
 /* One magic_effects slot: a live spell effect. */
 typedef struct MagicEffect {
     /* 0x00 */ u16 unk0; /* spell group */
@@ -159,7 +171,11 @@ extern s32 magic_status_time_range_self[12];
 
 /* The spell data block: fixed addresses in a block read from ROM (no C module defines it). */
 extern SpellDef *D_800C185C[]; /* per group (element): its SpellDef rows */
+extern u16 D_800C186E[]; /* indexed by SpellDef.unk4 (input length): Magic_GetSpellRestrictionFlags */
+extern Vec3f D_800C1878[]; /* launch directions (SpellDef.unk2C) */
 extern MagicVisualDef D_800C18D8[]; /* visual effects (SpellFxDef stage indices) */
+extern SpellFxDef *D_800C3268[]; /* per group: its SpellFxDef rows */
+extern SpellParticleDef *D_800C363C[]; /* per group: its SpellParticleDef rows */
 
 void Magic_ResetEffectSystem(void);
 s32 Magic_LookupSpellSequence(u16 n, u8 *arg1);
