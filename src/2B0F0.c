@@ -21,7 +21,7 @@ typedef struct {
 /* .bss 8008FAF0..8008FB30 */
 s8 D_8008FAF0;
 s8 D_8008FAF1;
-u16 D_8008FAF2;
+u16 D_8008FAF2; /* bit 0 change requested (after the delay), 1 stop the current sequence, 2 wait for the stop, then play the next */
 u8 D_8008FAF4;
 u16 D_8008FAF6;
 BgmFade D_8008FAF8[16];
