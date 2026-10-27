@@ -130,7 +130,7 @@ typedef struct {
 /* This file's .bss, 80085F90..800863F0, in address order (first declaration fixes
  * the order). Splat's D_80085F9C, D_80086370/88/A0, D_800863BC and D_800863CC are
  * fields of D_80085F98[0], D_80086358[1..3], D_800863B8 and D_800863C8. */
-s32 D_80085F90;
+s32 D_80085F90; /* 1 cast running, 2 ending (D_80085F94 frames left) */
 s32 D_80085F94;
 Unk80085F98 D_80085F98[16];
 Unk80086358 D_80086358[4];

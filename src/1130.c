@@ -70,7 +70,8 @@ void nnScWaitTaskReady(NNSched *sc, NNScTask *task);
 void osSpTaskLoad(OSTask *task);
 
 /* This file's .bss, 80077160..8007A170: the three thread stacks (each passed
- * by its top, the next object's address) and the retrace counter D_8007A160. */
+ * by its top, the end of the array) and the retrace counter D_8007A160, which
+ * the game loops in 1870.c wait on and reset. */
 u64 D_80077160[0x1000 / sizeof(u64)];
 u64 D_80078160[0x1000 / sizeof(u64)];
 u64 D_80079160[0x1000 / sizeof(u64)];
@@ -99,11 +100,11 @@ void nnScCreateScheduler(NNSched *sc, u8 numFields) {
 }
 
 void nnScStartScheduler(NNSched *sc) {
-    osCreateThread(&sc->schedulerThread, 0x13, (void (*)(void *))nnScEventHandler, sc, D_80078160, NN_SC_PRI);
+    osCreateThread(&sc->schedulerThread, 0x13, (void (*)(void *))nnScEventHandler, sc, D_80077160 + ARRAY_COUNT(D_80077160), NN_SC_PRI);
     osStartThread(&sc->schedulerThread);
-    osCreateThread(&sc->audioThread, 0x12, (void (*)(void *))nnScExecuteAudio, sc, D_80079160, NN_SC_AUDIO_PRI);
+    osCreateThread(&sc->audioThread, 0x12, (void (*)(void *))nnScExecuteAudio, sc, D_80078160 + ARRAY_COUNT(D_80078160), NN_SC_AUDIO_PRI);
     osStartThread(&sc->audioThread);
-    osCreateThread(&sc->graphicsThread, 0x11, (void (*)(void *))nnScExecuteGraphics, sc, &D_8007A160, NN_SC_GRAPHICS_PRI);
+    osCreateThread(&sc->graphicsThread, 0x11, (void (*)(void *))nnScExecuteGraphics, sc, D_80079160 + ARRAY_COUNT(D_80079160), NN_SC_GRAPHICS_PRI);
     osStartThread(&sc->graphicsThread);
 }
 

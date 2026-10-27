@@ -50,7 +50,7 @@ typedef struct {
  * D_8007A8BC are aliases in undefined_syms.txt. D_8007A194..D_8007A19C,
  * D_8007A1A4, D_8007A1CE, D_8007A1DC, D_8007A85C and D_8007A864 are
  * unreferenced gaps. */
-u16 D_8007A170;
+u16 D_8007A170; /* loop: 1 gameplay, 2 menu, 3 title, 4 intro, 5 ending, 6/7 cutscenes (0 = 1) */
 u16 D_8007A172;
 s32 D_8007A174;
 u16 D_8007A178;
@@ -137,6 +137,10 @@ extern u8 D_ECD470[];
 extern u64 D_8004B980[]; /* rspboot text */
 extern u64 D_8004BA50[]; /* gfx ucode text (= rspboot end) */
 extern u64 D_80070260[]; /* gfx ucode data */
+/* Bits seen in this file: 1 run Item_UpdateInventoryMenu, 2 run Text_UpdateAndDrawWindows,
+ * 0x20 fade in at loop start, 0x40 load the area at loop start, 0x80 transition countdown,
+ * 0x100 start the map's BGM, 0x200 stop sequence 0 at loop end, 0x4000 hide the HUD,
+ * 0x8000 leave the mode loop and reinitialise, 0x10000 don't draw the player. */
 s32 D_8004DCA0 = 0;
 extern OSViMode D_8006CDF0;
 extern OSViMode D_8006D6B0;

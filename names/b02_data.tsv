@@ -1,0 +1,24 @@
+# b02 data (round 3): D_ objects defined in 17360 (prefix magic_, as the Magic_* functions)
+# old	new	evidence
+D_80085F98	magic_effects	16 effect instances (0x3C each): Magic_ResetEffectSystem clears them, Magic_CreateCastEffect takes a free one, Magic_UpdateEffects runs them, Magic_IsAnyEffectActive counts them
+D_80086358	magic_cast_repeats	4 records: Magic_CreateCastEffect fills one when the spell def asks for more than one cast (count, delay, spell, flags, caster); Magic_UpdateEffects counts the delay down and calls Magic_CreateCastEffect again
+D_80085F90	magic_cast_state	bit 1 set by Magic_CreateCastEffect on a first cast (with slot light animation D_800EB700); Magic_UpdateEffects sets 2 when no effect is active and clears it 30 frames later (light animation D_800EB7C0); Hud_Draw skips the melee target marker while bit 1 is set
+D_80085F94	magic_cast_state_timer	frame counter of magic_cast_state: Magic_UpdateEffects sets 30 when the state becomes 2 and clears the state when it reaches 0 (Magic_CreateCastEffect also sets 8)
+D_800863B8	magic_temp_vec	scratch vector: rotated with Math_RotateVec2 by the Magic_PlaceEffect* functions and Magic_CreateCastEffect, and passed (x, y, z) to Magic_CreateVisualEffect by the presentation functions
+D_800863C4	magic_target_enemy_rec	pointer to the target's enemy record (a D_8007B908 entry): set by Magic_FindTargetInRange/FindEligibleTarget, Magic_HealTarget and Magic_TransferTargetResource, which then change its +0xA/+0xC values through it
+D_800863C8	magic_floor_result	Coll_ResolveFloorAndWalls result that Magic_CreateCastEffect, Magic_MoveHomingEffect and Magic_MoveVerticalEffect use to keep effects at or above the floor
+D_8004EC90	magic_place_handlers	the 10 Magic_PlaceEffect* functions; Magic_CreateCastEffect calls one by def +0x26 to place a new effect
+D_8004ECB8	magic_target_select_handlers	Magic_SelectClosestAimTarget, Magic_SelectFirstActiveTarget, Magic_TargetCaster; Magic_CreateCastEffect calls one by def +0x18
+D_8004ECC4	magic_move_handlers	Magic_MoveHomingEffect, Magic_MoveVerticalEffect (twice); Magic_UpdateEffects calls one by cfg +0x12 each frame
+D_8004ECD0	magic_find_target_handlers	Magic_FindTargetInRange, Magic_FindEligibleTarget, Magic_FindTargetInRangeIfLanded; Magic_UpdateEffects calls one by cfg +0x16 to find the actor hit
+D_8004ECDC	magic_hit_handlers	10 hit callbacks (Magic_ApplyEffectDamage, Magic_HealTarget, ...) that Magic_UpdateEffects calls by cfg +0x10 on the hit actor
+D_8004ED04	magic_status_handlers	12 status callbacks; Magic_UpdateEffects calls entry k for status k when Magic_ShouldApplyStatus passes (entry 0 is Magic_ApplyShrinkStatus)
+D_8004ED34	magic_slot_bits	1 << n for n = 0..15: an effect slot's bit in the hit-tracking words (Magic_WasActorHitBySlot, Magic_MarkActorHitBySlot, Magic_ClearSlotHitTracking)
+D_8004ED54	magic_launch_speeds	5 factors Magic_CreateCastEffect multiplies the launch direction by (index def +0x30) to set a new effect's velocity
+D_8004ED68	magic_homing_strengths	5 factors Magic_MoveHomingEffect gives the unit direction to the target (index cfg +0x28) before adding the current unit heading
+D_8004ED7C	magic_homing_accels	5 magnitudes Magic_MoveHomingEffect scales the blended direction to (index cfg +0x2E) before adding it to 0.9 x the velocity
+D_8004ED90	magic_damage_bonus_stats	player stat indices: Magic_CalculateEffectDamage adds stats [p[0]]>>4, [p[1]]>>3, [p[2]]>>3 to stat [n], with n = cfg +6 and p = &table[n * 2]
+D_8004EDA4	magic_hit_outcomes	{1, 2, 0}: Magic_GetHitOutcome returns table[r] for r = 0 (accuracy roll failed), 1 + the actor hit roll, or 2 (forced by flag 4)
+D_8004EDB0	magic_status_chances	12 per-status thresholds Magic_ShouldApplyStatus compares with Math_Rand(64) (enemy target) or Math_Rand(28 or 32) (player target)
+D_8004EDBC	magic_status_time_range_other	12 per-status ranges: Magic_StartStatusTimer sets the status timer to Math_Rand(range) + 2 when the target is not the caster
+D_8004EDEC	magic_status_time_range_self	12 per-status ranges: Magic_StartStatusTimer sets the status timer to Math_Rand(range) + 3 when the target is the caster
