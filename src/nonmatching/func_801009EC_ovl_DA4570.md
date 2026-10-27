@@ -5,12 +5,28 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Live source: [`src/ovl_DA4570/DA4570.c`](../ovl_DA4570/DA4570.c)
 - Retail assembly: [`asm/nonmatchings/ovl_DA4570/DA4570/func_801009EC_ovl_DA4570.s`](../../asm/nonmatchings/ovl_DA4570/DA4570/func_801009EC_ovl_DA4570.s)
 - Retail code size: `0x1294` bytes
-- Current best gap: 37 linked ROM words; all register fields.
+- Current gap: 37 linked ROM words (NON_MATCHING C in the source); length and frame exact.
 - Specific blocker: Explicit signedStick<33 XOR1 gives retail slti/xori separation. Cached signed Y is v1 as retail; pad pointer is s1 instead of s0, raw X a1 instead of s1, then partial-OR temporaries rotate.
 - Next discriminating test: Use constrained allocation tracing on pointer/raw-X live ranges at +0x1154, preserving all now-matching operations and ABI.
-- Saved function-only C attempt: [`func_801009EC_ovl_DA4570.draft.c`](func_801009EC_ovl_DA4570.draft.c)
+- C: in [`src/ovl_DA4570/DA4570.c`](../ovl_DA4570/DA4570.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/09ec-focus/func_801009EC_37words.c` (SHA-256 `4fa8eb94d8c2de18d3561e6db9e6b2b7eea5cd84060452501c3f6f684b27b82e`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__09ec-focus__REPORT.txt), [ REPORT-resume.txt ](reports/codex__overlay-oct26__REPORT-resume.txt)
+
+## Equivalence
+
+Verdict: **equivalent.**
+
+- Checked: linked NON_MATCHING build against retail with asm-differ, every instruction. All 37 differing
+  words are in the two pad-reading blocks at the loop bottom and are register numbers only (pad pointer s1
+  vs s0, stick_x a1 vs s1, the partial-OR temps); the slti/xori/sll/or sequence and the lhu/lb loads are the
+  same instructions in the same order.
+- func_801008F0 takes `u8* arg0` in the NON_MATCHING build (its definition is switched with `#ifdef`); it
+  only passes the pointer on to func_80101C80's `u8* str` and compiles to the same code either way.
+- The draft uses the module's .bss objects (D_801072xx_ovl_DA4570) and the module's message arrays; the
+  externs it adds (D_80092E98, D_80092C80, D_80092EA0, func_8003D0F0/D554/D6B0, func_8003EDC0) are in the
+  file's NON_MATCHING block and match their definitions.
+- Bugs fixed: none.
+- Open doubts: none.
 
 ## Prior attempts and findings
 
