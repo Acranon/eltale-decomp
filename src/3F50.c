@@ -272,11 +272,11 @@ extern u16 D_80092C86;
 extern CharData *D_80055D40[];
 extern RomRange D_80055F98[];
 extern Monster D_8007B908[];
-extern u16 D_8008BE52;
-extern u16 D_8008BE54;
-extern f32 D_8008BE64;
-extern f32 D_8008BE68;
-extern s16 D_8008C15E;
+extern u16 battle_flags;
+extern u16 battle_turn_delay;
+extern f32 battle_active_enemy_x;
+extern f32 battle_active_enemy_z;
+extern s16 hud_melee_hint_timer;
 extern Unk800C185C *D_800C185C[];
 extern u16 D_800C186E[];
 extern s32 D_8007A174;
@@ -287,8 +287,8 @@ extern Unk80084300 D_80084300;
 extern s32 D_800842BC;
 extern s32 D_800842C0;
 extern Unk80085E48 D_80085E48;
-extern s16 D_8008C152;
-extern u16 D_8008C154;
+extern s16 hud_panel_transition_frame;
+extern u16 hud_panel_transition_state;
 extern s32 D_80090450;
 extern s32 D_80090454;
 extern Unk803AAAA2 D_803AAAA2[];
@@ -628,8 +628,8 @@ extern s32 D_8007A9B4;
 extern s32 D_8007A9B8;
 extern s32 D_8007A9BC;
 extern f32 D_8007A8F0;
-extern s32 D_8008C17C;
-extern s16 D_8008C160;
+extern s32 hud_npc_marker_screen_y;
+extern s16 hud_element_input_timer;
 extern u8 D_8004F5A0[];
 extern u8 D_8004F5B4[];
 extern void (*D_8004DCB0[])(Actor *, PlayerState *, CharData *);
@@ -669,12 +669,12 @@ void Player_Update(void) {
     if (p->unk14->unk4 * 3 < p->unk14->unk6) {
         D_8007A910 = 0x19;
     } else {
-        D_8007A910 = (D_8008BE52 & 1) ? 0x11 : 0;
+        D_8007A910 = (battle_flags & 1) ? 0x11 : 0;
     }
     D_8007A9A0 = D_8007A9A4 = 0.0f;
     if (!(D_8004DCA0 & 0x87)) {
-        if (D_8008BE52 & 1) {
-            if (!(D_8008BE52 & 2) && !(p->actor.unk60 & 1)) {
+        if (battle_flags & 1) {
+            if (!(battle_flags & 2) && !(p->actor.unk60 & 1)) {
                 p->unk2 = Player_FindMeleeTarget(&D_8007AA20);
             }
         } else if (!(p->actor.unk60 & 1)) {
@@ -700,8 +700,8 @@ void Player_Update(void) {
     }
     if (!(D_8004DCA0 & 0xF)) {
         if (D_80092C86 & 0xA000) {
-            if ((D_8008BE52 & 1) && !(p->actor.unk60 & 1)) {
-                if (!(D_8008BE52 & 6) && Magic_IsAnyEffectActive() == 0) {
+            if ((battle_flags & 1) && !(p->actor.unk60 & 1)) {
+                if (!(battle_flags & 6) && Magic_IsAnyEffectActive() == 0) {
                     if (p->unk2 != 0) {
                         Player_StartMeleeAttack(&D_8007AA08, &D_8007AA20, cd);
                     } else {
@@ -720,7 +720,7 @@ void Player_Update(void) {
                     p->actor.unkC = 0.0f;
                     Anim_SetCurrentAndNext(&D_8007AA20, D_8007A910, 1, D_8007A910, 1, 1);
                     Npc_StartTalk(D_8007A9C0);
-                    Text_OpenWindow(D_8008C17C < 70 ? 0 : 1);
+                    Text_OpenWindow(hud_npc_marker_screen_y < 70 ? 0 : 1);
                     D_8004DCA0 |= 2;
                 } else if (D_8007A9C4 != NULL) {
                     s = p->unk14->unk24;
@@ -730,7 +730,7 @@ void Player_Update(void) {
                         p->unk0 = 0;
                         Spirit_SetCollected(((Unk8007A9C4 *) D_8007A9C4)->unk14);
                         ((Unk8007A9C4 *) D_8007A9C4)->unk10 |= 1;
-                        D_8008C160 = 8;
+                        hud_element_input_timer = 8;
                         Sfx_Play(0, 1, 0xFF);
                     }
                 } else if (Item_HasInventoryRoom() != 0 && D_8007A9C8 != NULL) {
@@ -796,8 +796,8 @@ void Player_Update(void) {
             p->actor.unk60 &= ~1;
         }
     }
-    if (D_8008BE52 & 8) {
-        D_8008BE52 &= ~8;
+    if (battle_flags & 8) {
+        battle_flags &= ~8;
         p->actor.unk64->unk10 += D_8007A9B4;
         p->actor.unk64->unk14 += D_8007A9B8;
         if (D_8007A9BC != 0xFF) {
@@ -815,13 +815,13 @@ void Player_Update(void) {
         p->actor.unk14 = 0.0f;
         p->actor.unkC = 0.0f;
         Anim_SetCurrentAndNext(&D_8007AA20, 0x10, 1, D_8007A910, 1, 1);
-    } else if (D_8008BE52 & 0x10) {
+    } else if (battle_flags & 0x10) {
         Hud_ClearActorStatusIndicators(&D_8007AA20);
         D_8007AA8C.unk0 = 0;
     }
     D_8004DCB0[p->unk0](&D_8007AA20, &D_8007AA08, cd);
     D_8007A9A8 = sqrtf(D_8007A9A0 * D_8007A9A0 + D_8007A9A4 * D_8007A9A4);
-    if (!(D_8008BE52 & 1) && p->actor.unk64->unk8 < p->actor.unk64->unkA) {
+    if (!(battle_flags & 1) && p->actor.unk64->unk8 < p->actor.unk64->unkA) {
         D_8007A8F0 += D_8007A9A8;
         if (D_8007A8F0 > 60.0) {
             D_8007A8F0 -= 60.0;
@@ -839,7 +839,7 @@ extern u8 D_10000A0[];
 extern Unk8007A928 D_8007A928;
 extern f32 D_8007A92C;
 extern Vec3f D_8007AB48;
-extern Vec3f D_8008BFC0;
+extern Vec3f anim_node_world_positions;
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
 void Env_ApplyLightSlot(s32 arg0);
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
@@ -875,10 +875,10 @@ void Player_Draw(void *arg0) {
     Anim_DrawModel(flag, &D_8007AA20, &anims[D_8007AA72], arg0);
     Anim_AdvanceFrame(D_8007AA78, &D_8007AA20, &anims[D_8007AA72]);
     Player_LoadAnim(&D_8007AA20);
-    Coll_ResolveFloorAndWalls(D_8008BFC0.x, D_8007AA24, D_8008BFC0.z, 0xA00, &D_8007A928);
-    D_8007AB48.x = D_8008BFC0.x;
+    Coll_ResolveFloorAndWalls(anim_node_world_positions.x, D_8007AA24, anim_node_world_positions.z, 0xA00, &D_8007A928);
+    D_8007AB48.x = anim_node_world_positions.x;
     D_8007AB48.y = D_8007A92C;
-    D_8007AB48.z = D_8008BFC0.z;
+    D_8007AB48.z = anim_node_world_positions.z;
     Shadow_Queue(D_8007AB48.x, D_8007AB48.y, D_8007AB48.z, p->actor.unk2C, p->actor.unk30, p->actor.unk34,
                   p->actor.unk28 * p->actor.scale);
 }
@@ -946,7 +946,7 @@ typedef struct {
     /* 0x38 */ f32 unk38;
 } Unk8004EE20;
 
-extern Unk8004EE20 D_8004EE20;
+extern Unk8004EE20 effect_foot_particle_template;
 extern s32 D_8007A908;
 extern f32 D_80085E70;
 extern s32 D_8008C168;
@@ -985,10 +985,10 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
     } else if (p->unk84 & 8) {
         x = z = 0.0f;
     }
-    if ((D_8008BE52 & 1) && (D_8008BE52 & 0x202)) {
+    if ((battle_flags & 1) && (battle_flags & 0x202)) {
         z = 0.0f;
         x = 0.0f;
-    } else if (D_8008BE54 != 0) {
+    } else if (battle_turn_delay != 0) {
         z = 0.0f;
         x = 0.0f;
     }
@@ -1033,13 +1033,13 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
         }
         if (p->unk4 != 0) {
             if (!(p->unk4 & 3)) {
-                D_8004EE20.unk18 = a->x;
-                D_8004EE20.unk1C = a->y + 1.0f;
-                D_8004EE20.unk20 = a->z;
-                D_8004EE20.unk30 = 0.0f;
-                D_8004EE20.unk34 = 0.2f;
-                D_8004EE20.unk38 = 0.0f;
-                Effect_AllocateSprite(&D_8004EE20);
+                effect_foot_particle_template.unk18 = a->x;
+                effect_foot_particle_template.unk1C = a->y + 1.0f;
+                effect_foot_particle_template.unk20 = a->z;
+                effect_foot_particle_template.unk30 = 0.0f;
+                effect_foot_particle_template.unk34 = 0.2f;
+                effect_foot_particle_template.unk38 = 0.0f;
+                Effect_AllocateSprite(&effect_foot_particle_template);
             }
             p->unk4--;
         }
@@ -1095,8 +1095,8 @@ void Player_StateHurt(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             D_8007A994 = 0.0f;
             D_8007A998 = 0x108;
             D_8007AA0E = 0;
-            D_8008C154 = 1;
-            D_8008C152 = 0xC;
+            hud_panel_transition_state = 1;
+            hud_panel_transition_frame = 0xC;
         } else {
             arg1->unk0 = 0;
             arg0->unk60 &= 0xFFFC;
@@ -1623,9 +1623,9 @@ void func_80006A50(void) {
 
 extern f32 D_8007A9A0;
 extern f32 D_8007A9A4;
-extern f32 D_8008BE5C;
-extern f32 D_8008BE60;
-extern f32 D_8008BE6C;
+extern f32 battle_center_x;
+extern f32 battle_center_z;
+extern f32 battle_arena_radius;
 void Player_PushOutOfObjects(f32 *vx, f32 *vz, Actor *arg2);
 
 void Player_MoveAndCollide(u16 arg0, Actor *arg1, PlayerState *arg2) {
@@ -1634,24 +1634,24 @@ void Player_MoveAndCollide(u16 arg0, Actor *arg1, PlayerState *arg2) {
     f32 max;
     f32 dist;
 
-    if ((D_8008BE52 & 1) && !(D_8008BE52 & 6)) {
-        dx = arg1->x + arg1->vx - D_8008BE64;
-        dz = arg1->z + arg1->vz - D_8008BE68;
+    if ((battle_flags & 1) && !(battle_flags & 6)) {
+        dx = arg1->x + arg1->vx - battle_active_enemy_x;
+        dz = arg1->z + arg1->vz - battle_active_enemy_z;
         dist = sqrtf(dx * dx + dz * dz);
         max = arg2->unkC * arg2->unk114;
         if (max < dist) {
-            arg1->vx = max * dx / dist - arg1->x + D_8008BE64;
-            arg1->vz = max * dz / dist - arg1->z + D_8008BE68;
+            arg1->vx = max * dx / dist - arg1->x + battle_active_enemy_x;
+            arg1->vz = max * dz / dist - arg1->z + battle_active_enemy_z;
         }
-        dx = arg1->x + arg1->vx - D_8008BE5C;
-        dz = arg1->z + arg1->vz - D_8008BE60;
+        dx = arg1->x + arg1->vx - battle_center_x;
+        dz = arg1->z + arg1->vz - battle_center_z;
         dist = sqrtf(dx * dx + dz * dz);
-        if (D_8008BE52 & 0x100) {
-            if (D_8008BE6C < dist) {
-                arg1->vx = D_8008BE6C * dx / dist - arg1->x + D_8008BE5C;
-                arg1->vz = D_8008BE6C * dz / dist - arg1->z + D_8008BE60;
+        if (battle_flags & 0x100) {
+            if (battle_arena_radius < dist) {
+                arg1->vx = battle_arena_radius * dx / dist - arg1->x + battle_center_x;
+                arg1->vz = battle_arena_radius * dz / dist - arg1->z + battle_center_z;
             }
-        } else if (D_8008BE6C < dist) {
+        } else if (battle_arena_radius < dist) {
             arg2->unk8 |= 0x20;
         } else {
             arg2->unk8 &= ~0x20;
@@ -2024,7 +2024,7 @@ void Player_LoadAnim(Actor *arg0) {
 }
 
 extern u16 D_8007C050[];
-extern u16 D_8008BE5A;
+extern u16 battle_enemy_count;
 
 #ifdef NON_MATCHING
 /* -1 and 0x130 swapped between s5/s7, one addu operand order (register allocation tie); code is equivalent */
@@ -2045,7 +2045,7 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
     ret = 0;
     idx = D_8007C050;
     i = 0;
-    for (; i < D_8008BE5A; i++, idx++) {
+    for (; i < battle_enemy_count; i++, idx++) {
         m = D_8007B908 + *idx;
         a = &m->actor;
         if (m->actor.unk50 != -1) {
@@ -2249,10 +2249,10 @@ void Player_StartMissReaction(void) {
 s32 Player_CanAct(PlayerState *arg0, Actor *arg1) {
     s32 ret = 0;
 
-    if (!(arg1->unk60 & 1) && !(D_8004DCA0 & 0x80) && !(D_8008BE52 & 8)) {
-        if (D_8008BE52 & 1) {
-            if (!(D_8008BE52 & 0x202)) {
-                if (Magic_IsAnyEffectActive() == 0 && D_8008BE54 == 0) {
+    if (!(arg1->unk60 & 1) && !(D_8004DCA0 & 0x80) && !(battle_flags & 8)) {
+        if (battle_flags & 1) {
+            if (!(battle_flags & 0x202)) {
+                if (Magic_IsAnyEffectActive() == 0 && battle_turn_delay == 0) {
                     ret = 1;
                 }
             }
@@ -2263,8 +2263,8 @@ s32 Player_CanAct(PlayerState *arg0, Actor *arg1) {
     return ret;
 }
 
-extern s16 D_8008C15A;
-extern u16 D_8008C15C;
+extern s16 hud_element_allocation_timer;
+extern u16 hud_element_allocation_mode_flags;
 extern u16 D_80092C86;
 
 s32 Magic_GetSpellRestrictionFlags(s32 arg0, u16 arg1);
@@ -2301,12 +2301,12 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
         }
         Sfx_Play(0, sfx, 0xFF);
         if (prev != arg0->unk120) {
-            D_8008C15A = 8;
-            D_8008C15C |= 1;
+            hud_element_allocation_timer = 8;
+            hud_element_allocation_mode_flags |= 1;
             if (arg0->unk120 == 1) {
-                D_8008C15C |= 2;
+                hud_element_allocation_mode_flags |= 2;
             } else {
-                D_8008C15C &= 0xFFFD;
+                hud_element_allocation_mode_flags &= 0xFFFD;
             }
         }
     } else if (arg0->unk120 && (D_80092C86 & 0xA000)) {
@@ -2318,8 +2318,8 @@ s32 Player_HandleSpellInput(PlayerState *arg0) {
     } else if ((D_80092C86 & 0x4000) && (D_8004DCA0 & 4)) {
         if (arg0->unk120) {
             arg0->unk120--;
-            D_8008C15A = 8;
-            D_8008C15C &= 0xFFFE;
+            hud_element_allocation_timer = 8;
+            hud_element_allocation_mode_flags &= 0xFFFE;
         }
         if (!arg0->unk120) {
             D_8004DCA0 &= ~4;
@@ -2354,16 +2354,16 @@ void Player_StartCastSpell(PlayerState *p, Actor *a, AnimEntry *anims) {
     a->unk60 |= 1;
     Anim_SetCurrentAndNext(a, anim, 1, next, 1, 1);
     Camera_StartBattleFocus(0x2D, a);
-    D_8008C15E = 0x1E;
+    hud_melee_hint_timer = 0x1E;
 }
 
 void Player_AddTurnMoveAgilityXP(PlayerState *arg0) {
     f32 dx;
     f32 dz;
 
-    if (D_8008BE52 & 1) {
-        dx = arg0->actor.x - D_8008BE64;
-        dz = arg0->actor.z - D_8008BE68;
+    if (battle_flags & 1) {
+        dx = arg0->actor.x - battle_active_enemy_x;
+        dz = arg0->actor.z - battle_active_enemy_z;
         D_8007A988 += sqrtf(dx * dx + dz * dz);
         while (D_8007A988 > 35.0) {
             D_8007A988 -= 35.0;
@@ -2377,7 +2377,7 @@ extern u16 D_80055F0C[];
 extern f32 D_8007A9A8;
 extern s32 D_8007A9BC;
 extern u8 D_8007A9BF;
-extern s16 D_8008C160;
+extern s16 hud_element_input_timer;
 
 void Effect_StartStatUpMarker(s32 arg0);
 void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
@@ -2386,7 +2386,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
     u8 *lv;
 
     count = 0;
-    if (!(D_8008BE52 & 1)) {
+    if (!(battle_flags & 1)) {
         if (D_800842E8 & 1) {
             D_8007A8FC += D_8007A9A8;
             if (D_8007A8FC > 800.0) {
@@ -2481,7 +2481,7 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
             if (lv[0] != 0x32 || lv[1] != 0x32 || lv[2] != 0x32 || lv[3] != 0x32) {
                 D_8004DCA0 |= 8;
                 p->unk0 = 0;
-                D_8008C160 = 8;
+                hud_element_input_timer = 8;
                 Sfx_Play(0, 1, 0xFF);
             }
         }

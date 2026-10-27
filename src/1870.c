@@ -172,10 +172,10 @@ extern s32 D_800842DC;
 extern s32 D_80084308;
 extern s16 D_80084992;
 extern f32 D_80085ECC;
-extern s16 D_8008C152;
-extern u16 D_8008C154;
-extern s16 D_8008C156;
-extern s16 D_8008C158[];
+extern s16 hud_panel_transition_frame;
+extern u16 hud_panel_transition_state;
+extern s16 hud_hp_meter_width;
+extern s16 hud_mp_meter_width[];
 extern OSMesgQueue D_80092C90;
 extern u8 D_80095AF0[];
 extern u8 D_800C0000[];
@@ -282,10 +282,10 @@ void Core_ResetGameState(void) {
     D_8007A994 = 1.5707964f;
     D_8007A998 = 0x108;
     D_8007AA0E = 0;
-    D_8008C154 = 1;
-    D_8008C152 = 0xC;
-    D_8008C158[0] *= 0;
-    D_8008C156 = 0;
+    hud_panel_transition_state = 1;
+    hud_panel_transition_frame = 0xC;
+    hud_mp_meter_width[0] *= 0;
+    hud_hp_meter_width = 0;
     D_8007A172 = 1;
     D_8007A178 = 0;
     D_8007A1CC = 0;
@@ -539,7 +539,7 @@ extern u16 D_8007A17A;
 extern s32 D_8007A1C4;
 extern s32 D_80084980;
 extern Unk80084998 D_80084998[];
-extern s32 D_800863F0;
+extern s32 effect_mapobj_emitter_count;
 extern s8 D_8008FAF4;
 extern u8 D_801C0000[];
 extern u8 D_E420D0[];
@@ -595,8 +595,8 @@ extern u8 D_8007AA20[];
 extern s32 D_800842C0;
 extern u16 D_800842E8;
 extern Unk80084300 D_80084300;
-extern u16 D_8008BE52;
-extern s32 D_8008C170;
+extern u16 battle_flags;
+extern s32 hud_pending_sequence_id;
 extern s32 D_80090450;
 extern u16 D_80092C84;
 extern u16 D_80092C86;
@@ -692,13 +692,13 @@ void Core_RunGameplayLoop(void) {
     while (D_8007A170 == 1) {
         Input_ReadController(D_80092C80);
         D_8007A180 = 0;
-        D_800863F0 = 0;
+        effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
         if (D_800842E8 & 1) {
             Battle_TryStartRandomEncounter();
         }
-        if (D_8008BE52 & 1) {
-            if (D_8008BE52 & 0x200) {
+        if (battle_flags & 1) {
+            if (battle_flags & 0x200) {
                 Battle_UpdateStartCamera();
             } else {
                 Battle_UpdateTurnTransition();
@@ -720,7 +720,7 @@ void Core_RunGameplayLoop(void) {
                 Player_StartAreaExit();
                 D_8007A178 = 0;
             } else if (!(D_8004DCA0 & 0x1000) && !(D_8007AA08.unk78 & 1) && (D_80092C86 & 0x1000) &&
-                       !(D_8008BE52 & 1) && !(D_80092C84 & 0x2000) && !(D_8004DCA0 & 1)) {
+                       !(battle_flags & 1) && !(D_80092C84 & 0x2000) && !(D_8004DCA0 & 1)) {
                 D_8007A170 = 2;
                 Sfx_Play(0, 1, 0xFF);
             }
@@ -754,10 +754,10 @@ void Core_RunGameplayLoop(void) {
             }
         }
         Bgm_Update();
-        if (D_8008C170 != -1 && Audio_GetSeqState(0) == 0) {
-            Audio_LoadSeq(0, D_8008C170);
+        if (hud_pending_sequence_id != -1 && Audio_GetSeqState(0) == 0) {
+            Audio_LoadSeq(0, hud_pending_sequence_id);
             Audio_PlaySeq(0);
-            D_8008C170 = -1;
+            hud_pending_sequence_id = -1;
         }
         D_8007A8B0 = osGetTime();
         D_8007A8B8 = (D_8007A8B0 - D_8007A8A8) * 64 / 3000;
@@ -819,7 +819,7 @@ void Core_RunMessageCutsceneLoop(void) {
         }
         Input_ReadController(D_80092C80);
         D_8007A180 = 0;
-        D_800863F0 = 0;
+        effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
         if (Cutscene_UpdateMessageSequence() != 0) {
             Cutscene_StartAudioFadeForEntry(count);
@@ -899,7 +899,7 @@ void Core_RunCameraCutsceneLoop(void) {
         }
         Input_ReadController(D_80092C80);
         D_8007A180 = 0;
-        D_800863F0 = 0;
+        effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
         Cutscene_UpdateScene();
         Env_Update();

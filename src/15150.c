@@ -187,7 +187,7 @@ typedef struct {
 } Unk15150Dyn;
 
 extern Unk8007C288* D_8007C288;
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 extern s32 D_8004DCA0;
 extern s32 D_8008C168;
 extern u16 D_80092C86;
@@ -312,14 +312,14 @@ void Camera_Update(Unk15150Dyn* arg0) {
     s32 idx;
     s32 pad;
 
-    if ((D_8007C288->unk14 & 2) && !(D_8008BE52 & 1) && cam->mode != 3) {
+    if ((D_8007C288->unk14 & 2) && !(battle_flags & 1) && cam->mode != 3) {
         idx = (D_8007AA82 >> 1) & 7;
         if (idx != D_80085F60) {
             Camera_SetPreset(idx);
         }
     }
     D_8004EC18[cam->mode](cam);
-    if (!(D_8004DCA0 & 0x82) && D_8008C168 == 0 && !(D_8008BE52 & 1) && !(D_8007C288->unk14 & 2) &&
+    if (!(D_8004DCA0 & 0x82) && D_8008C168 == 0 && !(battle_flags & 1) && !(D_8007C288->unk14 & 2) &&
         (D_80092C86 & 0x20) && D_80085C08[0] >= 2) {
         D_80085F60++;
         if (D_80085F60 >= D_80085C08[0]) {
@@ -356,7 +356,7 @@ void Camera_Update(Unk15150Dyn* arg0) {
 
 extern s32 D_8004DCA0;
 extern u16 D_80092C84;
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 extern f32 D_8007AA24;
 void func_80015B88(Camera15150 *arg0);
 void Camera_UpdateLookAt(Camera15150 *arg0, Unk15150Target *arg1);
@@ -377,7 +377,7 @@ void Camera_FollowTarget(Camera15150 *arg0)
   Unk15150Target *target;
   target = arg0->target;
   func_80015B88(arg0);
-  if (((!(D_8004DCA0 & 0x82)) && (!(D_8008BE52 & 0x200))) && (!(arg0->flags & 0x40)))
+  if (((!(D_8004DCA0 & 0x82)) && (!(battle_flags & 0x200))) && (!(arg0->flags & 0x40)))
   {
     if ((D_80092C84 & 0x4000) || (arg0->mode == 2))
     {
@@ -476,7 +476,7 @@ void Camera_FollowTarget(Camera15150 *arg0)
     y = dz;
   }
   y = Camera_RaiseOverNpcs(arg0, y);
-  if ((D_8008BE52 & 1) && (y < D_8007AA24))
+  if ((battle_flags & 1) && (y < D_8007AA24))
   {
     y = D_8007AA24;
   }
@@ -591,8 +591,8 @@ void Camera_UpdateHeading(Camera15150* arg0) {
     }
 }
 
-extern f32 D_8008BE5C;
-extern f32 D_8008BE60;
+extern f32 battle_center_x;
+extern f32 battle_center_z;
 extern u16 D_80092C86;
 void Camera_UpdateBattle(Camera15150* arg0) {
     f32 a;
@@ -603,7 +603,7 @@ void Camera_UpdateBattle(Camera15150* arg0) {
             *arg0 = D_80085B80;
         }
     } else {
-        a = Math_Atan2(D_8008BE5C - arg0->target->x, D_8008BE60 - arg0->target->z) + 3.141592653589793;
+        a = Math_Atan2(battle_center_x - arg0->target->x, battle_center_z - arg0->target->z) + 3.141592653589793;
         if (a > 3.141592653589793) {
             a -= 6.283185307179586;
         } else if (a < -3.141592653589793) {
@@ -736,11 +736,11 @@ void Camera_SetPreset(s32 arg0) {
 }
 
 extern f32 D_8007AA24;
-extern u16 D_8008BE52;
+extern u16 battle_flags;
 void Camera_StartBattleFocus(s32 arg0, Unk15150Target* arg1) {
     f32 h;
 
-    if (!(D_8008BE52 & 1)) {
+    if (!(battle_flags & 1)) {
         return;
     }
     if (!(D_80085E48.flags & 0x40)) {

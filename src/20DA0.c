@@ -73,9 +73,9 @@ typedef struct {
 } Struct_80020214_set;
 
 /* This file's .bss, 8008BFC0..8008C040, in address order. */
-Vec3f D_8008BFC0[4];
-s32 D_8008BFF0;
-MtxF D_8008BFF8;
+Vec3f anim_node_world_positions[4];
+s32 anim_node_position_count;
+MtxF anim_billboard_mtx_scratch;
 
 void Math_EvalTcbSpline(Struct_80020A28*, Vec3f*, s32);
 void Math_MtxFRotScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32);
@@ -176,7 +176,7 @@ void Anim_DrawModel(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, 
     MtxF mtx;
     Vec3f scale;
 
-    D_8008BFF0 = 0;
+    anim_node_position_count = 0;
     Math_MtxFRotScaleTrans(&mtx, arg1->unkC.x, arg1->unkC.y, arg1->unkC.z, arg1->unk24, arg1->unk0.x, arg1->unk0.y, arg1->unk0.z);
     scale.x = arg1->unk24;
     scale.y = arg1->unk24;
@@ -248,20 +248,20 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
     scale.z *= xf.unk18.z;
     if (anim->unk16 & 1) {
         Math_MtxFMul(parent, &mtx, &mtx);
-        Math_MtxFAimAt(&D_8008BFF8, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], D_80085E48.unkC, D_80085E48.unk10,
+        Math_MtxFAimAt(&anim_billboard_mtx_scratch, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], D_80085E48.unkC, D_80085E48.unk10,
                       D_80085E48.unk14);
-        Math_MtxFScaleAxes(&D_8008BFF8, scale.x, scale.y, scale.z);
-        guMtxF2L(D_8008BFF8.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
+        Math_MtxFScaleAxes(&anim_billboard_mtx_scratch, scale.x, scale.y, scale.z);
+        guMtxF2L(anim_billboard_mtx_scratch.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
     } else {
         Math_MtxFMul(parent, &mtx, &mtx);
         guMtxF2L(mtx.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
     }
     gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     if (anim->unk16 & 2) {
-        D_8008BFC0[D_8008BFF0].x = mtx.mf[3][0];
-        D_8008BFC0[D_8008BFF0].y = mtx.mf[3][1];
-        D_8008BFC0[D_8008BFF0].z = mtx.mf[3][2];
-        D_8008BFF0++;
+        anim_node_world_positions[anim_node_position_count].x = mtx.mf[3][0];
+        anim_node_world_positions[anim_node_position_count].y = mtx.mf[3][1];
+        anim_node_world_positions[anim_node_position_count].z = mtx.mf[3][2];
+        anim_node_position_count++;
     }
     dls = set->unk8;
     tbl = anim->unk18;

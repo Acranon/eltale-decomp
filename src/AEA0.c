@@ -251,7 +251,7 @@ void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, CollResult *);
 void Enemy_LoadAreaSet(void);
 Unk8000BA20 *Enemy_ChooseAttack(Enemy *, Obj *);
 void Enemy_StartAttack(Enemy *, Obj *, Unk8000BA20 *);
-extern s16 D_8008C162;
+extern s16 hud_battle_message_timer;
 void Anim_DrawModel(s32, Obj *, u8 *, s32);
 void Anim_AdvanceFrame(s32, Obj *, u8 *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
@@ -308,11 +308,11 @@ extern f32 D_8007B928;
 extern f32 D_8007B92C;
 void Camera_Shake(s32);
 void Enemy_ResolveCollisions(f32 *, f32 *, Obj *);
-extern f32 D_8008BE5C;
-extern f32 D_8008BE60;
-extern f32 D_8008BE64;
-extern f32 D_8008BE68;
-extern f32 D_8008BE6C;
+extern f32 battle_center_x;
+extern f32 battle_center_z;
+extern f32 battle_active_enemy_x;
+extern f32 battle_active_enemy_z;
+extern f32 battle_arena_radius;
 
 typedef struct {
     /* 0x00 */ s16 unk0;
@@ -335,8 +335,8 @@ extern Unk8007AA08 D_8007AA08;
 extern EnemyStats *D_8007AA88;
 extern Unk8007C288 *D_8007C288;
 extern u16 D_800842E8;
-extern u16 D_8008BE52;
-extern u16 D_8008BE58;
+extern u16 battle_flags;
+extern u16 battle_turn_order_index;
 extern Unk800C18D8 D_800C18D8[];
 extern u8 D_8020E6F0[];
 
@@ -373,7 +373,7 @@ void Enemy_UpdateAll(void) {
             }
         }
     }
-    if (D_8008BE52 & 0x100) {
+    if (battle_flags & 0x100) {
         Enemy_RunAttackScript();
     }
 }
@@ -524,7 +524,7 @@ void Enemy_SortTurnOrder(void) {
 }
 
 void Enemy_StartTurn(void) {
-    D_8007B908[D_8007C050[D_8008BE58]].flags |= 1;
+    D_8007B908[D_8007C050[battle_turn_order_index]].flags |= 1;
 }
 
 void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
@@ -534,7 +534,7 @@ void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
     Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
     if (e->flags & 1) {
         D_8007C028 = e;
-        D_8008C162 = 60;
+        hud_battle_message_timer = 60;
         e->flags &= 0xFFFC;
         if (e->unk98 & 8) {
             Battle_EndTurn(obj);
@@ -548,7 +548,7 @@ void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
             }
             e->type = 1;
             e->unk4 = 4;
-            if (D_8008BE52 & 0x100) {
+            if (battle_flags & 0x100) {
                 e->unk2 = arg2->unkE;
                 Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
             } else {
@@ -558,7 +558,7 @@ void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
         } else {
             e->type = 1;
             e->unk4 = 4;
-            if (D_8008BE52 & 0x100) {
+            if (battle_flags & 0x100) {
                 e->unk2 = arg2->unkE;
                 Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
             } else {
@@ -576,7 +576,7 @@ void Enemy_StateApproach(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
     f32 d;
 
     Enemy_TurnToward(obj, D_8007AA08.x, D_8007AA08.z);
-    if (D_8008BE52 & 0x100) {
+    if (battle_flags & 0x100) {
         D_8007C070.x = 0.0f;
         D_8007C070.y = 0.4f;
         Math_RotateVec2(obj->angle, &D_8007C070);
@@ -599,7 +599,7 @@ void Enemy_StateApproach(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
                 Enemy_StartAttack(e, obj, e->unk1C);
                 return;
             }
-            if (D_8008BE52 & 0x100) {
+            if (battle_flags & 0x100) {
                 e->unk2 = arg2->unkE;
             } else {
                 e->unk2 = arg2->unkE / 10;
@@ -616,7 +616,7 @@ void Enemy_StateApproach(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
                 Battle_EndTurn(obj);
                 return;
             }
-            if (D_8008BE52 & 0x100) {
+            if (battle_flags & 0x100) {
                 e->unk2 = arg2->unkE;
             } else {
                 e->unk2 = arg2->unkE / 10;
@@ -907,7 +907,7 @@ void Enemy_StartAttack(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
     if (e->unk2 == 0) {
         e->unk2 = 1;
     }
-    if (D_8008BE52 & 0x100) {
+    if (battle_flags & 0x100) {
         Enemy_StartAttackScript(arg2->unk0 & 0xFF, (s32)e);
     }
 }
@@ -946,22 +946,22 @@ void Enemy_Move(s32 clamp, f32 dx, f32 dz, Obj *obj, EnemyAI *ai) {
         e->unk24 *= 0.9f;
     }
     if (clamp) {
-        x = obj->x + obj->unk18 - D_8008BE64;
-        z = obj->z + obj->unk20 - D_8008BE68;
+        x = obj->x + obj->unk18 - battle_active_enemy_x;
+        z = obj->z + obj->unk20 - battle_active_enemy_z;
         d = sqrtf(x * x + z * z);
         r = e->unk10 * e->unk128;
         if (r < d) {
-            dx = r * x / d - obj->x + D_8008BE64;
-            dz = r * z / d - obj->z + D_8008BE68;
+            dx = r * x / d - obj->x + battle_active_enemy_x;
+            dz = r * z / d - obj->z + battle_active_enemy_z;
             e->flags |= 2;
         }
     }
-    x = obj->x + obj->unk18 - D_8008BE5C;
-    z = obj->z + obj->unk20 - D_8008BE60;
+    x = obj->x + obj->unk18 - battle_center_x;
+    z = obj->z + obj->unk20 - battle_center_z;
     d = sqrtf(x * x + z * z);
-    if (D_8008BE6C < d) {
-        dx = (D_8008BE6C - 0.5) * x / d - obj->x + D_8008BE5C;
-        dz = (D_8008BE6C - 0.5) * z / d - obj->z + D_8008BE60;
+    if (battle_arena_radius < d) {
+        dx = (battle_arena_radius - 0.5) * x / d - obj->x + battle_center_x;
+        dz = (battle_arena_radius - 0.5) * z / d - obj->z + battle_center_z;
     }
     Enemy_ResolveCollisions(&dx, &dz, obj);
     obj->unk18 = dx;
@@ -1162,7 +1162,7 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
         if (flags & 4) {
             obj->unk60 |= 2;
         }
-        if (D_8008BE52 & 0x100) {
+        if (battle_flags & 0x100) {
             D_8007B908[idx].unk2 = ((AnimDef *)anims)[D_8007B908[idx].unk28->unk28].unk2;
             Anim_SetCurrentAndNext(obj, D_8007B908[idx].unk28->unk28, 1, 0, 1, 1);
         } else {
