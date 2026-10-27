@@ -76,7 +76,7 @@ typedef struct Enemy {
     /* 0x000 */ u16 type; /* state, index into enemy_state_handlers */
     /* 0x002 */ s16 state_timer; /* state timer */
     /* 0x004 */ u16 approach_cycles_left;
-    /* 0x006 */ u16 unk6;
+    /* 0x006 */ u16 attack_phase;
     /* 0x008 */ u16 flags;
     /* 0x00A */ u16 hp;
     /* 0x00C */ u16 unkC;

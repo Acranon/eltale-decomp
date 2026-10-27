@@ -395,7 +395,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
     EnemyAttack *a;
     u16 attr;
 
-    switch (e->unk6) {
+    switch (e->attack_phase) {
         case 0:
             attr = e->selected_attack->unk2;
             if (attr & 2) {
@@ -404,7 +404,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
             }
             e->state_timer--;
             if (e->state_timer == 0) {
-                e->unk6++;
+                e->attack_phase++;
                 e->state_timer = e->selected_attack->unk6;
             }
             break;
@@ -449,7 +449,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
             e->state_timer--;
             if (e->state_timer == 0) {
                 a = e->selected_attack;
-                e->unk6++;
+                e->attack_phase++;
                 if (a->next_anim_index == -1) {
                     e->state_timer = anims[a->anim_index].length - a->startup_frames;
                 } else {
@@ -478,7 +478,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
 void Enemy_StateCastSpell(Actor *obj, Enemy *e, AnimSet *anims) {
     EnemyAttack *a;
 
-    switch (e->unk6) {
+    switch (e->attack_phase) {
         case 0:
             if (e->selected_attack->unk2 & 2) {
                 Enemy_GetAnimStep(obj, &enemy_temp_vec);
@@ -488,11 +488,11 @@ void Enemy_StateCastSpell(Actor *obj, Enemy *e, AnimSet *anims) {
             if (e->state_timer == 0) {
                 Magic_CreateCastEffect(obj, e->selected_attack->attack_code & ~0x8000, 0, 0);
                 a = e->selected_attack;
-                e->unk6++;
+                e->attack_phase++;
                 if (a->next_anim_index == -1) {
                     e->state_timer = anims[a->anim_index].length - a->startup_frames;
                 } else {
-                    e->unk6++;
+                    e->attack_phase++;
                     e->state_timer = a->unk6;
                 }
                 if (e->state_timer <= 0) {
@@ -521,7 +521,7 @@ void Enemy_StateCastSpell(Actor *obj, Enemy *e, AnimSet *anims) {
             e->state_timer--;
             if (e->state_timer == 0) {
                 a = e->selected_attack;
-                e->unk6--;
+                e->attack_phase--;
                 e->state_timer = anims[a->end_anim_index].length;
                 Anim_SetCurrentAndNext(obj, a->end_anim_index, 1, 0, 1, 1);
             }
@@ -625,7 +625,7 @@ void Enemy_StartAttack(Enemy *e, Actor *obj, EnemyAttack *arg2) {
     } else {
         e->type = 4;
     }
-    e->unk6 = 0;
+    e->attack_phase = 0;
     e->state_timer = arg2->startup_frames;
     e->flags &= 0xFFD7;
     obj->animFlags = 1;
