@@ -111,7 +111,7 @@ extern Gfx* D_8007A184;
 void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Unk80085A78*);
 u8 Spirit_IsCollected(u16);
 void func_800271B4(f32, Vec2f_147A0*);
-void func_8001D9A8(void*);
+void Effect_AllocateSprite(void*);
 s32 func_80026E90(s32);
 f32 sinf(f32);
 void Spirit_MoveSparkle(Unk80013FA4Arg*);
@@ -279,7 +279,7 @@ void Spirit_SpawnSparkles(void) {
                 D_8004E658.unk1C = obj->y;
                 D_8004E658.unk20 = obj->z + v.y;
                 D_8004E658.unk10 = D_8004E258[obj->unk12 >> 1];
-                func_8001D9A8(&D_8004E658);
+                Effect_AllocateSprite(&D_8004E658);
                 if (obj->unk12 >= 6) {
                     obj->unk12 = func_80026E90(30) - 60;
                     obj->unkC += 0.39269908169872414;

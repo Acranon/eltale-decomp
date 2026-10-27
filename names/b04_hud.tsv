@@ -1,0 +1,27 @@
+# D3 b04 hud
+# old<TAB>new<TAB>evidence
+func_80020AE0	Hud_ResetState	Resets the HUD offsets, clip bounds, popups, indicator timers, and animation counters.
+func_80020B78	Hud_Draw	Sets the HUD projection and draws status meters, compass, spell UI, actor icons, and popups according to game state.
+func_80021030	Hud_DrawPlayerMeters	Draws two model-stat ratios as animated bars with numeric current and maximum values.
+func_800213A8	Hud_DrawPlayerStatus	Draws four player values and pulsing status symbols beside the meters.
+func_80021920	Hud_DrawCompass	Draws the rotating compass graphic and, when a target is available, a relative-direction marker.
+func_80021C04	Hud_DrawSpellInput	Draws four input choices and the current three-element sequence, including transition effects.
+func_80022658	Hud_DrawSpellName	Looks up the encoded name from the actor's spell ID and draws it in a centered panel.
+func_80022970	Hud_UpdateDirectionalAllocation	Draws four spirit values and consumes directional input to increase one capped value and set milestone flags.
+func_800230A8	Hud_DrawWorldObjectMarker	Projects the selected D_8007ABF0 world object to screen and draws a bobbing sprite above it.
+func_80023470	Hud_DrawEnemyMarker	Projects an indexed enemy to screen and draws a bobbing marker above its model-dependent height.
+func_800235D8	Hud_DrawPlayerOverheadIcon	Projects the player's upper position and draws a palette-textured icon above it.
+func_8002373C	Hud_StartActorStatusIndicator	Records a status-icon index and optionally creates a visual effect attached to the actor.
+func_80023930	Hud_DrawActorStatusIndicators	Draws active actor status icons and updates or expires their attached visual effects.
+func_80023D28	Hud_ClearActorStatusIndicators	Clears all status-icon slots and ends any attached visual effects.
+func_80023E14	Hud_DrawInfoPanel	Draws a timed panel with a name pointer and numeric values from D_8007C028.
+func_8002430C	Hud_ResetPopups	Clears every entry in the eight-slot popup pool.
+func_8002433C	Hud_ShowActorPopup	Allocates a 45-frame popup attached to an actor and sets its sprite and height.
+func_8002440C	Hud_DrawPopups	Projects each timed popup's world position and draws its sprite.
+func_800245D0	Hud_DrawSpellLabel	Looks up a spell from input bytes, computes restriction flags, and draws its label with a matching palette.
+func_80024694	Hud_DrawGlyphString	Consumes encoded glyph bytes and emits textured rectangles with control-byte spacing.
+func_80024904	Hud_MeasureGlyphString	Sums glyph widths and control-byte spacing until the encoded string terminator.
+func_80024974	Hud_DrawNumber	Formats an integer into digits and draws each digit from the HUD texture.
+func_80024A54	Hud_LoadTextureTile	Loads either an 8-bit or 4-bit color-indexed texture tile from a texture descriptor.
+func_80024D40	Hud_DrawClippedTextureRect	Offsets and clips the rectangle to HUD bounds, then emits a texture-rectangle command.
+func_80024EB0	Hud_DrawTextureTile	Loads a texture tile and draws it at the requested rectangle.

@@ -120,10 +120,10 @@ f32 sqrtf(f32);
 void func_80028120();
 void Boss_Spawn(s32, f32, f32, f32, Unk8007C148 *);
 u8 Boss_IsDefeated(u32);
-void func_80020428(s32, Unk8007C174 *, void *, s32);
-void func_8002099C(s32, Unk8007C174 *, void *);
+void Anim_DrawModel(s32, Unk8007C174 *, void *, s32);
+void Anim_AdvanceFrame(s32, Unk8007C174 *, void *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
-void func_800201A0(Unk8007C174 *, s32, s32, s32, s32, u16);
+void Anim_SetCurrentAndNext(Unk8007C174 *, s32, s32, s32, s32, u16);
 void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, Unk8007C0B0 *);
 
 /* This file's .bss, 8007C0B0..8007C280, in address order. D_8007C0C8,
@@ -206,8 +206,8 @@ void Boss_Draw(s32 arg0) {
     if (D_8007C140 != 0) {
         temp = D_803ABA58[D_8007C148.unk2C.unk50];
         gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
-        func_80020428(1, &p->unk2C, temp + D_8007C148.unk2C.unk52 * 0xC, arg0);
-        func_8002099C(p->unk2C.unk58, &p->unk2C, temp + p->unk2C.unk52 * 0xC);
+        Anim_DrawModel(1, &p->unk2C, temp + D_8007C148.unk2C.unk52 * 0xC, arg0);
+        Anim_AdvanceFrame(p->unk2C.unk58, &p->unk2C, temp + p->unk2C.unk52 * 0xC);
         if (*p->unk2C.unk64 != 2) {
             Shadow_Queue(p->unk2C.x, p->unk2C.y, p->unk2C.z, p->unk2C.unk2C, p->unk2C.unk30, p->unk2C.unk34,
                           p->unk2C.unk28 * p->unk2C.unk24);
@@ -236,7 +236,7 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
     s16 flags;
 
     arg4->unk2C.unk50 = s2->unk2;
-    func_800201A0(s1, 0, 1, 0, 1, 1);
+    Anim_SetCurrentAndNext(s1, 0, 1, 0, 1, 1);
     s1->unk24 = s2->unk20;
     s1->unk28 = s2->unk18;
     s1->unk64 = (u16 *)s2;

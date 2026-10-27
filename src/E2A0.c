@@ -149,7 +149,7 @@ typedef struct {
 u32 func_80026E90(u32);
 void func_80026A00(AnimInfo *, Unk80082020 *, s32);
 void func_800271B4(f32, f32 *);
-void func_8001D9A8(SpriteObj *);
+void Effect_AllocateSprite(SpriteObj *);
 void func_800273C0(Mtx *, f32, f32, f32, f32, f32, f32, f32);
 
 extern AnimInfo D_800579F8;
@@ -359,7 +359,7 @@ typedef struct {
     /* 0x20 */ f32 z;
 } Unk8007AA08;
 extern Unk8007AA08 D_8007AA08;
-void func_8001A948(f32, f32, f32, Unk8000FA9C *);
+void Effect_QueueVisibleMarker(f32, f32, f32, Unk8000FA9C *);
 void MapObj_EmitArcSprite(Unk8000FA9C *);
 void MapObj_EmitDropSprite(Unk8000FA9C *);
 void MapObj_QueueSpinner(f32, f32, f32, f32, Unk8000FA9C *);
@@ -897,7 +897,7 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
             *D_80081CD4++ = s;
             D_80081CBC++;
         } else if (kind == 0x81) {
-            func_8001A948(s->x, s->y, s->z, s);
+            Effect_QueueVisibleMarker(s->x, s->y, s->z, s);
         } else if (kind == 0x83) {
             MapObj_EmitArcSprite(s);
         } else if (kind == 0x84) {
@@ -1105,7 +1105,7 @@ void MapObj_EmitArcSprite(Unk8000FA9C *arg0) {
         D_8004DE04.unk30 = D_80081FF0[0];
         D_8004DE04.unk38 = D_80081FF0[1];
         D_8004DE04.unk10 = &D_8005E9F8[arg0->timer << 10];
-        func_8001D9A8(&D_8004DE04);
+        Effect_AllocateSprite(&D_8004DE04);
         if (arg0->timer >= 7) {
             arg0->timer = func_80026E90(0x3C) - 0x78;
         }
@@ -1132,7 +1132,7 @@ void MapObj_EmitDropSprite(Unk8000FA9C *arg0) {
         D_8004DE44.y = arg0->y;
         D_8004DE44.z = arg0->z;
         D_8004DE44.unk28 = D_8004DE44.unk2C = arg0->scale;
-        func_8001D9A8(&D_8004DE44);
+        Effect_AllocateSprite(&D_8004DE44);
         arg0->timer = func_80026E90(0x96) + 0x96;
     }
 }

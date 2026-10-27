@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Actor model animation: state changes, root motion, frame advance, and node drawing.
+ * Folder: src/game/actor/
+ */
+
 typedef struct {
     f32 mf[4][4];
 } MtxF;
@@ -74,9 +79,9 @@ MtxF D_8008BFF8;
 
 void func_80026A00(Struct_80020A28*, Vec3f*, s32);
 void func_80027220(MtxF*, f32, f32, f32, f32, f32, f32, f32);
-void func_80020568(MtxF*, Vec3f, s32, s32, s32, s32, Struct_80020214_set*, Struct_80020A28*, s32);
+void Anim_DrawNode(MtxF*, Vec3f, s32, s32, s32, s32, Struct_80020214_set*, Struct_80020A28*, s32);
 
-void func_800201A0(Struct_800201A0* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
+void Anim_SetCurrentAndNext(Struct_800201A0* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
     if (arg1 != -1) {
         if (arg1 != arg0->unk52) {
             arg0->unk52 = arg1;
@@ -104,7 +109,7 @@ typedef struct {
     /* 0x18 */ Vec3f unk18;
 } Struct_80020568_xf;
 
-void func_80020214(Struct_800201A0* arg0, Struct_80020214_set* arg1, f32 scale) {
+void Anim_UpdateRootMotion(Struct_800201A0* arg0, Struct_80020214_set* arg1, f32 scale) {
     s32 i;
     s16 count;
     u16 cur;
@@ -163,7 +168,7 @@ void func_80020214(Struct_800201A0* arg0, Struct_80020214_set* arg1, f32 scale) 
     }
 }
 
-void func_80020428(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s32 arg3) {
+void Anim_DrawModel(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s32 arg3) {
     s32 i;
     u16 frame;
     Struct_80020A28* anims;
@@ -181,7 +186,7 @@ void func_80020428(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s
     total = arg1->unk56;
     for (i = 0; i < arg2->unk0; i++) {
         if (anims[i].unk14 == 0) {
-            func_80020568(&mtx, scale, arg0, i, frame, total, arg2, anims, arg3);
+            Anim_DrawNode(&mtx, scale, arg0, i, frame, total, arg2, anims, arg3);
         }
     }
 }
@@ -206,9 +211,9 @@ void func_80027ADC(MtxF*, f32, f32, f32, f32, f32, f32, f32, f32, f32);
 void func_80027D40(MtxF*, MtxF*, MtxF*);
 void func_800275DC(MtxF*, f32, f32, f32, f32, f32, f32);
 void func_80027CB4(MtxF*, f32, f32, f32);
-void func_80020A28(MtxF* arg0, Struct_80020A28* arg1);
+void Anim_ApplyPivotOffset(MtxF* arg0, Struct_80020A28* arg1);
 
-void func_80020568(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, Struct_80020214_set* set,
+void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, Struct_80020214_set* set,
                    Struct_80020A28* anims, s32 buf) {
     s32 fr;
     s32 i;
@@ -237,7 +242,7 @@ void func_80020568(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
     }
     func_80027ADC(&mtx, xf.unk0.x, xf.unk0.y, xf.unk0.z, xf.unkC.y, xf.unkC.x, xf.unkC.z, xf.unk18.x, xf.unk18.y,
                   xf.unk18.z);
-    func_80020A28(&mtx, anim);
+    Anim_ApplyPivotOffset(&mtx, anim);
     scale.x *= xf.unk18.x;
     scale.y *= xf.unk18.y;
     scale.z *= xf.unk18.z;
@@ -272,12 +277,12 @@ void func_80020568(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
     }
     for (i = 0; i < set->unk0; i++) {
         if (anims[i].unk14 == idx + 1) {
-            func_80020568(&mtx, scale, flags, i, frame, total, set, anims, buf);
+            Anim_DrawNode(&mtx, scale, flags, i, frame, total, set, anims, buf);
         }
     }
 }
 
-void func_8002099C(s32 arg0, Struct_800201A0* arg1, Struct_8002099C* arg2) {
+void Anim_AdvanceFrame(s32 arg0, Struct_800201A0* arg1, Struct_8002099C* arg2) {
     s32 temp_v0 = arg1->unk54 += arg0;
 
     if (temp_v0 >= arg2->unk2) {
@@ -297,7 +302,7 @@ void func_8002099C(s32 arg0, Struct_800201A0* arg1, Struct_8002099C* arg2) {
     arg1->unk56++;
 }
 
-void func_80020A28(MtxF* arg0, Struct_80020A28* arg1) {
+void Anim_ApplyPivotOffset(MtxF* arg0, Struct_80020A28* arg1) {
     f32 x, y, z;
     x = arg0->mf[0][0];
     y = arg0->mf[1][0];
