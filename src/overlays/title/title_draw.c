@@ -166,7 +166,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
         } else {
             title_menu_item = 0;
         }
-        title_current_message = title_menu_state6_message;
+        title_current_message = title_menu_default_message;
         title_draw_initialized = 1;
     }
 
@@ -308,7 +308,7 @@ void Title_DrawScreenAndMoveCursor(s32 arg0) {
                                 G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             if (arg0 == 6 || arg0 == 7 || arg0 == 8 || arg0 == 9 || arg0 == 10 || arg0 == 11 || arg0 == 12 || arg0 == 13 || arg0 == 14) {
                 if (arg0 == 6) {
-                    title_current_message = title_menu_state6_message;
+                    title_current_message = title_menu_default_message;
                 } else if (arg0 == 7) {
                     title_current_message = title_menu_state7_message;
                 } else if (arg0 == 8) {

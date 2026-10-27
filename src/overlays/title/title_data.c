@@ -62,8 +62,8 @@ u16 title_menu_item_cursor_tlut[0x100] = {
 #include "assets/title_menu_item_cursor_tlut.inc.c"
 };
 /* message text */
-u8 title_menu_state6_message[0x80] = {
-#include "assets/title_menu_state6_message.inc.c"
+u8 title_menu_default_message[0x80] = {
+#include "assets/title_menu_default_message.inc.c"
 };
 /* message text */
 u8 title_menu_state7_message[0x3C] = {

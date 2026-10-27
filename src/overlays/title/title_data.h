@@ -17,7 +17,7 @@ extern Gfx D_80211140_ovl_title[1];
 extern u8 title_menu_item_cursor_tex[0x58];
 extern Gfx D_802111A0_ovl_title[1];
 extern u16 title_menu_item_cursor_tlut[0x100];
-extern u8 title_menu_state6_message[0x80];
+extern u8 title_menu_default_message[0x80];
 extern u8 title_menu_state7_message[0x3C];
 extern u8 title_menu_state8_message[0x7C];
 extern u8 title_menu_state9_message[0x2C];

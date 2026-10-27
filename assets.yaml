@@ -291,7 +291,7 @@
 - { name: title_menu_atlas_tex, rom: 0xDB0240, size: 0x420, type: u8 }      # texture
 - { name: title_menu_item_cursor_tex, rom: 0xDB0668, size: 0x58, type: u8 }       # texture
 - { name: title_menu_item_cursor_tlut, rom: 0xDB06C8, size: 0x200, type: u16 }     # palette, 256 colours
-- { name: title_menu_state6_message, rom: 0xDB08C8, size: 0x80, type: u8 }       # message text
+- { name: title_menu_default_message, rom: 0xDB08C8, size: 0x80, type: u8 }       # message text
 - { name: title_menu_state7_message, rom: 0xDB0948, size: 0x3C, type: u8 }       # message text
 - { name: title_menu_state8_message, rom: 0xDB0984, size: 0x7C, type: u8 }       # message text
 - { name: title_menu_state9_message, rom: 0xDB0A00, size: 0x2C, type: u8 }       # message text
