@@ -1,4 +1,11 @@
 #include "overlays/intro/intro.h"
+#include "game/audio/audio.h"
+#include "game/audio/sound.h"
+#include "game/core/main.h"
+#include "game/event/cutscene.h"
+#include "game/input/input.h"
+#include "overlays/intro/intro_data.h"
+#include "overlays/intro/intro_screens.h"
 
 /*
  * Intro overlay: entry and per-frame update (boot pak check, splashes), and the
@@ -59,16 +66,6 @@ u8 D_80276F48_ovl_intro[0x12C]; /* not referenced */
 s32 intro_fade_alpha;
 u8 intro_skip_requested;
 
-extern s32 intro_splash_fade_alpha;
-extern s32 intro_splash_phase;
-extern IntroCueGroup intro_cue_groups[];
-extern u32 intro_cue_group_count;
-extern IntroAnim intro_sprite_anim_table[];
-extern Gfx D_802122E0_ovl_intro[];
-extern u16 D_80217A80_ovl_intro[];
-extern u8 D_80217C80_ovl_intro[];
-void Audio_StartSeqFadeOut(s32);
-extern Gfx D_802122C8_ovl_intro[];
 
 
 typedef struct {
@@ -76,31 +73,10 @@ typedef struct {
     /* 0x02 */ u8 pad2[0x12];
 } Unk80092E48; /* size = 0x14 */
 
-extern Gfx *gfx_dl_head;
-extern Gfx intro_render_setup_dl[];
-extern s8 input_primary_port;
-extern u16 input_pressed_buttons;
-extern OSMesgQueue input_si_queue;
-extern OSPfs pak_port_states[4];
-extern Unk80092E48 pak_game_file_scans[4];
-extern u8 D_8006CC74;
-extern u8 intro_first_frame_skipped;
-extern u8 intro_pak_check_done;
 
-s32 Pak_ScanGameFiles(s32);
-s32 Pak_ClassifyError(s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 void func_8003D8EC(char *, ...);
-void Sfx_Enqueue(s32, s32, s32);
-void Bgm_Play(s32);
-void Intro_RunSplash1(void);
-void Intro_RunSplash2(void);
-void Intro_RunSplash3(void);
-s32 Intro_RunNoPakScreen(void);
-void Intro_DrawNoControllerMessage(void);
-s32 Intro_RunPakFullScreen(void);
-s32 Intro_RunPakErrorScreen(void);
 
 void Intro_Init(void) {
     Intro_ClearAllSprites();
