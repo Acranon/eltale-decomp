@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/map/chest_flag.h"
 
 /*
  * Chests: sets an opened flag (the rest is in 140D0).

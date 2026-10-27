@@ -1,4 +1,4 @@
-#include "common.h"
+#include "game/gfx/shadow_reset.h"
 
 /*
  * Shadows: clears the shadow queue (the queue and drawing are in 13DF0).

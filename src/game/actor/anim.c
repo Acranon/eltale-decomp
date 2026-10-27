@@ -1,105 +1,75 @@
-#include "common.h"
+#include "game/actor/anim.h"
+#include "game/camera/camera.h"
 
 /*
  * Actor model animation: state changes, root motion, frame advance, and node drawing.
  * Original file: 20DA0.c (ROM 0x20DA0).
  */
 
-typedef struct {
-    f32 mf[4][4];
-} MtxF;
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
-    /* 0x00 */ Vec3f unk0;
-    /* 0x0C */ Vec3f unkC;
-    /* 0x18 */ char unk18[0x24 - 0x18];
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ char unk28[0x38 - 0x28];
-    /* 0x38 */ f32 unk38;
-    /* 0x3C */ f32 unk3C;
-    /* 0x40 */ f32 unk40;
-    /* 0x44 */ f32 unk44;
-    /* 0x48 */ f32 unk48;
-    /* 0x4C */ f32 unk4C;
+/*
+ * Local copy of Actor (game/actor/actor.h, h_actors) until H2. The shared actor-model base: position, rotation, scale, root motion and animation state.
+ * The player (inside player_state), NPCs, enemies, the boss, chests and the camera's focus
+ * target are all this layout. Anim_* drive it.
+ */
+typedef struct Actor {
+    /* 0x00 */ f32 x;
+    /* 0x04 */ f32 y;
+    /* 0x08 */ f32 z;
+    /* 0x0C */ f32 rx; /* rotation passed to Math_MtxFRotScaleTrans by Anim_DrawModel */
+    /* 0x10 */ f32 ry; /* the heading */
+    /* 0x14 */ f32 rz;
+    /* 0x18 */ f32 unk18; /* chest: half width of the open box */
+    /* 0x1C */ f32 unk1C; /* chest: facing angle of the open box */
+    /* 0x20 */ f32 unk20; /* chest: half depth of the open box */
+    /* 0x24 */ f32 scale;
+    /* 0x28 */ f32 unk28;
+    /* 0x2C */ f32 nx; /* floor normal (chest: from CollResult, passed to Shadow_Queue) */
+    /* 0x30 */ f32 ny;
+    /* 0x34 */ f32 nz;
+    /* 0x38 */ f32 rootX; /* root node position * scale, from Anim_UpdateRootMotion */
+    /* 0x3C */ f32 rootY;
+    /* 0x40 */ f32 rootZ;
+    /* 0x44 */ f32 rootDx; /* root motion since the last update */
+    /* 0x48 */ f32 rootDy;
+    /* 0x4C */ f32 rootDz;
     /* 0x50 */ s16 unk50;
-    /* 0x52 */ s16 unk52;
-    /* 0x54 */ u16 unk54;
-    /* 0x56 */ u16 unk56;
-    /* 0x58 */ u16 unk58;
-    /* 0x5A */ s16 unk5A;
-    /* 0x5C */ u16 unk5C;
-    /* 0x5E */ s16 unk5E;
-    /* 0x60 */ u16 unk60;
+    /* 0x52 */ s16 anim; /* current AnimSet index */
+    /* 0x54 */ u16 frame; /* frame within the current animation */
+    /* 0x56 */ u16 ticks; /* frames since the animation was set (+1 per Anim_AdvanceFrame) */
+    /* 0x58 */ u16 animStep; /* frames per Anim_AdvanceFrame */
+    /* 0x5A */ s16 nextAnim; /* played when the current one ends */
+    /* 0x5C */ u16 nextAnimStep;
+    /* 0x5E */ u16 unk5E;
+    /* 0x60 */ u16 flags; /* 0x200 looped this frame, 0x400 animation changed */
     /* 0x62 */ u16 unk62;
-} Struct_800201A0;
-
-typedef struct {
-    s16 unk0;
-    s16 unk2;
-    void* unk4;
-    void* unk8;
-} Struct_8002099C;
-
-typedef struct {
-    void* unk0;
-    u16 unk4;
-    u16 unk6;
-    Vec3f unk8;
-    s8 unk14;
-    s8 unk15;
-    u8 unk16;
-    char unk17;
-    s32* unk18;
-    u16 unk1C;
-    char unk1E[2];
-} Struct_80020A28;
-
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ char unkC[0x32 - 0xC];
-    /* 0x32 */ u16 unk32;
-} Struct_80020214_kf;
-
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x04 */ Struct_80020A28* unk4;
-    /* 0x08 */ Gfx** unk8;
-} Struct_80020214_set;
+    /* 0x64 */ void *unk64; /* per kind: player stats, enemy definition */
+    /* 0x68 */ void *unk68; /* per kind: player data, enemy stats */
+} Actor; /* 0x6C bytes */
 
 /* This file's .bss, 8008BFC0..8008C040, in address order. */
 Vec3f anim_node_world_positions[4];
 s32 anim_node_position_count;
 MtxF anim_billboard_mtx_scratch;
 
-void Math_EvalTcbSpline(Struct_80020A28*, Vec3f*, s32);
-void Math_MtxFRotScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32);
-void Anim_DrawNode(MtxF*, Vec3f, s32, s32, s32, s32, Struct_80020214_set*, Struct_80020A28*, s32);
-
-void Anim_SetCurrentAndNext(Struct_800201A0* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
+void Anim_SetCurrentAndNext(Actor* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
     if (arg1 != -1) {
-        if (arg1 != arg0->unk52) {
-            arg0->unk52 = arg1;
-            arg0->unk60 = arg0->unk60 | 0x400;
-            arg0->unk60 = arg0->unk60 & 0xFDFF;
+        if (arg1 != arg0->anim) {
+            arg0->anim = arg1;
+            arg0->flags = arg0->flags | 0x400;
+            arg0->flags = arg0->flags & 0xFDFF;
         }
 
-        arg0->unk58 = arg2;
+        arg0->animStep = arg2;
         if (arg5 & 1) {
-            arg0->unk54 = arg0->unk56 = 0;
+            arg0->frame = arg0->ticks = 0;
         }
     }
 
     if (arg3 != -1) {
-        if (arg3 != arg0->unk5A) {
-            arg0->unk5A = arg3;
+        if (arg3 != arg0->nextAnim) {
+            arg0->nextAnim = arg3;
         }
-        arg0->unk5C = arg4;
+        arg0->nextAnimStep = arg4;
     }
 }
 
@@ -109,83 +79,83 @@ typedef struct {
     /* 0x18 */ Vec3f unk18;
 } Struct_80020568_xf;
 
-void Anim_UpdateRootMotion(Struct_800201A0* arg0, Struct_80020214_set* arg1, f32 scale) {
+void Anim_UpdateRootMotion(Actor* arg0, AnimSet* arg1, f32 scale) {
     s32 i;
     s16 count;
     u16 cur;
     s32 frame;
-    Struct_80020214_kf* kf;
+    Keyframe* kf;
     f32 x;
     f32 y;
     Struct_80020568_xf pos;
-    Struct_80020A28* anim;
+    AnimNode* anim;
     f32 z;
 
-    count = arg1->unk0;
-    cur = arg0->unk54;
-    anim = arg1->unk4;
+    count = arg1->nodeCount;
+    cur = arg0->frame;
+    anim = arg1->nodes;
     i = 0;
-    while (i < count && anim->unk14 != 0) {
+    while (i < count && anim->parent != 0) {
         i++;
         anim++;
     }
-    frame = anim->unk6;
+    frame = anim->track.last;
     if (frame != 0) {
         frame = cur % frame;
     } else {
         frame = 0;
     }
-    Math_EvalTcbSpline(anim, (Vec3f*)&pos, frame);
-    if (arg0->unk60 & 0x200) {
-        kf = anim->unk0;
-        frame = anim->unk6;
-        while (kf->unk32 != frame) {
+    Math_EvalTcbSpline(&anim->track, (f32*)&pos, frame);
+    if (arg0->flags & 0x200) {
+        kf = anim->track.kfs;
+        frame = anim->track.last;
+        while (kf->frame != frame) {
             kf++;
         }
-        x = kf->unk0;
-        y = kf->unk4;
-        z = kf->unk8;
-        arg0->unk44 = (pos.unk0.x + x) * scale - arg0->unk38;
-        arg0->unk48 = (pos.unk0.y + y) * scale - arg0->unk3C;
-        arg0->unk4C = (pos.unk0.z + z) * scale - arg0->unk40;
-        arg0->unk38 = pos.unk0.x * scale;
-        arg0->unk3C = pos.unk0.y * scale;
-        arg0->unk40 = pos.unk0.z * scale;
-    } else if (arg0->unk60 & 0x400) {
-        arg0->unk44 = 0.0f;
-        arg0->unk48 = 0.0f;
-        arg0->unk4C = 0.0f;
-        arg0->unk38 = pos.unk0.x * scale;
-        arg0->unk3C = pos.unk0.y * scale;
-        arg0->unk40 = pos.unk0.z * scale;
+        x = kf->v[0];
+        y = kf->v[1];
+        z = kf->v[2];
+        arg0->rootDx = (pos.unk0.x + x) * scale - arg0->rootX;
+        arg0->rootDy = (pos.unk0.y + y) * scale - arg0->rootY;
+        arg0->rootDz = (pos.unk0.z + z) * scale - arg0->rootZ;
+        arg0->rootX = pos.unk0.x * scale;
+        arg0->rootY = pos.unk0.y * scale;
+        arg0->rootZ = pos.unk0.z * scale;
+    } else if (arg0->flags & 0x400) {
+        arg0->rootDx = 0.0f;
+        arg0->rootDy = 0.0f;
+        arg0->rootDz = 0.0f;
+        arg0->rootX = pos.unk0.x * scale;
+        arg0->rootY = pos.unk0.y * scale;
+        arg0->rootZ = pos.unk0.z * scale;
     } else {
-        arg0->unk44 = pos.unk0.x * scale - arg0->unk38;
-        arg0->unk48 = pos.unk0.y * scale - arg0->unk3C;
-        arg0->unk4C = pos.unk0.z * scale - arg0->unk40;
-        arg0->unk38 = pos.unk0.x * scale;
-        arg0->unk3C = pos.unk0.y * scale;
-        arg0->unk40 = pos.unk0.z * scale;
+        arg0->rootDx = pos.unk0.x * scale - arg0->rootX;
+        arg0->rootDy = pos.unk0.y * scale - arg0->rootY;
+        arg0->rootDz = pos.unk0.z * scale - arg0->rootZ;
+        arg0->rootX = pos.unk0.x * scale;
+        arg0->rootY = pos.unk0.y * scale;
+        arg0->rootZ = pos.unk0.z * scale;
     }
 }
 
-void Anim_DrawModel(s32 arg0, Struct_800201A0* arg1, Struct_80020214_set* arg2, s32 arg3) {
+void Anim_DrawModel(s32 arg0, Actor* arg1, AnimSet* arg2, s32 arg3) {
     s32 i;
     u16 frame;
-    Struct_80020A28* anims;
+    AnimNode* anims;
     u16 total;
     MtxF mtx;
     Vec3f scale;
 
     anim_node_position_count = 0;
-    Math_MtxFRotScaleTrans(&mtx, arg1->unkC.x, arg1->unkC.y, arg1->unkC.z, arg1->unk24, arg1->unk0.x, arg1->unk0.y, arg1->unk0.z);
-    scale.x = arg1->unk24;
-    scale.y = arg1->unk24;
-    scale.z = arg1->unk24;
-    anims = arg2->unk4;
-    frame = arg1->unk54;
-    total = arg1->unk56;
-    for (i = 0; i < arg2->unk0; i++) {
-        if (anims[i].unk14 == 0) {
+    Math_MtxFRotScaleTrans(&mtx, arg1->rx, arg1->ry, arg1->rz, arg1->scale, arg1->x, arg1->y, arg1->z);
+    scale.x = arg1->scale;
+    scale.y = arg1->scale;
+    scale.z = arg1->scale;
+    anims = arg2->nodes;
+    frame = arg1->frame;
+    total = arg1->ticks;
+    for (i = 0; i < arg2->nodeCount; i++) {
+        if (anims[i].parent == 0) {
             Anim_DrawNode(&mtx, scale, arg0, i, frame, total, arg2, anims, arg3);
         }
     }
@@ -196,42 +166,29 @@ typedef struct {
     /* 0xC0 */ Mtx unkC0[1];
 } Unk2000000;
 
-typedef struct {
-    /* 0x00 */ char unk0[0xC];
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-} Struct_80085E48;
-
 extern Gfx* gfx_dl_head;
 extern s32 gfx_mtx_index;
 extern Unk2000000 D_2000000;
-extern Struct_80085E48 camera_state;
-void Math_MtxFRotDegScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32, f32, f32);
-void Math_MtxFMul(MtxF*, MtxF*, MtxF*);
-void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
-void Math_MtxFScaleAxes(MtxF*, f32, f32, f32);
-void Anim_ApplyPivotOffset(MtxF* arg0, Struct_80020A28* arg1);
 
-void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, Struct_80020214_set* set,
-                   Struct_80020A28* anims, s32 buf) {
+void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, AnimSet* set,
+                   AnimNode* anims, s32 buf) {
     s32 fr;
     s32 i;
     Gfx** dls;
     s32* tbl;
     MtxF mtx;
     Struct_80020568_xf xf;
-    Struct_80020A28* anim;
+    AnimNode* anim;
 
     anim = &anims[idx];
-    fr = anim->unk6;
+    fr = anim->track.last;
     if (fr != 0) {
         fr = frame % fr;
     } else {
         fr = 0;
     }
-    Math_EvalTcbSpline(anim, (Vec3f*)&xf, fr);
-    if (anim->unk14 == 0) {
+    Math_EvalTcbSpline(&anim->track, (f32*)&xf, fr);
+    if (anim->parent == 0) {
         if (flags & 1) {
             xf.unk0.x = 0.0f;
             xf.unk0.z = 0.0f;
@@ -246,10 +203,10 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
     scale.x *= xf.unk18.x;
     scale.y *= xf.unk18.y;
     scale.z *= xf.unk18.z;
-    if (anim->unk16 & 1) {
+    if (anim->flags & 1) {
         Math_MtxFMul(parent, &mtx, &mtx);
-        Math_MtxFAimAt(&anim_billboard_mtx_scratch, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], camera_state.unkC, camera_state.unk10,
-                      camera_state.unk14);
+        Math_MtxFAimAt(&anim_billboard_mtx_scratch, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], camera_state.eyeX, camera_state.eyeY,
+                      camera_state.eyeZ);
         Math_MtxFScaleAxes(&anim_billboard_mtx_scratch, scale.x, scale.y, scale.z);
         guMtxF2L(anim_billboard_mtx_scratch.mf, &((Unk2000000*)buf)->unkC0[gfx_mtx_index]);
     } else {
@@ -257,63 +214,63 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
         guMtxF2L(mtx.mf, &((Unk2000000*)buf)->unkC0[gfx_mtx_index]);
     }
     gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-    if (anim->unk16 & 2) {
+    if (anim->flags & 2) {
         anim_node_world_positions[anim_node_position_count].x = mtx.mf[3][0];
         anim_node_world_positions[anim_node_position_count].y = mtx.mf[3][1];
         anim_node_world_positions[anim_node_position_count].z = mtx.mf[3][2];
         anim_node_position_count++;
     }
-    dls = set->unk8;
-    tbl = anim->unk18;
+    dls = set->dls;
+    tbl = anim->dlSeq;
     if (tbl == NULL) {
-        i = anim->unk15;
+        i = anim->dl;
         if (i != -1) {
             if (dls[i] != NULL) {
                 gSPDisplayList(gfx_dl_head++, dls[i]);
             }
         }
     } else {
-        gSPDisplayList(gfx_dl_head++, dls[tbl[total % anim->unk1C]]);
+        gSPDisplayList(gfx_dl_head++, dls[tbl[total % anim->dlSeqLen]]);
     }
-    for (i = 0; i < set->unk0; i++) {
-        if (anims[i].unk14 == idx + 1) {
+    for (i = 0; i < set->nodeCount; i++) {
+        if (anims[i].parent == idx + 1) {
             Anim_DrawNode(&mtx, scale, flags, i, frame, total, set, anims, buf);
         }
     }
 }
 
-void Anim_AdvanceFrame(s32 arg0, Struct_800201A0* arg1, Struct_8002099C* arg2) {
-    s32 temp_v0 = arg1->unk54 += arg0;
+void Anim_AdvanceFrame(s32 arg0, Actor* arg1, AnimSet* arg2) {
+    s32 temp_v0 = arg1->frame += arg0;
 
-    if (temp_v0 >= arg2->unk2) {
-        if (arg1->unk52 != arg1->unk5A) {
-            arg1->unk52 = arg1->unk5A;
-            arg1->unk54 = 0U;
-            arg1->unk56 = 0U;
-            arg1->unk58 = arg1->unk5C;
-            arg1->unk60 |= 0x400;
+    if (temp_v0 >= arg2->length) {
+        if (arg1->anim != arg1->nextAnim) {
+            arg1->anim = arg1->nextAnim;
+            arg1->frame = 0U;
+            arg1->ticks = 0U;
+            arg1->animStep = arg1->nextAnimStep;
+            arg1->flags |= 0x400;
         } else {
-            arg1->unk54 = temp_v0 - arg2->unk2;
-            arg1->unk60 |= 0x200;
+            arg1->frame = temp_v0 - arg2->length;
+            arg1->flags |= 0x200;
         }
     } else {
-        arg1->unk60 &= ~0x600;
+        arg1->flags &= ~0x600;
     }
-    arg1->unk56++;
+    arg1->ticks++;
 }
 
-void Anim_ApplyPivotOffset(MtxF* arg0, Struct_80020A28* arg1) {
+void Anim_ApplyPivotOffset(MtxF* arg0, AnimNode* arg1) {
     f32 x, y, z;
     x = arg0->mf[0][0];
     y = arg0->mf[1][0];
     z = arg0->mf[2][0];
-    arg0->mf[3][0] -= x * arg1->unk8.x + y * arg1->unk8.y + z * arg1->unk8.z;
+    arg0->mf[3][0] -= x * arg1->pivot.x + y * arg1->pivot.y + z * arg1->pivot.z;
     x = arg0->mf[0][1];
     y = arg0->mf[1][1];
     z = arg0->mf[2][1];
-    arg0->mf[3][1] -= x * arg1->unk8.x + y * arg1->unk8.y + z * arg1->unk8.z;
+    arg0->mf[3][1] -= x * arg1->pivot.x + y * arg1->pivot.y + z * arg1->pivot.z;
     x = arg0->mf[0][2];
     y = arg0->mf[1][2];
     z = arg0->mf[2][2];
-    arg0->mf[3][2] -= x * arg1->unk8.x + y * arg1->unk8.y + z * arg1->unk8.z;
+    arg0->mf[3][2] -= x * arg1->pivot.x + y * arg1->pivot.y + z * arg1->pivot.z;
 }

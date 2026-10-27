@@ -1,22 +1,12 @@
-#include "common.h"
+#include "game/gfx/shadow.h"
 
 /*
  * Shadows: a 64-entry queue of floor-aligned quads under objects, drawn in one pass.
  * Original file: 13DF0.c (ROM 0x13DF0).
  */
 
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 rx;
-    /* 0x10 */ f32 ry;
-    /* 0x14 */ f32 rz;
-    /* 0x18 */ f32 scale;
-} Unk84B80; // size = 0x1C
-
 /* This file's .bss, 80084B80..80085290 (13DE0 also uses shadow_count). */
-Unk84B80 shadow_queue[0x40];
+ShadowEntry shadow_queue[0x40];
 s32 shadow_count;
 extern Gfx* gfx_dl_head;
 extern s32 gfx_mtx_index;
@@ -24,7 +14,8 @@ extern s16 gfx_fog_near;
 extern s16 gfx_fog_far;
 extern Gfx D_1000270[];
 extern Vtx D_1000230[];
-typedef struct {
+/* Local view of GfxFrameData (game/core/main.h, h_core) until H2. */
+typedef struct GfxFrameData {
     /* 0x00 */ Mtx unk0[3];
     /* 0xC0 */ Mtx unkC0[1];
 } Unk2000000;
@@ -35,7 +26,7 @@ void Math_MtxFAlignYToVector(f32 (*mf)[4], f32, f32, f32);
 void Math_MtxFScaleAxes(f32 (*mf)[4], f32, f32, f32);
 
 void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
-    Unk84B80* p;
+    ShadowEntry* p;
 
     if ((u32)shadow_count < 0x40) {
         p = &shadow_queue[shadow_count++];
@@ -51,7 +42,7 @@ void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale) {
 
 void Shadow_DrawAll(Unk2000000* arg0) {
     s32 n = shadow_count;
-    Unk84B80* p = shadow_queue;
+    ShadowEntry* p = shadow_queue;
     f32 mf[4][4];
 
     if (n != 0) {
