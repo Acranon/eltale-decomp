@@ -122,7 +122,7 @@ void Chest_LoadForMap(void) {
     }
 }
 
-void Chest_UpdateAll(s32 arg0) {
+void Chest_UpdateAll(struct GfxFrameData *arg0) {
     s32 n;
     Actor* p;
     u16 t;

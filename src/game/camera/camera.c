@@ -33,8 +33,8 @@ f32 camera_shake_x;
 f32 camera_shake_y;
 s32 camera_height_osc_enabled[100];
 Camera camera_state;
-f32 camera_proj_mtx[4][4];
-f32 camera_view_mtx[4][4];
+MtxF camera_proj_mtx;
+MtxF camera_view_mtx;
 f32 camera_fovy;
 f32 camera_near;
 f32 camera_far;
@@ -222,11 +222,11 @@ void Camera_Update(Unk15150Dyn* arg0) {
     if (camera_height_osc_enabled[0] != 0) {
         Camera_UpdateHeightOscillation((Vec3f*)&camera_temp_vec);
     }
-    guPerspectiveF(camera_proj_mtx, &camera_persp_norm, camera_fovy, 1.3333334f, camera_near, camera_far, 1.0f);
-    guLookAtReflectF(camera_view_mtx, &arg0->lookAt, cam->eyeX, cam->eyeY + camera_temp_vec.y, cam->eyeZ, cam->atX, cam->atY,
+    guPerspectiveF(camera_proj_mtx.mf, &camera_persp_norm, camera_fovy, 1.3333334f, camera_near, camera_far, 1.0f);
+    guLookAtReflectF(camera_view_mtx.mf, &arg0->lookAt, cam->eyeX, cam->eyeY + camera_temp_vec.y, cam->eyeZ, cam->atX, cam->atY,
                      cam->atZ, 0.0f, 1.0f, 0.0f);
-    guMtxF2L(camera_proj_mtx, &arg0->proj);
-    guMtxF2L(camera_view_mtx, &arg0->view);
+    guMtxF2L(camera_proj_mtx.mf, &arg0->proj);
+    guMtxF2L(camera_view_mtx.mf, &arg0->view);
     if (camera_shake_timer != 0) {
         guTranslate(&arg0->unkC0[gfx_mtx_index], camera_shake_x, camera_shake_y, 0.0f);
         camera_shake_x *= -0.8;

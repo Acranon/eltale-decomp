@@ -146,8 +146,8 @@ void Fade_UpdateAndDraw(Struct_80026774* arg0) {
     }
 }
 
-void Fade_Start(s32 arg0, u16 arg1, ColorRGBA8* arg2) {
-    fade_frames_left = arg0;
-    fade_flags = (arg1 | 1) | (fade_flags & 8);
-    fade_ramp_ptr = arg2;
+void Fade_Start(s32 frames, u16 flags, ColorRGBA8* ramp) {
+    fade_frames_left = frames;
+    fade_flags = (flags | 1) | (fade_flags & 8);
+    fade_ramp_ptr = ramp;
 }

@@ -138,7 +138,7 @@ void Anim_UpdateRootMotion(Actor* arg0, AnimSet* arg1, f32 scale) {
     }
 }
 
-void Anim_DrawModel(s32 arg0, Actor* arg1, AnimSet* arg2, s32 arg3) {
+void Anim_DrawModel(s32 flags, Actor* arg1, AnimSet* arg2, struct GfxFrameData* frameData) {
     s32 i;
     u16 frame;
     AnimNode* anims;
@@ -156,7 +156,7 @@ void Anim_DrawModel(s32 arg0, Actor* arg1, AnimSet* arg2, s32 arg3) {
     total = arg1->ticks;
     for (i = 0; i < arg2->nodeCount; i++) {
         if (anims[i].parent == 0) {
-            Anim_DrawNode(&mtx, scale, arg0, i, frame, total, arg2, anims, arg3);
+            Anim_DrawNode(&mtx, scale, flags, i, frame, total, arg2, anims, frameData);
         }
     }
 }
@@ -171,7 +171,7 @@ extern s32 gfx_mtx_index;
 extern Unk2000000 D_2000000;
 
 void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32 total, AnimSet* set,
-                   AnimNode* anims, s32 buf) {
+                   AnimNode* anims, struct GfxFrameData* buf) {
     s32 fr;
     s32 i;
     Gfx** dls;
