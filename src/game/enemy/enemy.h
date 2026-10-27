@@ -9,44 +9,44 @@ struct GfxFrameData; /* game/core/main.h */
 struct CollResult;
 struct AnimSet;
 
-/* One entry of an EnemyDef's attack list (unk30, unk2C entries). */
+/* One entry of an EnemyDef's attack list (attacks, attack_count entries). */
 typedef struct EnemyAttack {
-    /* 0x00 */ u16 unk0; /* bit 15: spell (id in the low bits, Enemy_StateCastSpell) */
+    /* 0x00 */ u16 attack_code; /* bit 15: spell (id in the low bits, Enemy_StateCastSpell) */
     /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
+    /* 0x04 */ u16 startup_frames;
     /* 0x06 */ u16 unk6;
-    /* 0x08 */ s16 unk8; /* anim */
-    /* 0x0A */ s16 unkA; /* next anim, -1: none */
-    /* 0x0C */ s16 unkC;
+    /* 0x08 */ s16 anim_index; /* anim */
+    /* 0x0A */ s16 next_anim_index; /* next anim, -1: none */
+    /* 0x0C */ s16 end_anim_index;
     /* 0x0E */ u8 unkE[2];
-    /* 0x10 */ f32 unk10; /* range, times the actor's scale */
+    /* 0x10 */ f32 range; /* range, times the actor's scale */
     /* 0x14 */ f32 unk14;
 } EnemyAttack; /* 0x18 bytes */
 
-/* An enemy definition record (enemy_area_set->unkC[], the boss defs). 0x00..0x23 are
+/* An enemy definition record (enemy_area_set->defs[], the boss defs). 0x00..0x23 are
  * the same fields as ActorStats: Enemy_Spawn points the actor's stats at it. */
 typedef struct EnemyDef {
     /* 0x00 */ u16 unk0;
-    /* 0x02 */ s16 unk2;
+    /* 0x02 */ s16 anim_set_index;
     /* 0x04 */ u8 pad4[2];
-    /* 0x06 */ u16 unk6;
+    /* 0x06 */ u16 max_hp;
     /* 0x08 */ u8 pad8[2];
-    /* 0x0A */ u16 unkA;
+    /* 0x0A */ u16 max_mp;
     /* 0x0C */ u16 unkC;
     /* 0x0E */ u16 unkE;
     /* 0x10 */ s32 unk10;
     /* 0x14 */ s32 unk14;
     /* 0x18 */ f32 unk18;
     /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
+    /* 0x20 */ f32 scale;
     /* 0x24 */ u16 unk24;
-    /* 0x26 */ u16 unk26; /* index into enemy_element_bits */
-    /* 0x28 */ s16 unk28; /* hurt anim */
+    /* 0x26 */ u16 element_index; /* index into enemy_element_bits */
+    /* 0x28 */ s16 hurt_anim_index; /* hurt anim */
     /* 0x2A */ u16 unk2A; /* copied to ActorBattle.unk84 */
-    /* 0x2C */ u16 unk2C; /* attack count */
+    /* 0x2C */ u16 attack_count; /* attack count */
     /* 0x2E */ u8 pad2E[2];
-    /* 0x30 */ EnemyAttack *unk30; /* attack list */
-    /* 0x34 */ u8 unk34; /* item id (func_800200F8) */
+    /* 0x30 */ EnemyAttack *attacks; /* attack list */
+    /* 0x34 */ u8 item_id; /* item id (func_800200F8) */
     /* 0x35 */ u8 pad35[3];
 } EnemyDef; /* 0x38 bytes */
 
@@ -54,16 +54,16 @@ typedef struct EnemyDef {
 typedef struct EnemyAreaSet {
     /* 0x00 */ u8 *start; /* ROM range DMA'd by Enemy_LoadAreaSet (Dma_ReadRom devAddr) */
     /* 0x04 */ u8 *end;
-    /* 0x08 */ struct AnimSet **unk8; /* -> enemy_anim_tables */
-    /* 0x0C */ EnemyDef *unkC;
-    /* 0x10 */ u8 **unk10; /* -> enemy_names */
+    /* 0x08 */ struct AnimSet **anim_tables; /* -> enemy_anim_tables */
+    /* 0x0C */ EnemyDef *defs;
+    /* 0x10 */ u8 **names; /* -> enemy_names */
 } EnemyAreaSet; /* 0x14 bytes */
 
 /* One step of an enemy attack script (enemy_attack_scripts, Enemy_RunAttackScript). */
 typedef struct EnemyScriptCmd {
     /* 0x00 */ u16 time;
     /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 flags; /* 1: last, 2: at the player, 4: camera shake, 8: offset enemy_slots[0].unk20/24 */
+    /* 0x04 */ u16 flags; /* 1: last, 2: at the player, 4: camera shake, 8: offset enemy_slots[0].unk20/unk24 */
     /* 0x06 */ u8 pad6[2];
     /* 0x08 */ f32 unk8;
     /* 0x0C */ f32 unkC;
@@ -74,19 +74,19 @@ typedef struct EnemyScriptCmd {
 /* One enemy_slots entry (also boss_field_record). */
 typedef struct Enemy {
     /* 0x000 */ u16 type; /* state, index into enemy_state_handlers */
-    /* 0x002 */ s16 unk2; /* state timer */
+    /* 0x002 */ s16 state_timer; /* state timer */
     /* 0x004 */ u16 unk4;
     /* 0x006 */ u16 unk6;
     /* 0x008 */ u16 flags;
-    /* 0x00A */ u16 unkA;
+    /* 0x00A */ u16 hp;
     /* 0x00C */ u16 unkC;
     /* 0x00E */ u8 padE[2];
     /* 0x010 */ f32 unk10;
     /* 0x014 */ u8 pad14[8];
-    /* 0x01C */ EnemyAttack *unk1C; /* chosen attack */
+    /* 0x01C */ EnemyAttack *selected_attack; /* chosen attack */
     /* 0x020 */ f32 unk20;
     /* 0x024 */ f32 unk24;
-    /* 0x028 */ EnemyDef *unk28;
+    /* 0x028 */ EnemyDef *def;
     /* 0x02C */ Actor actor;
     /* 0x098 */ ActorBattle battle; /* actor.battle points here */
 } Enemy; /* 0x130 bytes */
@@ -101,7 +101,7 @@ extern Enemy *enemy_turn_current;
 extern s32 enemy_drawn_count;
 extern Actor *enemy_drawn_list[6];
 extern struct AnimSet **enemy_anim_tables; /* per anim set index (Actor.animSetIndex): the AnimSet table */
-extern u8 **enemy_names; /* name strings, indexed by EnemyDef.unk2 (hud.c) */
+extern u8 **enemy_names; /* name strings, indexed by EnemyDef.anim_set_index (hud.c) */
 extern u16 enemy_turn_order[6];
 extern EnemyAreaSet *enemy_area_set;
 extern u16 enemy_script_time;

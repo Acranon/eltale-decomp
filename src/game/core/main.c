@@ -522,8 +522,8 @@ void Core_RunGameplayLoop(void) {
                 map_next_id = exit_destination.map;
                 map_next_subarea = exit_destination.subarea;
                 if (core_flags & 0x400) {
-                    player_state.stats->unk4 = player_state.stats->unk6;
-                    player_state.stats->unk8 = player_state.stats->unkA;
+                    player_state.stats->hp = player_state.stats->max_hp;
+                    player_state.stats->mp = player_state.stats->max_mp;
                     env_clock += 0x2328;
                     Env_SetClock(env_clock);
                     player_respawn_map = map_id;

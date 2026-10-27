@@ -706,19 +706,19 @@ void Magic_HealTarget(MagicEffect* arg0, Actor* arg1) {
 
     if (arg1->typeFlags & 1) {
         magic_target_enemy_rec = (struct Enemy*)&enemy_slots[Enemy_GetSlotIndex(arg1)];
-        amt = arg1->stats->unk6 * arg0->cfg->unkC / 100;
+        amt = arg1->stats->max_hp * arg0->cfg->unkC / 100;
         amt += Math_Rand(amt >> 2);
-        magic_target_enemy_rec->unkA += amt;
-        if (magic_target_enemy_rec->unkA > arg1->stats->unk6) {
-            magic_target_enemy_rec->unkA = arg1->stats->unk6;
+        magic_target_enemy_rec->hp += amt;
+        if (magic_target_enemy_rec->hp > arg1->stats->max_hp) {
+            magic_target_enemy_rec->hp = arg1->stats->max_hp;
         }
     } else {
-        amt = (player_state.stats->unk24[arg0->cfg->input_sequence[0]] >> 1) + arg1->stats->unk6 * arg0->cfg->unkC / 100;
+        amt = (player_state.stats->unk24[arg0->cfg->input_sequence[0]] >> 1) + arg1->stats->max_hp * arg0->cfg->unkC / 100;
         amt += Math_Rand(amt >> 2);
-        if (arg1->stats->unk4 != arg1->stats->unk6) {
-            arg1->stats->unk4 += amt;
-            if (arg1->stats->unk4 > arg1->stats->unk6) {
-                arg1->stats->unk4 = arg1->stats->unk6;
+        if (arg1->stats->hp != arg1->stats->max_hp) {
+            arg1->stats->hp += amt;
+            if (arg1->stats->hp > arg1->stats->max_hp) {
+                arg1->stats->hp = arg1->stats->max_hp;
             }
             player_state.stats->unk2A++;
         }
@@ -735,20 +735,20 @@ void Magic_TransferTargetResource(MagicEffect* arg0, Actor* arg1) {
         magic_target_enemy_rec = (struct Enemy*)&enemy_slots[Enemy_GetSlotIndex(arg1)];
         amt = (magic_target_enemy_rec->unkC * 11 + 63) >> 6;
         magic_target_enemy_rec->unkC -= amt;
-        if (player_state.actor.stats->unk8 != player_state.actor.stats->unkA) {
-            pl->stats->unk8 += amt;
-            if (pl->stats->unk8 > pl->stats->unkA) {
-                pl->stats->unk8 = pl->stats->unkA;
+        if (player_state.actor.stats->mp != player_state.actor.stats->max_mp) {
+            pl->stats->mp += amt;
+            if (pl->stats->mp > pl->stats->max_mp) {
+                pl->stats->mp = pl->stats->max_mp;
             }
             player_state.stats->unk2A++;
         }
     } else {
-        amt = (arg1->stats->unk8 * 11 + 63) >> 6;
-        arg1->stats->unk8 -= amt;
+        amt = (arg1->stats->mp * 11 + 63) >> 6;
+        arg1->stats->mp -= amt;
         magic_target_enemy_rec = (struct Enemy*)&enemy_slots[Enemy_GetSlotIndex(arg1)];
         magic_target_enemy_rec->unkC += amt;
-        if (magic_target_enemy_rec->unkC > arg0->caster->stats->unkA) {
-            magic_target_enemy_rec->unkC = arg0->caster->stats->unkA;
+        if (magic_target_enemy_rec->unkC > arg0->caster->stats->max_mp) {
+            magic_target_enemy_rec->unkC = arg0->caster->stats->max_mp;
         }
     }
     Effect_AddFloatingNumber(arg1, 1, amt);
@@ -816,7 +816,7 @@ void Magic_RemoveEnemyOrDamagePlayer(MagicEffect* arg0, Actor* arg1) {
             Hud_ShowActorPopup(arg1);
         }
     } else {
-        Player_TakeDamage(arg1->stats->unk4 * 4, 4, arg0->caster);
+        Player_TakeDamage(arg1->stats->hp * 4, 4, arg0->caster);
     }
 }
 
@@ -1036,7 +1036,7 @@ u16 Magic_CalculateEffectDamage(SpellDef* arg0, Actor* arg1) {
     s32 i;
 
     if (arg1->typeFlags & 1) {
-        lv = enemy_slots[Enemy_GetSlotIndex(arg1)].unk28->unk2A;
+        lv = enemy_slots[Enemy_GetSlotIndex(arg1)].def->unk2A;
     } else {
         p = &magic_damage_bonus_stats[arg0->input_sequence[0] * 2];
         lv = player_stats.unk24[arg0->input_sequence[0]];
