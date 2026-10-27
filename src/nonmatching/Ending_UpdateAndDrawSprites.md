@@ -1,9 +1,9 @@
-# Ending_DrawSprites
+# Ending_UpdateAndDrawSprites
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c)
-- Retail assembly: [`asm/nonmatchings/ovl_ending/E22690/Ending_DrawSprites.s`](../../asm/nonmatchings/ovl_ending/E22690/Ending_DrawSprites.s)
+- Retail assembly: [`asm/nonmatchings/ovl_ending/E22690/Ending_UpdateAndDrawSprites.s`](../../asm/nonmatchings/ovl_ending/E22690/Ending_UpdateAndDrawSprites.s)
 - Retail code size: `0x103c` bytes
 - Current gap: 25 linked ROM words (NON_MATCHING C in the source); length and frame exact.
 - Specific blocker: Second packed texrect step folds an extra temporary and rotates t3/t4 thereafter.
@@ -29,7 +29,7 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **Ending_DrawSprites** (0x103C bytes)
+- **Ending_UpdateAndDrawSprites** (0x103C bytes)
   - w7 s1: Sprite renderer (bubble sort plus texrect). Draft is 106 words off, all register renaming starting at the flipY gSPTextureRectangle (retail puts -0x400 in t3, ours t4). Scratch d98c_q.c. Facts found: render mode is G_RM_XLU_SURF/G_RM_XLU_SURF2. flags must be s32 and the clip adds are written as shift + frac. IDO gives every function-scope scalar a stack slot in declaration order (first declared = highest address), so the frame only matched with this order: s32 i; rect; 7 scalars + 2 unused; list[150]; tmp; 2 unused. Without those unused scalars the frame size and offsets do not match.
   - w7 s2: Unchanged at 106 register words, starting at the flipY li -0x400 (t3 vs t4). Swept 'if (!x) { }' fakes after every statement for obj/flags/fadeDone/idx/entry: nothing below 106.
   - w7 s3: Still 106 words: t-register numbering from the flip block's B3 word on (retail t9/t5, mine t8/t7). All earlier instructions match register for register, so the cause is not visible in the output. Tried rect.dsdx = -rect.dsdx, the order of the dsdx/dtdy init, combined init, and do{}while(0) wrappers. Warning: permuter results for ovl_ending GBI functions do not carry over. Its preprocessed base scores 184 words in the real file (106 for the hand version), so its macro expansion or context differs.

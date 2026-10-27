@@ -162,7 +162,7 @@ extern AnimTbl D_80212810_ovl_intro[];
 extern Gfx D_802122E0_ovl_intro[];
 extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
-void Intro_DrawSprites(s32);
+void Intro_UpdateAndDrawSprites(s32);
 void Audio_StartSeqFadeOut(s32);
 s32 Intro_CountActiveSprites();
 s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx);
@@ -447,8 +447,8 @@ s32 Intro_RunSpriteScript(void) {
     if (D_802684C0_ovl_intro == 0x1E00) {
         Audio_StartSeqFadeOut(0x5A);
     }
-    Intro_DrawSprites(1);
-    Intro_DrawSprites(0);
+    Intro_UpdateAndDrawSprites(1);
+    Intro_UpdateAndDrawSprites(0);
     for (i = 0, obj = D_802684E0_ovl_intro; i < 150; i++, obj++) {
         if (i) {
         }
@@ -1046,7 +1046,7 @@ void Intro_ResetWait(s32 idx) {
 
 #ifdef NON_MATCHING
 /* 23 words: t3/t4 swapped in the flipped texrect block (allocation only); code is equivalent */
-void Intro_DrawSprites(s32 arg0) {
+void Intro_UpdateAndDrawSprites(s32 arg0) {
     s32 i;
     IntroRect r;
     s32 k;
@@ -1248,6 +1248,6 @@ void Intro_DrawSprites(s32 arg0) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/Intro_DrawSprites.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/Intro_UpdateAndDrawSprites.s")
 #endif
 

@@ -772,7 +772,7 @@ void Magic_UpdateEffects(void) {
     }
 }
 
-s32 func_80017AB0(void) {
+s32 Magic_IsAnyEffectActive(void) {
     s32 i;
     Unk80085F98* p;
 
@@ -1025,7 +1025,7 @@ Actor17360* Magic_FindEligibleTarget(Unk80018348* arg0, s32 arg1) {
     return ret;
 }
 
-s32 Magic_FindTargetWhenEnabled(Unk80018444* arg0) {
+s32 Magic_FindTargetInRangeIfLanded(Unk80018444* arg0) {
     s32 ret = 0;
 
     if (arg0->unkA & 1) {
@@ -1812,7 +1812,7 @@ void Magic_CreateGroundHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
     }
 }
 
-void Magic_TickActorStatuses(Actor17360* arg0) {
+void Magic_StepActorStatusTimers(Actor17360* arg0) {
     Unk17360Data* data = arg0->unk68;
     s32 bit = 1;
     s32 i;
@@ -1945,7 +1945,7 @@ FnECC4 D_8004ECC4[3] = {
 FnECD0 D_8004ECD0[3] = {
     (FnECD0) Magic_FindTargetInRange,
     (FnECD0) Magic_FindEligibleTarget,
-    (FnECD0) Magic_FindTargetWhenEnabled,
+    (FnECD0) Magic_FindTargetInRangeIfLanded,
 };
 FnECDC D_8004ECDC[10] = {
     (FnECDC) Magic_ApplyEffectDamage,

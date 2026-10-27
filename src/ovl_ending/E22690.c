@@ -206,8 +206,8 @@ s16 Ending_FindFreeSprite(void);
 void Ending_SetClipAnchor(s32 arg0);
 void Ending_SetMoveTarget(s32 arg0, s32 arg1, s32 arg2);
 void Ending_ResetWait(s32 arg0);
-void Ending_DrawSprites(s32 arg0);
-s32 Ending_DrawScrollingBackdrop(s32 arg0, s32 arg1);
+void Ending_UpdateAndDrawSprites(s32 arg0);
+s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1);
 
 s32 Ending_RunSpriteScript(void) {
     UnkStruct_802107F0_inner* entries;
@@ -278,11 +278,11 @@ s32 Ending_RunSpriteScript(void) {
             D_8022BB34_ovl_ending = 0;
         } while (entries[D_8022BB2C_ovl_ending].unk2 == 0);
     }
-    Ending_DrawSprites(1);
+    Ending_UpdateAndDrawSprites(1);
     if (D_8022BB20_ovl_ending >= 0xF78) {
-        Ending_DrawScrollingBackdrop(1, 0x4C2);
+        Ending_UpdateAndDrawScrollingBackdrop(1, 0x4C2);
     }
-    Ending_DrawSprites(0);
+    Ending_UpdateAndDrawSprites(0);
     for (i = 0, obj = D_8022BB38_ovl_ending; i < 150; i++, obj++) {
         if (i) {
         }
@@ -883,7 +883,7 @@ s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
 
 #ifdef NON_MATCHING
 /* 25 words: t4/t9 and t3/t5 swapped in the flipped texrect block (allocation only); code is equivalent */
-void Ending_DrawSprites(s32 arg0) {
+void Ending_UpdateAndDrawSprites(s32 arg0) {
     s32 i;
     UnkArg_8020CE70 rect;
     UnkSortEntry_8020D98C* entry;
@@ -1089,7 +1089,7 @@ void Ending_DrawSprites(s32 arg0) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/Ending_DrawSprites.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/Ending_UpdateAndDrawSprites.s")
 #endif
 
 /* func_8020E9C8's function statics; globals here while it is asm. */
@@ -1103,7 +1103,7 @@ u8 D_8020F6B4_ovl_ending = 0;
 
 #ifdef NON_MATCHING
 /* code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8: arg0/width homes, the B3/B4 hoists and allocation differ; the statics are the module's globals; code is equivalent */
-s32 Ending_DrawScrollingBackdrop(s32 arg0, s32 arg1) {
+s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     u32 width;
     f32 alpha;
     f32 delta;
@@ -1237,5 +1237,5 @@ s32 Ending_DrawScrollingBackdrop(s32 arg0, s32 arg1) {
     return 0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/Ending_DrawScrollingBackdrop.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/Ending_UpdateAndDrawScrollingBackdrop.s")
 #endif

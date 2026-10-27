@@ -32,7 +32,7 @@ extern s32 D_80226DC0_ovl_title;
 
 void Sfx_Enqueue(s32, s32, s32);
 s32 Title_RunPhase(void);
-void Title_DrawScreen(s32);
+void Title_DrawScreenAndMoveCursor(s32);
 
 void Title_Init(void) {
     D_80226D90_ovl_title = 0;
@@ -63,7 +63,7 @@ extern u8 D_8007A1CC;
 extern s8 D_80092C81;
 extern s8 D_80092C82;
 void Title_UpdateScreen(void);
-void Title_DrawSelectionExit(void);
+void Title_UpdateSelectionExit(void);
 void Title_UpdateScreenFade(void);
 
 
@@ -238,7 +238,7 @@ s32 Title_RunPhase(void) {
             }
             break;
         case 8:
-            Title_DrawSelectionExit();
+            Title_UpdateSelectionExit();
             Title_UpdateScreenFade();
             break;
     }
@@ -255,7 +255,7 @@ void Title_UpdateScreen(void) {
     gSPDisplayList(D_8007A184++, D_8020F208_ovl_title);
     gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80226D9C_ovl_title);
 
-    Title_DrawScreen((u32)D_80226DA4_ovl_title);
+    Title_DrawScreenAndMoveCursor((u32)D_80226DA4_ovl_title);
     D_80226D9C_ovl_title += D_80226DA0_ovl_title;
     if (D_80226D9C_ovl_title >= 0x100) {
         D_80226D9C_ovl_title = 0xFF;
@@ -336,11 +336,11 @@ void Title_UpdateScreen(void) {
     D_80226D94_ovl_title -= 1;
 }
 
-void Title_DrawSelectionExit(void) {
+void Title_UpdateSelectionExit(void) {
     gSPDisplayList(D_8007A184++, D_8020F208_ovl_title);
     gDPSetEnvColor(D_8007A184++, 0x00, 0x00, 0x00, 0xFF);
 
-    Title_DrawScreen(D_80226DA4_ovl_title);
+    Title_DrawScreenAndMoveCursor(D_80226DA4_ovl_title);
     if (--D_80226D94_ovl_title == 0) {
         D_80226DA4_ovl_title = 0xF;
     }

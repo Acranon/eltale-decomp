@@ -230,7 +230,7 @@ void Player_AddTurnMoveAgilityXP(PlayerState *arg0);
 void Npc_EndTalk(s32 arg0);
 void Item_BuildMessage(s32 arg0);
 void Magic_CreateCastEffect(Actor *arg0, u16 arg1, s32 arg2, u16 arg3);
-s32 func_80017AB0(void);
+s32 Magic_IsAnyEffectActive(void);
 void Effect_StartFootEmitter(Actor *arg0);
 void Battle_EndTurn(Actor *arg0);
 void Anim_SetCurrentAndNext(Actor *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
@@ -701,7 +701,7 @@ void Player_Update(void) {
     if (!(D_8004DCA0 & 0xF)) {
         if (D_80092C86 & 0xA000) {
             if ((D_8008BE52 & 1) && !(p->actor.unk60 & 1)) {
-                if (!(D_8008BE52 & 6) && func_80017AB0() == 0) {
+                if (!(D_8008BE52 & 6) && Magic_IsAnyEffectActive() == 0) {
                     if (p->unk2 != 0) {
                         Player_StartMeleeAttack(&D_8007AA08, &D_8007AA20, cd);
                     } else {
@@ -1242,7 +1242,7 @@ void Player_StateCastSpell(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             Magic_CreateCastEffect(arg0, arg1->unk122, 0, (arg1->unk8 & 0x10000) ? 0x10 : 0);
         }
     } else if (--arg1->unk4 == 0) {
-        if (func_80017AB0() != 0) {
+        if (Magic_IsAnyEffectActive() != 0) {
             arg1->unk4 = 8;
             return;
         }
@@ -1343,7 +1343,7 @@ void Player_StateUseItem(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             Player_AddTurnMoveAgilityXP(arg1);
         }
     } else if (--arg1->unk124 == 0) {
-        if (func_80017AB0() != 0) {
+        if (Magic_IsAnyEffectActive() != 0) {
             arg1->unk124 = 8;
             return;
         }
@@ -2252,7 +2252,7 @@ s32 Player_CanAct(PlayerState *arg0, Actor *arg1) {
     if (!(arg1->unk60 & 1) && !(D_8004DCA0 & 0x80) && !(D_8008BE52 & 8)) {
         if (D_8008BE52 & 1) {
             if (!(D_8008BE52 & 0x202)) {
-                if (func_80017AB0() == 0 && D_8008BE54 == 0) {
+                if (Magic_IsAnyEffectActive() == 0 && D_8008BE54 == 0) {
                     ret = 1;
                 }
             }

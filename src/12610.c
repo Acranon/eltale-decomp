@@ -475,7 +475,7 @@ void Env_ClearLightSlots(void) {
     } while (i != 0);
 }
 
-s32 Env_AllocLightSlot(void) {
+s32 Env_AllocateLightSlot(void) {
     Unk80084998 *p = &D_80084998[7];
     s32 i = 7;
 

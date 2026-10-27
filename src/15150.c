@@ -194,7 +194,7 @@ extern u16 D_80092C86;
 extern s32 D_8007A180;
 extern Gfx* D_8007A184;
 extern Unk15150Dyn D_2000000;
-void Camera_UpdateSway(Vec3f_15150*);
+void Camera_UpdateHeightOscillation(Vec3f_15150*);
 
 f32 Math_Atan2(f32, f32);
 void Math_RotateVec2(f32, Vec2f_15150*);
@@ -329,7 +329,7 @@ void Camera_Update(Unk15150Dyn* arg0) {
     }
     D_80085C10.y = 0.0f;
     if (D_80085CB8[0] != 0) {
-        Camera_UpdateSway((Vec3f_15150*)&D_80085C10);
+        Camera_UpdateHeightOscillation((Vec3f_15150*)&D_80085C10);
     }
     guPerspectiveF(D_80085ED0, &D_80085F88, D_80085F50, 1.3333334f, D_80085F54, D_80085F58, 1.0f);
     guLookAtReflectF(D_80085F10, &arg0->lookAt, cam->eyeX, cam->eyeY + D_80085C10.y, cam->eyeZ, cam->atX, cam->atY,
@@ -361,7 +361,7 @@ extern f32 D_8007AA24;
 void func_80015B88(Camera15150 *arg0);
 void Camera_UpdateLookAt(Camera15150 *arg0, Unk15150Target *arg1);
 void Camera_OrbitTarget(Camera15150 *arg0, Unk15150Target *arg1);
-f32 Camera_RaiseOverObjects(Camera15150 *arg0, f32 arg1);
+f32 Camera_RaiseOverNpcs(Camera15150 *arg0, f32 arg1);
 void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Coll15150 *);
 void Camera_FollowTarget(Camera15150 *arg0)
 {
@@ -475,7 +475,7 @@ void Camera_FollowTarget(Camera15150 *arg0)
   {
     y = dz;
   }
-  y = Camera_RaiseOverObjects(arg0, y);
+  y = Camera_RaiseOverNpcs(arg0, y);
   if ((D_8008BE52 & 1) && (y < D_8007AA24))
   {
     y = D_8007AA24;
@@ -873,7 +873,7 @@ void Camera_TurnForExit(void) {
     D_80085E48.flags |= 0x10;
 }
 
-f32 Camera_RaiseOverObjects(Camera15150* arg0, f32 arg1) {
+f32 Camera_RaiseOverNpcs(Camera15150* arg0, f32 arg1) {
     s32 n = D_8007ABA8;
     Unk8007ABB0** p;
     Unk8007ABB0* obj;
@@ -899,7 +899,7 @@ f32 Camera_RaiseOverObjects(Camera15150* arg0, f32 arg1) {
     return arg1;
 }
 
-void Camera_UpdateSway(Vec3f_15150* arg0) {
+void Camera_UpdateHeightOscillation(Vec3f_15150* arg0) {
     f32* pa;
     f32* pb;
     f32 a;

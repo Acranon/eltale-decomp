@@ -107,7 +107,7 @@ typedef struct {
 extern Struct_8007B908 D_8007B908[];
 extern u16 D_8007C050[];
 
-void Magic_TickActorStatuses(Vec3f*);
+void Magic_StepActorStatusTimers(Vec3f*);
 void Effect_FadeRing(u16, f32, f32, f32);
 
 
@@ -505,7 +505,7 @@ void Battle_EndTurn(Vec3f* arg0) {
     s32 max; s32 id;
     Struct_8007B908* e;
 
-    Magic_TickActorStatuses(arg0);
+    Magic_StepActorStatusTimers(arg0);
     if (D_8008BE52 & 1) {
         if (!(D_8008BE52 & 2)) {
             n = D_8008BE5A;

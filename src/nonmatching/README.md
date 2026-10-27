@@ -26,10 +26,10 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`Enemy_RunAttackScript`](Enemy_RunAttackScript.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
 | [`MapObj_UpdateAndDrawNearby`](MapObj_UpdateAndDrawNearby.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
 | [`PakMenu_Run`](PakMenu_Run.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
-| [`Ending_DrawSprites`](Ending_DrawSprites.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
-| [`Ending_DrawScrollingBackdrop`](Ending_DrawScrollingBackdrop.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |
+| [`Ending_UpdateAndDrawSprites`](Ending_UpdateAndDrawSprites.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
+| [`Ending_UpdateAndDrawScrollingBackdrop`](Ending_UpdateAndDrawScrollingBackdrop.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |
 | [`Intro_RunSpriteScript`](Intro_RunSpriteScript.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 609 masked object words; code 0x9D4 vs 0x9D0, frame 0xF0 exact |
-| [`Intro_DrawSprites`](Intro_DrawSprites.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 23 linked ROM words; length and frame 0x648 exact |
+| [`Intro_UpdateAndDrawSprites`](Intro_UpdateAndDrawSprites.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 23 linked ROM words; length and frame 0x648 exact |
 
 ## Recheck before promoting to a match
 
