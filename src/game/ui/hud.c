@@ -76,28 +76,11 @@ extern HudTextureDesc D_803A8748;
 
 
 
-typedef struct {
-    /* 0x00 */ u16 status_bits;
-    /* 0x02 */ char unk2[0x12 - 0x2];
-    /* 0x12 */ u8 status_icon_ids[0x10];
-    /* 0x22 */ s8 status_icon_timers[0x10];
-    /* 0x32 */ s8 status_effect_timers[0x12];
-    /* 0x44 */ s32 status_effect_handles[4];
-    /* 0x54 */ char unk54[0x94 - 0x54];
-    /* 0x94 */ f32 unk94;
-} Struct_8002373C_68; /* view of ActorBattle opaque status/icon fields */
 
 
-typedef struct {
-    /* 0x0 */ s16 visual_def_index;
-    /* 0x2 */ u16 unk2;
-    /* 0x4 */ u16 unk4;
-    /* 0x8 */ f32 scale_x;
-    /* 0xC */ f32 scale_y;
-} Struct_803AA6C4;
 
 extern MagicVisualDef D_803AA690[];
-extern Struct_803AA6C4 D_803AA6C4[];
+extern EnemyEffectDef D_803AA6C4[];
 
 
 void Hud_ResetState(void) {
@@ -713,9 +696,9 @@ void Hud_DrawOutOfRangeIcon(void) {
 }
 
 void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
-    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->battle;
+    ActorBattle* s = arg0->battle;
     u32 i;
-    Struct_803AA6C4* e;
+    EnemyEffectDef* e;
     f32 y;
     MagicVisualDef* fx;
 
@@ -735,17 +718,17 @@ void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
             hud_temp_vec.z = 1.0f;
             fx = &D_803AA690[e->visual_def_index];
             if (arg0->stats->unk0 == 1) {
-                if (e->unk4 & 0x100) {
+                if (e->flags & 0x100) {
                     y = arg0->battle->unk94;
                 } else {
                     y = arg0->battle->unk94 - arg0->stats->body_radius * arg0->scale;
                 }
-            } else if (e->unk4 & 0x100) {
+            } else if (e->flags & 0x100) {
                 y = arg0->y + arg0->stats->body_height * 0.5 * arg0->scale;
             } else {
                 y = arg0->y;
             }
-            s->status_effect_handles[i] = Magic_CreateVisualEffect(e->unk2, e->unk4, arg0->x, y, arg0->z, 0.0f, fx, &hud_temp_vec, arg0);
+            s->status_effect_handles[i] = Magic_CreateVisualEffect(e->color_index, e->flags, arg0->x, y, arg0->z, 0.0f, fx, &hud_temp_vec, arg0);
             return;
         }
     }
@@ -762,7 +745,7 @@ typedef struct {
 extern Struct_803AA628 D_803AA628[];
 
 void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
-    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->battle;
+    ActorBattle* s = arg0->battle;
     f32 y;
     s32 vis;
     s32 sx;
@@ -815,7 +798,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
     }
     for (i = 0; i < 4; i++) {
         if (s->status_effect_handles[i] != 0) {
-            fx = (EffectModel*)((Struct_8002373C_68*)arg0->battle)->status_effect_handles[i];
+            fx = (EffectModel*)(arg0->battle)->status_effect_handles[i];
             fx->x = arg0->x;
             fx->z = arg0->z;
             if (arg0->stats->unk0 == 1) {
@@ -849,7 +832,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
 }
 
 void Hud_ClearActorStatusIndicators(Actor* arg0) {
-    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->battle;
+    ActorBattle* s = arg0->battle;
     u32 i;
     EffectModel* fx;
 

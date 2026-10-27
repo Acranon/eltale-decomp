@@ -11,6 +11,7 @@
 #include "game/map/map.h"
 #include "game/player/player.h"
 #include "game/text/text.h"
+#include "game/ui/menu.h"
 
 /*
  * Items: the 150-slot inventory (item_inventory), the in-field inventory menu with its icon cache,
@@ -24,13 +25,6 @@ extern u8 D_803AC460[];
 extern ItemDef D_803AAAA0[];
 
 
-typedef struct {
-    /* 0x0 */ s16 visual_def_index;
-    /* 0x2 */ u16 unk2;
-    /* 0x4 */ u16 unk4;
-    /* 0x8 */ f32 scale_x;
-    /* 0xC */ f32 scale_y;
-} Struct_803AB36C;
 
 typedef struct {
     /* 0x0 */ u16 map_id;
@@ -43,7 +37,7 @@ typedef struct {
 
 extern Struct_803AAA40 D_803AAA40[];
 extern MagicVisualDef D_803AB358[];
-extern Struct_803AB36C D_803AB36C[];
+extern EnemyEffectDef D_803AB36C[];
 
 
 
@@ -455,7 +449,7 @@ void Item_UseRestore(Actor* arg0, ItemDef* arg1) {
     item_effect_scale.y = D_803AB36C[0].scale_y;
     fx = &D_803AB358[D_803AB36C[0].visual_def_index];
     item_effect_scale.z = 1.0f;
-    Magic_CreateVisualEffect(D_803AB36C[0].unk2, D_803AB36C[0].unk4, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
+    Magic_CreateVisualEffect(D_803AB36C[0].color_index, D_803AB36C[0].flags, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
     Sfx_Play(0, 0xB, 0xFF);
 }
 
@@ -477,7 +471,7 @@ void Item_UseWarp(Actor* arg0, ItemDef* arg1) {
     item_effect_scale.y = D_803AB36C[1].scale_y;
     fx = &D_803AB358[D_803AB36C[1].visual_def_index];
     item_effect_scale.z = 1.0f;
-    Magic_CreateVisualEffect(D_803AB36C[1].unk2, D_803AB36C[1].unk4, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
+    Magic_CreateVisualEffect(D_803AB36C[1].color_index, D_803AB36C[1].flags, arg0->x, arg0->y, arg0->z, 0.0f, fx, &item_effect_scale, arg0);
     Sfx_Play(0, 0x3B, 0xFF);
 }
 
