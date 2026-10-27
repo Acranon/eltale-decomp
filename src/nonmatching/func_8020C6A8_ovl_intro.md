@@ -5,12 +5,27 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Live source: [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c)
 - Retail assembly: [`asm/nonmatchings/ovl_intro/DC62B0/func_8020C6A8_ovl_intro.s`](../../asm/nonmatchings/ovl_intro/DC62B0/func_8020C6A8_ovl_intro.s)
 - Retail code size: `0x9d0` bytes
-- Current best gap: 2 linked ROM words; frame and BSS addresses exact.
+- Current gap: 608 masked object words (NON_MATCHING C in the source; one extra instruction near the top shifts the rest); code 0x9D4 vs 0x9D0, frame 0xF0 exact.
 - Specific blocker: The only differences are sw/lw v1 at sp+0x74 instead of retail sp+0x70. Uopt first assigns temp id0 to first-loop entries[index] and temp id1 to steps[index]; the later spill reuses id0.
 - Next discriminating test: Find an equivalent first-loop source that changes the temp reuse/order without changing code, saved registers or packet values.
-- Saved function-only C attempt: [`func_8020C6A8_ovl_intro.draft.c`](func_8020C6A8_ovl_intro.draft.c)
+- C: in [`src/ovl_intro/DC62B0.c`](../ovl_intro/DC62B0.c) under `#ifdef NON_MATCHING` (`NON_MATCHING=1 ./build.sh`)
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/overlay-oct26/c6_2words.full.c` (SHA-256 `ff4622b99e946b3188e3e98f355af7eb38d69e2140aa012219085e8801b1a9a7`)
 - Detailed research reports: [ C6A8-focused-report.txt ](reports/codex__overlay-oct26__C6A8-focused-report.txt)
+
+## Equivalence
+
+Verdict: **equivalent.**
+
+- One object, one definition: the draft made D_80276F44 (and the unreferenced D_80276F48 gap) function
+  statics and re-declared D_80277074/D_80277078 as block externs. In the source they are the module's
+  existing .bss globals, so those declarations were dropped. With a global, IDO keeps &D_80276F44 in a
+  register (lui/addiu once) instead of a lui/%lo per access: that is the extra instruction, and the two
+  increments at the top load/store D_802684C0, D_80276F44 and D_802684D4 in a different interleaving (same
+  values, same final stores).
+- Checked: linked NON_MATCHING build against retail with asm-differ, every instruction. Apart from the
+  above, the only differences are the v1 spill at sp+0x74 vs 0x70 and jal targets shifted by the 4 bytes.
+- Bugs fixed: none.
+- Open doubts: none.
 
 ## Prior attempts and findings
 

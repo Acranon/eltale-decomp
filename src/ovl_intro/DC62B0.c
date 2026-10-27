@@ -107,6 +107,22 @@ typedef struct {
         _g->words.w1 = (b);                \
     }
 
+#ifdef NON_MATCHING
+/* gSPTextureRectangle with the RDPHALF_2 step word built as ((dsdx & 0xFFFF) << 13) << 3
+   (func_8020E108's flipped texrects) */
+#define GFX_TEXRECT_STEPS(pkt, xl, yl, xh, yh, tile, s, t, dsdx, dtdy)                                       \
+    {                                                                                                     \
+        Gfx *_g = (Gfx *) (pkt);                                                                          \
+                                                                                                          \
+        _g->words.w0 = (_SHIFTL(G_TEXRECT, 24, 8) | _SHIFTL(xh, 12, 12) | _SHIFTL(yh, 0, 12));            \
+        _g->words.w1 = (_SHIFTL(tile, 24, 3) | _SHIFTL(xl, 12, 12) | _SHIFTL(yl, 0, 12));                 \
+        gImmp1(pkt, G_RDPHALF_1, (_SHIFTL(s, 16, 16) | _SHIFTL(t, 0, 16)));                               \
+        gImmp1(pkt, G_RDPHALF_2,                                                                          \
+               (((unsigned int) ((((unsigned int) (dsdx)) & ((0x01 << 16) - 1)) << 13) << 3) |             \
+                _SHIFTL(dtdy, 0, 16)));                                                                   \
+    }
+#endif
+
 /* ovl_intro .data 80212230..80212250 (80212250.. is DC9350.c's): 230, then
    func_8020C16C's statics 234..240. */
 s32 D_80212230_ovl_intro = 0;
@@ -346,7 +362,167 @@ s32 func_8020C16C_ovl_intro(void) {
     return ret;
 }
 
+#ifdef NON_MATCHING
+/* D_80276F44 is the module's global (the original's function static), so its address is kept in a register; v1 spill at sp+0x74 vs 0x70; code is equivalent */
+s32 func_8020C6A8_ovl_intro(void) {
+    Unk28* entries;
+    AnimFrame* steps;
+    u32 listIdx;
+    IntroSprite* obj;
+    s32 slot;
+    s32 dx;
+    s32 dy;
+    Unk28 *new_var;
+    s32 i;
+    s32 j;
+    s32 flags;
+    Gfx *g;
+    if (D_80277074_ovl_intro) {}
+
+    if (D_802684C8_ovl_intro == 0) {
+        D_80276F44_ovl_intro = 0;
+        D_802684C0_ovl_intro = 0;
+        D_80277078_ovl_intro = 0;
+        D_80277074_ovl_intro = 0;
+        D_802684C8_ovl_intro = 1;
+    }
+    D_802684C0_ovl_intro++;
+    D_80276F44_ovl_intro++;
+    D_802684D4_ovl_intro++;
+    if ((D_802684D4_ovl_intro >= D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0[D_802684CC_ovl_intro].unk2) &&
+        (D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0[D_802684CC_ovl_intro].unk22 == -1) && (D_802684DC_ovl_intro == 0)) {
+        do {
+            slot = func_8020D504_ovl_intro();
+            if (slot != -1) {
+            entries = D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0;
+            entries[D_802684CC_ovl_intro].unk20 = 0;
+            entries[D_802684CC_ovl_intro].unk22 = slot;
+            steps = D_80212810_ovl_intro[entries[D_802684CC_ovl_intro].unk0].unk0;
+            func_8020D0F4_ovl_intro(slot, 0x80000000 | entries[D_802684CC_ovl_intro].unk4 | steps[entries[D_802684CC_ovl_intro].unk20].unk0,
+                                     entries[D_802684CC_ovl_intro].unk8, entries[D_802684CC_ovl_intro].unkA, entries[D_802684CC_ovl_intro].unk10,
+                                     entries[D_802684CC_ovl_intro].unk12, entries[D_802684CC_ovl_intro].unkC, entries[D_802684CC_ovl_intro].unkE,
+                                     entries[D_802684CC_ovl_intro].unk14, entries[D_802684CC_ovl_intro].unk16, entries[D_802684CC_ovl_intro].unk18,
+                                     entries[D_802684CC_ovl_intro].unk1C, steps[entries[D_802684CC_ovl_intro].unk20].unk8, D_802684C4_ovl_intro);
+            D_802684C4_ovl_intro++;
+            if (entries[D_802684CC_ovl_intro].unk2 == 0) {
+                entries[D_802684CC_ovl_intro].unk24 = D_802684D0_ovl_intro;
+            } else {
+                D_802684D0_ovl_intro = D_802684CC_ovl_intro;
+            }
+            if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0xC800) {
+                if (entries[D_802684CC_ovl_intro].unk2 == 0) {
+                    dx = entries[D_802684CC_ovl_intro].unk8 - entries[D_802684D0_ovl_intro].unk8;
+                    dy = entries[D_802684CC_ovl_intro].unkA - entries[D_802684D0_ovl_intro].unkA;
+                } else {
+                    dx = 0;
+                    dy = 0;
+                }
+                func_8020DD6C_ovl_intro(slot, steps[entries[D_802684CC_ovl_intro].unk20].unk4 + dx, steps[entries[D_802684CC_ovl_intro].unk20].unk6 + dy);
+            }
+            if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0x1000) {
+                func_8020E0EC_ovl_intro(slot);
+            }
+            if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0x60000000) {
+                func_8020D8AC_ovl_intro(slot);
+            }
+            D_802684CC_ovl_intro++;
+            if (D_802684CC_ovl_intro >= D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk4) {
+                D_802684CC_ovl_intro = 0;
+                D_802684DC_ovl_intro = 1;
+                D_802684D4_ovl_intro = 0;
+                break;
+            }
+            D_802684D4_ovl_intro = 0;
+            } else {
+                break;
+            }
+        } while (entries[D_802684CC_ovl_intro].unk2 == 0);
+    }
+    if (D_802684C0_ovl_intro == 0x1E00) {
+        func_8002A338(0x5A);
+    }
+    func_8020E108_ovl_intro(1);
+    func_8020E108_ovl_intro(0);
+    for (i = 0, obj = D_802684E0_ovl_intro; i < 150; i++, obj++) {
+        if (i) {
+        }
+        if (obj->unk0.w & 0x80000000) {
+            j = func_8020D078_ovl_intro(i, &listIdx);
+            if (j != -1) {
+                flags = obj->unk0.w;
+                entries = D_802170E8_ovl_intro[listIdx].unk0;
+                steps = D_80212810_ovl_intro[entries[j].unk0].unk0;
+                if (flags & 0x800000) {
+                    flags &= ~0x800000;
+                }
+                if (!(steps[entries[j].unk20].unk0 & flags)) {
+                    if (D_802684D8_ovl_intro) {
+                    }
+                    new_var = entries;
+                    entries[j].unk20++;
+                    if (new_var[j].unk20 >= D_80212810_ovl_intro[new_var[j].unk0].unk4) {
+                        func_8020D300_ovl_intro(i);
+                        entries[j].unk22 = -1;
+                    } else {
+                        obj->unk0.w &= ~0x800000;
+                        obj->unk0.w |= steps[new_var[j].unk20].unk0;
+                        obj->unk38 = steps[new_var[j].unk20].unk8;
+                        if (steps[new_var[j].unk20].unk0 & 0xC800) {
+                            if (new_var[j].unk2 == 0) {
+                                dx = new_var[j].unk8 - new_var[new_var[j].unk24].unk8;
+                                dy = new_var[j].unkA - new_var[new_var[j].unk24].unkA;
+                            } else {
+                                dx = 0;
+                                dy = 0;
+                            }
+                            func_8020DD6C_ovl_intro(i, steps[new_var[j].unk20].unk4 + dx, steps[new_var[j].unk20].unk6 + dy);
+                        }
+                        if (steps[new_var[j].unk20].unk0 & 0x1000) {
+                            func_8020E0EC_ovl_intro(i);
+                        }
+                        if (steps[new_var[j].unk20].unk0 & 0x60000000) {
+                            func_8020D8AC_ovl_intro(i);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (D_80092C86 & 0x1000) {
+        D_80277078_ovl_intro = 1;
+    }
+    if (D_80277078_ovl_intro != 0) {
+        D_80277074_ovl_intro += 10;
+        if (D_80277074_ovl_intro >= 0x100) {
+            D_80277074_ovl_intro = 0xFF;
+        }
+        g = D_8007A184++; g->words.w0 = _SHIFTL(G_RDPPIPESYNC, 24, 8); g->words.w1 = 0;
+        g = D_8007A184++; g->words.w0 = (_SHIFTL(G_DL, 24, 8) | _SHIFTL(G_DL_PUSH, 16, 8)); g->words.w1 = (u32)D_802122E0_ovl_intro;
+        g = D_8007A184++; g->words.w0 = (_SHIFTL(G_SETOTHERMODE_H,24,8) | _SHIFTL(G_MDSFT_TEXTLUT,8,8) | _SHIFTL(2,0,8)); g->words.w1 = G_TT_RGBA16;
+        gDPSetRenderMode(D_8007A184++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+        gDPSetEnvColor(D_8007A184++, 255, 255, 255, D_80277074_ovl_intro);
+        gDPLoadTLUT_pal256(D_8007A184++, D_80217A80_ovl_intro);
+        for (i = 0; i < 40; i++) {
+            gDPLoadTextureTile(D_8007A184++, D_80217C80_ovl_intro, G_IM_FMT_CI, G_IM_SIZ_8b, 320, 6, 0, 0, 319, 5, 0, 0, 0, 0, 0, 0, 0);
+            gSPTextureRectangle(D_8007A184++, 0, (i * 6) << 2, 320 << 2, (i * 6 + 6) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+        }
+        if (D_80277074_ovl_intro >= 0xFF) {
+            return 1;
+        }
+    }
+    if ((func_8020D454_ovl_intro() == 0) && (D_802684DC_ovl_intro != 0)) {
+        D_802684DC_ovl_intro = 0;
+        D_802684D8_ovl_intro++;
+        if (D_802684D8_ovl_intro >= D_802170F0_ovl_intro) {
+            D_802684D8_ovl_intro = 0;
+            return 0;
+        }
+    }
+    return 2;
+}
+#else
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020C6A8_ovl_intro.s")
+#endif
 
 s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx) {
     u32 i;
@@ -862,5 +1038,210 @@ void func_8020E0EC_ovl_intro(s32 idx) {
     D_802684E0_ovl_intro[idx].unk34 = 0;
 }
 
+#ifdef NON_MATCHING
+/* 23 words: t3/t4 swapped in the flipped texrect block (allocation only); code is equivalent */
+void func_8020E108_ovl_intro(s32 arg0) {
+    s32 i;
+    IntroRect r;
+    s32 k;
+    IntroSprite *p;
+    s32 idx;
+    s32 flags;
+    s32 fade;
+    s32 changed;
+    s32 j;
+    s32 unused1;
+    s32 unused2;
+    SortEnt ents[150];
+    SortEnt tmp;
+
+    for (i = 0, p = D_802684E0_ovl_intro; i < 150; i++, p++) {
+        ents[i].idx = i;
+        ents[i].key = p->unk3C;
+    }
+    for (i = 0; i < 149; i++) {
+        for (j = 0; j < 149 - i; j++) {
+            if (ents[j + 1].key < ents[j].key) {
+                tmp = ents[j];
+                ents[j] = ents[j + 1];
+                ents[j + 1] = tmp;
+            }
+        }
+    }
+    gDPPipeSync(D_8007A184++);
+    GFX_WORDS(0xB900031D, 0x504240);
+    gDPSetTextureFilter(D_8007A184++, G_TF_POINT);
+    for (k = 0; k < 150; k++) {
+        idx = ents[k].idx;
+        p = &D_802684E0_ovl_intro[idx];
+        changed = 0;
+        fade = 0;
+        if (p->unk0.w & 0x80000000) {
+        if (arg0 == 1) {
+            if (!(p->unk0.w & 0x800000)) {
+                continue;
+            }
+        } else if (arg0 == 0 && (p->unk0.w & 0x800000)) {
+            continue;
+        }
+        flags = p->unk0.w;
+        if ((flags & 0x800) && func_8020DAF0_ovl_intro(idx, flags)) {
+            flags &= ~0x800;
+        }
+        if ((flags & 0x4000) && func_8020DDA0_ovl_intro(idx, flags)) {
+            flags &= ~0x4000;
+        }
+        if ((flags & 0x8000) && func_8020DF20_ovl_intro(idx, flags)) {
+            flags &= ~0x8000;
+        }
+        r.unk0 = p->unk4;
+        r.unk4 = p->unk6;
+        r.unk8 = p->unkC;
+        r.unkC = p->unkE;
+        r.unk10 = p->unk8;
+        r.unk14 = p->unkA;
+        r.unk18 = p->unk8;
+        r.unk1C = p->unkA;
+        r.unk20 = 0x400;
+        r.unk24 = 0x400;
+        r.unk28 = r.unk8 << 5;
+        r.unk2C = r.unkC << 5;
+        if ((flags & 0x20000000) && func_8020D5EC_ovl_intro(idx, flags, &r)) {
+            flags &= ~0x20000100;
+        }
+        if ((flags & 0x40000000) && func_8020D750_ovl_intro(idx, flags, &r)) {
+            flags &= ~0x40000400;
+        }
+        if (flags & 0x10) {
+            fade |= 0x10;
+            if (func_8020D8E8_ovl_intro(idx, 0)) {
+                flags &= ~0x10;
+                changed = 1;
+            }
+        }
+        if (flags & 0x20) {
+            fade |= 0x20;
+            if (func_8020D8E8_ovl_intro(idx, 1)) {
+                flags &= ~0x20;
+                changed = 1;
+            }
+        }
+        if (flags & 0x40) {
+            fade |= 0x40;
+            if (func_8020D9EC_ovl_intro(idx, 0)) {
+                flags &= ~0x40;
+                changed = 1;
+            }
+        }
+        if (flags & 0x80) {
+            fade |= 0x80;
+            if (func_8020D9EC_ovl_intro(idx, 1)) {
+                flags &= ~0x80;
+                changed = 1;
+            }
+        }
+        if ((flags & 0x1000) && func_8020E0A0_ovl_intro(idx)) {
+            flags &= ~0x1000;
+        }
+        if (flags & 0x10000000) {
+            if (func_8020E0A0_ovl_intro(idx)) {
+                flags &= ~0x10000000;
+            }
+            p->unk0.w = flags;
+            continue;
+        }
+        if (r.unk0 < D_802684B0_ovl_intro && r.unk4 < D_802684B4_ovl_intro && D_802684B0_ovl_intro + D_802684B8_ovl_intro < r.unk0 + r.unk10 &&
+            D_802684B4_ovl_intro + D_802684BC_ovl_intro < r.unk4 + r.unk14) {
+            p->unk0.w = flags;
+            continue;
+        }
+        if (r.unk0 + r.unk10 < D_802684B0_ovl_intro || r.unk4 + r.unk14 < D_802684B4_ovl_intro) {
+            p->unk0.w = flags;
+            continue;
+        }
+        if (D_802684B0_ovl_intro + D_802684B8_ovl_intro < r.unk0 || D_802684B4_ovl_intro + D_802684BC_ovl_intro < r.unk4) {
+            p->unk0.w = flags;
+            continue;
+        }
+        {
+            if (D_802684B0_ovl_intro + D_802684B8_ovl_intro < r.unk0 + r.unk10) {
+                r.unk10 = D_802684B0_ovl_intro + D_802684B8_ovl_intro - r.unk0;
+            }
+            if (D_802684B4_ovl_intro + D_802684BC_ovl_intro < r.unk4 + r.unk14) {
+                r.unk14 = D_802684B4_ovl_intro + D_802684BC_ovl_intro - r.unk4;
+            }
+            if (r.unk0 < D_802684B0_ovl_intro) {
+                r.unk10 = r.unk10 + r.unk0 - D_802684B0_ovl_intro;
+                r.unk8 = p->unkC;
+                r.unk28 = ((D_802684B0_ovl_intro - r.unk0) << 5) + r.unk28;
+                r.unk0 = D_802684B0_ovl_intro;
+            }
+            if (p->unk6 < D_802684B4_ovl_intro) {
+                r.unk14 = r.unk14 + r.unk4 - D_802684B4_ovl_intro;
+                r.unkC = p->unkE;
+                r.unk2C = ((D_802684B4_ovl_intro - r.unk4) << 5) + r.unk2C;
+                r.unk4 = D_802684B4_ovl_intro;
+            }
+            if (fade == 0) {
+                r.unk34 = 0xFF;
+                r.unk30 = 0xFF;
+            } else if (fade & 0x30) {
+                r.unk34 = 0xFF;
+                r.unk30 = p->unk4E;
+            } else if (fade & 0xC0) {
+                r.unk34 = p->unk4E;
+                r.unk30 = 0xFF;
+            }
+            gDPPipeSync(D_8007A184++);
+            if ((flags & 0xF0) || changed) {
+                gSPDisplayList(D_8007A184++, D_802122E0_ovl_intro);
+                gDPSetEnvColor(D_8007A184++, r.unk34, r.unk34, r.unk34, r.unk30);
+            } else {
+                gSPDisplayList(D_8007A184++, D_802122C8_ovl_intro);
+            }
+            gDPPipeSync(D_8007A184++);
+            if (p->unk0.w & 0x0C000000) {
+                gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+                if (p->unk0.w & 0x08000000) {
+                    gDPLoadTLUT_pal256(D_8007A184++, p->unk14);
+                    gDPLoadTextureTile(D_8007A184++, p->unk18, G_IM_FMT_CI, G_IM_SIZ_8b, p->unk10, 0, r.unk8, r.unkC,
+                                       r.unk8 + r.unk18 - 1, r.unkC + r.unk1C - 1, 0, 0, 0, 0, 0, 0, 0);
+                } else if (p->unk0.w & 0x04000000) {
+                    gDPLoadTLUT_pal16(D_8007A184++, 0, p->unk14);
+                    gDPLoadTextureTile_4b(D_8007A184++, p->unk18, G_IM_FMT_CI, p->unk10, 0, r.unk8, r.unkC,
+                                          r.unk8 + r.unk18 - 1, r.unkC + r.unk1C - 1, 0, 0, 0, 0, 0, 0, 0);
+                }
+            } else {
+                gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+                gDPLoadTextureTile(D_8007A184++, p->unk18, G_IM_FMT_RGBA, G_IM_SIZ_16b, p->unk10, 0, r.unk8, r.unkC,
+                                   r.unk8 + r.unk18 - 1, r.unkC + r.unk1C - 1, 0, 0, 0, 0, 0, 0, 0);
+            }
+            if (p->unk0.w & 0x60000) {
+                if (p->unk0.w & 0x20000) {
+                    r.unk20 = -0x400;
+                    GFX_TEXRECT_STEPS(D_8007A184++, r.unk0 << 2, r.unk4 << 2, (r.unk0 + r.unk10) << 2,
+                                        (r.unk4 + r.unk14) << 2, G_TX_RENDERTILE, (r.unk8 + r.unk18 - 1) << 5, r.unk2C,
+                                        r.unk20, r.unk24);
+                }
+                if (p->unk0.w & 0x40000) {
+                    r.unk24 = -0x400;
+                    GFX_TEXRECT_STEPS(D_8007A184++, r.unk0 << 2, r.unk4 << 2, (r.unk0 + r.unk10) << 2,
+                                        (r.unk4 + r.unk14) << 2, G_TX_RENDERTILE, r.unk28, (r.unkC + r.unk1C - 1) << 5,
+                                        r.unk20, r.unk24);
+                }
+            } else {
+                gSPTextureRectangle(D_8007A184++, r.unk0 << 2, r.unk4 << 2, (r.unk0 + r.unk10) << 2,
+                                    (r.unk4 + r.unk14) << 2, G_TX_RENDERTILE, r.unk28, r.unk2C, r.unk20, r.unk24);
+            }
+            if (changed) {
+                p->unk4E = 0xFF;
+            }
+        }
+        p->unk0.w = flags;
+        }
+    }
+}
+#else
 #pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020E108_ovl_intro.s")
+#endif
 
