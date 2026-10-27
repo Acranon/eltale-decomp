@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Screen fade: a full-screen quad whose colour steps through an RGBA ramp each frame
+ * (Quest 64 US twin file: screen_dim).
+ * Folder: src/game/gfx/   (proposed for round 4)
+ */
+
 typedef struct {
     char unk00[0xC0];
     Mtx unkC0[1];

@@ -1,5 +1,12 @@
 #include "common.h"
 
+/*
+ * Start-button menu (game state 2): four pages (stats, map, element levels, options) with
+ * slide transitions, its sprite/number drawing helpers, and the map-page location lookup.
+ * Also holds .data tables used by other modules.
+ * Folder: src/game/ui/   (proposed for round 4)
+ */
+
 /* .bss 8008FB30..8008FB70 */
 s32 D_8008FB30;
 s32 D_8008FB34;

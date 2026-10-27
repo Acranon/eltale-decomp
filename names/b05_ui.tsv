@@ -1,0 +1,16 @@
+# --- 2B530: start-button menu, game state 2 (D_8007A170 = 2 from the gameplay loop on button 0x1000); D_8008FB3E: bits 0-1 page, 0x2000/0x1000 slide, 0x8000 open
+func_8002A930	Menu_Init	called from Core_MainThread: menu flags D_8008FB3E = 0x8000 (page 0), clears D_8008FB70 and D_8008FB3C
+func_8002A954	Menu_ResetKeepPage	like Menu_Init but keeps the page bits (D_8008FB3E & 3); Menu_Update calls it when the menu closes
+func_8002A984	Menu_Update	Gfx_BuildFrameDisplayList runs it in state 2: draws the background and the current page (stats/map/elements/options by bits 0-1) or the slide; B/Start (0x5000) closes it (sound 1) and sets the next game state D_8007A170
+func_8002AC1C	Menu_DrawPageSlide	slides between page (bits 0-1) and its neighbour over 32 frames (D_8008FB38 31..0) (offset D_8008FB38^2 * 0.3125), drawing both pages, then sets the new page
+func_8002AE58	Menu_DrawStatsPage	page 0: HP/max, MP/max (stats +4..+0xA), agility/defense with bars, and the XP of each toward its D_80055F0C cost as a percentage; stick/button 0x10/0x2000 starts the slide
+func_8002B844	Menu_DrawOptionsPage	page 3: two option rows of 5 positions (D_800616B0, and D_80060CB0 = BGM volume via Bgm_ApplyVolumeOption), A to edit, stick moves the marker; both saved by 30600
+func_8002C598	Menu_DrawMapPage	page 1: DMAs the map picture for region D_8008FB50 (Dma_ReadRom) and draws it, the player marker from D_8007AA08 x/z (or the fixed spot D_8008FB54), and an A-toggled cursor moved by the stick
+func_8002D7CC	Menu_DrawElementsPage	page 2: the four element levels (stats +0x24..+0x27, out of 50) with bars, and exp (+0x10) as % of the D_80055D7C threshold for level +0x34 with Menu_DrawExpGauge
+func_8002DECC	Menu_DrawSprite	(id, x, y, w, h): textured rectangle of menu sprite D_80060D74[id] (size D_80060CB4[id]) clipped to x 0..320, with per-id tiling/alpha cases; used by all menu pages and 30600
+func_8002E42C	Menu_DrawExpGauge	(percent, x): draws a 4-layer 2-column picture whose layer 2 is filled from the bottom by percent / 2 rows; only Menu_DrawElementsPage calls it, with the exp %
+func_8002E9DC	Menu_DrawBackground	draws the menu backdrop: 4 texture strips at x 23..297 from y 22 down and again mirrored from y 120; first thing Menu_Update draws
+func_8002EED8	Menu_DrawNumber	(ndigits, x, y, value, pal): draws value with 8x10 digit sprites D_80060D74[pal + digit], 7 px apart, leading zeros skipped
+func_8002F2E4	Menu_DrawNumberZeroPad	as Menu_DrawNumber but draws every one of the ndigits digits (leading zeros kept)
+func_8002F6D8	Menu_PrintNumber	(ndigits, x, y, value): prints each digit with the text routine func_80035350 using a 5-byte message template, 10 px apart, leading zeros skipped; 30600 uses it
+func_8002F87C	Menu_FindMapPageLocation	from Core_RunGameplayLoop on area load: finds the current map/submap (D_800842BC/D_800842C0) in D_80060F30 (-1 starts a region, -2 a spot) and sets the map page region D_8008FB50 and spot D_8008FB54, centring the cursor

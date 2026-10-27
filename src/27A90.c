@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Math: the random number generator, arctangent, 2D vector helpers, float matrix builders
+ * (rotate/scale/translate, aim, align) with Mtx wrappers, and world-to-screen projection.
+ * Folder: src/game/math/   (proposed for round 4)
+ */
+
 #define PI 3.141592653589793
 #define SQ(x) ((x) * (x))
 

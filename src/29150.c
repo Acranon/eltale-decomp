@@ -1,5 +1,12 @@
 #include "common.h"
 
+/*
+ * Audio driver: synthesizer init and sample DMA cache, the audio thread (nnSc client),
+ * two compact-sequence players with volume fades, and the sound player with its
+ * 5-channel sound-effect script interpreter and request queue.
+ * Folder: src/game/audio/   (proposed for round 4)
+ */
+
 typedef struct {
     ALLink node;
     s32 startAddr;
