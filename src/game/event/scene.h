@@ -25,7 +25,7 @@ typedef struct SceneEntry {
     /* 0x30 */ s32 npc_count;
     /* 0x34 */ SceneMessage *messages;
     /* 0x38 */ s32 message_count;
-    /* 0x3C */ u16 unk3C;
+    /* 0x3C */ u16 flags;
     /* 0x3E */ s16 unk3E;
 } SceneEntry; /* 0x40 bytes */
 

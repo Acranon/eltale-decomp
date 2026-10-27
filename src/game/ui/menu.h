@@ -30,8 +30,8 @@ typedef struct SaveSpawnPoint {
 
 typedef struct EnemyEffectDef {
     /* 0x00 */ s16 visual_def_index; /* index into D_800C18D8 (MagicVisualDef, magic.h); read with lh */
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
+    /* 0x02 */ u16 color_index;
+    /* 0x04 */ u16 flags;
     /* 0x06 */ u16 unk6;
     /* 0x08 */ f32 scale_x;
     /* 0x0C */ f32 scale_y;

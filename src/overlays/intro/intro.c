@@ -1051,19 +1051,19 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
                 r.y = intro_clip_top;
             }
             if (fade == 0) {
-                r.prim = 0xFF;
-                r.env = 0xFF;
+                r.brightness = 0xFF;
+                r.alpha = 0xFF;
             } else if (fade & 0x30) {
-                r.prim = 0xFF;
-                r.env = p->fade_value;
+                r.brightness = 0xFF;
+                r.alpha = p->fade_value;
             } else if (fade & 0xC0) {
-                r.prim = p->fade_value;
-                r.env = 0xFF;
+                r.brightness = p->fade_value;
+                r.alpha = 0xFF;
             }
             gDPPipeSync(gfx_dl_head++);
             if ((flags & 0xF0) || changed) {
                 gSPDisplayList(gfx_dl_head++, D_802122E0_ovl_intro);
-                gDPSetEnvColor(gfx_dl_head++, r.prim, r.prim, r.prim, r.env);
+                gDPSetEnvColor(gfx_dl_head++, r.brightness, r.brightness, r.brightness, r.alpha);
             } else {
                 gSPDisplayList(gfx_dl_head++, D_802122C8_ovl_intro);
             }

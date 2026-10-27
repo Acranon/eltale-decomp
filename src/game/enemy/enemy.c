@@ -65,7 +65,7 @@ extern u8 D_8020E6F0[]; /* the area enemy set buffer Enemy_LoadAreaSet reads int
 
 /* Enemy_ChooseAttack and Enemy_ResolveCollisions read some player_state fields through their
  * labels (D_8007AA20.., player.h): retail addresses them as their own symbols. */
-/* Enemy_SpawnDeathEffects reads enemy_effect_defs[20].unk2/.unk4 through their labels
+/* Enemy_SpawnDeathEffects reads enemy_effect_defs[20].color_index/.flags through their labels
  * D_8005685A/C (menu.h): retail addresses them as their own symbols. */
 
 void Enemy_InitForArea(void) {
@@ -1004,7 +1004,7 @@ void Enemy_RunAttackScript(void) {
                 } else {
                     enemy_temp_vec.z = obj->unk28;
                 }
-                Magic_CreateVisualEffect(d->unk2, d->unk4, x, y, z, obj->rot + e->unk14, t, &enemy_temp_vec, obj);
+                Magic_CreateVisualEffect(d->color_index, d->flags, x, y, z, obj->rot + e->unk14, t, &enemy_temp_vec, obj);
             }
             if (e->flags & 4) {
                 Camera_Shake(1);
