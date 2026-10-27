@@ -5,12 +5,20 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Live source: [`src/2B530.c`](../2B530.c)
 - Retail assembly: [`asm/nonmatchings/2B530/func_8002DECC.s`](../../asm/nonmatchings/2B530/func_8002DECC.s)
 - Retail code size: `0x560` bytes
-- Current best gap: 328 object words; code 0x55C vs 0x560.
+- Current gap: 328 object words; code 0x55C vs 0x560, frame 0xD8 exact. Retail keeps w, s, lrs and lrt in stack homes and reloads them; the C promotes some to registers.
 - Specific blocker: Retail reloads w, s, lrs and lrt together from stack; compiler promotes some.
 - Next discriminating test: Find a single local layout that keeps all four memory-resident with frame 0xD8 before tuning graphics macros.
-- Saved function-only C attempt: [`func_8002DECC.draft.c`](func_8002DECC.draft.c)
+- C: in [`src/2B530.c`](../2B530.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/decc-review/base.c` (SHA-256 `bc6255cd0bbb643e69643a85014208d8e9c627ea7abfe688050d8a6745d716cb`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__decc-review__REPORT.txt)
+
+## Equivalence
+
+Verdict: **equivalent.**
+
+- Read the whole retail asm against the C: the `D_80060D74[id]` texture and `D_80060CB4[id]` size (`lbu`), the jump table (0x37..0x39 zero both scales, 0x3C alpha -0x80 and zero scales, 0x3D zero `dsdx`, 0x3E alpha 0x50) and the `id == 0` tiling case (masks 4, `s`/`t` from `x & 0xF`, `y & 0xF`), left clip (`ret = -1` if `x + w < 0`, else `s += -x << 5`, `w += x`, `x = 0`), right clip at 320 (`w = 320 - x`), `w <= 0 || h <= 0`, then PipeSync, RenderMode 0x504240, SetTextureFilter(bilerp), PipeSync, the `alpha == 0` display list choice (EnvColor 0xFFFFFF00 | alpha), the one-shot TLUT on `D_8008FB3E & 0x10` (sets the bit), every LoadTextureTile word (line `(lrs + 8) >> 3` with `sra`, maskt/masks fields), the TextureRectangle words (`s`/`t`, `dsdx`/`dtdy`) and the final PipeSync.
+- Bugs fixed: none.
+- Open: none.
 
 ## Prior attempts and findings
 
