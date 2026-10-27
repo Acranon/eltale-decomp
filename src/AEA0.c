@@ -1,5 +1,12 @@
 #include "common.h"
 
+/*
+ * Battle enemies (6 slots, D_8007B908): load the area's enemy set, spawn, per-frame
+ * state machine (idle, approach, hurt/death, attack, spell), turn order, movement and
+ * collision inside the battle circle, hit/damage rolls both ways, boss attack scripts.
+ * Folder: src/game/enemy/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ s16 unk2;
