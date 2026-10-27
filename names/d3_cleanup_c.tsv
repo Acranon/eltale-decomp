@@ -117,3 +117,11 @@ D_8020FE10_ovl_title	title_initial_screen_image_tlut	title_initial_screen_dl loa
 D_80210010_ovl_title	title_initial_screen_image_tex	title_initial_screen_dl loads this texture for the image drawn in title states 0 and 1
 D_80105578_ovl_DA4570	pak_menu_state9_confirmation_message	PakMenu_Run displays this only in state 9 before the user confirms another Pak initialization attempt
 D_80105608_ovl_DA4570	pak_menu_state10_confirmation_message	PakMenu_Run displays this only in state 10 before the user confirms another Pak initialization attempt
+# title encoded messages named by exact menu-state or confirmation-row selection, without content claims
+D_802113A8_ovl_title	title_menu_state6_message	Title_DrawScreenAndMoveCursor selects this encoded message only when title_menu_state is 6; no content interpretation
+D_80211428_ovl_title	title_menu_state7_message	Title_DrawScreenAndMoveCursor selects this encoded message only when title_menu_state is 7; no content interpretation
+D_80211464_ovl_title	title_menu_state8_message	Title_DrawScreenAndMoveCursor selects this encoded message only when title_menu_state is 8; no content interpretation
+D_802114E0_ovl_title	title_menu_state9_message	Title_DrawScreenAndMoveCursor selects this encoded message only when title_menu_state is 9; no content interpretation
+D_8021150C_ovl_title	title_menu_state10_message	Title_DrawScreenAndMoveCursor selects this encoded message only when title_menu_state is 10; no content interpretation
+D_80211540_ovl_title	title_confirmation_row0_text	Title_DrawScreenAndMoveCursor draws this encoded text at the first confirmation row; title_confirmation_row selects the cursor row
+D_80211548_ovl_title	title_confirmation_row1_text	Title_DrawScreenAndMoveCursor draws this encoded text at the second confirmation row; title_confirmation_row selects the cursor row
