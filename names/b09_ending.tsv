@@ -1,10 +1,11 @@
+# r2 reviewed 2026-10-26: kept 21, renamed 2, reverted 0
 # b09: ovl_ending (src/ovl_ending/E22690.c; E25C80.c is data only): the ending, the same sprite-script engine as ovl_intro plus a scrolling backdrop.
 # Core_RunEndingLoop DMAs it to 0x8020C0D0 and calls the entry; Gfx_BuildFrameDisplayList calls func_8020C15C every frame in state 5.
 # Sprite slots D_8022BB38[150] use the same flag bits as ovl_intro (see b09_intro.tsv).
 # old<TAB>new<TAB>evidence
 func_8020C0D0_ovl_ending	Ending_Init	overlay entry (Core_RunEndingLoop calls 0x8020C0D0 after func_80036220 loads it): Ending_ClearAllSprites, view rect D_8022BB10..1C = (10, 1, 300, 223), zeroes the script position and timers
 func_8020C15C_ovl_ending	Ending_Update	called each frame by Gfx_BuildFrameDisplayList in state 5: runs Ending_RunSpriteScript into one of its two display lists D_8022EA18 and calls it from the frame's list; returns the script result (0 = finished, core then goes to state 7)
-func_8020C254_ovl_ending	Ending_RunSpriteScript	same engine as Intro_RunSpriteScript: spawns scene D_8020F690's entries from D_802107F0 when their delay runs out, steps the animations (D_8020F880), draws both passes; from frame 0xF78 also Ending_DrawScrollingBackdrop(1, 0x4C2); returns 0 after the last scene, else 1
+func_8020C254_ovl_ending	Ending_RunSpriteScript	same engine as Intro_RunSpriteScript: spawns scene D_8020F690's entries from D_802107F0 when their delay runs out, draws both passes (Ending_UpdateAndDrawSprites), from frame 0xF78 also Ending_UpdateAndDrawScrollingBackdrop(1, 0x4C2), advances the animations (D_8020F880); returns 0 after the last scene, else 1
 func_8020C8FC_ovl_ending	Ending_FindSpriteScriptEntry	searches every scene's entries in D_802107F0 for the one whose slot (unk22) is the sprite; returns the entry index and stores the scene index, or -1
 func_8020C978_ovl_ending	Ending_SpawnSprite	fills sprite slot n: flags, position, size, texture offset, width (rounded up to 16 for CI4), image/palette, duration, sort key; clears the effect state, alpha 0xFF
 func_8020CA60_ovl_ending	Ending_ClearAllSprites	resets all 150 sprite slots of D_8022BB38 (flags 0, alpha 0xFF)
@@ -15,13 +16,13 @@ func_8020CD88_ovl_ending	Ending_FindFreeSprite	index of the first slot without t
 func_8020CE70_ovl_ending	Ending_StepClipGrow	flag 0x20000000: grows the drawn width (0x100 set) or height from 0 to the full size over the step's frames, anchored at the far edge set by Ending_SetClipAnchor; returns 0xFF when done
 func_8020CFD4_ovl_ending	Ending_StepClipShrink	flag 0x40000000: shrinks the drawn width (0x400 set) or height from the full size to 0 over the step's frames; returns 0xFF when done
 func_8020D130_ovl_ending	Ending_SetClipAnchor	stores the sprite's right/bottom edge (x+w, y+h) for the clip grow/shrink; called when a step has 0x60000000
-func_8020D16C_ovl_ending	Ending_StepAlphaFade	steps unk4E between 0 and 255 over the step's frames (arg 0 up, 1 down); Ending_DrawSprites uses it as the env alpha for flags 0x10/0x20; returns 0xFF when done
-func_8020D270_ovl_ending	Ending_StepBrightnessFade	same code as Ending_StepAlphaFade, called for flags 0x40/0x80, whose value Ending_DrawSprites uses as the env colour (r=g=b) instead of alpha
+func_8020D16C_ovl_ending	Ending_StepAlphaFade	steps unk4E between 0 and 255 over the step's frames (arg 0 up, 1 down); Ending_UpdateAndDrawSprites uses it as the env alpha for flags 0x10/0x20; returns 0xFF when done
+func_8020D270_ovl_ending	Ending_StepBrightnessFade	same code as Ending_StepAlphaFade, called for flags 0x40/0x80, whose value Ending_UpdateAndDrawSprites uses as the env colour (r=g=b) instead of alpha
 func_8020D374_ovl_ending	Ending_StepMoveXY	flag 0x800: moves the sprite position towards the target (unk2A, unk2C) by |target-start|/frames per frame, snaps to it at the end; returns 0xFF when done
 func_8020D5F0_ovl_ending	Ending_SetMoveTarget	stores the move target and the current position as the move start
 func_8020D624_ovl_ending	Ending_StepMoveX	flag 0x4000: the x-only version of Ending_StepMoveXY
 func_8020D7A4_ovl_ending	Ending_StepMoveY	flag 0x8000: the y-only version of Ending_StepMoveXY
 func_8020D924_ovl_ending	Ending_StepWait	flags 0x1000/0x10000000: counts unk34 up and returns 0xFF when it reaches the step's frames
 func_8020D970_ovl_ending	Ending_ResetWait	zeroes the wait counter unk34; called when a step with 0x1000 starts
-func_8020D98C_ovl_ending	Ending_DrawSprites	bubble-sorts the slots by key unk3C, then for the active sprites of the pass (arg 1: flag 0x800000 set, 0: clear) steps their move/clip/fade/wait effects, clips the rect to the view rect and emits the texture load and texrect (flipped when 0x20000/0x40000)
-func_8020E9C8_ovl_ending	Ending_DrawScrollingBackdrop	arg0 0 resets; else draws picture arg0 of D_80210800 (CI8, 304x222 in 6-line strips) wrapped horizontally at a scroll offset that moves width/arg1 px per frame, fades it in, cross-fades to picture arg0+1 at frame 0x26AC, calls func_8002A338(0x1E0) later and stops after the second fades out
+func_8020D98C_ovl_ending	Ending_UpdateAndDrawSprites	bubble-sorts the slots by key unk3C, then for the active sprites of the pass (arg 1: flag 0x800000 set, 0: clear) steps their move/clip/fade/wait effects and clears each finished effect's flag, clips the rect to the view rect and emits the texture load and texrect (flipped when 0x20000/0x40000) (r2: was Ending_DrawSprites; it also steps the effects)
+func_8020E9C8_ovl_ending	Ending_UpdateAndDrawScrollingBackdrop	arg0 0 resets; else draws picture arg0 of D_80210800 (CI8, 304x222 in 6-line strips) wrapped horizontally at a scroll offset that it moves by width/arg1 px per frame, fades it in, cross-fades to picture arg0+1 at frame 0x26AC, starts Audio_StartSeqFadeOut(0x1E0) at frame D_8022BAF8 and stops after the second fades out (r2: was Ending_DrawScrollingBackdrop; it also advances its scroll/fade)

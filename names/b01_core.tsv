@@ -1,3 +1,4 @@
+# r2 reviewed 2026-10-26: kept 75, renamed 3, reverted 0
 # b01_core (round 1): 1050, 1130, 113F0, 12610, 13DE0, 13DF0, 140D0, 14760, 147A0, 14CF0, 15150
 # old	new	evidence
 # --- 1050: boot
@@ -38,7 +39,7 @@ func_8001263C	Env_ComputeLightDirs	light dir 0: rotates (0,90,50) by an angle fr
 func_80012800	Env_StartPaletteFade	(frames, target, live): stores the fade length and both palette pointers, saves a copy of the live 256-entry palette as the fade start (D_80084350)
 func_80012854	Env_StepPaletteFade	(t): blends the saved start and target RGBA5551 palettes by t/frames into the live palette (t counts down, t=0 copies the target); called by func_80011C60 with the decremented timer
 func_80012A60	Env_ClearLightSlots	clears the in-use word of all 8 light slots D_80084998
-func_80012A90	Env_AllocLightSlot	scans the 8 light slots from the top for a free one, marks it used, clears its colour/light/dir animations, returns its index; called when map scenes set up (1870)
+func_80012A90	Env_AllocateLightSlot	scans the 8 light slots from the top for a free one, marks it used, clears its colour/light/dir animations, returns its index; called when map scenes set up (1870)
 func_80012AE0	Env_FreeLightSlot	clears light slot arg0's in-use word (pair of func_80012A90)
 func_80012B00	Env_SetSlotEnvAnim	(slot, mode, count, rgb list): sets the slot's env-colour animation that func_80012B88 steps (mode 1 play once, 2 hold last, 3 loop)
 func_80012B34	Env_SetSlotLightAnim	(slot, mode, count, list): sets the slot's light-colour scale animation (6 ints per step: ambient scale, light scale) that func_80012B88 steps with the same modes
@@ -86,5 +87,5 @@ func_80015F44	Camera_StartBattleFocus	(frames, target): in battle only, saves th
 func_80016218	Camera_SetPresetDelayedTurn	(i): func_80015DB4 then mode 5 (wait 15, turn 75, restore); called at the end of a battle (1FA00)
 func_8001628C	Camera_SetTargetView	(def, target): sets mode, distance/height from def, target, eye behind the target (mode 0) or at def's point (mode 1), flag 0x40; called from DAE0 func_8000D40C
 func_800163F4	Camera_TurnForExit	on entering an exit (1870 after func_80011770): eye angle offset = camera yaw vs player clamped to pi/4, turn target = exit angle (D_80084314) + pi, flag 0x10
-func_80016578	Camera_RaiseOverObjects	(cam, y): returns an object's y+30 when one of the objects D_8007ABB0 is within 30 of the eye and not more than 20 above y, else y
-func_8001668C	Camera_UpdateSway	writes sin(phaseA+phaseB) to arg->y and advances both phases; func_80014994 adds it to the eye height only in the map/rooms of D_8004EC30 ("sway" is a reading)
+func_80016578	Camera_RaiseOverNpcs	(cam, y): returns an NPC's y+30 when one of the D_8007ABB0 entries (9D50's NPC pointer list, D_8007ABA8 of them; Player_FindNpcToTalk walks the same list) is within 30 of the eye in x/z and less than 20 above y, else y; Camera_FollowTarget uses it for the eye height (r2: was Camera_RaiseOverObjects, the objects are the NPCs)
+func_8001668C	Camera_UpdateHeightOscillation	writes sin(phaseA+phaseB) to arg->y and advances the phases by pi/120 and pi/200 per call; Camera_Update adds it to the eye height only in the map/rooms of D_8004EC30 (r2: was Camera_UpdateSway, "sway" was a reading; the code shows a vertical oscillation)

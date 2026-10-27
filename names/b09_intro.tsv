@@ -1,3 +1,4 @@
+# r2 reviewed 2026-10-26: kept 31, renamed 1, reverted 0
 # b09: ovl_intro (src/ovl_intro/DC62B0.c, DC9350.c; DCC450.c is data only): the boot Controller Pak check, three splash screens, then a scripted sprite sequence.
 # Core_RunIntroLoop DMAs it to 0x8020C0D0 and calls the entry; Gfx_BuildFrameDisplayList calls func_8020C16C every frame in state 4.
 # Sprite slots: D_802684E0[150], word 0 flags: 0x80000000 active, 0x800 move XY, 0x4000 move X, 0x8000 move Y, 0x10/0x20 alpha fade in/out, 0x40/0x80 brightness fade,
@@ -5,7 +6,7 @@
 # old<TAB>new<TAB>evidence
 func_8020C0D0_ovl_intro	Intro_Init	overlay entry (Core_RunIntroLoop calls 0x8020C0D0 after func_800361E8 loads it): Intro_ClearAllSprites, view rect D_802684B0..BC = (10, 1, 300, 223), zeroes the script position and timers
 func_8020C16C_ovl_intro	Intro_Update	called each frame by Gfx_BuildFrameDisplayList in state 4: no controller (D_80092C80 == -1) shows Intro_DrawNoControllerMessage; once per boot the pak check (prints "pack_status = %d", picks one of the three pak screens); then the three splashes (START skips: returns 1), a 45-frame wait that starts BGM 0x1B, then Intro_RunSpriteScript into its own display list; core goes back to the title on 0 or 1
-func_8020C6A8_ovl_intro	Intro_RunSpriteScript	spawns the script entries of scene D_802684D8 from D_802170E8 into free slots when their delay runs out, steps each sprite's animation (D_80212810 steps) when its effect flags clear, draws both passes (Intro_DrawSprites); START fades the screen to white and returns 1, the last scene ending returns 0, else 2
+func_8020C6A8_ovl_intro	Intro_RunSpriteScript	spawns the script entries of scene D_802684D8 from D_802170E8 into free slots when their delay runs out, draws both passes (Intro_UpdateAndDrawSprites), advances each sprite to its next animation step (D_80212810) when the step's effect flags have cleared; START fades the screen to white and returns 1, the last scene ending returns 0, else 2
 func_8020D078_ovl_intro	Intro_FindSpriteScriptEntry	searches every scene's entries in D_802170E8 for the one whose slot (unk22) is the sprite; returns the entry index and stores the scene index, or -1
 func_8020D0F4_ovl_intro	Intro_SpawnSprite	fills sprite slot n: flags, position, size, texture offset, width (rounded up to 16 for CI4), image/palette, duration, sort key; clears the effect state, alpha 0xFF
 func_8020D1DC_ovl_intro	Intro_ClearAllSprites	resets all 150 sprite slots of D_802684E0 (flags 0, alpha 0xFF)
@@ -16,15 +17,15 @@ func_8020D504_ovl_intro	Intro_FindFreeSprite	index of the first slot without the
 func_8020D5EC_ovl_intro	Intro_StepClipGrow	flag 0x20000000: grows the drawn width (0x100 set) or height from 0 to the full size over the step's frames, anchored at the far edge set by Intro_SetClipAnchor; returns 0xFF when done
 func_8020D750_ovl_intro	Intro_StepClipShrink	flag 0x40000000: shrinks the drawn width (0x400 set) or height from the full size to 0 over the step's frames, anchored like Intro_StepClipGrow; returns 0xFF when done
 func_8020D8AC_ovl_intro	Intro_SetClipAnchor	stores the sprite's right/bottom edge (x+w, y+h) for the clip grow/shrink; called when a step has 0x60000000
-func_8020D8E8_ovl_intro	Intro_StepAlphaFade	steps unk4E between 0 and 255 over the step's frames (arg 0 up, 1 down); Intro_DrawSprites uses it as the env alpha for flags 0x10/0x20; returns 0xFF when done
-func_8020D9EC_ovl_intro	Intro_StepBrightnessFade	same code as Intro_StepAlphaFade, called for flags 0x40/0x80, whose value Intro_DrawSprites uses as the env colour (r=g=b) instead of alpha
+func_8020D8E8_ovl_intro	Intro_StepAlphaFade	steps unk4E between 0 and 255 over the step's frames (arg 0 up, 1 down); Intro_UpdateAndDrawSprites uses it as the env alpha for flags 0x10/0x20; returns 0xFF when done
+func_8020D9EC_ovl_intro	Intro_StepBrightnessFade	same code as Intro_StepAlphaFade, called for flags 0x40/0x80, whose value Intro_UpdateAndDrawSprites uses as the env colour (r=g=b) instead of alpha
 func_8020DAF0_ovl_intro	Intro_StepMoveXY	flag 0x800: moves the sprite position towards the target (unk2A, unk2C) by |target-start|/frames per frame, snaps to it at the end; returns 0xFF when done
 func_8020DD6C_ovl_intro	Intro_SetMoveTarget	stores the move target and the current position as the move start
 func_8020DDA0_ovl_intro	Intro_StepMoveX	flag 0x4000: the x-only version of Intro_StepMoveXY
 func_8020DF20_ovl_intro	Intro_StepMoveY	flag 0x8000: the y-only version of Intro_StepMoveXY
 func_8020E0A0_ovl_intro	Intro_StepWait	flags 0x1000/0x10000000: counts unk34 up and returns 0xFF when it reaches the step's frames
 func_8020E0EC_ovl_intro	Intro_ResetWait	zeroes the wait counter unk34; called when a step with 0x1000 starts
-func_8020E108_ovl_intro	Intro_DrawSprites	bubble-sorts the slots by key unk3C, then for the active sprites of the pass (arg 1: flag 0x800000 set, 0: clear) steps their move/clip/fade/wait effects, clips the rect to the view rect and emits the texture load and texrect (flipped when 0x20000/0x40000)
+func_8020E108_ovl_intro	Intro_UpdateAndDrawSprites	bubble-sorts the slots by key unk3C, then for the active sprites of the pass (arg 1: flag 0x800000 set, 0: clear) steps their move/clip/fade/wait effects and clears each finished effect's flag (which Intro_RunSpriteScript waits for), clips the rect to the view rect and emits the texture load and texrect (flipped when 0x20000/0x40000) (r2: was Intro_DrawSprites; it also steps the effects)
 func_8020F170_ovl_intro	Intro_RunSplash1	first splash screen (Intro_Update step 0): Intro_DrawSplash1 under env alpha D_80212250 that rises by 16, holds 90 frames, falls by 16
 func_8020F2DC_ovl_intro	Intro_RunSplash2	second splash (step 1, START skips): Intro_DrawSplash2, alpha steps of 8, holds 100 frames
 func_8020F448_ovl_intro	Intro_RunSplash3	third splash (step 2, START skips): Intro_DrawSplash3, alpha steps of 8, holds 120 frames

@@ -1,3 +1,4 @@
+# r2 reviewed 2026-10-26: kept 15, renamed 0, reverted 0
 # b09: ovl_DA4570 (src/ovl_DA4570/DA4570.c), the boot-time Controller Pak manager.
 # Core_MainThread DMAs it to 0x80100000 and calls func_801009EC (its entry) once before the scheduler starts.
 # func_8003D0F0/D554/D6B0/EDC0 are osPfsInitPak/osMotorInit/osGbpakInit/osPfsNumFiles (pfsinitpak.o, motor.o, gbpakinit.o, pfsnumfiles.o in build/eltale.map).

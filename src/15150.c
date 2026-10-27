@@ -2,7 +2,7 @@
 
 /*
  * Camera: per-map presets, the mode handlers (follow, fixed eye, battle, delayed turn),
- * shake and sway, and the projection/view matrices for each frame.
+ * shake, the eye-height oscillation, and the projection/view matrices for each frame.
  * Folder: src/game/camera/   (proposed for round 4)
  */
 

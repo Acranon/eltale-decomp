@@ -1,35 +1,36 @@
+# r2 reviewed 2026-10-26: kept 43, renamed 2, reverted 0 (plus 1 func_ named in review)
 # b02: src/17360.c spell/effect system
 # old<TAB>new<TAB>evidence
 func_80016760	Magic_ResetEffectSystem	Clears the 16 effect-slot active fields, four repeat-slot counters, and the effect-system state flag.
-func_800167B0	Magic_LookupSpellSequence	Copies and normalizes an input byte sequence, then searches the selected spell-definition group for matching bytes.
-func_800168F0	Magic_GetSpellRestrictionFlags	Builds three restriction bits from the spell record's threshold, mode mask, and cost check.
-func_800169B8	Magic_CreateCastEffect	Allocates an effect slot from a spell definition, schedules repeats, initializes velocity, and invokes its target and visual callbacks.
+func_800167B0	Magic_LookupSpellSequence	(n, bytes): copies n bytes, swaps bytes 1/2 into ascending order when n >= 3, then searches the 15 records of group bytes[0] in D_800C185C for one of length n with the same bytes; returns group<<8 | index; Player and 216E0 pass the entered element sequence, Magic_GetSpellRestrictionFlags takes the result
+func_800168F0	Magic_GetSpellRestrictionFlags	(spell id, value): bit 4 when the caster's level D_8007AA1C->unk24[group] is below the record's +0, bit 2 when the record's +2 mask lacks the field/battle bit (D_8008BE52&1), bit 1 when value (Player passes unk14->unk8) is below D_800C186E[length]; Player refuses the cast on 5 or nonzero
+func_800169B8	Magic_CreateCastEffect	(caster, spell id, repeat index, flags): takes a free slot of the 16 effects D_80085F98 from the spell's record, queues the remaining repeats in D_80086358 (def +0x20 > 1), sets the start velocity, runs the record's target-select (D_8004ECB8) and placement (D_8004EC90) entries and Magic_CreateCastPresentation; called by Player (cast), Enemy (AEA0), Item_UseSpell and the repeat queue
 func_80016DE0	Magic_PlaceEffectAtActorLowerPoint	Copies actor X/Z and chooses actor Y or ground-height minus model radius for the effect position.
 func_80016E34	Magic_PlaceEffectAtActorMiddlePoint	Copies actor X/Z and chooses ground height or actor Y plus half model height for the effect position.
 func_80016EA8	Magic_PlaceEffectAtActorUpperPoint	Copies actor X/Z and sets Y from upper model extent plus configured offset.
 func_80016F3C	Magic_PlaceEffectAheadAtMiddlePoint	Rotates a positive local Z offset by actor yaw and places the effect at the actor's middle height.
 func_80017028	Magic_PlaceEffectAheadAtUpperPoint	Rotates a positive local Z offset by actor yaw and places the effect at its upper height.
 func_80017134	Magic_PlaceEffectBehindAtUpperPoint	Rotates a negative local Z offset by actor yaw and places the effect at its upper height.
-func_80017244	Magic_PlaceEffectAtSelectedTarget	Uses the effect's target when present and copies its X/Z and model-dependent lower Y.
+func_80017244	Magic_PlaceEffectAtSelectedTarget	placement entry 6 of D_8004EC90: uses the effect's target when set (else the caster) and copies its X/Z; Y = model-type-1 centre minus radius, +100*scale for model type 2, else the actor's y
 func_800172D0	Magic_PlaceEffectAtRandomOffset	Chooses random radius and yaw, rotates the offset, and places it around the actor.
-func_8001744C	Magic_PlaceEffectAtDiagonalOffset	Derives distance from target separation or model radius, rotates a 1.5:1 X/Z offset, then places the effect.
+func_8001744C	Magic_PlaceEffectAtDiagonalOffset	placement entry 8: distance = caster-target distance (enemy caster, unk5E&1) or 10*radius*scale, places the effect at the caster plus the yaw-rotated offset (1.5*d, d), at the caster's lower point
 func_80017590	Magic_PlaceEffectAtFixedForwardOffset	Rotates a 380-unit local Z offset and adds scaled X/Y/Z offsets to actor position.
 func_80017630	Magic_UpdateEffects	Advances repeat schedules and all 16 active effects, resolves target hits, updates linked visuals, and handles effect-system end state.
 func_80017AEC	Magic_MoveHomingEffect	Steers velocity toward a target, applies optional gravity, integrates position, and handles ground contact.
 func_80017F48	Magic_MoveVerticalEffect	Integrates vertical velocity with optional gravity, handles ground contact, and follows target X/Z when configured.
 func_8001809C	Magic_FindTargetInRange	Tests eligible player or enemy actors against the effect's position and configured radius, returning one in range.
 func_80018348	Magic_FindEligibleTarget	Returns player or an active enemy after checking the slot-specific hit mask, without a distance test.
-func_80018444	Magic_FindTargetWhenEnabled	Invokes the target search only when bit one of the effect flags is set.
-func_80018480	Magic_ApplyEffectDamage	Calculates damage from definition and caster, adjusts it for target state and random bonus, then calls player or enemy damage.
-func_8001860C	Magic_HealTarget	Adds a bounded amount to the target's current resource using its configured maximum, then reports the amount.
-func_800187C4	Magic_TransferTargetResource	Subtracts a fraction of one actor resource and adds it to the opposing actor's bounded resource.
+func_80018444	Magic_FindTargetInRangeIfLanded	hit-test entry 2 of D_8004ECD0: calls Magic_FindTargetInRange only when the effect's flag bit 1 is set; that bit is set only on ground contact in Magic_MoveHomingEffect / Magic_MoveVerticalEffect (casts pass flags 0, 4 or 0x10) (r2: was Magic_FindTargetWhenEnabled)
+func_80018480	Magic_ApplyEffectDamage	hit-effect entry 0: damage from Magic_CalculateEffectDamage, halved when the caster has status bit 1; a 1-in-32 (enemy target: only with D_8007AA10&0x1000, 1-in-4 with 0x10000) bonus of +50% with a Fade_Start flash and flag 0x4000; then Enemy_TakeDamage or Player_TakeDamage
+func_8001860C	Magic_HealTarget	hit-effect entry 1 of D_8004ECDC: adds def +0xC percent of the max (model +6) plus a random quarter to the current value (model +4 for the player, slot +0xA for an enemy), capped at the max; shows the amount with Effect_AddFloatingNumber(target, 1, amt). +4/+6 are the HP pair (Item_UseRestore)
+func_800187C4	Magic_TransferTargetResource	hit-effect entry 2: moves 11/64 of the target's value (enemy slot +0xC, or the player's model +8) to the other side (the player's model +8 capped at +0xA, or the enemy slot +0xC); shows the amount
 func_80018AAC	Magic_ApplyZeroDamageHit	Calls the player or enemy damage routine with amount zero and hit flag four.
-func_80018C14	Magic_RemoveEnemyOrDamagePlayer	For enemy targets disables/removes the actor; for the player applies damage equal to four times a model stat.
-func_80018CD8	Magic_ClearActorStatuses	Clears the actor status bits and restores affected scale and three model-derived values.
+func_80018C14	Magic_RemoveEnemyOrDamagePlayer	hit-effect entry 7: an enemy target (unk5E&1) is cleared from the battle (status indicators cleared, unk50 = -1, D_8007B900--) unless D_8008BE52&0x100 (then the popup); the player takes damage of 4x the current value at model +4 (the HP that Magic_HealTarget refills)
+func_80018CD8	Magic_ClearActorStatuses	hit-effect entry 8: when the actor's status bits (unk68->unk0) are set, clears them and resets the values the status entries change: unk8A = 0x10, unk88/unk86 from the model's +0xE/+0xC, unk90 = 1.0 (the shrink status's actor scale is not restored here)
 func_80018D88	Magic_DamageAndClearStatuses	Calls the module's effect-damage handler, then clears the target's statuses.
-func_80018DC0	Magic_SelectClosestAimTarget	Chooses the active enemy with the smallest absolute yaw difference from the caster aiming direction.
-func_80018FB0	Magic_SelectFirstActiveTarget	Targets the player for an enemy caster, otherwise chooses the first active enemy among six slots.
-func_80019024	Magic_TargetCaster	Copies the effect's caster pointer into its target pointer.
+func_80018DC0	Magic_SelectClosestAimTarget	target-select entry 0 of D_8004ECB8: an enemy caster targets the player; otherwise picks the active enemy with the smallest absolute angle from the aim direction (the effect velocity when cfg +2 & 8, else the caster's yaw)
+func_80018FB0	Magic_SelectFirstActiveTarget	target-select entry 1: the player for an enemy caster, otherwise the first of the six enemy slots with unk7C != -1, or NULL
+func_80019024	Magic_TargetCaster	target-select entry 2: copies the caster (effect +0x24) into the target (+0x28)
 func_80019034	Magic_ApplyShrinkStatus	Sets status bit one, halves actor scale, and starts the corresponding timed status effect.
 func_800195FC	Magic_CalculateEffectDamage	Computes the amount used by the effect-damage handler from base value and caster or target level.
 func_80019820	Magic_CreateVisualEffect	Scales visual dimensions from model size and calls the effect-object constructor.
@@ -37,11 +38,12 @@ func_800199C0	Magic_CreateCastPresentation	Creates the cast visual, optional par
 func_80019BFC	Magic_CreateTimedPresentation	Creates a visual and optional sound for a timed effect step.
 func_80019D2C	Magic_CreateHitPresentation	Creates a visual, optional particle effect, and optional sound at the hit actor.
 func_80019FC8	Magic_CreateGroundHitPresentation	Creates an effect visual, optional particle effect, and optional sound for the ground-contact callback.
-func_8001A1A4	Magic_TickActorStatuses	Decrements all active status timers and restores changed actor values when each timer expires.
+func_8001A1A4	Magic_StepActorStatusTimers	Battle (1FA00) calls it per actor: decrements the timer of each of the 12 set status bits and on expiry clears the bit and restores what it changed (bit 1 scale, 4 unk8A, 0x10 unk90, 0x20 unk86, 0x400 unk88, 8 unk60 bit 1) (r2: was Magic_TickActorStatuses, Step as in the other per-tick names)
 func_8001A2A0	Magic_WasActorHitBySlot	Tests the bit for an effect slot against the actor's recorded hit mask.
 func_8001A2C4	Magic_MarkActorHitBySlot	Sets the bit for an effect slot in the actor's recorded hit mask.
 func_8001A2EC	Magic_ResetHitTracking	Clears the player hit mask and the six enemy hit masks.
 func_8001A340	Magic_ClearSlotHitTracking	Clears one effect-slot bit from the player and six enemy hit masks.
-func_8001A3EC	Magic_GetHitOutcome	Combines the effect flag, random threshold, and target relationship into a value from the outcome table.
-func_8001A4AC	Magic_ShouldApplyStatus	Checks effect flags and target type, then compares a random value with the status-specific chance table.
+func_8001A3EC	Magic_GetHitOutcome	returns D_8004EDA4[r] = 0 when the effect hits (flag 4, or the 1..100 roll under cfg +0xE and then Player_RollMeleeHit / Enemy_RollHitOnPlayer for a target other than the caster), 1 or 2 for the two miss cases; Magic_UpdateEffects shows a miss (popup / Enemy_PlayMissEffect / Player_StartDodge) on nonzero
+func_8001A4AC	Magic_ShouldApplyStatus	(effect, caster, status k): 1 with flag 4 or cfg +0x18 == 2; else Math_Rand(64) (enemy caster) or Math_Rand(32 / 28 with player flag 0x8000) under the per-status chance D_8004EDB0[k]
 func_8001A56C	Magic_StartStatusTimer	Assigns a random duration to the selected target status, with different ranges for self and other targets.
+func_80017AB0	Magic_IsAnyEffectActive	returns 0 when none of the 16 effect slots D_80085F98 is active (+4 != 0), else nonzero (16 minus the first active index); Player (3F50) waits for 0 before leaving its cast states and before acting in battle (r2: added)
