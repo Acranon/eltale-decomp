@@ -104,7 +104,7 @@ typedef struct {
 } UnkStruct_802107F0;
 
 /* ovl_ending .bss 8022BB10..80238660: all of it is this file's (source order). */
-s32 D_8022BB10_ovl_ending;
+s32 D_8022BB10_ovl_ending; /* sprite clip left, screen pixels */
 s32 D_8022BB14_ovl_ending;
 s32 D_8022BB18_ovl_ending;
 s32 D_8022BB1C_ovl_ending;
@@ -113,7 +113,7 @@ s32 D_8022BB24_ovl_ending;
 s32 D_8022BB28_ovl_ending;
 u32 D_8022BB2C_ovl_ending;
 u32 D_8022BB30_ovl_ending;
-s32 D_8022BB34_ovl_ending;
+s32 D_8022BB34_ovl_ending; /* current sprite-script frame */
 UnkStruct_8022BB38 D_8022BB38_ovl_ending[150];
 Gfx D_8022EA18_ovl_ending[2][2500];
 Gfx* D_80238658_ovl_ending;

@@ -134,7 +134,7 @@ typedef struct {
 s32 D_80212230_ovl_intro = 0;
 
 /* ovl_intro .bss 802684B0..80277080 (80277080.. is DC9350.c's). */
-s32 D_802684B0_ovl_intro;
+s32 D_802684B0_ovl_intro; /* sprite clip left, screen pixels */
 s32 D_802684B4_ovl_intro;
 s32 D_802684B8_ovl_intro;
 s32 D_802684BC_ovl_intro;
@@ -143,7 +143,7 @@ s32 D_802684C4_ovl_intro;
 s32 D_802684C8_ovl_intro;
 s32 D_802684CC_ovl_intro;
 s32 D_802684D0_ovl_intro;
-s32 D_802684D4_ovl_intro;
+s32 D_802684D4_ovl_intro; /* current sprite-script frame */
 s32 D_802684D8_ovl_intro;
 s32 D_802684DC_ovl_intro;
 IntroSprite D_802684E0_ovl_intro[150];

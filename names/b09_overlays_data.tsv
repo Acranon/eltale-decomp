@@ -1,0 +1,118 @@
+# b09 round 3: data names owned by Pak manager, title, intro and ending overlays
+# old<TAB>new<TAB>evidence
+D_80101FA0_ovl_DA4570	pak_menu_cursor_tlut	PakMenu_DrawCursor passes this 16-color palette with the cursor image to PakMenu_BlitImage.
+D_80101FC0_ovl_DA4570	pak_menu_cursor_tex	PakMenu_DrawCursor blits this 16x14 4bpp image at the cursor coordinates.
+D_80103F28_ovl_DA4570	pak_menu_screen_sprites	PakMenu_DrawScreen blits all 235 entries as its base screen graphics.
+D_80104DD8_ovl_DA4570	pak_menu_message_frame_sprites	PakMenu_DrawMessageBox blits these 75 sprites around its message.
+D_80105288_ovl_DA4570	pak_menu_message_detail_sprites	PakMenu_DrawMessageBox blits these 22 sprites after the frame sprites.
+D_801053E8_ovl_DA4570	pak_menu_previous_rows_sprite	PakMenu_DrawScreen blits this sprite only when the note-list offset is nonzero.
+D_801053F8_ovl_DA4570	pak_menu_more_rows_sprite	PakMenu_DrawScreen blits this sprite only while the note-list offset is below ten.
+D_80105660_ovl_DA4570	pak_menu_framebuffer_index	PakMenu_WaitFrame increments it and alternates the two framebuffer pointers by its low bit.
+D_80105664_ovl_DA4570	pak_menu_framebuffers	Two 320x240 pixel buffer pointers alternated by PakMenu_WaitFrame and osViSwapBuffer.
+D_8010566C_ovl_DA4570	pak_menu_font_metrics	PakMenu_DrawText uses this width, height, advance and line-height record.
+D_8010568C_ovl_DA4570	pak_menu_font_bitmap	PakMenu_DrawChar reads 4bpp glyph nibbles from this bitmap.
+D_8010700C_ovl_DA4570	pak_menu_font_tluts	Seven four-color palettes selected by PakMenu_SetTextPalette.
+D_80107044_ovl_DA4570	pak_menu_active_font_tlut	PakMenu_SetTextPalette points it into the font palette array; PakMenu_DrawChar reads pixel colors through it.
+D_80107080_ovl_DA4570	pak_menu_note_states	PakMenu_Run fills sixteen Pak note-state records and PakMenu_DrawNoteRow reads names and sizes.
+D_80107280_ovl_DA4570	pak_menu_max_glyph_code	PakMenu_DrawChar replaces codes above this per-screen bound before indexing the font bitmap.
+D_80107288_ovl_DA4570	pak_menu_note_errors	PakMenu_Run stores sixteen osPfsFileState results; row drawing checks for zero and deletion marks -1.
+D_801072C8_ovl_DA4570	pak_menu_state	PakMenu_Run switches this value among list, delete, repair and error states.
+D_801072CA_ovl_DA4570	pak_menu_selected_row	PakMenu_Run moves this 0..5 row and PakMenu_DrawNoteRow highlights it.
+D_801072CC_ovl_DA4570	pak_menu_previous_row	PakMenu_Run compares this with the selected row and copies the new value after moving the cursor.
+D_801072CE_ovl_DA4570	pak_menu_list_offset	PakMenu_DrawNoteRow adds this to the row index and PakMenu_Run changes it while scrolling.
+D_801072CF_ovl_DA4570	pak_menu_previous_offset	PakMenu_Run compares it to the list offset and updates it after a page movement.
+D_801072D0_ovl_DA4570	pak_menu_cursor_x	PakMenu_DrawCursor uses this pixel X coordinate for the 16x14 cursor image.
+D_801072D2_ovl_DA4570	pak_menu_cursor_y	PakMenu_DrawCursor uses this pixel Y coordinate for the 16x14 cursor image.
+D_801072D4_ovl_DA4570	pak_menu_dialog_selection	PakMenu_Run toggles this 0/1 selection with horizontal input in confirmation prompts.
+D_801072D8_ovl_DA4570	pak_menu_free_pages	PakMenu_Run converts osPfsFreeBlocks bytes to pages and PakMenu_DrawFreePages displays it.
+D_801072DC_ovl_DA4570	pak_menu_redraw_pending	PakMenu_DrawScreen sets it; PakMenu_WaitFrame swaps buffers and clears it when set.
+D_801072E0_ovl_DA4570	pak_menu_draw_framebuffer	PakMenu_BlitImage and text drawing write through this current framebuffer pointer.
+D_801072E4_ovl_DA4570	pak_menu_si_queue	PakMenu_Run saves the SI message queue here for controller and Pak operations.
+D_801072E8_ovl_DA4570	pak_menu_vi_queue	PakMenu_WaitFrame receives frame messages from this queue supplied to PakMenu_Run.
+D_801072EC_ovl_DA4570	pak_menu_message	PakMenu_WaitFrame receives VI messages into this slot.
+D_801072F0_ovl_DA4570	pak_menu_text_pixel_cursor	PakMenu_SetCursor sets this framebuffer pixel pointer; PakMenu_DrawChar advances and writes through it.
+D_801072F4_ovl_DA4570	pak_menu_text_x	PakMenu_SetCursor stores the text X coordinate here.
+D_801072F6_ovl_DA4570	pak_menu_text_y	PakMenu_SetCursor stores the text Y coordinate here.
+D_80226D90_ovl_title	title_flow_state	Title_Update switches and advances this overall title-screen flow state.
+D_80226D94_ovl_title	title_state_timer	Title_Update and title drawing assign and decrement this per-state frame countdown.
+D_80226D9C_ovl_title	title_fade_alpha	Title_UpdateScreenFade uses this as black env-color alpha and clamps it to 0..255.
+D_80226DA0_ovl_title	title_fade_step	Title_UpdateScreenFade adds this signed step to the current fade alpha and reverses it at endpoints.
+D_80226DA4_ovl_title	title_menu_state	Title_Update branches on this menu phase and passes it to Title_DrawScreenAndMoveCursor.
+D_8020F1E0_ovl_title	title_idle_sequence_state	Title_Update changes this among 0,1,2 while its timed idle sequence runs.
+D_8020F1E8_ovl_title	title_elapsed_frames	Title_Update increments and resets this counter at 0x1C21 frames.
+D_80226DB0_ovl_title	title_confirmation_row	Title_DrawScreenAndMoveCursor clamps it to 0..1 and uses it to place the confirmation cursor.
+D_80226DB4_ovl_title	title_overlay_fade_alpha	Title_DrawScreenAndMoveCursor copies the current fade alpha here for an overlay draw pass.
+D_80226DB8	title_previous_direction_bits	Title_DrawScreenAndMoveCursor stores held stick direction bits and compares them for new presses.
+D_80226DB9	title_vertical_direction	Title_DrawScreenAndMoveCursor assigns -1 or +1 from vertical input to move menu selection.
+D_80226DBA	title_horizontal_direction	Title_DrawScreenAndMoveCursor assigns -1 or +1 from horizontal input to change an option.
+D_80226DBC	title_current_message	Title_DrawScreenAndMoveCursor selects a text pointer by state and passes it to Text_DrawEncodedString.
+D_8020F4D0_ovl_title	title_cursor_blink_frame	Title_DrawScreenAndMoveCursor cycles it over 32 frames to change cursor width/position.
+D_8020F4D4_ovl_title	title_menu_row	Title_DrawScreenAndMoveCursor changes and clamps this 0..2 selection with vertical input.
+D_8020F4D8_ovl_title	title_option_index	Title_DrawScreenAndMoveCursor changes and clamps this 0..2 option and stores it in D_8007A1CC.
+D_8020F4DC_ovl_title	title_option_cursor_positions	Title_DrawScreenAndMoveCursor indexes these X/Y pairs when drawing the selected option cursor.
+D_8020F4F0_ovl_title	title_screen_fade_state	Title_UpdateScreenFade switches this value to select its fade direction and phase.
+D_8020F4F4_ovl_title	title_screen_fade_frames	Title_UpdateScreenFade uses this as fade duration when deriving the per-frame alpha step.
+D_802150F0_ovl_title	title_background_tlut	Title_DrawScreenAndMoveCursor loads this palette before drawing the full 320-pixel-wide background.
+D_802152F0_ovl_title	title_background_tex	Title_DrawScreenAndMoveCursor draws this image in strips across the full screen.
+D_80211550_ovl_title	title_center_image_tlut	Title_DrawScreenAndMoveCursor loads this palette before the centered 194-pixel image.
+D_80211750_ovl_title	title_center_image_tex	Title_DrawScreenAndMoveCursor draws this 194-pixel-wide image centered on the screen.
+D_80210B00_ovl_title	title_menu_strip_tlut	Title_DrawScreenAndMoveCursor loads this palette before drawing its 160-pixel source menu strip.
+D_802105F8_ovl_title	title_menu_strip_tex	Title_DrawScreenAndMoveCursor draws this 4bpp strip below the center image.
+D_8020F510_ovl_title	title_menu_cursor_tlut	Title_DrawScreenAndMoveCursor loads this palette before drawing menu cursor parts.
+D_8020F710_ovl_title	title_menu_cursor_tex	Title_DrawScreenAndMoveCursor selects four patches from this image for the confirmation cursor.
+D_80212230_ovl_intro	intro_phase_timer	Intro_Update assigns and decrements this frame countdown across its phase changes.
+D_802684B0_ovl_intro	intro_clip_left	Intro_UpdateAndDrawSprites clips sprite rectangles against this left pixel bound.
+D_802684B4_ovl_intro	intro_clip_top	Intro_UpdateAndDrawSprites clips sprite rectangles against this top pixel bound.
+D_802684B8_ovl_intro	intro_clip_width	Intro_UpdateAndDrawSprites clips against left plus this width.
+D_802684BC_ovl_intro	intro_clip_height	Intro_UpdateAndDrawSprites clips against top plus this height.
+D_802684C0_ovl_intro	intro_elapsed_frames	Intro_Update increments this counter until the 0x1E00-frame limit.
+D_802684C4_ovl_intro	intro_sprite_tick	Intro_RunSpriteScript increments this value and passes it when spawning sprite cues.
+D_802684C8_ovl_intro	intro_scene_initialized	Intro_Update sets this from zero to one after one-time scene initialization.
+D_802684CC_ovl_intro	intro_cue_entry_index	Intro_RunSpriteScript indexes the active cue group entries with this value and advances it.
+D_802684D0_ovl_intro	intro_previous_cue_index	Intro_RunSpriteScript retains the preceding entry index for relative sprite positions.
+D_802684D4_ovl_intro	intro_cue_frame	Intro_RunSpriteScript increments this frame count and compares it to cue start frames.
+D_802684D8_ovl_intro	intro_cue_group_index	Intro_RunSpriteScript indexes the cue-group table and advances this value between groups.
+D_802684DC_ovl_intro	intro_wait_for_sprites	Intro_RunSpriteScript sets it after the last cue and clears it once no sprites remain.
+D_802684E0_ovl_intro	intro_sprite_slots	The 150-entry pool reset, spawned, updated and drawn by Intro_*Sprite functions.
+D_8026B3C0_ovl_intro	intro_display_list_buffers	Intro_Update alternates these two display-list buffers for frame rendering.
+D_80276F40_ovl_intro	intro_saved_display_ptr	Intro_Update stores the current display-list pointer here before switching buffers, then restores it.
+D_80277074_ovl_intro	intro_fade_alpha	Intro_Update increases and clamps this value before passing it as env-color alpha.
+D_80277078_ovl_intro	intro_fade_complete	Intro_Update sets this flag and checks it after the alpha reaches its limit.
+D_80212234_ovl_intro	intro_display_buffer_index	Intro_Update toggles this bit and indexes the two display-list buffers with it.
+D_80212250_ovl_intro	intro_prompt_fade_alpha	Intro prompt rendering increments and decrements this 0..255 value used as env-color alpha.
+D_80212254_ovl_intro	intro_prompt_phase	Intro prompt update switches and advances this phase value.
+D_8021225C_ovl_intro	intro_prompt_a_column	Intro prompt input clamps this selection to 0..1 from horizontal input.
+D_80212260_ovl_intro	intro_prompt_a_row	Intro prompt input clamps this selection to 0..1 and uses it to draw the cursor Y.
+D_80277080_ovl_intro	intro_prompt_a_prev_direction	Intro prompt input compares current direction bits with this previous value for edge detection.
+D_80212268_ovl_intro	intro_prompt_b_column	The second intro prompt clamps this selection to 0..1 from horizontal input.
+D_8021226C_ovl_intro	intro_prompt_b_row	The second intro prompt clamps this selection to 0..1 and uses it to draw the cursor Y.
+D_80277083_ovl_intro	intro_prompt_b_prev_direction	The second intro prompt compares current direction bits with this previous value for edge detection.
+D_80212270_ovl_intro	intro_sprite_setup_dl	Intro sprite rendering emits this display list before drawing textured sprites.
+D_80212810_ovl_intro	intro_sprite_anim_table	Intro_RunSpriteScript selects step arrays from this 36-entry animation table.
+D_802170E8_ovl_intro	intro_cue_groups	Intro_RunSpriteScript indexes this scene cue-entry table by group index.
+D_802170F0_ovl_intro	intro_cue_group_count	Intro_RunSpriteScript wraps its group index at this count.
+D_8022BB10_ovl_ending	ending_clip_left	Ending_UpdateAndDrawSprites clips sprite rectangles against this left pixel bound.
+D_8022BB14_ovl_ending	ending_clip_top	Ending_UpdateAndDrawSprites clips sprite rectangles against this top pixel bound.
+D_8022BB18_ovl_ending	ending_clip_width	Ending_UpdateAndDrawSprites clips against left plus this width.
+D_8022BB1C_ovl_ending	ending_clip_height	Ending_UpdateAndDrawSprites clips against top plus this height.
+D_8022BB20_ovl_ending	ending_elapsed_frames	Ending_Update increments this counter until the 0xF78-frame limit.
+D_8022BB24_ovl_ending	ending_sprite_tick	Ending_RunSpriteScript increments this value and passes it when spawning sprite cues.
+D_8022BB28_ovl_ending	ending_scene_initialized	Ending_Update sets this from zero to one after one-time scene initialization.
+D_8022BB2C_ovl_ending	ending_cue_entry_index	Ending_RunSpriteScript indexes active cue entries with this value and advances it.
+D_8022BB30_ovl_ending	ending_previous_cue_index	Ending_RunSpriteScript retains the preceding cue index for relative sprite positions.
+D_8022BB34_ovl_ending	ending_cue_frame	Ending_RunSpriteScript increments this frame count and compares it to cue start frames.
+D_8022BB38_ovl_ending	ending_sprite_slots	The 150-entry pool reset, spawned, updated and drawn by Ending_*Sprite functions.
+D_8022EA18_ovl_ending	ending_display_list_buffers	Ending_Update alternates these two display-list buffers for frame rendering.
+D_80238658_ovl_ending	ending_saved_display_ptr	Ending_Update stores the prior display-list pointer here before switching buffers and later restores it.
+D_8020F690_ovl_ending	ending_cue_group_index	Ending_RunSpriteScript indexes cue groups with this value and wraps it at the group count.
+D_8020F694_ovl_ending	ending_wait_for_sprites	Ending_RunSpriteScript sets it after the last cue and clears it once no sprites remain.
+D_8020F698_ovl_ending	ending_display_buffer_index	Ending_Update toggles this index to select a display-list buffer.
+D_8020F69C_ovl_ending	ending_scroll_offset	Ending_Update stores a float scroll position here and ending drawing advances it by width over frames.
+D_8020F6A0_ovl_ending	ending_story_frame	Ending_Update advances this global frame counter and tests thresholds for credits/story timing.
+D_8020F6A4_ovl_ending	ending_first_fade_alpha	Ending_Update accumulates and clamps this first fade alpha value.
+D_8020F6A8_ovl_ending	ending_second_fade_alpha	Ending_Update accumulates and clamps this second fade alpha value.
+D_8020F6C0_ovl_ending	ending_sprite_setup_dl	Ending sprite rendering emits this display list before drawing cue sprites.
+D_8020F880_ovl_ending	ending_sprite_anim_table	Ending_RunSpriteScript selects step arrays from this eight-entry animation table.
+D_802107F0_ovl_ending	ending_cue_groups	Ending_RunSpriteScript indexes this cue-entry group table.
+D_802107F8_ovl_ending	ending_cue_group_count	Ending_RunSpriteScript wraps its group index at this count.
+D_80210800_ovl_ending	ending_picture_defs	Ending image drawing indexes this four-entry picture descriptor table.

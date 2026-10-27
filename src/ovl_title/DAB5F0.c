@@ -23,7 +23,7 @@ extern s32 D_8020F4F4_ovl_title;
 s32 D_80226D90_ovl_title;
 s32 D_80226D94_ovl_title;
 s32 D_80226D98_ovl_title;
-s32 D_80226D9C_ovl_title;
+s32 D_80226D9C_ovl_title; /* black overlay alpha, 0..255 */
 s32 D_80226DA0_ovl_title;
 s32 D_80226DA4_ovl_title;
 extern s8 D_80226DB0_ovl_title;
