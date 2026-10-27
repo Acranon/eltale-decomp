@@ -336,8 +336,8 @@ s32 Intro_RunSpriteScript(void) {
                         obj->step_duration = steps[new_var[j].anim_step_index].duration;
                         if (steps[new_var[j].anim_step_index].flags & 0xC800) {
                             if (new_var[j].start_frame == 0) {
-                                dx = new_var[j].x - new_var[new_var[j].start_frame4].unk8;
-                                dy = new_var[j].y - new_var[new_var[j].start_frame4].unkA;
+                                dx = new_var[j].x - new_var[new_var[j].previous_cue_index].x;
+                                dy = new_var[j].y - new_var[new_var[j].previous_cue_index].y;
                             } else {
                                 dx = 0;
                                 dy = 0;
