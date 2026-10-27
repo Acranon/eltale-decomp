@@ -5,3 +5,103 @@ D_8005593C	audio_task_index	Audio_ThreadMain selects one of two NNScTask and aud
 D_80055940	audio_output_frame_index	Audio_ThreadMain increments it each retrace and uses value modulo 3 to select audio_output_buffers and sample-count slot
 D_80055944	audio_output_sample_counts	Audio_ThreadMain computes each output buffer sample count, passes it to alAudioFrame, then sends count times four bytes to osAiSetNextBuffer
 D_8004DEC8	map_halfword_rotation_counter	Map_RotateHalfwordBuffer reads it; negative values advance toward zero, nonnegative values rotate D_80081AB0 and reset it to zero
+D_800620A0	menu_sprite_00_tex	entry 0 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800621A8	menu_sprite_01_tex	entry 1 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062280	menu_sprite_02_tex	entry 2 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062290	menu_sprite_03_tex	entry 3 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800622A0	menu_sprite_04_tex	entry 4 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062338	menu_sprite_05_tex	entry 5 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062380	menu_sprite_06_tex	entry 6 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062438	menu_sprite_07_tex	entry 7 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800624F0	menu_sprite_08_tex	entry 8 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062500	menu_sprite_09_tex	entry 9 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062510	menu_sprite_10_tex	entry 10 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062568	menu_sprite_11_tex	entry 11 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800625C0	menu_sprite_12_tex	entry 12 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062618	menu_sprite_13_tex	entry 13 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062670	menu_sprite_14_tex	entry 14 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800626C8	menu_sprite_15_tex	entry 15 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062720	menu_sprite_16_tex	entry 16 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062778	menu_sprite_17_tex	entry 17 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800627D0	menu_sprite_18_tex	entry 18 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062828	menu_sprite_19_tex	entry 19 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062880	menu_sprite_20_tex	entry 20 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800628D8	menu_sprite_21_tex	entry 21 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062930	menu_sprite_22_tex	entry 22 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062988	menu_sprite_23_tex	entry 23 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800629E0	menu_sprite_24_tex	entry 24 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062A38	menu_sprite_25_tex	entry 25 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062A90	menu_sprite_26_tex	entry 26 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80062EC8	menu_sprite_27_tex	entry 27 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80063038	menu_sprite_28_tex	entry 28 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800631B0	menu_sprite_29_tex	entry 29 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800633D8	menu_sprite_30_tex	entry 30 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80063588	menu_sprite_31_tex	entry 31 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80063598	menu_sprite_32_tex	entry 32 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80063680	menu_sprite_33_tex	entry 33 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80063B40	menu_sprite_34_tex	entry 34 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80063DD0	menu_sprite_35_tex	entry 35 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80063FD0	menu_sprite_36_tex	entry 36 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064228	menu_sprite_37_tex	entry 37 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064320	menu_sprite_38_tex	entry 38 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064380	menu_sprite_39_tex	entry 39 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800643E0	menu_sprite_40_tex	entry 40 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064440	menu_sprite_41_tex	entry 41 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064538	menu_sprite_42_tex	entry 42 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064630	menu_sprite_43_tex	entry 43 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800649D8	menu_sprite_44_tex	entry 44 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064AA0	menu_sprite_45_tex	entry 45 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064F08	menu_sprite_46_tex	entry 46 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80064FA0	menu_sprite_47_tex	entry 47 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065038	menu_sprite_48_tex	entry 48 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800650D0	menu_sprite_49_tex	entry 49 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065168	menu_sprite_50_tex	entry 50 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065350	menu_sprite_51_tex	entry 51 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800653F8	menu_sprite_52_tex	entry 52 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065408	menu_sprite_53_tex	entry 53 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065418	menu_sprite_54_tex	entry 54 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065590	menu_sprite_55_tex	entry 55 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800655A8	menu_sprite_56_tex	entry 56 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800655C0	menu_sprite_57_tex	entry 57 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800655D8	menu_sprite_58_tex	entry 58 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800655F0	menu_sprite_59_tex	entry 59 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065608	menu_sprite_60_tex	entry 60 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065620	menu_sprite_61_tex	entry 61 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065638	menu_sprite_62_tex	entry 62 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065648	menu_sprite_63_tex	entry 63 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065780	menu_sprite_64_tex	entry 64 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065790	menu_sprite_65_tex	entry 65 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800657A0	menu_sprite_66_tex	entry 66 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065D78	menu_sprite_67_tex	entry 67 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80065F08	menu_sprite_68_tex	entry 68 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066098	menu_sprite_69_tex	entry 69 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066210	menu_sprite_70_tex	entry 70 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066330	menu_sprite_71_tex	entry 71 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066488	menu_sprite_72_tex	entry 72 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800664E0	menu_sprite_73_tex	entry 73 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066538	menu_sprite_74_tex	entry 74 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066590	menu_sprite_75_tex	entry 75 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800665E8	menu_sprite_76_tex	entry 76 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066640	menu_sprite_77_tex	entry 77 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066698	menu_sprite_78_tex	entry 78 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800666F0	menu_sprite_79_tex	entry 79 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066748	menu_sprite_80_tex	entry 80 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800667A0	menu_sprite_81_tex	entry 81 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800667F8	menu_sprite_82_tex	entry 82 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066850	menu_sprite_83_tex	entry 83 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066918	menu_sprite_84_tex	entry 84 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800669E0	menu_sprite_85_tex	entry 85 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_800669F0	menu_sprite_86_tex	entry 86 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80066AE8	menu_sprite_87_tex	entry 87 of menu_sprite_tex[89], directly selected by Menu_DrawSprite(id) and sized by menu_sprite_sizes[id]; no image-content claim
+D_80068EB0	menu_exp_gauge_layer_0_tlut	menu_exp_gauge_tluts.v[0]; Menu_DrawExpGauge loops k=0..3 as layered picture passes and loads this palette at k=0; no colour-content claim
+D_8006A8F0	menu_exp_gauge_layer_1_tlut	menu_exp_gauge_tluts.v[1]; Menu_DrawExpGauge loops k=0..3 as layered picture passes and loads this palette at k=1; no colour-content claim
+D_8006B4D8	menu_exp_gauge_layer_2_tlut	menu_exp_gauge_tluts.v[2]; Menu_DrawExpGauge loops k=0..3 as layered picture passes and loads this palette at k=2; no colour-content claim
+D_80069A98	menu_exp_gauge_layer_3_tlut	menu_exp_gauge_tluts.v[3]; Menu_DrawExpGauge loops k=0..3 as layered picture passes and loads this palette at k=3; no colour-content claim
+D_800690B8	menu_exp_gauge_layer_0_0_tex	menu_exp_gauge_tex.v[0][0]; Menu_DrawExpGauge loads this texture at layer k=0, column j=0; no image-content claim
+D_800695A8	menu_exp_gauge_layer_0_1_tex	menu_exp_gauge_tex.v[0][1]; Menu_DrawExpGauge loads this texture at layer k=0, column j=1; no image-content claim
+D_8006AAF8	menu_exp_gauge_layer_1_0_tex	menu_exp_gauge_tex.v[1][0]; Menu_DrawExpGauge loads this texture at layer k=1, column j=0; no image-content claim
+D_8006AFE8	menu_exp_gauge_layer_1_1_tex	menu_exp_gauge_tex.v[1][1]; Menu_DrawExpGauge loads this texture at layer k=1, column j=1; no image-content claim
+D_8006B6E0	menu_exp_gauge_layer_2_0_tex	menu_exp_gauge_tex.v[2][0]; Menu_DrawExpGauge loads this texture at layer k=2, column j=0; no image-content claim
+D_8006BBD0	menu_exp_gauge_layer_2_1_tex	menu_exp_gauge_tex.v[2][1]; Menu_DrawExpGauge loads this texture at layer k=2, column j=1; no image-content claim
+D_80069CA0	menu_exp_gauge_layer_3_0_tex	menu_exp_gauge_tex.v[3][0]; Menu_DrawExpGauge loads this texture at layer k=3, column j=0; no image-content claim
+D_8006A2C8	menu_exp_gauge_layer_3_1_tex	menu_exp_gauge_tex.v[3][1]; Menu_DrawExpGauge loads this texture at layer k=3, column j=1; no image-content claim
