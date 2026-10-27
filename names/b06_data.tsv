@@ -64,3 +64,4 @@ D_8006CC28	save_menu_slot_label_ptrs	SaveMenu_UpdateSlotList chooses one of thes
 D_8006CC90	cutscene_image_setup_dl	Cutscene_DrawImageCues emits this display list before drawing cue rectangles.
 D_8007A8E0	cutscene_message_wait_frames	Cutscene_StartEntry sets 60; Cutscene_UpdateMessageSequence decrements it between message windows.
 D_8007A8E4	cutscene_messages_remaining	Cutscene_StartEntry copies the entry's message count; UpdateMessageSequence decrements it per message.
+D_8007A8E8	cutscene_next_message	Cutscene_StartEntry copies the entry message pointer here; Cutscene_UpdateMessageSequence reads one message/name pair and advances it.
