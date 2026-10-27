@@ -74,7 +74,7 @@ typedef struct {
     /* 0x00 */ TexParam e[5];
 } TexParams5;
 
-extern Gfx *D_8007A184;
+extern Gfx *gfx_dl_head;
 extern u16 text_font_tlut[];
 /* This file's .data, 80061660..80061760. */
 s8 text_reveal_speed_steps[8] = {
@@ -99,7 +99,7 @@ TexPtrs5 text_rect_texture_ptrs = { { D_80061A50, D_80061B50, D_80061D58, D_8006
 TexParams5 text_rect_texture_params = { { { 16, 16, 0, 0, 4, 4 }, { 40, 13, 0, 0, 0, 0 }, { 12, 12, 0, 0, 0, 0 }, { 1, 1, 2, 2, 0, 0 }, { 12, 12, 0, 0, 0, 0 } } };
 extern u8 D_8007B8E0[32];
 extern u8 D_8007B430[0x4B0];
-extern s32 D_8004DCA0;
+extern s32 core_flags;
 /* .bss 80090450..80092C70 */
 s32 text_active_window_count;
 s32 text_last_choice_index;
@@ -249,7 +249,7 @@ s32 Text_OpenWindow(s32 arg0) {
             text_active_window_count++;
         }
     }
-    D_8004DCA0 |= 2;
+    core_flags |= 2;
     text_font_load_flag = 0;
     return ret;
 }
@@ -276,8 +276,8 @@ void Text_UpdateAndDrawWindows(void) {
     s32 cnt = 0;
 
     order.w = D_800616B4;
-    gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
-    gDPSetBlendColor(D_8007A184++, 0, 0, 0, 1);
+    gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
+    gDPSetBlendColor(gfx_dl_head++, 0, 0, 0, 1);
     for (j = 0; j < 4; j++) {
         c = text_window_slots[j].unk0 & 7;
         switch (c) {
@@ -291,10 +291,10 @@ void Text_UpdateAndDrawWindows(void) {
         }
     }
     for (w = 0; w < 4; w++) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
-        gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, text_font_tlut);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
         idx = order.v[w];
         if (idx >= 0) {
             if (text_window_slots[idx].unk0 & 0x10000000) {
@@ -324,15 +324,15 @@ void Text_UpdateAndDrawWindows(void) {
                     Text_ResetWindow(idx, 0);
                     text_active_window_count--;
                     if (n <= 0) {
-                        D_8004DCA0 &= ~2;
+                        core_flags &= ~2;
                     }
                 }
             } else {
                 if (text_window_slots[idx].unk0 & 0x20000000) {
                     Text_DrawWindowFrame(idx);
                     if (text_window_slots[idx].unk0 & 0x40000000) {
-                        gDPPipeSync(D_8007A184++);
-                        gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
+                        gDPPipeSync(gfx_dl_head++);
+                        gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
                         x = text_window_slots[idx].unk4 + 12;
                         y = text_window_slots[idx].unk6 + 6;
                         for (i = 0; i < text_window_slots[idx].unk38; i++) {
@@ -372,12 +372,12 @@ void Text_UpdateAndDrawWindows(void) {
                                 }
                             }
                             if (!(text_window_slots[idx].unk0 & 0x01000000)) {
-                                gDPPipeSync(D_8007A184++);
-                                gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
+                                gDPPipeSync(gfx_dl_head++);
+                                gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
                                 x = text_window_slots[idx].unk4 - 2;
                                 y = text_window_slots[idx].unk6 + text_window_slots[idx].unk15 * 13 + 2;
-                                gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
-                                gDPLoadTLUT_pal256(D_8007A184++, text_font_tlut);
+                                gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
+                                gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
                                 Text_DrawTexturedRect(4, x, y, 12, 12);
                             }
                         }
@@ -586,10 +586,10 @@ void Text_UpdateAndDrawWindows(void) {
             Text_OpenWindow(-1);
         }
     }
-    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
-    gDPPipeSync(D_8007A184++);
-    gfx = D_8007A184++; gfx->words.w0 = 0xF9000000; gfx->words.w1 = 1;
-    gfx = D_8007A184++; gfx->words.w0 = 0xE7000000; gfx->words.w1 = 0;
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
+    gDPPipeSync(gfx_dl_head++);
+    gfx = gfx_dl_head++; gfx->words.w0 = 0xF9000000; gfx->words.w1 = 1;
+    gfx = gfx_dl_head++; gfx->words.w0 = 0xE7000000; gfx->words.w1 = 0;
 }
 #else
 #pragma GLOBAL_ASM("asm/nonmatchings/337B0/Text_UpdateAndDrawWindows.s")
@@ -642,8 +642,8 @@ void Text_DrawWindowContents(s32 arg0) {
     s32 x;
     s32 y;
 
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
     if (text_window_slots[arg0].unk17[0] != 0xFF) {
         x = text_window_slots[arg0].unk4;
         y = text_window_slots[arg0].unk6;
@@ -668,14 +668,14 @@ void Text_DrawWindowFrame(s32 idx) {
     s32 x;
     s32 y;
 
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
     p = &text_window_slots[idx];
     Text_DrawTexturedRect(0, p->unk4, p->unk6, p->unk8, p->unkA);
     Text_DrawTexturedRect(3, p->unk8 + p->unk4, p->unk6 + 2, 2, p->unkA);
     Text_DrawTexturedRect(3, p->unk4 + 2, p->unkA + p->unk6, p->unk8, 2);
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
     x = p->unk4;
     y = p->unk6;
     Text_DrawTexturedRect(3, x, y, p->unk8, 1);
@@ -765,12 +765,12 @@ void Text_DrawAdvanceIndicator(s32 idx) {
     Unk8Bytes b = D_800616C0;
     Unk8Bytes c = D_800616C8;
 
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
-    gDPPipeSync(D_8007A184++);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
-    gDPPipeSync(D_8007A184++);
-    gDPLoadTLUT_pal256(D_8007A184++, text_font_tlut);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTLUT_pal256(gfx_dl_head++, text_font_tlut);
     text_window_slots[idx].unkC++;
     i = (text_window_slots[idx].unkC >> 1) & 7;
     x = text_window_slots[idx].unk4 + text_window_slots[idx].unk8 - 11;
@@ -840,22 +840,22 @@ void Text_DrawTexturedRect(s32 type, s32 x, s32 y, s32 w, s32 h)
   TexPtrs5 tex = text_rect_texture_ptrs;
   TexParams5 prm = text_rect_texture_params;
 
-  { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
+  { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
   ;
   t = &prm.e[type];
   {
-    { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = ((((unsigned int) ((((unsigned int) 0xfd) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) (t->w - 1)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (unsigned int) tex.p[type]; }
+    { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = ((((unsigned int) ((((unsigned int) 0xfd) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) (t->w - 1)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (unsigned int) tex.p[type]; }
     ;
-    { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (((((unsigned int) ((((unsigned int) 0xf5) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) ((((((t->w - 1) - 0) + 1) * 1) + 7) >> 3)) & ((0x01 << 9) - 1)) << 9))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 9) - 1)) << 0)); _g->words.w1 = ((((((((unsigned int) ((((unsigned int) 7) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 20))) | ((unsigned int) ((((unsigned int) t->cmt) & ((0x01 << 2) - 1)) << 18))) | ((unsigned int) ((((unsigned int) t->maskt) & ((0x01 << 4) - 1)) << 14))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 10))) | ((unsigned int) ((((unsigned int) t->cms) & ((0x01 << 2) - 1)) << 8))) | ((unsigned int) ((((unsigned int) prm.e[type].masks) & ((0x01 << 4) - 1)) << 4))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 0)); }
+    { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((((unsigned int) ((((unsigned int) 0xf5) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) ((((((t->w - 1) - 0) + 1) * 1) + 7) >> 3)) & ((0x01 << 9) - 1)) << 9))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 9) - 1)) << 0)); _g->words.w1 = ((((((((unsigned int) ((((unsigned int) 7) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 20))) | ((unsigned int) ((((unsigned int) t->cmt) & ((0x01 << 2) - 1)) << 18))) | ((unsigned int) ((((unsigned int) t->maskt) & ((0x01 << 4) - 1)) << 14))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 10))) | ((unsigned int) ((((unsigned int) t->cms) & ((0x01 << 2) - 1)) << 8))) | ((unsigned int) ((((unsigned int) prm.e[type].masks) & ((0x01 << 4) - 1)) << 4))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 0)); }
     ;
-    { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe6) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
+    { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe6) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
     ;
-    { Gfx *_g = (Gfx *) (D_8007A184++); new_var2 = _g; new_var2->words.w0 = (((unsigned int) ((((unsigned int) 0xf4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 0)); new_var2->words.w1 = (((unsigned int) ((((unsigned int) 7) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((t->w - 1) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((prm.e[type].h - 1) << 2)) & ((0x01 << 12) - 1)) << 0)); }
+    { Gfx *_g = (Gfx *) (gfx_dl_head++); new_var2 = _g; new_var2->words.w0 = (((unsigned int) ((((unsigned int) 0xf4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 0)); new_var2->words.w1 = (((unsigned int) ((((unsigned int) 7) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((t->w - 1) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((prm.e[type].h - 1) << 2)) & ((0x01 << 12) - 1)) << 0)); }
     ;
- { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; } ; { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (((((unsigned int) ((((unsigned int) 0xf5) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) ((((((t->w - 1) - 0) + 1) * 1) + 7) >> 3)) & ((0x01 << 9) - 1)) << 9))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 9) - 1)) << 0)); _g->words.w1 = ((((((((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 20))) | ((unsigned int) ((((unsigned int) t->cmt) & ((0x01 << 2) - 1)) << 18))) | ((unsigned int) ((((unsigned int) t->maskt) & ((0x01 << 4) - 1)) << 14))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 10))) | ((unsigned int) ((((unsigned int) t->cms) & ((0x01 << 2) - 1)) << 8))) | ((unsigned int) ((((unsigned int) prm.e[type].masks) & ((0x01 << 4) - 1)) << 4))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 0)); } ; { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (((unsigned int) ((((unsigned int) 0xf2) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((t->w - 1) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((prm.e[type].h - 1) << 2)) & ((0x01 << 12) - 1)) << 0)); } } ; { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; } ; if (type == 0) { { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (((unsigned int) (new_var = (((unsigned int) 0xe4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((x + w) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((y + h) << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (x << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (y << 2)) & ((0x01 << 12) - 1)) << 0)); { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 11)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) ((x & 0xF) << 5)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) ((y & 0xF) << 5)) & ((0x01 << 16) - 1)) << 0))); } ; { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 12)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 0))); } ; } ; } else { { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (((unsigned int) ((((unsigned int) 0xe4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((x + w) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((y + h) << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (x << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (y << 2)) & ((0x01 << 12) - 1)) << 0)); { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 11)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) 0) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 16) - 1)) << 0))); } ; { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 12)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 0))); } ; }
+ { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((((unsigned int) ((((unsigned int) 0xf5) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) ((((((t->w - 1) - 0) + 1) * 1) + 7) >> 3)) & ((0x01 << 9) - 1)) << 9))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 9) - 1)) << 0)); _g->words.w1 = ((((((((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 20))) | ((unsigned int) ((((unsigned int) t->cmt) & ((0x01 << 2) - 1)) << 18))) | ((unsigned int) ((((unsigned int) t->maskt) & ((0x01 << 4) - 1)) << 14))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 10))) | ((unsigned int) ((((unsigned int) t->cms) & ((0x01 << 2) - 1)) << 8))) | ((unsigned int) ((((unsigned int) prm.e[type].masks) & ((0x01 << 4) - 1)) << 4))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 0)); } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((unsigned int) ((((unsigned int) 0xf2) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((t->w - 1) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((prm.e[type].h - 1) << 2)) & ((0x01 << 12) - 1)) << 0)); } } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; } ; if (type == 0) { { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((unsigned int) (new_var = (((unsigned int) 0xe4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((x + w) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((y + h) << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (x << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (y << 2)) & ((0x01 << 12) - 1)) << 0)); { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 11)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) ((x & 0xF) << 5)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) ((y & 0xF) << 5)) & ((0x01 << 16) - 1)) << 0))); } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 12)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 0))); } ; } ; } else { { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((unsigned int) ((((unsigned int) 0xe4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((x + w) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((y + h) << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (x << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (y << 2)) & ((0x01 << 12) - 1)) << 0)); { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 11)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) 0) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 16) - 1)) << 0))); } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 12)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 0))); } ; }
     ;
   }
-  { Gfx *_g = (Gfx *) (D_8007A184++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
+  { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
   ;
 
 }
@@ -864,13 +864,13 @@ void Text_DrawTexturedRect(s32 type, s32 x, s32 y, s32 w, s32 h)
 #endif
 
 void Text_DrawFramedRect(s32 x, s32 y, s32 w, s32 h) {
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xCC);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
     Text_DrawTexturedRect(0, x, y, w, h);
     Text_DrawTexturedRect(3, x + w, y + 2, 2, h);
     Text_DrawTexturedRect(3, x + 2, y + h, w, 2);
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
     Text_DrawTexturedRect(3, x, y, w, 1);
     Text_DrawTexturedRect(3, x, y + h - 1, w, 1);
     Text_DrawTexturedRect(3, x, y, 1, h);

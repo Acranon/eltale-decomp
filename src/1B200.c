@@ -84,7 +84,7 @@ typedef struct {
     /* 0x14 */ f32 unk14;
 } Unk800866D8; // size = 0x18
 
-extern Gfx* D_8007A184;
+extern Gfx* gfx_dl_head;
 extern s16 D_800865CC;
 typedef struct {
     /* 0x00 */ u16 unk0;
@@ -207,8 +207,8 @@ typedef struct {
  * is defined here). Labels splat put inside these arrays (D_800865CC..,
  * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
 
-extern Unk80085E48 D_80085E48;
-extern s32 D_8007A17C;
+extern Unk80085E48 camera_state;
+extern s32 gfx_frame_index;
 extern Unk800EB2B4 D_800EB2B4[];
 extern u8 D_800CADA8[][4];
 extern Unk800DA0F0 D_800DA0F0[];
@@ -223,7 +223,7 @@ void Math_MtxFRotate(MtxF*, f32, f32, f32);
 f32 Math_Atan2(f32, f32);
 u32 Math_Rand(u32);
 s32 Text_FormatNumber(s32, u8*, u16);
-extern s32 D_8007A180;
+extern s32 gfx_mtx_index;
 void Math_MtxFRotScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32);
 void Math_MtxFAlignYToVector(MtxF*, f32, f32, f32);
 void Math_MtxFScaleAxes(MtxF*, f32, f32, f32);
@@ -382,7 +382,7 @@ void Effect_UpdateFootParticle(Unk1B200Particle* arg0) {
     arg0->unk34 *= 0.9;
     arg0->unk38 *= 0.8;
     arg0->unk28 = arg0->unk2C = effect_foot_particle_scale_anim[arg0->unk0];
-    gDPSetEnvColor(D_8007A184++, 255, 255, 255, effect_foot_particle_alpha_anim[arg0->unk0]);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, effect_foot_particle_alpha_anim[arg0->unk0]);
 }
 
 void Effect_ResetMapObjEmitters(void) {
@@ -410,9 +410,9 @@ void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
     f32 angle;
     s32 n;
 
-    cur = D_8007A17C ? effect_mapobj_emitter_buffer_a : effect_mapobj_emitter_buffer_b;
-    prev = D_8007A17C ? effect_mapobj_emitter_buffer_b : effect_mapobj_emitter_buffer_a;
-    angle = Math_Atan2(x - D_80085E48.eyeX, z - D_80085E48.eyeZ) - D_80085E48.yaw + 3.141592653589793;
+    cur = gfx_frame_index ? effect_mapobj_emitter_buffer_a : effect_mapobj_emitter_buffer_b;
+    prev = gfx_frame_index ? effect_mapobj_emitter_buffer_b : effect_mapobj_emitter_buffer_a;
+    angle = Math_Atan2(x - camera_state.eyeX, z - camera_state.eyeZ) - camera_state.yaw + 3.141592653589793;
     if (angle < -3.141592653589793) {
         angle += 6.283185307179586;
     } else if (angle > 3.141592653589793) {
@@ -448,7 +448,7 @@ void Effect_UpdateMapObjEmitters(void) {
     s32 n;
 
     effect_mapobj_previous_count = effect_mapobj_emitter_count;
-    p = D_8007A17C ? effect_mapobj_emitter_buffer_a : effect_mapobj_emitter_buffer_b;
+    p = gfx_frame_index ? effect_mapobj_emitter_buffer_a : effect_mapobj_emitter_buffer_b;
     n = effect_mapobj_previous_count;
     while (n != 0) {
         if (p->unk0 != 0 && --p->unk0 == 0) {
@@ -492,7 +492,7 @@ void Effect_UpdateMapObjParticle(Unk1B200Particle* arg0) {
     if (b >= 0x100) {
         b = 0xFF;
     }
-    gDPSetEnvColor(D_8007A184++, r, g, b, effect_mapobj_particle_alpha_anim[arg0->unk0]);
+    gDPSetEnvColor(gfx_dl_head++, r, g, b, effect_mapobj_particle_alpha_anim[arg0->unk0]);
 }
 
 void Effect_SpawnFlipbookSprite(f32 x, f32 y, f32 z) {
@@ -539,7 +539,7 @@ void Effect_UpdateFlipbookSprite(Unk1B200Particle* arg0) {
         arg0->unk10 = effect_flipbook_frame_ptrs[v >> 2];
     }
     arg0->unk28 = arg0->unk2C = effect_flipbook_scale_anim[v];
-    gDPSetEnvColor(D_8007A184++, 255, 255, 255, effect_flipbook_alpha_anim[arg0->unk0]);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, effect_flipbook_alpha_anim[arg0->unk0]);
 }
 
 void Effect_ResetFloatingNumbers(void) {
@@ -642,8 +642,8 @@ void Effect_DrawFloatingNumbers(void) {
             }
             if (Camera_WorldToScreen(actor->x, y, actor->z, &sx, &sy)) {
                 if (!first) {
-                    gSPDisplayList(D_8007A184++, D_800C40C0);
-                    gDPLoadTextureBlock(D_8007A184++, D_8039E290, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 10, 0, G_TX_WRAP, G_TX_WRAP, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
+                    gSPDisplayList(gfx_dl_head++, D_800C40C0);
+                    gDPLoadTextureBlock(gfx_dl_head++, D_8039E290, G_IM_FMT_RGBA, G_IM_SIZ_16b, 128, 10, 0, G_TX_WRAP, G_TX_WRAP, 0, 0, G_TX_NOLOD, G_TX_NOLOD);
                     first++;
                 }
                 if (d->unk10 & 0x8000) {
@@ -667,14 +667,14 @@ void Effect_DrawFloatingNumbers(void) {
                 sx -= d->unk18 * w;
                 sy = sy - d->unk18 * 5 - 8;
                 c = effect_converge_colors[d->unk10 & 0xF];
-                gDPPipeSync(D_8007A184++);
-                gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], 255);
+                gDPPipeSync(gfx_dl_head++);
+                gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 255);
                 dp = d->digits;
                 sx -= (k = d->numDigits) * 4;
                 while (k) {
                     k--;
                     if (*dp != 0x20) {
-                        gSPTextureRectangle(D_8007A184++, (sx - w) << 2, (sy - h) << 2, (sx + w) << 2, (sy + h) << 2, G_TX_RENDERTILE, *dp << 8, 0, dtdy, dsdx);
+                        gSPTextureRectangle(gfx_dl_head++, (sx - w) << 2, (sy - h) << 2, (sx + w) << 2, (sy + h) << 2, G_TX_RENDERTILE, *dp << 8, 0, dtdy, dsdx);
                         sx += w * 2;
                     }
                     dp++;
@@ -767,9 +767,9 @@ void Effect_UpdateConvergeParticle(Unk1B200Spark* arg0) {
     }
     c = D_800EB5E4[arg0->unk3C];
     if (arg0->unk0 & 1) {
-        gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], 0xDC);
+        gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0xDC);
     } else {
-        gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], 0x20);
+        gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0x20);
     }
 }
 
@@ -814,9 +814,9 @@ void Effect_UpdateBurstParticle(Unk1B200Spark* arg0) {
     }
     c = D_800EB5E4[arg0->unk3C];
     if (arg0->unk0 & 1) {
-        gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], 0xDC);
+        gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0xDC);
     } else {
-        gDPSetEnvColor(D_8007A184++, c[0], c[1], c[2], 0x20);
+        gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0x20);
     }
 }
 
@@ -847,9 +847,9 @@ void Effect_UpdateAndDrawStreaks(void* arg0) {
             p->x += p->vx;
             p->y += p->vy;
             p->z += p->vz;
-            if (D_8007A180 < 0x1E6) {
+            if (gfx_mtx_index < 0x1E6) {
                 if (first == 0) {
-                    gSPDisplayList(D_8007A184++, D_800EB880);
+                    gSPDisplayList(gfx_dl_head++, D_800EB880);
                     first++;
                 }
                 if (p->unk0 & 1) {
@@ -869,10 +869,10 @@ void Effect_UpdateAndDrawStreaks(void* arg0) {
                 mtx.mf[3][0] = p->x;
                 mtx.mf[3][1] = p->y;
                 mtx.mf[3][2] = p->z;
-                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[D_8007A180]);
-                gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-                gDPSetEnvColor(D_8007A184++, 255, 255, 255, alpha);
-                gSPDisplayList(D_8007A184++, D_800EB8E8);
+                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[gfx_mtx_index]);
+                gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, alpha);
+                gSPDisplayList(gfx_dl_head++, D_800EB8E8);
             }
             p->unk0--;
             p->vx *= 0.6;
@@ -1033,8 +1033,8 @@ void Effect_UpdateAndDrawRings(void* arg0) {
     do {
         if (p->unk0) {
             if (first == 0) {
-                gSPDisplayList(D_8007A184++, D_800C4780);
-                gDPLoadTextureBlock(D_8007A184++, D_800C47C0, G_IM_FMT_I, G_IM_SIZ_8b, 8, 8, 0, G_TX_WRAP, G_TX_WRAP, 3, 0, G_TX_NOLOD, G_TX_NOLOD);
+                gSPDisplayList(gfx_dl_head++, D_800C4780);
+                gDPLoadTextureBlock(gfx_dl_head++, D_800C47C0, G_IM_FMT_I, G_IM_SIZ_8b, 8, 8, 0, G_TX_WRAP, G_TX_WRAP, 3, 0, G_TX_NOLOD, G_TX_NOLOD);
                 first++;
             }
             p->unk2++;
@@ -1058,7 +1058,7 @@ void Effect_UpdateAndDrawRings(void* arg0) {
                     break;
             }
             color = effect_ring_colors[p->unk6];
-            gDPSetEnvColor(D_8007A184++, color[0], color[1], color[2], alpha);
+            gDPSetEnvColor(gfx_dl_head++, color[0], color[1], color[2], alpha);
             pt = p->pts;
             j = 16;
             do {
@@ -1090,9 +1090,9 @@ void Effect_UpdateAndDrawRings(void* arg0) {
                     mtx.mf[3][0] = x0;
                     mtx.mf[3][1] = y0;
                     mtx.mf[3][2] = z0;
-                    guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[D_8007A180]);
-                    gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
-                    gSPDisplayList(D_8007A184++, D_800C4840);
+                    guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[gfx_mtx_index]);
+                    gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+                    gSPDisplayList(gfx_dl_head++, D_800C4840);
                 }
             } while (j != 0);
         }
@@ -1150,7 +1150,7 @@ void Effect_UpdateAndDrawModelEffects(void* arg0) {
     u16* cnt;
 
     cnt = &effect_model_frame_counter;
-    gSPDisplayList(D_8007A184++, D_800EB6D0);
+    gSPDisplayList(gfx_dl_head++, D_800EB6D0);
     effect_loaded_tlut_index = 0xFFFF;
     i = 32;
     p = effect_model_slots;
@@ -1172,11 +1172,11 @@ void Effect_UpdateAndDrawModelEffects(void* arg0) {
                 alpha = (p->unk4 * alpha) >> 3;
             }
             col = D_800EB5E4[p->unk6 & 0xFF];
-            gDPSetEnvColor(D_8007A184++, col[0], col[1], col[2], alpha);
+            gDPSetEnvColor(gfx_dl_head++, col[0], col[1], col[2], alpha);
             if (p->unk8 & 8) {
-                gSPSetGeometryMode(D_8007A184++, G_CULL_BACK);
+                gSPSetGeometryMode(gfx_dl_head++, G_CULL_BACK);
             } else {
-                gSPClearGeometryMode(D_8007A184++, G_CULL_BACK);
+                gSPClearGeometryMode(gfx_dl_head++, G_CULL_BACK);
             }
             Effect_DrawModelEffectGeometry(p, (s32)arg0);
             p->unk34++;
@@ -1190,8 +1190,8 @@ void Effect_UpdateAndDrawModelEffects(void* arg0) {
         i--;
         p++;
     } while (i != 0);
-    gDPPipeSync(D_8007A184++);
-    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
     (*cnt)++;
 }
 
@@ -1233,7 +1233,7 @@ s32 Effect_DrawModelEffectGeometry(Unk80086798b* arg0, s32 arg1) {
     scale.z = arg0->unk24 * 0.01;
     anims = ((AnimSet1B200*)&arg0->unk38)->unk4;
     frame = arg0->unk34;
-    if (D_8007A180 < 0x1E6) {
+    if (gfx_mtx_index < 0x1E6) {
         for (i = 0; i < ((AnimSet1B200*)&arg0->unk38)->unk0; i++) {
             if (anims[i].unk14 == 0) {
                 Anim_DrawNode(&mtx, scale, 0, i, frame, 0, (AnimSet1B200*)&arg0->unk38, anims, arg1);
@@ -1275,47 +1275,47 @@ s32 Effect_ConfigureModelEffectTexture(Unk80086798b* arg0) {
             clamp = 0;
         }
         if (t->flags & 2) {
-            gDPLoadTextureBlock(D_8007A184++, img, G_IM_FMT_I, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+            gDPLoadTextureBlock(gfx_dl_head++, img, G_IM_FMT_I, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
             if (t->flags & 0x40) {
                 if (arg0->unk8 & 0x20) {
-                    gDPSetCombine(D_8007A184++, 0x629A04, 0x1F10FFFF);
+                    gDPSetCombine(gfx_dl_head++, 0x629A04, 0x1F10FFFF);
                 } else {
-                    gDPSetCombine(D_8007A184++, 0x629BFF, 0x1F10FE3F);
+                    gDPSetCombine(gfx_dl_head++, 0x629BFF, 0x1F10FE3F);
                 }
             } else if (arg0->unk8 & 0x20) {
-                gDPSetCombine(D_8007A184++, 0x62FE04, 0x1F10FBFF);
+                gDPSetCombine(gfx_dl_head++, 0x62FE04, 0x1F10FBFF);
             } else {
-                gDPSetCombine(D_8007A184++, 0x62FFFF, 0x1F10FA3F);
+                gDPSetCombine(gfx_dl_head++, 0x62FFFF, 0x1F10FA3F);
             }
         } else {
-            gDPLoadTextureBlock(D_8007A184++, img, G_IM_FMT_CI, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
-            gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+            gDPLoadTextureBlock(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, size, size, 0, clamp, clamp, mask, mask, G_TX_NOLOD, G_TX_NOLOD);
+            gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
             if (arg0->unk8 & 0x20) {
-                gDPSetCombine(D_8007A184++, 0x129804, 0xFF17FFFF);
+                gDPSetCombine(gfx_dl_head++, 0x129804, 0xFF17FFFF);
             } else {
-                gDPSetCombine(D_8007A184++, 0x1299FF, 0xFF17FE3F);
+                gDPSetCombine(gfx_dl_head++, 0x1299FF, 0xFF17FE3F);
             }
             if (effect_loaded_tlut_index != t->tlut) {
                 effect_loaded_tlut_index = t->tlut;
-                gDPLoadTLUT_pal256(D_8007A184++, effect_model_tlut_ptrs[effect_loaded_tlut_index]);
+                gDPLoadTLUT_pal256(gfx_dl_head++, effect_model_tlut_ptrs[effect_loaded_tlut_index]);
             }
         }
-        gDPSetTileSize(D_8007A184++, G_TX_RENDERTILE, t->s, t->t, t->s + size, t->t + size);
+        gDPSetTileSize(gfx_dl_head++, G_TX_RENDERTILE, t->s, t->t, t->s + size, t->t + size);
         if (t->flags & 0x20) {
-            gSPTexture(D_8007A184++, size << 6, size << 6, 0, G_TX_RENDERTILE, G_ON);
+            gSPTexture(gfx_dl_head++, size << 6, size << 6, 0, G_TX_RENDERTILE, G_ON);
             geom |= G_LIGHTING | G_TEXTURE_GEN;
         } else {
-            gSPTexture(D_8007A184++, 0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON);
+            gSPTexture(gfx_dl_head++, 0x8000, 0x8000, 0, G_TX_RENDERTILE, G_ON);
         }
     } else {
-        gDPPipeSync(D_8007A184++);
-        gDPSetCombine(D_8007A184++, 0x62CBFF, 0x4FFE7E38);
-        gSPTexture(D_8007A184++, 0x8000, 0x8000, 0, G_TX_RENDERTILE, G_OFF);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetCombine(gfx_dl_head++, 0x62CBFF, 0x4FFE7E38);
+        gSPTexture(gfx_dl_head++, 0x8000, 0x8000, 0, G_TX_RENDERTILE, G_OFF);
     }
-    gSPClearGeometryMode(D_8007A184++, G_LIGHTING | G_TEXTURE_GEN);
+    gSPClearGeometryMode(gfx_dl_head++, G_LIGHTING | G_TEXTURE_GEN);
     if (geom) {
-        gSPSetGeometryMode(D_8007A184++, geom);
+        gSPSetGeometryMode(gfx_dl_head++, geom);
     }
 }
 
@@ -1351,9 +1351,9 @@ void Effect_DrawStatUpMarkers(void* arg0) {
     first = 0;
     for (i = 0, p = effect_stat_marker_slots; i < 4; i++, p++) {
         if (p->unk0 != 0) {
-            if (D_8007A180 < 0x1E6) {
+            if (gfx_mtx_index < 0x1E6) {
                 if (first == 0) {
-                    gSPDisplayList(D_8007A184++, D_800EB990);
+                    gSPDisplayList(gfx_dl_head++, D_800EB990);
                     first++;
                 }
                 alpha = 200 - Math_Rand(32);
@@ -1365,18 +1365,18 @@ void Effect_DrawStatUpMarkers(void* arg0) {
                 x = D_8007AB48.x;
                 y = D_8007AA44 * 70.0 + D_8007AB48.y;
                 z = D_8007AB48.z;
-                Math_MtxFAimAt(&mtx, x, y, z, D_80085E48.eyeX, D_80085E48.eyeY, D_80085E48.eyeZ);
+                Math_MtxFAimAt(&mtx, x, y, z, camera_state.eyeX, camera_state.eyeY, camera_state.eyeZ);
                 Math_MtxFScaleAxes(&mtx, D_8007AA44, D_8007AA44, D_8007AA44);
-                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[D_8007A180]);
+                guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[gfx_mtx_index]);
                 /* Keep the index update in the matrix command's scope for IDO scheduling. */
                 {
-                    Gfx* _g = D_8007A184++;
+                    Gfx* _g = gfx_dl_head++;
                     _g->words.w0 = 0x01020040;
-                    _g->words.w1 = (u32)&D_2000000.unkC0[D_8007A180];
-                    D_8007A180++;
+                    _g->words.w1 = (u32)&D_2000000.unkC0[gfx_mtx_index];
+                    gfx_mtx_index++;
                 }
-                gDPSetEnvColor(D_8007A184++, effect_ring_segment_colors[i / 1][0], effect_ring_segment_colors[i / 1][1], effect_ring_segment_colors[i / 1][2], alpha);
-                gSPDisplayList(D_8007A184++, D_800EB9C8);
+                gDPSetEnvColor(gfx_dl_head++, effect_ring_segment_colors[i / 1][0], effect_ring_segment_colors[i / 1][1], effect_ring_segment_colors[i / 1][2], alpha);
+                gSPDisplayList(gfx_dl_head++, D_800EB9C8);
             }
             p->unk0--;
         }

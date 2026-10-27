@@ -85,15 +85,15 @@ typedef struct {
     char unk0[0xA];
 } Struct_803AB358;
 
-extern s32 D_8004DCA0;
-extern s32 D_8007A174;
-extern s16 D_8007A178;
+extern s32 core_flags;
+extern s32 core_transition_timer;
+extern s16 fade_transition_style;
 extern f32 D_8007A98C;
 extern f32 D_8007A990;
 extern f32 D_8007A994;
 extern s32 D_8007A998;
 extern s16 D_8007AA0E;
-extern Struct_80084300 D_80084300;
+extern Struct_80084300 exit_destination;
 extern Struct_803AAA40 D_803AAA40[];
 extern Struct_803AB358 D_803AB358[];
 extern Struct_803AB36C D_803AB36C[];
@@ -263,7 +263,7 @@ s32 func_80025228(u16 arg0) {
 void Item_DrawMenuFrame(s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, void*);
 void Fade_Start(s32, s32, void*);
-extern Gfx* D_8007A184;
+extern Gfx* gfx_dl_head;
 extern s8 input_stick_x;
 extern u16 input_pressed_buttons;
 extern u8 fade_black_ramp_dim[];
@@ -295,11 +295,11 @@ void Item_UpdateInventoryMenu(void) {
     s32 y;
     s32 b;
 
-    gSPDisplayList(D_8007A184++, D_803AA7C0);
+    gSPDisplayList(gfx_dl_head++, D_803AA7C0);
     Item_DrawMenuFrame(0x46, 0x7F, 0xB2, 0x16);
     Item_DrawMenuFrame(0x48, 0x44, 0xAD, 0x36);
-    gSPDisplayList(D_8007A184++, D_803AA940);
-    gSPDisplayList(D_8007A184++, D_803AA998);
+    gSPDisplayList(gfx_dl_head++, D_803AA940);
+    gSPDisplayList(gfx_dl_head++, D_803AA998);
     x = input_stick_x;
     if (x > 5) {
         x -= 5;
@@ -376,7 +376,7 @@ void Item_UpdateInventoryMenu(void) {
             p = list;
         } while (n != 0);
         x = 0x1AC;
-        gSPDisplayList(D_8007A184++, D_803AA9F0);
+        gSPDisplayList(gfx_dl_head++, D_803AA9F0);
         hl = 0;
         n = count;
         while (n != 0 && *p != 0xFF) {
@@ -394,43 +394,43 @@ void Item_UpdateInventoryMenu(void) {
             } else {
                 tex = ((u8 (*)[0x100])item_icon_cache_tex)[8 - k];
             }
-            gDPLoadTextureBlock(D_8007A184++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, 16, 16, 0, G_TX_NOMIRROR | G_TX_WRAP,
+            gDPLoadTextureBlock(gfx_dl_head++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, 16, 16, 0, G_TX_NOMIRROR | G_TX_WRAP,
                                 G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
             p++;
             if (item_menu_cursor == count - n) {
-                gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, 0xFF);
-                gDPLoadTLUT_pal256(D_8007A184++, D_803AC460);
+                gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
+                gDPLoadTLUT_pal256(gfx_dl_head++, D_803AC460);
                 hl = 1;
             } else if (hl) {
-                gDPSetEnvColor(D_8007A184++, 0x7F, 0x7F, 0x7F, 0xFF);
-                gDPLoadTLUT_pal256(D_8007A184++, D_803AC660);
+                gDPSetEnvColor(gfx_dl_head++, 0x7F, 0x7F, 0x7F, 0xFF);
+                gDPLoadTLUT_pal256(gfx_dl_head++, D_803AC660);
                 hl = 0;
             }
-            gSPTextureRectangle(D_8007A184++, x, 0x20C, x + 0x40, 0x24C, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
+            gSPTextureRectangle(gfx_dl_head++, x, 0x20C, x + 0x40, 0x24C, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
             x += 0x44;
             n--;
         }
         x = item_menu_cursor * 0x44 + 0x1D4;
         y = 0x1F0 - (u16)((sins(item_menu_bob_phase & 0x7FFF) >> 13) << 2);
-        gSPDisplayList(D_8007A184++, D_803AA828);
-        gSPTextureRectangle(D_8007A184++, x, y, x + 0x30, y + 0x30, G_TX_RENDERTILE, 0x9C0, 0, 0x400, 0x400);
+        gSPDisplayList(gfx_dl_head++, D_803AA828);
+        gSPTextureRectangle(gfx_dl_head++, x, y, x + 0x30, y + 0x30, G_TX_RENDERTILE, 0x9C0, 0, 0x400, 0x400);
         if (count == 8) {
             b = sins((item_menu_bob_phase * 2) & 0x7FFF);
-            gDPLoadTextureTile(D_8007A184++, D_8039AFB0, G_IM_FMT_CI, G_IM_SIZ_8b, 176, 0, 90, 0, 146, 13, 0,
+            gDPLoadTextureTile(gfx_dl_head++, D_8039AFB0, G_IM_FMT_CI, G_IM_SIZ_8b, 176, 0, 90, 0, 146, 13, 0,
                                G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK,
                                G_TX_NOLOD, G_TX_NOLOD);
             if (item_menu_scroll != 0) {
-                gSPTextureRectangle(D_8007A184++, 0x218, 0x250, 0x234, 0x26C, G_TX_RENDERTILE, 0xE00, 0, 0x400, 0x400);
-                gSPTextureRectangle(D_8007A184++, (0x77 - (b >> 13)) * 4, 0x248, (0x85 - (b >> 13)) * 4, 0x274,
+                gSPTextureRectangle(gfx_dl_head++, 0x218, 0x250, 0x234, 0x26C, G_TX_RENDERTILE, 0xE00, 0, 0x400, 0x400);
+                gSPTextureRectangle(gfx_dl_head++, (0x77 - (b >> 13)) * 4, 0x248, (0x85 - (b >> 13)) * 4, 0x274,
                                     G_TX_RENDERTILE, 0xEE0, 0, 0x400, 0x400);
             }
             if (item_inventory[item_menu_scroll + 8] != 0xFF) {
-                gSPTextureRectangle(D_8007A184++, 0x348, 0x250, 0x364, 0x26C, G_TX_RENDERTILE, 0xE00, 0, 0x400, 0x400);
-                gSPTextureRectangle(D_8007A184++, ((b >> 13) + 0xDA) * 4, 0x248, ((b >> 13) + 0xE8) * 4, 0x274,
+                gSPTextureRectangle(gfx_dl_head++, 0x348, 0x250, 0x364, 0x26C, G_TX_RENDERTILE, 0xE00, 0, 0x400, 0x400);
+                gSPTextureRectangle(gfx_dl_head++, ((b >> 13) + 0xDA) * 4, 0x248, ((b >> 13) + 0xE8) * 4, 0x274,
                                     G_TX_RENDERTILE, 0x10A0, 0, 0x400, 0x400);
             }
         }
-        gSPDisplayList(D_8007A184++, D_1000388);
+        gSPDisplayList(gfx_dl_head++, D_1000388);
         Text_DrawEncodedString(0x77, 0x48, D_803AB288[item_inventory[item_menu_scroll + item_menu_cursor]]);
         Text_DrawEncodedString(0x4E, 0x5A, D_803AB2F0[item_inventory[item_menu_scroll + item_menu_cursor]]);
         if ((input_pressed_buttons & 0xA000) && Item_TryUse(item_inventory[item_menu_scroll + item_menu_cursor])) {
@@ -440,7 +440,7 @@ void Item_UpdateInventoryMenu(void) {
                 p++;
             }
             *p = 0xFF;
-            D_8004DCA0 &= ~1;
+            core_flags &= ~1;
             Fade_Start(6, 4, fade_black_ramp_dim);
             list = &item_inventory[item_menu_scroll];
             if (list[item_menu_cursor] == 0xFF) {
@@ -533,17 +533,17 @@ void Item_UseRestore(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
 void Item_UseWarp(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     Struct_803AB358* fx;
 
-    D_8004DCA0 |= 0x80;
-    D_8007A174 = 0x16;
-    D_80084300.unk0 = D_803AAA40[arg1->unk4].unk0;
-    D_80084300.unk4 = D_803AAA40[arg1->unk4].unk2;
-    D_80084300.unk8 = -1;
+    core_flags |= 0x80;
+    core_transition_timer = 0x16;
+    exit_destination.unk0 = D_803AAA40[arg1->unk4].unk0;
+    exit_destination.unk4 = D_803AAA40[arg1->unk4].unk2;
+    exit_destination.unk8 = -1;
     D_8007A98C = D_803AAA40[arg1->unk4].unk4;
     D_8007A990 = D_803AAA40[arg1->unk4].unk8;
     D_8007A994 = D_803AAA40[arg1->unk4].unkC;
     D_8007A998 = 0x108;
     D_8007AA0E = 0;
-    D_8007A178 = 1;
+    fade_transition_style = 1;
     item_effect_scale.x = D_803AB36C[1].unk8;
     item_effect_scale.y = D_803AB36C[1].unkC;
     fx = &D_803AB358[D_803AB36C[1].unk0];
@@ -556,20 +556,20 @@ void Item_UseSpell(s32 arg0, Struct_803AAAA0* arg1) {
     Magic_CreateCastEffect(arg0, arg1->unk4, 0, 4);
 }
 
-extern Gfx* D_8007A184;
+extern Gfx* gfx_dl_head;
 extern Gfx D_803AA8A8[];
 
 void Item_DrawMenuFrame(s32 x, s32 y, s32 w, s32 h) {
-    gDPPipeSync(D_8007A184++);
-    gDPSetCycleType(D_8007A184++, G_CYC_FILL);
-    gDPSetRenderMode(D_8007A184++, G_RM_NOOP, G_RM_NOOP2);
-    gDPSetFillColor(D_8007A184++, 0x00010001);
-    gDPFillRectangle(D_8007A184++, x, y, (x + w), y);
-    gDPFillRectangle(D_8007A184++, x, (y + h), (x + w), (y + h));
-    gDPFillRectangle(D_8007A184++, x, y, x, (y + h));
-    gDPFillRectangle(D_8007A184++, (x + w), y, (x + w), (y + h));
-    gDPFillRectangle(D_8007A184++, x + 3, (y + h) + 1, (x + w) + 2, (y + h) + 2);
-    gDPFillRectangle(D_8007A184++, (x + w) + 1, y + 3, (x + w) + 2, (y + h) + 1);
-    gSPDisplayList(D_8007A184++, D_803AA8A8);
-    gSPTextureRectangle(D_8007A184++, (x + 1) << 2, (y + 1) << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetCycleType(gfx_dl_head++, G_CYC_FILL);
+    gDPSetRenderMode(gfx_dl_head++, G_RM_NOOP, G_RM_NOOP2);
+    gDPSetFillColor(gfx_dl_head++, 0x00010001);
+    gDPFillRectangle(gfx_dl_head++, x, y, (x + w), y);
+    gDPFillRectangle(gfx_dl_head++, x, (y + h), (x + w), (y + h));
+    gDPFillRectangle(gfx_dl_head++, x, y, x, (y + h));
+    gDPFillRectangle(gfx_dl_head++, (x + w), y, (x + w), (y + h));
+    gDPFillRectangle(gfx_dl_head++, x + 3, (y + h) + 1, (x + w) + 2, (y + h) + 2);
+    gDPFillRectangle(gfx_dl_head++, (x + w) + 1, y + 3, (x + w) + 2, (y + h) + 1);
+    gSPDisplayList(gfx_dl_head++, D_803AA8A8);
+    gSPTextureRectangle(gfx_dl_head++, (x + 1) << 2, (y + 1) << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 }

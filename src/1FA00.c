@@ -297,11 +297,11 @@ typedef struct {
     f32 unk8;
 } Struct_8004F0B0;
 
-extern Struct_80085E48 D_80085E48;
+extern Struct_80085E48 camera_state;
 extern Struct_8004F0B0 battle_camera_offsets[];
 extern f32 D_80085F78;
-extern f32 D_80085F84;
-extern s32 D_80085F60;
+extern f32 camera_battle_angle_offset;
+extern s32 camera_preset_index;
 extern s32 D_800842BC;
 void Math_RotateVec2(f32, Struct_8001FF10_Pos*);
 void Camera_SetPreset(s32);
@@ -352,30 +352,30 @@ void Battle_UpdateStartCamera(void) {
             } else {
                 battle_rotated_offset_scratch.unk4 = a->unk64->unk1C * a->unk24 * 2.0 + 15.0;
             }
-            D_80085E48.unk4C = battle_rotated_offset_scratch.unk4 * 1.5;
+            camera_state.unk4C = battle_rotated_offset_scratch.unk4 * 1.5;
             Math_RotateVec2(ang, &battle_rotated_offset_scratch);
-            D_80085E48.unkC = a->unk0 + battle_rotated_offset_scratch.unk0;
-            D_80085E48.unk14 = a->unk8 + battle_rotated_offset_scratch.unk4;
-            D_80085E48.unk10 = a->unk4 + 15.0;
-            if (D_80085E48.unk10 < D_8007AA08.unk1C) {
-                D_80085E48.unk10 = D_8007AA08.unk1C;
+            camera_state.unkC = a->unk0 + battle_rotated_offset_scratch.unk0;
+            camera_state.unk14 = a->unk8 + battle_rotated_offset_scratch.unk4;
+            camera_state.unk10 = a->unk4 + 15.0;
+            if (camera_state.unk10 < D_8007AA08.unk1C) {
+                camera_state.unk10 = D_8007AA08.unk1C;
             }
-            D_80085E48.unk48 = 0.0f;
-            D_80085E48.unk0 = 0;
-            D_80085E48.unk3C = 0.0f;
-            D_80085E48.unk44 = D_80085E48.unk48;
-            D_80085E48.unk40 = D_80085E48.unk44;
-            D_80085E48.unk58 = 15.0f;
-            D_80085E48.unk80 = a;
-            D_80085E48.unk70 = 0.01f;
-            D_80085F78 = D_80085E48.unk2C;
+            camera_state.unk48 = 0.0f;
+            camera_state.unk0 = 0;
+            camera_state.unk3C = 0.0f;
+            camera_state.unk44 = camera_state.unk48;
+            camera_state.unk40 = camera_state.unk44;
+            camera_state.unk58 = 15.0f;
+            camera_state.unk80 = a;
+            camera_state.unk70 = 0.01f;
+            D_80085F78 = camera_state.unk2C;
             battle_camera_phase++;
             battle_camera_phase_timer = 60;
             break;
         case 1:
             if (--battle_camera_phase_timer == 0) {
                 battle_flags &= ~0x200;
-                Camera_SetPreset(D_80085F60);
+                Camera_SetPreset(camera_preset_index);
                 dx = battle_center_x - D_8007AA08.unk18;
                 dz = battle_center_z - D_8007AA08.unk20;
                 ang = Math_Atan2(dx, dz) + 3.141592653589793;
@@ -387,26 +387,26 @@ void Battle_UpdateStartCamera(void) {
                 battle_rotated_offset_scratch.unk0 = 0.0f;
                 battle_rotated_offset_scratch.unk4 = 50.0f;
                 Math_RotateVec2(ang, &battle_rotated_offset_scratch);
-                D_80085E48.unk0 = 4;
-                D_80085E48.unk8 |= 0x10;
-                D_80085E48.unkC = D_8007AA08.unk18 + battle_rotated_offset_scratch.unk0;
-                D_80085E48.unk48 = 0.0f;
-                D_80085E48.unk10 = D_8007AA08.unk1C + 30.0;
-                D_80085E48.unk14 = D_8007AA08.unk20 + battle_rotated_offset_scratch.unk4;
-                D_80085E48.unk44 = D_80085E48.unk48;
-                D_80085E48.unk3C = 0.0f;
-                D_80085E48.unk40 = D_80085E48.unk44;
+                camera_state.unk0 = 4;
+                camera_state.unk8 |= 0x10;
+                camera_state.unkC = D_8007AA08.unk18 + battle_rotated_offset_scratch.unk0;
+                camera_state.unk48 = 0.0f;
+                camera_state.unk10 = D_8007AA08.unk1C + 30.0;
+                camera_state.unk14 = D_8007AA08.unk20 + battle_rotated_offset_scratch.unk4;
+                camera_state.unk44 = camera_state.unk48;
+                camera_state.unk3C = 0.0f;
+                camera_state.unk40 = camera_state.unk44;
                 if ((battle_flags & 0x100) && battle_boss_index_plus_one == 8) {
-                    D_80085E48.unk58 = 50.0f;
-                    D_80085E48.unk5C = 28.0f;
-                    D_80085E48.unk4C = 180.0f;
+                    camera_state.unk58 = 50.0f;
+                    camera_state.unk5C = 28.0f;
+                    camera_state.unk4C = 180.0f;
                 } else {
-                    D_80085E48.unk58 += battle_camera_offsets[D_800842BC].unk0;
-                    D_80085E48.unk4C += battle_camera_offsets[D_800842BC].unk4;
+                    camera_state.unk58 += battle_camera_offsets[D_800842BC].unk0;
+                    camera_state.unk4C += battle_camera_offsets[D_800842BC].unk4;
                 }
-                D_80085E48.unk80 = &D_8007AA20;
-                D_80085E48.unk70 = 0.02f;
-                D_80085F84 = 0.0f;
+                camera_state.unk80 = &D_8007AA20;
+                camera_state.unk70 = 0.02f;
+                camera_battle_angle_offset = 0.0f;
             }
             break;
     }
@@ -415,7 +415,7 @@ void Battle_UpdateStartCamera(void) {
 
 extern Actor D_8007AA20;
 extern s32 D_8007A9BC;
-extern s32 D_80085F60;
+extern s32 camera_preset_index;
 extern s32 D_800842BC;
 extern s16 hud_battle_message_timer;
 
@@ -466,7 +466,7 @@ void Battle_UpdateTurnTransition(void) {
                 hud_battle_message_timer = 0;
                 Effect_FadeRing(battle_outer_ring_slot, D_8007AA08.unk18, D_8007AA08.unk1C, D_8007AA08.unk20);
                 Enemy_RemoveAll();
-                Camera_SetPresetDelayedTurn(D_80085F60);
+                Camera_SetPresetDelayedTurn(camera_preset_index);
                 if (battle_flags & 0x100) {
                     battle_flags &= ~0x100;
                 }

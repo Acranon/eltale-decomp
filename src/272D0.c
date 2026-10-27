@@ -13,8 +13,8 @@ typedef struct {
 
 extern Mtx D_2000000[];
 extern Mtx D_2000040[];
-extern s32 D_8007A180;
-extern Gfx* D_8007A184;
+extern s32 gfx_mtx_index;
+extern Gfx* gfx_dl_head;
 typedef struct { u8 r, g, b, a; } Color_RGBA8;
 /* .bss 8008CA50..8008CE60 */
 u16 fade_flags; /* bit 0 quad on, 1 hold at the end, 2 step the ramp backwards, 3 letterbox bars */
@@ -117,21 +117,21 @@ void Fade_Init(void) {
 
 void Fade_UpdateAndDraw(Struct_80026774* arg0) {
     if (fade_flags & 8) {
-        gSPDisplayList(D_8007A184++, fade_letterbox_dl);
+        gSPDisplayList(gfx_dl_head++, fade_letterbox_dl);
     }
     if (fade_flags & 1) {
-        gDPPipeSync(D_8007A184++);
-        gSPMatrix(D_8007A184++, D_2000040, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
-        guMtxIdent(&arg0->unkC0[D_8007A180]);
-        gSPMatrix(D_8007A184++, &D_2000000[D_8007A180 + 3], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        D_8007A180++;
-        gDPSetEnvColor(D_8007A184++, fade_ramp_ptr->r, fade_ramp_ptr->g, fade_ramp_ptr->b, fade_ramp_ptr->a);
+        gDPPipeSync(gfx_dl_head++);
+        gSPMatrix(gfx_dl_head++, D_2000040, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_PROJECTION);
+        guMtxIdent(&arg0->unkC0[gfx_mtx_index]);
+        gSPMatrix(gfx_dl_head++, &D_2000000[gfx_mtx_index + 3], G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        gfx_mtx_index++;
+        gDPSetEnvColor(gfx_dl_head++, fade_ramp_ptr->r, fade_ramp_ptr->g, fade_ramp_ptr->b, fade_ramp_ptr->a);
         if (fade_ramp_ptr->a == 0xFF) {
-            gDPSetRenderMode(D_8007A184++, 0x0F0A4000, 0);
+            gDPSetRenderMode(gfx_dl_head++, 0x0F0A4000, 0);
         } else {
-            gDPSetRenderMode(D_8007A184++, 0x00504340, 0);
+            gDPSetRenderMode(gfx_dl_head++, 0x00504340, 0);
         }
-        gSPDisplayList(D_8007A184++, fade_quad_dl);
+        gSPDisplayList(gfx_dl_head++, fade_quad_dl);
         if (fade_frames_left) {
             if (fade_flags & 4) {
                 fade_ramp_ptr--;

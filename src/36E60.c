@@ -54,11 +54,11 @@ typedef struct {
     /* 0x06 */ u16 unk6;
 } Unk8007A9D0;
 
-extern s32 D_8004DCA0;
-extern s16 D_8007A170;
-extern s32 D_8007A174;
-extern s16 D_8007A178;
-extern s16 D_8007A17A;
+extern s32 core_flags;
+extern s16 core_game_mode;
+extern s32 core_transition_timer;
+extern s16 fade_transition_style;
+extern s16 core_fade_out_time;
 extern f32 D_8007A98C;
 extern f32 D_8007A990;
 extern f32 D_8007A994;
@@ -71,9 +71,9 @@ extern s32 D_800842BC;
 extern s32 D_800842C4;
 extern s32 D_800842C8;
 extern s32 D_80084308;
-extern s32 D_80084980;
-extern Unk80085E48 D_80085E48;
-extern f32 D_80085F50;
+extern s32 env_clock;
+extern Unk80085E48 camera_state;
+extern f32 camera_fovy;
 extern s32 text_active_window_count;
 /* .bss 80092ED0..80092FF0 */
 s32 cutscene_sequence_index;
@@ -83,7 +83,7 @@ Unk80092EDC *cutscene_camera_track;
 s32 cutscene_image_frame;
 Cue *cutscene_next_image_cue;
 Unk80092EE8 cutscene_image_cue_slots[32];
-extern Gfx *D_8007A184;
+extern Gfx *gfx_dl_head;
 /* This file's .data, 80061850..8006CD00: textures and palettes (assets; the
  * converter put a gsSPEndDisplayList word after most images), message text
  * (assets), the message pointer tables and layouts, flags and a display list. */
@@ -650,7 +650,7 @@ void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame);
 
 void Cutscene_ResetSequence(void) {
     cutscene_sequence_index = 0;
-    D_80084980 = 0x34BC;
+    env_clock = 0x34BC;
 }
 
 void Cutscene_StartNextScene(void) {
@@ -676,11 +676,11 @@ void Cutscene_StartNextScene(void) {
         D_8007AA0E = 0;
         Player_Spawn();
     } else {
-        D_8004DCA0 |= 0x10000;
+        core_flags |= 0x10000;
     }
     Camera_InitForMap();
-    D_80085E48.unk0 = 3;
-    D_80085F50 = 35.0f;
+    camera_state.unk0 = 3;
+    camera_fovy = 35.0f;
     Cutscene_ApplyCameraFrame(cutscene_camera_track, cutscene_camera_frame);
     D_8007ABA4 = 0;
     D_8007B900 = 0;
@@ -694,16 +694,16 @@ void Cutscene_StartNextScene(void) {
 void Cutscene_UpdateScene(void) {
     Cutscene_ApplyCameraFrame(cutscene_camera_track, cutscene_camera_frame++);
     if (cutscene_camera_end_frame - cutscene_camera_frame == 0x31) {
-        if (!(D_8004DCA0 & 0x80)) {
-            D_8004DCA0 |= 0x80;
-            D_8007A178 = 2;
+        if (!(core_flags & 0x80)) {
+            core_flags |= 0x80;
+            fade_transition_style = 2;
             if (cutscene_sequence_index >= 14) {
-                D_8007A174 = 0x14E;
-                D_8007A17A = 0x14C;
+                core_transition_timer = 0x14E;
+                core_fade_out_time = 0x14C;
                 Audio_StartSeqFadeOut(0x12C);
             } else {
-                D_8007A174 = 0x31;
-                D_8007A17A = 0x2F;
+                core_transition_timer = 0x31;
+                core_fade_out_time = 0x2F;
             }
         }
     }
@@ -711,10 +711,10 @@ void Cutscene_UpdateScene(void) {
 
 void Cutscene_EndScene(void) {
     if (cutscene_sequence_index < 14) {
-        D_8004DCA0 |= 0x60;
+        core_flags |= 0x60;
     } else {
-        D_8007A170 = 0;
-        D_8004DCA0 |= 0x8240;
+        core_game_mode = 0;
+        core_flags |= 0x8240;
     }
 }
 
@@ -726,14 +726,14 @@ void Cutscene_ApplyCameraFrame(Unk80092EDC *arg0, s32 frame) {
         frame = arg0->unk6;
     }
     Math_EvalTcbSpline(arg0, buf, frame);
-    D_80085E48.unkC = buf[0];
-    D_80085E48.unk10 = buf[1];
-    D_80085E48.unk14 = buf[2];
+    camera_state.unkC = buf[0];
+    camera_state.unk10 = buf[1];
+    camera_state.unk14 = buf[2];
     Math_MtxFRotate(m, -buf[4] * 0.0174532925199432955, -buf[3] * 0.0174532925199432955, buf[5] * 0.0174532925199432955);
-    Math_MtxFMulVecNegZ(m, 0.0f, 0.0f, -100.0f, &D_80085E48.unk18, &D_80085E48.unk1C, &D_80085E48.unk20);
-    D_80085E48.unk18 += D_80085E48.unkC;
-    D_80085E48.unk1C += D_80085E48.unk10;
-    D_80085E48.unk20 = D_80085E48.unk14 - D_80085E48.unk20;
+    Math_MtxFMulVecNegZ(m, 0.0f, 0.0f, -100.0f, &camera_state.unk18, &camera_state.unk1C, &camera_state.unk20);
+    camera_state.unk18 += camera_state.unkC;
+    camera_state.unk1C += camera_state.unk10;
+    camera_state.unk20 = camera_state.unk14 - camera_state.unk20;
 }
 
 void Cutscene_UpdateAndDrawImageCues(void) {
@@ -760,7 +760,7 @@ void Cutscene_UpdateAndDrawImageCues(void) {
         } while (cutscene_image_frame == cutscene_next_image_cue->frame);
     }
     slot = cutscene_image_cue_slots;
-    gSPDisplayList(D_8007A184++, cutscene_image_setup_dl);
+    gSPDisplayList(gfx_dl_head++, cutscene_image_setup_dl);
     for (n = 32; n != 0; slot++) {
         n--;
         d = slot->unk0;
@@ -776,11 +776,11 @@ void Cutscene_UpdateAndDrawImageCues(void) {
                     a = 0xFF;
                 }
             }
-            gDPLoadTextureTile_4b(D_8007A184++, cue->img, G_IM_FMT_CI, (cue->w + 15) & ~15, cue->h, 0, 0, cue->w - 1, cue->h - 1, 0, 0, 0, 0, 0, 0, 0);
-            gDPLoadTLUT_pal16(D_8007A184++, 0, cue->tlut);
-            gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, a);
+            gDPLoadTextureTile_4b(gfx_dl_head++, cue->img, G_IM_FMT_CI, (cue->w + 15) & ~15, cue->h, 0, 0, cue->w - 1, cue->h - 1, 0, 0, 0, 0, 0, 0, 0);
+            gDPLoadTLUT_pal16(gfx_dl_head++, 0, cue->tlut);
+            gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, a);
             xr = (cue->x + cue->w) & ~1;
-            gSPTextureRectangle(D_8007A184++, cue->x << 2, cue->y << 2, xr << 2, (cue->y + cue->h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+            gSPTextureRectangle(gfx_dl_head++, cue->x << 2, cue->y << 2, xr << 2, (cue->y + cue->h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
             slot->unk0--;
         }
     }

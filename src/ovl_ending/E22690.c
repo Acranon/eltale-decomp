@@ -6,7 +6,7 @@
  * Folder: src/game/ending/   (proposed for round 4)
  */
 
-extern Gfx* D_8007A184;
+extern Gfx* gfx_dl_head;
 extern Gfx D_8020F6C0_ovl_ending[];
 
 s32 Ending_RunSpriteScript(void);
@@ -183,18 +183,18 @@ s32 Ending_Update(void) {
     s32 ret;
 
     idx = (D_8020F698_ovl_ending + 1) & 1;
-    D_80238658_ovl_ending = D_8007A184;
-    D_8007A184 = D_8022EA18_ovl_ending[idx];
-    gSPDisplayList(D_8007A184++, D_8020F6C0_ovl_ending);
+    D_80238658_ovl_ending = gfx_dl_head;
+    gfx_dl_head = D_8022EA18_ovl_ending[idx];
+    gSPDisplayList(gfx_dl_head++, D_8020F6C0_ovl_ending);
     // D_8020F698 is a function static in the original: IDO does not keep its address
     // in a register. Until D2 moves the data into C, write it through the neighbouring
     // symbol so this extern's address is not CSE'd either.
     (&D_8020F694_ovl_ending)[1] = idx;
     ret = Ending_RunSpriteScript();
     idx = D_8020F698_ovl_ending;
-    gSPEndDisplayList(D_8007A184++);
-    D_8007A184 = D_80238658_ovl_ending;
-    gSPDisplayList(D_8007A184++, D_8022EA18_ovl_ending[idx]);
+    gSPEndDisplayList(gfx_dl_head++);
+    gfx_dl_head = D_80238658_ovl_ending;
+    gSPDisplayList(gfx_dl_head++, D_8022EA18_ovl_ending[idx]);
     return ret;
 }
 
@@ -913,9 +913,9 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
             }
         }
     }
-    gDPSetRenderMode(D_8007A184++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
-    gDPSetTextureFilter(D_8007A184++, G_TF_POINT);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gDPSetRenderMode(gfx_dl_head++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+    gDPSetTextureFilter(gfx_dl_head++, G_TF_POINT);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     for (entry = list; entry != &list[150]; entry++) {
         idx = entry->idx;
         obj = &D_8022BB38_ovl_ending[idx];
@@ -1041,43 +1041,43 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
                 rect.prim = obj->unk4E;
                 rect.env = 0xFF;
             }
-            gDPPipeSync(D_8007A184++);
+            gDPPipeSync(gfx_dl_head++);
             if ((flags & 0xF0) || fadeDone) {
-                gSPDisplayList(D_8007A184++, D_8020F748_ovl_ending);
-                gDPSetEnvColor(D_8007A184++, rect.prim, rect.prim, rect.prim, rect.env);
+                gSPDisplayList(gfx_dl_head++, D_8020F748_ovl_ending);
+                gDPSetEnvColor(gfx_dl_head++, rect.prim, rect.prim, rect.prim, rect.env);
             } else {
-                gSPDisplayList(D_8007A184++, D_8020F718_ovl_ending);
+                gSPDisplayList(gfx_dl_head++, D_8020F718_ovl_ending);
             }
-            gDPPipeSync(D_8007A184++);
+            gDPPipeSync(gfx_dl_head++);
             if (obj->unk0 & 0x0C000000) {
                 if (obj->unk0 & 0x08000000) {
-                    gDPLoadTLUT_pal256(D_8007A184++, obj->unk14);
-                    gDPLoadTextureTile(D_8007A184++, obj->unk18, G_IM_FMT_CI, G_IM_SIZ_8b, obj->unk10, 0, rect.s, rect.t,
+                    gDPLoadTLUT_pal256(gfx_dl_head++, obj->unk14);
+                    gDPLoadTextureTile(gfx_dl_head++, obj->unk18, G_IM_FMT_CI, G_IM_SIZ_8b, obj->unk10, 0, rect.s, rect.t,
                                        rect.s + rect.sw - 1, rect.t + rect.th - 1, 0, 0, 0, 0, 0, 0, 0);
                 } else if (obj->unk0 & 0x04000000) {
-                    gDPLoadTLUT_pal16(D_8007A184++, 0, obj->unk14);
-                    gDPLoadTextureTile_4b(D_8007A184++, obj->unk18, G_IM_FMT_CI, obj->unk10, 0, rect.s, rect.t,
+                    gDPLoadTLUT_pal16(gfx_dl_head++, 0, obj->unk14);
+                    gDPLoadTextureTile_4b(gfx_dl_head++, obj->unk18, G_IM_FMT_CI, obj->unk10, 0, rect.s, rect.t,
                                           rect.s + rect.sw - 1, rect.t + rect.th - 1, 0, 0, 0, 0, 0, 0, 0);
                 }
             } else {
-                gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
-                gDPLoadTextureTile(D_8007A184++, obj->unk18, G_IM_FMT_RGBA, G_IM_SIZ_16b, obj->unk10, 0, rect.s, rect.t,
+                gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
+                gDPLoadTextureTile(gfx_dl_head++, obj->unk18, G_IM_FMT_RGBA, G_IM_SIZ_16b, obj->unk10, 0, rect.s, rect.t,
                                    rect.s + rect.sw - 1, rect.t + rect.th - 1, 0, 0, 0, 0, 0, 0, 0);
             }
             if (obj->unk0 & 0x60000) {
                 if (obj->unk0 & 0x20000) {
                     rect.dsdx = -0x400;
-                    GFX_TEXRECT_STEPS(D_8007A184++, rect.unk0 << 2, rect.unk4 << 2, (rect.unk0 + rect.unk10) << 2,
+                    GFX_TEXRECT_STEPS(gfx_dl_head++, rect.unk0 << 2, rect.unk4 << 2, (rect.unk0 + rect.unk10) << 2,
                                         (rect.unk4 + rect.unk14) << 2, G_TX_RENDERTILE, (rect.s + rect.sw - 1) << 5,
                                         rect.tfrac, rect.dsdx, rect.dtdy);
                 } else {
                     rect.dtdy = -0x400;
-                    GFX_TEXRECT_STEPS(D_8007A184++, rect.unk0 << 2, rect.unk4 << 2, (rect.unk0 + rect.unk10) << 2,
+                    GFX_TEXRECT_STEPS(gfx_dl_head++, rect.unk0 << 2, rect.unk4 << 2, (rect.unk0 + rect.unk10) << 2,
                                         (rect.unk4 + rect.unk14) << 2, G_TX_RENDERTILE, rect.sfrac,
                                         (rect.t + rect.th - 1) << 5, rect.dsdx, rect.dtdy);
                 }
             } else {
-                gSPTextureRectangle(D_8007A184++, rect.unk0 << 2, rect.unk4 << 2, (rect.unk0 + rect.unk10) << 2,
+                gSPTextureRectangle(gfx_dl_head++, rect.unk0 << 2, rect.unk4 << 2, (rect.unk0 + rect.unk10) << 2,
                                     (rect.unk4 + rect.unk14) << 2, G_TX_RENDERTILE, rect.sfrac, rect.tfrac, rect.dsdx,
                                     rect.dtdy);
             }
@@ -1122,10 +1122,10 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     if (D_8020F6B4_ovl_ending == 2) {
         return 1;
     }
-    gDPPipeSync(D_8007A184++);
-    gDPSetRenderMode(D_8007A184++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
-    gSPDisplayList(D_8007A184++, D_8020F730_ovl_ending);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetRenderMode(gfx_dl_head++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+    gSPDisplayList(gfx_dl_head++, D_8020F730_ovl_ending);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     if (D_8020F6A0_ovl_ending == 0x26AC) {
         D_8020F6AC_ovl_ending = 2;
         D_8020F6B0_ovl_ending = 1;
@@ -1158,22 +1158,22 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     }
     D_8020F6A4_ovl_ending = alpha;
     if (D_8020F6A0_ovl_ending < 0x2814) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, (s32) alpha);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
         pic = &D_80210800_ovl_ending[arg0];
         width = pic->width;
         img = pic->img;
-        gDPLoadTLUT_pal256(D_8007A184++, pic->tlut);
+        gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);
         D_8020F6A4_ovl_ending = alpha;
         x = (s32) D_8020F69C_ovl_ending % width;
         for (y = 0; y < 222; y += 6) {
-            gDPLoadTextureTile(D_8007A184++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
                                0, 0);
-            gSPTextureRectangle(D_8007A184++, 0, y << 2, (304 - x) << 2, (y + 6) << 2, G_TX_RENDERTILE, x << 5, y << 5,
+            gSPTextureRectangle(gfx_dl_head++, 0, y << 2, (304 - x) << 2, (y + 6) << 2, G_TX_RENDERTILE, x << 5, y << 5,
                                 0x400, 0x400);
-            gDPLoadTextureTile(D_8007A184++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, y, x - 1, y + 5, 0, 0, 0, 0, 0,
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, y, x - 1, y + 5, 0, 0, 0, 0, 0,
                                0, 0);
-            gSPTextureRectangle(D_8007A184++, (304 - x) << 2, y << 2, 304 << 2, (y + 6) << 2, G_TX_RENDERTILE, 0, y << 5,
+            gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, y << 2, 304 << 2, (y + 6) << 2, G_TX_RENDERTILE, 0, y << 5,
                                 0x400, 0x400);
         }
     }
@@ -1206,22 +1206,22 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     }
     D_8020F6A8_ovl_ending = alpha;
     if (D_8020F6A0_ovl_ending >= 0x26AC) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetEnvColor(D_8007A184++, 0xFF, 0xFF, 0xFF, (s32) alpha);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
         pic = &D_80210800_ovl_ending[arg0 + 1];
         width = pic->width;
         img = pic->img;
-        gDPLoadTLUT_pal256(D_8007A184++, pic->tlut);
+        gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);
         D_8020F6A8_ovl_ending = alpha;
         x = (s32) scroll % width;
         for (y = 0; y < 222; y += 6) {
-            gDPLoadTextureTile(D_8007A184++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
                                0, 0);
-            gSPTextureRectangle(D_8007A184++, 0, y << 2, (304 - x) << 2, (y + 6) << 2, G_TX_RENDERTILE, x << 5, y << 5,
+            gSPTextureRectangle(gfx_dl_head++, 0, y << 2, (304 - x) << 2, (y + 6) << 2, G_TX_RENDERTILE, x << 5, y << 5,
                                 0x400, 0x400);
-            gDPLoadTextureTile(D_8007A184++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, y, x - 1, y + 5, 0, 0, 0, 0, 0,
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, y, x - 1, y + 5, 0, 0, 0, 0, 0,
                                0, 0);
-            gSPTextureRectangle(D_8007A184++, (304 - x) << 2, y << 2, 304 << 2, (y + 6) << 2, G_TX_RENDERTILE, 0, y << 5,
+            gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, y << 2, 304 << 2, (y + 6) << 2, G_TX_RENDERTILE, 0, y << 5,
                                 0x400, 0x400);
         }
     }

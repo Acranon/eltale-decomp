@@ -107,7 +107,7 @@ Unk8008FBA8 save_menu_header_read_scratch; /* Pak_ReadFile reads 0x80 bytes into
 u8 D_80090358[0x18];    /* the rest of that 0x80-byte buffer: unreferenced */
 u8 save_menu_state_read_scratch[0xE0];
 
-extern s32 D_8004DCA0;
+extern s32 core_flags;
 extern s8 menu_bgm_volume_option;
 extern s8 D_800616B0;
 extern u16 D_8007A9AC;
@@ -123,15 +123,15 @@ extern s32 D_800842D8;
 extern s32 D_800842DC;
 extern s32 D_800842E0;
 extern s32 D_800842E4;
-extern u16 D_80084990;
-extern u16 D_80084992;
-extern u8 D_80085988[];
-extern u8 D_80085A98[];
+extern u16 env_day_count;
+extern u16 env_play_time;
+extern u8 chest_opened_flags[];
+extern u8 spirit_collected_flags[];
 extern u8 item_inventory[];
 extern Unk80092E48 pak_game_file_scans[];
 extern Gfx text_glyph_setup_dl[];
-extern s16 D_8007A170;
-extern Gfx *D_8007A184;
+extern s16 core_game_mode;
+extern Gfx *gfx_dl_head;
 extern u16 menu_flags;
 extern s16 save_menu_choice_rects[][4];
 extern u8 *save_menu_choice_messages[];
@@ -188,7 +188,7 @@ void Menu_PrintNumber(s32, s32, s32, u32);
 #endif
 
 void SaveMenu_Init(s32 arg0) {
-    D_8007A170 = 2;
+    core_game_mode = 2;
     menu_flags = menu_flags | arg0 | 0x4000;
     save_menu_flags = 0x1000;
     save_menu_choice_cursor = 0xFF;
@@ -1246,15 +1246,15 @@ void SaveMenu_RefreshFileList(void) {
                 save_menu_flags &= 0xFFF8;
                 save_menu_flags |= 5;
             } else if (e->unk64 != 0) {
-                D_8004DCA0 |= 0x20000;
+                core_flags |= 0x20000;
             }
         }
     }
 }
 
 void SaveMenu_SetTextDrawState(void) {
-    gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     menu_flags &= ~0x10;
 }
 
@@ -1289,8 +1289,8 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     s32 n;
 
     e->unk0 = D_8007A9D0;
-    e->unk38 = D_80084992;
-    e->unk3A = D_80084990;
+    e->unk38 = env_play_time;
+    e->unk3A = env_day_count;
     e->unk3C = D_800842BC;
     e->unk40 = D_800842C0;
     e->unk44 = D_800842D0;
@@ -1304,17 +1304,17 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     e->unk60 = D_8007A9B0;
     e->unk62 = D_800616B0;
     e->unk63 = menu_bgm_volume_option;
-    if (D_8004DCA0 & 0x20000) {
+    if (core_flags & 0x20000) {
         e->unk64 = 1;
     } else {
         e->unk64 = 0;
     }
     d = save_menu_game_state_block.unk0.b;
-    for (s = D_80085988, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
+    for (s = chest_opened_flags, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
         *d++ = *s++;
     }
     d = D_80090248;
-    for (s = D_80085A98, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
+    for (s = spirit_collected_flags, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
         *d++ = *s++;
     }
     d = D_80090258;
@@ -1334,8 +1334,8 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     s32 n;
 
     D_8007A9D0 = e->unk0;
-    D_80084992 = e->unk38;
-    D_80084990 = e->unk3A;
+    env_play_time = e->unk38;
+    env_day_count = e->unk3A;
     D_800842BC = e->unk3C;
     D_800842C0 = e->unk40;
     D_800842D0 = e->unk44;
@@ -1350,13 +1350,13 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     D_800616B0 = e->unk62;
     menu_bgm_volume_option = e->unk63;
     if (e->unk64 != 0) {
-        D_8004DCA0 |= 0x20000;
+        core_flags |= 0x20000;
     }
-    for (s = save_menu_game_state_block.unk0.b, d = D_80085988, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
+    for (s = save_menu_game_state_block.unk0.b, d = chest_opened_flags, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
         *d++ = *s++;
     }
     s = D_80090248;
-    for (d = D_80085A98, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
+    for (d = spirit_collected_flags, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
         *d++ = *s++;
     }
     s = D_80090258;

@@ -25,7 +25,7 @@ s32 menu_options_marker_x; /* only Menu_UpdateOptionsPage (asm) uses it */
 f32 menu_map_cursor_saved_x; /* only Menu_UpdateMapPage (asm) uses these two */
 f32 menu_map_cursor_saved_y;
 
-extern Gfx* D_8007A184;
+extern Gfx* gfx_dl_head;
 extern u16 save_menu_flags;
 
 void Menu_Init(void) {
@@ -40,9 +40,9 @@ void Menu_ResetKeepPage(void) {
     menu_map_cursor_active = 0;
 }
 
-extern Gfx* D_8007A184;
+extern Gfx* gfx_dl_head;
 extern Gfx text_glyph_setup_dl[];
-extern u16 D_8007A170;
+extern u16 core_game_mode;
 extern u16 input_pressed_buttons;
 void Sfx_Play(u8 arg0, s8 arg1, u8 arg2);
 
@@ -55,8 +55,8 @@ void Menu_DrawBackground();
 void SaveMenu_Update(void);
 
 void Menu_Update(s32 arg0) {
-    gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     Menu_DrawBackground();
     menu_frame_counter++;
     if (menu_flags & 0x4000) {
@@ -80,8 +80,8 @@ void Menu_Update(s32 arg0) {
         }
     }
     menu_flags &= ~0x10;
-    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
-    gDPSetBlendColor(D_8007A184++, 0, 0, 0, 1);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
+    gDPSetBlendColor(gfx_dl_head++, 0, 0, 0, 1);
     if ((input_pressed_buttons & 0x5000) && !(menu_flags & 0x6020)) {
         menu_flags &= 0x7FFF;
         Sfx_Play(0, 1, 0xFF);
@@ -91,22 +91,22 @@ void Menu_Update(s32 arg0) {
             switch ((u16)(menu_flags & 0xC)) {
                 case 0:
                     if (save_menu_flags & 0x80) {
-                        D_8007A170 = 1;
+                        core_game_mode = 1;
                         menu_save_loaded = 1;
                     } else {
-                        D_8007A170 = 3;
+                        core_game_mode = 3;
                         menu_save_loaded = 0;
                     }
                     break;
                 case 8:
-                    D_8007A170 = 3;
+                    core_game_mode = 3;
                     break;
                 case 4:
-                    D_8007A170 = 1;
+                    core_game_mode = 1;
                     break;
             }
         } else {
-            D_8007A170 = 1;
+            core_game_mode = 1;
         }
         Menu_ResetKeepPage();
     }
@@ -216,8 +216,8 @@ void Menu_UpdateStatsPage(s32 x) {
     f32 f;
     s32 pad[2]; // unused locals in the original (frame size)
 
-    gDPPipeSync(D_8007A184++);
-    gDPSetEnvColor(D_8007A184++, 255, 255, 255, 255);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 255);
     Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x98);
     Menu_DrawSprite(0x37, x + 0x2B, 0xB7, 0xF0, 3);
     Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x96);
@@ -628,18 +628,18 @@ void Menu_UpdateMapPage(s32 arg0) {
             s = 0;
         }
         if (h != 0) {
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTLUT_pal256(D_8007A184++, menu_map_tluts[menu_map_region]);
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_tluts[menu_map_region]);
             for (i = 0; i < 24; i++) {
                 if (i == 23) {
                     h = 1;
                 }
-                gDPLoadTextureTile(D_8007A184++, menu_map_strips[menu_map_region * 24 + i], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
+                gDPLoadTextureTile(gfx_dl_head++, menu_map_strips[menu_map_region * 24 + i], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
                                    243, h - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                    G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
                                     1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
+                gDPPipeSync(gfx_dl_head++);
                 y += h;
             }
             SaveMenu_SetTextDrawState();
@@ -683,20 +683,20 @@ void Menu_UpdateMapPage(s32 arg0) {
             s = 0;
         }
         if (h != 0) {
-            gDPLoadTLUT_pal256(D_8007A184++, menu_map_small_tluts[n]);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_small_tluts[n]);
             menu_flags &= ~0x10;
-            gDPLoadTextureTile(D_8007A184++, menu_map_small_tex[n * 2], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][1], 0, 0,
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][1], 0, 0,
                                menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][1] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-            gDPPipeSync(D_8007A184++);
-            gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
+            gDPPipeSync(gfx_dl_head++);
+            gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
                                 1 << 10, 1 << 10);
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTextureTile(D_8007A184++, menu_map_small_tex[n * 2 + 1], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][2], 0, 0,
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2 + 1], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][2], 0, 0,
                                menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][2] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-            gDPPipeSync(D_8007A184++);
-            gSPTextureRectangle(D_8007A184++, x << 2, (y + menu_map_small_sizes[n][1]) << 2, (x + w) << 2, (y + h + menu_map_small_sizes[n][2]) << 2,
+            gDPPipeSync(gfx_dl_head++);
+            gSPTextureRectangle(gfx_dl_head++, x << 2, (y + menu_map_small_sizes[n][1]) << 2, (x + w) << 2, (y + h + menu_map_small_sizes[n][2]) << 2,
                                 G_TX_RENDERTILE, s, 0, 1 << 10, 1 << 10);
             SaveMenu_SetTextDrawState();
         }
@@ -999,27 +999,27 @@ void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
         ret = -1;
     }
     if (ret >= 0) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
-        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
         if (alpha == 0) {
-            gSPDisplayList(D_8007A184++, menu_sprite_opaque_dl);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
         } else {
-            gSPDisplayList(D_8007A184++, menu_sprite_alpha_dl);
-            gDPPipeSync(D_8007A184++);
-            gDPSetEnvColor(D_8007A184++, 255, 255, 255, alpha);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
+            gDPPipeSync(gfx_dl_head++);
+            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, alpha);
         }
         if (!(menu_flags & 0x10)) {
-            gDPPipeSync(D_8007A184++);
-            gDPLoadTLUT_pal256(D_8007A184++, menu_ui_tlut);
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
             menu_flags |= 0x10;
         }
-        gDPLoadTextureTile(D_8007A184++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
+        gDPLoadTextureTile(gfx_dl_head++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, masks, maskt, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, t, dsdx,
+        gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, t, dsdx,
                             dtdy);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
     }
 }
 #else
@@ -1056,18 +1056,18 @@ void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
     s32 ret;
 
     for (k = 0; k < 4; k++) {
-        gDPPipeSync(D_8007A184++);
-        gDPSetRenderMode(D_8007A184++, 0x504240, 0);
-        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
         if (k != 1) {
-            gSPDisplayList(D_8007A184++, menu_sprite_opaque_dl);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
         } else {
-            gSPDisplayList(D_8007A184++, menu_sprite_alpha_dl);
-            gDPSetEnvColor(D_8007A184++, 255, 255, 255, 0x80);
+            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
+            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 0x80);
         }
-        gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, pals.v[k]);
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, pals.v[k]);
         for (j = 0; j < 2; j++) {
             s[0] = 0;
             switch (k) {
@@ -1122,12 +1122,12 @@ void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
                 ret = -1;
             }
             if (ret >= 0) {
-                gDPLoadTextureTile(D_8007A184++, tex.v[k][j], G_IM_FMT_CI, G_IM_SIZ_8b, texW, texH, 0, ult, texW - 1,
+                gDPLoadTextureTile(gfx_dl_head++, tex.v[k][j], G_IM_FMT_CI, G_IM_SIZ_8b, texW, texH, 0, ult, texW - 1,
                                    texH - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                    G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + w) << 2, (y + h - ult) << 2, G_TX_RENDERTILE, s[0],
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h - ult) << 2, G_TX_RENDERTILE, s[0],
                                     t, 1 << 10, 1 << 10);
-                gDPPipeSync(D_8007A184++);
+                gDPPipeSync(gfx_dl_head++);
             }
         }
     }
@@ -1152,23 +1152,23 @@ void Menu_DrawBackground(void) {
     Unk4Words stripH = menu_bg_strip_heights;
     Unk4Ptrs tex = menu_bg_strip_tex;
 
-    gDPPipeSync(D_8007A184++);
-    gDPLoadTLUT_pal256(D_8007A184++, D_80066E88);
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTLUT_pal256(gfx_dl_head++, D_80066E88);
     menu_flags &= ~0x10;
     for (i = 0, y = 22; i < 4; i++) {
-        gDPLoadTextureTile(D_8007A184++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
                            G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0, 0,
+        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0, 0,
                             0x4A8, 0x4E6);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
         y += stripH.v[i];
     }
     for (i = 3, y = 120; i >= 0; i--) {
-        gDPLoadTextureTile(D_8007A184++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
                            G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0,
+        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0,
                             (texH.v[i] - 1) << 5, 0x4A8, -0x4E6);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
         y += stripH.v[i];
     }
 }
@@ -1208,18 +1208,18 @@ void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     digits[0] = v;
     i = 0;
     if (!(menu_flags & 0x10)) {
-        gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, menu_ui_tlut);
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
         menu_flags |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {
         i += digits[n];
         if (i != 0 || n == 0) {
-            gDPLoadTextureTile(D_8007A184++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
+            gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
                                0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
-            gSPTextureRectangle(D_8007A184++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
+            gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
                                 G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-            gDPPipeSync(D_8007A184++);
+            gDPPipeSync(gfx_dl_head++);
         }
         xoff += 7;
     }
@@ -1256,16 +1256,16 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
     }
     digits[0] = v;
     if (!(menu_flags & 0x10)) {
-        gDPPipeSync(D_8007A184++);
-        gDPLoadTLUT_pal256(D_8007A184++, menu_ui_tlut);
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_ui_tlut);
         menu_flags |= 0x10;
     }
     for (n = ndigits - 1; n >= 0; n--) {
-        gDPLoadTextureTile(D_8007A184++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
+        gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
                            0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(D_8007A184++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
+        gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
                             G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-        gDPPipeSync(D_8007A184++);
+        gDPPipeSync(gfx_dl_head++);
         xoff += 7;
     }
 }

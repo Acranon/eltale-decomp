@@ -91,12 +91,12 @@ typedef struct {
 } Unk8010FDC4;
 
 /* This file's .bss, 80085290..800859B0, in address order (first declaration fixes the order). */
-Unk80085290 D_80085290[16];
-s32 D_80085950;
-Unk80085958 D_80085958;
+Unk80085290 chest_objects[16];
+s32 chest_count;
+Unk80085958 chest_local_offset;
 u8 D_80085960[8]; /* unreferenced */
-Unk80085968 D_80085968;
-u8 D_80085988[0x20];
+Unk80085968 chest_floor_result;
+u8 chest_opened_flags[0x20];
 u8 D_800859A8[8];
 
 extern u8 math_bit_masks[];
@@ -104,14 +104,14 @@ extern s32 D_800842BC;
 extern s32 D_800842C0;
 extern Unk8010FDC4 D_8010FDC4[];
 /* Message text around the name in Item_BuildMessage. */
-u8 D_8004DF00[8] = {
-#include "assets/D_8004DF00.inc.c"
+u8 item_message_prefix[8] = {
+#include "assets/item_message_prefix.inc.c"
 };
-u8 D_8004DF08[20] = {
-#include "assets/D_8004DF08.inc.c"
+u8 item_message_suffix[20] = {
+#include "assets/item_message_suffix.inc.c"
 };
 /* Per-map placement groups (the group arrays are in the map overlays). */
-Unk8004DF1C D_8004DF1C[19] = {
+Unk8004DF1C chest_map_placements[19] = {
     { 0x0D, (Unk140D0Group*) 0x80199140 },
     { 0x0E, (Unk140D0Group*) 0x801A3B44 },
     { 0x0F, (Unk140D0Group*) 0x801697A4 },
@@ -150,7 +150,7 @@ void Chest_ClearOpenedFlags(void) {
     s32 i;
 
     for (i = 0; i < 0x20; i++) {
-        D_80085988[i] = 0;
+        chest_opened_flags[i] = 0;
     }
 }
 
@@ -163,28 +163,28 @@ void Chest_LoadForMap(void) {
     s32 id;
     s32 mode;
 
-    for (id = D_800842BC, entry = D_8004DF1C, i = 0; i < 19; i++, entry++) {
+    for (id = D_800842BC, entry = chest_map_placements, i = 0; i < 19; i++, entry++) {
         if (id == entry->id) {
             break;
         }
     }
     if (i != 19) {
         group = &entry->groups[D_800842C0];
-        D_80085950 = group->count;
-        i = D_80085950;
+        chest_count = group->count;
+        i = chest_count;
         def = group->defs;
-        p = D_80085290;
+        p = chest_objects;
         while (i != 0) {
             p->x = def->x;
             p->z = def->z;
             p->rx = 0.0f;
             p->rz = 0.0f;
             p->ry = def->ry;
-            Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &D_80085968);
-            p->y = D_80085968.unk4;
-            p->unk2C = D_80085968.unkC;
-            p->unk30 = D_80085968.unk10;
-            p->unk34 = D_80085968.unk14;
+            Coll_ResolveFloorAndWalls(p->x, 0.0f, p->z, 0xA00, &chest_floor_result);
+            p->y = chest_floor_result.unk4;
+            p->unk2C = chest_floor_result.unkC;
+            p->unk30 = chest_floor_result.unk10;
+            p->unk34 = chest_floor_result.unk14;
             p->unk1C = def->unk14;
             p->unk18 = def->unk18;
             p->unk20 = def->unk1C;
@@ -205,7 +205,7 @@ void Chest_LoadForMap(void) {
             def++;
         }
     } else {
-        D_80085950 = 0;
+        chest_count = 0;
     }
 }
 
@@ -214,8 +214,8 @@ void Chest_UpdateAll(s32 arg0) {
     Unk80085290* p;
     u16 t;
 
-    n = D_80085950;
-    p = D_80085290;
+    n = chest_count;
+    p = chest_objects;
     while (n != 0) {
         if (p->unk60 & 0x8000) {
             t = p->unk60 & ~0x8000;
@@ -236,8 +236,8 @@ void Chest_UpdateAll(s32 arg0) {
 }
 
 Unk80085290* Chest_FindInFront(Unk80013808Arg* arg0) {
-    s32 n = D_80085950;
-    Unk80085290* obj = D_80085290;
+    s32 n = chest_count;
+    Unk80085290* obj = chest_objects;
     f32 d;
     f32 dx;
     f32 dz;
@@ -254,11 +254,11 @@ Unk80085290* Chest_FindInFront(Unk80013808Arg* arg0) {
                 dx = arg0->x - obj->unk44;
                 dz = arg0->z - obj->unk4C;
                 if (dx * dx + dz * dz < 300.0f) {
-                    D_80085958.x = dx;
-                    D_80085958.y = dz;
-                    Math_RotateVec2(obj->unk1C, &D_80085958);
-                    dx = D_80085958.x;
-                    dz = D_80085958.y;
+                    chest_local_offset.x = dx;
+                    chest_local_offset.y = dz;
+                    Math_RotateVec2(obj->unk1C, &chest_local_offset);
+                    dx = chest_local_offset.x;
+                    dz = chest_local_offset.y;
                     if (dx < 0.0f) {
                         dx = -dx;
                     }
@@ -291,7 +291,7 @@ void Item_BuildMessage(s32 arg0) {
     u8* src;
     u8* dst;
 
-    src = D_8004DF00;
+    src = item_message_prefix;
     dst = D_8007B430;
     while (*src != 0xFF) {
         *dst++ = *src++;
@@ -300,7 +300,7 @@ void Item_BuildMessage(s32 arg0) {
     while (*src != 0xFF) {
         *dst++ = *src++;
     }
-    src = D_8004DF08;
+    src = item_message_suffix;
     while (*src != 0xFF) {
         *dst++ = *src++;
     }
@@ -309,5 +309,5 @@ void Item_BuildMessage(s32 arg0) {
 }
 
 u8 Chest_IsOpened(u16 arg0) {
-    return D_80085988[arg0 >> 3] & math_bit_masks[arg0 & 7];
+    return chest_opened_flags[arg0 >> 3] & math_bit_masks[arg0 & 7];
 }

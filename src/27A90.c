@@ -25,9 +25,9 @@ u8 math_bit_masks[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 u32 math_rand_seed = 0x9B0;
 MtxF math_scratch_mtxf; /* .bss 8008CE60..8008CEA0 */
 
-extern MtxF D_80085F10;
-extern f32 D_80085F54;
-extern f32 D_80085F5C;
+extern MtxF camera_view_mtx;
+extern f32 camera_near;
+extern f32 camera_tan_half_fovy;
 
 f32 Math_Atan(f32 x);
 void Math_MtxFRotScaleTrans(MtxF* arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7);
@@ -439,12 +439,12 @@ s32 Camera_WorldToScreen(f32 arg0, f32 arg1, f32 arg2, s32* arg3, s32* arg4) {
     f32 z;
     f32 w;
 
-    guMtxXFMF(D_80085F10.mf, arg0, arg1, arg2, &x, &y, &z);
-    ret = z < -D_80085F54;
+    guMtxXFMF(camera_view_mtx.mf, arg0, arg1, arg2, &x, &y, &z);
+    ret = z < -camera_near;
     if (ret) {
-        w = z * D_80085F5C;
+        w = z * camera_tan_half_fovy;
         *arg3 = 160 - (s32) (((x * 160.0) / w) * 0.75);
         *arg4 = (s32) ((120.0f * y) / w) + 120;
     }
-    return z < -D_80085F54;
+    return z < -camera_near;
 }

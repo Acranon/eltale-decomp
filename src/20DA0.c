@@ -203,10 +203,10 @@ typedef struct {
     /* 0x14 */ f32 unk14;
 } Struct_80085E48;
 
-extern Gfx* D_8007A184;
-extern s32 D_8007A180;
+extern Gfx* gfx_dl_head;
+extern s32 gfx_mtx_index;
 extern Unk2000000 D_2000000;
-extern Struct_80085E48 D_80085E48;
+extern Struct_80085E48 camera_state;
 void Math_MtxFRotDegScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32, f32, f32);
 void Math_MtxFMul(MtxF*, MtxF*, MtxF*);
 void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
@@ -248,15 +248,15 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
     scale.z *= xf.unk18.z;
     if (anim->unk16 & 1) {
         Math_MtxFMul(parent, &mtx, &mtx);
-        Math_MtxFAimAt(&anim_billboard_mtx_scratch, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], D_80085E48.unkC, D_80085E48.unk10,
-                      D_80085E48.unk14);
+        Math_MtxFAimAt(&anim_billboard_mtx_scratch, mtx.mf[3][0], mtx.mf[3][1], mtx.mf[3][2], camera_state.unkC, camera_state.unk10,
+                      camera_state.unk14);
         Math_MtxFScaleAxes(&anim_billboard_mtx_scratch, scale.x, scale.y, scale.z);
-        guMtxF2L(anim_billboard_mtx_scratch.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
+        guMtxF2L(anim_billboard_mtx_scratch.mf, &((Unk2000000*)buf)->unkC0[gfx_mtx_index]);
     } else {
         Math_MtxFMul(parent, &mtx, &mtx);
-        guMtxF2L(mtx.mf, &((Unk2000000*)buf)->unkC0[D_8007A180]);
+        guMtxF2L(mtx.mf, &((Unk2000000*)buf)->unkC0[gfx_mtx_index]);
     }
-    gSPMatrix(D_8007A184++, &D_2000000.unkC0[D_8007A180++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+    gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index++], G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
     if (anim->unk16 & 2) {
         anim_node_world_positions[anim_node_position_count].x = mtx.mf[3][0];
         anim_node_world_positions[anim_node_position_count].y = mtx.mf[3][1];
@@ -269,11 +269,11 @@ void Anim_DrawNode(MtxF* parent, Vec3f scale, s32 flags, s32 idx, s32 frame, s32
         i = anim->unk15;
         if (i != -1) {
             if (dls[i] != NULL) {
-                gSPDisplayList(D_8007A184++, dls[i]);
+                gSPDisplayList(gfx_dl_head++, dls[i]);
             }
         }
     } else {
-        gSPDisplayList(D_8007A184++, dls[tbl[total % anim->unk1C]]);
+        gSPDisplayList(gfx_dl_head++, dls[tbl[total % anim->unk1C]]);
     }
     for (i = 0; i < set->unk0; i++) {
         if (anims[i].unk14 == idx + 1) {

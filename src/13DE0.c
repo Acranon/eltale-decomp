@@ -5,8 +5,8 @@
  * Folder: src/game/gfx/   (proposed for round 4)
  */
 
-extern s32 D_80085280;
+extern s32 shadow_count;
 
 void Shadow_ClearQueue(void) {
-    D_80085280 = 0;
+    shadow_count = 0;
 }

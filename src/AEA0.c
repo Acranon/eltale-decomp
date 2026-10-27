@@ -255,7 +255,7 @@ extern s16 hud_battle_message_timer;
 void Anim_DrawModel(s32, Obj *, u8 *, s32);
 void Anim_AdvanceFrame(s32, Obj *, u8 *);
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
-extern Gfx *D_8007A184;
+extern Gfx *gfx_dl_head;
 void Enemy_StartAttackScript(s32, s32);
 f32 Math_Atan2(f32, f32);
 void Anim_SetCurrentAndNext(Obj *, s32, s32, s32, s32, u16);
@@ -389,7 +389,7 @@ void Enemy_DrawAll(s32 arg0) {
 
     D_8007C02C = 0;
     list = D_8007C030;
-    gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+    gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     n = D_8007B900;
     e = D_8007B908;
     while (n != 0) {

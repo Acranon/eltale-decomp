@@ -124,8 +124,8 @@ extern CollWalls *D_8007C298;
 extern CollWalls *D_8007C29C;
 extern s32 D_800842C0;
 /* This file's .bss, 800842F0..80084300. */
-f32 D_800842F0;
-extern Vec2f D_80084320;
+f32 coll_push_radius;
+extern Vec2f exit_local_offset;
 extern u16 battle_flags;
 extern u8 item_inventory[];
 
@@ -136,7 +136,7 @@ void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) 
     s32 i;
     s32 n;
 
-    D_800842F0 = out->x;
+    coll_push_radius = out->x;
     out->x = x;
     out->y = y;
     out->z = z;
@@ -464,7 +464,7 @@ s32 Coll_PushFromWalls(f32 x, f32 z, CollWalls *walls, CollResult *out) {
             bx = a->x;
             bz = a->z;
             idx++;
-            hit |= Coll_PushFromSegment(&x, &z, D_800842F0, ax, az, bx, bz);
+            hit |= Coll_PushFromSegment(&x, &z, coll_push_radius, ax, az, bx, bz);
         }
     }
     out->x = x;
@@ -485,14 +485,14 @@ s32 Exit_CheckEnter(f32 x, f32 z, f32 angle) {
     n = D_8007C288->count;
     for (p = D_8007C288->list; n != 0; n--, p++) {
         if (Exit_IsEnabled(p)) {
-            D_80084320.x = x - p->x;
-            D_80084320.z = z - p->z;
-            Math_RotateVec2(p->angle, &D_80084320.x);
-            dx = D_80084320.x;
+            exit_local_offset.x = x - p->x;
+            exit_local_offset.z = z - p->z;
+            Math_RotateVec2(p->angle, &exit_local_offset.x);
+            dx = exit_local_offset.x;
             if (dx < 0.0f) {
                 dx = -dx;
             }
-            dz = D_80084320.z;
+            dz = exit_local_offset.z;
             if (dz < 0.0f) {
                 dz = -dz;
             }

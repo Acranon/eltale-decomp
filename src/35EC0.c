@@ -18,7 +18,7 @@ typedef struct {
     /* 0xC */ s32 unkC;
 } Font;
 
-extern Gfx *D_8007A184;
+extern Gfx *gfx_dl_head;
 /* This file's .data, 80061760..80061810. */
 Font text_font_metrics[1] = {
     { 10, 13, 10, 14 },
@@ -69,17 +69,17 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
     s32 y = y0;
     s32 c;
 
-    gDPPipeSync(D_8007A184++);
-    gDPSetTextureLUT(D_8007A184++, G_TT_RGBA16);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     for (; *str != 0xFF; str++) {
         if (*str & 0x80) {
             c = *str & 0x1F;
             switch (*str & 0x60) {
                 case 0x00:
-                    gDPLoadTextureTile_4b(D_8007A184++, D_803245A0 + c * 0x7B8, G_IM_FMT_CI, 304, 13, 0, 0, 303, 12, 0, 0, 0, 0, 0, 0, 0);
+                    gDPLoadTextureTile_4b(gfx_dl_head++, D_803245A0 + c * 0x7B8, G_IM_FMT_CI, 304, 13, 0, 0, 303, 12, 0, 0, 0, 0, 0, 0, 0);
                     break;
                 case 0x20:
-                    gDPLoadTLUT_pal16(D_8007A184++, 0, (u16 *) D_80332D30 + c * 16);
+                    gDPLoadTLUT_pal16(gfx_dl_head++, 0, (u16 *) D_80332D30 + c * 16);
                     break;
                 case 0x40:
                     if (c < 16) {
@@ -95,7 +95,7 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
                         case 0x14:
                             break;
                         case 0x1E:
-                            gSPDisplayList(D_8007A184++, text_glyph_setup_dl);
+                            gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
                             break;
                         case 0:
                             x = x0;
@@ -109,12 +109,12 @@ void Text_DrawEncodedString(s32 x0, s32 y0, u8 *str) {
             if (*str == 0x7F) {
                 x += text_font_metrics[text_current_glyph_index].unk8 + text_extra_glyph_spacing;
             } else {
-                gSPTextureRectangle(D_8007A184++, x << 2, y << 2, (x + text_font_metrics[text_current_glyph_index].unk0) << 2, (text_font_metrics[text_current_glyph_index].unk4 + y) << 2, G_TX_RENDERTILE,
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + text_font_metrics[text_current_glyph_index].unk0) << 2, (text_font_metrics[text_current_glyph_index].unk4 + y) << 2, G_TX_RENDERTILE,
                                     (text_font_metrics[text_current_glyph_index].unk0 * c) << 5, 0, 1 << 10, 1 << 10);
                 x += text_font_metrics[text_current_glyph_index].unk8 + text_extra_glyph_spacing;
             }
         }
     }
-    gDPPipeSync(D_8007A184++);
-    gDPSetTextureLUT(D_8007A184++, G_TT_NONE);
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
 }

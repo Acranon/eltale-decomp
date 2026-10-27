@@ -142,7 +142,7 @@ s32 D_8007C274;
 s32 D_8007C278[2];
 
 extern u8 math_bit_masks[];
-extern Gfx *D_8007A184;
+extern Gfx *gfx_dl_head;
 extern Unk8007AA08 D_8007AA08;
 extern u8 D_802A7BC0[];
 extern RomRange D_803AB390[];
@@ -159,11 +159,11 @@ extern u8 *D_803AC418[];
 extern u8 *D_803AC438[];
 extern u8 D_803AC328[];
 extern Unk803AB820 D_803AB4B0[];
-extern s32 D_8004DCA0;
+extern s32 core_flags;
 extern s16 D_8007A172;
-extern s32 D_8007A174;
-extern s16 D_8007A178;
-extern s16 D_8007A17A;
+extern s32 core_transition_timer;
+extern s16 fade_transition_style;
+extern s16 core_fade_out_time;
 u16 D_8004DD50[8] = { 10, 10, 15, 20, 20, 25, 25, 0 };
 u16 D_8004DD60[8] = { 5, 5, 5, 10, 10, 15, 15, 0 };
 extern Unk8007A9D0 D_8007A9D0;
@@ -205,7 +205,7 @@ void Boss_Draw(s32 arg0) {
 
     if (D_8007C140 != 0) {
         temp = D_803ABA58[D_8007C148.unk2C.unk50];
-        gDPSetTextureFilter(D_8007A184++, G_TF_BILERP);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
         Anim_DrawModel(1, &p->unk2C, temp + D_8007C148.unk2C.unk52 * 0xC, arg0);
         Anim_AdvanceFrame(p->unk2C.unk58, &p->unk2C, temp + p->unk2C.unk52 * 0xC);
         if (*p->unk2C.unk64 != 2) {
@@ -321,10 +321,10 @@ void Boss_HandleDefeat(s32 arg0) {
         }
         Text_OpenWindow(1);
         D_8007AA08.unk8 |= 0x10;
-        D_8004DCA0 |= 0x80;
-        D_8007A174 = 0x40;
-        D_8007A178 = 3;
-        D_8007A17A = 0x3E;
+        core_flags |= 0x80;
+        core_transition_timer = 0x40;
+        fade_transition_style = 3;
+        core_fade_out_time = 0x3E;
         D_8007A172 = 4;
     } else {
         D_8007A9D0.unk6 += D_8004DD50[arg0];

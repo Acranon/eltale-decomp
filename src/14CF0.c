@@ -37,11 +37,11 @@ typedef struct {
     /* 0x10 */ f32 unk10;
 } Unk80014318Arg;
 
-extern u8 D_80085A98[];
+extern u8 spirit_collected_flags[];
 extern u8 math_bit_masks[];
 extern s32 D_800842BC;
 extern s32 D_800842C0;
-Unk8004E6A0 D_8004E6A0[0x26] = {
+Unk8004E6A0 textspot_table[0x26] = {
     { 0x00, 3, 58.0f, -324.0f, -1.5707964f, 10.0f, 0, 0x0070, 0x0078 },
     { 0x00, 3, 168.0f, -295.0f, 1.2217305f, 10.0f, 0, 0x0070, 0x0078 },
     { 0x00, 3, -384.0f, -146.0f, -2.3561945f, 10.0f, 0, 0x0070, 0x0078 },
@@ -83,12 +83,12 @@ Unk8004E6A0 D_8004E6A0[0x26] = {
 };
 s32 D_8004EB60 = 0x26; /* the entry count; nothing reads it */
 /* This file's .bss, 80085AB0..80085B80, in address order (first declaration fixes
- * the order). Splat's D_80085AC8/D_80085ACC are TextSpot_LoadForMap's D_80085AC0[0].unk8
- * and &D_80085AC0[1]. */
-Unk80085AB0 D_80085AB0;
+ * the order). Splat's D_80085AC8/D_80085ACC are TextSpot_LoadForMap's textspot_list[0].unk8
+ * and &textspot_list[1]. */
+Unk80085AB0 textspot_local_dir;
 s32 D_80085AB8; /* unreferenced */
-s32 D_80085ABC;
-Unk80085AC0 D_80085AC0[16];
+s32 textspot_count;
+Unk80085AC0 textspot_list[16];
 extern u8 D_D37700[];
 extern u8 D_8007B8E0[];
 extern u8 D_8007B430[];
@@ -100,27 +100,27 @@ f32 sqrtf(f32);
 void Dma_ReadRom(u8*, void*, s32);
 
 void Spirit_SetCollected(u16 arg0) {
-    D_80085A98[arg0 >> 3] |= math_bit_masks[arg0 & 7];
+    spirit_collected_flags[arg0 >> 3] |= math_bit_masks[arg0 & 7];
 }
 
 void TextSpot_LoadForMap(void) {
-    Unk80085AC0* out = D_80085AC0;
+    Unk80085AC0* out = textspot_list;
     s32 i;
 
-    D_80085ABC = 0;
+    textspot_count = 0;
     for (i = 0; i < 0x26; i++) {
-        if (D_800842BC == D_8004E6A0[i].unk0 && D_800842C0 == D_8004E6A0[i].unk4) {
-            out->entry = &D_8004E6A0[i];
+        if (D_800842BC == textspot_table[i].unk0 && D_800842C0 == textspot_table[i].unk4) {
+            out->entry = &textspot_table[i];
             out->unk8 = 0;
             out++;
-            D_80085ABC++;
+            textspot_count++;
         }
     }
 }
 
 Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
-    s32 n = D_80085ABC;
-    Unk80085AC0* out = D_80085AC0;
+    s32 n = textspot_count;
+    Unk80085AC0* out = textspot_list;
     f32 dx;
     f32 dz;
     f32 angle;
@@ -129,19 +129,19 @@ Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
         dx = arg0->x - out->entry->x;
         dz = arg0->z - out->entry->z;
         if (sqrtf(dx * dx + dz * dz) < out->entry->unk14) {
-            D_80085AB0.x = -dx;
-            D_80085AB0.y = -dz;
-            Math_RotateVec2(arg0->unk10, &D_80085AB0);
-            angle = Math_Atan2(D_80085AB0.x, D_80085AB0.y);
+            textspot_local_dir.x = -dx;
+            textspot_local_dir.y = -dz;
+            Math_RotateVec2(arg0->unk10, &textspot_local_dir);
+            angle = Math_Atan2(textspot_local_dir.x, textspot_local_dir.y);
             if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
                 out->unk4 = arg0->unk10 - angle;
                 if (out->entry->unk18 & 1) {
                     break;
                 }
-                D_80085AB0.x = dx;
-                D_80085AB0.y = dz;
-                Math_RotateVec2(-out->entry->unk10, &D_80085AB0);
-                angle = Math_Atan2(D_80085AB0.x, D_80085AB0.y);
+                textspot_local_dir.x = dx;
+                textspot_local_dir.y = dz;
+                Math_RotateVec2(-out->entry->unk10, &textspot_local_dir);
+                angle = Math_Atan2(textspot_local_dir.x, textspot_local_dir.y);
                 if (angle < 0.7853981633974483 && angle > -0.7853981633974483) {
                     break;
                 }

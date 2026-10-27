@@ -129,15 +129,15 @@ typedef struct {
 
 /* This file's .bss, 80085F90..800863F0, in address order (first declaration fixes
  * the order). Splat's D_80085F9C, D_80086370/88/A0, D_800863BC and D_800863CC are
- * fields of D_80085F98[0], D_80086358[1..3], D_800863B8 and D_800863C8. */
-s32 D_80085F90; /* 1 cast running, 2 ending (D_80085F94 frames left) */
-s32 D_80085F94;
-Unk80085F98 D_80085F98[16];
-Unk80086358 D_80086358[4];
-Unk17360Vec2 D_800863B8;
-Unk8007B908_b* D_800863C4;
-Coll17360 D_800863C8;
-extern u16 D_8004ED34[];
+ * fields of magic_effects[0], magic_cast_repeats[1..3], magic_temp_vec and magic_floor_result. */
+s32 magic_cast_state; /* 1 cast running, 2 ending (magic_cast_state_timer frames left) */
+s32 magic_cast_state_timer;
+Unk80085F98 magic_effects[16];
+Unk80086358 magic_cast_repeats[4];
+Unk17360Vec2 magic_temp_vec;
+Unk8007B908_b* magic_target_enemy_rec;
+Coll17360 magic_floor_result;
+extern u16 magic_slot_bits[];
 extern u16 D_8007AB18;
 extern Unk8007B908 D_8007B908[];
 extern u16 battle_flags;
@@ -216,7 +216,7 @@ typedef struct {
     /* 0x14 */ u16 unk14;
 } Unk8007C288;
 
-extern s32 D_8004EDA4[];
+extern s32 magic_hit_outcomes[];
 extern u16 D_800842B8;
 extern s32 D_800842BC;
 extern s32 D_800842D0;
@@ -225,15 +225,15 @@ extern s32 D_800842D8;
 extern s32 D_800842DC;
 extern s32 D_800842E0;
 extern s32 D_800842E4;
-extern Unk80084300 D_80084300;
+extern Unk80084300 exit_destination;
 extern s32 D_8007A998;
 extern Unk8007AA08 D_8007AA08;
-extern s32 D_8004DCA0;
-extern s32 D_8007A174;
+extern s32 core_flags;
+extern s32 core_transition_timer;
 extern Unk8007C288* D_8007C288;
-extern u8 D_8004EDB0[];
-extern s32 D_8004EDBC[];
-extern s32 D_8004EDEC[];
+extern u8 magic_status_chances[];
+extern s32 magic_status_time_range_other[];
+extern s32 magic_status_time_range_self[];
 s32 Player_RollHitOnEnemy(s32, Actor17360*);
 s32 Enemy_RollHitOnPlayer(Actor17360*, Actor17360*);
 s32 Enemy_GetSlotIndex(Actor17360*);
@@ -254,12 +254,12 @@ void Magic_ResetEffectSystem(void) {
     s32 i;
 
     for (i = 0; i < 16; i++) {
-        D_80085F98[i].unk4 = 0;
+        magic_effects[i].unk4 = 0;
     }
     for (i = 0; i < 4; i++) {
-        D_80086358[i].unk0 = 0;
+        magic_cast_repeats[i].unk0 = 0;
     }
-    D_80085F90 = 0;
+    magic_cast_state = 0;
 }
 
 s32 Magic_LookupSpellSequence(u16 n, u8* arg1) {
@@ -389,11 +389,11 @@ typedef struct {
     /* 0x10 */ Unk80086358Cfg* unk10;
     /* 0x14 */ s32 unk14;
 } Unk80086358_b; // size = 0x18
-extern void (*D_8004ECC4[])(Unk80017F48*);
-extern Actor17360* (*D_8004ECD0[])(Unk80017F48*, s32);
-extern void (*D_8004ECDC[])(Unk80017F48*, Actor17360*);
-extern void (*D_8004ED04[])(u8, Actor17360*);
-extern s32 D_8007A1C8;
+extern void (*magic_move_handlers[])(Unk80017F48*);
+extern Actor17360* (*magic_find_target_handlers[])(Unk80017F48*, s32);
+extern void (*magic_hit_handlers[])(Unk80017F48*, Actor17360*);
+extern void (*magic_status_handlers[])(u8, Actor17360*);
+extern s32 gfx_scene_light_slot;
 extern u8 D_800EB7C0[];
 void Magic_CreateCastEffect(s32, u32, s32, u16);
 void Magic_MarkActorHitBySlot(s32, Actor17360*);
@@ -408,8 +408,8 @@ void Magic_CreateTimedPresentation();
 typedef struct {
     /* 0x00 */ f32 v[5];
 } Unk8004ED68;
-extern Unk8004ED68 D_8004ED68;
-extern Unk8004ED68 D_8004ED7C;
+extern Unk8004ED68 magic_homing_strengths;
+extern Unk8004ED68 magic_homing_accels;
 typedef struct {
     /* 0x00 */ u8 pad0[0xA];
     /* 0x0A */ u16 unkA;
@@ -441,11 +441,11 @@ typedef struct {
 extern Unk800169B8Def* D_800C185C_b[];
 extern Unk800169B8Def2* D_800C3268[];
 extern Unk800C1878 D_800C1878[];
-extern Unk8004ED68 D_8004ED54;
+extern Unk8004ED68 magic_launch_speeds;
 extern u8 D_800EB700[];
 extern Unk80017F48 D_80085F98_b[];
-extern void (*D_8004ECB8[])(Unk80017F48*);
-extern void (*D_8004EC90[])(Unk80017F48*, Actor17360*);
+extern void (*magic_target_select_handlers[])(Unk80017F48*);
+extern void (*magic_place_handlers[])(Unk80017F48*, Actor17360*);
 void Magic_ClearSlotHitTracking(s32);
 void Magic_CreateCastPresentation();
 void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
@@ -457,16 +457,16 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
     s32 boost;
     Unk8004ED68 sizes;
 
-    sizes = D_8004ED54;
+    sizes = magic_launch_speeds;
     if (arg2 == 0) {
-        Env_SetSlotLightAnim(D_8007A1C8, 2, 8, D_800EB700);
-        D_80085F90 |= 1;
-        D_80085F94 = 8;
+        Env_SetSlotLightAnim(gfx_scene_light_slot, 2, 8, D_800EB700);
+        magic_cast_state |= 1;
+        magic_cast_state_timer = 8;
     }
     def = &((Unk800169B8Def**)D_800C185C)[(arg1 >> 8) & 0xF][arg1 & 0xFF];
     def2 = &D_800C3268[(arg1 >> 8) & 0xF][arg1 & 0xFF];
     if (arg2 == 0 && def->unk20 >= 2) {
-        r = (Unk80086358_b*)D_80086358;
+        r = (Unk80086358_b*)magic_cast_repeats;
         i = 3;
         while (i != 0 && r->unk0 != 0) {
             i--;
@@ -483,7 +483,7 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
         r->unk10 = (Unk80086358Cfg*)def;
         r->unk14 = arg0;
     }
-    p = (Unk80017F48*)D_80085F98;
+    p = (Unk80017F48*)magic_effects;
     i = 15;
     while (i != 0 && p->unk4 != 0) {
         i--;
@@ -502,12 +502,12 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
     Magic_ClearSlotHitTracking(15 - i);
     switch (def->unk12) {
         case 0:
-            D_800863B8.x = D_800C1878[(def->unk2C + arg2) & 7].x * sizes.v[def->unk30];
-            D_800863B8.y = D_800C1878[(def->unk2C + arg2) & 7].z * sizes.v[def->unk30];
+            magic_temp_vec.x = D_800C1878[(def->unk2C + arg2) & 7].x * sizes.v[def->unk30];
+            magic_temp_vec.y = D_800C1878[(def->unk2C + arg2) & 7].z * sizes.v[def->unk30];
             boost = arg3 & 0x10;
-            Math_RotateVec2(((Actor17360*)arg0)->ry, &D_800863B8);
-            p->vx = D_800863B8.x;
-            p->vz = D_800863B8.y;
+            Math_RotateVec2(((Actor17360*)arg0)->ry, &magic_temp_vec);
+            p->vx = magic_temp_vec.x;
+            p->vz = magic_temp_vec.y;
             if (def->unk2A & 2) {
                 p->vy = 0.0f;
             } else {
@@ -522,12 +522,12 @@ void Magic_CreateCastEffect(s32 arg0, u32 arg1, s32 arg2, u16 arg3) {
             p->vx = p->vy = p->vz = 0.0f;
             break;
     }
-    D_8004ECB8[def->unk18](p);
+    magic_target_select_handlers[def->unk18](p);
     if (p->target != NULL) {
-        D_8004EC90[def->unk26](p, (Actor17360*)arg0);
+        magic_place_handlers[def->unk26](p, (Actor17360*)arg0);
         if (def->unk14 == 2) {
-            Coll_ResolveFloorAndWalls(p->x, p->y, p->z, 0xA00, &D_800863C8);
-            p->y = D_800863C8.y;
+            Coll_ResolveFloorAndWalls(p->x, p->y, p->z, 0xA00, &magic_floor_result);
+            p->y = magic_floor_result.y;
         }
         Magic_CreateCastPresentation(p, p->unk24);
     } else {
@@ -566,11 +566,11 @@ void Magic_PlaceEffectAtActorUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
 }
 
 void Magic_PlaceEffectAheadAtMiddlePoint(Unk17360Cam* arg0, Actor17360* arg1) {
-    D_800863B8.x = 0.0f;
-    D_800863B8.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
-    Math_RotateVec2(arg1->ry, &D_800863B8);
-    arg0->x = arg1->x + D_800863B8.x;
-    arg0->z = arg1->z + D_800863B8.y;
+    magic_temp_vec.x = 0.0f;
+    magic_temp_vec.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    Math_RotateVec2(arg1->ry, &magic_temp_vec);
+    arg0->x = arg1->x + magic_temp_vec.x;
+    arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->unk64->unk0 == 1) {
         arg0->y = arg1->unk68->unk94;
     } else {
@@ -579,11 +579,11 @@ void Magic_PlaceEffectAheadAtMiddlePoint(Unk17360Cam* arg0, Actor17360* arg1) {
 }
 
 void Magic_PlaceEffectAheadAtUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
-    D_800863B8.x = 0.0f;
-    D_800863B8.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
-    Math_RotateVec2(arg1->ry, &D_800863B8);
-    arg0->x = arg1->x + D_800863B8.x;
-    arg0->z = arg1->z + D_800863B8.y;
+    magic_temp_vec.x = 0.0f;
+    magic_temp_vec.y = arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    Math_RotateVec2(arg1->ry, &magic_temp_vec);
+    arg0->x = arg1->x + magic_temp_vec.x;
+    arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->unk64->unk0 == 1) {
         arg0->y = arg1->unk68->unk94 + arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
     } else {
@@ -592,11 +592,11 @@ void Magic_PlaceEffectAheadAtUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
 }
 
 void Magic_PlaceEffectBehindAtUpperPoint(Unk17360Cam* arg0, Actor17360* arg1) {
-    D_800863B8.x = 0.0f;
-    D_800863B8.y = -arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
-    Math_RotateVec2(arg1->ry, &D_800863B8);
-    arg0->x = arg1->x + D_800863B8.x;
-    arg0->z = arg1->z + D_800863B8.y;
+    magic_temp_vec.x = 0.0f;
+    magic_temp_vec.y = -arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
+    Math_RotateVec2(arg1->ry, &magic_temp_vec);
+    arg0->x = arg1->x + magic_temp_vec.x;
+    arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->unk64->unk0 == 1) {
         arg0->y = arg1->unk68->unk94 + arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
     } else {
@@ -620,11 +620,11 @@ void Magic_PlaceEffectAtSelectedTarget(Unk17360Cam* arg0, Actor17360* arg1) {
 }
 
 void Magic_PlaceEffectAtRandomOffset(Unk17360Cam* arg0, Actor17360* arg1) {
-    D_800863B8.x = 0.0f;
-    D_800863B8.y = (f32)Math_Rand(20) + 20.0;
-    Math_RotateVec2((f32)Math_Rand(16) * 3.141592653589793 / 8.0f - 3.141592653589793, &D_800863B8);
-    arg0->x = arg1->x + D_800863B8.x;
-    arg0->z = arg1->z + D_800863B8.y;
+    magic_temp_vec.x = 0.0f;
+    magic_temp_vec.y = (f32)Math_Rand(20) + 20.0;
+    Math_RotateVec2((f32)Math_Rand(16) * 3.141592653589793 / 8.0f - 3.141592653589793, &magic_temp_vec);
+    arg0->x = arg1->x + magic_temp_vec.x;
+    arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->unk64->unk0 == 1) {
         arg0->y = arg1->unk68->unk94 + arg1->unk64->unk18 * arg1->scale + arg0->cfg->unk1C;
     } else {
@@ -643,11 +643,11 @@ void Magic_PlaceEffectAtDiagonalOffset(Unk17360Cam* arg0, Actor17360* arg1) {
     } else {
         dist = arg1->unk64->unk18 * 10.0 * arg1->scale;
     }
-    D_800863B8.y = dist;
-    D_800863B8.x = dist * 1.5;
-    Math_RotateVec2(arg1->ry, &D_800863B8);
-    arg0->x = arg1->x + D_800863B8.x;
-    arg0->z = arg1->z + D_800863B8.y;
+    magic_temp_vec.y = dist;
+    magic_temp_vec.x = dist * 1.5;
+    Math_RotateVec2(arg1->ry, &magic_temp_vec);
+    arg0->x = arg1->x + magic_temp_vec.x;
+    arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->unk64->unk0 == 1) {
         arg0->y = arg1->unk68->unk94 - arg1->unk64->unk18 * arg1->scale;
     } else {
@@ -656,12 +656,12 @@ void Magic_PlaceEffectAtDiagonalOffset(Unk17360Cam* arg0, Actor17360* arg1) {
 }
 
 void Magic_PlaceEffectAtFixedForwardOffset(Unk17360Cam* arg0, Actor17360* arg1) {
-    D_800863B8.x = 0.0f;
-    D_800863B8.y = 380.0f;
-    Math_RotateVec2(arg1->ry, &D_800863B8);
-    arg0->x = arg1->x + D_800863B8.x * arg1->scale;
+    magic_temp_vec.x = 0.0f;
+    magic_temp_vec.y = 380.0f;
+    Math_RotateVec2(arg1->ry, &magic_temp_vec);
+    arg0->x = arg1->x + magic_temp_vec.x * arg1->scale;
     arg0->y = arg1->y + 380.0f * arg1->scale;
-    arg0->z = arg1->z + D_800863B8.y * arg1->scale;
+    arg0->z = arg1->z + magic_temp_vec.y * arg1->scale;
 }
 
 void Magic_UpdateEffects(void) {
@@ -674,7 +674,7 @@ void Magic_UpdateEffects(void) {
     s32 hits;
     s32 tries;
 
-    r = (Unk80086358_b*)D_80086358;
+    r = (Unk80086358_b*)magic_cast_repeats;
     for (i = 4; i != 0; i--, r++) {
         if (r->unk0 != 0) {
             if (--r->unk2 == 0) {
@@ -685,7 +685,7 @@ void Magic_UpdateEffects(void) {
             }
         }
     }
-    p = (Unk80017F48*)D_80085F98;
+    p = (Unk80017F48*)magic_effects;
     active = 0;
     for (i = 0; i != 16; i++, p++) {
         if (p->unk4 == 0) {
@@ -696,8 +696,8 @@ void Magic_UpdateEffects(void) {
             p->unk8--;
         } else {
             p->unk4--;
-            D_8004ECC4[p->cfg->unk12](p);
-            a = D_8004ECD0[p->cfg->unk16](p, i);
+            magic_move_handlers[p->cfg->unk12](p);
+            a = magic_find_target_handlers[p->cfg->unk16](p, i);
             if (a != NULL) {
                 Magic_MarkActorHitBySlot(i, a);
                 if (!(a->unk68->unk0 & 0x100) || p->cfg->unk18 == 2) {
@@ -710,14 +710,14 @@ void Magic_UpdateEffects(void) {
                             Player_StartMissReaction();
                         }
                     } else {
-                        D_8004ECDC[p->cfg->unk10](p, a);
+                        magic_hit_handlers[p->cfg->unk10](p, a);
                         hits = 0;
                         for (tries = 0, k = 0; k != 12; k++) {
                             if (p->cfg->unk32[k] != 0) {
                                 tries++;
                                 if (Magic_ShouldApplyStatus(p, p->unk24, k)) {
                                     Magic_StartStatusTimer(p, a, k);
-                                    D_8004ED04[k](p->cfg->unk32[k], a);
+                                    magic_status_handlers[k](p->cfg->unk32[k], a);
                                     hits++;
                                 }
                             }
@@ -761,13 +761,13 @@ void Magic_UpdateEffects(void) {
             }
         }
     }
-    if ((D_80085F90 & 1) && active == 0) {
-        D_80085F90 = 2;
-        D_80085F94 = 30;
-    } else if (D_80085F90 & 2) {
-        if (--D_80085F94 == 0) {
-            D_80085F90 = 0;
-            Env_SetSlotLightAnim(D_8007A1C8, 2, 8, D_800EB7C0);
+    if ((magic_cast_state & 1) && active == 0) {
+        magic_cast_state = 2;
+        magic_cast_state_timer = 30;
+    } else if (magic_cast_state & 2) {
+        if (--magic_cast_state_timer == 0) {
+            magic_cast_state = 0;
+            Env_SetSlotLightAnim(gfx_scene_light_slot, 2, 8, D_800EB7C0);
         }
     }
 }
@@ -777,7 +777,7 @@ s32 Magic_IsAnyEffectActive(void) {
     Unk80085F98* p;
 
     i = 16;
-    p = D_80085F98;
+    p = magic_effects;
     while (i != 0 && p->unk4 == 0) {
         i--;
         p++;
@@ -799,8 +799,8 @@ void Magic_MoveHomingEffect(Unk80017F48* arg0) {
     Unk8004ED68 speeds;
     Unk8004ED68 turns;
 
-    speeds = D_8004ED68;
-    turns = D_8004ED7C;
+    speeds = magic_homing_strengths;
+    turns = magic_homing_accels;
     flags = arg0->unkA;
     t = arg0->target;
     if (flags & 1) {
@@ -851,10 +851,10 @@ void Magic_MoveHomingEffect(Unk80017F48* arg0) {
     arg0->y += arg0->vy;
     arg0->z += arg0->vz;
     if (arg0->cfg->unk14 != 0) {
-        Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
+        Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &magic_floor_result);
         switch (arg0->cfg->unk14) {
             case 1:
-                if (arg0->y < D_800863C8.y) {
+                if (arg0->y < magic_floor_result.y) {
                     arg0->unkA |= 1;
                     arg0->unk4 = 8;
                     arg0->vz = 0.0f;
@@ -871,7 +871,7 @@ void Magic_MoveHomingEffect(Unk80017F48* arg0) {
                 }
                 break;
             case 2:
-                arg0->y = D_800863C8.y;
+                arg0->y = magic_floor_result.y;
                 break;
         }
     }
@@ -884,9 +884,9 @@ void Magic_MoveVerticalEffect(Unk80017F48* arg0) {
         }
         arg0->y += arg0->vy;
         if (arg0->cfg->unk14 == 1) {
-            Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &D_800863C8);
-            if (arg0->y < D_800863C8.y) {
-                arg0->y = D_800863C8.y;
+            Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &magic_floor_result);
+            if (arg0->y < magic_floor_result.y) {
+                arg0->y = magic_floor_result.y;
                 arg0->unkA |= 1;
                 arg0->unk4 = 8;
                 arg0->vz = 0.0f;
@@ -983,7 +983,7 @@ s32 Magic_FindTargetInRange(arg0, arg1)
             if (n == 0) {
                 ret = NULL;
             } else {
-                D_800863C4 = p;
+                magic_target_enemy_rec = p;
             }
         }
     } else {
@@ -1015,7 +1015,7 @@ Actor17360* Magic_FindEligibleTarget(Unk80018348* arg0, s32 arg1) {
             if (p->unk7C != -1) {
                 if (!Magic_WasActorHitBySlot(arg1, (Actor17360*)p->unk2C)) {
                     ret = (Actor17360*)p->unk2C;
-                    D_800863C4 = p;
+                    magic_target_enemy_rec = p;
                 }
                 n--;
             }
@@ -1092,12 +1092,12 @@ void Magic_HealTarget(Unk80018480* arg0, Actor17360* arg1) {
     s32 pad;
 
     if (arg1->unk5E & 1) {
-        D_800863C4 = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
+        magic_target_enemy_rec = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
         amt = arg1->unk64->unk6 * arg0->cfg->unkC / 100;
         amt += Math_Rand(amt >> 2);
-        ((Unk8001860CRec*)D_800863C4)->unkA += amt;
-        if (((Unk8001860CRec*)D_800863C4)->unkA > arg1->unk64->unk6) {
-            ((Unk8001860CRec*)D_800863C4)->unkA = arg1->unk64->unk6;
+        ((Unk8001860CRec*)magic_target_enemy_rec)->unkA += amt;
+        if (((Unk8001860CRec*)magic_target_enemy_rec)->unkA > arg1->unk64->unk6) {
+            ((Unk8001860CRec*)magic_target_enemy_rec)->unkA = arg1->unk64->unk6;
         }
     } else {
         amt = (D_8007AA1C->unk24[arg0->cfg->unk6] >> 1) + arg1->unk64->unk6 * arg0->cfg->unkC / 100;
@@ -1119,9 +1119,9 @@ void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
 
     pl = (Actor17360*)D_8007AA20;
     if (arg1->unk5E & 1) {
-        D_800863C4 = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
-        amt = (D_800863C4->unkC * 11 + 63) >> 6;
-        D_800863C4->unkC -= amt;
+        magic_target_enemy_rec = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
+        amt = (magic_target_enemy_rec->unkC * 11 + 63) >> 6;
+        magic_target_enemy_rec->unkC -= amt;
         if (D_8007AA08.unk7C->unk8 != D_8007AA08.unk7C->unkA) {
             pl->unk64->unk8 += amt;
             if (pl->unk64->unk8 > pl->unk64->unkA) {
@@ -1132,10 +1132,10 @@ void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
     } else {
         amt = (arg1->unk64->unk8 * 11 + 63) >> 6;
         arg1->unk64->unk8 -= amt;
-        D_800863C4 = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
-        D_800863C4->unkC += amt;
-        if (D_800863C4->unkC > arg0->unk24->unk64->unkA) {
-            D_800863C4->unkC = arg0->unk24->unk64->unkA;
+        magic_target_enemy_rec = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
+        magic_target_enemy_rec->unkC += amt;
+        if (magic_target_enemy_rec->unkC > arg0->unk24->unk64->unkA) {
+            magic_target_enemy_rec->unkC = arg0->unk24->unk64->unkA;
         }
     }
     Effect_AddFloatingNumber(arg1, 1, amt);
@@ -1155,14 +1155,14 @@ void func_80018968(s32 arg0, Actor17360* arg1) {
 
 void func_800189F0(s32 arg0, Actor17360* arg1) {
     if (D_800842B8 == 4 && D_800842D0 != -1 && !(D_8007C288->unk14 & 4)) {
-        D_80084300.unk0 = D_800842D0;
-        D_80084300.unk4 = D_800842D4;
-        D_80084300.unk8 = D_800842D8;
+        exit_destination.unk0 = D_800842D0;
+        exit_destination.unk4 = D_800842D4;
+        exit_destination.unk8 = D_800842D8;
         D_8007A998 = 0x108;
         D_8007AA08.unk6 = 0;
         D_8007AA08.unk14->unk2A++;
-        D_8004DCA0 |= 0x80;
-        D_8007A174 = 0x1E;
+        core_flags |= 0x80;
+        core_transition_timer = 0x1E;
     }
 }
 
@@ -1180,14 +1180,14 @@ void Magic_ApplyZeroDamageHit(Unk17360Cam* arg0, Actor17360* arg1) {
 void func_80018B40(s32 arg0, Actor17360* arg1) {
     if ((D_800842B8 & 8) && D_800842DC != -1 && !(D_8007C288->unk14 & 8) && D_800842BC != 0x1E &&
         D_800842BC != 0x22) {
-        D_80084300.unk0 = D_800842DC;
-        D_80084300.unk4 = D_800842E0;
-        D_80084300.unk8 = D_800842E4;
+        exit_destination.unk0 = D_800842DC;
+        exit_destination.unk4 = D_800842E0;
+        exit_destination.unk8 = D_800842E4;
         D_8007A998 = 0x108;
         D_8007AA08.unk6 = 0;
         D_8007AA08.unk14->unk2A++;
-        D_8004DCA0 |= 0x80;
-        D_8007A174 = 0x1E;
+        core_flags |= 0x80;
+        core_transition_timer = 0x1E;
     }
 }
 
@@ -1275,10 +1275,10 @@ void Magic_SelectClosestAimTarget(Unk80018DC0* arg0) {
     p = (Unk80018DC0Rec*)D_8007B908;
     while (n != 0) {
         if (p->unk7C != -1) {
-            D_800863B8.x = p->x - caster->x;
-            D_800863B8.y = p->z - caster->z;
-            Math_RotateVec2(angle, &D_800863B8);
-            d = Math_Atan2(D_800863B8.x, D_800863B8.y);
+            magic_temp_vec.x = p->x - caster->x;
+            magic_temp_vec.y = p->z - caster->z;
+            Math_RotateVec2(angle, &magic_temp_vec);
+            d = Math_Atan2(magic_temp_vec.x, magic_temp_vec.y);
             if (d > 3.141592653589793) {
                 d -= 6.283185307179586;
             } else if (d < -3.141592653589793) {
@@ -1451,7 +1451,7 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x24];
     /* 0x24 */ u8 stats[1];
 } Unk8007A9D0;
-extern u16 D_8004ED90[];
+extern u16 magic_damage_bonus_stats[];
 extern Unk8007A9D0 D_8007A9D0;
 u16 Magic_CalculateEffectDamage(Unk80018480Cfg* arg0, Actor17360* arg1) {
     u16 lv;
@@ -1463,7 +1463,7 @@ u16 Magic_CalculateEffectDamage(Unk80018480Cfg* arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
         lv = ((Unk800195FCRec*)D_8007B908)[Enemy_GetSlotIndex(arg1)].unk28->unk2A;
     } else {
-        p = &D_8004ED90[arg0->unk6 * 2];
+        p = &magic_damage_bonus_stats[arg0->unk6 * 2];
         lv = D_8007A9D0.stats[arg0->unk6];
         lv += D_8007A9D0.stats[*p++] >> 4;
         lv += D_8007A9D0.stats[*p++] >> 3;
@@ -1637,15 +1637,15 @@ void Magic_CreateCastPresentation(Unk800199C0* arg0, Actor17360* arg1) {
     cfg = arg0->cfg;
     if (def->unk0 >= 0) {
         tbl = &D_800C18D8[def->unk0];
-        D_800863B8.x = def->unk8;
-        D_800863B8.y = def->unkC;
-        D_800863B8.z = cfg->unk1C;
+        magic_temp_vec.x = def->unk8;
+        magic_temp_vec.y = def->unkC;
+        magic_temp_vec.z = cfg->unk1C;
         if (arg0->unk18 != 0.0f || arg0->unk20 != 0.0f) {
             angle = Math_Atan2(arg0->unk18, arg0->unk20);
         } else {
             angle = arg1->ry;
         }
-        arg0->unk34 = Magic_CreateVisualEffect(def->unk2, def->unk4, arg0->x, arg0->y, arg0->z, angle, tbl, &D_800863B8, arg1);
+        arg0->unk34 = Magic_CreateVisualEffect(def->unk2, def->unk4, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg1);
         arg0->unk34->unk28 = arg0->unk18;
         arg0->unk34->unk2C = arg0->unk1C;
         arg0->unk34->unk30 = arg0->unk20;
@@ -1680,15 +1680,15 @@ void Magic_CreateTimedPresentation(Unk80019BFC* arg0, Unk80019BFCArg1* arg1) {
     def = arg0->def;
     cfg = arg0->cfg;
     tbl = &D_800C18D8[def->unk10];
-    D_800863B8.x = def->unk18;
-    D_800863B8.y = def->unk1C;
-    D_800863B8.z = cfg->unk1C;
+    magic_temp_vec.x = def->unk18;
+    magic_temp_vec.y = def->unk1C;
+    magic_temp_vec.z = cfg->unk1C;
     if (def->unk14 & 0x10) {
         angle = arg0->unk4 * 3.141592653589793 / 10.0;
     } else {
         angle = arg1->unk10;
     }
-    ret = Magic_CreateVisualEffect(def->unk12, def->unk14, arg0->x, arg0->y, arg0->z, angle, tbl, &D_800863B8, arg0->unk24);
+    ret = Magic_CreateVisualEffect(def->unk12, def->unk14, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->unk24);
     ret->unk28 = arg0->unk18;
     ret->unk2C = arg0->unk1C;
     ret->unk30 = arg0->unk20;
@@ -1728,9 +1728,9 @@ void Magic_CreateHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
     cfg = arg0->cfg;
     if (def->unk30 >= 0) {
         tbl = &D_800C18D8[def->unk30];
-        D_800863B8.x = def->unk38;
-        D_800863B8.y = def->unk3C;
-        D_800863B8.z = cfg->unk1C;
+        magic_temp_vec.x = def->unk38;
+        magic_temp_vec.y = def->unk3C;
+        magic_temp_vec.z = cfg->unk1C;
         flags = def->unk34;
         if (flags & 0x40) {
             arg1 = arg0->unk24;
@@ -1746,7 +1746,7 @@ void Magic_CreateHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
         } else {
             y = arg1->y;
         }
-        arg0->unk38 = Magic_CreateVisualEffect(def->unk32, flags, arg1->x, y, arg1->z, arg1->ry, tbl, &D_800863B8, arg1);
+        arg0->unk38 = Magic_CreateVisualEffect(def->unk32, flags, arg1->x, y, arg1->z, arg1->ry, tbl, &magic_temp_vec, arg1);
         arg0->unk38->unk28 = arg0->unk18;
         arg0->unk38->unk2C = arg0->unk1C;
         arg0->unk38->unk30 = arg0->unk20;
@@ -1786,10 +1786,10 @@ void Magic_CreateGroundHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
     cfg = arg0->cfg;
     if (def->unk20 >= 0) {
         tbl = &D_800C18D8[def->unk20];
-        D_800863B8.x = def->unk28;
-        D_800863B8.y = def->unk2C;
-        D_800863B8.z = cfg->unk1C;
-        ret = Magic_CreateVisualEffect(def->unk22, def->unk24, arg0->x, arg0->y, arg0->z, arg1->ry, tbl, &D_800863B8, arg0->unk24);
+        magic_temp_vec.x = def->unk28;
+        magic_temp_vec.y = def->unk2C;
+        magic_temp_vec.z = cfg->unk1C;
+        ret = Magic_CreateVisualEffect(def->unk22, def->unk24, arg0->x, arg0->y, arg0->z, arg1->ry, tbl, &magic_temp_vec, arg0->unk24);
         ret->unk28 = arg0->unk18;
         ret->unk2C = arg0->unk1C;
         ret->unk30 = arg0->unk20;
@@ -1841,11 +1841,11 @@ void Magic_StepActorStatusTimers(Actor17360* arg0) {
 }
 
 s32 Magic_WasActorHitBySlot(s32 arg0, Actor17360* arg1) {
-    return D_8004ED34[arg0] & arg1->unk68->unk8C;
+    return magic_slot_bits[arg0] & arg1->unk68->unk8C;
 }
 
 void Magic_MarkActorHitBySlot(s32 arg0, Actor17360* arg1) {
-    arg1->unk68->unk8C |= D_8004ED34[arg0];
+    arg1->unk68->unk8C |= magic_slot_bits[arg0];
 }
 
 void Magic_ResetHitTracking(void) {
@@ -1860,9 +1860,9 @@ void Magic_ResetHitTracking(void) {
 void Magic_ClearSlotHitTracking(s32 arg0) {
     s32 i;
 
-    D_8007AA08.unk110 &= ~D_8004ED34[arg0];
+    D_8007AA08.unk110 &= ~magic_slot_bits[arg0];
     for (i = 0; i < 6; i++) {
-        D_8007B908[i].unk124 &= ~D_8004ED34[arg0];
+        D_8007B908[i].unk124 &= ~magic_slot_bits[arg0];
     }
 }
 
@@ -1884,7 +1884,7 @@ s32 Magic_GetHitOutcome(Unk8001A3EC* arg0, Actor17360* arg1) {
             ret++;
         }
     }
-    return D_8004EDA4[ret];
+    return magic_hit_outcomes[ret];
 }
 
 s32 Magic_ShouldApplyStatus(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
@@ -1897,19 +1897,19 @@ s32 Magic_ShouldApplyStatus(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
     } else if (cfg = arg0->unk2C, cfg->unk18 == 2) {
         ret = 1;
     } else if (arg1->unk5E & 1) {
-        ret = Math_Rand(64) < D_8004EDB0[arg2];
+        ret = Math_Rand(64) < magic_status_chances[arg2];
     } else {
         n = (D_8007AA08.unk8 & 0x8000) ? 28 : 32;
-        ret = Math_Rand(n) < D_8004EDB0[arg2];
+        ret = Math_Rand(n) < magic_status_chances[arg2];
     }
     return ret;
 }
 
 void Magic_StartStatusTimer(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
     if (arg1 != arg0->unk24) {
-        arg1->unk68->timers[arg2] = Math_Rand(D_8004EDBC[arg2]) + 2;
+        arg1->unk68->timers[arg2] = Math_Rand(magic_status_time_range_other[arg2]) + 2;
     } else {
-        arg1->unk68->timers[arg2] = Math_Rand(D_8004EDEC[arg2]) + 3;
+        arg1->unk68->timers[arg2] = Math_Rand(magic_status_time_range_self[arg2]) + 3;
     }
 }
 
@@ -1920,7 +1920,7 @@ typedef void (*FnECC4)(Unk80017F48*);
 typedef Actor17360* (*FnECD0)(Unk80017F48*, s32);
 typedef void (*FnECDC)(Unk80017F48*, Actor17360*);
 typedef void (*FnED04)(u8, Actor17360*);
-FnEC90 D_8004EC90[10] = {
+FnEC90 magic_place_handlers[10] = {
     (FnEC90) Magic_PlaceEffectAtActorLowerPoint,
     (FnEC90) Magic_PlaceEffectAtActorMiddlePoint,
     (FnEC90) Magic_PlaceEffectAtActorUpperPoint,
@@ -1932,22 +1932,22 @@ FnEC90 D_8004EC90[10] = {
     (FnEC90) Magic_PlaceEffectAtDiagonalOffset,
     (FnEC90) Magic_PlaceEffectAtFixedForwardOffset,
 };
-FnECB8 D_8004ECB8[3] = {
+FnECB8 magic_target_select_handlers[3] = {
     (FnECB8) Magic_SelectClosestAimTarget,
     (FnECB8) Magic_SelectFirstActiveTarget,
     (FnECB8) Magic_TargetCaster,
 };
-FnECC4 D_8004ECC4[3] = {
+FnECC4 magic_move_handlers[3] = {
     (FnECC4) Magic_MoveHomingEffect,
     (FnECC4) Magic_MoveVerticalEffect,
     (FnECC4) Magic_MoveVerticalEffect,
 };
-FnECD0 D_8004ECD0[3] = {
+FnECD0 magic_find_target_handlers[3] = {
     (FnECD0) Magic_FindTargetInRange,
     (FnECD0) Magic_FindEligibleTarget,
     (FnECD0) Magic_FindTargetInRangeIfLanded,
 };
-FnECDC D_8004ECDC[10] = {
+FnECDC magic_hit_handlers[10] = {
     (FnECDC) Magic_ApplyEffectDamage,
     (FnECDC) Magic_HealTarget,
     (FnECDC) Magic_TransferTargetResource,
@@ -1959,7 +1959,7 @@ FnECDC D_8004ECDC[10] = {
     (FnECDC) Magic_ClearActorStatuses,
     (FnECDC) Magic_DamageAndClearStatuses,
 };
-FnED04 D_8004ED04[12] = {
+FnED04 magic_status_handlers[12] = {
     (FnED04) Magic_ApplyShrinkStatus,
     (FnED04) func_800190BC,
     (FnED04) func_80019104,
@@ -1973,15 +1973,15 @@ FnED04 D_8004ED04[12] = {
     (FnED04) func_800194E0,
     (FnED04) func_800195E0,
 };
-u16 D_8004ED34[16] = {
+u16 magic_slot_bits[16] = {
     0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080,
     0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000,
 };
-Unk8004ED68 D_8004ED54 = { { 2.0f, 3.0f, 4.0f, 6.0f, 7.0f } };
-Unk8004ED68 D_8004ED68 = { { 0.0f, 1.0f, 2.0f, 10.0f, 10.0f } };
-Unk8004ED68 D_8004ED7C = { { 0.4f, 0.5f, 0.7f, 1.0f, 1.2f } };
-u16 D_8004ED90[10] = { 2, 1, 3, 2, 0, 3, 1, 0, 2, 0 };
-s32 D_8004EDA4[3] = { 1, 2, 0 };
-u8 D_8004EDB0[12] = { 24, 24, 24, 16, 24, 24, 16, 24, 24, 24, 24, 24 };
-s32 D_8004EDBC[12] = { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
-s32 D_8004EDEC[12] = { 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
+Unk8004ED68 magic_launch_speeds = { { 2.0f, 3.0f, 4.0f, 6.0f, 7.0f } };
+Unk8004ED68 magic_homing_strengths = { { 0.0f, 1.0f, 2.0f, 10.0f, 10.0f } };
+Unk8004ED68 magic_homing_accels = { { 0.4f, 0.5f, 0.7f, 1.0f, 1.2f } };
+u16 magic_damage_bonus_stats[10] = { 2, 1, 3, 2, 0, 3, 1, 0, 2, 0 };
+s32 magic_hit_outcomes[3] = { 1, 2, 0 };
+u8 magic_status_chances[12] = { 24, 24, 24, 16, 24, 24, 16, 24, 24, 24, 24, 24 };
+s32 magic_status_time_range_other[12] = { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
+s32 magic_status_time_range_self[12] = { 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
