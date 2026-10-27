@@ -94,11 +94,11 @@ void Boss_Draw(struct GfxFrameData *arg0) {
     AnimSet *temp;
 
     if (boss_field_index != 0) {
-        temp = D_803ABA58[boss_field_record.actor.unk50];
+        temp = D_803ABA58[boss_field_record.actor.animSetIndex];
         gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
-        Anim_DrawModel(1, &p->actor, &temp[boss_field_record.actor.unk52], arg0);
-        Anim_AdvanceFrame(p->actor.unk58, &p->actor, &temp[p->actor.unk52]);
-        if (p->actor.unk64->unk0 != 2) {
+        Anim_DrawModel(1, &p->actor, &temp[boss_field_record.actor.animIndex], arg0);
+        Anim_AdvanceFrame(p->actor.animStep, &p->actor, &temp[p->actor.animIndex]);
+        if (p->actor.stats->unk0 != 2) {
             Shadow_Queue(p->actor.x, p->actor.y, p->actor.z, p->actor.nx, p->actor.ny, p->actor.nz,
                           p->actor.unk28 * p->actor.scale);
         }
@@ -125,12 +125,12 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     Actor *s1 = &arg4->actor;
     s16 flags;
 
-    arg4->actor.unk50 = s2->unk2;
+    arg4->actor.animSetIndex = s2->unk2;
     Anim_SetCurrentAndNext(s1, 0, 1, 0, 1, 1);
     s1->scale = s2->unk20;
     s1->unk28 = s2->unk18;
-    s1->unk64 = (ActorStats *)s2;
-    s1->unk68 = &arg4->battle;
+    s1->stats = (ActorStats *)s2;
+    s1->battle = &arg4->battle;
     arg4->unk28 = s2;
     arg4->unkA = s2->unk6;
     arg4->unkC = s2->unk6;
@@ -139,8 +139,8 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     arg4->unk10 = sqrtf((u32)s2->unkC) * 3.846 + 17.838;
     arg4->battle.unk0 = 0;
     arg4->battle.unk84 = arg4->unk28->unk2A;
-    arg4->battle.unk86 = ((EnemyDef *)s1->unk64)->unkC;
-    arg4->battle.unk88 = ((EnemyDef *)s1->unk64)->unkE;
+    arg4->battle.unk86 = ((EnemyDef *)s1->stats)->unkC;
+    arg4->battle.unk88 = ((EnemyDef *)s1->stats)->unkE;
     arg4->battle.unk90 = 1.0f;
     Coll_ResolveFloorAndWalls(arg1, 0.0f, arg2, 0xA00, &boss_spawn_coll);
     s1->x = boss_spawn_coll.x;
@@ -154,10 +154,10 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     s1->nx = boss_spawn_coll.nx;
     s1->ny = boss_spawn_coll.ny;
     s1->nz = boss_spawn_coll.nz;
-    s1->unk5E = 1;
-    s1->unk60 = 0;
+    s1->typeFlags = 1;
+    s1->animFlags = 0;
     if (s2 == &D_803AB9A8) {
-        s1->unk5E |= 4;
+        s1->typeFlags |= 4;
     }
 }
 

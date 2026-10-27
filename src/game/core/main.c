@@ -498,12 +498,12 @@ void Core_RunGameplayLoop(void) {
         Gfx_BuildFrameDisplayList(&D_80301000[gfx_frame_index]);
         frame = &D_80301000[gfx_frame_index];
         if (!(core_flags & 0x87)) {
-            if (!(player_state.actor.unk60 & 1) && Exit_CheckEnter(player_state.actor.x, player_state.actor.z, player_state.actor.rot) != 0) {
+            if (!(player_state.actor.animFlags & 1) && Exit_CheckEnter(player_state.actor.x, player_state.actor.z, player_state.actor.rot) != 0) {
                 core_flags |= 0x80;
                 Camera_TurnForExit();
                 Player_StartAreaExit();
                 fade_transition_style = 0;
-            } else if (!(core_flags & 0x1000) && !(player_state.actor.unk60 & 1) && (input_pressed_buttons & 0x1000) &&
+            } else if (!(core_flags & 0x1000) && !(player_state.actor.animFlags & 1) && (input_pressed_buttons & 0x1000) &&
                        !(battle_flags & 1) && !(input_held_buttons & 0x2000) && !(core_flags & 1)) {
                 core_game_mode = 2;
                 Sfx_Play(0, 1, 0xFF);

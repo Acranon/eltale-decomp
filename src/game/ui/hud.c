@@ -166,7 +166,7 @@ void Hud_Draw(GfxFrameData* buf) {
     hud_draw_origin_x = hud_draw_origin_y = 0;
     if (battle_flags & 1) {
         Hud_DrawPopups();
-        if (!(battle_flags & 2) && player_state.unk2 && !(player_state.actor.unk60 & 1) && !(magic_cast_state & 1)) {
+        if (!(battle_flags & 2) && player_state.unk2 && !(player_state.actor.animFlags & 1) && !(magic_cast_state & 1)) {
             Hud_DrawMeleeTargetMarker(player_state.unk2 - 1);
         }
         if ((player_state.unk8 & 0x20) && !(core_flags & 0x800)) {
@@ -176,13 +176,13 @@ void Hud_Draw(GfxFrameData* buf) {
         n = enemy_count;
         e = enemy_slots;
         while (n != 0) {
-            if (e->actor.unk50 != -1) {
+            if (e->actor.animSetIndex != -1) {
                 Hud_UpdateAndDrawActorStatusIndicators(&e->actor);
                 n--;
             }
             e++;
         }
-    } else if (!(core_flags & 0x87) && !(player_state.actor.unk60 & 1)) {
+    } else if (!(core_flags & 0x87) && !(player_state.actor.animFlags & 1)) {
         if (player_talk_npc) {
             Hud_DrawNpcTalkMarker();
         } else if (player_front_spirit && !(core_flags & 8)) {
@@ -219,7 +219,7 @@ void Hud_DrawPlayerMeters(Actor* arg0) {
         w = hud_panel_transition_frame * hud_panel_transition_frame;
         hud_draw_origin_x -= w * 150 / 144;
     }
-    st = arg0->unk64;
+    st = arg0->stats;
     Hud_DrawTextureTile(&D_803A86F8, 0, 1, 0x3E, 0x11, 0x20, 0x27, 0x400, 0x400);
     Hud_DrawTextureTile(&D_803A86F8, 0, 0x12, 0x3E, 0x12, 0x20, 0x38, 0x400, 0x400);
     w = st->unk4 * 56 / st->unk6;
@@ -679,12 +679,12 @@ void Hud_DrawMeleeTargetMarker(u16 arg0) {
     u16 *angle = &hud_melee_marker_phase;
 
     a = &enemy_slots[arg0].actor;
-    if (a->unk64->unk0 == 1) {
-        y = a->unk68->unk94;
-    } else if (a->unk64->unk0 == 2) {
+    if (a->stats->unk0 == 1) {
+        y = a->battle->unk94;
+    } else if (a->stats->unk0 == 2) {
         y = a->y + 350.0 * a->scale;
     } else {
-        y = a->y + a->unk64->unk1C * a->scale;
+        y = a->y + a->stats->unk1C * a->scale;
     }
     if (Camera_WorldToScreen(a->x, y, a->z, &sx, &sy)) {
         bob = sins(*angle) >> 13;
@@ -703,7 +703,7 @@ void Hud_DrawOutOfRangeIcon(void) {
     f32 y;
     f32 h;
 
-    h = player_state.actor.unk64->unk1C * player_state.actor.scale;
+    h = player_state.actor.stats->unk1C * player_state.actor.scale;
     y = player_state.actor.y + h;
     if (Camera_WorldToScreen(player_state.actor.x, y, player_state.actor.z, &sx, &sy) != 0) {
         gDPPipeSync(gfx_dl_head++);
@@ -713,7 +713,7 @@ void Hud_DrawOutOfRangeIcon(void) {
 }
 
 void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
-    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->unk68;
+    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->battle;
     u32 i;
     Struct_803AA6C4* e;
     f32 y;
@@ -734,14 +734,14 @@ void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
             hud_temp_vec.y = e->unkC;
             hud_temp_vec.z = 1.0f;
             fx = &D_803AA690[e->unk0];
-            if (arg0->unk64->unk0 == 1) {
+            if (arg0->stats->unk0 == 1) {
                 if (e->unk4 & 0x100) {
-                    y = arg0->unk68->unk94;
+                    y = arg0->battle->unk94;
                 } else {
-                    y = arg0->unk68->unk94 - arg0->unk64->unk18 * arg0->scale;
+                    y = arg0->battle->unk94 - arg0->stats->unk18 * arg0->scale;
                 }
             } else if (e->unk4 & 0x100) {
-                y = arg0->y + arg0->unk64->unk1C * 0.5 * arg0->scale;
+                y = arg0->y + arg0->stats->unk1C * 0.5 * arg0->scale;
             } else {
                 y = arg0->y;
             }
@@ -762,7 +762,7 @@ typedef struct {
 extern Struct_803AA628 D_803AA628[];
 
 void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
-    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->unk68;
+    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->battle;
     f32 y;
     s32 vis;
     s32 sx;
@@ -780,10 +780,10 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
     EffectModel* fx;
 
     if (!(core_flags & 0x800)) {
-        if (arg0->unk64->unk0 == 1) {
-            y = arg0->unk68->unk94;
+        if (arg0->stats->unk0 == 1) {
+            y = arg0->battle->unk94;
         } else {
-            y = arg0->y + arg0->unk64->unk1C * arg0->scale;
+            y = arg0->y + arg0->stats->unk1C * arg0->scale;
         }
         pad1 = pad2 = 0;
     vis = Camera_WorldToScreen(arg0->x, y, arg0->z, &sx, &sy);
@@ -815,17 +815,17 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
     }
     for (i = 0; i < 4; i++) {
         if (s->unk44[i] != 0) {
-            fx = (EffectModel*)((Struct_8002373C_68*)arg0->unk68)->unk44[i];
+            fx = (EffectModel*)((Struct_8002373C_68*)arg0->battle)->unk44[i];
             fx->unkC = arg0->x;
             fx->unk14 = arg0->z;
-            if (arg0->unk64->unk0 == 1) {
+            if (arg0->stats->unk0 == 1) {
                 if (fx->unk8 & 0x100) {
-                    fx->unk10 = arg0->unk68->unk94;
+                    fx->unk10 = arg0->battle->unk94;
                 } else {
-                    fx->unk10 = arg0->unk68->unk94 - arg0->unk64->unk18 * arg0->scale;
+                    fx->unk10 = arg0->battle->unk94 - arg0->stats->unk18 * arg0->scale;
                 }
             } else if (fx->unk8 & 0x100) {
-                fx->unk10 = arg0->y + arg0->unk64->unk1C * 0.5 * arg0->scale;
+                fx->unk10 = arg0->y + arg0->stats->unk1C * 0.5 * arg0->scale;
             } else {
                 fx->unk10 = arg0->y;
             }
@@ -849,7 +849,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
 }
 
 void Hud_ClearActorStatusIndicators(Actor* arg0) {
-    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->unk68;
+    Struct_8002373C_68* s = (Struct_8002373C_68*)arg0->battle;
     u32 i;
     EffectModel* fx;
 
@@ -949,10 +949,10 @@ void Hud_ShowActorPopup(Actor* arg0) {
     p->unk4 = arg0;
     p->unk10 = 0.0f;
     p->unk8 = 0.0f;
-    if (arg0->unk64->unk0 == 0) {
-        p->unkC = arg0->unk64->unk1C * arg0->scale;
-    } else if (arg0->unk64->unk0 == 1) {
-        p->unkC = arg0->unk68->unk94 - arg0->y;
+    if (arg0->stats->unk0 == 0) {
+        p->unkC = arg0->stats->unk1C * arg0->scale;
+    } else if (arg0->stats->unk0 == 1) {
+        p->unkC = arg0->battle->unk94 - arg0->y;
     } else {
         p->unkC = arg0->scale * 600.0;
     }

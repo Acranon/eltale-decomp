@@ -114,10 +114,10 @@ extern s32 player_light_slot;
 extern Actor D_8007AA20; /* player_state.actor */
 extern f32 D_8007AA24; /* player_state.actor.y */
 extern f32 D_8007AA28; /* player_state.actor.z */
-extern s16 D_8007AA70; /* player_state.actor.unk50 */
-extern s16 D_8007AA72; /* player_state.actor.unk52 */
-extern u16 D_8007AA78; /* player_state.actor.unk58 */
-extern ActorStats *D_8007AA84; /* player_state.actor.unk64 */
+extern s16 D_8007AA70; /* player_state.actor.animSetIndex */
+extern s16 D_8007AA72; /* player_state.actor.animIndex */
+extern u16 D_8007AA78; /* player_state.actor.animStep */
+extern ActorStats *D_8007AA84; /* player_state.actor.stats */
 
 /* Labels inside player_stats and player_state (aliases in undefined_syms.txt) that the menu's
  * stats and elements pages address as their own symbols (through player_stats.x /

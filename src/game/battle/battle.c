@@ -69,7 +69,7 @@ void Battle_TryStartRandomEncounter(void) {
     EncounterRegion* area;
     EncounterPoint* pt;
 
-    if (!(battle_flags & 1) && !(battle_flags & 0x8000) && !(player_state.actor.unk60 & 1) && (player_move_dist != 0.0f)) {
+    if (!(battle_flags & 1) && !(battle_flags & 0x8000) && !(player_state.actor.animFlags & 1) && (player_move_dist != 0.0f)) {
         battle_travel_accumulator += player_move_dist;
         if (battle_travel_accumulator >= 50.0) {
             battle_encounter_roll_limit += 50;
@@ -180,10 +180,10 @@ void Battle_UpdateStartCamera(void) {
                 ang -= 6.283185307179586;
             }
             battle_temp_vec.x = 0.0f;
-            if (a->unk64->unk1C < a->unk64->unk18) {
-                battle_temp_vec.y = a->unk64->unk18 * a->scale * 2.0 + 15.0;
+            if (a->stats->unk1C < a->stats->unk18) {
+                battle_temp_vec.y = a->stats->unk18 * a->scale * 2.0 + 15.0;
             } else {
-                battle_temp_vec.y = a->unk64->unk1C * a->scale * 2.0 + 15.0;
+                battle_temp_vec.y = a->stats->unk1C * a->scale * 2.0 + 15.0;
             }
             camera_state.distance = battle_temp_vec.y * 1.5;
             Math_RotateVec2(ang, (Vec2f*)&battle_temp_vec);
@@ -260,7 +260,7 @@ void Battle_UpdateTurnTransition(void) {
         } else {
             a = &player_state.actor;
         }
-        if (!(a->unk60 & 1)) {
+        if (!(a->animFlags & 1)) {
             done = 0;
             if (enemy_count == 0 || (battle_flags & 0x400)) {
                 battle_flags |= 8;
@@ -310,8 +310,8 @@ void Battle_UpdateTurnTransition(void) {
             } else {
                 a = &player_state.actor;
             }
-            f *= a->unk68->unk90;
-            f += a->unk64->unk18 * a->scale;
+            f *= a->battle->unk90;
+            f += a->stats->unk18 * a->scale;
             battle_turn_ring_slot = Effect_CreateTerrainRing((battle_flags & 2) ? 1 : 2, battle_turn_origin_x, a->y, battle_turn_origin_z, f * 1.04);
         }
     }
@@ -333,7 +333,7 @@ void Battle_EndTurn(Actor* arg0) {
                     battle_turn_order_index = 0;
                 }
                 e = &enemy_slots[id = enemy_turn_order[battle_turn_order_index]];
-                if (e->unkA != 0 && e->actor.unk50 != -1) {
+                if (e->unkA != 0 && e->actor.animSetIndex != -1) {
                     break;
                 }
                 n--;

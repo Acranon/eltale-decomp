@@ -32,7 +32,7 @@ typedef struct EncounterPoint {
 typedef struct EncounterGroupEntry {
     /* 0x00 */ s32 enemy_def_index; /* enemy def index (Enemy_Spawn) */
     /* 0x04 */ s32 count; /* count */
-    /* 0x08 */ s32 extra_count_max; /* random extra count, 0..unk8 */
+    /* 0x08 */ s32 extra_count_max; /* random extra count, 0..extra_count_max */
 } EncounterGroupEntry; /* 0xC bytes */
 
 typedef struct EncounterGroup {

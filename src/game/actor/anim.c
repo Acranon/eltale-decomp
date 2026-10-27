@@ -16,13 +16,13 @@ MtxF anim_billboard_mtx_scratch;
 
 void Anim_SetCurrentAndNext(Actor* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, u16 arg5) {
     if (arg1 != -1) {
-        if (arg1 != arg0->unk52) {
-            arg0->unk52 = arg1;
-            arg0->unk60 = arg0->unk60 | 0x400;
-            arg0->unk60 = arg0->unk60 & 0xFDFF;
+        if (arg1 != arg0->animIndex) {
+            arg0->animIndex = arg1;
+            arg0->animFlags = arg0->animFlags | 0x400;
+            arg0->animFlags = arg0->animFlags & 0xFDFF;
         }
 
-        arg0->unk58 = arg2;
+        arg0->animStep = arg2;
         if (arg5 & 1) {
             arg0->frame = arg0->ticks = 0;
         }
@@ -69,7 +69,7 @@ void Anim_UpdateRootMotion(Actor* arg0, AnimSet* arg1, f32 scale) {
         frame = 0;
     }
     Math_EvalTcbSpline(&anim->track, (f32*)&pos, frame);
-    if (arg0->unk60 & 0x200) {
+    if (arg0->animFlags & 0x200) {
         kf = anim->track.kfs;
         frame = anim->track.last;
         while (kf->frame != frame) {
@@ -84,7 +84,7 @@ void Anim_UpdateRootMotion(Actor* arg0, AnimSet* arg1, f32 scale) {
         arg0->rootX = pos.unk0.x * scale;
         arg0->rootY = pos.unk0.y * scale;
         arg0->rootZ = pos.unk0.z * scale;
-    } else if (arg0->unk60 & 0x400) {
+    } else if (arg0->animFlags & 0x400) {
         arg0->unk44 = 0.0f;
         arg0->unk48 = 0.0f;
         arg0->unk4C = 0.0f;
@@ -110,7 +110,7 @@ void Anim_DrawModel(s32 flags, Actor* arg1, AnimSet* arg2, struct GfxFrameData* 
     Vec3f scale;
 
     anim_node_position_count = 0;
-    Math_MtxFRotScaleTrans(&mtx, arg1->unkC, arg1->rot, arg1->unk14, arg1->scale, arg1->x, arg1->y, arg1->z);
+    Math_MtxFRotScaleTrans(&mtx, arg1->rotX, arg1->rot, arg1->rotZ, arg1->scale, arg1->x, arg1->y, arg1->z);
     scale.x = arg1->scale;
     scale.y = arg1->scale;
     scale.z = arg1->scale;
@@ -197,18 +197,18 @@ void Anim_AdvanceFrame(s32 arg0, Actor* arg1, AnimSet* arg2) {
     s32 temp_v0 = arg1->frame += arg0;
 
     if (temp_v0 >= arg2->length) {
-        if (arg1->unk52 != arg1->nextAnim) {
-            arg1->unk52 = arg1->nextAnim;
+        if (arg1->animIndex != arg1->nextAnim) {
+            arg1->animIndex = arg1->nextAnim;
             arg1->frame = 0U;
             arg1->ticks = 0U;
-            arg1->unk58 = arg1->nextAnimStep;
-            arg1->unk60 |= 0x400;
+            arg1->animStep = arg1->nextAnimStep;
+            arg1->animFlags |= 0x400;
         } else {
             arg1->frame = temp_v0 - arg2->length;
-            arg1->unk60 |= 0x200;
+            arg1->animFlags |= 0x200;
         }
     } else {
-        arg1->unk60 &= ~0x600;
+        arg1->animFlags &= ~0x600;
     }
     arg1->ticks++;
 }
