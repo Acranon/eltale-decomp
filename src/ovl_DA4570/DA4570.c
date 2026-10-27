@@ -654,17 +654,17 @@ u16* D_801072F0_ovl_DA4570;
 s16 D_801072F4_ovl_DA4570;
 s16 D_801072F6_ovl_DA4570;
 
-void func_80100000_ovl_DA4570(u16 arg0, u8* arg1);
-void func_801000E4_ovl_DA4570(s32 arg0);
-void func_8010022C_ovl_DA4570(s16 arg0, s16 arg1);
-void func_8010028C_ovl_DA4570(u8* arg0, s32 arg1);
-void func_801002F0_ovl_DA4570(s32 arg0);
-void func_80100310_ovl_DA4570(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palette, u8 mode);
-void func_801004E8_ovl_DA4570(UnkStruct_801004E8* arg0, s32 arg1);
-void func_80100620_ovl_DA4570(s32 arg0);
-void func_80100854_ovl_DA4570(u16 arg0);
-void func_80100944_ovl_DA4570(void);
-void func_80101C80_ovl_DA4570(s32 x, s32 y, u8* str);
+void PakMenu_FormatNumber(u16 arg0, u8* arg1);
+void PakMenu_DrawChar(s32 arg0);
+void PakMenu_SetCursor(s16 arg0, s16 arg1);
+void PakMenu_DrawString(u8* arg0, s32 arg1);
+void PakMenu_SetTextPalette(s32 arg0);
+void PakMenu_BlitImage(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palette, u8 mode);
+void PakMenu_DrawSprites(UnkStruct_801004E8* arg0, s32 arg1);
+void PakMenu_DrawNoteRow(s32 arg0);
+void PakMenu_DrawFreePages(u16 arg0);
+void PakMenu_DrawScreen(void);
+void PakMenu_DrawText(s32 x, s32 y, u8* str);
 
 #ifdef NON_MATCHING
 extern u8 D_80092E98;
@@ -674,12 +674,12 @@ s32 func_8003D0F0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D554(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D6B0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003EDC0(OSPfs*, s32*, s32*);
-void func_8010055C_ovl_DA4570(void);
-void func_8010089C_ovl_DA4570(void);
-void func_801008F0_ovl_DA4570(u8* arg0);
+void PakMenu_WaitFrame(void);
+void PakMenu_DrawCursor(void);
+void PakMenu_DrawMessageBox(u8* arg0);
 #endif
 
-void func_80100000_ovl_DA4570(u16 arg0, u8* arg1) {
+void PakMenu_FormatNumber(u16 arg0, u8* arg1) {
     s32 var_v0 = arg0;
 
     if (var_v0 >= 1000) {
@@ -690,7 +690,7 @@ void func_80100000_ovl_DA4570(u16 arg0, u8* arg1) {
     arg1[2] = (var_v0 % 10) + 0x10;
 }
 
-void func_801000E4_ovl_DA4570(s32 arg0) {
+void PakMenu_DrawChar(s32 arg0) {
     u32* src;
     u16* dst;
     s32 i;
@@ -703,7 +703,7 @@ void func_801000E4_ovl_DA4570(s32 arg0) {
     }
     if (arg0 == 10) {
         D_801072F6_ovl_DA4570 += 13;
-        func_8010022C_ovl_DA4570(D_801072F4_ovl_DA4570, D_801072F6_ovl_DA4570);
+        PakMenu_SetCursor(D_801072F4_ovl_DA4570, D_801072F6_ovl_DA4570);
         return;
     }
     if ((arg0 < 0xF) || (arg0 > D_80107280_ovl_DA4570)) {
@@ -726,7 +726,7 @@ void func_801000E4_ovl_DA4570(s32 arg0) {
     D_801072F0_ovl_DA4570 += 9;
 }
 
-void func_8010022C_ovl_DA4570(s16 arg0, s16 arg1) {
+void PakMenu_SetCursor(s16 arg0, s16 arg1) {
     D_801072F4_ovl_DA4570 = arg0;
     D_801072F6_ovl_DA4570 = arg1;
     D_801072F0_ovl_DA4570 = D_801072E0_ovl_DA4570 + (arg0 + (arg1 * 320));
@@ -735,17 +735,17 @@ void func_8010022C_ovl_DA4570(s16 arg0, s16 arg1) {
 void func_80100284_ovl_DA4570(void) {
 }
 
-void func_8010028C_ovl_DA4570(u8* arg0, s32 arg1) {
+void PakMenu_DrawString(u8* arg0, s32 arg1) {
     while (arg1-- && *arg0) {
-        func_801000E4_ovl_DA4570(*arg0++);
+        PakMenu_DrawChar(*arg0++);
     }
 }
 
-void func_801002F0_ovl_DA4570(s32 arg0) {
+void PakMenu_SetTextPalette(s32 arg0) {
     D_80107044_ovl_DA4570 = D_8010700C_ovl_DA4570 + arg0 * 4;
 }
 
-void func_80100310_ovl_DA4570(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palette, u8 mode) {
+void PakMenu_BlitImage(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palette, u8 mode) {
     u16* dst = D_801072E0_ovl_DA4570 + (x + y * 320);
     u8* src = pixels;
     s32 i;
@@ -783,15 +783,15 @@ void func_80100310_ovl_DA4570(s16 x, s16 y, s16 w, s16 h, u8* pixels, u16* palet
     }
 }
 
-void func_801004E8_ovl_DA4570(UnkStruct_801004E8* arg0, s32 arg1) {
+void PakMenu_DrawSprites(UnkStruct_801004E8* arg0, s32 arg1) {
     s32 i;
 
     for (i = 0; i < arg1; i++) {
-        func_80100310_ovl_DA4570(arg0[i].x, arg0[i].y, arg0[i].w, arg0[i].h, arg0[i].pixels, arg0[i].palette, 2);
+        PakMenu_BlitImage(arg0[i].x, arg0[i].y, arg0[i].w, arg0[i].h, arg0[i].pixels, arg0[i].palette, 2);
     }
 }
 
-void func_8010055C_ovl_DA4570(void) {
+void PakMenu_WaitFrame(void) {
     osWritebackDCacheAll();
     osRecvMesg(D_801072E8_ovl_DA4570, &D_801072EC_ovl_DA4570, OS_MESG_BLOCK);
     if ((s32) D_801072EC_ovl_DA4570 == 0x29D) {
@@ -805,90 +805,90 @@ void func_8010055C_ovl_DA4570(void) {
     }
 }
 
-void func_80100620_ovl_DA4570(s32 arg0) {
+void PakMenu_DrawNoteRow(s32 arg0) {
     u8 buf[3];
     s16 y;
 
     D_80107280_ovl_DA4570 = 0x94;
     if ((arg0 == D_801072CA_ovl_DA4570) && (D_801072C8_ovl_DA4570 >= 2) && (D_801072C8_ovl_DA4570 < 5)) {
-        func_801002F0_ovl_DA4570(3);
+        PakMenu_SetTextPalette(3);
     } else {
-        func_801002F0_ovl_DA4570(1);
+        PakMenu_SetTextPalette(1);
     }
     if (D_80107288_ovl_DA4570[arg0 + D_801072CE_ovl_DA4570] == 0) {
         y = arg0 * 13 + 0x58;
-        func_8010022C_ovl_DA4570(0x52, y);
+        PakMenu_SetCursor(0x52, y);
 
-        func_8010028C_ovl_DA4570((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].name, 16);
+        PakMenu_DrawString((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].name, 16);
         if ((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unkA != 0) {
-            func_801000E4_ovl_DA4570(0x3C);
+            PakMenu_DrawChar(0x3C);
             D_801072F0_ovl_DA4570 = D_801072F0_ovl_DA4570;
-            func_801000E4_ovl_DA4570((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unkA);
+            PakMenu_DrawChar((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unkA);
         }
-        func_8010022C_ovl_DA4570(0x100, y);
-        func_80100000_ovl_DA4570(((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unk0 + 0xFF) >> 8, buf);
-        func_8010028C_ovl_DA4570(buf, 3);
+        PakMenu_SetCursor(0x100, y);
+        PakMenu_FormatNumber(((&D_80107080_ovl_DA4570[arg0])[D_801072CE_ovl_DA4570].unk0 + 0xFF) >> 8, buf);
+        PakMenu_DrawString(buf, 3);
     }
     y = arg0 * 13 + 0x58;
     if (D_801072CE_ovl_DA4570 + arg0 < 9) {
-        func_8010022C_ovl_DA4570(0x3C, y);
-        func_801000E4_ovl_DA4570(D_801072CE_ovl_DA4570 + arg0 + 0x11);
+        PakMenu_SetCursor(0x3C, y);
+        PakMenu_DrawChar(D_801072CE_ovl_DA4570 + arg0 + 0x11);
     } else {
-        func_8010022C_ovl_DA4570(0x37, y);
-        func_801000E4_ovl_DA4570(0x11);
-        func_8010022C_ovl_DA4570(0x3D, y);
-        func_801000E4_ovl_DA4570(D_801072CE_ovl_DA4570 + arg0 + 7);
+        PakMenu_SetCursor(0x37, y);
+        PakMenu_DrawChar(0x11);
+        PakMenu_SetCursor(0x3D, y);
+        PakMenu_DrawChar(D_801072CE_ovl_DA4570 + arg0 + 7);
     }
-    func_8010022C_ovl_DA4570(0x43, y);
-    func_801000E4_ovl_DA4570(0x3E);
+    PakMenu_SetCursor(0x43, y);
+    PakMenu_DrawChar(0x3E);
     D_80107280_ovl_DA4570 = 0x62;
 }
 
-void func_80100854_ovl_DA4570(u16 arg0) {
+void PakMenu_DrawFreePages(u16 arg0) {
     u8 buf[4];
 
-    func_801002F0_ovl_DA4570(1);
-    func_80100000_ovl_DA4570(arg0, buf);
-    func_8010022C_ovl_DA4570(200, 173);
-    func_8010028C_ovl_DA4570(buf, 3);
+    PakMenu_SetTextPalette(1);
+    PakMenu_FormatNumber(arg0, buf);
+    PakMenu_SetCursor(200, 173);
+    PakMenu_DrawString(buf, 3);
 }
 
-void func_8010089C_ovl_DA4570(void) {
-    func_80100310_ovl_DA4570(D_801072D0_ovl_DA4570, D_801072D2_ovl_DA4570, 16, 14, D_80101FC0_ovl_DA4570, D_80101FA0_ovl_DA4570, 2);
+void PakMenu_DrawCursor(void) {
+    PakMenu_BlitImage(D_801072D0_ovl_DA4570, D_801072D2_ovl_DA4570, 16, 14, D_80101FC0_ovl_DA4570, D_80101FA0_ovl_DA4570, 2);
 }
 
 #ifdef NON_MATCHING
 /* the message pointer it passes on to func_80101C80's u8* str (same code as s32) */
-void func_801008F0_ovl_DA4570(u8* arg0) {
+void PakMenu_DrawMessageBox(u8* arg0) {
 #else
-void func_801008F0_ovl_DA4570(s32 arg0) {
+void PakMenu_DrawMessageBox(s32 arg0) {
 #endif
-    func_80100944_ovl_DA4570();
-    func_801004E8_ovl_DA4570(D_80104DD8_ovl_DA4570, 75);
-    func_801004E8_ovl_DA4570(D_80105288_ovl_DA4570, 22);
-    func_80101C80_ovl_DA4570(0x34, 0x4E, arg0);
+    PakMenu_DrawScreen();
+    PakMenu_DrawSprites(D_80104DD8_ovl_DA4570, 75);
+    PakMenu_DrawSprites(D_80105288_ovl_DA4570, 22);
+    PakMenu_DrawText(0x34, 0x4E, arg0);
 }
 
-void func_80100944_ovl_DA4570(void) {
+void PakMenu_DrawScreen(void) {
     s32 i;
 
-    func_801004E8_ovl_DA4570(D_80103F28_ovl_DA4570, 235);
-    func_80100854_ovl_DA4570(D_801072D8_ovl_DA4570);
+    PakMenu_DrawSprites(D_80103F28_ovl_DA4570, 235);
+    PakMenu_DrawFreePages(D_801072D8_ovl_DA4570);
     if (D_801072CE_ovl_DA4570 != 0) {
-        func_801004E8_ovl_DA4570(D_801053E8_ovl_DA4570, 1);
+        PakMenu_DrawSprites(D_801053E8_ovl_DA4570, 1);
     }
     if (D_801072CE_ovl_DA4570 < 10) {
-        func_801004E8_ovl_DA4570(D_801053F8_ovl_DA4570, 1);
+        PakMenu_DrawSprites(D_801053F8_ovl_DA4570, 1);
     }
     for (i = 0; i < 6; i++) {
-        func_80100620_ovl_DA4570(i);
+        PakMenu_DrawNoteRow(i);
     }
     D_801072DC_ovl_DA4570 = 1;
 }
 
 #ifdef NON_MATCHING
 /* 37 words: pad pointer, stick_x and the pad-bit temps in other registers (allocation only); code is equivalent */
-s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
+s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
     OSContPad pads[4];
     u32* p;
     u16 btn;
@@ -955,7 +955,7 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
     }
     osViBlack(0);
     D_801072DC_ovl_DA4570 = 1;
-    func_8010055C_ovl_DA4570();
+    PakMenu_WaitFrame();
     D_80107280_ovl_DA4570 = 0x62;
     repeat = 0;
     held = 0;
@@ -1021,8 +1021,8 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D4_ovl_DA4570 = 1;
                     }
                     D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xBA : 0x4C;
-                    func_80100944_ovl_DA4570();
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawCursor();
                 } else if ((D_801072D4_ovl_DA4570 == 0) && (btn & 0x8000)) {
                     D_801072C8_ovl_DA4570 = 2;
                     sub = 0;
@@ -1036,16 +1036,16 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D4_ovl_DA4570 = 1;
                         D_801072D0_ovl_DA4570 = 0xBA;
                     }
-                    func_80100944_ovl_DA4570();
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawCursor();
                 }
                 break;
             case 2:
                 if (sub == 0) {
                     D_801072D0_ovl_DA4570 = 0x26;
                     D_801072D2_ovl_DA4570 = (D_801072CA_ovl_DA4570 * 13) + 0x58;
-                    func_80100944_ovl_DA4570();
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawCursor();
                     sub++;
                 } else if (btn & 0x4000) {
                     D_801072C8_ovl_DA4570 = 1;
@@ -1080,10 +1080,10 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     if ((D_801072CA_ovl_DA4570 != D_801072CC_ovl_DA4570) || (D_801072CE_ovl_DA4570 != D_801072CF_ovl_DA4570)) {
                         D_801072CC_ovl_DA4570 = D_801072CA_ovl_DA4570;
                         D_801072CF_ovl_DA4570 = D_801072CE_ovl_DA4570;
-                        func_80100944_ovl_DA4570();
+                        PakMenu_DrawScreen();
                         D_801072D0_ovl_DA4570 = 0x26;
                         D_801072D2_ovl_DA4570 = (D_801072CA_ovl_DA4570 * 13) + 0x58;
-                        func_8010089C_ovl_DA4570();
+                        PakMenu_DrawCursor();
                     }
                 }
                 break;
@@ -1092,9 +1092,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     D_801072D2_ovl_DA4570 = 0xA2;
                     sub++;
                     D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xA6 : 0x60;
-                    func_80100944_ovl_DA4570();
-                    func_801008F0_ovl_DA4570(D_80105408_ovl_DA4570);
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawMessageBox(D_80105408_ovl_DA4570);
+                    PakMenu_DrawCursor();
                 }
                 if ((D_801072D4_ovl_DA4570 == 0) && (btn & 0x8000)) {
                     sub = 0; file = &D_80107080_ovl_DA4570[ret2]; ret = osPfsDeleteFile(&pfs, file->unk8, file->unk4, file->name, &file->unkA);
@@ -1123,9 +1123,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D4_ovl_DA4570 = 1;
                         D_801072D0_ovl_DA4570 = 0xA6;
                     }
-                    func_80100944_ovl_DA4570();
-                    func_801008F0_ovl_DA4570(D_80105408_ovl_DA4570);
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawMessageBox(D_80105408_ovl_DA4570);
+                    PakMenu_DrawCursor();
                 }
                 break;
             case 4:
@@ -1133,8 +1133,8 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     D_801072D2_ovl_DA4570 = 0xC0;
                     sub++;
                     D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0x9C : 0x59;
-                    func_80100944_ovl_DA4570();
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawCursor();
                 } else if ((D_801072D4_ovl_DA4570 == 0) && (btn & 0x8000)) {
                     D_801072C8_ovl_DA4570 = 3;
                     sub = 0;
@@ -1150,8 +1150,8 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D4_ovl_DA4570 = 1;
                         D_801072D0_ovl_DA4570 = 0x9C;
                     }
-                    func_80100944_ovl_DA4570();
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawCursor();
                 }
                 break;
             case 5:
@@ -1166,9 +1166,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D0_ovl_DA4570 = 0x60;
                     }
                     D_801072D2_ovl_DA4570 = 0xA2;
-                    func_80100944_ovl_DA4570();
-                    func_801008F0_ovl_DA4570(D_801054E8_ovl_DA4570);
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
+                    PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
@@ -1188,9 +1188,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             D_801072D4_ovl_DA4570 = 1;
                             D_801072D0_ovl_DA4570 = 0xA6;
                         }
-                        func_80100944_ovl_DA4570();
-                        func_801008F0_ovl_DA4570(D_801054E8_ovl_DA4570);
-                        func_8010089C_ovl_DA4570();
+                        PakMenu_DrawScreen();
+                        PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
+                        PakMenu_DrawCursor();
                     }
                     break;
                 } else {
@@ -1198,10 +1198,10 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     if (blink == 0) {
                         D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xA6 : 0x60;
                         D_801072D2_ovl_DA4570 = 0xA2;
-                        func_80100944_ovl_DA4570();
-                        func_801008F0_ovl_DA4570(D_801054E8_ovl_DA4570);
+                        PakMenu_DrawScreen();
+                        PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
                         if (D_80105660_ovl_DA4570 & 1) {
-                            func_8010089C_ovl_DA4570();
+                            PakMenu_DrawCursor();
                         }
                     }
                     ret = osPfsRepairId(&pfs);
@@ -1227,10 +1227,10 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     if (blink == 0) {
                         D_801072D0_ovl_DA4570 = (D_801072D4_ovl_DA4570 != 0) ? 0xA6 : 0x60;
                         D_801072D2_ovl_DA4570 = 0xA2;
-                        func_80100944_ovl_DA4570();
-                        func_801008F0_ovl_DA4570(D_801054E8_ovl_DA4570);
+                        PakMenu_DrawScreen();
+                        PakMenu_DrawMessageBox(D_801054E8_ovl_DA4570);
                         if (D_80105660_ovl_DA4570 & 1) {
-                            func_8010089C_ovl_DA4570();
+                            PakMenu_DrawCursor();
                         }
                     }
                     ret = func_8003D0F0(mq, &pfs, D_80092C80);
@@ -1251,9 +1251,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                     D_801072D0_ovl_DA4570 = 0x88;
                     sub++;
                     D_801072D2_ovl_DA4570 = 0xA2;
-                    func_80100944_ovl_DA4570();
-                    func_801008F0_ovl_DA4570(D_801054B0_ovl_DA4570);
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawMessageBox(D_801054B0_ovl_DA4570);
+                    PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
@@ -1284,9 +1284,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D0_ovl_DA4570 = 0x60;
                     }
                     D_801072D2_ovl_DA4570 = 0xA2;
-                    func_80100944_ovl_DA4570();
-                    func_801008F0_ovl_DA4570(D_80105448_ovl_DA4570);
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
+                    PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
@@ -1299,17 +1299,17 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             D_801072D4_ovl_DA4570 = 1;
                             D_801072D0_ovl_DA4570 = 0xA6;
                         }
-                        func_80100944_ovl_DA4570();
-                        func_801008F0_ovl_DA4570(D_80105448_ovl_DA4570);
-                        func_8010089C_ovl_DA4570();
+                        PakMenu_DrawScreen();
+                        PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
+                        PakMenu_DrawCursor();
                     }
                 } else if (sub == 2) {
                     if (D_801072D4_ovl_DA4570 == 0) {
                         if (blink == 0) {
-                            func_80100944_ovl_DA4570();
-                            func_801008F0_ovl_DA4570(D_80105448_ovl_DA4570);
+                            PakMenu_DrawScreen();
+                            PakMenu_DrawMessageBox(D_80105448_ovl_DA4570);
                             if (D_80105660_ovl_DA4570 & 1) {
-                                func_8010089C_ovl_DA4570();
+                                PakMenu_DrawCursor();
                             }
                         }
                         ret = func_8003D0F0(mq, &pfs, D_80092C80);
@@ -1337,9 +1337,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D0_ovl_DA4570 = 0x60;
                     }
                     D_801072D2_ovl_DA4570 = 0xA2;
-                    func_80100944_ovl_DA4570();
-                    func_801008F0_ovl_DA4570(D_80105578_ovl_DA4570);
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawMessageBox(D_80105578_ovl_DA4570);
+                    PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
@@ -1351,9 +1351,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             D_801072D4_ovl_DA4570 = 1;
                             D_801072D0_ovl_DA4570 = 0xA6;
                         }
-                        func_80100944_ovl_DA4570();
-                        func_801008F0_ovl_DA4570(D_80105578_ovl_DA4570);
-                        func_8010089C_ovl_DA4570();
+                        PakMenu_DrawScreen();
+                        PakMenu_DrawMessageBox(D_80105578_ovl_DA4570);
+                        PakMenu_DrawCursor();
                     }
                 } else if (D_801072D4_ovl_DA4570 == 0) {
                     ret = func_8003D0F0(mq, &pfs, D_80092C80);
@@ -1380,9 +1380,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                         D_801072D0_ovl_DA4570 = 0x60;
                     }
                     D_801072D2_ovl_DA4570 = 0xA2;
-                    func_80100944_ovl_DA4570();
-                    func_801008F0_ovl_DA4570(D_80105608_ovl_DA4570);
-                    func_8010089C_ovl_DA4570();
+                    PakMenu_DrawScreen();
+                    PakMenu_DrawMessageBox(D_80105608_ovl_DA4570);
+                    PakMenu_DrawCursor();
                 } else if (sub == 1) {
                     if (btn & 0x8000) {
                         sub++;
@@ -1394,9 +1394,9 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
                             D_801072D4_ovl_DA4570 = 1;
                             D_801072D0_ovl_DA4570 = 0xA6;
                         }
-                        func_80100944_ovl_DA4570();
-                        func_801008F0_ovl_DA4570(D_80105608_ovl_DA4570);
-                        func_8010089C_ovl_DA4570();
+                        PakMenu_DrawScreen();
+                        PakMenu_DrawMessageBox(D_80105608_ovl_DA4570);
+                        PakMenu_DrawCursor();
                     }
                 } else if (D_801072D4_ovl_DA4570 == 0) {
                     ret = func_8003D0F0(mq, &pfs, D_80092C80);
@@ -1429,7 +1429,7 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
             blink = 0;
         }
         osContStartReadData(mq);
-        func_8010055C_ovl_DA4570();
+        PakMenu_WaitFrame();
         osRecvMesg(mq, &D_801072EC_ovl_DA4570, 1);
         unused3 = pads[D_80092C80].stick_y;
         dir = (((unused3 < 33) ^ 1) << 3) | ((pads[D_80092C80].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[D_80092C80].stick_x < -32) << 1);
@@ -1455,10 +1455,10 @@ s32 func_801009EC_ovl_DA4570(OSMesgQueue* mq, OSMesgQueue* arg1) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_DA4570/DA4570/func_801009EC_ovl_DA4570.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_DA4570/DA4570/PakMenu_Run.s")
 #endif
 
-void func_80101C80_ovl_DA4570(s32 x, s32 y, u8* str) {
+void PakMenu_DrawText(s32 x, s32 y, u8* str) {
     s32 rowOff = 0;
     s32 curX = x;
     s32 curY = y;

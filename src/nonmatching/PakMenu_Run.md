@@ -1,9 +1,9 @@
-# func_801009EC_ovl_DA4570
+# PakMenu_Run
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/ovl_DA4570/DA4570.c`](../ovl_DA4570/DA4570.c)
-- Retail assembly: [`asm/nonmatchings/ovl_DA4570/DA4570/func_801009EC_ovl_DA4570.s`](../../asm/nonmatchings/ovl_DA4570/DA4570/func_801009EC_ovl_DA4570.s)
+- Retail assembly: [`asm/nonmatchings/ovl_DA4570/DA4570/PakMenu_Run.s`](../../asm/nonmatchings/ovl_DA4570/DA4570/PakMenu_Run.s)
 - Retail code size: `0x1294` bytes
 - Current gap: 37 linked ROM words (NON_MATCHING C in the source); length and frame exact.
 - Specific blocker: Explicit signedStick<33 XOR1 gives retail slti/xori separation. Cached signed Y is v1 as retail; pad pointer is s1 instead of s0, raw X a1 instead of s1, then partial-OR temporaries rotate.
@@ -32,7 +32,7 @@ Verdict: **equivalent.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_801009EC_ovl_DA4570** (0x12C4 bytes)
+- **PakMenu_Run** (0x12C4 bytes)
   - w7 s1: Large (0x1290) controller-pak boot screen. Not attempted beyond m2c.
   - w7 s2: Controller-pak screen, first real attempt. A full C draft is structurally right. Locals found: OSContPad pads[4] at 0x168; one u16 var at 0x162 that holds prev buttons, then pressed buttons; repeat 0x15C; blink 0x15A; u32 timer 0x154; OSPfs pfs at 0xEC and pfs2 at 0x84; count 0x80; maxFiles 0x7C. At -g3 every declared local gets a slot, so the frame only fits with exactly 10 locals below count. Blocked: the message strings D_80105408/448/4B0/4E8/578/608 are statics in the original. Retail builds each address right at its call; IDO hoists extern addresses into s-registers, even with a different symbol for each use. That uses up the register that holds &pfs in $fp in retail.
   - w7 s3: Down from 1101 to 971 words. The string addresses are not a statics problem. Micro-tests show IDO hoists extern, static and literal LDAs alike whenever an s-register is free. Retail just has none left. Two fixes put fp = &pfs and the early s-registers in line with retail: (1) the 0x80200000 clear loop needs its own 'u32* p' pointer in place of the 'unused1' slot, while-loop form '*p++ = 0'; (2) func_8003DEA0's third argument is 'D_80107080 + i', which keeps IDO from strength-reducing it. Remaining: retail never uses t0, so held is in t1. btn is in a3 and the CE copy in a2; mine has them the other way round. Strings still get hoisted in some cases. Best draft: scratchpad w7s3/pb_r1.c.

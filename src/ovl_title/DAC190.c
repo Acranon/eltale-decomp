@@ -173,7 +173,7 @@ void Text_DrawEncodedString(s32, s32, u8*);
 s8 D_80226DB0_ovl_title;
 s32 D_80226DB4_ovl_title;
 
-void func_8020CC70_ovl_title(s32 arg0) {
+void Title_DrawScreen(s32 arg0) {
     static s32 D_8020F4D0_ovl_title = 0;
     static s8 D_8020F4D4_ovl_title = 0;
     static s8 D_8020F4D8_ovl_title = 0;
@@ -412,9 +412,9 @@ s32 D_8020F4F0_ovl_title = 0;
 s32 D_8020F4F4_ovl_title = 2;
 s32 D_80226DC0_ovl_title;
 
-void func_8020EFE4_ovl_title(UnkStruct_8020EF00* arg0);
+void Title_DrawScreenFade(UnkStruct_8020EF00* arg0);
 
-void func_8020EF00_ovl_title(void) {
+void Title_UpdateScreenFade(void) {
     static UnkFade_8020F4F8 fade = { 0 };
 
     if (D_8020F4F0_ovl_title == 0) {
@@ -440,11 +440,11 @@ void func_8020EF00_ovl_title(void) {
                     break;
             }
         }
-        func_8020EFE4_ovl_title((UnkStruct_8020EF00*) &fade);
+        Title_DrawScreenFade((UnkStruct_8020EF00*) &fade);
     }
 }
 
-void func_8020EFE4_ovl_title(UnkStruct_8020EF00* arg0) {
+void Title_DrawScreenFade(UnkStruct_8020EF00* arg0) {
     s32 rgbColorValue;
     s32 alpha;
 

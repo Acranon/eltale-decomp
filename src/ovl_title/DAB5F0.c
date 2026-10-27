@@ -31,10 +31,10 @@ extern s32 D_80226DB4_ovl_title;
 extern s32 D_80226DC0_ovl_title;
 
 void func_80029A88(s32, s32, s32);
-s32 func_8020C178_ovl_title(void);
-void func_8020CC70_ovl_title(s32);
+s32 Title_RunPhase(void);
+void Title_DrawScreen(s32);
 
-void func_8020C0D0_ovl_title(void) {
+void Title_Init(void) {
     D_80226D90_ovl_title = 0;
     D_80226DA4_ovl_title = 0;
     D_8020F4F4_ovl_title = 1;
@@ -45,8 +45,8 @@ void func_8020C0D0_ovl_title(void) {
     D_80226D98_ovl_title = 0;
 }
 
-s32 func_8020C11C_ovl_title(void) {
-    if (func_8020C178_ovl_title() == 0) {
+s32 Title_Update(void) {
+    if (Title_RunPhase() == 0) {
         if (D_80226DA4_ovl_title == 0) {
             return 1;
         }
@@ -62,15 +62,15 @@ extern u8 D_8006CC80;
 extern u8 D_8007A1CC;
 extern s8 D_80092C81;
 extern s8 D_80092C82;
-void func_8020C7A8_ovl_title(void);
-void func_8020CBE4_ovl_title(void);
-void func_8020EF00_ovl_title(void);
+void Title_UpdateScreen(void);
+void Title_DrawSelectionExit(void);
+void Title_UpdateScreenFade(void);
 
 
 /* .data 8020F1E0..8020F200: D_8020F1E0, then func_8020C178's statics F1E4..F1F0. */
 s32 D_8020F1E0_ovl_title = 0;
 
-s32 func_8020C178_ovl_title(void) {
+s32 Title_RunPhase(void) {
     static u8 D_8020F1E4_ovl_title = 0;
     static u32 D_8020F1E8_ovl_title = 0;
     static u16 D_8020F1EC_ovl_title = 0;
@@ -95,9 +95,9 @@ s32 func_8020C178_ovl_title(void) {
             }
             break;
         case 4:
-            func_8020C7A8_ovl_title();
+            Title_UpdateScreen();
             if (D_8020F4F0_ovl_title == 2) {
-                func_8020EF00_ovl_title();
+                Title_UpdateScreenFade();
             }
             if ((D_80226D94_ovl_title == 0) && (D_80226DA4_ovl_title == 0) && (D_8020F1E0_ovl_title == 0)) {
                 D_8020F1E0_ovl_title = 1;
@@ -106,7 +106,7 @@ s32 func_8020C178_ovl_title(void) {
                 D_80226D94_ovl_title = 0x3C;
             }
             if (D_8020F1E0_ovl_title == 1) {
-                func_8020EF00_ovl_title();
+                Title_UpdateScreenFade();
                 if (D_8020F4F0_ovl_title == 0) {
                     D_80226D9C_ovl_title = 0;
                     D_80226DA0_ovl_title = 8;
@@ -123,7 +123,7 @@ s32 func_8020C178_ovl_title(void) {
             }
             break;
         case 5:
-            func_8020C7A8_ovl_title();
+            Title_UpdateScreen();
             if (D_8020F1EC_ovl_title == 0) {
                 D_8020F1E8_ovl_title++;
             } else {
@@ -161,7 +161,7 @@ s32 func_8020C178_ovl_title(void) {
                 }
             }
             if (D_8020F1E0_ovl_title == 2) {
-                func_8020EF00_ovl_title();
+                Title_UpdateScreenFade();
                 if (D_8020F4F0_ovl_title == 0) {
                     D_80226D9C_ovl_title = 0;
                     D_80226DA0_ovl_title = 8;
@@ -174,7 +174,7 @@ s32 func_8020C178_ovl_title(void) {
             }
             break;
         case 6:
-            func_8020C7A8_ovl_title();
+            Title_UpdateScreen();
             if (D_8020F1E4_ovl_title < 2) {
                 D_8020F1E4_ovl_title++;
             } else if ((D_8007A1CC & 0xF0) == 0x10) {
@@ -188,7 +188,7 @@ s32 func_8020C178_ovl_title(void) {
             }
             break;
         case 7:
-            func_8020C7A8_ovl_title();
+            Title_UpdateScreen();
             if (D_8020F1E0_ovl_title == 0) {
                 D_80226D94_ovl_title = 0x14;
             }
@@ -238,8 +238,8 @@ s32 func_8020C178_ovl_title(void) {
             }
             break;
         case 8:
-            func_8020CBE4_ovl_title();
-            func_8020EF00_ovl_title();
+            Title_DrawSelectionExit();
+            Title_UpdateScreenFade();
             break;
     }
     if (D_80226D94_ovl_title == 0) {
@@ -249,13 +249,13 @@ s32 func_8020C178_ovl_title(void) {
     return D_80226D94_ovl_title;
 }
 
-void func_8020C7A8_ovl_title(void) {
+void Title_UpdateScreen(void) {
     s32 var_v0;
 
     gSPDisplayList(D_8007A184++, D_8020F208_ovl_title);
     gDPSetEnvColor(D_8007A184++, 0, 0, 0, D_80226D9C_ovl_title);
 
-    func_8020CC70_ovl_title((u32)D_80226DA4_ovl_title);
+    Title_DrawScreen((u32)D_80226DA4_ovl_title);
     D_80226D9C_ovl_title += D_80226DA0_ovl_title;
     if (D_80226D9C_ovl_title >= 0x100) {
         D_80226D9C_ovl_title = 0xFF;
@@ -336,11 +336,11 @@ void func_8020C7A8_ovl_title(void) {
     D_80226D94_ovl_title -= 1;
 }
 
-void func_8020CBE4_ovl_title(void) {
+void Title_DrawSelectionExit(void) {
     gSPDisplayList(D_8007A184++, D_8020F208_ovl_title);
     gDPSetEnvColor(D_8007A184++, 0x00, 0x00, 0x00, 0xFF);
 
-    func_8020CC70_ovl_title(D_80226DA4_ovl_title);
+    Title_DrawScreen(D_80226DA4_ovl_title);
     if (--D_80226D94_ovl_title == 0) {
         D_80226DA4_ovl_title = 0xF;
     }

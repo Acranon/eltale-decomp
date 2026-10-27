@@ -162,28 +162,28 @@ extern AnimTbl D_80212810_ovl_intro[];
 extern Gfx D_802122E0_ovl_intro[];
 extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
-void func_8020E108_ovl_intro(s32);
+void Intro_DrawSprites(s32);
 void func_8002A338(s32);
-s32 func_8020D454_ovl_intro();
-s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx);
-void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
+s32 Intro_CountActiveSprites();
+s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx);
+void Intro_SpawnSprite(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
                              s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13);
-void func_8020D300_ovl_intro(s32 idx);
-s16 func_8020D504_ovl_intro(void);
-void func_8020D8AC_ovl_intro(s32 idx);
-void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2);
-void func_8020E0EC_ovl_intro(s32 idx);
+void Intro_ClearSprite(s32 idx);
+s16 Intro_FindFreeSprite(void);
+void Intro_SetClipAnchor(s32 idx);
+void Intro_SetMoveTarget(s32 idx, s32 arg1, s32 arg2);
+void Intro_ResetWait(s32 idx);
 extern Gfx D_802122C8_ovl_intro[];
-s32 func_8020D5EC_ovl_intro(s32 idx, s32 flags, IntroRect *r);
-s32 func_8020D750_ovl_intro(s32 idx, s32 flags, IntroRect *r);
-s32 func_8020D8E8_ovl_intro(s32 idx, s32 arg1);
-s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1);
-s32 func_8020DAF0_ovl_intro(s32 idx, s32 flags);
-s32 func_8020DDA0_ovl_intro(s32 idx, s32 flags);
-s32 func_8020DF20_ovl_intro(s32 idx, s32 flags);
-s32 func_8020E0A0_ovl_intro(s32 idx);
+s32 Intro_StepClipGrow(s32 idx, s32 flags, IntroRect *r);
+s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r);
+s32 Intro_StepAlphaFade(s32 idx, s32 arg1);
+s32 Intro_StepBrightnessFade(s32 idx, s32 arg1);
+s32 Intro_StepMoveXY(s32 idx, s32 flags);
+s32 Intro_StepMoveX(s32 idx, s32 flags);
+s32 Intro_StepMoveY(s32 idx, s32 flags);
+s32 Intro_StepWait(s32 idx);
 
-void func_8020D1DC_ovl_intro(void);
+void Intro_ClearAllSprites(void);
 
 typedef struct {
     /* 0x00 */ s16 unk0;
@@ -208,17 +208,17 @@ s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 void func_8003D8EC(char *, ...);
 void func_80029A88(s32, s32, s32);
 void func_8002A6B8(s32);
-s32 func_8020C6A8_ovl_intro(void);
-void func_8020F170_ovl_intro(void);
-void func_8020F2DC_ovl_intro(void);
-void func_8020F448_ovl_intro(void);
-s32 func_80210140_ovl_intro(void);
-void func_80210D38_ovl_intro(void);
-s32 func_802111A4_ovl_intro(void);
-s32 func_80211634_ovl_intro(void);
+s32 Intro_RunSpriteScript(void);
+void Intro_RunSplash1(void);
+void Intro_RunSplash2(void);
+void Intro_RunSplash3(void);
+s32 Intro_RunNoPakScreen(void);
+void Intro_DrawNoControllerMessage(void);
+s32 Intro_RunPakFullScreen(void);
+s32 Intro_RunPakErrorScreen(void);
 
-void func_8020C0D0_ovl_intro(void) {
-    func_8020D1DC_ovl_intro();
+void Intro_Init(void) {
+    Intro_ClearAllSprites();
     D_802684B0_ovl_intro = 10;
     D_802684B4_ovl_intro = 1;
     D_802684B8_ovl_intro = 300;
@@ -235,7 +235,7 @@ void func_8020C0D0_ovl_intro(void) {
     D_802684C8_ovl_intro = 0;
 }
 
-s32 func_8020C16C_ovl_intro(void) {
+s32 Intro_Update(void) {
     s32 ret;
     s32 err;
     static s32 D_80212234_ovl_intro = 0;
@@ -244,7 +244,7 @@ s32 func_8020C16C_ovl_intro(void) {
     static s32 D_80212240_ovl_intro = 1;
 
     if (D_80092C80 == -1) {
-        func_80210D38_ovl_intro();
+        Intro_DrawNoControllerMessage();
         return 2;
     }
     if (D_8006CC7C == 0) {
@@ -275,19 +275,19 @@ s32 func_8020C16C_ovl_intro(void) {
                 D_80212238_ovl_intro = 3;
                 return 2;
             case 1:
-                if (func_802111A4_ovl_intro() != 0) {
+                if (Intro_RunPakFullScreen() != 0) {
                     D_8006CC7C = 1;
                     return 2;
                 }
                 break;
             case 2:
-                if (func_80210140_ovl_intro() != 0) {
+                if (Intro_RunNoPakScreen() != 0) {
                     D_8006CC7C = 1;
                     return 2;
                 }
                 break;
             case 3:
-                if (func_80211634_ovl_intro() != 0) {
+                if (Intro_RunPakErrorScreen() != 0) {
                     D_8006CC7C = 1;
                 }
                 break;
@@ -300,7 +300,7 @@ s32 func_8020C16C_ovl_intro(void) {
     } else {
         switch (D_80212240_ovl_intro) {
             case 0:
-                func_8020F170_ovl_intro();
+                Intro_RunSplash1();
                 if (D_80212230_ovl_intro == 0) {
                     D_80212230_ovl_intro = 150;
                     D_80212250_ovl_intro = 0;
@@ -309,7 +309,7 @@ s32 func_8020C16C_ovl_intro(void) {
                 }
                 break;
             case 1:
-                func_8020F2DC_ovl_intro();
+                Intro_RunSplash2();
                 if (D_80092C86 & 0x1000) {
                     func_80029A88(1, 0xFF, 0x40);
                     D_80212230_ovl_intro = 0;
@@ -328,7 +328,7 @@ s32 func_8020C16C_ovl_intro(void) {
                 }
                 break;
             case 2:
-                func_8020F448_ovl_intro();
+                Intro_RunSplash3();
                 if (D_80092C86 & 0x1000) {
                     func_80029A88(1, 0xFF, 0x40);
                     D_80212230_ovl_intro = 0;
@@ -358,7 +358,7 @@ s32 func_8020C16C_ovl_intro(void) {
                 D_80276F40_ovl_intro = D_8007A184;
                 D_8007A184 = D_8026B3C0_ovl_intro[D_80212234_ovl_intro];
                 gSPDisplayList(D_8007A184++, D_80212270_ovl_intro);
-                ret = func_8020C6A8_ovl_intro();
+                ret = Intro_RunSpriteScript();
                 gSPEndDisplayList(D_8007A184);
                 D_8007A184 = D_80276F40_ovl_intro;
                 gSPDisplayList(D_8007A184++, D_8026B3C0_ovl_intro[D_80212234_ovl_intro]);
@@ -370,7 +370,7 @@ s32 func_8020C16C_ovl_intro(void) {
 
 #ifdef NON_MATCHING
 /* D_80276F44 is the module's global (the original's function static), so its address is kept in a register; v1 spill at sp+0x74 vs 0x70; code is equivalent */
-s32 func_8020C6A8_ovl_intro(void) {
+s32 Intro_RunSpriteScript(void) {
     Unk28* entries;
     AnimFrame* steps;
     u32 listIdx;
@@ -398,13 +398,13 @@ s32 func_8020C6A8_ovl_intro(void) {
     if ((D_802684D4_ovl_intro >= D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0[D_802684CC_ovl_intro].unk2) &&
         (D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0[D_802684CC_ovl_intro].unk22 == -1) && (D_802684DC_ovl_intro == 0)) {
         do {
-            slot = func_8020D504_ovl_intro();
+            slot = Intro_FindFreeSprite();
             if (slot != -1) {
             entries = D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk0;
             entries[D_802684CC_ovl_intro].unk20 = 0;
             entries[D_802684CC_ovl_intro].unk22 = slot;
             steps = D_80212810_ovl_intro[entries[D_802684CC_ovl_intro].unk0].unk0;
-            func_8020D0F4_ovl_intro(slot, 0x80000000 | entries[D_802684CC_ovl_intro].unk4 | steps[entries[D_802684CC_ovl_intro].unk20].unk0,
+            Intro_SpawnSprite(slot, 0x80000000 | entries[D_802684CC_ovl_intro].unk4 | steps[entries[D_802684CC_ovl_intro].unk20].unk0,
                                      entries[D_802684CC_ovl_intro].unk8, entries[D_802684CC_ovl_intro].unkA, entries[D_802684CC_ovl_intro].unk10,
                                      entries[D_802684CC_ovl_intro].unk12, entries[D_802684CC_ovl_intro].unkC, entries[D_802684CC_ovl_intro].unkE,
                                      entries[D_802684CC_ovl_intro].unk14, entries[D_802684CC_ovl_intro].unk16, entries[D_802684CC_ovl_intro].unk18,
@@ -423,13 +423,13 @@ s32 func_8020C6A8_ovl_intro(void) {
                     dx = 0;
                     dy = 0;
                 }
-                func_8020DD6C_ovl_intro(slot, steps[entries[D_802684CC_ovl_intro].unk20].unk4 + dx, steps[entries[D_802684CC_ovl_intro].unk20].unk6 + dy);
+                Intro_SetMoveTarget(slot, steps[entries[D_802684CC_ovl_intro].unk20].unk4 + dx, steps[entries[D_802684CC_ovl_intro].unk20].unk6 + dy);
             }
             if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0x1000) {
-                func_8020E0EC_ovl_intro(slot);
+                Intro_ResetWait(slot);
             }
             if (steps[entries[D_802684CC_ovl_intro].unk20].unk0 & 0x60000000) {
-                func_8020D8AC_ovl_intro(slot);
+                Intro_SetClipAnchor(slot);
             }
             D_802684CC_ovl_intro++;
             if (D_802684CC_ovl_intro >= D_802170E8_ovl_intro[D_802684D8_ovl_intro].unk4) {
@@ -447,13 +447,13 @@ s32 func_8020C6A8_ovl_intro(void) {
     if (D_802684C0_ovl_intro == 0x1E00) {
         func_8002A338(0x5A);
     }
-    func_8020E108_ovl_intro(1);
-    func_8020E108_ovl_intro(0);
+    Intro_DrawSprites(1);
+    Intro_DrawSprites(0);
     for (i = 0, obj = D_802684E0_ovl_intro; i < 150; i++, obj++) {
         if (i) {
         }
         if (obj->unk0.w & 0x80000000) {
-            j = func_8020D078_ovl_intro(i, &listIdx);
+            j = Intro_FindSpriteScriptEntry(i, &listIdx);
             if (j != -1) {
                 flags = obj->unk0.w;
                 entries = D_802170E8_ovl_intro[listIdx].unk0;
@@ -467,7 +467,7 @@ s32 func_8020C6A8_ovl_intro(void) {
                     new_var = entries;
                     entries[j].unk20++;
                     if (new_var[j].unk20 >= D_80212810_ovl_intro[new_var[j].unk0].unk4) {
-                        func_8020D300_ovl_intro(i);
+                        Intro_ClearSprite(i);
                         entries[j].unk22 = -1;
                     } else {
                         obj->unk0.w &= ~0x800000;
@@ -481,13 +481,13 @@ s32 func_8020C6A8_ovl_intro(void) {
                                 dx = 0;
                                 dy = 0;
                             }
-                            func_8020DD6C_ovl_intro(i, steps[new_var[j].unk20].unk4 + dx, steps[new_var[j].unk20].unk6 + dy);
+                            Intro_SetMoveTarget(i, steps[new_var[j].unk20].unk4 + dx, steps[new_var[j].unk20].unk6 + dy);
                         }
                         if (steps[new_var[j].unk20].unk0 & 0x1000) {
-                            func_8020E0EC_ovl_intro(i);
+                            Intro_ResetWait(i);
                         }
                         if (steps[new_var[j].unk20].unk0 & 0x60000000) {
-                            func_8020D8AC_ovl_intro(i);
+                            Intro_SetClipAnchor(i);
                         }
                     }
                 }
@@ -516,7 +516,7 @@ s32 func_8020C6A8_ovl_intro(void) {
             return 1;
         }
     }
-    if ((func_8020D454_ovl_intro() == 0) && (D_802684DC_ovl_intro != 0)) {
+    if ((Intro_CountActiveSprites() == 0) && (D_802684DC_ovl_intro != 0)) {
         D_802684DC_ovl_intro = 0;
         D_802684D8_ovl_intro++;
         if (D_802684D8_ovl_intro >= D_802170F0_ovl_intro) {
@@ -527,10 +527,10 @@ s32 func_8020C6A8_ovl_intro(void) {
     return 2;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020C6A8_ovl_intro.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/Intro_RunSpriteScript.s")
 #endif
 
-s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx) {
+s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx) {
     u32 i;
     u32 j;
 
@@ -545,7 +545,7 @@ s32 func_8020D078_ovl_intro(s32 id, u32 *outIdx) {
     return -1;
 }
 
-void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
+void Intro_SpawnSprite(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8,
                              s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
@@ -579,7 +579,7 @@ void func_8020D0F4_ovl_intro(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg
     p->unk2E = p->unk30 = 0;
 }
 
-void func_8020D1DC_ovl_intro(void) {
+void Intro_ClearAllSprites(void) {
     s32 i;
     IntroSprite *p = D_802684E0_ovl_intro;
 
@@ -615,7 +615,7 @@ void func_8020D1DC_ovl_intro(void) {
     }
 }
 
-void func_8020D300_ovl_intro(s32 idx) {
+void Intro_ClearSprite(s32 idx) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk0.w = 0;
@@ -648,7 +648,7 @@ void func_8020D300_ovl_intro(s32 idx) {
     p->unk2E = p->unk30 = 0;
 }
 
-s32 func_8020D3A4_ovl_intro(s32 n) {
+s32 Intro_CountFreeSprites(s32 n) {
     s32 i;
     IntroSprite *p = D_802684E0_ovl_intro;
 
@@ -661,7 +661,7 @@ s32 func_8020D3A4_ovl_intro(s32 n) {
     return n;
 }
 
-s32 func_8020D454_ovl_intro(s32 n) {
+s32 Intro_CountActiveSprites(s32 n) {
     s32 i;
     IntroSprite *p = D_802684E0_ovl_intro;
 
@@ -674,7 +674,7 @@ s32 func_8020D454_ovl_intro(s32 n) {
     return n;
 }
 
-s16 func_8020D504_ovl_intro(void) {
+s16 Intro_FindFreeSprite(void) {
     s32 i;
     IntroSprite *p = D_802684E0_ovl_intro;
 
@@ -686,7 +686,7 @@ s16 func_8020D504_ovl_intro(void) {
     return -1;
 }
 
-s32 func_8020D5EC_ovl_intro(s32 arg0, s32 arg1, IntroRect* arg2) {
+s32 Intro_StepClipGrow(s32 arg0, s32 arg1, IntroRect* arg2) {
     IntroSprite* temp_v1;
     s32 v = 0;
     s32 x;
@@ -732,7 +732,7 @@ s32 func_8020D5EC_ovl_intro(s32 arg0, s32 arg1, IntroRect* arg2) {
     return 0;
 }
 
-s32 func_8020D750_ovl_intro(s32 idx, s32 flags, IntroRect *r) {
+s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r) {
     IntroSprite *s = &D_802684E0_ovl_intro[idx];
     IntroSprite *p;
     s32 v;
@@ -774,14 +774,14 @@ s32 func_8020D750_ovl_intro(s32 idx, s32 flags, IntroRect *r) {
     return 0;
 }
 
-void func_8020D8AC_ovl_intro(s32 idx) {
+void Intro_SetClipAnchor(s32 idx) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk2E = p->unk4 + p->unk8;
     p->unk30 = p->unk6 + p->unkA;
 }
 
-s32 func_8020D8E8_ovl_intro(s32 idx, s32 arg1) {
+s32 Intro_StepAlphaFade(s32 idx, s32 arg1) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
 
@@ -812,7 +812,7 @@ s32 func_8020D8E8_ovl_intro(s32 idx, s32 arg1) {
     return 0;
 }
 
-s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1) {
+s32 Intro_StepBrightnessFade(s32 idx, s32 arg1) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
 
@@ -843,7 +843,7 @@ s32 func_8020D9EC_ovl_intro(s32 idx, s32 arg1) {
     return 0;
 }
 
-s32 func_8020DAF0_ovl_intro(s32 idx, s32 flags) {
+s32 Intro_StepMoveXY(s32 idx, s32 flags) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
     s32 tx;
@@ -921,7 +921,7 @@ s32 func_8020DAF0_ovl_intro(s32 idx, s32 flags) {
     return 0;
 }
 
-void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2) {
+void Intro_SetMoveTarget(s32 idx, s32 arg1, s32 arg2) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk2A = arg1;
@@ -930,7 +930,7 @@ void func_8020DD6C_ovl_intro(s32 idx, s32 arg1, s32 arg2) {
     p->unk28 = p->unk6;
 }
 
-s32 func_8020DDA0_ovl_intro(s32 idx, s32 flags) {
+s32 Intro_StepMoveX(s32 idx, s32 flags) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
     s32 t;
@@ -980,7 +980,7 @@ s32 func_8020DDA0_ovl_intro(s32 idx, s32 flags) {
     return 0;
 }
 
-s32 func_8020DF20_ovl_intro(s32 idx, s32 flags) {
+s32 Intro_StepMoveY(s32 idx, s32 flags) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
     f32 step;
     s32 t;
@@ -1030,7 +1030,7 @@ s32 func_8020DF20_ovl_intro(s32 idx, s32 flags) {
     return 0;
 }
 
-s32 func_8020E0A0_ovl_intro(s32 idx) {
+s32 Intro_StepWait(s32 idx) {
     IntroSprite *p = &D_802684E0_ovl_intro[idx];
 
     p->unk34++;
@@ -1040,13 +1040,13 @@ s32 func_8020E0A0_ovl_intro(s32 idx) {
     return 0;
 }
 
-void func_8020E0EC_ovl_intro(s32 idx) {
+void Intro_ResetWait(s32 idx) {
     D_802684E0_ovl_intro[idx].unk34 = 0;
 }
 
 #ifdef NON_MATCHING
 /* 23 words: t3/t4 swapped in the flipped texrect block (allocation only); code is equivalent */
-void func_8020E108_ovl_intro(s32 arg0) {
+void Intro_DrawSprites(s32 arg0) {
     s32 i;
     IntroRect r;
     s32 k;
@@ -1091,13 +1091,13 @@ void func_8020E108_ovl_intro(s32 arg0) {
             continue;
         }
         flags = p->unk0.w;
-        if ((flags & 0x800) && func_8020DAF0_ovl_intro(idx, flags)) {
+        if ((flags & 0x800) && Intro_StepMoveXY(idx, flags)) {
             flags &= ~0x800;
         }
-        if ((flags & 0x4000) && func_8020DDA0_ovl_intro(idx, flags)) {
+        if ((flags & 0x4000) && Intro_StepMoveX(idx, flags)) {
             flags &= ~0x4000;
         }
-        if ((flags & 0x8000) && func_8020DF20_ovl_intro(idx, flags)) {
+        if ((flags & 0x8000) && Intro_StepMoveY(idx, flags)) {
             flags &= ~0x8000;
         }
         r.unk0 = p->unk4;
@@ -1112,45 +1112,45 @@ void func_8020E108_ovl_intro(s32 arg0) {
         r.unk24 = 0x400;
         r.unk28 = r.unk8 << 5;
         r.unk2C = r.unkC << 5;
-        if ((flags & 0x20000000) && func_8020D5EC_ovl_intro(idx, flags, &r)) {
+        if ((flags & 0x20000000) && Intro_StepClipGrow(idx, flags, &r)) {
             flags &= ~0x20000100;
         }
-        if ((flags & 0x40000000) && func_8020D750_ovl_intro(idx, flags, &r)) {
+        if ((flags & 0x40000000) && Intro_StepClipShrink(idx, flags, &r)) {
             flags &= ~0x40000400;
         }
         if (flags & 0x10) {
             fade |= 0x10;
-            if (func_8020D8E8_ovl_intro(idx, 0)) {
+            if (Intro_StepAlphaFade(idx, 0)) {
                 flags &= ~0x10;
                 changed = 1;
             }
         }
         if (flags & 0x20) {
             fade |= 0x20;
-            if (func_8020D8E8_ovl_intro(idx, 1)) {
+            if (Intro_StepAlphaFade(idx, 1)) {
                 flags &= ~0x20;
                 changed = 1;
             }
         }
         if (flags & 0x40) {
             fade |= 0x40;
-            if (func_8020D9EC_ovl_intro(idx, 0)) {
+            if (Intro_StepBrightnessFade(idx, 0)) {
                 flags &= ~0x40;
                 changed = 1;
             }
         }
         if (flags & 0x80) {
             fade |= 0x80;
-            if (func_8020D9EC_ovl_intro(idx, 1)) {
+            if (Intro_StepBrightnessFade(idx, 1)) {
                 flags &= ~0x80;
                 changed = 1;
             }
         }
-        if ((flags & 0x1000) && func_8020E0A0_ovl_intro(idx)) {
+        if ((flags & 0x1000) && Intro_StepWait(idx)) {
             flags &= ~0x1000;
         }
         if (flags & 0x10000000) {
-            if (func_8020E0A0_ovl_intro(idx)) {
+            if (Intro_StepWait(idx)) {
                 flags &= ~0x10000000;
             }
             p->unk0.w = flags;
@@ -1248,6 +1248,6 @@ void func_8020E108_ovl_intro(s32 arg0) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/func_8020E108_ovl_intro.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_intro/DC62B0/Intro_DrawSprites.s")
 #endif
 

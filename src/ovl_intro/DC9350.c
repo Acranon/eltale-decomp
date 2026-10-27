@@ -39,16 +39,16 @@ extern u8 D_8025C1E0_ovl_intro[];
 extern u16 D_8025BFD8_ovl_intro[];
 extern u8 D_80259250_ovl_intro[];
 
-void func_8020F5B4_ovl_intro(void);
-void func_8020F878_ovl_intro(void);
-void func_8020FCDC_ovl_intro(void);
+void Intro_DrawSplash1(void);
+void Intro_DrawSplash2(void);
+void Intro_DrawSplash3(void);
 
-void func_8020F170_ovl_intro(void) {
+void Intro_RunSplash1(void) {
     gSPDisplayList(D_8007A184++, D_80212270_ovl_intro);
     GFX_WORDS(0xB900031D, 0x504240);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCFA7D);
     GFX_WORDS(0xFB000000, D_80212250_ovl_intro & 0xFF);
-    func_8020F5B4_ovl_intro();
+    Intro_DrawSplash1();
     D_80212230_ovl_intro--;
     switch (D_80212254_ovl_intro) {
         case 0:
@@ -76,12 +76,12 @@ void func_8020F170_ovl_intro(void) {
     }
 }
 
-void func_8020F2DC_ovl_intro(void) {
+void Intro_RunSplash2(void) {
     gSPDisplayList(D_8007A184++, D_80212270_ovl_intro);
     GFX_WORDS(0xB900031D, 0x504240);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCFA7D);
     GFX_WORDS(0xFB000000, D_80212250_ovl_intro & 0xFF);
-    func_8020F878_ovl_intro();
+    Intro_DrawSplash2();
     D_80212230_ovl_intro--;
     switch (D_80212254_ovl_intro) {
         case 0:
@@ -109,12 +109,12 @@ void func_8020F2DC_ovl_intro(void) {
     }
 }
 
-void func_8020F448_ovl_intro(void) {
+void Intro_RunSplash3(void) {
     gSPDisplayList(D_8007A184++, D_80212270_ovl_intro);
     GFX_WORDS(0xFCFFFFFF, 0xFFFCFA7D);
     GFX_WORDS(0xB900031D, 0x504240);
     GFX_WORDS(0xFB000000, D_80212250_ovl_intro & 0xFF);
-    func_8020FCDC_ovl_intro();
+    Intro_DrawSplash3();
     D_80212230_ovl_intro--;
     switch (D_80212254_ovl_intro) {
         case 0:
@@ -142,7 +142,7 @@ void func_8020F448_ovl_intro(void) {
     }
 }
 
-void func_8020F5B4_ovl_intro(void) {
+void Intro_DrawSplash1(void) {
     s32 i;
 
     gDPPipeSync(D_8007A184++);
@@ -154,7 +154,7 @@ void func_8020F5B4_ovl_intro(void) {
     }
 }
 
-void func_8020F878_ovl_intro(void) {
+void Intro_DrawSplash2(void) {
     s32 i;
     s32 x;
     s16 rx;
@@ -175,7 +175,7 @@ void func_8020F878_ovl_intro(void) {
     gSPTextureRectangle(D_8007A184++, rx << 2, 73 << 2, (s16) (rx + 8) << 2, 165 << 2, G_TX_RENDERTILE, x << 5, 0, 1 << 10, 1 << 10);
 }
 
-void func_8020FCDC_ovl_intro(void) {
+void Intro_DrawSplash3(void) {
     s32 i;
     s32 x;
     s16 rx;
@@ -196,7 +196,7 @@ void func_8020FCDC_ovl_intro(void) {
     gSPTextureRectangle(D_8007A184++, rx << 2, 99 << 2, (s16) (rx + 24) << 2, 139 << 2, G_TX_RENDERTILE, x << 5, 0, 1 << 10, 1 << 10);
 }
 
-s32 func_80210140_ovl_intro(void) {
+s32 Intro_RunNoPakScreen(void) {
     s32 pad[2];
     s32 ret = 0;
     u8 *tex[77];
@@ -299,7 +299,7 @@ s32 func_80210140_ovl_intro(void) {
     return ret;
 }
 
-void func_80210D38_ovl_intro(void) {
+void Intro_DrawNoControllerMessage(void) {
     s32 i;
 
     gSPDisplayList(D_8007A184++, D_80212270_ovl_intro);
@@ -315,7 +315,7 @@ void func_80210D38_ovl_intro(void) {
     gSPTextureRectangle(D_8007A184++, 60 << 2, (i * 10 + 99) << 2, 260 << 2, (i * 10 + 101) << 2, G_TX_RENDERTILE, 0, (i * 10) << 5, 1 << 10, 1 << 10);
 }
 
-s32 func_802111A4_ovl_intro(void) {
+s32 Intro_RunPakFullScreen(void) {
     s32 ret = 0;
     s32 i;
 
@@ -336,7 +336,7 @@ s32 func_802111A4_ovl_intro(void) {
     return ret;
 }
 
-s32 func_80211634_ovl_intro(void) {
+s32 Intro_RunPakErrorScreen(void) {
     s32 pad[2];
     s32 ret = 0;
     u8 *tex[77];

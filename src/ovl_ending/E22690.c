@@ -9,7 +9,7 @@
 extern Gfx* D_8007A184;
 extern Gfx D_8020F6C0_ovl_ending[];
 
-s32 func_8020C254_ovl_ending(void);
+s32 Ending_RunSpriteScript(void);
 
 typedef struct {
     s32 unk0;
@@ -160,10 +160,10 @@ extern f64 D_8022BAF8_ovl_ending;
 void func_8002A338(s32);
 #endif
 
-void func_8020CA60_ovl_ending(void);
+void Ending_ClearAllSprites(void);
 
-void func_8020C0D0_ovl_ending(void) {
-    func_8020CA60_ovl_ending();
+void Ending_Init(void) {
+    Ending_ClearAllSprites();
     D_8022BB10_ovl_ending = 0xA;
     D_8022BB14_ovl_ending = 1;
     D_8022BB18_ovl_ending = 0x12C;
@@ -178,7 +178,7 @@ void func_8020C0D0_ovl_ending(void) {
     D_8022BB28_ovl_ending = 0;
 }
 
-s32 func_8020C15C_ovl_ending(void) {
+s32 Ending_Update(void) {
     s32 idx;
     s32 ret;
 
@@ -190,7 +190,7 @@ s32 func_8020C15C_ovl_ending(void) {
     // in a register. Until D2 moves the data into C, write it through the neighbouring
     // symbol so this extern's address is not CSE'd either.
     (&D_8020F694_ovl_ending)[1] = idx;
-    ret = func_8020C254_ovl_ending();
+    ret = Ending_RunSpriteScript();
     idx = D_8020F698_ovl_ending;
     gSPEndDisplayList(D_8007A184++);
     D_8007A184 = D_80238658_ovl_ending;
@@ -198,18 +198,18 @@ s32 func_8020C15C_ovl_ending(void) {
     return ret;
 }
 
-s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1);
-void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
-void func_8020CB84_ovl_ending(s32 arg0);
-s32 func_8020CCD8_ovl_ending(void);
-s16 func_8020CD88_ovl_ending(void);
-void func_8020D130_ovl_ending(s32 arg0);
-void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2);
-void func_8020D970_ovl_ending(s32 arg0);
-void func_8020D98C_ovl_ending(s32 arg0);
-s32 func_8020E9C8_ovl_ending(s32 arg0, s32 arg1);
+s32 Ending_FindSpriteScriptEntry(s32 arg0, u32* arg1);
+void Ending_SpawnSprite(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
+void Ending_ClearSprite(s32 arg0);
+s32 Ending_CountActiveSprites(void);
+s16 Ending_FindFreeSprite(void);
+void Ending_SetClipAnchor(s32 arg0);
+void Ending_SetMoveTarget(s32 arg0, s32 arg1, s32 arg2);
+void Ending_ResetWait(s32 arg0);
+void Ending_DrawSprites(s32 arg0);
+s32 Ending_DrawScrollingBackdrop(s32 arg0, s32 arg1);
 
-s32 func_8020C254_ovl_ending(void) {
+s32 Ending_RunSpriteScript(void) {
     UnkStruct_802107F0_inner* entries;
     UnkStep_8020F880* steps;
     u32 listIdx;
@@ -233,7 +233,7 @@ s32 func_8020C254_ovl_ending(void) {
     if ((D_8022BB34_ovl_ending >= D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0[D_8022BB2C_ovl_ending].unk2) &&
         (D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk0[D_8022BB2C_ovl_ending].unk22 == -1) && (D_8020F694_ovl_ending == 0)) {
         do {
-            slot = func_8020CD88_ovl_ending();
+            slot = Ending_FindFreeSprite();
             if (slot == -1) {
                 break;
             }
@@ -241,7 +241,7 @@ s32 func_8020C254_ovl_ending(void) {
             entries[D_8022BB2C_ovl_ending].unk20 = 0;
             entries[D_8022BB2C_ovl_ending].unk22 = slot;
             steps = D_8020F880_ovl_ending[entries[D_8022BB2C_ovl_ending].unk0].steps;
-            func_8020C978_ovl_ending(slot, 0x80000000 | entries[D_8022BB2C_ovl_ending].unk4 | steps[entries[D_8022BB2C_ovl_ending].unk20].flags,
+            Ending_SpawnSprite(slot, 0x80000000 | entries[D_8022BB2C_ovl_ending].unk4 | steps[entries[D_8022BB2C_ovl_ending].unk20].flags,
                                      entries[D_8022BB2C_ovl_ending].unk8, entries[D_8022BB2C_ovl_ending].unkA, entries[D_8022BB2C_ovl_ending].unk10,
                                      entries[D_8022BB2C_ovl_ending].unk12, entries[D_8022BB2C_ovl_ending].unkC, entries[D_8022BB2C_ovl_ending].unkE,
                                      entries[D_8022BB2C_ovl_ending].unk14, entries[D_8022BB2C_ovl_ending].unk16, entries[D_8022BB2C_ovl_ending].unk18,
@@ -260,13 +260,13 @@ s32 func_8020C254_ovl_ending(void) {
                     dx = 0;
                     dy = 0;
                 }
-                func_8020D5F0_ovl_ending(slot, steps[entries[D_8022BB2C_ovl_ending].unk20].x + dx, steps[entries[D_8022BB2C_ovl_ending].unk20].y + dy);
+                Ending_SetMoveTarget(slot, steps[entries[D_8022BB2C_ovl_ending].unk20].x + dx, steps[entries[D_8022BB2C_ovl_ending].unk20].y + dy);
             }
             if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0x1000) {
-                func_8020D970_ovl_ending(slot);
+                Ending_ResetWait(slot);
             }
             if (steps[entries[D_8022BB2C_ovl_ending].unk20].flags & 0x60000000) {
-                func_8020D130_ovl_ending(slot);
+                Ending_SetClipAnchor(slot);
             }
             D_8022BB2C_ovl_ending++;
             if (D_8022BB2C_ovl_ending >= D_802107F0_ovl_ending[D_8020F690_ovl_ending].unk4) {
@@ -278,16 +278,16 @@ s32 func_8020C254_ovl_ending(void) {
             D_8022BB34_ovl_ending = 0;
         } while (entries[D_8022BB2C_ovl_ending].unk2 == 0);
     }
-    func_8020D98C_ovl_ending(1);
+    Ending_DrawSprites(1);
     if (D_8022BB20_ovl_ending >= 0xF78) {
-        func_8020E9C8_ovl_ending(1, 0x4C2);
+        Ending_DrawScrollingBackdrop(1, 0x4C2);
     }
-    func_8020D98C_ovl_ending(0);
+    Ending_DrawSprites(0);
     for (i = 0, obj = D_8022BB38_ovl_ending; i < 150; i++, obj++) {
         if (i) {
         }
         if (obj->unk0 & 0x80000000) {
-            j = func_8020C8FC_ovl_ending(i, &listIdx);
+            j = Ending_FindSpriteScriptEntry(i, &listIdx);
             if (j != -1) {
                 flags = obj->unk0;
                 entries = D_802107F0_ovl_ending[listIdx].unk0;
@@ -302,7 +302,7 @@ s32 func_8020C254_ovl_ending(void) {
                     }
                     entries[j].unk20++;
                     if (entries[j].unk20 >= D_8020F880_ovl_ending[entries[j].unk0].count) {
-                        func_8020CB84_ovl_ending(i);
+                        Ending_ClearSprite(i);
                         entries[j].unk22 = -1;
                     } else {
                         obj->unk0 &= ~0x800000;
@@ -316,20 +316,20 @@ s32 func_8020C254_ovl_ending(void) {
                                 dx = 0;
                                 dy = 0;
                             }
-                            func_8020D5F0_ovl_ending(i, steps[entries[j].unk20].x + dx, steps[entries[j].unk20].y + dy);
+                            Ending_SetMoveTarget(i, steps[entries[j].unk20].x + dx, steps[entries[j].unk20].y + dy);
                         }
                         if (steps[entries[j].unk20].flags & 0x1000) {
-                            func_8020D970_ovl_ending(i);
+                            Ending_ResetWait(i);
                         }
                         if (steps[entries[j].unk20].flags & 0x60000000) {
-                            func_8020D130_ovl_ending(i);
+                            Ending_SetClipAnchor(i);
                         }
                     }
                 }
             }
         }
     }
-    if ((func_8020CCD8_ovl_ending() == 0) && (D_8020F694_ovl_ending != 0)) {
+    if ((Ending_CountActiveSprites() == 0) && (D_8020F694_ovl_ending != 0)) {
         D_8020F694_ovl_ending = 0;
         D_8020F690_ovl_ending++;
         if (D_8020F690_ovl_ending >= D_802107F8_ovl_ending) {
@@ -340,7 +340,7 @@ s32 func_8020C254_ovl_ending(void) {
     return 1;
 }
 
-s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1) {
+s32 Ending_FindSpriteScriptEntry(s32 arg0, u32* arg1) {
     u32 i, j;
 
     for (i = 0; i < D_802107F8_ovl_ending; i++) {
@@ -355,7 +355,7 @@ s32 func_8020C8FC_ovl_ending(s32 arg0, u32* arg1) {
     return -1;
 }
 
-void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD) {
+void Ending_SpawnSprite(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD) {
     UnkStruct_8022BB38* temp_v0;
 
     temp_v0 = &D_8022BB38_ovl_ending[arg0];
@@ -389,7 +389,7 @@ void func_8020C978_ovl_ending(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, 
     temp_v0->unk2E = temp_v0->unk30 = 0;
 }
 
-void func_8020CA60_ovl_ending(void) {
+void Ending_ClearAllSprites(void) {
     s32 i;
     UnkStruct_8022BB38* temp_v0 = D_8022BB38_ovl_ending;
 
@@ -425,7 +425,7 @@ void func_8020CA60_ovl_ending(void) {
     }
 }
 
-void func_8020CB84_ovl_ending(s32 arg0) {
+void Ending_ClearSprite(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
     temp_v0 = &D_8022BB38_ovl_ending[arg0];
@@ -459,7 +459,7 @@ void func_8020CB84_ovl_ending(s32 arg0) {
     temp_v0->unk2E = temp_v0->unk30 = 0;
 }
 
-s32 func_8020CC28_ovl_ending(void) {
+s32 Ending_CountFreeSprites(void) {
     s32 count;
     UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
     s32 i = 0;
@@ -475,7 +475,7 @@ s32 func_8020CC28_ovl_ending(void) {
     return count;
 }
 
-s32 func_8020CCD8_ovl_ending(void) {
+s32 Ending_CountActiveSprites(void) {
     s32 count;
     UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
     s32 i = 0;
@@ -491,7 +491,7 @@ s32 func_8020CCD8_ovl_ending(void) {
     return count;
 }
 
-s16 func_8020CD88_ovl_ending(void) {
+s16 Ending_FindFreeSprite(void) {
     UnkStruct_8022BB38* ptr = D_8022BB38_ovl_ending;
     s32 i = 0;
 
@@ -505,7 +505,7 @@ s16 func_8020CD88_ovl_ending(void) {
     return -1;
 }
 
-s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
+s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     UnkStruct_8022BB38* temp_v1;
     s32 v;
     s32 x;
@@ -554,7 +554,7 @@ s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     return 0;
 }
 
-s32 func_8020CFD4_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
+s32 Ending_StepClipShrink(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     UnkStruct_8022BB38* temp_v1;
     s32 v;
     s16 x;
@@ -599,7 +599,7 @@ s32 func_8020CFD4_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     return 0;
 }
 
-void func_8020D130_ovl_ending(s32 arg0) {
+void Ending_SetClipAnchor(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
     temp_v0 = &D_8022BB38_ovl_ending[arg0];
@@ -607,7 +607,7 @@ void func_8020D130_ovl_ending(s32 arg0) {
     temp_v0->unk30 = temp_v0->unk6 + temp_v0->unkA;
 }
 
-s32 func_8020D16C_ovl_ending(s32 arg0, s32 arg1) {
+s32 Ending_StepAlphaFade(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v0;
     f32 step;
 
@@ -639,7 +639,7 @@ s32 func_8020D16C_ovl_ending(s32 arg0, s32 arg1) {
     return 0;
 }
 
-s32 func_8020D270_ovl_ending(s32 arg0, s32 arg1) {
+s32 Ending_StepBrightnessFade(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v0;
     f32 step;
 
@@ -671,7 +671,7 @@ s32 func_8020D270_ovl_ending(s32 arg0, s32 arg1) {
     return 0;
 }
 
-s32 func_8020D374_ovl_ending(s32 arg0, s32 arg1) {
+s32 Ending_StepMoveXY(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v1;
     f32 step;
     s32 dir;
@@ -750,7 +750,7 @@ s32 func_8020D374_ovl_ending(s32 arg0, s32 arg1) {
     return 0;
 }
 
-void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2) {
+void Ending_SetMoveTarget(s32 arg0, s32 arg1, s32 arg2) {
     UnkStruct_8022BB38* temp_v0;
 
     temp_v0 = &D_8022BB38_ovl_ending[arg0];
@@ -760,7 +760,7 @@ void func_8020D5F0_ovl_ending(s32 arg0, s32 arg1, s32 arg2) {
     temp_v0->unk28 = temp_v0->unk6;
 }
 
-s32 func_8020D624_ovl_ending(s32 arg0, s32 arg1) {
+s32 Ending_StepMoveX(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v1;
     f32 step;
     s32 dir;
@@ -812,7 +812,7 @@ s32 func_8020D624_ovl_ending(s32 arg0, s32 arg1) {
     return 0;
 }
 
-s32 func_8020D7A4_ovl_ending(s32 arg0, s32 arg1) {
+s32 Ending_StepMoveY(s32 arg0, s32 arg1) {
     UnkStruct_8022BB38* temp_v1;
     f32 step;
     s32 dir;
@@ -864,7 +864,7 @@ s32 func_8020D7A4_ovl_ending(s32 arg0, s32 arg1) {
     return 0;
 }
 
-s32 func_8020D924_ovl_ending(s32 arg0) {
+s32 Ending_StepWait(s32 arg0) {
     UnkStruct_8022BB38* temp_v0;
 
     temp_v0 = &D_8022BB38_ovl_ending[arg0];
@@ -875,15 +875,15 @@ s32 func_8020D924_ovl_ending(s32 arg0) {
     return 0;
 }
 
-void func_8020D970_ovl_ending(s32 arg0) {
+void Ending_ResetWait(s32 arg0) {
     D_8022BB38_ovl_ending[arg0].unk34 = 0;
 }
 
-s32 func_8020CE70_ovl_ending(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
+s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
 
 #ifdef NON_MATCHING
 /* 25 words: t4/t9 and t3/t5 swapped in the flipped texrect block (allocation only); code is equivalent */
-void func_8020D98C_ovl_ending(s32 arg0) {
+void Ending_DrawSprites(s32 arg0) {
     s32 i;
     UnkArg_8020CE70 rect;
     UnkSortEntry_8020D98C* entry;
@@ -934,13 +934,13 @@ void func_8020D98C_ovl_ending(s32 arg0) {
             }
         }
         flags = obj->unk0;
-        if ((flags & 0x800) && func_8020D374_ovl_ending(idx, flags)) {
+        if ((flags & 0x800) && Ending_StepMoveXY(idx, flags)) {
             flags &= ~0x800;
         }
-        if ((flags & 0x4000) && func_8020D624_ovl_ending(idx, flags)) {
+        if ((flags & 0x4000) && Ending_StepMoveX(idx, flags)) {
             flags &= ~0x4000;
         }
-        if ((flags & 0x8000) && func_8020D7A4_ovl_ending(idx, flags)) {
+        if ((flags & 0x8000) && Ending_StepMoveY(idx, flags)) {
             flags &= ~0x8000;
         }
         rect.unk0 = obj->unk4;
@@ -955,45 +955,45 @@ void func_8020D98C_ovl_ending(s32 arg0) {
         rect.dtdy = 0x400;
         rect.sfrac = rect.s << 5;
         rect.tfrac = rect.t << 5;
-        if ((flags & 0x20000000) && func_8020CE70_ovl_ending(idx, flags, &rect)) {
+        if ((flags & 0x20000000) && Ending_StepClipGrow(idx, flags, &rect)) {
             flags &= ~0x20000100;
         }
-        if ((flags & 0x40000000) && func_8020CFD4_ovl_ending(idx, flags, &rect)) {
+        if ((flags & 0x40000000) && Ending_StepClipShrink(idx, flags, &rect)) {
             flags &= ~0x40000400;
         }
         if (flags & 0x10) {
             fade = 0x10;
-            if (func_8020D16C_ovl_ending(idx, 0)) {
+            if (Ending_StepAlphaFade(idx, 0)) {
                 flags &= ~0x10;
                 fadeDone = 1;
             }
         }
         if (flags & 0x20) {
             fade |= 0x20;
-            if (func_8020D16C_ovl_ending(idx, 1)) {
+            if (Ending_StepAlphaFade(idx, 1)) {
                 flags &= ~0x20;
                 fadeDone = 1;
             }
         }
         if (flags & 0x40) {
             fade |= 0x40;
-            if (func_8020D270_ovl_ending(idx, 0)) {
+            if (Ending_StepBrightnessFade(idx, 0)) {
                 flags &= ~0x40;
                 fadeDone = 1;
             }
         }
         if (flags & 0x80) {
             fade |= 0x80;
-            if (func_8020D270_ovl_ending(idx, 1)) {
+            if (Ending_StepBrightnessFade(idx, 1)) {
                 flags &= ~0x80;
                 fadeDone = 1;
             }
         }
-        if ((flags & 0x1000) && func_8020D924_ovl_ending(idx)) {
+        if ((flags & 0x1000) && Ending_StepWait(idx)) {
             flags &= ~0x1000;
         }
         if (flags & 0x10000000) {
-            if (func_8020D924_ovl_ending(idx)) {
+            if (Ending_StepWait(idx)) {
                 flags &= ~0x10000000;
             }
             obj->unk0 = flags;
@@ -1089,7 +1089,7 @@ void func_8020D98C_ovl_ending(s32 arg0) {
     }
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020D98C_ovl_ending.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/Ending_DrawSprites.s")
 #endif
 
 /* func_8020E9C8's function statics; globals here while it is asm. */
@@ -1103,7 +1103,7 @@ u8 D_8020F6B4_ovl_ending = 0;
 
 #ifdef NON_MATCHING
 /* code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8: arg0/width homes, the B3/B4 hoists and allocation differ; the statics are the module's globals; code is equivalent */
-s32 func_8020E9C8_ovl_ending(s32 arg0, s32 arg1) {
+s32 Ending_DrawScrollingBackdrop(s32 arg0, s32 arg1) {
     u32 width;
     f32 alpha;
     f32 delta;
@@ -1237,5 +1237,5 @@ s32 func_8020E9C8_ovl_ending(s32 arg0, s32 arg1) {
     return 0;
 }
 #else
-#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/func_8020E9C8_ovl_ending.s")
+#pragma GLOBAL_ASM("asm/nonmatchings/ovl_ending/E22690/Ending_DrawScrollingBackdrop.s")
 #endif

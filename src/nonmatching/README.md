@@ -25,11 +25,11 @@ Step D3 puts each function's C into its live `src/` module under `#ifdef NON_MAT
 | [`Player_TakeDamage`](Player_TakeDamage.md) | `src/3F50.c`, C under `NON_MATCHING` | 235 object words; frame 0x50 vs 0x48 |
 | [`Enemy_RunAttackScript`](Enemy_RunAttackScript.md) | `src/AEA0.c`, C under `NON_MATCHING` | 78 object words; frame exact |
 | [`MapObj_DrawNearby`](MapObj_DrawNearby.md) | `src/E2A0.c`, C under `NON_MATCHING` | 437 object words; length exact |
-| [`func_801009EC_ovl_DA4570`](func_801009EC_ovl_DA4570.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
-| [`func_8020D98C_ovl_ending`](func_8020D98C_ovl_ending.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
-| [`func_8020E9C8_ovl_ending`](func_8020E9C8_ovl_ending.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |
-| [`func_8020C6A8_ovl_intro`](func_8020C6A8_ovl_intro.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 609 masked object words; code 0x9D4 vs 0x9D0, frame 0xF0 exact |
-| [`func_8020E108_ovl_intro`](func_8020E108_ovl_intro.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 23 linked ROM words; length and frame 0x648 exact |
+| [`PakMenu_Run`](PakMenu_Run.md) | `src/ovl_DA4570/DA4570.c`, C under `NON_MATCHING` | 37 linked ROM words; length and frame exact |
+| [`Ending_DrawSprites`](Ending_DrawSprites.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 25 linked ROM words; length and frame exact |
+| [`Ending_DrawScrollingBackdrop`](Ending_DrawScrollingBackdrop.md) | `src/ovl_ending/E22690.c`, C under `NON_MATCHING` | 754 object words; code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8 |
+| [`Intro_RunSpriteScript`](Intro_RunSpriteScript.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 609 masked object words; code 0x9D4 vs 0x9D0, frame 0xF0 exact |
+| [`Intro_DrawSprites`](Intro_DrawSprites.md) | `src/ovl_intro/DC62B0.c`, C under `NON_MATCHING` | 23 linked ROM words; length and frame 0x648 exact |
 
 ## Recheck before promoting to a match
 

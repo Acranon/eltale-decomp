@@ -1,9 +1,9 @@
-# func_8020E9C8_ovl_ending
+# Ending_DrawScrollingBackdrop
 
 Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may be from older compiler inputs or source layouts; the current gap takes precedence.
 
 - Live source: [`src/ovl_ending/E22690.c`](../ovl_ending/E22690.c)
-- Retail assembly: [`asm/nonmatchings/ovl_ending/E22690/func_8020E9C8_ovl_ending.s`](../../asm/nonmatchings/ovl_ending/E22690/func_8020E9C8_ovl_ending.s)
+- Retail assembly: [`asm/nonmatchings/ovl_ending/E22690/Ending_DrawScrollingBackdrop.s`](../../asm/nonmatchings/ovl_ending/E22690/Ending_DrawScrollingBackdrop.s)
 - Retail code size: `0xcbc` bytes
 - Current gap: 754 object words (NON_MATCHING C in the source); code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8.
 - Specific blocker: Statics are available but TLUT/settile pointer homes and arg0 reloads are wrong; code is 0x24 bytes short.
@@ -41,7 +41,7 @@ Verdict: **equivalent, after one fix.**
 
 This is the original worker history. Treat old D1/D2 labels and old best scores as historical.
 
-- **func_8020E9C8_ovl_ending** (0xCD8 bytes)
+- **Ending_DrawScrollingBackdrop** (0xCD8 bytes)
   - w7 s1: Large GBI function that uses .data statics D_8020F69C..F6B4, likely function statics. Not attempted beyond m2c.
   - w7 s2: First attempt: full C draft (e9c8.c) written from GBI macros: gDPLoadTLUT_pal256, two gDPLoadTextureTile CI 8b plus gSPTextureRectangle per 6-line strip, y < 222, render mode G_RM_AA_XLU_SURF/2. Its 31 static accesses (F69C..F6B4) are rewritten through 31 unique symbols by gen_e9c8.py, and scroll is a local because retail keeps F69C in f16. Still about 700 words off: frame 0x1A0 vs 0x1A8, retail hoists B3/B4 into fp/s7 where mine hoists E7/0x04000400, and retail moves the D_8022BAF0 load above the F6B4 store. Wait for D2.
   - w7 s3: Not re-drafted. Its statics are accessed with separate lui instructions, so the AT trick can work. The blocker is register priority: retail hoists 0xB3000000/0xB4000000 (texrect RDPHALF words) into fp/s7, and the draft hoists E7 and 0x04000400. Each constant has 2 uses per loop iteration, so this is a tie. Draft: scratchpad w7s2/e9c8b.c.
