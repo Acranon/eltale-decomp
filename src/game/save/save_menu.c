@@ -643,8 +643,8 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
             Menu_DrawNumber(3, 0x7E, 0x36, n, colors[0]);
             Menu_DrawNumberZeroPad(2, 0x9A, 0x36, secs, colors[0]);
             Menu_DrawNumber(3, 0xC0, 0x36, save_menu_save_headers[idx].day_count, colors[0]);
-            Menu_PrintNumber(3, 0x70, 0x58, save_menu_save_headers[idx].player_stats.unk4);
-            Menu_PrintNumber(3, 0xC0, 0x58, save_menu_save_headers[idx].player_stats.unk8);
+            Menu_PrintNumber(3, 0x70, 0x58, save_menu_save_headers[idx].player_stats.hp);
+            Menu_PrintNumber(3, 0xC0, 0x58, save_menu_save_headers[idx].player_stats.mp);
         }
     } else {
         flag = 1;
@@ -745,8 +745,8 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 Menu_DrawNumber(3, 0x7E, 0x83, n, colors[0]);
                 Menu_DrawNumberZeroPad(2, 0x9A, 0x83, secs, colors[0]);
                 Menu_DrawNumber(3, 0xC0, 0x83, save_menu_save_headers[idx].day_count, colors[0]);
-                Menu_PrintNumber(3, 0x70, 0xA6, save_menu_save_headers[idx].player_stats.unk4);
-                Menu_PrintNumber(3, 0xC0, 0xA6, save_menu_save_headers[idx].player_stats.unk8);
+                Menu_PrintNumber(3, 0x70, 0xA6, save_menu_save_headers[idx].player_stats.hp);
+                Menu_PrintNumber(3, 0xC0, 0xA6, save_menu_save_headers[idx].player_stats.mp);
             }
         } else {
             Text_DrawEncodedString(0x82, 0x7F, buf.b);

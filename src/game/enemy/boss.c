@@ -125,20 +125,20 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     Actor *s1 = &arg4->actor;
     s16 flags;
 
-    arg4->actor.animSetIndex = s2->unk2;
+    arg4->actor.animSetIndex = s2->anim_set_index;
     Anim_SetCurrentAndNext(s1, 0, 1, 0, 1, 1);
-    s1->scale = s2->unk20;
+    s1->scale = s2->scale;
     s1->unk28 = s2->unk18;
     s1->stats = (ActorStats *)s2;
     s1->battle = &arg4->battle;
-    arg4->unk28 = s2;
-    arg4->unkA = s2->unk6;
-    arg4->unkC = s2->unk6;
+    arg4->def = s2;
+    arg4->hp = s2->max_hp;
+    arg4->unkC = s2->max_hp;
     arg4->type = 0;
     arg4->flags = 0;
     arg4->unk10 = sqrtf((u32)s2->unkC) * 3.846 + 17.838;
     arg4->battle.status_bits = 0;
-    arg4->battle.unk84 = arg4->unk28->unk2A;
+    arg4->battle.unk84 = arg4->def->unk2A;
     arg4->battle.unk86 = ((EnemyDef *)s1->stats)->unkC;
     arg4->battle.unk88 = ((EnemyDef *)s1->stats)->unkE;
     arg4->battle.unk90 = 1.0f;
@@ -217,15 +217,15 @@ void Boss_HandleDefeat(s32 arg0) {
         core_fade_out_time = 0x3E;
         D_8007A172 = 4;
     } else {
-        player_stats.unk6 += boss_reward_max_hp[arg0];
-        if (player_stats.unk6 > 500) {
-            player_stats.unk6 = 500;
+        player_stats.max_hp += boss_reward_max_hp[arg0];
+        if (player_stats.max_hp > 500) {
+            player_stats.max_hp = 500;
         }
-        player_stats.unk4 = player_stats.unk6;
-        player_stats.unkA += boss_reward_max_mp[arg0];
-        if (player_stats.unkA > 500) {
-            player_stats.unkA = 500;
+        player_stats.hp = player_stats.max_hp;
+        player_stats.max_mp += boss_reward_max_mp[arg0];
+        if (player_stats.max_mp > 500) {
+            player_stats.max_mp = 500;
         }
-        player_stats.unk8 = player_stats.unkA;
+        player_stats.mp = player_stats.max_mp;
     }
 }

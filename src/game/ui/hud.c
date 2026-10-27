@@ -222,7 +222,7 @@ void Hud_DrawPlayerMeters(Actor* arg0) {
     st = arg0->stats;
     Hud_DrawTextureTile(&D_803A86F8, 0, 1, 0x3E, 0x11, 0x20, 0x27, 0x400, 0x400);
     Hud_DrawTextureTile(&D_803A86F8, 0, 0x12, 0x3E, 0x12, 0x20, 0x38, 0x400, 0x400);
-    w = st->unk4 * 56 / st->unk6;
+    w = st->hp * 56 / st->max_hp;
     d = w - hud_hp_meter_width;
     if (d >= 2 || d < -1) {
         hud_hp_meter_width += d >> 1;
@@ -232,7 +232,7 @@ void Hud_DrawPlayerMeters(Actor* arg0) {
     if (hud_hp_meter_width) {
         Hud_DrawTextureTile(&D_803A86F8, 3, 0xB, hud_hp_meter_width, 5, 0x5E, 0x27, 0x400, 0x400);
     }
-    w = st->unk8 * 56 / st->unkA;
+    w = st->mp * 56 / st->max_mp;
     d = w - hud_mp_meter_width;
     if (d >= 2 || d < -1) {
         hud_mp_meter_width += d >> 1;
@@ -243,10 +243,10 @@ void Hud_DrawPlayerMeters(Actor* arg0) {
         Hud_DrawTextureTile(&D_803A86F8, 3, 0x15, hud_mp_meter_width, 5, 0x5E, 0x2C, 0x400, 0x400);
     }
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
-    Hud_DrawNumber(3, 0xC, 0, st->unk4);
-    Hud_DrawNumber(1, 0x36, 0, st->unk6);
-    Hud_DrawNumber(3, 0xC, 0x1B, st->unk8);
-    Hud_DrawNumber(1, 0x36, 0x1B, st->unkA);
+    Hud_DrawNumber(3, 0xC, 0, st->hp);
+    Hud_DrawNumber(1, 0x36, 0, st->max_hp);
+    Hud_DrawNumber(3, 0xC, 0x1B, st->mp);
+    Hud_DrawNumber(1, 0x36, 0x1B, st->max_mp);
     Hud_DrawClippedTextureRect(0x2F, 0, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
     Hud_DrawClippedTextureRect(0x2F, 0x1B, 8, 0xA, 0x70, 0x1D, 0x400, 0x400);
 }
@@ -411,13 +411,13 @@ void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
             str[i] = arg1->spell_input_dirs[i];
         }
         str[i] = 0;
-        Hud_DrawSpellLabel(x0, y0 + 3, str, i + 1, arg1->stats->unk8);
+        Hud_DrawSpellLabel(x0, y0 + 3, str, i + 1, arg1->stats->mp);
         str[i] = 1;
-        Hud_DrawSpellLabel(x1, y1 + 3, str, i + 1, arg1->stats->unk8);
+        Hud_DrawSpellLabel(x1, y1 + 3, str, i + 1, arg1->stats->mp);
         str[i] = 2;
-        Hud_DrawSpellLabel(x2, y2 + 3, str, i + 1, arg1->stats->unk8);
+        Hud_DrawSpellLabel(x2, y2 + 3, str, i + 1, arg1->stats->mp);
         str[i] = 3;
-        Hud_DrawSpellLabel(x3, y3 + 3, str, i + 1, arg1->stats->unk8);
+        Hud_DrawSpellLabel(x3, y3 + 3, str, i + 1, arg1->stats->mp);
     }
     hud_draw_origin_x = 0x69;
     hud_draw_origin_y = 0x32;
@@ -437,7 +437,7 @@ void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
         Hud_DrawTextureTile(&D_803A8718, x0, yoff + 0xD, 0xB, 0xB, 0x40, y0 * 0xB + 0x24, 0x400, 0x400);
         x0 += 0xC;
     }
-    Hud_DrawSpellLabel(0, yoff + 3, arg1->spell_input_dirs, arg1->spell_input_count, arg1->stats->unk8);
+    Hud_DrawSpellLabel(0, yoff + 3, arg1->spell_input_dirs, arg1->spell_input_count, arg1->stats->mp);
     hud_draw_origin_x = 0x22;
     hud_draw_origin_y = 0x8C;
     if (arg1->spell_input_count != 3) {
@@ -912,16 +912,16 @@ void Hud_DrawEnemyInfoPanel(void) {
         Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0xA, 0x64, 0x2C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x1A, 0x6E, 2, 0x64, 0x4E, 0x400, 0x400);
     }
-    Hud_DrawGlyphString(4, 0x11, 0, ((u8 **)enemy_names)[enemy_turn_current->unk28->unk2]); /* enemy_names stores a pointer table in one s32 slot */
+    Hud_DrawGlyphString(4, 0x11, 0, ((u8 **)enemy_names)[enemy_turn_current->def->anim_set_index]); /* enemy_names stores a pointer table in one s32 slot */
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039ADB0);
     if (enemy_turn_current->battle.status_bits & 0x80) {
-        Hud_DrawNumber(3, 0x10, 0x1C, enemy_turn_current->unk28->unk6);
-        Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->unk28->unkE);
-        Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->unk28->unk2A);
-        Hud_DrawNumber(3, 0x46, 0x26, enemy_turn_current->unk28->unkC);
-        if (enemy_turn_current->unk28->unk26 != 4) {
-            Hud_DrawTextureTile(&D_803A86F8, 0x5B, 3, 0xC, 0xC, enemy_turn_current->unk28->unk26 * 0xC + 0x20, 0x10, 0x400, 0x400);
+        Hud_DrawNumber(3, 0x10, 0x1C, enemy_turn_current->def->max_hp);
+        Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->def->unkE);
+        Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->def->unk2A);
+        Hud_DrawNumber(3, 0x46, 0x26, enemy_turn_current->def->unkC);
+        if (enemy_turn_current->def->element_index != 4) {
+            Hud_DrawTextureTile(&D_803A86F8, 0x5B, 3, 0xC, 0xC, enemy_turn_current->def->element_index * 0xC + 0x20, 0x10, 0x400, 0x400);
         }
     }
 }

@@ -604,7 +604,7 @@ void Cutscene_StartNextScene(void) {
         player_spawn_z = e->spawn_z;
         player_spawn_rot = e->spawn_rot;
         player_spawn_type = 0x108;
-        player_stats.unk4 = player_stats.unk6;
+        player_stats.hp = player_stats.max_hp;
         player_state.unk6 = 0;
         Player_Spawn();
     } else {

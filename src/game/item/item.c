@@ -397,10 +397,10 @@ s32 Item_CanUseRestore(Actor* arg0, ItemDef* arg1) {
     s32 ret = 0;
     ActorStats* temp = arg0->stats;
 
-    if ((arg1->unk4 != 0) && (temp->unk6 != temp->unk4)) {
+    if ((arg1->unk4 != 0) && (temp->max_hp != temp->hp)) {
         ret = 1;
     }
-    if ((arg1->unk6 != 0) && (temp->unkA != temp->unk8)) {
+    if ((arg1->unk6 != 0) && (temp->max_mp != temp->mp)) {
         ret = 1;
     }
     return ret;
@@ -436,19 +436,19 @@ void Item_UseRestore(Actor* arg0, ItemDef* arg1) {
     MagicVisualDef* fx;
 
     if (arg1->unk4 != 0) {
-        amt = st->unk6 - st->unk4;
+        amt = st->max_hp - st->hp;
         if (arg1->unk4 < amt) {
             amt = arg1->unk4;
         }
-        st->unk4 += amt;
+        st->hp += amt;
         Effect_AddFloatingNumber(arg0, 1, amt);
     }
     if (arg1->unk6 != 0) {
-        amt = st->unkA - st->unk8;
+        amt = st->max_mp - st->mp;
         if (arg1->unk6 < amt) {
             amt = arg1->unk6;
         }
-        st->unk8 += amt;
+        st->mp += amt;
         Effect_AddFloatingNumber(arg0, 2, amt);
     }
     item_effect_scale.x = D_803AB36C[0].scale_x;

@@ -90,7 +90,7 @@ void Battle_TryStartRandomEncounter(void) {
                         battle_flags = 0x205;
                         D_8008BE56 = 0;
                         battle_turn_delay = 20;
-                        if (player_state.stats->unkC < enemy_slots[enemy_turn_order[0]].unk28->unkC) {
+                        if (player_state.stats->unkC < enemy_slots[enemy_turn_order[0]].def->unkC) {
                             battle_turn_order_index = 0;
                             battle_flags |= 2;
                         } else {
@@ -333,7 +333,7 @@ void Battle_EndTurn(Actor* arg0) {
                     battle_turn_order_index = 0;
                 }
                 e = &enemy_slots[id = enemy_turn_order[battle_turn_order_index]];
-                if (e->unkA != 0 && e->actor.animSetIndex != -1) {
+                if (e->hp != 0 && e->actor.animSetIndex != -1) {
                     break;
                 }
                 n--;
@@ -464,7 +464,7 @@ s32 func_800200F8(void) {
         r = 4;
     }
     if ((battle_flags & 0x100) || Math_Rand(r) == 0) {
-        r = enemy_slots[Math_Rand(battle_enemy_count)].unk28->unk34;
+        r = enemy_slots[Math_Rand(battle_enemy_count)].def->item_id;
     } else {
         r = 0xFF;
     }

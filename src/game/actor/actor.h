@@ -16,10 +16,10 @@
 typedef struct ActorStats {
     /* 0x00 */ u16 unk0; /* 1: Magic_/Enemy_ code use battle->unk94 as the body height; 2: no shadow */
     /* 0x02 */ s16 anim_set_index; /* anim set index, copied to Actor.animSetIndex */
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6; /* cap of unk4 (Player_StateMeleeAttack) */
-    /* 0x08 */ u16 unk8;
-    /* 0x0A */ u16 unkA; /* cap of unk8 */
+    /* 0x04 */ u16 hp;
+    /* 0x06 */ u16 max_hp; /* cap of hp (Player_StateMeleeAttack) */
+    /* 0x08 */ u16 mp;
+    /* 0x0A */ u16 max_mp; /* cap of mp */
     /* 0x0C */ u16 unkC; /* copied to ActorBattle.unk86 */
     /* 0x0E */ u16 unkE; /* copied to ActorBattle.unk88 */
     /* 0x10 */ u32 unk10;

@@ -49,7 +49,7 @@ void Cutscene_StartEntry(s32 arg0) {
     player_spawn_rot = entry->spawn_rot;
     player_spawn_type = 0x108;
     player_state.unk6 = 0;
-    player_stats.unk4 = player_stats.unk6;
+    player_stats.hp = player_stats.max_hp;
     Player_Spawn();
     if (!(entry->unk3C & 1)) {
         core_flags |= 0x10000;

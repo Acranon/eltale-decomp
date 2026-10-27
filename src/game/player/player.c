@@ -225,8 +225,8 @@ void Player_Spawn(void) {
         p->flags |= 0x10;
     }
     if (core_flags & 0x800) {
-        p->actor.stats->unk4 = 1;
-        p->actor.stats->unk8 = p->actor.stats->unkA;
+        p->actor.stats->hp = 1;
+        p->actor.stats->mp = p->actor.stats->max_mp;
         p->actor.battle->status_bits = 0;
     }
     p->actor.battle->status_bits = 0;
@@ -284,7 +284,7 @@ void Player_Update(void) {
     u8 *s;
 
     cd = player_char_data[p->actor.animSetIndex];
-    if (p->stats->unk4 * 3 < p->stats->unk6) {
+    if (p->stats->hp * 3 < p->stats->max_hp) {
         player_idle_anim = 0x19;
     } else {
         player_idle_anim = (battle_flags & 1) ? 0x11 : 0;
@@ -439,11 +439,11 @@ void Player_Update(void) {
     }
     player_state_handlers[p->state](&player_state.actor, &player_state, cd);
     player_move_dist = sqrtf(player_move_dx * player_move_dx + player_move_dz * player_move_dz);
-    if (!(battle_flags & 1) && p->actor.stats->unk8 < p->actor.stats->unkA) {
+    if (!(battle_flags & 1) && p->actor.stats->mp < p->actor.stats->max_mp) {
         player_mp_regen_dist += player_move_dist;
         if (player_mp_regen_dist > 60.0) {
             player_mp_regen_dist -= 60.0;
-            p->actor.stats->unk8++;
+            p->actor.stats->mp++;
         }
     }
 }
@@ -647,7 +647,7 @@ void Player_StateHurt(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
 
         arg0->vx = 0.0f;
         arg0->vz = 0.0f;
-        if (sub->unk4 == 0) {
+        if (sub->hp == 0) {
             arg1->state = 6;
             arg1->state_timer = 0xE6;
             Anim_SetCurrentAndNext(arg0, 9, 1, player_idle_anim, 1, 1);
@@ -747,16 +747,16 @@ void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd) {
             }
             dmg = Enemy_TakeDamage(p->melee_target_plus_one - 1, dmg, (p->spell_id >> 8) & 0xF, flags, a);
             if (dmg != 0) {
-                a->stats->unk8++;
-                if (a->stats->unkA < a->stats->unk8) {
-                    a->stats->unk8 = a->stats->unkA;
+                a->stats->mp++;
+                if (a->stats->max_mp < a->stats->mp) {
+                    a->stats->mp = a->stats->max_mp;
                 }
                 if (p->battle.status_bits & 2) {
                     t = ((dmg + 3) >> 2) + 1;
                     dmg = t;
-                    a->stats->unk4 += dmg;
-                    if (a->stats->unk6 < a->stats->unk4) {
-                        a->stats->unk4 = a->stats->unk6;
+                    a->stats->hp += dmg;
+                    if (a->stats->max_hp < a->stats->hp) {
+                        a->stats->hp = a->stats->max_hp;
                     }
                     Effect_AddFloatingNumber(a, 1, dmg);
                     Hud_StartActorStatusIndicator(a, 2, 1, 0x1E);
@@ -770,7 +770,7 @@ void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd) {
         } else {
             Enemy_PlayMissEffect(&enemy_slots[p->melee_target_plus_one - 1].actor);
         }
-        if (enemy_slots[p->melee_target_plus_one - 1].unkA == 0) {
+        if (enemy_slots[p->melee_target_plus_one - 1].hp == 0) {
             p->flags &= ~0x100;
         }
         if (p->state == 0xD && (p->flags & 0x100)) {
@@ -1700,15 +1700,15 @@ u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
                 dmg++;
             }
             d = dmg;
-            if (p->actor.stats->unk4 < dmg) {
-                p->actor.stats->unk4 = 0;
+            if (p->actor.stats->hp < dmg) {
+                p->actor.stats->hp = 0;
             } else {
-                p->actor.stats->unk4 -= d;
+                p->actor.stats->hp -= d;
             }
             if (p->battle.status_bits & 0x200) {
-                p->actor.stats->unk8 += d;
-                if (p->actor.stats->unkA < p->actor.stats->unk8) {
-                    p->actor.stats->unk8 = p->actor.stats->unkA;
+                p->actor.stats->mp += d;
+                if (p->actor.stats->max_mp < p->actor.stats->mp) {
+                    p->actor.stats->mp = p->actor.stats->max_mp;
                 }
                 Hud_StartActorStatusIndicator(&player_state.actor, 0x200, 2, 0x1E);
             }
@@ -1747,7 +1747,7 @@ void Player_StartMissReaction(void) {
     PlayerAnimTable *cd;
 
     if (p->state != 6) {
-        if (p->stats->unk4 != 0) {
+        if (p->stats->hp != 0) {
             cd = player_char_data[p->actor.animSetIndex];
             p->state = 3;
             p->state_timer = cd->unk56;
@@ -1797,7 +1797,7 @@ s32 Player_HandleSpellInput(Player *arg0) {
         }
         arg0->spell_input_dirs[arg0->spell_input_count] = dir;
         arg0->spell_input_count++;
-        if (Magic_GetSpellRestrictionFlags(Magic_LookupSpellSequence(arg0->spell_input_count, arg0->spell_input_dirs), arg0->stats->unk8) & 5) {
+        if (Magic_GetSpellRestrictionFlags(Magic_LookupSpellSequence(arg0->spell_input_count, arg0->spell_input_dirs), arg0->stats->mp) & 5) {
             sfx = 0x13;
             arg0->spell_input_count--;
         } else if (!(core_flags & 4)) {
@@ -1818,7 +1818,7 @@ s32 Player_HandleSpellInput(Player *arg0) {
         }
     } else if (arg0->spell_input_count && (input_pressed_buttons & 0xA000)) {
         arg0->spell_id = Magic_LookupSpellSequence(arg0->spell_input_count, arg0->spell_input_dirs);
-        if (Magic_GetSpellRestrictionFlags(arg0->spell_id, arg0->stats->unk8) == 0) {
+        if (Magic_GetSpellRestrictionFlags(arg0->spell_id, arg0->stats->mp) == 0) {
             core_flags &= ~4;
             ret = 1;
         }
@@ -1842,7 +1842,7 @@ void Player_StartCastSpell(Player *p, Actor *a, AnimSet *anims) {
     s32 next;
     u16 t;
 
-    a->stats->unk8 -= D_800C186E[p->spell_input_count];
+    a->stats->mp -= D_800C186E[p->spell_input_count];
     e = &D_800C185C[(p->spell_id >> 8) & 0xF][p->spell_id & 0xFF];
     if (e->target_select_handler_index == 2) {
         p->flags |= 4;
@@ -1900,11 +1900,11 @@ void Player_UpdateStatGrowth(Player *p, Actor *a) {
             }
         }
     }
-    if (a->stats->unk6 < 500) {
+    if (a->stats->max_hp < 500) {
         if (p->stats->unk28 >= player_stat_xp_costs[p->stats->unk30]) {
             p->stats->unk28 -= player_stat_xp_costs[p->stats->unk30];
-            a->stats->unk6++;
-            a->stats->unk4++;
+            a->stats->max_hp++;
+            a->stats->hp++;
             if (p->stats->unk30 < 0x36) {
                 p->stats->unk30++;
             }
@@ -1914,7 +1914,7 @@ void Player_UpdateStatGrowth(Player *p, Actor *a) {
     } else {
         p->stats->unk28 = 0;
     }
-    if (a->stats->unkA < 500) {
+    if (a->stats->max_mp < 500) {
         cost = player_stat_xp_costs[p->stats->unk31];
         if (p->flags & 0x4000) {
             cost *= 3;
@@ -1923,8 +1923,8 @@ void Player_UpdateStatGrowth(Player *p, Actor *a) {
         }
         if (p->stats->unk2A >= cost) {
             p->stats->unk2A -= cost;
-            a->stats->unkA++;
-            a->stats->unk8++;
+            a->stats->max_mp++;
+            a->stats->mp++;
             if (p->stats->unk31 < 0x36) {
                 p->stats->unk31++;
             }
