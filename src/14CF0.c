@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Spirits: sets a collected flag. Text spots: fixed per-map points that show a message
+ * read from ROM when the player faces them.
+ * Folder: src/game/map/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;

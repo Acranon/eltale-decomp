@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Shadows: a 64-entry queue of floor-aligned quads under objects, drawn in one pass.
+ * Folder: src/game/gfx/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;

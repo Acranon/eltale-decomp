@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Camera: per-map presets, the mode handlers (follow, fixed eye, battle, delayed turn),
+ * shake and sway, and the projection/view matrices for each frame.
+ * Folder: src/game/camera/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
