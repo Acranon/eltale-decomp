@@ -39,8 +39,8 @@ typedef struct {
 
 extern u8 spirit_collected_flags[];
 extern u8 math_bit_masks[];
-extern s32 D_800842BC;
-extern s32 D_800842C0;
+extern s32 map_id;
+extern s32 map_subarea;
 Unk8004E6A0 textspot_table[0x26] = {
     { 0x00, 3, 58.0f, -324.0f, -1.5707964f, 10.0f, 0, 0x0070, 0x0078 },
     { 0x00, 3, 168.0f, -295.0f, 1.2217305f, 10.0f, 0, 0x0070, 0x0078 },
@@ -90,8 +90,8 @@ s32 D_80085AB8; /* unreferenced */
 s32 textspot_count;
 Unk80085AC0 textspot_list[16];
 extern u8 D_D37700[];
-extern u8 D_8007B8E0[];
-extern u8 D_8007B430[];
+extern u8 text_speaker_name[];
+extern u8 text_message_buf[];
 extern f32 D_8007AB3C;
 
 void Math_RotateVec2(f32, Unk80085AB0*);
@@ -109,7 +109,7 @@ void TextSpot_LoadForMap(void) {
 
     textspot_count = 0;
     for (i = 0; i < 0x26; i++) {
-        if (D_800842BC == textspot_table[i].unk0 && D_800842C0 == textspot_table[i].unk4) {
+        if (map_id == textspot_table[i].unk0 && map_subarea == textspot_table[i].unk4) {
             out->entry = &textspot_table[i];
             out->unk8 = 0;
             out++;
@@ -157,10 +157,10 @@ Unk80085AC0* TextSpot_FindInFront(Unk80014318Arg* arg0) {
 }
 
 void TextSpot_LoadMessage(Unk80085AC0* arg0) {
-    Dma_ReadRom(&D_D37700[arg0->entry->unk1C], D_8007B8E0, 0x20);
-    Dma_ReadRom(&D_D37700[arg0->entry->unk1E], D_8007B430, 0x200);
-    if (D_8007B8E0[2] == 0xFF) {
-        D_8007B8E0[0] = 0xFF;
+    Dma_ReadRom(&D_D37700[arg0->entry->unk1C], text_speaker_name, 0x20);
+    Dma_ReadRom(&D_D37700[arg0->entry->unk1E], text_message_buf, 0x200);
+    if (text_speaker_name[2] == 0xFF) {
+        text_speaker_name[0] = 0xFF;
     }
     D_8007AB3C = arg0->unk4;
 }

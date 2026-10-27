@@ -139,7 +139,7 @@ Unk8007B908_b* magic_target_enemy_rec;
 Coll17360 magic_floor_result;
 extern u16 magic_slot_bits[];
 extern u16 D_8007AB18;
-extern Unk8007B908 D_8007B908[];
+extern Unk8007B908 enemy_slots[];
 extern u16 battle_flags;
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -176,7 +176,7 @@ extern Unk800C185C* D_800C185C[];
 extern u16 D_800C186E[];
 
 extern Unk8007AA1C* D_8007AA1C;
-extern s32 D_8007B900;
+extern s32 enemy_count;
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
     /* 0x0E */ u16 unkE;
@@ -217,20 +217,20 @@ typedef struct {
 } Unk8007C288;
 
 extern s32 magic_hit_outcomes[];
-extern u16 D_800842B8;
-extern s32 D_800842BC;
-extern s32 D_800842D0;
-extern s32 D_800842D4;
-extern s32 D_800842D8;
-extern s32 D_800842DC;
-extern s32 D_800842E0;
-extern s32 D_800842E4;
+extern u16 map_flags;
+extern s32 map_id;
+extern s32 map_flag4_return_map;
+extern s32 map_flag4_return_subarea;
+extern s32 map_flag4_return_entry;
+extern s32 map_flag8_return_map;
+extern s32 map_flag8_return_subarea;
+extern s32 map_flag8_return_entry;
 extern Unk80084300 exit_destination;
-extern s32 D_8007A998;
-extern Unk8007AA08 D_8007AA08;
+extern s32 player_spawn_type;
+extern Unk8007AA08 player_state;
 extern s32 core_flags;
 extern s32 core_transition_timer;
-extern Unk8007C288* D_8007C288;
+extern Unk8007C288* map_subarea_def;
 extern u8 magic_status_chances[];
 extern s32 magic_status_time_range_other[];
 extern s32 magic_status_time_range_self[];
@@ -951,8 +951,8 @@ s32 Magic_FindTargetInRange(arg0, arg1)
                 }
             }
         } else {
-            n = D_8007B900;
-            p = (Unk8007B908_b*)D_8007B908;
+            n = enemy_count;
+            p = (Unk8007B908_b*)enemy_slots;
             while (n != 0) {
                 if (p->unk7C != -1) {
                     a = (Actor17360*)p->unk2C;
@@ -1008,9 +1008,9 @@ Actor17360* Magic_FindEligibleTarget(Unk80018348* arg0, s32 arg1) {
             ret = NULL;
         }
     } else if ((ret = arg0->unk28) == NULL || Magic_WasActorHitBySlot(arg1, ret)) {
-        n = D_8007B900;
+        n = enemy_count;
         ret = NULL;
-        p = (Unk8007B908_b*)D_8007B908;
+        p = (Unk8007B908_b*)enemy_slots;
         while (n != 0) {
             if (p->unk7C != -1) {
                 if (!Magic_WasActorHitBySlot(arg1, (Actor17360*)p->unk2C)) {
@@ -1092,7 +1092,7 @@ void Magic_HealTarget(Unk80018480* arg0, Actor17360* arg1) {
     s32 pad;
 
     if (arg1->unk5E & 1) {
-        magic_target_enemy_rec = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
+        magic_target_enemy_rec = (Unk8007B908_b*)&enemy_slots[Enemy_GetSlotIndex(arg1)];
         amt = arg1->unk64->unk6 * arg0->cfg->unkC / 100;
         amt += Math_Rand(amt >> 2);
         ((Unk8001860CRec*)magic_target_enemy_rec)->unkA += amt;
@@ -1119,20 +1119,20 @@ void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
 
     pl = (Actor17360*)D_8007AA20;
     if (arg1->unk5E & 1) {
-        magic_target_enemy_rec = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
+        magic_target_enemy_rec = (Unk8007B908_b*)&enemy_slots[Enemy_GetSlotIndex(arg1)];
         amt = (magic_target_enemy_rec->unkC * 11 + 63) >> 6;
         magic_target_enemy_rec->unkC -= amt;
-        if (D_8007AA08.unk7C->unk8 != D_8007AA08.unk7C->unkA) {
+        if (player_state.unk7C->unk8 != player_state.unk7C->unkA) {
             pl->unk64->unk8 += amt;
             if (pl->unk64->unk8 > pl->unk64->unkA) {
                 pl->unk64->unk8 = pl->unk64->unkA;
             }
-            D_8007AA08.unk14->unk2A++;
+            player_state.unk14->unk2A++;
         }
     } else {
         amt = (arg1->unk64->unk8 * 11 + 63) >> 6;
         arg1->unk64->unk8 -= amt;
-        magic_target_enemy_rec = (Unk8007B908_b*)&D_8007B908[Enemy_GetSlotIndex(arg1)];
+        magic_target_enemy_rec = (Unk8007B908_b*)&enemy_slots[Enemy_GetSlotIndex(arg1)];
         magic_target_enemy_rec->unkC += amt;
         if (magic_target_enemy_rec->unkC > arg0->unk24->unk64->unkA) {
             magic_target_enemy_rec->unkC = arg0->unk24->unk64->unkA;
@@ -1144,7 +1144,7 @@ void Magic_TransferTargetResource(Unk80018480* arg0, Actor17360* arg1) {
 void func_80018968(s32 arg0, Actor17360* arg1) {
     if (arg1->unk5E & 1) {
         arg1->unk50 = -1;
-        D_8007B900--;
+        enemy_count--;
     } else if (!(battle_flags & 0x100)) {
         battle_flags |= 0x10;
         D_8007AA1C->unk2A++;
@@ -1154,13 +1154,13 @@ void func_80018968(s32 arg0, Actor17360* arg1) {
 }
 
 void func_800189F0(s32 arg0, Actor17360* arg1) {
-    if (D_800842B8 == 4 && D_800842D0 != -1 && !(D_8007C288->unk14 & 4)) {
-        exit_destination.unk0 = D_800842D0;
-        exit_destination.unk4 = D_800842D4;
-        exit_destination.unk8 = D_800842D8;
-        D_8007A998 = 0x108;
-        D_8007AA08.unk6 = 0;
-        D_8007AA08.unk14->unk2A++;
+    if (map_flags == 4 && map_flag4_return_map != -1 && !(map_subarea_def->unk14 & 4)) {
+        exit_destination.unk0 = map_flag4_return_map;
+        exit_destination.unk4 = map_flag4_return_subarea;
+        exit_destination.unk8 = map_flag4_return_entry;
+        player_spawn_type = 0x108;
+        player_state.unk6 = 0;
+        player_state.unk14->unk2A++;
         core_flags |= 0x80;
         core_transition_timer = 0x1E;
     }
@@ -1178,14 +1178,14 @@ void Magic_ApplyZeroDamageHit(Unk17360Cam* arg0, Actor17360* arg1) {
 }
 
 void func_80018B40(s32 arg0, Actor17360* arg1) {
-    if ((D_800842B8 & 8) && D_800842DC != -1 && !(D_8007C288->unk14 & 8) && D_800842BC != 0x1E &&
-        D_800842BC != 0x22) {
-        exit_destination.unk0 = D_800842DC;
-        exit_destination.unk4 = D_800842E0;
-        exit_destination.unk8 = D_800842E4;
-        D_8007A998 = 0x108;
-        D_8007AA08.unk6 = 0;
-        D_8007AA08.unk14->unk2A++;
+    if ((map_flags & 8) && map_flag8_return_map != -1 && !(map_subarea_def->unk14 & 8) && map_id != 0x1E &&
+        map_id != 0x22) {
+        exit_destination.unk0 = map_flag8_return_map;
+        exit_destination.unk4 = map_flag8_return_subarea;
+        exit_destination.unk8 = map_flag8_return_entry;
+        player_spawn_type = 0x108;
+        player_state.unk6 = 0;
+        player_state.unk14->unk2A++;
         core_flags |= 0x80;
         core_transition_timer = 0x1E;
     }
@@ -1197,7 +1197,7 @@ void Magic_RemoveEnemyOrDamagePlayer(Unk17360Cam* arg0, Actor17360* arg1) {
             Hud_ClearActorStatusIndicators(arg1);
             arg1->unk50 = -1;
             arg1->unk60 &= ~1;
-            D_8007B900--;
+            enemy_count--;
             D_8007AA1C->unk2A++;
         } else {
             Hud_ShowActorPopup(arg1);
@@ -1271,8 +1271,8 @@ void Magic_SelectClosestAimTarget(Unk80018DC0* arg0) {
     }
     caster = arg0->unk24;
     best = 9.424778f;
-    n = D_8007B900;
-    p = (Unk80018DC0Rec*)D_8007B908;
+    n = enemy_count;
+    p = (Unk80018DC0Rec*)enemy_slots;
     while (n != 0) {
         if (p->unk7C != -1) {
             magic_temp_vec.x = p->x - caster->x;
@@ -1305,7 +1305,7 @@ void Magic_SelectFirstActiveTarget(Unk80018FB0* arg0) {
         arg0->unk28 = D_8007AA20;
         return;
     }
-    p = (Unk8007B908_b*)D_8007B908;
+    p = (Unk8007B908_b*)enemy_slots;
     i = 6;
     while (i != 0 && p->unk7C == -1) {
         i--;
@@ -1452,7 +1452,7 @@ typedef struct {
     /* 0x24 */ u8 stats[1];
 } Unk8007A9D0;
 extern u16 magic_damage_bonus_stats[];
-extern Unk8007A9D0 D_8007A9D0;
+extern Unk8007A9D0 player_stats;
 u16 Magic_CalculateEffectDamage(Unk80018480Cfg* arg0, Actor17360* arg1) {
     u16 lv;
     u16* p;
@@ -1461,13 +1461,13 @@ u16 Magic_CalculateEffectDamage(Unk80018480Cfg* arg0, Actor17360* arg1) {
     s32 i;
 
     if (arg1->unk5E & 1) {
-        lv = ((Unk800195FCRec*)D_8007B908)[Enemy_GetSlotIndex(arg1)].unk28->unk2A;
+        lv = ((Unk800195FCRec*)enemy_slots)[Enemy_GetSlotIndex(arg1)].unk28->unk2A;
     } else {
         p = &magic_damage_bonus_stats[arg0->unk6 * 2];
-        lv = D_8007A9D0.stats[arg0->unk6];
-        lv += D_8007A9D0.stats[*p++] >> 4;
-        lv += D_8007A9D0.stats[*p++] >> 3;
-        lv += D_8007A9D0.stats[*p] >> 3;
+        lv = player_stats.stats[arg0->unk6];
+        lv += player_stats.stats[*p++] >> 4;
+        lv += player_stats.stats[*p++] >> 3;
+        lv += player_stats.stats[*p] >> 3;
     }
     sum = arg0->unkC * 0.02;
     step = sum * 0.2;
@@ -1853,16 +1853,16 @@ void Magic_ResetHitTracking(void) {
 
     D_8007AB18 = 0;
     for (i = 0; i < 6; i++) {
-        D_8007B908[i].unk124 = 0;
+        enemy_slots[i].unk124 = 0;
     }
 }
 
 void Magic_ClearSlotHitTracking(s32 arg0) {
     s32 i;
 
-    D_8007AA08.unk110 &= ~magic_slot_bits[arg0];
+    player_state.unk110 &= ~magic_slot_bits[arg0];
     for (i = 0; i < 6; i++) {
-        D_8007B908[i].unk124 &= ~magic_slot_bits[arg0];
+        enemy_slots[i].unk124 &= ~magic_slot_bits[arg0];
     }
 }
 
@@ -1899,7 +1899,7 @@ s32 Magic_ShouldApplyStatus(Unk8001A3EC* arg0, Actor17360* arg1, s32 arg2) {
     } else if (arg1->unk5E & 1) {
         ret = Math_Rand(64) < magic_status_chances[arg2];
     } else {
-        n = (D_8007AA08.unk8 & 0x8000) ? 28 : 32;
+        n = (player_state.unk8 & 0x8000) ? 28 : 32;
         ret = Math_Rand(n) < magic_status_chances[arg2];
     }
     return ret;

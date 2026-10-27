@@ -159,20 +159,20 @@ extern OSMesgQueue *gfx_sched_mq;
 extern NNScClient gfx_sched_client;
 extern OSMesgQueue gfx_mesg_queue;
 extern OSMesg gfx_mesgs[];
-extern f32 D_8007A98C;
-extern f32 D_8007A990;
-extern f32 D_8007A994;
-extern s32 D_8007A998;
-extern s16 D_8007A9AC;
-extern u16 D_8007A9AE;
-extern s16 D_8007A9B0;
+extern f32 player_spawn_x;
+extern f32 player_spawn_z;
+extern f32 player_spawn_rot;
+extern s32 player_spawn_type;
+extern s16 player_respawn_map;
+extern u16 player_respawn_subarea;
+extern s16 player_respawn_entry;
 extern s16 D_8007AA0E;
-extern u16 D_8007C282;
-extern s32 D_800842BC;
-extern u32 D_800842C4;
-extern s32 D_800842C8;
-extern s32 D_800842D0;
-extern s32 D_800842DC;
+extern u16 map_backdrop_id;
+extern s32 map_id;
+extern u32 map_next_id;
+extern s32 map_next_subarea;
+extern s32 map_flag4_return_map;
+extern s32 map_flag8_return_map;
 extern s32 D_80084308;
 extern s16 env_play_time;
 extern f32 D_80085ECC;
@@ -269,22 +269,22 @@ void Core_ResetGameState(void) {
     core_flags &= 0x20000;
     core_flags |= 0x160;
     core_game_mode = 4;
-    D_800842BC = -1;
-    D_800842D0 = -1;
-    D_800842DC = -1;
-    D_8007C282 = 0xFFFF;
+    map_id = -1;
+    map_flag4_return_map = -1;
+    map_flag8_return_map = -1;
+    map_backdrop_id = 0xFFFF;
     D_80085ECC = 0.0f;
     env_play_time = 0;
-    D_800842C4 = 0xD;
-    D_800842C8 = 0x11;
+    map_next_id = 0xD;
+    map_next_subarea = 0x11;
     D_80084308 = -1;
-    D_8007A9AC = 0xD;
-    D_8007A9AE = 0x11;
-    D_8007A9B0 = 0;
-    D_8007A98C = -26.0f;
-    D_8007A990 = 0.0f;
-    D_8007A994 = 1.5707964f;
-    D_8007A998 = 0x108;
+    player_respawn_map = 0xD;
+    player_respawn_subarea = 0x11;
+    player_respawn_entry = 0;
+    player_spawn_x = -26.0f;
+    player_spawn_z = 0.0f;
+    player_spawn_rot = 1.5707964f;
+    player_spawn_type = 0x108;
     D_8007AA0E = 0;
     hud_panel_transition_state = 1;
     hud_panel_transition_frame = 0xC;
@@ -352,8 +352,8 @@ extern s32 gfx_clear_g;
 extern u32 gfx_clear_b;
 extern s32 gfx_scene_light_slot;
 extern s32 gfx_dl_peak_len;
-extern s32 D_8007AB60;
-extern u16 D_8007C280;
+extern s32 player_light_slot;
+extern u16 map_env_flags;
 s32 D_8004DCA4 = 0;
 extern s8 D_8006CC80;
 extern u8 D_1000010[];
@@ -420,7 +420,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
     if (core_game_mode == 1 || core_game_mode == 6 || core_game_mode == 7) {
         Camera_Update(sub);
         Env_PrepareFrameLighting();
-        if (D_8007C280 & 4) {
+        if (map_env_flags & 4) {
             Env_ApplyLightSlot(gfx_scene_light_slot);
             Map_DrawBackdrop(sub);
         }
@@ -435,7 +435,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         Enemy_DrawAll(sub);
         Boss_Draw(sub);
         Spirit_SpawnSparkles();
-        Env_ApplyLightSlot(D_8007AB60);
+        Env_ApplyLightSlot(player_light_slot);
         Shadow_DrawAll(sub);
         Effect_UpdateAndDrawSprites(sub);
         Effect_UpdateAndDrawAll(sub);
@@ -594,10 +594,10 @@ typedef struct {
 extern u64 core_frame_start_time;
 extern u64 core_frame_end_time;
 extern u64 D_8007A8B8;
-extern PlayerState D_8007AA08;
+extern PlayerState player_state;
 extern u8 D_8007AA20[];
-extern s32 D_800842C0;
-extern u16 D_800842E8;
+extern s32 map_subarea;
+extern u16 map_subarea_flags;
 extern Unk80084300 exit_destination;
 extern u16 battle_flags;
 extern s32 hud_pending_sequence_id;
@@ -649,8 +649,8 @@ void Core_RunGameplayLoop(void) {
     msg = NULL;
     if (core_flags & 0x40) {
         if (core_flags & 0x800) {
-            D_800842BC = (u16)D_8007A9AC;
-            D_800842C0 = D_8007A9AE;
+            map_id = (u16)player_respawn_map;
+            map_subarea = player_respawn_subarea;
             Player_SetSpawnFromSaveTable();
         }
         Text_ResetAllWindows(0);
@@ -668,9 +668,9 @@ void Core_RunGameplayLoop(void) {
         Env_InitForMap();
         gfx_scene_light_slot = Env_AllocateLightSlot();
         D_8007A1C4 = Env_AllocateLightSlot();
-        D_8007AB60 = Env_AllocateLightSlot();
-        env_light_slots[D_8007AB60].unk0 = 2;
-        Battle_ResetState(&D_8007AB60);
+        player_light_slot = Env_AllocateLightSlot();
+        env_light_slots[player_light_slot].unk0 = 2;
+        Battle_ResetState(&player_light_slot);
         Magic_ResetEffectSystem();
         Effect_ResetAll();
         Effect_ResetSpritePool();
@@ -686,7 +686,7 @@ void Core_RunGameplayLoop(void) {
         Fade_StartTransitionIn();
     }
     if (core_flags & 0x100) {
-        Bgm_PlayForMap(D_800842BC, D_800842C0, 0);
+        Bgm_PlayForMap(map_id, map_subarea, 0);
         core_flags &= ~0x100;
     }
     core_flags &= ~0x480;
@@ -698,7 +698,7 @@ void Core_RunGameplayLoop(void) {
         gfx_mtx_index = 0;
         effect_mapobj_emitter_count = 0;
         Shadow_ClearQueue();
-        if (D_800842E8 & 1) {
+        if (map_subarea_flags & 1) {
             Battle_TryStartRandomEncounter();
         }
         if (battle_flags & 1) {
@@ -718,12 +718,12 @@ void Core_RunGameplayLoop(void) {
         Gfx_BuildFrameDisplayList(&D_80301000[gfx_frame_index]);
         frame = &D_80301000[gfx_frame_index];
         if (!(core_flags & 0x87)) {
-            if (!(D_8007AA08.unk78 & 1) && Exit_CheckEnter(D_8007AA08.x, D_8007AA08.z, D_8007AA08.rot) != 0) {
+            if (!(player_state.unk78 & 1) && Exit_CheckEnter(player_state.x, player_state.z, player_state.rot) != 0) {
                 core_flags |= 0x80;
                 Camera_TurnForExit();
                 Player_StartAreaExit();
                 fade_transition_style = 0;
-            } else if (!(core_flags & 0x1000) && !(D_8007AA08.unk78 & 1) && (input_pressed_buttons & 0x1000) &&
+            } else if (!(core_flags & 0x1000) && !(player_state.unk78 & 1) && (input_pressed_buttons & 0x1000) &&
                        !(battle_flags & 1) && !(input_held_buttons & 0x2000) && !(core_flags & 1)) {
                 core_game_mode = 2;
                 Sfx_Play(0, 1, 0xFF);
@@ -739,16 +739,16 @@ void Core_RunGameplayLoop(void) {
                 if (!(core_flags & 0x400)) {
                     core_flags |= 0x40;
                 }
-                D_800842C4 = exit_destination.unk0;
-                D_800842C8 = exit_destination.unk4;
+                map_next_id = exit_destination.unk0;
+                map_next_subarea = exit_destination.unk4;
                 if (core_flags & 0x400) {
-                    D_8007AA08.unk14->unk4 = D_8007AA08.unk14->unk6;
-                    D_8007AA08.unk14->unk8 = D_8007AA08.unk14->unkA;
+                    player_state.unk14->unk4 = player_state.unk14->unk6;
+                    player_state.unk14->unk8 = player_state.unk14->unkA;
                     env_clock += 0x2328;
                     Env_SetClock(env_clock);
-                    D_8007A9AC = D_800842BC;
-                    D_8007A9AE = D_800842C0;
-                    D_8007A9B0 = D_80084308;
+                    player_respawn_map = map_id;
+                    player_respawn_subarea = map_subarea;
+                    player_respawn_entry = D_80084308;
                     fade_transition_style = 2;
                 }
                 core_flags |= 0x100;
@@ -811,8 +811,8 @@ void Core_RunMessageCutsceneLoop(void) {
             Env_InitForMap();
             gfx_scene_light_slot = Env_AllocateLightSlot();
             D_8007A1C4 = Env_AllocateLightSlot();
-            D_8007AB60 = Env_AllocateLightSlot();
-            env_light_slots[D_8007AB60].unk0 = 2;
+            player_light_slot = Env_AllocateLightSlot();
+            env_light_slots[player_light_slot].unk0 = 2;
             Fade_Init();
             fade_flags |= 8;
             if (core_flags & 0x20) {
@@ -891,8 +891,8 @@ void Core_RunCameraCutsceneLoop(void) {
             Env_InitForMap();
             gfx_scene_light_slot = Env_AllocateLightSlot();
             D_8007A1C4 = Env_AllocateLightSlot();
-            D_8007AB60 = Env_AllocateLightSlot();
-            env_light_slots[D_8007AB60].unk0 = 2;
+            player_light_slot = Env_AllocateLightSlot();
+            env_light_slots[player_light_slot].unk0 = 2;
             Fade_Init();
             fade_flags |= 8;
             if (core_flags & 0x20) {

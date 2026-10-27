@@ -97,8 +97,8 @@ extern u8 D_80061DE8[];
 extern u8 D_80061DF8[];
 TexPtrs5 text_rect_texture_ptrs = { { D_80061A50, D_80061B50, D_80061D58, D_80061DE8, D_80061DF8 } };
 TexParams5 text_rect_texture_params = { { { 16, 16, 0, 0, 4, 4 }, { 40, 13, 0, 0, 0, 0 }, { 12, 12, 0, 0, 0, 0 }, { 1, 1, 2, 2, 0, 0 }, { 12, 12, 0, 0, 0, 0 } } };
-extern u8 D_8007B8E0[32];
-extern u8 D_8007B430[0x4B0];
+extern u8 text_speaker_name[32];
+extern u8 text_message_buf[0x4B0];
 extern s32 core_flags;
 /* .bss 80090450..80092C70 */
 s32 text_active_window_count;
@@ -212,11 +212,11 @@ s32 Text_OpenWindow(s32 arg0) {
             text_window_slots[i].unk0 |= 4;
             if (!(text_window_slots[i].unk0 & 0x80000)) {
                 for (j = 0; j < 32; j++) {
-                    text_window_slots[i].unk17[j] = D_8007B8E0[j];
+                    text_window_slots[i].unk17[j] = text_speaker_name[j];
                 }
                 for (j = 0; j < 0x4B0; j++) {
                     c = text_reveal_speed_steps[0] + D_800616B0;
-                    text_window_slots[i].unk9C[j] = D_8007B430[j];
+                    text_window_slots[i].unk9C[j] = text_message_buf[j];
                 }
                 for (k = 0; k < text_pending_choice_rows.n; k++) {
                     s = text_pending_choice_rows.rows[k];

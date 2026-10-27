@@ -46,7 +46,7 @@ typedef struct {
     /* 0x4 */ u8 unk4[0x8];
 } AnimEntry;
 
-/* a moving object: the player (D_8007AA20, inside D_8007AA08) and others */
+/* a moving object: the player (D_8007AA20, inside player_state) and others */
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
@@ -100,7 +100,7 @@ typedef struct {
     /* 0x34 */ u8 unk34;
 } PlayerStateSub14;
 
-/* D_8007B908: monsters, size 0x130 */
+/* enemy_slots: monsters, size 0x130 */
 typedef struct {
     /* 0x00 */ u8 unk0[0xA];
     /* 0x0A */ u16 unkA;
@@ -114,9 +114,9 @@ typedef struct {
     /* 0x4 */ u8 *end;
 } RomRange;
 
-/* D_8007AA08 */
+/* player_state */
 typedef struct {
-    /* 0x000 */ u16 unk0; /* state, index into D_8004DCB0 */
+    /* 0x000 */ u16 unk0; /* state, index into player_state_handlers */
     /* 0x002 */ u16 unk2;
     /* 0x004 */ u16 unk4; /* state timer */
     /* 0x006 */ u16 unk6;
@@ -267,11 +267,11 @@ void Hud_ShowActorPopup(Actor *arg0);
 f32 sqrtf(f32 x);
 
 extern s32 core_flags;
-extern u16 D_800842E8;
+extern u16 map_subarea_flags;
 extern u16 input_pressed_buttons;
 extern CharData *player_char_data[];
 extern RomRange player_anim_rom_ranges[];
-extern Monster D_8007B908[];
+extern Monster enemy_slots[];
 extern u16 battle_flags;
 extern u16 battle_turn_delay;
 extern f32 battle_active_enemy_x;
@@ -284,8 +284,8 @@ extern u16 fade_transition_style;
 extern s16 core_fade_out_time;
 extern Unk8007AC70 D_8007AC70[];
 extern Unk80084300 exit_destination;
-extern s32 D_800842BC;
-extern s32 D_800842C0;
+extern s32 map_id;
+extern s32 map_subarea;
 extern Unk80085E48 camera_state;
 extern s16 hud_panel_transition_frame;
 extern u16 hud_panel_transition_state;
@@ -303,116 +303,116 @@ extern ActorStats player_default_stats;
  * struct tags and data declarations count, prototypes don't) and emits the
  * later block first, so the whole list must sit inside one block: the externs
  * above are here to push it past a boundary. Labels inside these objects
- * (fields of D_8007A9D0, D_8007AA08, ...) are aliases in undefined_syms.txt.
+ * (fields of player_stats, player_state, ...) are aliases in undefined_syms.txt.
  * D_8007A90E, D_8007A914, D_8007A924, D_8007A9B2, D_8007AB54..5C are
  * unreferenced gaps. */
-f32 D_8007A8F0;
+f32 player_mp_regen_dist;
 f32 D_8007A8F4;
 f32 D_8007A8F8;
-f32 D_8007A8FC;
-f32 D_8007A900;
-s32 D_8007A904;
-s32 D_8007A908;
-u16 D_8007A90C;
+f32 player_agility_dist_enemy_area;
+f32 player_agility_dist_npc_area;
+s32 player_near_boss;
+s32 player_boss_text_delay;
+u16 player_run_sfx_timer;
 u16 D_8007A90E;
-s32 D_8007A910;
+s32 player_idle_anim;
 s32 D_8007A914;
-Vec2f D_8007A918;
+Vec2f player_temp_vec;
 s32 D_8007A924;
-Unk8007A928 D_8007A928;
-f32 D_8007A988;
-f32 D_8007A98C;
-f32 D_8007A990;
-f32 D_8007A994;
-s32 D_8007A998; /* bit 3: start in state 3; bits 8-10: entry kind (Player_Spawn) */
-s32 D_8007A99C;
-f32 D_8007A9A0;
-f32 D_8007A9A4;
-f32 D_8007A9A8;
-u16 D_8007A9AC;
-u16 D_8007A9AE;
-u16 D_8007A9B0;
+Unk8007A928 player_coll;
+f32 player_battle_move_dist;
+f32 player_spawn_x;
+f32 player_spawn_z;
+f32 player_spawn_rot;
+s32 player_spawn_type; /* bit 3: start in state 3; bits 8-10: entry kind (Player_Spawn) */
+s32 player_spawn_obj;
+f32 player_move_dx;
+f32 player_move_dz;
+f32 player_move_dist;
+u16 player_respawn_map;
+u16 player_respawn_subarea;
+u16 player_respawn_entry;
 u16 D_8007A9B2;
-s32 D_8007A9B4;
+s32 player_battle_exp;
 s32 D_8007A9B8;
-s32 D_8007A9BC;
-s32 D_8007A9C0;
-void *D_8007A9C4;
-Actor *D_8007A9C8;
-void *D_8007A9CC;
-ActorStats D_8007A9D0;
-PlayerState D_8007AA08;
-Vec3f D_8007AB48;
+s32 player_battle_drop_item;
+s32 player_talk_npc;
+void *player_front_spirit;
+Actor *player_front_chest;
+void *player_front_text_spot;
+ActorStats player_stats;
+PlayerState player_state;
+Vec3f player_shadow_pos;
 s32 D_8007AB54;
 s32 D_8007AB58;
 s32 D_8007AB5C;
-s32 D_8007AB60;
+s32 player_light_slot;
 
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern u16 D_8007A90C;
-extern f32 D_8007A988;
-extern PlayerState D_8007AA08;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern u16 player_run_sfx_timer;
+extern f32 player_battle_move_dist;
+extern PlayerState player_state;
 extern Actor D_8007AA20;
-extern s32 D_8007A910;
-extern Vec2f D_8007A918;
-extern f32 D_8007A98C;
-extern f32 D_8007A990;
-extern f32 D_8007A994;
-extern s32 D_8007A998;
-extern u16 D_8007A9AC;
-extern u16 D_8007A9AE;
-extern u16 D_8007A9B0;
-extern s32 D_8007A9C0;
+extern s32 player_idle_anim;
+extern Vec2f player_temp_vec;
+extern f32 player_spawn_x;
+extern f32 player_spawn_z;
+extern f32 player_spawn_rot;
+extern s32 player_spawn_type;
+extern u16 player_respawn_map;
+extern u16 player_respawn_subarea;
+extern u16 player_respawn_entry;
+extern s32 player_talk_npc;
 extern s16 D_8007AA0E;
 
-extern ActorStats D_8007A9D0;
+extern ActorStats player_stats;
 extern ActorSub68 D_8007AA8C;
 extern f32 D_8007A8F4;
 extern f32 D_8007A8F8;
-extern f32 D_8007A8FC;
-extern f32 D_8007A900;
+extern f32 player_agility_dist_enemy_area;
+extern f32 player_agility_dist_npc_area;
 
 void Player_Init(void) {
     Dma_ReadRom(D_869620, D_80206000, D_86F6F0 - D_869620);
-    D_8007A9D0 = player_default_stats;
-    D_8007AA08.actor.scale = D_8007A9D0.unk20;
-    D_8007AA08.actor.unk28 = D_8007A9D0.unk18;
-    D_8007AA08.actor.unk50 = D_8007A9D0.unk2;
-    D_8007AA08.unk14 = (PlayerStateSub14 *)&D_8007A9D0;
-    D_8007AA08.unk6 = 0;
-    D_8007AA08.unk8 = 0;
-    D_8007AA08.unk120 = 0;
-    D_8007AA08.actor.unk52 = -1;
-    D_8007AA08.actor.unk54 = 0;
-    D_8007AA08.actor.unk58 = 1;
-    D_8007AA08.actor.unk64 = &D_8007A9D0;
-    D_8007AA08.actor.unk68 = &D_8007AA8C;
-    D_8007AA08.actor.unk5E = 0;
-    D_8007AA08.actor.unk60 = 0;
-    D_8007A998 = 0x108;
-    D_8007A9AC = 0xD;
-    D_8007A9AE = 0x11;
-    D_8007A9B0 = 0;
-    D_8007A988 = 0.0f;
+    player_stats = player_default_stats;
+    player_state.actor.scale = player_stats.unk20;
+    player_state.actor.unk28 = player_stats.unk18;
+    player_state.actor.unk50 = player_stats.unk2;
+    player_state.unk14 = (PlayerStateSub14 *)&player_stats;
+    player_state.unk6 = 0;
+    player_state.unk8 = 0;
+    player_state.unk120 = 0;
+    player_state.actor.unk52 = -1;
+    player_state.actor.unk54 = 0;
+    player_state.actor.unk58 = 1;
+    player_state.actor.unk64 = &player_stats;
+    player_state.actor.unk68 = &D_8007AA8C;
+    player_state.actor.unk5E = 0;
+    player_state.actor.unk60 = 0;
+    player_spawn_type = 0x108;
+    player_respawn_map = 0xD;
+    player_respawn_subarea = 0x11;
+    player_respawn_entry = 0;
+    player_battle_move_dist = 0.0f;
     D_8007A8F4 = D_8007A8F8 = 0.0f;
-    D_8007A8FC = D_8007A900 = 0.0f;
+    player_agility_dist_enemy_area = player_agility_dist_npc_area = 0.0f;
 }
 
 typedef struct {
@@ -423,105 +423,105 @@ typedef struct {
     /* 0x10 */ u8 unk10[0x18 - 0x10];
 } Unk8007C290; /* size 0x18 */
 
-extern Unk8007C290 *D_8007C290;
-extern s32 D_8007A99C;
-extern f32 D_8007A8F0;
-extern s32 D_8007A9BC;
-extern void *D_8007A9C4;
-extern Actor *D_8007A9C8;
-extern void *D_8007A9CC;
+extern Unk8007C290 *map_objs;
+extern s32 player_spawn_obj;
+extern f32 player_mp_regen_dist;
+extern s32 player_battle_drop_item;
+extern void *player_front_spirit;
+extern Actor *player_front_chest;
+extern void *player_front_text_spot;
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
 void MapObjAnim_Start(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
 
 void Player_Spawn(void) {
     s32 n;
     s32 pad;
-    PlayerState *p = &D_8007AA08;
+    PlayerState *p = &player_state;
     CharData *cd;
     Unk8007C290 *pos;
 
     core_flags &= ~0x10000;
-    cd = player_char_data[D_8007AA08.actor.unk50];
-    D_8007AA08.unk0 = 0;
-    D_8007AA08.unk128 = 0;
-    D_8007AA08.actor.x = D_8007A98C;
-    D_8007AA08.actor.y = 0.0f;
-    D_8007AA08.actor.z = D_8007A990;
-    D_8007AA08.actor.unkC = 0.0f;
-    D_8007AA08.actor.unk14 = 0.0f;
-    D_8007AA08.actor.rot = D_8007A994;
-    D_8007AA08.actor.vx = 0.0f;
-    D_8007AA08.actor.unk1C = 0.0f;
-    D_8007AA08.actor.vz = 0.0f;
-    Coll_ResolveFloorAndWalls(D_8007A98C, 0.0f, D_8007A990, 0xA00, &D_8007A928);
-    p->actor.y = D_8007A928.unk4;
-    p->actor.unk2C = D_8007A928.unkC;
-    p->actor.unk30 = D_8007A928.unk10;
-    p->actor.unk34 = D_8007A928.unk14;
-    if (D_8007A928.unk18 & 0x8000) {
+    cd = player_char_data[player_state.actor.unk50];
+    player_state.unk0 = 0;
+    player_state.unk128 = 0;
+    player_state.actor.x = player_spawn_x;
+    player_state.actor.y = 0.0f;
+    player_state.actor.z = player_spawn_z;
+    player_state.actor.unkC = 0.0f;
+    player_state.actor.unk14 = 0.0f;
+    player_state.actor.rot = player_spawn_rot;
+    player_state.actor.vx = 0.0f;
+    player_state.actor.unk1C = 0.0f;
+    player_state.actor.vz = 0.0f;
+    Coll_ResolveFloorAndWalls(player_spawn_x, 0.0f, player_spawn_z, 0xA00, &player_coll);
+    p->actor.y = player_coll.unk4;
+    p->actor.unk2C = player_coll.unkC;
+    p->actor.unk30 = player_coll.unk10;
+    p->actor.unk34 = player_coll.unk14;
+    if (player_coll.unk18 & 0x8000) {
         p->actor.unk62 = 0;
     } else {
-        p->actor.unk62 = D_8007A928.unk18;
+        p->actor.unk62 = player_coll.unk18;
     }
-    Anim_SetCurrentAndNext(&D_8007AA20, p->unk6 ? p->unk6 : D_8007A910, 1, D_8007A910, 1, 1);
-    if (D_8007A998 & 8) {
+    Anim_SetCurrentAndNext(&D_8007AA20, p->unk6 ? p->unk6 : player_idle_anim, 1, player_idle_anim, 1, 1);
+    if (player_spawn_type & 8) {
         p->unk0 = 3;
         p->unk4 = 0xF;
         p->actor.unk60 = 1;
     } else {
-        switch ((D_8007A998 >> 8) & 7) {
+        switch ((player_spawn_type >> 8) & 7) {
             case 1:
             case 4:
                 p->unk0 = 8;
                 p->unk4 = 0xF;
-                D_8007A918.x = 0.0f;
-                D_8007A918.z = 20.0f;
-                Math_RotateVec2(p->actor.rot, &D_8007A918);
-                p->unk12C = D_8007A918.x;
-                p->unk130 = D_8007A918.z;
+                player_temp_vec.x = 0.0f;
+                player_temp_vec.z = 20.0f;
+                Math_RotateVec2(p->actor.rot, &player_temp_vec);
+                p->unk12C = player_temp_vec.x;
+                p->unk130 = player_temp_vec.z;
                 p->actor.unk60 = 1;
                 Sfx_Play(5, 0x21, 0xFF);
                 Sfx_Play(0xF, 0x21, 0xFF);
                 break;
             case 2:
                 p->unk0 = 10;
-                pos = &D_8007C290[D_8007A99C];
+                pos = &map_objs[player_spawn_obj];
                 p->unk138 = p->actor.rot = pos->rot * 0.017453292519943295;
-                if (D_8007A998 & 1) {
+                if (player_spawn_type & 1) {
                     p->unk4 = 0x15;
                     p->actor.unk54 = 0x55;
-                    D_8007A918.x = -115.61f;
-                    D_8007A918.z = 15.746f;
+                    player_temp_vec.x = -115.61f;
+                    player_temp_vec.z = 15.746f;
                     n = 0xE;
                 } else {
                     p->unk4 = 0x1F;
                     p->unk138 = p->unk138 + 3.141592653589793;
                     p->actor.unk54 = 0x3C;
-                    D_8007A918.x = -132.831f;
-                    D_8007A918.z = -120.681f;
+                    player_temp_vec.x = -132.831f;
+                    player_temp_vec.z = -120.681f;
                     n = 0x14;
                 }
-                Math_RotateVec2(-pos->rot * 0.017453292519943295, &D_8007A918);
-                p->actor.x = pos->x - D_8007A918.x * p->actor.scale;
-                p->actor.z = pos->z + D_8007A918.z * p->actor.scale;
+                Math_RotateVec2(-pos->rot * 0.017453292519943295, &player_temp_vec);
+                p->actor.x = pos->x - player_temp_vec.x * p->actor.scale;
+                p->actor.z = pos->z + player_temp_vec.z * p->actor.scale;
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
-                MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
+                MapObjAnim_Start(1, (u16) p->actor.unk54, player_spawn_type, pos);
                 Sfx_Play(n, 8, 0xFF);
                 break;
             case 3:
                 p->unk0 = 8;
                 p->unk4 = 0xF;
-                D_8007A918.x = 0.0f;
-                D_8007A918.z = 20.0f;
-                Math_RotateVec2(p->actor.rot, &D_8007A918);
-                p->unk12C = D_8007A918.x;
-                p->unk130 = D_8007A918.z;
+                player_temp_vec.x = 0.0f;
+                player_temp_vec.z = 20.0f;
+                Math_RotateVec2(p->actor.rot, &player_temp_vec);
+                p->unk12C = player_temp_vec.x;
+                p->unk130 = player_temp_vec.z;
                 p->actor.unk60 = 1;
                 Player_LoadAnim(&D_8007AA20);
                 Anim_UpdateRootMotion(&D_8007AA20, p->actor.unk52 * 0xC + (s32) cd, p->actor.scale);
-                MapObjAnim_Start(1, (u16) p->actor.unk54, D_8007A998, pos);
+                MapObjAnim_Start(1, (u16) p->actor.unk54, player_spawn_type, pos);
                 Sfx_Play(5, 0x21, 0xFF);
                 Sfx_Play(0xF, 0x21, 0xFF);
                 break;
@@ -537,13 +537,13 @@ void Player_Spawn(void) {
         p->actor.unk68->unk0 = 0;
     }
     p->actor.unk68->unk0 = 0;
-    D_8007A9A8 = D_8007A8F0 = 0.0f;
-    D_8007A90C = 0;
-    D_8007A9BC = 0xFF;
-    D_8007A9C0 = 0;
-    D_8007A9C4 = 0;
-    D_8007A9C8 = 0;
-    D_8007A9CC = 0;
+    player_move_dist = player_mp_regen_dist = 0.0f;
+    player_run_sfx_timer = 0;
+    player_battle_drop_item = 0xFF;
+    player_talk_npc = 0;
+    player_front_spirit = 0;
+    player_front_chest = 0;
+    player_front_text_spot = 0;
     if (p->unk14->unk24[0] == 50) {
         p->unk8 |= 0x1000;
     }
@@ -573,30 +573,30 @@ typedef struct {
 
 extern Unk80056088 player_save_spawn_points[];
 extern Unk80056088 D_80056198[];
-extern s32 D_800842C4;
-extern s32 D_800842C8;
+extern s32 map_next_id;
+extern s32 map_next_subarea;
 
 void Player_SetSpawnFromSaveTable(void) {
     s32 i;
 
-    D_8007AA08.unk14->unk18 = 50.0f;
-    D_800842C4 = D_800842BC;
-    D_800842C8 = D_800842C0;
+    player_state.unk14->unk18 = 50.0f;
+    map_next_id = map_id;
+    map_next_subarea = map_subarea;
     exit_destination.unk8 = 0;
     for (i = 0; i < 17; i++) {
-        if (D_800842BC == player_save_spawn_points[i].unk0 && D_800842C0 == player_save_spawn_points[i].unk2) {
-            D_8007A98C = player_save_spawn_points[i].x;
-            D_8007A990 = player_save_spawn_points[i].y;
-            D_8007A994 = player_save_spawn_points[i].rot;
+        if (map_id == player_save_spawn_points[i].unk0 && map_subarea == player_save_spawn_points[i].unk2) {
+            player_spawn_x = player_save_spawn_points[i].x;
+            player_spawn_z = player_save_spawn_points[i].y;
+            player_spawn_rot = player_save_spawn_points[i].rot;
             exit_destination.unk8 = -1;
             break;
         }
     }
-    D_800842BC = -1;
-    D_800842C0 = -1;
+    map_id = -1;
+    map_subarea = -1;
 }
 
-/* D_8007A9C4: Spirit_FindInFront's result */
+/* player_front_spirit: Spirit_FindInFront's result */
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
@@ -612,27 +612,27 @@ typedef struct {
     /* 0x18 */ s32 unk18;
 } Unk8007A9CCEntry;
 
-/* D_8007A9CC: TextSpot_FindInFront's result */
+/* player_front_text_spot: TextSpot_FindInFront's result */
 typedef struct {
     /* 0x00 */ Unk8007A9CCEntry *entry;
 } Unk8007A9CC;
 
-extern void *D_8007A9C4;
-extern Actor *D_8007A9C8;
-extern void *D_8007A9CC;
-extern s32 D_8007A904;
-extern s32 D_8007A908;
-extern f32 D_8007A9A0;
-extern f32 D_8007A9A4;
-extern s32 D_8007A9B4;
+extern void *player_front_spirit;
+extern Actor *player_front_chest;
+extern void *player_front_text_spot;
+extern s32 player_near_boss;
+extern s32 player_boss_text_delay;
+extern f32 player_move_dx;
+extern f32 player_move_dz;
+extern s32 player_battle_exp;
 extern s32 D_8007A9B8;
-extern s32 D_8007A9BC;
-extern f32 D_8007A8F0;
+extern s32 player_battle_drop_item;
+extern f32 player_mp_regen_dist;
 extern s32 hud_npc_marker_screen_y;
 extern s16 hud_element_input_timer;
 extern u8 fade_black_ramp[];
 extern u8 fade_black_ramp_dim[];
-extern void (*D_8004DCB0[])(Actor *, PlayerState *, CharData *);
+extern void (*player_state_handlers[])(Actor *, PlayerState *, CharData *);
 #ifdef NON_MATCHING
 /* retail returns the unmasked index + 1 in v0 */
 s32 Player_FindMeleeTarget(Actor *arg0);
@@ -660,35 +660,35 @@ void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2);
 void Player_StartOpenChest(PlayerState *arg0, Actor *arg1, s32 arg2);
 
 void Player_Update(void) {
-    PlayerState *p = &D_8007AA08;
+    PlayerState *p = &player_state;
     s32 pad;
     CharData *cd;
     u8 *s;
 
     cd = player_char_data[p->actor.unk50];
     if (p->unk14->unk4 * 3 < p->unk14->unk6) {
-        D_8007A910 = 0x19;
+        player_idle_anim = 0x19;
     } else {
-        D_8007A910 = (battle_flags & 1) ? 0x11 : 0;
+        player_idle_anim = (battle_flags & 1) ? 0x11 : 0;
     }
-    D_8007A9A0 = D_8007A9A4 = 0.0f;
+    player_move_dx = player_move_dz = 0.0f;
     if (!(core_flags & 0x87)) {
         if (battle_flags & 1) {
             if (!(battle_flags & 2) && !(p->actor.unk60 & 1)) {
                 p->unk2 = Player_FindMeleeTarget(&D_8007AA20);
             }
         } else if (!(p->actor.unk60 & 1)) {
-            D_8007A9C0 = Player_FindNpcToTalk(&D_8007AA08, &D_8007AA20);
-            if (D_8007A9C0 == 0) {
-                D_8007A9C4 = Spirit_FindInFront(&D_8007AA20);
-                if (D_8007A9C4 == NULL) {
-                    D_8007A9C8 = Chest_FindInFront(&D_8007AA20);
-                    if (D_8007A9C8 == NULL) {
-                        D_8007A9CC = TextSpot_FindInFront(&D_8007AA20);
-                        if (D_8007A9CC == NULL) {
-                            if ((D_8007A904 = Boss_CheckPlayerNear()) != 0) {
-                                Boss_BeginEncounter(D_8007A904 - 1);
-                                D_8007A908 = 0x1E;
+            player_talk_npc = Player_FindNpcToTalk(&player_state, &D_8007AA20);
+            if (player_talk_npc == 0) {
+                player_front_spirit = Spirit_FindInFront(&D_8007AA20);
+                if (player_front_spirit == NULL) {
+                    player_front_chest = Chest_FindInFront(&D_8007AA20);
+                    if (player_front_chest == NULL) {
+                        player_front_text_spot = TextSpot_FindInFront(&D_8007AA20);
+                        if (player_front_text_spot == NULL) {
+                            if ((player_near_boss = Boss_CheckPlayerNear()) != 0) {
+                                Boss_BeginEncounter(player_near_boss - 1);
+                                player_boss_text_delay = 0x1E;
                                 core_flags |= 2;
                                 p->unk8 |= 1;
                             }
@@ -703,65 +703,65 @@ void Player_Update(void) {
             if ((battle_flags & 1) && !(p->actor.unk60 & 1)) {
                 if (!(battle_flags & 6) && Magic_IsAnyEffectActive() == 0) {
                     if (p->unk2 != 0) {
-                        Player_StartMeleeAttack(&D_8007AA08, &D_8007AA20, cd);
+                        Player_StartMeleeAttack(&player_state, &D_8007AA20, cd);
                     } else {
-                        Player_AddTurnMoveAgilityXP(&D_8007AA08);
+                        Player_AddTurnMoveAgilityXP(&player_state);
                         p->unk2 = 0;
                         Battle_EndTurn(&D_8007AA20);
                     }
                 }
             } else if (!(p->actor.unk60 & 1)) {
-                if (D_8007A9C0 != 0) {
-                    D_8007A9C0--;
+                if (player_talk_npc != 0) {
+                    player_talk_npc--;
                     p->unk0 = 7;
                     p->actor.vz = 0.0f;
                     p->actor.vx = 0.0f;
                     p->actor.unk14 = 0.0f;
                     p->actor.unkC = 0.0f;
-                    Anim_SetCurrentAndNext(&D_8007AA20, D_8007A910, 1, D_8007A910, 1, 1);
-                    Npc_StartTalk(D_8007A9C0);
+                    Anim_SetCurrentAndNext(&D_8007AA20, player_idle_anim, 1, player_idle_anim, 1, 1);
+                    Npc_StartTalk(player_talk_npc);
                     Text_OpenWindow(hud_npc_marker_screen_y < 70 ? 0 : 1);
                     core_flags |= 2;
-                } else if (D_8007A9C4 != NULL) {
+                } else if (player_front_spirit != NULL) {
                     s = p->unk14->unk24;
                     if (s[0] == 50 && s[1] == 50 && s[2] == 50 && s[3] == 50) {
                     } else {
                         core_flags |= 8;
                         p->unk0 = 0;
-                        Spirit_SetCollected(((Unk8007A9C4 *) D_8007A9C4)->unk14);
-                        ((Unk8007A9C4 *) D_8007A9C4)->unk10 |= 1;
+                        Spirit_SetCollected(((Unk8007A9C4 *) player_front_spirit)->unk14);
+                        ((Unk8007A9C4 *) player_front_spirit)->unk10 |= 1;
                         hud_element_input_timer = 8;
                         Sfx_Play(0, 1, 0xFF);
                     }
-                } else if (Item_HasInventoryRoom() != 0 && D_8007A9C8 != NULL) {
-                    Chest_Open(D_8007A9C8);
-                    D_8007A918.x = 0.0f;
-                    D_8007A918.z = p->actor.scale * 171.0f;
-                    Math_RotateVec2(D_8007A9C8->rot, &D_8007A918);
-                    p->actor.x = D_8007A9C8->x + D_8007A918.x;
-                    p->actor.z = D_8007A9C8->z + D_8007A918.z;
-                    p->actor.rot = D_8007A9C8->rot;
-                    p->unk138 = D_8007A9C8->rot + 3.141592653589793;
-                    p->unk11C = D_8007A9C8->unk50;
-                    Player_StartOpenChest(&D_8007AA08, &D_8007AA20, (s32) cd);
-                    D_8007A9C8 = NULL;
-                } else if (D_8007A9CC != NULL) {
-                    TextSpot_LoadMessage(D_8007A9CC);
+                } else if (Item_HasInventoryRoom() != 0 && player_front_chest != NULL) {
+                    Chest_Open(player_front_chest);
+                    player_temp_vec.x = 0.0f;
+                    player_temp_vec.z = p->actor.scale * 171.0f;
+                    Math_RotateVec2(player_front_chest->rot, &player_temp_vec);
+                    p->actor.x = player_front_chest->x + player_temp_vec.x;
+                    p->actor.z = player_front_chest->z + player_temp_vec.z;
+                    p->actor.rot = player_front_chest->rot;
+                    p->unk138 = player_front_chest->rot + 3.141592653589793;
+                    p->unk11C = player_front_chest->unk50;
+                    Player_StartOpenChest(&player_state, &D_8007AA20, (s32) cd);
+                    player_front_chest = NULL;
+                } else if (player_front_text_spot != NULL) {
+                    TextSpot_LoadMessage(player_front_text_spot);
                     p->unk0 = 0x11;
                     p->actor.unk60 |= 1;
                     p->actor.vz = 0.0f;
                     p->actor.vx = 0.0f;
                     p->actor.unk14 = 0.0f;
                     p->actor.unkC = 0.0f;
-                    if (((Unk8007A9CC *) D_8007A9CC)->entry->unk18 & 2) {
+                    if (((Unk8007A9CC *) player_front_text_spot)->entry->unk18 & 2) {
                         p->unk4 = 0xF;
                         p->unk8 |= 0x200;
-                        Anim_SetCurrentAndNext(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
+                        Anim_SetCurrentAndNext(&D_8007AA20, 0x1B, 1, player_idle_anim, 1, 1);
                     } else {
                         p->unk4 = 0xF;
                         Anim_SetCurrentAndNext(&D_8007AA20, 0xC, 1, 0xD, 1, 1);
                     }
-                    D_8007A9CC = NULL;
+                    player_front_text_spot = NULL;
                 } else {
                     p->unk0 = 3;
                     p->unk4 = 0xF;
@@ -770,23 +770,23 @@ void Player_Update(void) {
                     p->actor.unk14 = 0.0f;
                     p->actor.unkC = 0.0f;
                     p->actor.unk60 |= 1;
-                    Anim_SetCurrentAndNext(&D_8007AA20, 0x1B, 1, D_8007A910, 1, 1);
+                    Anim_SetCurrentAndNext(&D_8007AA20, 0x1B, 1, player_idle_anim, 1, 1);
                 }
             }
-        } else if (Player_CanAct(&D_8007AA08, &D_8007AA20) != 0) {
+        } else if (Player_CanAct(&player_state, &D_8007AA20) != 0) {
             if (!(core_flags & 4) && (input_pressed_buttons & 0x10)) {
                 core_flags ^= 1;
                 Fade_Start(6, 2, fade_black_ramp);
                 Sfx_Play(0, 1, 0xFF);
                 p->actor.unk60 |= 1;
             }
-            if (!(core_flags & 1) && !(p->actor.unk68->unk0 & 0x40) && Player_HandleSpellInput(&D_8007AA08) != 0) {
-                Player_StartCastSpell(&D_8007AA08, &D_8007AA20, (AnimEntry *) cd);
+            if (!(core_flags & 1) && !(p->actor.unk68->unk0 & 0x40) && Player_HandleSpellInput(&player_state) != 0) {
+                Player_StartCastSpell(&player_state, &D_8007AA20, (AnimEntry *) cd);
             }
         }
     } else if (core_flags & 4) {
-        if (Player_HandleSpellInput(&D_8007AA08) != 0) {
-            Player_StartCastSpell(&D_8007AA08, &D_8007AA20, (AnimEntry *) cd);
+        if (Player_HandleSpellInput(&player_state) != 0) {
+            Player_StartCastSpell(&player_state, &D_8007AA20, (AnimEntry *) cd);
         }
     } else if (core_flags & 1) {
         if (input_pressed_buttons & 0x4010) {
@@ -798,11 +798,11 @@ void Player_Update(void) {
     }
     if (battle_flags & 8) {
         battle_flags &= ~8;
-        p->actor.unk64->unk10 += D_8007A9B4;
+        p->actor.unk64->unk10 += player_battle_exp;
         p->actor.unk64->unk14 += D_8007A9B8;
-        if (D_8007A9BC != 0xFF) {
-            if ((u32) Item_CountInInventory(D_8007A9BC) >= 3 || (u32) Item_GetInventoryCount() >= 0x8D) {
-                D_8007A9BC = 0xFF;
+        if (player_battle_drop_item != 0xFF) {
+            if ((u32) Item_CountInInventory(player_battle_drop_item) >= 3 || (u32) Item_GetInventoryCount() >= 0x8D) {
+                player_battle_drop_item = 0xFF;
             }
         }
         Hud_ClearActorStatusIndicators(&D_8007AA20);
@@ -814,17 +814,17 @@ void Player_Update(void) {
         p->actor.vx = 0.0f;
         p->actor.unk14 = 0.0f;
         p->actor.unkC = 0.0f;
-        Anim_SetCurrentAndNext(&D_8007AA20, 0x10, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(&D_8007AA20, 0x10, 1, player_idle_anim, 1, 1);
     } else if (battle_flags & 0x10) {
         Hud_ClearActorStatusIndicators(&D_8007AA20);
         D_8007AA8C.unk0 = 0;
     }
-    D_8004DCB0[p->unk0](&D_8007AA20, &D_8007AA08, cd);
-    D_8007A9A8 = sqrtf(D_8007A9A0 * D_8007A9A0 + D_8007A9A4 * D_8007A9A4);
+    player_state_handlers[p->unk0](&D_8007AA20, &player_state, cd);
+    player_move_dist = sqrtf(player_move_dx * player_move_dx + player_move_dz * player_move_dz);
     if (!(battle_flags & 1) && p->actor.unk64->unk8 < p->actor.unk64->unkA) {
-        D_8007A8F0 += D_8007A9A8;
-        if (D_8007A8F0 > 60.0) {
-            D_8007A8F0 -= 60.0;
+        player_mp_regen_dist += player_move_dist;
+        if (player_mp_regen_dist > 60.0) {
+            player_mp_regen_dist -= 60.0;
             p->actor.unk64->unk8++;
         }
     }
@@ -833,12 +833,12 @@ void Player_Update(void) {
 
 
 extern Gfx *gfx_dl_head;
-extern s32 D_8007AB60;
+extern s32 player_light_slot;
 extern u8 D_10000A0[];
 
-extern Unk8007A928 D_8007A928;
+extern Unk8007A928 player_coll;
 extern f32 D_8007A92C;
-extern Vec3f D_8007AB48;
+extern Vec3f player_shadow_pos;
 extern Vec3f anim_node_world_positions;
 void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, void *out);
 void Env_ApplyLightSlot(s32 arg0);
@@ -846,7 +846,7 @@ void Shadow_Queue(f32 x, f32 y, f32 z, f32 rx, f32 ry, f32 rz, f32 scale);
 void Anim_DrawModel(s32 arg0, Actor *arg1, AnimEntry *arg2, void *arg3);
 void Anim_AdvanceFrame(u16 arg0, Actor *arg1, AnimEntry *arg2);
 
-/* fields of D_8007AA08.actor under their own names */
+/* fields of player_state.actor under their own names */
 extern f32 D_8007AA24;
 extern f32 D_8007AA44;
 extern f32 D_8007AA48;
@@ -861,11 +861,11 @@ void Player_Draw(void *arg0) {
     s32 flag;
     s32 pad[2];
     AnimEntry *anims;
-    PlayerState *p = &D_8007AA08;
+    PlayerState *p = &player_state;
 
     gSPDisplayList(gfx_dl_head++, D_10000A0);
-    Env_ApplyLightSlot(D_8007AB60);
-    if (D_8007AA08.unk0 == 0xA || p->unk0 == 0xB) {
+    Env_ApplyLightSlot(player_light_slot);
+    if (player_state.unk0 == 0xA || p->unk0 == 0xB) {
         flag = 1;
     } else {
         flag = 0;
@@ -875,15 +875,15 @@ void Player_Draw(void *arg0) {
     Anim_DrawModel(flag, &D_8007AA20, &anims[D_8007AA72], arg0);
     Anim_AdvanceFrame(D_8007AA78, &D_8007AA20, &anims[D_8007AA72]);
     Player_LoadAnim(&D_8007AA20);
-    Coll_ResolveFloorAndWalls(anim_node_world_positions.x, D_8007AA24, anim_node_world_positions.z, 0xA00, &D_8007A928);
-    D_8007AB48.x = anim_node_world_positions.x;
-    D_8007AB48.y = D_8007A92C;
-    D_8007AB48.z = anim_node_world_positions.z;
-    Shadow_Queue(D_8007AB48.x, D_8007AB48.y, D_8007AB48.z, p->actor.unk2C, p->actor.unk30, p->actor.unk34,
+    Coll_ResolveFloorAndWalls(anim_node_world_positions.x, D_8007AA24, anim_node_world_positions.z, 0xA00, &player_coll);
+    player_shadow_pos.x = anim_node_world_positions.x;
+    player_shadow_pos.y = D_8007A92C;
+    player_shadow_pos.z = anim_node_world_positions.z;
+    Shadow_Queue(player_shadow_pos.x, player_shadow_pos.y, player_shadow_pos.z, p->actor.unk2C, p->actor.unk30, p->actor.unk34,
                   p->actor.unk28 * p->actor.scale);
 }
 
-extern s32 D_8007A9B4;
+extern s32 player_battle_exp;
 extern s32 D_8007A9B8;
 extern s32 D_8007AA10; /* .unk8 */
 extern s32 D_8007AA18; /* .unk10 */
@@ -893,26 +893,26 @@ extern u16 D_8007AA80; /* .actor.unk60 */
 extern f32 D_8007AB3C;
 
 void Player_InitBattle(void) {
-    PlayerState *p = &D_8007AA08;
+    PlayerState *p = &player_state;
     ActorStats *stats;
     CharData *cd;
     s32 quarter;
     s32 i;
 
-    D_8007A9B4 = D_8007A9B8 = 0;
-    stats = D_8007AA08.actor.unk64;
-    cd = player_char_data[D_8007AA08.actor.unk50];
-    D_8007AA08.unkC = (f32)(u32)stats->unkC * 0.2857 + 17.0;
-    D_8007AA08.unk84 = 0;
-    D_8007AA08.unk110 = 0;
-    D_8007AA08.unk108 = D_8007AA08.unk14->unk24[0] + D_8007AA08.unk14->unk24[1] + D_8007AA08.unk14->unk24[2] +
-                        D_8007AA08.unk14->unk24[3];
-    D_8007AA08.unk10E = 0x10;
-    D_8007AA08.unk10A = stats->unkC;
-    D_8007AA08.unk10C = stats->unkE;
-    D_8007AA08.unk10 = D_8007AA08.unk108;
-    D_8007AA08.unk114 = 1.0f;
-    quarter = D_8007AA08.unk108 >> 2;
+    player_battle_exp = D_8007A9B8 = 0;
+    stats = player_state.actor.unk64;
+    cd = player_char_data[player_state.actor.unk50];
+    player_state.unkC = (f32)(u32)stats->unkC * 0.2857 + 17.0;
+    player_state.unk84 = 0;
+    player_state.unk110 = 0;
+    player_state.unk108 = player_state.unk14->unk24[0] + player_state.unk14->unk24[1] + player_state.unk14->unk24[2] +
+                        player_state.unk14->unk24[3];
+    player_state.unk10E = 0x10;
+    player_state.unk10A = stats->unkC;
+    player_state.unk10C = stats->unkE;
+    player_state.unk10 = player_state.unk108;
+    player_state.unk114 = 1.0f;
+    quarter = player_state.unk108 >> 2;
     for (i = 0; i < 4; i++) {
         if (quarter < p->unk14->unk24[i]) {
             p->unk10 = p->unk10 - p->unk14->unk24[i] + quarter;
@@ -928,10 +928,10 @@ void Player_InitBattle(void) {
     p->unk134 = p->actor.rot;
     p->unk8 &= ~0x20;
     p->actor.unk60 |= 1;
-    if (D_8007A910 != 0x19) {
-        D_8007A910 = 0x11;
+    if (player_idle_anim != 0x19) {
+        player_idle_anim = 0x11;
     }
-    Anim_SetCurrentAndNext(&p->actor, 0x12, 1, D_8007A910, 1, 1);
+    Anim_SetCurrentAndNext(&p->actor, 0x12, 1, player_idle_anim, 1, 1);
 }
 
 /* particle/effect spawn parameters */
@@ -947,7 +947,7 @@ typedef struct {
 } Unk8004EE20;
 
 extern Unk8004EE20 effect_foot_particle_template;
-extern s32 D_8007A908;
+extern s32 player_boss_text_delay;
 extern f32 D_80085E70;
 extern s32 D_8008C168;
 extern s32 D_8008C16C;
@@ -969,11 +969,11 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
         z = 0.0f;
     }
     if (x != 0.0f || z != 0.0f) {
-        D_8007A918.x = x;
-        D_8007A918.z = z;
-        Math_RotateVec2(D_80085E70, &D_8007A918);
-        x = D_8007A918.x;
-        z = D_8007A918.z;
+        player_temp_vec.x = x;
+        player_temp_vec.z = z;
+        Math_RotateVec2(D_80085E70, &player_temp_vec);
+        x = player_temp_vec.x;
+        z = player_temp_vec.z;
     }
     Player_UpdateStatGrowth(p, a);
     if (D_8008C168 != 0) {
@@ -993,8 +993,8 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
         x = 0.0f;
     }
     if (p->unk8 & 1) {
-        if (D_8007A908 != 0) {
-            if (--D_8007A908 == 0) {
+        if (player_boss_text_delay != 0) {
+            if (--player_boss_text_delay == 0) {
                 Text_OpenWindow(0);
             }
         } else if (text_active_window_count == 0) {
@@ -1026,9 +1026,9 @@ void Player_StateMove(Actor *a, PlayerState *p, CharData *cd) {
     }
     Player_MoveAndCollide(0xA01, a, p);
     if (p->unk0 == 2) {
-        D_8007A90C += a->unk58;
-        if (D_8007A90C >= 0x97) {
-            D_8007A90C = 0;
+        player_run_sfx_timer += a->unk58;
+        if (player_run_sfx_timer >= 0x97) {
+            player_run_sfx_timer = 0;
             Sfx_Play(0, 0x21, 0xFF);
         }
         if (p->unk4 != 0) {
@@ -1079,7 +1079,7 @@ void Player_StateHurt(Actor *arg0, PlayerState *arg1, CharData *arg2) {
         if (sub->unk4 == 0) {
             arg1->unk0 = 6;
             arg1->unk4 = 0xE6;
-            Anim_SetCurrentAndNext(arg0, 9, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(arg0, 9, 1, player_idle_anim, 1, 1);
             Hud_ClearActorStatusIndicators(arg0);
             Bgm_Play(0x1E);
             core_flags |= 0x880;
@@ -1087,13 +1087,13 @@ void Player_StateHurt(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             fade_transition_style = 2;
             core_fade_out_time = 0x5A;
             arg1->unk124 = 0xC8;
-            exit_destination.unk0 = D_8007A9AC;
-            exit_destination.unk4 = D_8007A9AE;
-            exit_destination.unk8 = D_8007A9B0;
-            D_8007A98C = 0.0f;
-            D_8007A990 = 0.0f;
-            D_8007A994 = 0.0f;
-            D_8007A998 = 0x108;
+            exit_destination.unk0 = player_respawn_map;
+            exit_destination.unk4 = player_respawn_subarea;
+            exit_destination.unk8 = player_respawn_entry;
+            player_spawn_x = 0.0f;
+            player_spawn_z = 0.0f;
+            player_spawn_rot = 0.0f;
+            player_spawn_type = 0x108;
             D_8007AA0E = 0;
             hud_panel_transition_state = 1;
             hud_panel_transition_frame = 0xC;
@@ -1105,9 +1105,9 @@ void Player_StateHurt(Actor *arg0, PlayerState *arg1, CharData *arg2) {
 }
 
 void Player_StateDying(Actor *arg0, PlayerState *arg1, s32 arg2) {
-    Player_GetAnimMotion(arg0, arg2, &D_8007A918);
-    arg0->vx = D_8007A918.x;
-    arg0->vz = D_8007A918.z;
+    Player_GetAnimMotion(arg0, arg2, &player_temp_vec);
+    arg0->vx = player_temp_vec.x;
+    arg0->vz = player_temp_vec.z;
     Player_MoveAndCollide(0xA01, arg0, arg1);
     if (--arg1->unk4 == arg1->unk124) {
         camera_state.unk4C = 250.0f;
@@ -1120,18 +1120,18 @@ void Player_StateTalk(Actor *arg0, PlayerState *arg1, CharData *arg2) {
     arg0->vz = 0.0f;
     arg0->vx = 0.0f;
     if (text_active_window_count == 0) {
-        Npc_EndTalk(D_8007A9C0);
+        Npc_EndTalk(player_talk_npc);
         arg1->unk0 = 0;
         arg0->unk60 &= 0xFFFE;
         core_flags &= ~2;
         if (core_flags & 0x10) {
             core_flags &= ~0x10;
-            if (*(u16 *)((u8 *)D_8007AC70[D_8007A9C0].unk0 + 2) == 6 && text_last_choice_index == 0) {
+            if (*(u16 *)((u8 *)D_8007AC70[player_talk_npc].unk0 + 2) == 6 && text_last_choice_index == 0) {
                 core_flags |= 0x480;
                 core_transition_timer = 0x23;
                 core_fade_out_time = 0x1E;
-                D_8007A9AC = D_800842BC;
-                D_8007A9AE = D_800842C0;
+                player_respawn_map = map_id;
+                player_respawn_subarea = map_subarea;
                 arg1->unk0 = 3;
                 arg1->unk4 = 0x41;
                 arg0->unk60 |= 1;
@@ -1141,7 +1141,7 @@ void Player_StateTalk(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             arg1->unk8 &= ~0x40;
             Sfx_Play(0, 0x3B, 0xFF);
         }
-        D_8007A9C0 = 0;
+        player_talk_npc = 0;
     }
 }
 
@@ -1197,16 +1197,16 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
                     Effect_AddFloatingNumber(a, 1, dmg);
                     Hud_StartActorStatusIndicator(a, 2, 1, 0x1E);
                 }
-                D_8007A918.x = 0.0f;
-                D_8007A918.z = 2.0f * (a->unk64->unk18 * a->scale);
-                Math_RotateVec2(a->rot, &D_8007A918);
-                Effect_SpawnStreakBurst(a->x + D_8007A918.x, a->y + a->unk64->unk1C * a->scale * 0.7f, a->z + D_8007A918.z);
+                player_temp_vec.x = 0.0f;
+                player_temp_vec.z = 2.0f * (a->unk64->unk18 * a->scale);
+                Math_RotateVec2(a->rot, &player_temp_vec);
+                Effect_SpawnStreakBurst(a->x + player_temp_vec.x, a->y + a->unk64->unk1C * a->scale * 0.7f, a->z + player_temp_vec.z);
             }
             p->unk14->unk28++;
         } else {
-            Enemy_PlayMissEffect(&D_8007B908[p->unk2 - 1].actor);
+            Enemy_PlayMissEffect(&enemy_slots[p->unk2 - 1].actor);
         }
-        if (D_8007B908[p->unk2 - 1].unkA == 0) {
+        if (enemy_slots[p->unk2 - 1].unkA == 0) {
             p->unk8 &= ~0x100;
         }
         if (p->unk0 == 0xD && (p->unk8 & 0x100)) {
@@ -1214,7 +1214,7 @@ void Player_StateMeleeAttack(Actor *a, PlayerState *p, CharData *cd) {
             p->unk4 = 0x12;
             p->unk8 &= ~0x100;
             a->unk60 |= 1;
-            Anim_SetCurrentAndNext(a, 0xB, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(a, 0xB, 1, player_idle_anim, 1, 1);
             D_80085E4C = 0x23;
             return;
         }
@@ -1251,7 +1251,7 @@ void Player_StateCastSpell(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             arg1->unk0 = 3;
             arg1->unk4 = arg2->unk122;
             arg1->unk8 &= ~4;
-            Anim_SetCurrentAndNext(arg0, 0x18, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(arg0, 0x18, 1, player_idle_anim, 1, 1);
         } else {
             arg1->unk0 = 0;
         }
@@ -1286,7 +1286,7 @@ void Player_StateWalkToExitObject(Actor *arg0, PlayerState *arg1, s32 arg2) {
     if (--arg1->unk4 == 0) {
         arg1->unk0 = 0xA;
         arg1->unk4 = 0x50;
-        Anim_SetCurrentAndNext(arg0, arg1->unk6, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(arg0, arg1->unk6, 1, player_idle_anim, 1, 1);
         Player_LoadAnim(arg0);
         Anim_UpdateRootMotion(arg0, arg0->unk52 * 0xC + arg2, arg0->scale);
         arg0->rot = arg1->unk138;
@@ -1295,9 +1295,9 @@ void Player_StateWalkToExitObject(Actor *arg0, PlayerState *arg1, s32 arg2) {
 }
 
 void Player_StateAnimMove(Actor *arg0, PlayerState *arg1, s32 arg2) {
-    Player_GetAnimMotion(arg0, arg2, &D_8007A918);
-    arg0->vx = D_8007A918.x;
-    arg0->vz = D_8007A918.z;
+    Player_GetAnimMotion(arg0, arg2, &player_temp_vec);
+    arg0->vx = player_temp_vec.x;
+    arg0->vz = player_temp_vec.z;
     Player_MoveAndCollide(0xA00, arg0, arg1);
     if (--arg1->unk4 == 0) {
         arg1->unk0 = 0;
@@ -1308,9 +1308,9 @@ void Player_StateAnimMove(Actor *arg0, PlayerState *arg1, s32 arg2) {
 
 void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
     if (arg1->unk4 != 0) {
-        Player_GetAnimMotion(arg0, arg2, &D_8007A918);
-        arg0->vx = D_8007A918.x;
-        arg0->vz = D_8007A918.z;
+        Player_GetAnimMotion(arg0, arg2, &player_temp_vec);
+        arg0->vx = player_temp_vec.x;
+        arg0->vz = player_temp_vec.z;
         Player_MoveAndCollide(0xA00, arg0, arg1);
         if (arg1->unk4 == 0x20) {
             Item_BuildMessage(arg1->unk11C);
@@ -1321,13 +1321,13 @@ void Player_StateOpenChest(Actor *arg0, PlayerState *arg1, s32 arg2) {
         }
         if (--arg1->unk4 == 0) {
             arg0->rot = arg1->unk138;
-            Anim_SetCurrentAndNext(arg0, D_8007A910, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(arg0, player_idle_anim, 1, player_idle_anim, 1, 1);
         }
     } else if (text_active_window_count == 0) {
         arg1->unk0 = 0;
         arg0->unk60 &= 0xFFFE;
         core_flags &= ~2;
-        D_8007A9C0 = 0;
+        player_talk_npc = 0;
     }
 }
 
@@ -1349,7 +1349,7 @@ void Player_StateUseItem(Actor *arg0, PlayerState *arg1, CharData *arg2) {
         }
         arg1->unk0 = 3;
         arg1->unk4 = 0xF;
-        Anim_SetCurrentAndNext(arg0, 0x18, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(arg0, 0x18, 1, player_idle_anim, 1, 1);
         arg1->unk2 = 0;
         Battle_EndTurn(arg0);
     }
@@ -1385,7 +1385,7 @@ void Player_StateBattleWon(Actor *arg0, PlayerState *arg1, CharData *arg2) {
         arg1->unk0 = 0;
         arg0->unk60 &= 0xFFFD;
         if (D_8007A172 != 4) {
-            Bgm_PlayForMap(D_800842BC, D_800842C0, 0x1E);
+            Bgm_PlayForMap(map_id, map_subarea, 0x1E);
         }
     }
 }
@@ -1420,15 +1420,15 @@ void Player_StateExamine(Actor *arg0, PlayerState *arg1, CharData *arg2) {
             arg1->unk4 = 2;
         } else {
             arg1->unk4 = 8;
-            Anim_SetCurrentAndNext(arg0, 0xE, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(arg0, 0xE, 1, player_idle_anim, 1, 1);
         }
         arg1->unk8 &= ~0x200;
         core_flags &= ~2;
-        D_8007A9C0 = 0;
+        player_talk_npc = 0;
     }
 }
 
-extern u16 D_8007A90C;
+extern u16 player_run_sfx_timer;
 
 void Player_MoveIdle(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
     f32 speed;
@@ -1443,16 +1443,16 @@ void Player_MoveIdle(f32 arg0, f32 arg1, Actor *arg2, PlayerState *arg3) {
         if (speed > 1.5) {
             arg3->unk0 = 2;
             arg3->unk4 = 0x1E;
-            D_8007A90C = 0;
+            player_run_sfx_timer = 0;
         } else {
             arg3->unk0 = 1;
         }
-    } else if (D_8007A910 != arg2->unk52 && D_8007A910 != arg2->unk5A) {
-        Anim_SetCurrentAndNext(arg2, D_8007A910, 1, D_8007A910, 1, 1);
+    } else if (player_idle_anim != arg2->unk52 && player_idle_anim != arg2->unk5A) {
+        Anim_SetCurrentAndNext(arg2, player_idle_anim, 1, player_idle_anim, 1, 1);
     }
 }
 
-extern u16 D_8007A90C;
+extern u16 player_run_sfx_timer;
 
 void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
     s32 anim;
@@ -1492,11 +1492,11 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         } else if (a->rot < -3.141592653589793) {
             a->rot += 6.283185307179586;
         }
-        D_8007A918.x = 0.0f;
-        D_8007A918.z = cur + (spd - cur) * 0.85;
-        Math_RotateVec2(a->rot, &D_8007A918);
-        a->vx = D_8007A918.x;
-        a->vz = D_8007A918.z;
+        player_temp_vec.x = 0.0f;
+        player_temp_vec.z = cur + (spd - cur) * 0.85;
+        Math_RotateVec2(a->rot, &player_temp_vec);
+        a->vx = player_temp_vec.x;
+        a->vz = player_temp_vec.z;
         anim = 1;
         next = 1;
         flag = 0;
@@ -1504,14 +1504,14 @@ void Player_MoveWalk(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         if (spd > 1.5 || (f32)(cur + (spd - cur) * 0.85) > 1.5) {
             p->unk0 = 2;
             p->unk4 = 0x1E;
-            D_8007A90C = 0;
+            player_run_sfx_timer = 0;
         }
     } else {
         a->vx *= 0.82;
         a->vz *= 0.82;
         if (cur > 1.0) {
             anim = 0xF;
-            next = D_8007A910;
+            next = player_idle_anim;
             mode = 3;
             p->unk0 = 4;
             p->unk4 = 8;
@@ -1575,11 +1575,11 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         } else if (a->rot < -3.141592653589793) {
             a->rot += 6.283185307179586;
         }
-        D_8007A918.x = 0.0f;
-        D_8007A918.z = newspd = cur + (spd - cur) * 0.2;
-        Math_RotateVec2(a->rot, &D_8007A918);
-        a->vx = D_8007A918.x;
-        a->vz = D_8007A918.z;
+        player_temp_vec.x = 0.0f;
+        player_temp_vec.z = newspd = cur + (spd - cur) * 0.2;
+        Math_RotateVec2(a->rot, &player_temp_vec);
+        a->vx = player_temp_vec.x;
+        a->vz = player_temp_vec.z;
         anim = 2;
         next = 2;
         mode = 0;
@@ -1590,7 +1590,7 @@ void Player_MoveRun(f32 sx, f32 sz, Actor *a, PlayerState *p) {
         }
     } else {
         anim = 0xF;
-        next = D_8007A910;
+        next = player_idle_anim;
         mode = 3;
         p->unk0 = 4;
         p->unk4 = 8;
@@ -1621,8 +1621,8 @@ void Player_GetAnimMotion(Actor *arg0, s32 arg1, Vec2f *arg2) {
 void func_80006A50(void) {
 }
 
-extern f32 D_8007A9A0;
-extern f32 D_8007A9A4;
+extern f32 player_move_dx;
+extern f32 player_move_dz;
 extern f32 battle_center_x;
 extern f32 battle_center_z;
 extern f32 battle_arena_radius;
@@ -1658,33 +1658,33 @@ void Player_MoveAndCollide(u16 arg0, Actor *arg1, PlayerState *arg2) {
         }
     }
     Player_PushOutOfObjects(&arg1->vx, &arg1->vz, arg1);
-    D_8007A9A0 = arg1->vx;
-    D_8007A9A4 = arg1->vz;
+    player_move_dx = arg1->vx;
+    player_move_dz = arg1->vz;
     dx = arg1->x + arg1->vx;
     dz = arg1->z + arg1->vz;
-    D_8007A928.unk0 = arg1->unk64->unk18 * arg1->unk64->unk20;
-    Coll_ResolveFloorAndWalls(dx, arg1->y, dz, arg0, &D_8007A928);
-    arg1->vx = D_8007A928.unk0 - arg1->x;
-    arg1->vz = D_8007A928.unk8 - arg1->z;
-    arg1->x = D_8007A928.unk0;
-    arg1->y = D_8007A928.unk4;
-    arg1->z = D_8007A928.unk8;
-    arg1->unk2C = D_8007A928.unkC;
-    arg1->unk30 = D_8007A928.unk10;
-    arg1->unk34 = D_8007A928.unk14;
-    arg1->unk62 = D_8007A928.unk18;
+    player_coll.unk0 = arg1->unk64->unk18 * arg1->unk64->unk20;
+    Coll_ResolveFloorAndWalls(dx, arg1->y, dz, arg0, &player_coll);
+    arg1->vx = player_coll.unk0 - arg1->x;
+    arg1->vz = player_coll.unk8 - arg1->z;
+    arg1->x = player_coll.unk0;
+    arg1->y = player_coll.unk4;
+    arg1->z = player_coll.unk8;
+    arg1->unk2C = player_coll.unkC;
+    arg1->unk30 = player_coll.unk10;
+    arg1->unk34 = player_coll.unk14;
+    arg1->unk62 = player_coll.unk18;
 }
 
-/* D_8007ABF0: objects of 0x84 bytes with an Actor at +0x14 */
+/* npc_slots: objects of 0x84 bytes with an Actor at +0x14 */
 typedef struct {
     /* 0x00 */ u8 unk0[0x14];
     /* 0x14 */ Actor actor;
     /* 0x80 */ u8 unk80[0x84 - 0x80];
 } Unk8007ABF0;
 
-extern s32 D_8007ABA8;
-extern Actor *D_8007ABB0[];
-extern Unk8007ABF0 D_8007ABF0[];
+extern s32 npc_drawn_count;
+extern Actor *npc_drawn_list[];
+extern Unk8007ABF0 npc_slots[];
 
 s32 Player_FindNpcToTalk(PlayerState *arg0, Actor *arg1) {
     s32 ret;
@@ -1699,8 +1699,8 @@ s32 Player_FindNpcToTalk(PlayerState *arg0, Actor *arg1) {
 
     ret = 0;
     if (!(core_flags & 0x448D) && !(arg0->unk8 & 0x10)) {
-        list = D_8007ABB0;
-        for (n = D_8007ABA8; n != 0 && ret == 0; n--) {
+        list = npc_drawn_list;
+        for (n = npc_drawn_count; n != 0 && ret == 0; n--) {
             a = *list++;
             dx = a->x - arg1->x;
             dy = a->y - arg1->y;
@@ -1712,12 +1712,12 @@ s32 Player_FindNpcToTalk(PlayerState *arg0, Actor *arg1) {
                     r = 225.0f;
                 }
                 if (dx * dx + dz * dz < r) {
-                    D_8007A918.x = dx;
-                    D_8007A918.z = dz;
-                    Math_RotateVec2(arg1->rot, &D_8007A918);
-                    if (D_8007A918.z >= 0.0f && D_8007A918.x > -6.0 && D_8007A918.x < 6.0) {
+                    player_temp_vec.x = dx;
+                    player_temp_vec.z = dz;
+                    Math_RotateVec2(arg1->rot, &player_temp_vec);
+                    if (player_temp_vec.z >= 0.0f && player_temp_vec.x > -6.0 && player_temp_vec.x < 6.0) {
                         ret++;
-                        for (it = D_8007ABF0; &it->actor != a; it++) {
+                        for (it = npc_slots; &it->actor != a; it++) {
                             ret++;
                         }
                     }
@@ -1736,10 +1736,10 @@ typedef struct {
     /* 0x10 */ f32 radius;
 } Unk8007C2A8;
 
-extern s32 D_8007C02C;
-extern Actor *D_8007C030[];
-extern s32 D_8007C2A4;
-extern Unk8007C2A8 *D_8007C2A8[];
+extern s32 enemy_drawn_count;
+extern Actor *enemy_drawn_list[];
+extern s32 mapobj_billboard_count;
+extern Unk8007C2A8 *mapobj_billboard_list[];
 
 void Player_PushOutOfObjects(f32 *arg0, f32 *arg1, Actor *arg2) {
     f32 size;
@@ -1761,9 +1761,9 @@ void Player_PushOutOfObjects(f32 *arg0, f32 *arg1, Actor *arg2) {
     size = arg2->unk28 * arg2->scale;
     x = *arg0 + arg2->x;
     z = *arg1 + arg2->z;
-    n = D_8007C02C;
+    n = enemy_drawn_count;
     if (n != 0) {
-        for (list = D_8007C030; !hit && n != 0; n--) {
+        for (list = enemy_drawn_list; !hit && n != 0; n--) {
             a = *list++;
             dx = x - a->x;
             dz = z - a->z;
@@ -1781,9 +1781,9 @@ void Player_PushOutOfObjects(f32 *arg0, f32 *arg1, Actor *arg2) {
             }
         }
     }
-    n = D_8007ABA8;
+    n = npc_drawn_count;
     if (n != 0) {
-        for (list = D_8007ABB0; !hit && n != 0; n--) {
+        for (list = npc_drawn_list; !hit && n != 0; n--) {
             a = *list++;
             dx = x - a->x;
             dz = z - a->z;
@@ -1801,9 +1801,9 @@ void Player_PushOutOfObjects(f32 *arg0, f32 *arg1, Actor *arg2) {
             }
         }
     }
-    n = D_8007C2A4;
+    n = mapobj_billboard_count;
     if (n != 0) {
-        for (list2 = D_8007C2A8; !hit && n != 0; n--) {
+        for (list2 = mapobj_billboard_list; !hit && n != 0; n--) {
             o = *list2++;
             dx = x - o->x;
             dz = z - o->z;
@@ -1853,23 +1853,23 @@ extern f32 D_8007AA2C; /* .actor.unkC */
 extern f32 D_8007AA34; /* .actor.unk14 */
 extern f32 D_8007AB34;
 extern f32 D_8007AB38;
-extern Unk8007C290 *D_8007C290;
+extern Unk8007C290 *map_objs;
 void Player_StartObjectExit(PlayerState *arg0, Actor *arg1);
 void MapObjAnim_Start(s32 arg0, s32 arg1, s32 arg2, Unk8007C290 *arg3);
 
 void Player_StartAreaExit(void) {
-    PlayerState *p = &D_8007AA08;
+    PlayerState *p = &player_state;
     s32 kind = (exit_destination.unkC >> 8) & 0xF;
     f32 r;
     Unk8007C290 *pos;
 
-    D_8007A998 = exit_destination.unkC;
+    player_spawn_type = exit_destination.unkC;
     if (exit_destination.unkC & 4) {
         p->unk0 = 3;
         p->unk4 = 0x1E;
         p->unk6 = 0;
         p->actor.unk60 |= 1;
-        Anim_SetCurrentAndNext(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(&p->actor, player_idle_anim, 1, player_idle_anim, 1, 1);
         core_transition_timer = 0x13;
         return;
     }
@@ -1881,12 +1881,12 @@ void Player_StartAreaExit(void) {
             r = exit_destination.unk14;
             p->actor.unk14 = 0.0f;
             p->actor.unkC = 0.0f;
-            D_8007A918.x = 0.0f;
-            D_8007A918.z = 40.0f;
+            player_temp_vec.x = 0.0f;
+            player_temp_vec.z = 40.0f;
             p->actor.rot = r;
-            Math_RotateVec2(r, &D_8007A918);
-            p->unk12C = D_8007A918.x;
-            p->unk130 = D_8007A918.z;
+            Math_RotateVec2(r, &player_temp_vec);
+            p->unk12C = player_temp_vec.x;
+            p->unk130 = player_temp_vec.z;
             p->actor.unk60 |= 1;
             Sfx_Play(5, 0x21, 0xFF);
             Sfx_Play(0xF, 0x21, 0xFF);
@@ -1903,13 +1903,13 @@ void Player_StartAreaExit(void) {
             p->actor.unk60 |= 1;
             break;
         case 4:
-            pos = &D_8007C290[exit_destination.unk10];
+            pos = &map_objs[exit_destination.unk10];
             MapObjAnim_Start(1, 0, exit_destination.unkC, pos);
             p->unk0 = 3;
             p->unk4 = 0x1E;
             p->unk6 = 0;
             p->actor.unk60 |= 1;
-            Anim_SetCurrentAndNext(&p->actor, D_8007A910, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(&p->actor, player_idle_anim, 1, player_idle_anim, 1, 1);
             core_transition_timer = 0x19;
             break;
     }
@@ -1922,7 +1922,7 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
     Unk8007C290 *pos;
     s16 n;
 
-    pos = &D_8007C290[exit_destination.unk10];
+    pos = &map_objs[exit_destination.unk10];
     MapObjAnim_Start(0, 0, exit_destination.unkC, pos);
     hi = exit_destination.unkC >> 8;
     if ((hi & 0xF) == 3) {
@@ -1941,22 +1941,22 @@ void Player_StartObjectExit(PlayerState *arg0, Actor *arg1) {
         Anim_SetCurrentAndNext(arg1, 1, 0xA, 1, 0xA, 1);
         if (exit_destination.unkC & 1) {
             n = 0x15;
-            D_8007A918.x = -133.0f;
-            D_8007A918.z = -92.0f;
-            D_8007A918.unk8 = 4.0f;
+            player_temp_vec.x = -133.0f;
+            player_temp_vec.z = -92.0f;
+            player_temp_vec.unk8 = 4.0f;
         } else {
             n = 0x14;
-            D_8007A918.x = -119.0f;
-            D_8007A918.z = 125.0f;
-            D_8007A918.unk8 = 162.0f;
+            player_temp_vec.x = -119.0f;
+            player_temp_vec.z = 125.0f;
+            player_temp_vec.unk8 = 162.0f;
         }
         arg0->unk6 = n;
         rot = pos->rot * 0.017453292519943295;
-        Math_RotateVec2(-rot, &D_8007A918);
-        arg0->unk12C = (pos->x - D_8007A918.x * arg1->scale - arg1->x) / arg0->unk4;
-        arg0->unk130 = (pos->z + D_8007A918.z * arg1->scale - arg1->z) / arg0->unk4;
+        Math_RotateVec2(-rot, &player_temp_vec);
+        arg0->unk12C = (pos->x - player_temp_vec.x * arg1->scale - arg1->x) / arg0->unk4;
+        arg0->unk130 = (pos->z + player_temp_vec.z * arg1->scale - arg1->z) / arg0->unk4;
         arg0->unk138 = rot;
-        rot = rot + D_8007A918.unk8 * 0.017453292519943295;
+        rot = rot + player_temp_vec.unk8 * 0.017453292519943295;
         if (rot > 3.141592653589793) {
             rot -= 6.283185307179586;
         } else if (rot < -3.141592653589793) {
@@ -1979,19 +1979,19 @@ void Player_StartOpenChest(PlayerState *arg0, Actor *arg1, s32 arg2) {
 }
 
 void Player_StartUseItem(u8 arg0) {
-    CharData *cd = player_char_data[D_8007AA08.actor.unk50];
+    CharData *cd = player_char_data[player_state.actor.unk50];
 
-    D_8007AA08.unk11C = arg0;
-    D_8007AA08.unk0 = 0xC;
-    D_8007AA08.unk4 = cd->unk116;
-    D_8007AA08.actor.unk60 |= 1;
+    player_state.unk11C = arg0;
+    player_state.unk0 = 0xC;
+    player_state.unk4 = cd->unk116;
+    player_state.actor.unk60 |= 1;
     Anim_SetCurrentAndNext(&D_8007AA20, 0x17, 1, 0x16, 1, 1);
 }
 
 /* .data 8004DCB0..8004DD10 in source order: this table (after the functions it
- * points to), Player_LoadAnim's static cache (8004DCF8), D_8004DCFC (end of file). */
+ * points to), Player_LoadAnim's static cache (8004DCF8), player_melee_damage_scale (end of file). */
 typedef void (*Fn8004DCB0)(Actor*, PlayerState*, CharData*);
-Fn8004DCB0 D_8004DCB0[18] = {
+Fn8004DCB0 player_state_handlers[18] = {
     (Fn8004DCB0) Player_StateMove,
     (Fn8004DCB0) Player_StateMove,
     (Fn8004DCB0) Player_StateMove,
@@ -2013,17 +2013,17 @@ Fn8004DCB0 D_8004DCB0[18] = {
 };
 
 void Player_LoadAnim(Actor *arg0) {
-    static s32 D_8004DCF8 = -1;
+    static s32 player_loaded_anim = -1;
     RomRange *r;
 
-    if (D_8004DCF8 != arg0->unk52) {
-        D_8004DCF8 = arg0->unk52;
-        r = &player_anim_rom_ranges[D_8004DCF8];
+    if (player_loaded_anim != arg0->unk52) {
+        player_loaded_anim = arg0->unk52;
+        r = &player_anim_rom_ranges[player_loaded_anim];
         Dma_ReadRom(r->start, (void *) 0x80200000, r->end - r->start);
     }
 }
 
-extern u16 D_8007C050[];
+extern u16 enemy_turn_order[];
 extern u16 battle_enemy_count;
 
 #ifdef NON_MATCHING
@@ -2043,10 +2043,10 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
 
     radius = arg0->unk64->unk18 * arg0->scale;
     ret = 0;
-    idx = D_8007C050;
+    idx = enemy_turn_order;
     i = 0;
     for (; i < battle_enemy_count; i++, idx++) {
-        m = D_8007B908 + *idx;
+        m = enemy_slots + *idx;
         a = &m->actor;
         if (m->actor.unk50 != -1) {
             dx = a->x - arg0->x;
@@ -2054,8 +2054,8 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
             dist = sqrtf(dx * dx + dz * dz);
             r = a->unk64->unk18 * a->scale;
             if (dist < radius + r + 10.0) {
-                D_8007A918.x = dx;
-                D_8007A918.z = dz;
+                player_temp_vec.x = dx;
+                player_temp_vec.z = dz;
                 stats = a->unk64;
                 if (stats->unk0 == 1) {
                     dx = a->unk68->unk94 - arg0->y;
@@ -2072,9 +2072,9 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
                 }
                 dx -= dz * a->scale + arg0->unk64->unk1C * arg0->scale;
                 if (dx <= 0.0f) {
-                    Math_RotateVec2(arg0->rot, &D_8007A918);
+                    Math_RotateVec2(arg0->rot, &player_temp_vec);
                     r = r * 1.5;
-                    if (D_8007A918.z >= 0.0f && -r < D_8007A918.x && D_8007A918.x < r) {
+                    if (player_temp_vec.z >= 0.0f && -r < player_temp_vec.x && player_temp_vec.x < r) {
                         ret = *idx + 1;
                         break;
                     }
@@ -2096,8 +2096,8 @@ void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2) {
     arg0->unk4 = 0x14;
     arg0->unk8 &= ~0x400;
     arg1->unk60 |= 1;
-    Anim_SetCurrentAndNext(arg1, 0xA, 1, D_8007A910, 1, 1);
-    mon = &D_8007B908[arg0->unk2];
+    Anim_SetCurrentAndNext(arg1, 0xA, 1, player_idle_anim, 1, 1);
+    mon = &enemy_slots[arg0->unk2];
     dx = mon[-1].actor.x - arg1->x;
     arg1->rot = Math_Atan2(dx, mon[-1].actor.z - arg1->z);
     Camera_StartBattleFocus(0x23, arg1);
@@ -2105,13 +2105,13 @@ void Player_StartMeleeAttack(PlayerState *arg0, Actor *arg1, CharData *arg2) {
 
 s32 Player_RollHitOnEnemy(s32 arg0, Actor *arg1) {
     s16 chance;
-    Monster *m = &D_8007B908[arg0];
+    Monster *m = &enemy_slots[arg0];
 
     chance = (arg1->unk68->unk86 * 100) / (arg1->unk68->unk86 + ((m->actor.unk68->unk86 + 7) >> 3));
     return Math_Rand(100) < chance;
 }
 
-extern s32 D_8004DCFC[];
+extern s32 player_melee_damage_scale[];
 extern u8 fade_damage_flash[];
 void Fade_Start(s32 arg0, u16 arg1, void *arg2);
 
@@ -2134,7 +2134,7 @@ u16 Player_CalcMeleeDamage(PlayerState *arg0) {
     }
     val = (val >> 1) + sum;
     if (n != 0) {
-        val = (D_8004DCFC[n] * val) >> 6;
+        val = (player_melee_damage_scale[n] * val) >> 6;
     }
     val = (val * arg0->unk10E) >> 4;
     if (Math_Rand((arg0->unk8 & 0x10000) ? 4 : 0x20) == 0) {
@@ -2153,7 +2153,7 @@ void Camera_Shake(s32 arg0);
 
 /* frame 0x50 vs 0x48: damage kept in an extra saved register, arg2 kept live (register allocation); code is equivalent */
 s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
-    PlayerState *p = &D_8007AA08;
+    PlayerState *p = &player_state;
     CharData *cd;
     f32 angle;
     s32 d;
@@ -2209,7 +2209,7 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
         if (arg1 & 4) {
             D_8007AA20.unk60 |= 2;
         }
-        Anim_SetCurrentAndNext(&D_8007AA20, 8, 1, D_8007A910, 1, 1);
+        Anim_SetCurrentAndNext(&D_8007AA20, 8, 1, player_idle_anim, 1, 1);
         if (dmg != 0) {
             Camera_Shake(2);
         }
@@ -2223,14 +2223,14 @@ s32 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
 #pragma GLOBAL_ASM("asm/nonmatchings/3F50/Player_TakeDamage.s")
 #endif
 
-/* these are fields of D_8007AA08; some functions use them by their own names */
+/* these are fields of player_state; some functions use them by their own names */
 extern u16 D_8007AA0C;    /* .unk4 */
 extern PlayerStateSub14 *D_8007AA1C; /* .unk14 */
 extern s16 D_8007AA70;    /* .actor.unk50 */
 extern u16 D_8007AA80;    /* .actor.unk60 */
 
 void Player_StartMissReaction(void) {
-    PlayerState *p = &D_8007AA08;
+    PlayerState *p = &player_state;
     CharData *cd;
 
     if (p->unk0 != 6) {
@@ -2239,7 +2239,7 @@ void Player_StartMissReaction(void) {
             p->unk0 = 3;
             p->unk4 = cd->unk56;
             p->actor.unk60 |= 3;
-            Anim_SetCurrentAndNext(&p->actor, 7, 1, D_8007A910, 1, 1);
+            Anim_SetCurrentAndNext(&p->actor, 7, 1, player_idle_anim, 1, 1);
             Hud_ShowActorPopup(&p->actor);
             Sfx_Play(0, 0x17, 0xFF);
         }
@@ -2343,7 +2343,7 @@ void Player_StartCastSpell(PlayerState *p, Actor *a, AnimEntry *anims) {
         next = 0x16;
     } else {
         anim = 3;
-        next = D_8007A910;
+        next = player_idle_anim;
     }
     t = anims[anim].unk2;
     p->unk0 = 0xE;
@@ -2364,9 +2364,9 @@ void Player_AddTurnMoveAgilityXP(PlayerState *arg0) {
     if (battle_flags & 1) {
         dx = arg0->actor.x - battle_active_enemy_x;
         dz = arg0->actor.z - battle_active_enemy_z;
-        D_8007A988 += sqrtf(dx * dx + dz * dz);
-        while (D_8007A988 > 35.0) {
-            D_8007A988 -= 35.0;
+        player_battle_move_dist += sqrtf(dx * dx + dz * dz);
+        while (player_battle_move_dist > 35.0) {
+            player_battle_move_dist -= 35.0;
             arg0->unk14->unk2C++;
         }
     }
@@ -2374,8 +2374,8 @@ void Player_AddTurnMoveAgilityXP(PlayerState *arg0) {
 
 extern u32 player_level_exp_table[];
 extern u16 player_stat_xp_costs[];
-extern f32 D_8007A9A8;
-extern s32 D_8007A9BC;
+extern f32 player_move_dist;
+extern s32 player_battle_drop_item;
 extern u8 D_8007A9BF;
 extern s16 hud_element_input_timer;
 
@@ -2387,16 +2387,16 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
 
     count = 0;
     if (!(battle_flags & 1)) {
-        if (D_800842E8 & 1) {
-            D_8007A8FC += D_8007A9A8;
-            if (D_8007A8FC > 800.0) {
-                D_8007A8FC -= 800.0;
+        if (map_subarea_flags & 1) {
+            player_agility_dist_enemy_area += player_move_dist;
+            if (player_agility_dist_enemy_area > 800.0) {
+                player_agility_dist_enemy_area -= 800.0;
                 p->unk14->unk2C++;
             }
         } else {
-            D_8007A900 += D_8007A9A8;
-            if (D_8007A900 > 1500.0) {
-                D_8007A900 -= 1500.0;
+            player_agility_dist_npc_area += player_move_dist;
+            if (player_agility_dist_npc_area > 1500.0) {
+                player_agility_dist_npc_area -= 1500.0;
                 p->unk14->unk2C++;
             }
         }
@@ -2489,11 +2489,11 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
     if (count != 0) {
         Sfx_Play(4, 0x35, 0xFF);
     }
-    if (!(core_flags & 0xA) && D_8007A9BC != 0xFF) {
-        Item_BuildMessage(D_8007A9BC);
+    if (!(core_flags & 0xA) && player_battle_drop_item != 0xFF) {
+        Item_BuildMessage(player_battle_drop_item);
         Text_OpenWindow(1);
         Item_AddToInventory(D_8007A9BF);
-        D_8007A9BC = 0xFF;
+        player_battle_drop_item = 0xFF;
         p->unk8 |= 2;
         core_flags |= 2;
         Sfx_Play(0, 0x3B, 0xFF);
@@ -2503,4 +2503,4 @@ void Player_UpdateStatGrowth(PlayerState *p, Actor *a) {
     }
 }
 
-s32 D_8004DCFC[4] = { 0x40, 0x40, 0x39, 0x3C };
+s32 player_melee_damage_scale[4] = { 0x40, 0x40, 0x39, 0x3C };

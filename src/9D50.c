@@ -154,30 +154,30 @@ f32 sqrtf(f32);
 /* This file's .bss, 8007AB70..8007B900, in address order. D_8007AB80,
  * D_8007ABA0 and D_8007ABAC are unreferenced gaps. D_8007AC70 (each NPC's def
  * field, 3F50) and D_8007B7E2 are aliases in undefined_syms.txt. */
-RomRange *D_8007AB70;
-u16 D_8007AB74;
-f32 D_8007AB78[2];
+RomRange *npc_area_set_rom_range;
+u16 npc_walking_count;
+f32 npc_walk_step[2];
 s32 D_8007AB80[2];
-CollOut D_8007AB88;
+CollOut npc_move_coll;
 s32 D_8007ABA0;
-s32 D_8007ABA4;
-s32 D_8007ABA8;
+s32 npc_count;
+s32 npc_drawn_count;
 s32 D_8007ABAC;
-NPCObj *D_8007ABB0[16];
-NPC D_8007ABF0[16];
-u8 D_8007B430[0x4B0];
-u8 D_8007B8E0[0x20];
+NPCObj *npc_drawn_list[16];
+NPC npc_slots[16];
+u8 text_message_buf[0x4B0];
+u8 text_speaker_name[0x20];
 
 extern f32 D_8007AA20;
 extern f32 D_8007AA28;
-extern s32 D_8007C2A4;
-extern Unk8007C2A8 *D_8007C2A8[];
+extern s32 mapobj_billboard_count;
+extern Unk8007C2A8 *mapobj_billboard_list[];
 
 void Shadow_Queue(f32, f32, f32, f32, f32, f32, f32);
 void Anim_DrawModel(s32, NPCObj *, AnimEntry *, s32);
 void Anim_AdvanceFrame(s32, NPCObj *, AnimEntry *);
 extern Gfx *gfx_dl_head;
-extern Unk8007AA08 D_8007AA08;
+extern Unk8007AA08 player_state;
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -193,11 +193,11 @@ u8 Boss_IsDefeated(u32);
 void Npc_LoadMessage(NPC *, s32);
 extern s32 core_flags;
 /* Message text that Npc_StartTalk hands to the text box. */
-u8 D_8004DD10[8] = {
-#include "assets/D_8004DD10.inc.c"
+u8 npc_rest_choice_row0[8] = {
+#include "assets/npc_rest_choice_row0.inc.c"
 };
-u8 D_8004DD18[8] = {
-#include "assets/D_8004DD18.inc.c"
+u8 npc_rest_choice_row1[8] = {
+#include "assets/npc_rest_choice_row1.inc.c"
 };
 extern s32 core_transition_timer;
 extern s32 text_last_choice_index;
@@ -248,22 +248,22 @@ typedef struct {
     /* 0x80 */ NPCDef *def;
 } NPC2; /* size 0x84 */
 void Npc_Move(f32, f32, Unk80009988 *);
-extern Unk8007C284 *D_8007C284;
-extern Unk8007C288 *D_8007C288;
-extern s32 D_800842C0;
-extern u16 D_800842E8;
+extern Unk8007C284 *map_area_def;
+extern Unk8007C288 *map_subarea_def;
+extern s32 map_subarea;
+extern u16 map_subarea_flags;
 
 void Npc_InitArea(void) {
     NPCList *list;
 
-    D_8007ABA4 = 0;
-    if (!(D_800842E8 & 1)) {
-        func_80009764(D_8007C288->unk12);
-        list = D_8007C284->npcs;
+    npc_count = 0;
+    if (!(map_subarea_flags & 1)) {
+        func_80009764(map_subarea_def->unk12);
+        list = map_area_def->npcs;
         if (list != NULL) {
             Npc_SpawnForArea(list->defs, list->count);
         }
-        D_8007AB74 = 0;
+        npc_walking_count = 0;
         if (D_8007A172 == 1) {
             Npc_SetMessage(0, npc_area_entry_message);
             Text_OpenWindow(1);
@@ -278,15 +278,15 @@ void Npc_UpdateAll(void) {
     f32 dx;
     f32 dz;
 
-    i = D_8007ABA4;
-    npc = D_8007ABF0;
+    i = npc_count;
+    npc = npc_slots;
     for (; i != 0; i--, npc++) {
         obj = (NPCObj *)&npc->x;
         switch (npc->state) {
             case 0:
                 if (npc->def->unk4 == 2) {
                     if (--npc->timer == 0) {
-                        if (D_8007AB74 < 3) {
+                        if (npc_walking_count < 3) {
                             npc->state = 1;
                             npc->timer = (Math_Rand(2) + 1) * npc->def->unk10->unkE;
                             Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
@@ -297,7 +297,7 @@ void Npc_UpdateAll(void) {
                             } else {
                                 obj->angle = (f32)Math_Rand(16) * 0.39269908169872414 - 1.5707963267948966;
                             }
-                            D_8007AB74++;
+                            npc_walking_count++;
                         } else {
                             npc->timer = (Math_Rand(2) + 1) * npc->def->unk10->unk2;
                         }
@@ -305,15 +305,15 @@ void Npc_UpdateAll(void) {
                 }
                 break;
             case 1:
-                D_8007AB78[0] = 0.0f;
-                D_8007AB78[1] = 0.4f;
-                Math_RotateVec2(obj->angle, D_8007AB78);
-                Npc_Move(D_8007AB78[0], D_8007AB78[1], (Unk80009988 *)obj);
+                npc_walk_step[0] = 0.0f;
+                npc_walk_step[1] = 0.4f;
+                Math_RotateVec2(obj->angle, npc_walk_step);
+                Npc_Move(npc_walk_step[0], npc_walk_step[1], (Unk80009988 *)obj);
                 if (--npc->timer == 0) {
                     npc->state = 0;
                     npc->timer = npc->def->unk10->unk2;
                     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
-                    D_8007AB74--;
+                    npc_walking_count--;
                 }
                 break;
             case 2:
@@ -350,14 +350,14 @@ void Npc_DrawAll(s32 arg0) {
     s32 filter;
     AnimEntry *anims;
 
-    D_8007ABA8 = 0;
-    i = D_8007ABA4;
-    npc = D_8007ABF0;
-    list = D_8007ABB0;
+    npc_drawn_count = 0;
+    i = npc_count;
+    npc = npc_slots;
+    list = npc_drawn_list;
     for (; i != 0; i--, npc++) {
-        dx = npc->x - D_8007AA08.x;
+        dx = npc->x - player_state.x;
         obj = (NPCObj *)&npc->x;
-        dz = npc->z - D_8007AA08.z;
+        dz = npc->z - player_state.z;
         dist = dx * dx + dz * dz;
         if (dist < 90000.0f) {
             filter = (dist < 20000.0f) ? G_TF_BILERP : G_TF_POINT;
@@ -367,7 +367,7 @@ void Npc_DrawAll(s32 arg0) {
             Anim_AdvanceFrame(obj->unk58, obj, &anims[obj->unk52]);
             Shadow_Queue(obj->x, obj->y, obj->z, obj->rx, obj->ry, obj->rz, 5.0f);
             *list++ = obj;
-            D_8007ABA8++;
+            npc_drawn_count++;
         }
     }
 }
@@ -376,20 +376,20 @@ void func_80009764(s32 arg0) {
     u32 start;
     u32 end;
 
-    D_8007AB70 = &npc_area_set_rom_ranges[arg0];
+    npc_area_set_rom_range = &npc_area_set_rom_ranges[arg0];
     Dma_ReadRom(D_86F6F0, func_8020C0D0, D_871D10 - D_86F6F0);
     Dma_ReadRom(D_A70350, D_802A0000, D_A77F10 - D_A70350);
-    start = D_8007AB70->start;
-    end = D_8007AB70->end;
+    start = npc_area_set_rom_range->start;
+    end = npc_area_set_rom_range->end;
     Dma_ReadRom(start, D_8020E6F0, end - start);
 }
 
 void Npc_SpawnForArea(NPCDef *def, s32 n) {
-    NPC *npc = D_8007ABF0;
+    NPC *npc = npc_slots;
     CollResult out;
 
     for (; n != 0; n--, def++) {
-        if (D_800842C0 == def->area) {
+        if (map_subarea == def->area) {
             npc->state = 0;
             npc->timer = 1;
             npc->def = def;
@@ -415,7 +415,7 @@ void Npc_SpawnForArea(NPCDef *def, s32 n) {
                 npc->unk74 = 0;
             }
             npc++;
-            D_8007ABA4++;
+            npc_count++;
         }
     }
 }
@@ -426,14 +426,14 @@ void Npc_Move(f32 dx, f32 dz, Unk80009988 *obj) {
     obj->unk20 = dz;
     obj->x += dx;
     obj->z += dz;
-    D_8007AB88.x = 4.0f;
-    Coll_ResolveFloorAndWalls(obj->x, obj->y, obj->z, 0xA01, &D_8007AB88);
-    obj->x = D_8007AB88.x;
-    obj->y = D_8007AB88.y;
-    obj->z = D_8007AB88.z;
-    obj->nx = D_8007AB88.nx;
-    obj->ny = D_8007AB88.ny;
-    obj->nz = D_8007AB88.nz;
+    npc_move_coll.x = 4.0f;
+    Coll_ResolveFloorAndWalls(obj->x, obj->y, obj->z, 0xA01, &npc_move_coll);
+    obj->x = npc_move_coll.x;
+    obj->y = npc_move_coll.y;
+    obj->z = npc_move_coll.z;
+    obj->nx = npc_move_coll.nx;
+    obj->ny = npc_move_coll.ny;
+    obj->nz = npc_move_coll.nz;
 }
 
 void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Unk80009988 *obj) {
@@ -455,9 +455,9 @@ void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Unk80009988 *obj) {
     nz = *dz + obj->z;
     radius = obj->unk28 * obj->unk24;
     hit = 0;
-    ddx = nx - D_8007AA08.x;
-    ddz = nz - D_8007AA08.z;
-    r = D_8007AA08.unk40 * D_8007AA08.unk3C + radius;
+    ddx = nx - player_state.x;
+    ddz = nz - player_state.z;
+    r = player_state.unk40 * player_state.unk3C + radius;
     if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
         d = sqrtf(ddx * ddx + ddz * ddz);
         if (d < r) {
@@ -469,9 +469,9 @@ void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Unk80009988 *obj) {
             *dz = D_8007AA28 + ddz - obj->z;
         }
     }
-    i = D_8007ABA8;
+    i = npc_drawn_count;
     if (i != 0) {
-        for (list = D_8007ABB0; !hit && i != 0; i--) {
+        for (list = npc_drawn_list; !hit && i != 0; i--) {
             other = *list++;
             if ((void *)other != (void *)obj) {
                 ddx = nx - other->x;
@@ -491,9 +491,9 @@ void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Unk80009988 *obj) {
             }
         }
     }
-    i = D_8007C2A4;
+    i = mapobj_billboard_count;
     if (i != 0) {
-        for (list2 = D_8007C2A8; !hit && i != 0; i--) {
+        for (list2 = mapobj_billboard_list; !hit && i != 0; i--) {
             other2 = *list2++;
             ddx = nx - other2->x;
             ddz = nz - other2->z;
@@ -516,7 +516,7 @@ void Npc_PushOutOfObjects(f32 *dx, f32 *dz, Unk80009988 *obj) {
 void Npc_StartTalk(s32 idx) {
     s32 pad;
     s32 found;
-    NPC *npc = &D_8007ABF0[idx];
+    NPC *npc = &npc_slots[idx];
     f32 angle;
     f32 dx;
     f32 dz;
@@ -527,8 +527,8 @@ void Npc_StartTalk(s32 idx) {
         npc->timer = 0;
     } else {
         npc->timer = 15;
-        dx = D_8007AA08.x - npc->x;
-        dz = D_8007AA08.z - npc->z;
+        dx = player_state.x - npc->x;
+        dz = player_state.z - npc->z;
         angle = Math_Atan2(dx, dz) - npc->angle;
         if (angle < -3.141592653589793) {
             angle += 6.283185307179586;
@@ -552,7 +552,7 @@ void Npc_StartTalk(s32 idx) {
             Npc_LoadMessage(npc, msg);
             if (found == 0) {
                 Item_AddToInventory(npc->def->u6.b.unk7);
-                D_8007AA08.unk8 |= 0x40;
+                player_state.unk8 |= 0x40;
             }
             break;
         case 5:
@@ -570,8 +570,8 @@ void Npc_StartTalk(s32 idx) {
         case 6:
             Npc_LoadMessage(npc, npc->def->unk8);
             text_pending_choice_rows.unk0 = 2;
-            text_pending_choice_rows.unk8 = D_8004DD10;
-            text_pending_choice_rows.unkC = D_8004DD18;
+            text_pending_choice_rows.unk8 = npc_rest_choice_row0;
+            text_pending_choice_rows.unkC = npc_rest_choice_row1;
             text_last_choice_index = -1;
             core_flags |= 0x10;
             break;
@@ -582,7 +582,7 @@ void Npc_StartTalk(s32 idx) {
 }
 
 void Npc_EndTalk(s32 idx) {
-    NPC *npc = &D_8007ABF0[idx];
+    NPC *npc = &npc_slots[idx];
 
     if (npc->def->unk4 == 2) {
         npc->state = 0;
@@ -600,13 +600,13 @@ void Npc_EndTalk(s32 idx) {
 void Npc_LoadMessage(NPC *npc, s32 arg1) {
     s32 i;
 
-    Dma_ReadRom(arg1 + (u32)D_D2E2F0, D_8007B430, 0x4B0);
+    Dma_ReadRom(arg1 + (u32)D_D2E2F0, text_message_buf, 0x4B0);
     if (npc->def->name != NULL) {
         for (i = 0; i != 0x20; i++) {
-            D_8007B8E0[i] = npc->def->name[i];
+            text_speaker_name[i] = npc->def->name[i];
         }
     } else {
-        D_8007B8E0[0] = 0xFF;
+        text_speaker_name[0] = 0xFF;
     }
 }
 
@@ -615,16 +615,16 @@ void Npc_SetMessage(s32 arg0, u8 *arg1) {
     u8 *dst;
     NPC *npc;
 
-    dst = D_8007B430;
+    dst = text_message_buf;
     for (i = 0x4B0; i != 0; i--) {
         *dst++ = *arg1++;
     }
-    npc = &D_8007ABF0[arg0];
+    npc = &npc_slots[arg0];
     if (npc->def->name != NULL) {
         for (i = 0; i != 0x20; i++) {
-            D_8007B8E0[i] = npc->def->name[i];
+            text_speaker_name[i] = npc->def->name[i];
         }
     } else {
-        D_8007B8E0[0] = 0xFF;
+        text_speaker_name[0] = 0xFF;
     }
 }

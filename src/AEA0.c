@@ -1,7 +1,7 @@
 #include "common.h"
 
 /*
- * Battle enemies (6 slots, D_8007B908): load the area's enemy set, spawn, per-frame
+ * Battle enemies (6 slots, enemy_slots): load the area's enemy set, spawn, per-frame
  * state machine (idle, approach, hurt/death, attack, spell), turn order, movement and
  * collision inside the battle circle, hit/damage rolls both ways, boss attack scripts.
  * Folder: src/game/enemy/   (proposed for round 4)
@@ -148,26 +148,26 @@ typedef struct {
 
 /* This file's .bss, 8007B900..8007C0B0, in address order. D_8007B904 and
  * D_8007C09C/D_8007C0A0 are unreferenced gaps. Splat's labels inside the enemy
- * table (D_8007B918..D_8007BB5C, fields of D_8007B908[0] and [1]) and D_8007C074
- * (D_8007C070.y) are aliases in undefined_syms.txt. Enemy_StartAttackScript treats
- * D_8007C060..D_8007C06C as one Unk8007C060; they are kept as the scalars the
+ * table (D_8007B918..D_8007BB5C, fields of enemy_slots[0] and [1]) and D_8007C074
+ * (enemy_temp_vec.y) are aliases in undefined_syms.txt. Enemy_StartAttackScript treats
+ * enemy_script_time..enemy_script_obj as one Unk8007C060; they are kept as the scalars the
  * other functions use. */
-s32 D_8007B900;
+s32 enemy_count;
 s32 D_8007B904;
-Enemy D_8007B908[6];
-Enemy *D_8007C028;
-s32 D_8007C02C;
-Obj *D_8007C030[6];
-u8 **D_8007C048;
-s32 D_8007C04C;
-u16 D_8007C050[6];
-Unk800561A0 *D_8007C05C;
-u16 D_8007C060;
-SpawnScript *D_8007C064;
-Enemy *D_8007C068;
-Obj *D_8007C06C;
-Vec3f D_8007C070;
-CollResult D_8007C080;
+Enemy enemy_slots[6];
+Enemy *enemy_turn_current;
+s32 enemy_drawn_count;
+Obj *enemy_drawn_list[6];
+u8 **enemy_anim_tables;
+s32 enemy_names;
+u16 enemy_turn_order[6];
+Unk800561A0 *enemy_area_set;
+u16 enemy_script_time;
+SpawnScript *enemy_script_cmd;
+Enemy *enemy_script_enemy;
+Obj *enemy_script_obj;
+Vec3f enemy_temp_vec;
+CollResult enemy_coll;
 s32 D_8007C09C;
 s32 D_8007C0A0[4];
 
@@ -210,8 +210,8 @@ typedef struct {
     /* 0x10 */ f32 unk10;
 } Unk8007C2A8;
 
-extern s32 D_8007C2A4;
-extern Unk8007C2A8 *D_8007C2A8[];
+extern s32 mapobj_billboard_count;
+extern Unk8007C2A8 *mapobj_billboard_list[];
 
 typedef struct Unk8007AA84 {
     /* 0x00 */ u8 pad0[0x18];
@@ -276,9 +276,9 @@ u32 Math_Rand(u32);
 void Math_RotateVec2(f32, Vec3f *);
 void Dma_ReadRom();
 void Sfx_Play(u8, s8, u8);
-extern s32 D_8004DD38[];
+extern s32 enemy_element_bits[];
 
-extern void (*D_8004DD20[])(Obj *, Enemy *, u8 *);
+extern void (*enemy_state_handlers[])(Obj *, Enemy *, u8 *);
 extern u8 fade_damage_flash[];
 extern Unk800561A0 enemy_area_sets[];
 extern u32 enemy_attack_scripts[];
@@ -329,12 +329,12 @@ void Effect_AddFloatingNumber(Obj *, s32, s32);
 void Hud_StartActorStatusIndicator(Obj *, u16, u16, s16);
 void Player_StartMissReaction(void);
 extern f32 D_8007C074;
-extern s32 D_8007A9B4;
+extern s32 player_battle_exp;
 extern s32 D_8007A9B8;
-extern Unk8007AA08 D_8007AA08;
+extern Unk8007AA08 player_state;
 extern EnemyStats *D_8007AA88;
-extern Unk8007C288 *D_8007C288;
-extern u16 D_800842E8;
+extern Unk8007C288 *map_subarea_def;
+extern u16 map_subarea_flags;
 extern u16 battle_flags;
 extern u16 battle_turn_order_index;
 extern Unk800C18D8 D_800C18D8[];
@@ -344,16 +344,16 @@ void Enemy_InitForArea(void) {
     s32 i;
     Enemy *e;
 
-    D_8007B900 = 0;
-    D_8007C02C = 0;
-    e = D_8007B908;
+    enemy_count = 0;
+    enemy_drawn_count = 0;
+    e = enemy_slots;
     i = 6;
     do {
         e->obj.unk50 = -1;
         e++;
         i--;
     } while (i != 0);
-    if (D_800842E8 & 1) {
+    if (map_subarea_flags & 1) {
         Enemy_LoadAreaSet();
     }
 }
@@ -363,12 +363,12 @@ void Enemy_UpdateAll(void) {
     Enemy *e;
     Obj *obj;
 
-    n = D_8007B900;
+    n = enemy_count;
     if (n != 0) {
-        for (e = D_8007B908; n != 0; e++) {
+        for (e = enemy_slots; n != 0; e++) {
             obj = &e->obj;
             if (e->obj.unk50 != -1) {
-                D_8004DD20[e->type](obj, e, D_8007C048[obj->unk50]);
+                enemy_state_handlers[e->type](obj, e, enemy_anim_tables[obj->unk50]);
                 n--;
             }
         }
@@ -387,20 +387,20 @@ void Enemy_DrawAll(s32 arg0) {
     f32 y;
     f32 h;
 
-    D_8007C02C = 0;
-    list = D_8007C030;
+    enemy_drawn_count = 0;
+    list = enemy_drawn_list;
     gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
-    n = D_8007B900;
-    e = D_8007B908;
+    n = enemy_count;
+    e = enemy_slots;
     while (n != 0) {
         obj = &e->obj;
         if (e->obj.unk50 != -1) {
             y = obj->y;
-            anims = D_8007C048[obj->unk50];
+            anims = enemy_anim_tables[obj->unk50];
             if (obj->unk64->unk0 == 1) {
                 h = obj->unk64->unk1C * obj->unk24;
-                if (y < D_8007AA08.y) {
-                    obj->y = D_8007AA08.y;
+                if (y < player_state.y) {
+                    obj->y = player_state.y;
                 }
                 obj->y += h;
                 obj->unk68->unk94 = obj->y;
@@ -413,7 +413,7 @@ void Enemy_DrawAll(s32 arg0) {
             }
             *list++ = obj;
             n--;
-            D_8007C02C++;
+            enemy_drawn_count++;
         }
         e++;
     }
@@ -423,12 +423,12 @@ void Enemy_LoadAreaSet(void) {
     u32 start;
     u32 end;
 
-    D_8007C05C = &enemy_area_sets[D_8007C288->unk12];
-    D_8007C048 = D_8007C05C->unk8;
-    D_8007C04C = D_8007C05C->unk10;
-    start = D_8007C05C->start;
-    end = D_8007C05C->end;
-    Dma_ReadRom(start, D_8020E6F0, end - start, &D_8007C05C);
+    enemy_area_set = &enemy_area_sets[map_subarea_def->unk12];
+    enemy_anim_tables = enemy_area_set->unk8;
+    enemy_names = enemy_area_set->unk10;
+    start = enemy_area_set->start;
+    end = enemy_area_set->end;
+    Dma_ReadRom(start, D_8020E6F0, end - start, &enemy_area_set);
 }
 
 void Enemy_RemoveAll(void) {
@@ -436,21 +436,21 @@ void Enemy_RemoveAll(void) {
     s32 i;
     Obj *obj;
 
-    for (e = D_8007B908, i = 6; i != 0; i--, e++) {
+    for (e = enemy_slots, i = 6; i != 0; i--, e++) {
         obj = &e->obj;
         if (e->obj.unk50 != -1) {
             Hud_ClearActorStatusIndicators(obj);
             obj->unk50 = -1;
         }
     }
-    D_8007B900 = 0;
+    enemy_count = 0;
 }
 
 void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Obj *obj, Enemy *e) {
     s32 pad;
     EnemyDef *def;
 
-    def = &D_8007C05C->unkC[idx];
+    def = &enemy_area_set->unkC[idx];
     obj->unk50 = def->unk2;
     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
     obj->unk54 = Math_Rand(16);
@@ -465,26 +465,26 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Obj *obj, Enemy *e) {
     e->flags = 0;
     e->unk10 = (f32)def->unkC * 0.2857 + 17.0;
     e->unk20 = e->unk24 = 0;
-    D_8007C080.x = obj->unk64->unk18 * obj->unk64->unk20;
-    Coll_ResolveFloorAndWalls(x, 0.0f, z, 0xA01, &D_8007C080);
-    if (D_8007C080.flags & 0x8000) {
+    enemy_coll.x = obj->unk64->unk18 * obj->unk64->unk20;
+    Coll_ResolveFloorAndWalls(x, 0.0f, z, 0xA01, &enemy_coll);
+    if (enemy_coll.flags & 0x8000) {
         if (obj->unk64->unk0 == 0) {
-            Coll_ResolveFloorAndWalls(x + 0.5, 0.0f, z + 0.5, 0xA01, &D_8007C080);
-            if (D_8007C080.flags & 0x8000) {
-                D_8007C080.y = D_8007AA08.y;
+            Coll_ResolveFloorAndWalls(x + 0.5, 0.0f, z + 0.5, 0xA01, &enemy_coll);
+            if (enemy_coll.flags & 0x8000) {
+                enemy_coll.y = player_state.y;
             }
         } else {
-            D_8007C080.y = D_8007AA08.y;
+            enemy_coll.y = player_state.y;
         }
     }
-    obj->x = D_8007C080.x;
-    obj->y = D_8007C080.y;
-    obj->z = D_8007C080.z;
+    obj->x = enemy_coll.x;
+    obj->y = enemy_coll.y;
+    obj->z = enemy_coll.z;
     obj->angle = angle;
-    obj->unk2C = D_8007C080.nx;
-    obj->unk30 = D_8007C080.ny;
-    obj->unk34 = D_8007C080.nz;
-    obj->unk62 = D_8007C080.flags;
+    obj->unk2C = enemy_coll.nx;
+    obj->unk30 = enemy_coll.ny;
+    obj->unk34 = enemy_coll.nz;
+    obj->unk62 = enemy_coll.flags;
     obj->unk5E = 1;
     obj->unk60 = 0;
     e->unk98 = 0;
@@ -503,37 +503,37 @@ void Enemy_SortTurnOrder(void) {
     u16 tmp;
     u16 keys[6];
 
-    for (i = 0; i < D_8007B900; i++) {
-        D_8007C050[i] = i;
-        keys[i] = D_8007B908[i].unk28->unkC;
+    for (i = 0; i < enemy_count; i++) {
+        enemy_turn_order[i] = i;
+        keys[i] = enemy_slots[i].unk28->unkC;
     }
     do {
         swapped = 0;
-        for (i = 0; i < D_8007B900 - 1; i++) {
+        for (i = 0; i < enemy_count - 1; i++) {
             if (keys[i] < keys[i + 1]) {
                 tmp = keys[i];
                 keys[i] = keys[i + 1];
                 keys[i + 1] = tmp;
                 swapped++;
-                tmp = D_8007C050[i];
-                D_8007C050[i] = D_8007C050[i + 1];
-                D_8007C050[i + 1] = tmp;
+                tmp = enemy_turn_order[i];
+                enemy_turn_order[i] = enemy_turn_order[i + 1];
+                enemy_turn_order[i + 1] = tmp;
             }
         }
     } while (swapped);
 }
 
 void Enemy_StartTurn(void) {
-    D_8007B908[D_8007C050[battle_turn_order_index]].flags |= 1;
+    enemy_slots[enemy_turn_order[battle_turn_order_index]].flags |= 1;
 }
 
 void Enemy_StateIdle(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
     Unk8000BA20 *v;
 
-    Enemy_GetAnimStep(obj, &D_8007C070);
-    Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+    Enemy_GetAnimStep(obj, &enemy_temp_vec);
+    Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
     if (e->flags & 1) {
-        D_8007C028 = e;
+        enemy_turn_current = e;
         hud_battle_message_timer = 60;
         e->flags &= 0xFFFC;
         if (e->unk98 & 8) {
@@ -575,22 +575,22 @@ void Enemy_StateApproach(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
     f32 dz;
     f32 d;
 
-    Enemy_TurnToward(obj, D_8007AA08.x, D_8007AA08.z);
+    Enemy_TurnToward(obj, player_state.x, player_state.z);
     if (battle_flags & 0x100) {
-        D_8007C070.x = 0.0f;
-        D_8007C070.y = 0.4f;
-        Math_RotateVec2(obj->angle, &D_8007C070);
+        enemy_temp_vec.x = 0.0f;
+        enemy_temp_vec.y = 0.4f;
+        Math_RotateVec2(obj->angle, &enemy_temp_vec);
     } else {
-        Enemy_GetAnimStep(obj, &D_8007C070);
+        Enemy_GetAnimStep(obj, &enemy_temp_vec);
     }
-    Enemy_Move(1, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+    Enemy_Move(1, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
     e->unk2--;
     if (e->unk2 == 0) {
         e->unk4--;
         if (e->unk1C != NULL) {
-            dx = D_8007AA08.x - obj->x;
-            dz = D_8007AA08.z - obj->z;
-            d = sqrtf(dx * dx + dz * dz) - D_8007AA84->unk18 * D_8007AA08.unk3C;
+            dx = player_state.x - obj->x;
+            dz = player_state.z - obj->z;
+            d = sqrtf(dx * dx + dz * dz) - D_8007AA84->unk18 * player_state.unk3C;
             if (d < e->unk1C->unk10 * obj->unk24) {
                 Enemy_StartAttack(e, obj, e->unk1C);
                 return;
@@ -626,8 +626,8 @@ void Enemy_StateApproach(Obj *obj, Enemy *e, Unk8000AA74 *arg2) {
 }
 
 void Enemy_StateHurt(Obj *obj, EnemyAI *ai, s32 arg2) {
-    Enemy_GetAnimStep(obj, &D_8007C070);
-    Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, ai);
+    Enemy_GetAnimStep(obj, &enemy_temp_vec);
+    Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, ai);
     ai->unk2--;
     if (ai->unk2 == 0) {
         if (ai->unkA == 0) {
@@ -635,8 +635,8 @@ void Enemy_StateHurt(Obj *obj, EnemyAI *ai, s32 arg2) {
             Enemy_SpawnDeathEffects(obj);
             obj->unk50 = -1;
             obj->unk60 &= 0xFFFE;
-            D_8007B900--;
-            D_8007A9B4 += obj->unk64->unk10;
+            enemy_count--;
+            player_battle_exp += obj->unk64->unk10;
             D_8007A9B8 += obj->unk64->unk14;
             Sfx_Play(0, 10, 0xFF);
         } else {
@@ -647,9 +647,9 @@ void Enemy_StateHurt(Obj *obj, EnemyAI *ai, s32 arg2) {
 }
 
 void Enemy_StateFacePlayer(Obj *obj, EnemyAI *ai, s32 arg2) {
-    Enemy_TurnToward(obj, D_8007AA08.x, D_8007AA08.z);
-    Enemy_GetAnimStep(obj, &D_8007C070);
-    Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, ai);
+    Enemy_TurnToward(obj, player_state.x, player_state.z);
+    Enemy_GetAnimStep(obj, &enemy_temp_vec);
+    Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, ai);
     ai->unk2--;
     if (ai->unk2 == 0) {
         ai->unk0 = 0;
@@ -671,8 +671,8 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
         case 0:
             attr = e->unk1C->unk2;
             if (attr & 2) {
-                Enemy_GetAnimStep(obj, &D_8007C070);
-                Enemy_Move(0, D_8007C070.x, D_8007C074, obj, (EnemyAI *)e);
+                Enemy_GetAnimStep(obj, &enemy_temp_vec);
+                Enemy_Move(0, enemy_temp_vec.x, D_8007C074, obj, (EnemyAI *)e);
             }
             e->unk2--;
             if (e->unk2 == 0) {
@@ -683,13 +683,13 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
         case 1:
             attr = e->unk1C->unk2;
             if (attr & 0xA) {
-                Enemy_GetAnimStep(obj, &D_8007C070);
-                Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+                Enemy_GetAnimStep(obj, &enemy_temp_vec);
+                Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
             }
-            if (!(D_8007AA08.unk78 & 2) && !(e->flags & 8)) {
-                dx = D_8007AA08.x - obj->x;
-                dz = D_8007AA08.z - obj->z;
-                d = sqrtf(dx * dx + dz * dz) - D_8007AA08.unk3C * D_8007AA08.unk14->unk18;
+            if (!(player_state.unk78 & 2) && !(e->flags & 8)) {
+                dx = player_state.x - obj->x;
+                dz = player_state.z - obj->z;
+                d = sqrtf(dx * dx + dz * dz) - player_state.unk3C * player_state.unk14->unk18;
                 if (d < e->unk1C->unk14 * obj->unk24) {
                     if (Enemy_RollHitOnPlayer(obj) != 0) {
                         n = Enemy_CalcAttackDamage(e);
@@ -698,10 +698,10 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
                             atk = 0xC004;
                         }
                         n = Player_TakeDamage(n, atk, obj);
-                        D_8007C070.x = 0.0f;
-                        D_8007C070.y = 2.0f * (obj->unk64->unk18 * obj->unk24);
-                        Math_RotateVec2(obj->angle, &D_8007C070);
-                        Effect_SpawnStreakBurst(obj->x + D_8007C070.x, obj->y + obj->unk64->unk1C * obj->unk24 * 0.7f, obj->z + D_8007C070.y);
+                        enemy_temp_vec.x = 0.0f;
+                        enemy_temp_vec.y = 2.0f * (obj->unk64->unk18 * obj->unk24);
+                        Math_RotateVec2(obj->angle, &enemy_temp_vec);
+                        Effect_SpawnStreakBurst(obj->x + enemy_temp_vec.x, obj->y + obj->unk64->unk1C * obj->unk24 * 0.7f, obj->z + enemy_temp_vec.y);
                         if (e->unk98 & 2) {
                             n = ((n + 3) >> 2) + 1;
                             e->unkA += n;
@@ -713,7 +713,7 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
                         }
                     } else {
                         Player_StartMissReaction();
-                        D_8007AA08.unk14->unk2C++;
+                        player_state.unk14->unk2C++;
                     }
                     e->flags |= 8;
                 }
@@ -727,7 +727,7 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
                 } else {
                     e->unk2 = anims[a->unkC].unk2;
                     Anim_SetCurrentAndNext(obj, a->unkC, 1, 0, 1, 1);
-                    Enemy_GetAnimStep(obj, &D_8007C070);
+                    Enemy_GetAnimStep(obj, &enemy_temp_vec);
                 }
                 if (e->unk2 <= 0) {
                     e->unk2 = 1;
@@ -736,8 +736,8 @@ void Enemy_StateMeleeAttack(Obj *obj, Enemy *e, AnimDef *anims) {
             }
             break;
         case 2:
-            Enemy_GetAnimStep(obj, &D_8007C070);
-            Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+            Enemy_GetAnimStep(obj, &enemy_temp_vec);
+            Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
             e->unk2--;
             if (e->unk2 == 0) {
                 e->type = 0;
@@ -753,8 +753,8 @@ void Enemy_StateCastSpell(Obj *obj, Enemy *e, AnimDef *anims) {
     switch (e->unk6) {
         case 0:
             if (e->unk1C->unk2 & 2) {
-                Enemy_GetAnimStep(obj, &D_8007C070);
-                Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+                Enemy_GetAnimStep(obj, &enemy_temp_vec);
+                Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
             }
             e->unk2--;
             if (e->unk2 == 0) {
@@ -775,8 +775,8 @@ void Enemy_StateCastSpell(Obj *obj, Enemy *e, AnimDef *anims) {
             break;
         case 1:
             if (e->unk1C->unk2 & 0xA) {
-                Enemy_GetAnimStep(obj, &D_8007C070);
-                Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+                Enemy_GetAnimStep(obj, &enemy_temp_vec);
+                Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
             }
             e->unk2--;
             if (e->unk2 == 0) {
@@ -787,8 +787,8 @@ void Enemy_StateCastSpell(Obj *obj, Enemy *e, AnimDef *anims) {
             break;
         case 2:
             if (e->unk1C->unk2 & 0xA) {
-                Enemy_GetAnimStep(obj, &D_8007C070);
-                Enemy_Move(0, D_8007C070.x, D_8007C070.y, obj, (EnemyAI *)e);
+                Enemy_GetAnimStep(obj, &enemy_temp_vec);
+                Enemy_Move(0, enemy_temp_vec.x, enemy_temp_vec.y, obj, (EnemyAI *)e);
             }
             e->unk2--;
             if (e->unk2 == 0) {
@@ -819,7 +819,7 @@ Unk8000BA20 *Enemy_ChooseAttack(Enemy *e, Obj *obj) {
     Unk8000BA20 *a;
 
     e->flags &= ~0x10;
-    dist = sqrtf((D_8007AA08.x - obj->x) * (D_8007AA08.x - obj->x) + (D_8007AA08.z - obj->z) * (D_8007AA08.z - obj->z)) - D_8007AA84->unk18 * D_8007AA08.unk3C;
+    dist = sqrtf((player_state.x - obj->x) * (player_state.x - obj->x) + (player_state.z - obj->z) * (player_state.z - obj->z)) - D_8007AA84->unk18 * player_state.unk3C;
     sel = e->unk28->unk30;
     for (i = 0; i < e->unk28->unk2C; i++) {
         list[i] = sel++;
@@ -901,7 +901,7 @@ void Enemy_StartAttack(Enemy *e, Obj *obj, Unk8000BA20 *arg2) {
     e->unk2 = arg2->unk4;
     e->flags &= 0xFFD7;
     obj->unk60 = 1;
-    obj->angle = Math_Atan2(D_8007AA08.x - obj->x, D_8007AA08.z - obj->z);
+    obj->angle = Math_Atan2(player_state.x - obj->x, player_state.z - obj->z);
     Anim_SetCurrentAndNext(obj, arg2->unk8, 1, arg2->unkA == -1 ? 0 : arg2->unkA, 1, 1);
     Camera_StartBattleFocus(arg2->unk4 + 0xF, obj);
     if (e->unk2 == 0) {
@@ -972,24 +972,24 @@ void Enemy_Move(s32 clamp, f32 dx, f32 dz, Obj *obj, EnemyAI *ai) {
     if (obj->unk64->unk0 == 0 && e->type != 0) {
         flags = 0xA01;
     }
-    D_8007C080.x = obj->unk64->unk18 * obj->unk64->unk20;
-    Coll_ResolveFloorAndWalls(obj->x, obj->y, obj->z, flags, &D_8007C080);
-    obj->x = D_8007C080.x;
-    obj->y = D_8007C080.y;
-    obj->z = D_8007C080.z;
+    enemy_coll.x = obj->unk64->unk18 * obj->unk64->unk20;
+    Coll_ResolveFloorAndWalls(obj->x, obj->y, obj->z, flags, &enemy_coll);
+    obj->x = enemy_coll.x;
+    obj->y = enemy_coll.y;
+    obj->z = enemy_coll.z;
     if (e->flags & 4) {
         obj->y -= 30.0;
     }
-    obj->unk2C = D_8007C080.nx;
-    obj->unk30 = D_8007C080.ny;
-    obj->unk34 = D_8007C080.nz;
-    obj->unk62 = D_8007C080.flags;
+    obj->unk2C = enemy_coll.nx;
+    obj->unk30 = enemy_coll.ny;
+    obj->unk34 = enemy_coll.nz;
+    obj->unk62 = enemy_coll.flags;
 }
 
 void Enemy_GetAnimStep(Obj *obj, Vec3f *out) {
     u8 *anims;
 
-    anims = D_8007C048[obj->unk50];
+    anims = enemy_anim_tables[obj->unk50];
     Anim_UpdateRootMotion(obj, anims + obj->unk52 * 0xC, obj->unk24, out);
     out->x = -obj->unk44;
     out->y = obj->unk4C;
@@ -1015,9 +1015,9 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Obj *obj) {
     nz = *dz + obj->z;
     radius = obj->unk28 * obj->unk24;
     hit = 0;
-    ddx = nx - D_8007AA08.x;
-    ddz = nz - D_8007AA08.z;
-    r = D_8007AA08.unk40 * D_8007AA08.unk3C + radius;
+    ddx = nx - player_state.x;
+    ddz = nz - player_state.z;
+    r = player_state.unk40 * player_state.unk3C + radius;
     if (ddx < r && -r < ddx && ddz < r && -r < ddz) {
         d = sqrtf(ddx * ddx + ddz * ddz);
         if (d < r) {
@@ -1029,9 +1029,9 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Obj *obj) {
             *dz = D_8007AA28 + ddz - obj->z;
         }
     }
-    i = D_8007C02C;
+    i = enemy_drawn_count;
     if (i != 0) {
-        for (list = D_8007C030; !hit && i != 0; i--) {
+        for (list = enemy_drawn_list; !hit && i != 0; i--) {
             other = *list++;
             if (other != obj) {
                 ddx = nx - other->x;
@@ -1051,9 +1051,9 @@ void Enemy_ResolveCollisions(f32 *dx, f32 *dz, Obj *obj) {
             }
         }
     }
-    i = D_8007C2A4;
+    i = mapobj_billboard_count;
     if (i != 0) {
-        for (list2 = D_8007C2A8; !hit && i != 0; i--) {
+        for (list2 = mapobj_billboard_list; !hit && i != 0; i--) {
             other2 = *list2++;
             ddx = nx - other2->x;
             ddz = nz - other2->z;
@@ -1103,12 +1103,12 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
     u8 *anims;
     Enemy *enemies;
 
-    obj = &D_8007B908[idx].obj;
-    anims = D_8007C048[D_8007B908[idx].obj.unk50];
-    if (D_8007B908[idx].unkA) {
+    obj = &enemy_slots[idx].obj;
+    anims = enemy_anim_tables[enemy_slots[idx].obj.unk50];
+    if (enemy_slots[idx].unkA) {
         if (dmg) {
             if (!(flags & 0x8000)) {
-                switch (D_8004DD38[D_8007B908[idx].unk28->unk26] | D_8004DD38[elem]) {
+                switch (enemy_element_bits[enemy_slots[idx].unk28->unk26] | enemy_element_bits[elem]) {
                     case 1:
                     case 2:
                     case 4:
@@ -1135,39 +1135,39 @@ u16 Enemy_TakeDamage(s32 idx, u16 dmg, u16 elem, u16 flags, Obj *src) {
                 }
             }
             a = src->unk68->unk84;
-            a /= (f32)(src->unk68->unk84 + D_8007B908[idx].unk120);
+            a /= (f32)(src->unk68->unk84 + enemy_slots[idx].unk120);
             dmg = dmg * a;
             q = sqrtf(dmg);
             dmg += Math_Rand(q * 0.75 + 1.0);
             if (!dmg) {
                 dmg++;
             }
-            if (D_8007B908[idx].unkA < dmg) {
-                D_8007B908[idx].unkA = 0;
+            if (enemy_slots[idx].unkA < dmg) {
+                enemy_slots[idx].unkA = 0;
             } else {
-                D_8007B908[idx].unkA -= dmg;
+                enemy_slots[idx].unkA -= dmg;
             }
-            if (D_8007B908[idx].unk98 & 0x200) {
-                D_8007B908[idx].unkC += dmg;
-                enemies = D_8007B908;
+            if (enemy_slots[idx].unk98 & 0x200) {
+                enemy_slots[idx].unkC += dmg;
+                enemies = enemy_slots;
                 if (obj->unk64->unkA < enemies[idx].unkC) {
-                    D_8007B908[idx].unkC = obj->unk64->unkA;
+                    enemy_slots[idx].unkC = obj->unk64->unkA;
                 }
                 Hud_StartActorStatusIndicator(obj, 0x200, 2, 30);
             }
             Effect_AddFloatingNumber(obj, (flags & 0x4000) ? 0x8003 : 0, dmg);
         }
-        D_8007B908[idx].type = 2;
+        enemy_slots[idx].type = 2;
         obj->unk60 |= 1;
         if (flags & 4) {
             obj->unk60 |= 2;
         }
         if (battle_flags & 0x100) {
-            D_8007B908[idx].unk2 = ((AnimDef *)anims)[D_8007B908[idx].unk28->unk28].unk2;
-            Anim_SetCurrentAndNext(obj, D_8007B908[idx].unk28->unk28, 1, 0, 1, 1);
+            enemy_slots[idx].unk2 = ((AnimDef *)anims)[enemy_slots[idx].unk28->unk28].unk2;
+            Anim_SetCurrentAndNext(obj, enemy_slots[idx].unk28->unk28, 1, 0, 1, 1);
         } else {
-            D_8007B908[idx].unk2 = ((AnimDef *)anims)[D_8007B908[idx].unk28->unk28].unk2 / 10;
-            Anim_SetCurrentAndNext(obj, D_8007B908[idx].unk28->unk28, 10, 0, 1, 1);
+            enemy_slots[idx].unk2 = ((AnimDef *)anims)[enemy_slots[idx].unk28->unk28].unk2 / 10;
+            Anim_SetCurrentAndNext(obj, enemy_slots[idx].unk28->unk28, 10, 0, 1, 1);
         }
     }
     if (flags & 0x8000) {
@@ -1186,7 +1186,7 @@ s32 Enemy_GetSlotIndex(Obj *arg0) {
     s32 i;
 
     for (i = 0; i < 6; i++) {
-        if (arg0 == &D_8007B908[i].obj) {
+        if (arg0 == &enemy_slots[i].obj) {
             break;
         }
     }
@@ -1197,33 +1197,33 @@ void Enemy_SpawnDeathEffects(Obj *obj) {
     f32 y;
     Unk800C18D8 *t;
 
-    D_8007C070.x = enemy_effect_defs.unk148;
-    D_8007C070.y = enemy_effect_defs.unk14C;
+    enemy_temp_vec.x = enemy_effect_defs.unk148;
+    enemy_temp_vec.y = enemy_effect_defs.unk14C;
     t = &D_800C18D8[enemy_effect_defs.unk140];
-    D_8007C070.z = obj->unk28;
+    enemy_temp_vec.z = obj->unk28;
     if (obj->unk64->unk0 == 1) {
         y = obj->unk68->unk94;
     } else {
         y = obj->y + obj->unk64->unk1C * 0.5 * obj->unk24;
     }
-    Magic_CreateVisualEffect(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &D_8007C070, obj);
+    Magic_CreateVisualEffect(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->angle, t, &enemy_temp_vec, obj);
     Effect_StartConvergeEmitter(2, 0x1E, obj->x, obj->unk64->unk1C * obj->unk24 + y, obj->z,
                   obj->unk64->unk18 * obj->unk24 * 3.6);
 }
 
 void Enemy_ClearAttackScript(void) {
-    D_8007C064 = 0;
+    enemy_script_cmd = 0;
 }
 
 void Enemy_StartAttackScript(s32 arg0, s32 arg1) {
-    ((Unk8007C060 *)&D_8007C060)->unk0 = 0;
-    ((Unk8007C060 *)&D_8007C060)->unk4 = enemy_attack_scripts[arg0];
-    ((Unk8007C060 *)&D_8007C060)->unk8 = arg1;
-    ((Unk8007C060 *)&D_8007C060)->unkC = &D_8007B908[0].obj;
+    ((Unk8007C060 *)&enemy_script_time)->unk0 = 0;
+    ((Unk8007C060 *)&enemy_script_time)->unk4 = enemy_attack_scripts[arg0];
+    ((Unk8007C060 *)&enemy_script_time)->unk8 = arg1;
+    ((Unk8007C060 *)&enemy_script_time)->unkC = &enemy_slots[0].obj;
 }
 
 #ifdef NON_MATCHING
-/* &D_8007C060 kept in a register for the ++ shifts the temporaries by one (register allocation); code is equivalent */
+/* &enemy_script_time kept in a register for the ++ shifts the temporaries by one (register allocation); code is equivalent */
 void Enemy_RunAttackScript(void) {
     SpawnScript *e;
     f32 x;
@@ -1237,24 +1237,24 @@ void Enemy_RunAttackScript(void) {
     s32 pad4;
     SpawnDef *d;
     Unk800C18D8 *t;
-    Enemy *en = D_8007B908;
+    Enemy *en = enemy_slots;
 
-    if (D_8007C064 != NULL) {
-        e = D_8007C064;
-        if (e->time < ++D_8007C060) {
-            obj = D_8007C06C;
+    if (enemy_script_cmd != NULL) {
+        e = enemy_script_cmd;
+        if (e->time < ++enemy_script_time) {
+            obj = enemy_script_obj;
             if (e->flags & 8) {
-                D_8007C070.x = e->unk8;
-                D_8007C070.y = e->unk10;
-                Math_RotateVec2(obj->angle, &D_8007C070);
-                en->unk20 = D_8007C070.x;
-                en->unk24 = D_8007C070.y;
+                enemy_temp_vec.x = e->unk8;
+                enemy_temp_vec.y = e->unk10;
+                Math_RotateVec2(obj->angle, &enemy_temp_vec);
+                en->unk20 = enemy_temp_vec.x;
+                en->unk24 = enemy_temp_vec.y;
             } else {
                 d = &((SpawnDef *) &enemy_effect_defs)[e->unk2];
                 t = &D_800C18D8[d->unk0];
-                D_8007C070.x = e->unk8;
-                D_8007C070.y = e->unk10;
-                Math_RotateVec2(obj->angle + e->unk14, &D_8007C070);
+                enemy_temp_vec.x = e->unk8;
+                enemy_temp_vec.y = e->unk10;
+                Math_RotateVec2(obj->angle + e->unk14, &enemy_temp_vec);
                 if (e->flags & 2) {
                     x = D_8007AA20;
                     y = D_8007AA24;
@@ -1265,26 +1265,26 @@ void Enemy_RunAttackScript(void) {
                     z = obj->z;
                 }
                 s = obj->unk24;
-                x += D_8007C070.x * s;
+                x += enemy_temp_vec.x * s;
                 y += e->unkC * s;
-                z += D_8007C070.y * s;
-                D_8007C070.x = d->unk8;
-                D_8007C070.y = d->unkC;
-                m = D_8007C068->unk1C->unk0;
+                z += enemy_temp_vec.y * s;
+                enemy_temp_vec.x = d->unk8;
+                enemy_temp_vec.y = d->unkC;
+                m = enemy_script_enemy->unk1C->unk0;
                 if (m & 0x8000) {
-                    D_8007C070.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C;
+                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].unk1C;
                 } else {
-                    D_8007C070.z = obj->unk28;
+                    enemy_temp_vec.z = obj->unk28;
                 }
-                Magic_CreateVisualEffect(d->unk2, d->unk4, x, y, z, obj->angle + e->unk14, t, &D_8007C070, obj);
+                Magic_CreateVisualEffect(d->unk2, d->unk4, x, y, z, obj->angle + e->unk14, t, &enemy_temp_vec, obj);
             }
             if (e->flags & 4) {
                 Camera_Shake(1);
             }
             if (e->flags & 1) {
-                D_8007C064 = NULL;
+                enemy_script_cmd = NULL;
             } else {
-                D_8007C064++;
+                enemy_script_cmd++;
             }
         }
     }
@@ -1295,7 +1295,7 @@ void Enemy_RunAttackScript(void) {
 
 /* .data 8004DD20..8004DD50 */
 typedef void (*Fn8004DD20)(Obj*, Enemy*, u8*);
-Fn8004DD20 D_8004DD20[6] = {
+Fn8004DD20 enemy_state_handlers[6] = {
     (Fn8004DD20) Enemy_StateIdle,
     (Fn8004DD20) Enemy_StateApproach,
     (Fn8004DD20) Enemy_StateHurt,
@@ -1303,4 +1303,4 @@ Fn8004DD20 D_8004DD20[6] = {
     (Fn8004DD20) Enemy_StateMeleeAttack,
     (Fn8004DD20) Enemy_StateCastSpell,
 };
-s32 D_8004DD38[5] = { 1, 2, 4, 8, 0x10 };
+s32 enemy_element_bits[5] = { 1, 2, 4, 8, 0x10 };

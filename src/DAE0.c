@@ -127,23 +127,23 @@ void Anim_SetCurrentAndNext(Unk8007C174 *, s32, s32, s32, s32, u16);
 void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, Unk8007C0B0 *);
 
 /* This file's .bss, 8007C0B0..8007C280, in address order. D_8007C0C8,
- * D_8007C144, D_8007C274 and D_8007C278 are unreferenced gaps (D_8007C148 is
- * probably an Enemy-like record of 0x130 bytes, like AEA0's D_8007B908[]).
- * Splat's labels inside D_8007C148 (D_8007C174..D_8007C1D8, its unk2C object)
+ * D_8007C144, D_8007C274 and D_8007C278 are unreferenced gaps (boss_field_record is
+ * probably an Enemy-like record of 0x130 bytes, like AEA0's enemy_slots[]).
+ * Splat's labels inside boss_field_record (D_8007C174..D_8007C1D8, its unk2C object)
  * are aliases in undefined_syms.txt. */
-Unk8007C0B0 D_8007C0B0;
+Unk8007C0B0 boss_spawn_coll;
 s32 D_8007C0C8[2];
-Unk8007C174 D_8007C0D0;
-u8 D_8007C13C[4];
-s32 D_8007C140;
+Unk8007C174 boss_camera_target;
+u8 boss_defeated_bits[4];
+s32 boss_field_index;
 s32 D_8007C144;
-Unk8007C148 D_8007C148;
+Unk8007C148 boss_field_record;
 s32 D_8007C274;
 s32 D_8007C278[2];
 
 extern u8 math_bit_masks[];
 extern Gfx *gfx_dl_head;
-extern Unk8007AA08 D_8007AA08;
+extern Unk8007AA08 player_state;
 extern u8 D_802A7BC0[];
 extern RomRange D_803AB390[];
 extern Unk803AB3D0 D_803AB3D0[];
@@ -151,10 +151,10 @@ extern f32 D_803AB48C[];
 extern Unk803AB820 D_803AB820[];
 extern Unk803AB820 D_803AB9A8;
 extern u8 *D_803ABA58[];
-extern s32 D_800842BC;
-extern s32 D_800842C0;
-extern u8 D_8007B8E0[];
-extern u8 D_8007B430[];
+extern s32 map_id;
+extern s32 map_subarea;
+extern u8 text_speaker_name[];
+extern u8 text_message_buf[];
 extern u8 *D_803AC418[];
 extern u8 *D_803AC438[];
 extern u8 D_803AC328[];
@@ -164,14 +164,14 @@ extern s16 D_8007A172;
 extern s32 core_transition_timer;
 extern s16 fade_transition_style;
 extern s16 core_fade_out_time;
-u16 D_8004DD50[8] = { 10, 10, 15, 20, 20, 25, 25, 0 };
-u16 D_8004DD60[8] = { 5, 5, 5, 10, 10, 15, 15, 0 };
-extern Unk8007A9D0 D_8007A9D0;
+u16 boss_reward_max_hp[8] = { 10, 10, 15, 20, 20, 25, 25, 0 };
+u16 boss_reward_max_mp[8] = { 5, 5, 5, 10, 10, 15, 15, 0 };
+extern Unk8007A9D0 player_stats;
 void Camera_SetTargetView(Unk803AB820 *, Unk8007C174 *);
 void Text_OpenWindow(s32);
 
 void Boss_ClearDefeated(void) {
-    D_8007C13C[0] = 0;
+    boss_defeated_bits[0] = 0;
 }
 
 void Boss_LoadForArea(void) {
@@ -181,17 +181,17 @@ void Boss_LoadForArea(void) {
     s32 size;
     Unk803AB3D0 *p;
 
-    D_8007C140 = 0;
+    boss_field_index = 0;
     for (i = 0; i < 8; i++) {
         p = &D_803AB3D0[i];
-        if (D_800842BC == p->unk0 && D_800842C0 == p->unk2) {
+        if (map_id == p->unk0 && map_subarea == p->unk2) {
             if (Boss_IsDefeated(i) == 0) {
                 start = D_803AB390[p->unk4].start;
                 end = D_803AB390[p->unk4].end;
                 size = end - start;
                 Dma_ReadRom(start, D_802A7BC0, size);
-                Boss_Spawn(i, p->unkC, p->unk10, p->unk14, &D_8007C148);
-                D_8007C140 = i + 1;
+                Boss_Spawn(i, p->unkC, p->unk10, p->unk14, &boss_field_record);
+                boss_field_index = i + 1;
             }
             return;
         }
@@ -199,14 +199,14 @@ void Boss_LoadForArea(void) {
 }
 
 void Boss_Draw(s32 arg0) {
-    Unk8007C148 *p = &D_8007C148;
+    Unk8007C148 *p = &boss_field_record;
     s32 pad;
     u8 *temp;
 
-    if (D_8007C140 != 0) {
-        temp = D_803ABA58[D_8007C148.unk2C.unk50];
+    if (boss_field_index != 0) {
+        temp = D_803ABA58[boss_field_record.unk2C.unk50];
         gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
-        Anim_DrawModel(1, &p->unk2C, temp + D_8007C148.unk2C.unk52 * 0xC, arg0);
+        Anim_DrawModel(1, &p->unk2C, temp + boss_field_record.unk2C.unk52 * 0xC, arg0);
         Anim_AdvanceFrame(p->unk2C.unk58, &p->unk2C, temp + p->unk2C.unk52 * 0xC);
         if (*p->unk2C.unk64 != 2) {
             Shadow_Queue(p->unk2C.x, p->unk2C.y, p->unk2C.z, p->unk2C.unk2C, p->unk2C.unk30, p->unk2C.unk34,
@@ -220,11 +220,11 @@ s32 Boss_CheckPlayerNear(void) {
     f32 dx;
     f32 dz;
 
-    if (D_8007C140 != 0) {
-        dx = D_8007C148.unk2C.x - D_8007AA08.x;
-        dz = D_8007C148.unk2C.z - D_8007AA08.z;
-        if (sqrtf(dx * dx + dz * dz) < D_803AB48C[D_8007C140]) {
-            ret = D_8007C140;
+    if (boss_field_index != 0) {
+        dx = boss_field_record.unk2C.x - player_state.x;
+        dz = boss_field_record.unk2C.z - player_state.z;
+        if (sqrtf(dx * dx + dz * dz) < D_803AB48C[boss_field_index]) {
+            ret = boss_field_index;
         }
     }
     return ret;
@@ -252,18 +252,18 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
     arg4->unk11E = ((Unk803AB820 *)s1->unk64)->unkC;
     arg4->unk120 = ((Unk803AB820 *)s1->unk64)->unkE;
     arg4->unk128 = 1.0f;
-    Coll_ResolveFloorAndWalls(arg1, 0.0f, arg2, 0xA00, &D_8007C0B0);
-    s1->x = D_8007C0B0.x;
-    s1->y = D_8007C0B0.y;
-    s1->z = D_8007C0B0.z;
+    Coll_ResolveFloorAndWalls(arg1, 0.0f, arg2, 0xA00, &boss_spawn_coll);
+    s1->x = boss_spawn_coll.x;
+    s1->y = boss_spawn_coll.y;
+    s1->z = boss_spawn_coll.z;
     if (arg0 == 7) {
         arg4->unk8 |= 4;
         s1->y -= 30.0;
     }
     s1->unk10 = arg3;
-    s1->unk2C = D_8007C0B0.unkC;
-    s1->unk30 = D_8007C0B0.unk10;
-    s1->unk34 = D_8007C0B0.unk14;
+    s1->unk2C = boss_spawn_coll.unkC;
+    s1->unk30 = boss_spawn_coll.unk10;
+    s1->unk34 = boss_spawn_coll.unk14;
     s1->unk5E = 1;
     s1->unk60 = 0;
     if (s2 == &D_803AB9A8) {
@@ -272,11 +272,11 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8007C148 *arg4) {
 }
 
 u8 Boss_IsDefeated(u32 arg0) {
-    return D_8007C13C[arg0 >> 3] & math_bit_masks[arg0 & 7];
+    return boss_defeated_bits[arg0 >> 3] & math_bit_masks[arg0 & 7];
 }
 
 void Boss_SetDefeated(u16 arg0) {
-    D_8007C13C[arg0 >> 3] |= math_bit_masks[arg0 & 7];
+    boss_defeated_bits[arg0 >> 3] |= math_bit_masks[arg0 & 7];
 }
 
 void Boss_BeginEncounter(s32 arg0) {
@@ -285,22 +285,22 @@ void Boss_BeginEncounter(s32 arg0) {
     s32 i;
 
     src = D_803AC418[arg0];
-    dst = D_8007B8E0;
+    dst = text_speaker_name;
     for (i = 0x20; i != 0; i--) {
         *dst++ = *src++;
     }
     src = D_803AC438[arg0];
-    dst = D_8007B430;
+    dst = text_message_buf;
     for (i = 0x4B0; i != 0; i--) {
         *dst++ = *src++;
     }
-    D_8007C0D0 = D_8007C148.unk2C;
+    boss_camera_target = boss_field_record.unk2C;
     if (arg0 == 7) {
-        D_8007C0D0.x = -31.0f;
-        D_8007C0D0.y = 139.0f;
-        D_8007C0D0.z = -328.0f;
+        boss_camera_target.x = -31.0f;
+        boss_camera_target.y = 139.0f;
+        boss_camera_target.z = -328.0f;
     }
-    Camera_SetTargetView(&D_803AB4B0[arg0], &D_8007C0D0);
+    Camera_SetTargetView(&D_803AB4B0[arg0], &boss_camera_target);
 }
 
 void Boss_HandleDefeat(s32 arg0) {
@@ -310,32 +310,32 @@ void Boss_HandleDefeat(s32 arg0) {
 
     if (arg0 == 7) {
         src = D_803AC418[arg0];
-        dst = D_8007B8E0;
+        dst = text_speaker_name;
         for (i = 0x20; i != 0; i--) {
             *dst++ = *src++;
         }
         src = D_803AC328;
-        dst = D_8007B430;
+        dst = text_message_buf;
         for (i = 0x4B0; i != 0; i--) {
             *dst++ = *src++;
         }
         Text_OpenWindow(1);
-        D_8007AA08.unk8 |= 0x10;
+        player_state.unk8 |= 0x10;
         core_flags |= 0x80;
         core_transition_timer = 0x40;
         fade_transition_style = 3;
         core_fade_out_time = 0x3E;
         D_8007A172 = 4;
     } else {
-        D_8007A9D0.unk6 += D_8004DD50[arg0];
-        if (D_8007A9D0.unk6 > 500) {
-            D_8007A9D0.unk6 = 500;
+        player_stats.unk6 += boss_reward_max_hp[arg0];
+        if (player_stats.unk6 > 500) {
+            player_stats.unk6 = 500;
         }
-        D_8007A9D0.unk4 = D_8007A9D0.unk6;
-        D_8007A9D0.unkA += D_8004DD60[arg0];
-        if (D_8007A9D0.unkA > 500) {
-            D_8007A9D0.unkA = 500;
+        player_stats.unk4 = player_stats.unk6;
+        player_stats.unkA += boss_reward_max_mp[arg0];
+        if (player_stats.unkA > 500) {
+            player_stats.unkA = 500;
         }
-        D_8007A9D0.unk8 = D_8007A9D0.unkA;
+        player_stats.unk8 = player_stats.unkA;
     }
 }

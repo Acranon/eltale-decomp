@@ -110,19 +110,19 @@ u8 save_menu_state_read_scratch[0xE0];
 extern s32 core_flags;
 extern s8 menu_bgm_volume_option;
 extern s8 D_800616B0;
-extern u16 D_8007A9AC;
-extern u16 D_8007A9AE;
-extern u16 D_8007A9B0;
-extern Unk8007A9D0 D_8007A9D0;
-extern u8 D_8007C13C[];
-extern s32 D_800842BC;
-extern s32 D_800842C0;
-extern s32 D_800842D0;
-extern s32 D_800842D4;
-extern s32 D_800842D8;
-extern s32 D_800842DC;
-extern s32 D_800842E0;
-extern s32 D_800842E4;
+extern u16 player_respawn_map;
+extern u16 player_respawn_subarea;
+extern u16 player_respawn_entry;
+extern Unk8007A9D0 player_stats;
+extern u8 boss_defeated_bits[];
+extern s32 map_id;
+extern s32 map_subarea;
+extern s32 map_flag4_return_map;
+extern s32 map_flag4_return_subarea;
+extern s32 map_flag4_return_entry;
+extern s32 map_flag8_return_map;
+extern s32 map_flag8_return_subarea;
+extern s32 map_flag8_return_entry;
 extern u16 env_day_count;
 extern u16 env_play_time;
 extern u8 chest_opened_flags[];
@@ -1288,20 +1288,20 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     u8 *s;
     s32 n;
 
-    e->unk0 = D_8007A9D0;
+    e->unk0 = player_stats;
     e->unk38 = env_play_time;
     e->unk3A = env_day_count;
-    e->unk3C = D_800842BC;
-    e->unk40 = D_800842C0;
-    e->unk44 = D_800842D0;
-    e->unk48 = D_800842D4;
-    e->unk4C = D_800842D8;
-    e->unk50 = D_800842DC;
-    e->unk54 = D_800842E0;
-    e->unk58 = D_800842E4;
-    e->unk5C = D_8007A9AC;
-    e->unk5E = D_8007A9AE;
-    e->unk60 = D_8007A9B0;
+    e->unk3C = map_id;
+    e->unk40 = map_subarea;
+    e->unk44 = map_flag4_return_map;
+    e->unk48 = map_flag4_return_subarea;
+    e->unk4C = map_flag4_return_entry;
+    e->unk50 = map_flag8_return_map;
+    e->unk54 = map_flag8_return_subarea;
+    e->unk58 = map_flag8_return_entry;
+    e->unk5C = player_respawn_map;
+    e->unk5E = player_respawn_subarea;
+    e->unk60 = player_respawn_entry;
     e->unk62 = D_800616B0;
     e->unk63 = menu_bgm_volume_option;
     if (core_flags & 0x20000) {
@@ -1322,7 +1322,7 @@ void SaveMenu_CaptureGameState(s32 arg0) {
         *d++ = *s++;
     }
     d = D_800902EF;
-    for (s = D_8007C13C, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
+    for (s = boss_defeated_bits, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
         *d++ = *s++;
     }
 }
@@ -1333,20 +1333,20 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     u8 *s;
     s32 n;
 
-    D_8007A9D0 = e->unk0;
+    player_stats = e->unk0;
     env_play_time = e->unk38;
     env_day_count = e->unk3A;
-    D_800842BC = e->unk3C;
-    D_800842C0 = e->unk40;
-    D_800842D0 = e->unk44;
-    D_800842D4 = e->unk48;
-    D_800842D8 = e->unk4C;
-    D_800842DC = e->unk50;
-    D_800842E0 = e->unk54;
-    D_800842E4 = e->unk58;
-    D_8007A9AC = e->unk5C;
-    D_8007A9AE = e->unk5E;
-    D_8007A9B0 = e->unk60;
+    map_id = e->unk3C;
+    map_subarea = e->unk40;
+    map_flag4_return_map = e->unk44;
+    map_flag4_return_subarea = e->unk48;
+    map_flag4_return_entry = e->unk4C;
+    map_flag8_return_map = e->unk50;
+    map_flag8_return_subarea = e->unk54;
+    map_flag8_return_entry = e->unk58;
+    player_respawn_map = e->unk5C;
+    player_respawn_subarea = e->unk5E;
+    player_respawn_entry = e->unk60;
     D_800616B0 = e->unk62;
     menu_bgm_volume_option = e->unk63;
     if (e->unk64 != 0) {
@@ -1364,7 +1364,7 @@ void SaveMenu_RestoreGameState(s32 arg0) {
         *d++ = *s++;
     }
     s = D_800902EF;
-    for (d = D_8007C13C, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
+    for (d = boss_defeated_bits, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
         *d++ = *s++;
     }
 }

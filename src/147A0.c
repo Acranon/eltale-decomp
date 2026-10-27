@@ -103,8 +103,8 @@ Unk80085A78 spirit_floor_result;
 u8 spirit_collected_flags[0x10];
 
 extern u8 math_bit_masks[];
-extern s32 D_800842BC;
-extern s32 D_800842C0;
+extern s32 map_id;
+extern s32 map_subarea;
 
 extern Gfx* gfx_dl_head;
 
@@ -198,8 +198,8 @@ void Spirit_LoadForMap(void) {
     u32 i;
     s32 id;
 
-    id = D_800842BC; entry = spirit_map_placements; for (i = 0; i < 0x2B; i++, entry++) {
-        if (id == entry->unk0 && D_800842C0 == entry->unk2) {
+    id = map_id; entry = spirit_map_placements; for (i = 0; i < 0x2B; i++, entry++) {
+        if (id == entry->unk0 && map_subarea == entry->unk2) {
             break;
         }
     }

@@ -261,8 +261,8 @@
 - { name: D_8010700C_ovl_DA4570, rom: 0xDAB57C, size: 0x38, type: u16 }    # 7 palettes of 4 colours
 
 # main .data (ROM = vram - 0x7FFFF400)
-- { name: D_8004DD10, rom: 0x4E910, size: 0x8, type: u8 }                  # message text
-- { name: D_8004DD18, rom: 0x4E918, size: 0x8, type: u8 }                  # message text
+- { name: npc_rest_choice_row0, rom: 0x4E910, size: 0x8, type: u8 }                  # message text
+- { name: npc_rest_choice_row1, rom: 0x4E918, size: 0x8, type: u8 }                  # message text
 - { name: item_message_prefix, rom: 0x4EB00, size: 0x8, type: u8 }                  # message text
 - { name: item_message_suffix, rom: 0x4EB08, size: 0x14, type: u8 }                 # message text
 - { name: spirit_sparkle_tex, rom: 0x4EE58, size: 0x400, type: u8 }                # 4 textures of 0x100 bytes

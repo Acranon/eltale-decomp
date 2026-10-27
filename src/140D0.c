@@ -100,8 +100,8 @@ u8 chest_opened_flags[0x20];
 u8 D_800859A8[8];
 
 extern u8 math_bit_masks[];
-extern s32 D_800842BC;
-extern s32 D_800842C0;
+extern s32 map_id;
+extern s32 map_subarea;
 extern Unk8010FDC4 D_8010FDC4[];
 /* Message text around the name in Item_BuildMessage. */
 u8 item_message_prefix[8] = {
@@ -132,8 +132,8 @@ Unk8004DF1C chest_map_placements[19] = {
     { 0x21, (Unk140D0Group*) 0x80143378 },
     { 0x09, (Unk140D0Group*) 0x8015F1E4 },
 };
-extern u8 D_8007B430[];
-extern u8 D_8007B8E0;
+extern u8 text_message_buf[];
+extern u8 text_speaker_name;
 extern u8* D_803AB288[];
 
 void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Unk80085968*);
@@ -163,13 +163,13 @@ void Chest_LoadForMap(void) {
     s32 id;
     s32 mode;
 
-    for (id = D_800842BC, entry = chest_map_placements, i = 0; i < 19; i++, entry++) {
+    for (id = map_id, entry = chest_map_placements, i = 0; i < 19; i++, entry++) {
         if (id == entry->id) {
             break;
         }
     }
     if (i != 19) {
-        group = &entry->groups[D_800842C0];
+        group = &entry->groups[map_subarea];
         chest_count = group->count;
         i = chest_count;
         def = group->defs;
@@ -292,7 +292,7 @@ void Item_BuildMessage(s32 arg0) {
     u8* dst;
 
     src = item_message_prefix;
-    dst = D_8007B430;
+    dst = text_message_buf;
     while (*src != 0xFF) {
         *dst++ = *src++;
     }
@@ -305,7 +305,7 @@ void Item_BuildMessage(s32 arg0) {
         *dst++ = *src++;
     }
     *dst = *src;
-    D_8007B8E0 = 0xFF;
+    text_speaker_name = 0xFF;
 }
 
 u8 Chest_IsOpened(u16 arg0) {

@@ -149,8 +149,8 @@ Unk80085F68 camera_delayed_turn;
 f32 camera_battle_angle_offset;
 u16 camera_persp_norm;
 
-extern s32 D_8007ABA8;
-extern Unk8007ABB0* D_8007ABB0[];
+extern s32 npc_drawn_count;
+extern Unk8007ABB0* npc_drawn_list[];
 
 typedef struct {
     /* 0x00 */ Camera15150Preset* presets;
@@ -166,11 +166,11 @@ extern Mtx D_80301098;
 extern Mtx D_8030EB68;
 extern s32 D_80084308;
 extern u16 D_8007AA82;
-extern Unk8007C284* D_8007C284;
-extern s32 D_800842BC;
-extern s32 D_800842C0;
+extern Unk8007C284* map_area_def;
+extern s32 map_id;
+extern s32 map_subarea;
 extern Vec3f_15150 D_8007AA20;
-extern f32 D_8007A994;
+extern f32 player_spawn_rot;
 void guOrtho(Mtx*, f32, f32, f32, f32, f32, f32, f32);
 
 typedef struct {
@@ -186,7 +186,7 @@ typedef struct {
     /* 0x8A40 */ LookAt lookAt;
 } Unk15150Dyn;
 
-extern Unk8007C288* D_8007C288;
+extern Unk8007C288* map_subarea_def;
 extern u16 battle_flags;
 extern s32 core_flags;
 extern s32 D_8008C168;
@@ -236,9 +236,9 @@ void Camera_InitForMap(void) {
         cam->unk84 = 3.1415927f;
     }
     camera_preset_index = (D_8007AA82 >> 1) & 7;
-    if (D_8007C284->unk24 != NULL) {
-        camera_presets = D_8007C284->unk24[D_800842C0].presets;
-        camera_preset_count[0] = D_8007C284->unk24[D_800842C0].count;
+    if (map_area_def->unk24 != NULL) {
+        camera_presets = map_area_def->unk24[map_subarea].presets;
+        camera_preset_count[0] = map_area_def->unk24[map_subarea].count;
     } else {
         camera_presets = camera_default_presets;
         camera_preset_count[0] = 1;
@@ -262,7 +262,7 @@ void Camera_InitForMap(void) {
             camera_temp_vec.x = 0.0f;
             camera_temp_vec.y = cam->unk4C * 0.8;
             cam->eyeY = pos->y + p->unk14;
-            Math_RotateVec2(cam->unk84 + D_8007A994, &camera_temp_vec);
+            Math_RotateVec2(cam->unk84 + player_spawn_rot, &camera_temp_vec);
             cam->eyeX = pos->x - camera_temp_vec.x;
             cam->eyeZ = pos->z - camera_temp_vec.y;
             cam->unk54 = 0.0f;
@@ -299,7 +299,7 @@ void Camera_InitForMap(void) {
     camera_battle_angle_offset = 0.0f;
     camera_height_osc_enabled[0] = 0;
     for (i = 0; i < 7; i++) {
-        if (D_800842BC == camera_height_osc_areas[i][0] && D_800842C0 == camera_height_osc_areas[i][1]) {
+        if (map_id == camera_height_osc_areas[i][0] && map_subarea == camera_height_osc_areas[i][1]) {
             camera_height_osc_enabled[0]++;
             break;
         }
@@ -312,14 +312,14 @@ void Camera_Update(Unk15150Dyn* arg0) {
     s32 idx;
     s32 pad;
 
-    if ((D_8007C288->unk14 & 2) && !(battle_flags & 1) && cam->mode != 3) {
+    if ((map_subarea_def->unk14 & 2) && !(battle_flags & 1) && cam->mode != 3) {
         idx = (D_8007AA82 >> 1) & 7;
         if (idx != camera_preset_index) {
             Camera_SetPreset(idx);
         }
     }
     camera_mode_handlers[cam->mode](cam);
-    if (!(core_flags & 0x82) && D_8008C168 == 0 && !(battle_flags & 1) && !(D_8007C288->unk14 & 2) &&
+    if (!(core_flags & 0x82) && D_8008C168 == 0 && !(battle_flags & 1) && !(map_subarea_def->unk14 & 2) &&
         (input_pressed_buttons & 0x20) && camera_preset_count[0] >= 2) {
         camera_preset_index++;
         if (camera_preset_index >= camera_preset_count[0]) {
@@ -874,14 +874,14 @@ void Camera_TurnForExit(void) {
 }
 
 f32 Camera_RaiseOverNpcs(Camera15150* arg0, f32 arg1) {
-    s32 n = D_8007ABA8;
+    s32 n = npc_drawn_count;
     Unk8007ABB0** p;
     Unk8007ABB0* obj;
     f32 dx;
     f32 dz;
 
-    if (D_8007ABA8 != 0) {
-        p = D_8007ABB0;
+    if (npc_drawn_count != 0) {
+        p = npc_drawn_list;
         while (n != 0) {
             obj = *p++;
             dx = obj->y - arg1;

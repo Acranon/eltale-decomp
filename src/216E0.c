@@ -110,7 +110,7 @@ typedef struct {
 } Struct_8007AA08;
 
 extern Gfx* gfx_dl_head;
-extern Struct_8007AA08 D_8007AA08;
+extern Struct_8007AA08 player_state;
 extern Gfx D_803AA448[];
 extern Gfx D_803AA4C0[];
 extern Gfx D_803AA538[];
@@ -213,19 +213,19 @@ typedef struct {
 extern Unk2000000 D_2000000;
 extern s32 core_flags;
 extern s32 gfx_mtx_index;
-extern s32 D_8007A9C0;
-extern s32 D_8007A9C4;
-extern s32 D_8007A9C8;
-extern s32 D_8007A9CC;
+extern s32 player_talk_npc;
+extern s32 player_front_spirit;
+extern s32 player_front_chest;
+extern s32 player_front_text_spot;
 extern u16 D_8007AA0A;
 extern s32 D_8007AA10;
 extern s32 D_8007AA1C;
 extern u8 D_8007AA20[];
 extern u16 D_8007AA80;
-extern s32 D_8007B900;
-extern Struct_8007B908_216E0 D_8007B908[];
-extern Struct_8007C288* D_8007C288;
-extern u16 D_800842B8;
+extern s32 enemy_count;
+extern Struct_8007B908_216E0 enemy_slots[];
+extern Struct_8007C288* map_subarea_def;
+extern u16 map_flags;
 extern s32 magic_cast_state;
 extern u16 battle_flags;
 extern Gfx D_803A8788[];
@@ -277,7 +277,7 @@ void Hud_Draw(Unk2000000* buf) {
             }
         }
     }
-    if ((D_800842B8 & 0xD) && !(battle_flags & 1) && !(D_8007C288->unk14 & 8) && !(core_flags & 2)) {
+    if ((map_flags & 0xD) && !(battle_flags & 1) && !(map_subarea_def->unk14 & 8) && !(core_flags & 2)) {
         Hud_DrawCompass(buf);
     }
     if ((battle_flags & 1) && hud_battle_message_timer) {
@@ -294,8 +294,8 @@ void Hud_Draw(Unk2000000* buf) {
             Hud_DrawOutOfRangeIcon();
         }
         Hud_UpdateAndDrawActorStatusIndicators((Struct_8002373C*)D_8007AA20);
-        n = D_8007B900;
-        e = D_8007B908;
+        n = enemy_count;
+        e = enemy_slots;
         while (n != 0) {
             if (e->unk7C != -1) {
                 Hud_UpdateAndDrawActorStatusIndicators((Struct_8002373C*)e->unk2C);
@@ -304,23 +304,23 @@ void Hud_Draw(Unk2000000* buf) {
             e++;
         }
     } else if (!(core_flags & 0x87) && !(D_8007AA80 & 1)) {
-        if (D_8007A9C0) {
+        if (player_talk_npc) {
             Hud_DrawNpcTalkMarker();
-        } else if (D_8007A9C4 && !(core_flags & 8)) {
+        } else if (player_front_spirit && !(core_flags & 8)) {
             Hud_DrawSpiritMarker();
-        } else if (D_8007A9C8) {
+        } else if (player_front_chest) {
             Hud_DrawChestMarker();
-        } else if (D_8007A9CC) {
+        } else if (player_front_text_spot) {
             Hud_DrawTextSpotMarker();
         }
     }
     if (core_flags & 4) {
-        Hud_DrawSpellInput(buf, (struct Struct_80021C04*)&D_8007AA08);
+        Hud_DrawSpellInput(buf, (struct Struct_80021C04*)&player_state);
     } else if (core_flags & 8) {
-        Hud_UpdateElementAllocation(buf, (struct Struct_80022970*)&D_8007AA08);
+        Hud_UpdateElementAllocation(buf, (struct Struct_80022970*)&player_state);
     }
     if (hud_melee_hint_timer) {
-        Hud_DrawSpellName(&D_8007AA08);
+        Hud_DrawSpellName(&player_state);
         hud_melee_hint_timer--;
     }
 }
@@ -416,7 +416,7 @@ void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
         x += 0x16;
     }
     for (i = 0; i < 4; i++) {
-        if (((s32*)&D_8007AA08)[2] & hud_element_unlock_masks[i]) {
+        if (((s32*)&player_state)[2] & hud_element_unlock_masks[i]) {
             col = &hud_element_colors[0][i];
             fx = i * 22.0f + 5.0 + (f32)hud_draw_origin_x;
             fy = hud_draw_origin_y + 5.0f;
@@ -472,8 +472,8 @@ void Hud_DrawCompass(Unk2000000* buf) {
     gSPDisplayList(gfx_dl_head++, D_803AA758);
     Hud_DrawTextureTile(&D_803A86F8, 13, 10, 11, 14, 0x93, 0, 0x400, 0x400);
     if (menu_map_region < 6 && menu_map_spot < 0 && !(core_flags & 0x80)) {
-        dx = menu_map_marker_x - D_8007AA08.unk18;
-        dz = menu_map_marker_z - D_8007AA08.unk20;
+        dx = menu_map_marker_x - player_state.unk18;
+        dz = menu_map_marker_z - player_state.unk20;
         dist = sqrtf(dx * dx + dz * dz);
         if (dist > 10.0) {
             ang = Math_Atan2(dx, dz) - D_80085E74;
@@ -783,8 +783,8 @@ typedef struct {
     /* 0x20 */ char unk20[0x84 - 0x20];
 } Struct_8007ABF0;
 
-extern s32 D_8007A9C0;
-extern Struct_8007ABF0 D_8007ABF0[];
+extern s32 player_talk_npc;
+extern Struct_8007ABF0 npc_slots[];
 
 void Hud_DrawNpcTalkMarker(void) {
     s32 sx;
@@ -792,7 +792,7 @@ void Hud_DrawNpcTalkMarker(void) {
     Vec3f_216E0* p;
     u16 *angle = &hud_npc_marker_phase;
 
-    p = &D_8007ABF0[D_8007A9C0 - 1].unk14;
+    p = &npc_slots[player_talk_npc - 1].unk14;
     if (Camera_WorldToScreen(p->x, p->y + 14.0, p->z, &sx, &hud_npc_marker_screen_y)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
@@ -812,7 +812,7 @@ void Hud_DrawSpiritMarker(void) {
     s32 bob;
     u16 *angle = &hud_spirit_marker_phase;
 
-    if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+    if (Camera_WorldToScreen(player_state.unk18, player_state.unk1C + 11.0, player_state.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -829,7 +829,7 @@ void Hud_DrawChestMarker(void) {
     s32 bob;
     u16 *angle = &hud_chest_text_marker_phases[0];
 
-    if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+    if (Camera_WorldToScreen(player_state.unk18, player_state.unk1C + 11.0, player_state.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -846,7 +846,7 @@ void Hud_DrawTextSpotMarker(void) {
     s32 bob;
     u16 *angle = &hud_chest_text_marker_phases[1];
 
-    if (Camera_WorldToScreen(D_8007AA08.unk18, D_8007AA08.unk1C + 11.0, D_8007AA08.unk20, &sx, &sy)) {
+    if (Camera_WorldToScreen(player_state.unk18, player_state.unk1C + 11.0, player_state.unk20, &sx, &sy)) {
         bob = sins(*angle) >> 13;
         if (bob < 0) {
             bob = -bob;
@@ -868,7 +868,7 @@ void Hud_DrawMeleeTargetMarker(u16 arg0) {
     Struct_8002373C* a;
     u16 *angle = &hud_melee_marker_phase;
 
-    a = (Struct_8002373C*)D_8007B908[arg0].unk2C;
+    a = (Struct_8002373C*)enemy_slots[arg0].unk2C;
     if (a->unk64->unk0 == 1) {
         y = a->unk68->unk94;
     } else if (a->unk64->unk0 == 2) {
@@ -893,9 +893,9 @@ void Hud_DrawOutOfRangeIcon(void) {
     f32 y;
     f32 h;
 
-    h = D_8007AA08.unk7C->unk1C * D_8007AA08.unk3C;
-    y = D_8007AA08.unk1C + h;
-    if (Camera_WorldToScreen(D_8007AA08.unk18, y, D_8007AA08.unk20, &sx, &sy) != 0) {
+    h = player_state.unk7C->unk1C * player_state.unk3C;
+    y = player_state.unk1C + h;
+    if (Camera_WorldToScreen(player_state.unk18, y, player_state.unk20, &sx, &sy) != 0) {
         gDPPipeSync(gfx_dl_head++);
         gDPLoadTLUT_pal256(gfx_dl_head++, D_803A4118);
         Hud_DrawTextureTile(D_803A8728, sx - 0x17, sy - 0xF, 0x2E, 0xF, 0x51, 0x31, 0x400, 0x400);
@@ -1102,8 +1102,8 @@ typedef struct {
     /* 0x98 */ u16 unk98;
 } Struct_8007C028;
 
-extern Struct_8007C028* D_8007C028;
-extern u8** D_8007C04C;
+extern Struct_8007C028* enemy_turn_current;
+extern u8** enemy_names;
 extern u8 D_8039ADB0[];
 extern u8 D_8039EC90[];
 extern Struct_80024A54 D_803A86F8;
@@ -1122,7 +1122,7 @@ void Hud_DrawEnemyInfoPanel(void) {
     }
     gDPPipeSync(gfx_dl_head++);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
-    if (D_8007C028->unk98 & 0x80) {
+    if (enemy_turn_current->unk98 & 0x80) {
         Hud_DrawTextureTile(&D_803A8718, 0, 0, 0x6E, 0x10, 0x64, 0x1C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0x10, 0x64, 0x2C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x20, 0x6E, 0x10, 0x64, 0x3C, 0x400, 0x400);
@@ -1132,16 +1132,16 @@ void Hud_DrawEnemyInfoPanel(void) {
         Hud_DrawTextureTile(&D_803A8718, 0, 0x10, 0x6E, 0xA, 0x64, 0x2C, 0x400, 0x400);
         Hud_DrawTextureTile(&D_803A8718, 0, 0x1A, 0x6E, 2, 0x64, 0x4E, 0x400, 0x400);
     }
-    Hud_DrawGlyphString(4, 0x11, 0, D_8007C04C[D_8007C028->unk28->unk2]);
+    Hud_DrawGlyphString(4, 0x11, 0, enemy_names[enemy_turn_current->unk28->unk2]);
     Hud_LoadTextureTile(&D_803A86F8, 0x20, 0x1D, 0x80, 0xA);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039ADB0);
-    if (D_8007C028->unk98 & 0x80) {
-        Hud_DrawNumber(3, 0x10, 0x1C, D_8007C028->unk28->unk6);
-        Hud_DrawNumber(3, 0x10, 0x26, D_8007C028->unk28->unkE);
-        Hud_DrawNumber(3, 0x46, 0x1C, D_8007C028->unk28->unk2A);
-        Hud_DrawNumber(3, 0x46, 0x26, D_8007C028->unk28->unkC);
-        if (D_8007C028->unk28->unk26 != 4) {
-            Hud_DrawTextureTile(&D_803A86F8, 0x5B, 3, 0xC, 0xC, D_8007C028->unk28->unk26 * 0xC + 0x20, 0x10, 0x400, 0x400);
+    if (enemy_turn_current->unk98 & 0x80) {
+        Hud_DrawNumber(3, 0x10, 0x1C, enemy_turn_current->unk28->unk6);
+        Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->unk28->unkE);
+        Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->unk28->unk2A);
+        Hud_DrawNumber(3, 0x46, 0x26, enemy_turn_current->unk28->unkC);
+        if (enemy_turn_current->unk28->unk26 != 4) {
+            Hud_DrawTextureTile(&D_803A86F8, 0x5B, 3, 0xC, 0xC, enemy_turn_current->unk28->unk26 * 0xC + 0x20, 0x10, 0x400, 0x400);
         }
     }
 }

@@ -59,34 +59,34 @@ typedef struct {
 /* Part of this file's .bss, 80082860..800842F0 (the run 80082030..80082860
  * comes first: see D_80082030). These objects are declared here, before the
  * file's 256th declaration, and IDO emits the later declaration block (with
- * D_80082030..D_80082858) first. */
-Unk8000FA9C *D_80082860[0x100];
-Unk8000FA9C *D_80082C60[0x100];
-u16 *D_80083060;
-Unk8000FA9C *D_80083068[0x100];
-u16 *D_80083468;
-Unk80083470 D_80083470[8];
-u16 *D_80083550;
-Unk80083470 D_80083558[8];
-Vec3f D_80083638[0x100];
-Unk80084238 D_80084238[4];
-u16 D_800842A8;
-f32 D_800842AC;
-s32 D_800842B0;
-s32 D_800842B4;
-u16 D_800842B8;
-s32 D_800842BC;
-s32 D_800842C0;
-s32 D_800842C4;
-s32 D_800842C8;
+ * D_80082030..map_clock_blend_len) first. */
+Unk8000FA9C *mapobj_translucent_list[0x100];
+Unk8000FA9C *mapobj_animtex_list[0x100];
+u16 *map_clock_blend_from;
+Unk8000FA9C *mapobj_scrolltex_list[0x100];
+u16 *map_clock_blend_to;
+Unk80083470 mapobj_spinner_buf1[8];
+u16 *map_clock_blend_out;
+Unk80083470 mapobj_spinner_buf0[8];
+Vec3f mapobj_billboard_normals[0x100];
+Unk80084238 mapobj_anim_slots[4];
+u16 mapobj_arc_flicker_tick;
+f32 mapobj_ambient_dist;
+s32 mapobj_ambient_type;
+s32 mapobj_ambient_prev_type;
+u16 map_flags;
+s32 map_id;
+s32 map_subarea;
+s32 map_next_id;
+s32 map_next_subarea;
 s32 D_800842CC;
-s32 D_800842D0;
-s32 D_800842D4;
-s32 D_800842D8;
-s32 D_800842DC;
-s32 D_800842E0;
-s32 D_800842E4;
-u16 D_800842E8; /* bit 0: enemy area (enemy set, random encounters, no NPCs) */
+s32 map_flag4_return_map;
+s32 map_flag4_return_subarea;
+s32 map_flag4_return_entry;
+s32 map_flag8_return_map;
+s32 map_flag8_return_subarea;
+s32 map_flag8_return_entry;
+u16 map_subarea_flags; /* bit 0: enemy area (enemy set, random encounters, no NPCs) */
 
 typedef struct {
     /* 0x00 */ u16 alpha;
@@ -260,52 +260,52 @@ typedef struct {
 } Unk8004DD98; /* size 0x18 */
 
 /* This file's .bss starts here: 8007C280..80082030 in address order, then
- * D_80082030.. below. D_8007C2A8 is a pointer table other files use.
+ * D_80082030.. below. mapobj_billboard_list is a pointer table other files use.
  * D_80081CE4, D_80081FEC, D_80081FF8 and D_8008201C are
  * unreferenced. Splat's labels inside D_80081AB0 (D_80081B78..D_80081C42) and
- * D_80081CE8 (D_80081D00..D_80081D30) are aliases in undefined_syms.txt. */
-u16 D_8007C280; /* bit 0: own light cycle, bit 1: world clock time (Env_*) */
-u16 D_8007C282;
-Unk8007C284 *D_8007C284;
-Unk8007C288 *D_8007C288;
-Unk8007C28C *D_8007C28C;
-Unk8000FA9C *D_8007C290;
-Unk8007C294 *D_8007C294;
-s32 D_8007C298;
-s32 D_8007C29C;
+ * mapobj_wave_base (D_80081D00..D_80081D30) are aliases in undefined_syms.txt. */
+u16 map_env_flags; /* bit 0: own light cycle, bit 1: world clock time (Env_*) */
+u16 map_backdrop_id;
+Unk8007C284 *map_area_def;
+Unk8007C288 *map_subarea_def;
+Unk8007C28C *map_subarea_grid;
+Unk8000FA9C *map_objs;
+Unk8007C294 *map_obj_models;
+s32 map_actor_walls;
+s32 map_camera_walls;
 s32 D_8007C2A0;
-s32 D_8007C2A4;
-void *D_8007C2A8[0x100];
-s32 D_8007C6A8;
-s32 D_8007C6AC;
-u8 D_8007C6B0[0x4000];
-u16 D_800806B0[0x100];
-u8 D_800808B0[0x800];
-u16 D_800810B0[0x200];
-u16 D_800814B0[3][0x100];
+s32 mapobj_billboard_count;
+void *mapobj_billboard_list[0x100];
+s32 mapobj_spinner_prev_count;
+s32 mapobj_spinner_count;
+u8 map_backdrop_tex[0x4000];
+u16 map_backdrop_tlut[0x100];
+u8 map_backdrop_phase_tluts[0x800];
+u16 map_clock_tlut[0x200];
+u16 map_clock_tlut_srcs[3][0x100];
 u16 D_80081AB0[0x100];
-s32 D_80081CB0;
-s32 D_80081CB4;
-s32 D_80081CB8;
-s32 D_80081CBC;
-s32 D_80081CC0;
-s32 D_80081CC4;
-Unk8000FA9C **D_80081CC8;
-Unk8000FA9C **D_80081CCC;
-Unk8000FA9C **D_80081CD0;
-Unk8000FA9C **D_80081CD4;
-Unk8000FA9C **D_80081CD8;
-Unk8000FA9C **D_80081CDC;
-s32 D_80081CE0;
+s32 mapobj_opaque_count;
+s32 mapobj_noanim_count;
+s32 mapobj_billboard_draw_count;
+s32 mapobj_translucent_count;
+s32 mapobj_animtex_count;
+s32 mapobj_scrolltex_count;
+Unk8000FA9C **mapobj_opaque_cursor;
+Unk8000FA9C **mapobj_noanim_cursor;
+Unk8000FA9C **mapobj_billboard_cursor;
+Unk8000FA9C **mapobj_translucent_cursor;
+Unk8000FA9C **mapobj_animtex_cursor;
+Unk8000FA9C **mapobj_scrolltex_cursor;
+s32 mapobj_wave_capture;
 s32 D_80081CE4;
-Unk8004DD98 D_80081CE8[32];
-Unk8000FA9C *D_80081FE8;
+Unk8004DD98 mapobj_wave_base[32];
+Unk8000FA9C *mapobj_wave_base_cursor;
 s32 D_80081FEC;
-f32 D_80081FF0[2];
+f32 mapobj_temp_vec[2];
 s32 D_80081FF8[2];
-CollResult D_80082000;
+CollResult map_load_coll;
 s32 D_8008201C;
-Unk80082020 D_80082020;
+Unk80082020 mapobj_spline_out;
 
 void Dma_ReadRom();
 void MapObjAnim_ClearAll(void);
@@ -314,10 +314,10 @@ void Coll_ResolveFloorAndWalls(f32, f32, f32, u16, CollResult *);
 extern Unk8007C284 map_area_defs[];
 extern Unk80057540 map_extra_rom_ranges[];
 extern s32 D_80084308;
-extern f32 D_8007A98C;
-extern f32 D_8007A990;
-extern f32 D_8007A994;
-extern s32 D_8007A99C;
+extern f32 player_spawn_x;
+extern f32 player_spawn_z;
+extern f32 player_spawn_rot;
+extern s32 player_spawn_obj;
 extern u16 D_80081B78[];
 extern u16 D_80081B7A[];
 extern u8 D_753F0[];
@@ -346,19 +346,19 @@ void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C
  * holds Map_BlendPaletteByClock's static at 80082858). Nothing names 80082030..80082048
  * (splat's D_80082030 is Map_LoadArea's loop end), so it is a placeholder. */
 u8 D_80082030[0x18];
-Unk80082048 D_80082048[4];
-u16 D_80082058[0x200];
-u16 D_80082458[0x200];
+Unk80082048 mapobj_wave_phase[4];
+u16 mapobj_opaque_list[0x200];
+u16 mapobj_noanim_list[0x200];
 /* Declared after the definitions above: IDO orders a file's .bss by declaration
  * number mod 256 (later blocks first on a tie), and these declarations keep
- * Map_BlendPaletteByClock's static D_80082858 after D_80082458. */
+ * Map_BlendPaletteByClock's static map_clock_blend_len after mapobj_noanim_list. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ f32 x;
     /* 0x1C */ f32 y;
     /* 0x20 */ f32 z;
 } Unk8007AA08;
-extern Unk8007AA08 D_8007AA08;
+extern Unk8007AA08 player_state;
 void Effect_QueueMapObjEmitter(f32, f32, f32, Unk8000FA9C *);
 void MapObj_EmitArcSprite(Unk8000FA9C *);
 void MapObj_EmitDropSprite(Unk8000FA9C *);
@@ -385,20 +385,20 @@ extern s32 env_clock;
  * (8004DE44), then the tables defined after MapObj_EmitDropSprite. IDO stores a
  * function-static descriptor's fields with lui/%lo (sharing the lui inside a
  * 16-byte line), which both functions need. D_8004DD8B (MapObj_UpdateAndDrawNearby's asm
- * name for D_8004DD88 + 3) is an alias in undefined_syms.txt. */
+ * name for mapobj_ambient_sfx + 3) is an alias in undefined_syms.txt. */
 u16 D_8004DD70 = 0;
-s32 D_8004DD74[4] = { 0x00000000, 0x01600160, 0x01600160, 0x01600100 };
+s32 mapobj_wave_phase_step[4] = { 0x00000000, 0x01600160, 0x01600160, 0x01600100 };
 s32 D_8004DD84 = 0x00500050;
-s32 D_8004DD88[4] = { 0x19, 0x1B, 0x1E, 0x20 };
-Unk8004DD98 D_8004DD98 = { { 0 } };
-u16 D_8004DDB0 = 0;
-u8 *D_8004DDB4[5] = {
+s32 mapobj_ambient_sfx[4] = { 0x19, 0x1B, 0x1E, 0x20 };
+Unk8004DD98 mapobj_wave_base_init = { { 0 } };
+u16 mapobj_scrolltex_offset = 0;
+u8 *mapobj_scrolltex_tex[5] = {
     (u8 *)0x801093B0, (u8 *)0x8010A3B0, (u8 *)0x80129D10, (u8 *)0x80160B30, (u8 *)0x8014DA40,
 };
-u16 D_8004DDC8[6] = { 0x40, 0x40, 0x20, 0x40, 0x20, 0 };
-f32 D_8004DDD4[4] = { 0.0f, 5000.0f, 1000.0f, 3000.0f };
-f32 D_8004DDE4[4] = { 0.0f, 30000.0f, 30000.0f, 48000.0f };
-f32 D_8004DDF4[4] = { 0.0f, 1000.0f, 5000.0f, 3000.0f };
+u16 mapobj_scrolltex_height[6] = { 0x40, 0x40, 0x20, 0x40, 0x20, 0 };
+f32 mapobj_wave_x_div[4] = { 0.0f, 5000.0f, 1000.0f, 3000.0f };
+f32 mapobj_wave_y_div[4] = { 0.0f, 30000.0f, 30000.0f, 48000.0f };
+f32 mapobj_wave_z_div[4] = { 0.0f, 1000.0f, 5000.0f, 3000.0f };
 
 void Map_LoadArea(void) {
     u32 *q;
@@ -415,52 +415,52 @@ void Map_LoadArea(void) {
     s32 kind;
     Unk80082048 *z;
 
-    D_8007C284 = &map_area_defs[D_800842C4];
-    if (D_800842BC != -1) {
-        if (D_800842C4 == 11) {
-            if (D_800842C0 == 2 && D_800842C8 == 0) {
-                D_800842D0 = D_800842C4;
-                D_800842D4 = D_800842C8;
-                D_800842D8 = D_80084308;
+    map_area_def = &map_area_defs[map_next_id];
+    if (map_id != -1) {
+        if (map_next_id == 11) {
+            if (map_subarea == 2 && map_next_subarea == 0) {
+                map_flag4_return_map = map_next_id;
+                map_flag4_return_subarea = map_next_subarea;
+                map_flag4_return_entry = D_80084308;
             }
-        } else if (D_800842C4 == 6) {
-            D_800842D0 = D_800842C4;
-            D_800842D4 = D_800842C8;
-            D_800842D8 = D_80084308;
-        } else if ((D_800842B8 & 1) && (D_8007C284->flags & 4)) {
-            D_800842D0 = D_800842C4;
-            D_800842D4 = D_800842C8;
-            D_800842D8 = D_80084308;
-        } else if (D_800842C4 != D_800842BC && (D_8007C284->flags & 8)) {
-            D_800842DC = D_800842C4;
-            D_800842E0 = D_800842C8;
-            D_800842E4 = D_80084308;
-            if (D_800842DC == 0x1A && D_800842E0 == 4) {
-                D_800842E0 = 2;
-                D_800842E4 = 1;
+        } else if (map_next_id == 6) {
+            map_flag4_return_map = map_next_id;
+            map_flag4_return_subarea = map_next_subarea;
+            map_flag4_return_entry = D_80084308;
+        } else if ((map_flags & 1) && (map_area_def->flags & 4)) {
+            map_flag4_return_map = map_next_id;
+            map_flag4_return_subarea = map_next_subarea;
+            map_flag4_return_entry = D_80084308;
+        } else if (map_next_id != map_id && (map_area_def->flags & 8)) {
+            map_flag8_return_map = map_next_id;
+            map_flag8_return_subarea = map_next_subarea;
+            map_flag8_return_entry = D_80084308;
+            if (map_flag8_return_map == 0x1A && map_flag8_return_subarea == 4) {
+                map_flag8_return_subarea = 2;
+                map_flag8_return_entry = 1;
             }
         }
     }
-    if (D_800842BC == -1) {
+    if (map_id == -1) {
         Dma_ReadRom(D_753F0, D_80100000, D_851F0_end - D_753F0);
-        Dma_ReadRom(D_D86170, D_800814B0, 0x600);
+        Dma_ReadRom(D_D86170, map_clock_tlut_srcs, 0x600);
         Dma_ReadRom(D_D86770, D_80081AB0, 0x200);
     }
-    if (D_800842BC != D_800842C4) {
-        D_800842CC = D_800842BC;
-        D_800842BC = D_800842C4;
-        D_800842B8 = D_8007C284->flags;
-        if (D_800842B8 & 7) {
-            if (D_800842B8 & 2) {
+    if (map_id != map_next_id) {
+        D_800842CC = map_id;
+        map_id = map_next_id;
+        map_flags = map_area_def->flags;
+        if (map_flags & 7) {
+            if (map_flags & 2) {
                 Dma_ReadRom(D_851F0, D_8010FE00, D_C8DE0 - D_851F0);
             }
-            q = &((u32 *)map_extra_rom_ranges)[D_8007C284->unk3C * 3];
+            q = &((u32 *)map_extra_rom_ranges)[map_area_def->unk3C * 3];
             start = *q++;
             end = *q++;
             Dma_ReadRom(start, *q, end - start);
         }
-        Dma_ReadRom(D_8007C284->romStart, D_8007C284->dst, D_8007C284->romEnd - D_8007C284->romStart);
-        switch (D_800842BC) {
+        Dma_ReadRom(map_area_def->romStart, map_area_def->dst, map_area_def->romEnd - map_area_def->romStart);
+        switch (map_id) {
             case 3:
             case 5:
             case 7:
@@ -476,42 +476,42 @@ void Map_LoadArea(void) {
         *dst++ = *src--;
         n--;
     } while (n != 0);
-    k = D_800842C0 = D_800842C8;
-    D_8007C288 = &D_8007C284->unk18[k];
-    D_8007C294 = D_8007C284->unk10;
-    D_8007C28C = &D_8007C284->unk14[D_8007C288->unk0];
-    env_area_settings = &D_8007C284->unk1C[D_8007C288->unk2];
-    D_8007C290 = D_8007C28C->objs;
-    D_8007C298 = D_8007C284->unk2C;
-    D_8007C29C = D_8007C284->unk28;
-    D_800842E8 = D_8007C288->unk14;
-    D_8007C280 = env_area_settings->unk18;
-    if (D_8007C282 != env_area_settings->unk1C) {
-        D_8007C282 = env_area_settings->unk1C;
-        Dma_ReadRom(map_backdrop_defs[D_8007C282].start, D_800808B0, 0x800);
-        Dma_ReadRom(map_backdrop_defs[D_8007C282].start + 0x800, D_8007C6B0, 0x4000);
+    k = map_subarea = map_next_subarea;
+    map_subarea_def = &map_area_def->unk18[k];
+    map_obj_models = map_area_def->unk10;
+    map_subarea_grid = &map_area_def->unk14[map_subarea_def->unk0];
+    env_area_settings = &map_area_def->unk1C[map_subarea_def->unk2];
+    map_objs = map_subarea_grid->objs;
+    map_actor_walls = map_area_def->unk2C;
+    map_camera_walls = map_area_def->unk28;
+    map_subarea_flags = map_subarea_def->unk14;
+    map_env_flags = env_area_settings->unk18;
+    if (map_backdrop_id != env_area_settings->unk1C) {
+        map_backdrop_id = env_area_settings->unk1C;
+        Dma_ReadRom(map_backdrop_defs[map_backdrop_id].start, map_backdrop_phase_tluts, 0x800);
+        Dma_ReadRom(map_backdrop_defs[map_backdrop_id].start + 0x800, map_backdrop_tex, 0x4000);
     }
     if (D_80084308 != -1) {
-        sp = &D_8007C288->unkC[D_80084308];
-        D_8007A98C = sp->x;
-        D_8007A990 = sp->y;
-        D_8007A994 = sp->z;
-        D_8007A99C = sp->unkE;
+        sp = &map_subarea_def->unkC[D_80084308];
+        player_spawn_x = sp->x;
+        player_spawn_z = sp->y;
+        player_spawn_rot = sp->z;
+        player_spawn_obj = sp->unkE;
     }
-    n = D_8007C28C->count;
-    s = D_8007C290;
-    D_8007C2A4 = k = 0;
-    v = D_80083638;
+    n = map_subarea_grid->count;
+    s = map_objs;
+    mapobj_billboard_count = k = 0;
+    v = mapobj_billboard_normals;
     for (; n != 0; n--, s++) {
         if (s->unk16 & 0x8000) {
-            Coll_ResolveFloorAndWalls(s->x, s->y, s->z, 0xA00, &D_80082000);
-            s->y = D_80082000.y;
+            Coll_ResolveFloorAndWalls(s->x, s->y, s->z, 0xA00, &map_load_coll);
+            s->y = map_load_coll.y;
         }
         kind = s->unk16 & 0xFF;
         if (kind == 0x10) {
-            v->x = D_80082000.nx;
-            v->y = D_80082000.ny;
-            v->z = D_80082000.nz;
+            v->x = map_load_coll.nx;
+            v->y = map_load_coll.ny;
+            v->z = map_load_coll.nz;
             s->angle = k++;
             v++;
         } else if (kind == 0x83) {
@@ -522,17 +522,17 @@ void Map_LoadArea(void) {
             s->timer = Math_Rand(16);
         }
     }
-    for (z = D_80082048; z < &D_80082048[4]; z++) {
+    for (z = mapobj_wave_phase; z < &mapobj_wave_phase[4]; z++) {
         z->a = 0;
         z->b = 0;
     }
     for (i = 0; i < 32; i++) {
-        D_80081CE8[i] = D_8004DD98;
+        mapobj_wave_base[i] = mapobj_wave_base_init;
     }
-    D_80081CE0 = 1;
+    mapobj_wave_capture = 1;
     MapObjAnim_ClearAll();
     MapObj_ClearSpinners();
-    D_800842B4 = -1;
+    mapobj_ambient_prev_type = -1;
 }
 
 void Map_StartFrame(void) {
@@ -540,12 +540,12 @@ void Map_StartFrame(void) {
     s32 tmp;
     u16 *p;
 
-    D_8007C6AC = 0;
-    if (D_800842BC == 0x1D) {
+    mapobj_spinner_count = 0;
+    if (map_id == 0x1D) {
         i = 18; p = D_80124E00 + i; tmp = *p;
         for (; i != 0; i--, p--) { *p = *(p - 1); }
         *p = tmp;
-        D_800842A8++;
+        mapobj_arc_flicker_tick++;
     }
 }
 
@@ -579,7 +579,7 @@ void Sfx_PlayIfAudible(s8, u8);
 s32 MapObjAnim_Find(s32);
 void MapObj_DrawBillboards(MtxBuf *, s32, s32, Unk8000FA9C **);
 
-/* &D_80082058 kept in a saved register instead of rematerialized, 8 bytes short, register allocation; code is equivalent */
+/* &mapobj_opaque_list kept in a saved register instead of rematerialized, 8 bytes short, register allocation; code is equivalent */
 void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
     CellOffset *off;
     s32 n;
@@ -604,54 +604,54 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
     Unk80082048 *b;
     f64 d;
     s32 k;
-    s32 *pCB4 = &D_80081CB4;
-    s32 *pCB8 = &D_80081CB8;
-    Unk8000FA9C ***pCD0 = &D_80081CD0;
-    f32 *pAC = &D_800842AC;
-    s32 *pB0 = &D_800842B0;
+    s32 *pCB4 = &mapobj_noanim_count;
+    s32 *pCB8 = &mapobj_billboard_draw_count;
+    Unk8000FA9C ***pCD0 = &mapobj_billboard_cursor;
+    f32 *pAC = &mapobj_ambient_dist;
+    s32 *pB0 = &mapobj_ambient_type;
 
     *pCB4 = 0;
-    D_80081CB0 = 0;
+    mapobj_opaque_count = 0;
     *pCB8 = 0;
-    D_80081CBC = 0;
-    D_80081CC0 = 0;
-    D_80081CC4 = 0;
-    D_8007C2A4 = 0;
-    D_80081CC8 = (Unk8000FA9C **) D_80082058;
-    D_80081CCC = (Unk8000FA9C **) D_80082458;
-    *pCD0 = (Unk8000FA9C **) D_8007C2A8;
-    D_80081CD4 = D_80082860;
-    D_80081CD8 = D_80082C60;
-    D_80081CDC = D_80083068;
-    D_80081FE8 = (Unk8000FA9C *) D_80081CE8;
+    mapobj_translucent_count = 0;
+    mapobj_animtex_count = 0;
+    mapobj_scrolltex_count = 0;
+    mapobj_billboard_count = 0;
+    mapobj_opaque_cursor = (Unk8000FA9C **) mapobj_opaque_list;
+    mapobj_noanim_cursor = (Unk8000FA9C **) mapobj_noanim_list;
+    *pCD0 = (Unk8000FA9C **) mapobj_billboard_list;
+    mapobj_translucent_cursor = mapobj_translucent_list;
+    mapobj_animtex_cursor = mapobj_animtex_list;
+    mapobj_scrolltex_cursor = mapobj_scrolltex_list;
+    mapobj_wave_base_cursor = (Unk8000FA9C *) mapobj_wave_base;
     *pAC = 600.0f;
     *pB0 = -1;
     px = camera_state.x;
     pz = camera_state.z;
-    switch (D_8007C28C->unk28) {
+    switch (map_subarea_grid->unk28) {
         case 1:
             off = mapobj_cell_disc_r7;
             n = 0x9D;
-            cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
-            cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
+            cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
+            cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         case 2:
             off = mapobj_cell_disc_r5;
             n = 0x59;
-            cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
-            cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
+            cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
+            cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         case 3:
             off = mapobj_cell_square_3x3;
             n = 9;
-            cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
-            cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
+            cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
+            cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         case 4:
             off = mapobj_cell_disc_r2;
             n = 0x15;
-            cx = (px - D_8007C28C->originX) / D_8007C28C->cellW;
-            cz = (pz - D_8007C28C->originZ) / D_8007C28C->cellD;
+            cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
+            cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         default:
             off = mapobj_cell_single;
@@ -664,23 +664,23 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
         gx = off->dx + cx;
         gz = off->dz + cz;
         off++;
-        if (gx >= 0 && gz >= 0 && gx < D_8007C28C->w && gz < D_8007C28C->h) {
-            idx = D_8007C28C->w * gz + gx;
-            list = &D_8007C28C->lists[D_8007C28C->cells[idx]];
+        if (gx >= 0 && gz >= 0 && gx < map_subarea_grid->w && gz < map_subarea_grid->h) {
+            idx = map_subarea_grid->w * gz + gx;
+            list = &map_subarea_grid->lists[map_subarea_grid->cells[idx]];
             t = *list;
             MapObj_CollectCell(t, list + 1);
         }
     }
-    if (D_8007C28C->unk2 != 0) {
-        t = D_8007C28C->unk2;
-        MapObj_CollectCell(t, D_8007C28C->unk24);
+    if (map_subarea_grid->unk2 != 0) {
+        t = map_subarea_grid->unk2;
+        MapObj_CollectCell(t, map_subarea_grid->unk24);
     }
     gSPDisplayList(gfx_dl_head++, D_10000E8);
     gSPFogPosition(gfx_dl_head++, gfx_fog_near, gfx_fog_far);
     D_8007C2A0 = 0;
-    D_80081CC8 = (Unk8000FA9C **) D_80082058;
-    for (n = D_80081CB0; n != 0; n--) {
-        s = *D_80081CC8++;
+    mapobj_opaque_cursor = (Unk8000FA9C **) mapobj_opaque_list;
+    for (n = mapobj_opaque_count; n != 0; n--) {
+        s = *mapobj_opaque_cursor++;
         flags = s->unk16;
         x = s->x;
         y = s->y;
@@ -690,10 +690,10 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
             anim = &mapobj_loop_anims[(flags & 0xF00) >> 8];
             t = flags;
             t = (t & 0xFF) + 1;
-            Math_EvalTcbSpline((AnimInfo *) anim, &D_80082020, flags & 0xFF);
-            x += D_80082020.x * s->scale;
-            y += D_80082020.y * s->scale;
-            z += D_80082020.z * s->scale;
+            Math_EvalTcbSpline((AnimInfo *) anim, &mapobj_spline_out, flags & 0xFF);
+            x += mapobj_spline_out.x * s->scale;
+            y += mapobj_spline_out.y * s->scale;
+            z += mapobj_spline_out.z * s->scale;
             flags = t;
             if (t >= anim->unk6) {
                 flags = 0;
@@ -702,34 +702,34 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
         } else if (flags & 0x100) {
             i = MapObjAnim_Find((s32) s);
             if (i != 0) {
-                D_80081FF0[1] = 0.0f;
-                D_80081FF0[0] = D_80084238[i - 1].x;
-                Math_RotateVec2(s->angle * 0.017453292519943295, D_80081FF0);
-                x -= D_80081FF0[0];
-                z -= D_80081FF0[1];
-                rot += D_80084238[i - 1].z;
+                mapobj_temp_vec[1] = 0.0f;
+                mapobj_temp_vec[0] = mapobj_anim_slots[i - 1].x;
+                Math_RotateVec2(s->angle * 0.017453292519943295, mapobj_temp_vec);
+                x -= mapobj_temp_vec[0];
+                z -= mapobj_temp_vec[1];
+                rot += mapobj_anim_slots[i - 1].z;
             }
         }
         guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, s->scale, x, y, z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gSPDisplayList(gfx_dl_head++, D_8007C294[s->timer].dl);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[s->timer].dl);
         D_8007C2A0++;
     }
-    D_80081CC8 = (Unk8000FA9C **) D_80082458;
+    mapobj_opaque_cursor = (Unk8000FA9C **) mapobj_noanim_list;
     for (n = *pCB4; n != 0; n--) {
-        s = *D_80081CC8++;
+        s = *mapobj_opaque_cursor++;
         guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gSPDisplayList(gfx_dl_head++, D_8007C294[s->timer].dl);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[s->timer].dl);
         D_8007C2A0++;
     }
     MapObj_DrawSpinners(arg0);
     if (*pCB8 != 0) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetRenderMode(gfx_dl_head++, 0xC8113078, 0);
-        *pCD0 = (Unk8000FA9C **) D_8007C2A8;
+        *pCD0 = (Unk8000FA9C **) mapobj_billboard_list;
         MapObj_DrawBillboards(arg0, *pCB8, 0, *pCD0);
         MapObj_DrawBillboards(arg0, *pCB8, 1, *pCD0);
         MapObj_DrawBillboards(arg0, *pCB8, 2, *pCD0);
@@ -737,14 +737,14 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
     }
     gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
-    /* D_8004DD74 is read as four u16 pairs */
-    a = D_80082048;
-    b = (Unk80082048 *) D_8004DD74;
+    /* mapobj_wave_phase_step is read as four u16 pairs */
+    a = mapobj_wave_phase;
+    b = (Unk80082048 *) mapobj_wave_phase_step;
     for (;;) {
         u16 ta = a->a + b->a;
         u16 tb = a->b + b->b;
         b++;
-        k = b < ((Unk80082048 *) D_8004DD74) + 4;
+        k = b < ((Unk80082048 *) mapobj_wave_phase_step) + 4;
         a++;
         a[-1].a = ta;
         a[-1].b = tb;
@@ -752,29 +752,29 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
             break;
         }
     }
-    D_80081CE0 = 0;
+    mapobj_wave_capture = 0;
     Map_BlendPaletteByClock();
     func_80010768();
-    if (D_800842B0 == -1) {
-        if (D_800842B4 != D_800842B0) {
+    if (mapobj_ambient_type == -1) {
+        if (mapobj_ambient_prev_type != mapobj_ambient_type) {
             Sfx_StopChannel4();
         }
     } else {
-        d = D_800842AC;
+        d = mapobj_ambient_dist;
         if (d > 200.0) {
             n = (600.0 - d) * 0.6375;
         } else {
             n = 0xFF;
         }
         if (n >= 2) {
-            /* retail reads the low (last) byte of the word: lb D_8004DD88 + 4 * i + 3 */
-            Sfx_PlayIfAudible((s8) D_8004DD88[D_800842B0], n);
+            /* retail reads the low (last) byte of the word: lb mapobj_ambient_sfx + 4 * i + 3 */
+            Sfx_PlayIfAudible((s8) mapobj_ambient_sfx[mapobj_ambient_type], n);
         } else {
             Sfx_StopChannel4();
-            D_800842B0 = D_800842B4 = -1;
+            mapobj_ambient_type = mapobj_ambient_prev_type = -1;
         }
     }
-    D_800842B4 = D_800842B0;
+    mapobj_ambient_prev_type = mapobj_ambient_type;
 }
 #else
 #pragma GLOBAL_ASM("asm/nonmatchings/E2A0/MapObj_UpdateAndDrawNearby.s")
@@ -788,58 +788,58 @@ void MapObj_DrawTranslucent(MtxBuf *arg0) {
     s32 t;
     f32 rot;
 
-    D_80081CD4 = D_80082860;
-    n = D_80081CBC;
+    mapobj_translucent_cursor = mapobj_translucent_list;
+    n = mapobj_translucent_count;
     if (n != 0) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetRenderMode(gfx_dl_head++, 0x0C1849D8, 0);
-        gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_translucent_alpha[D_800842BC]);
+        gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_translucent_alpha[map_id]);
         gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     }
     for (; n != 0; n--) {
-        s = *D_80081CD4++;
+        s = *mapobj_translucent_cursor++;
         idx = s->timer;
         guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gSPDisplayList(gfx_dl_head++, D_8007C294[idx].dl);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[idx].dl);
         D_8007C2A0++;
     }
-    if (D_80081CC4 != 0) {
-        gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_translucent_alpha[D_800842BC]);
+    if (mapobj_scrolltex_count != 0) {
+        gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_translucent_alpha[map_id]);
         gDPSetRenderMode(gfx_dl_head++, 0xC81049D8, 0);
         gDPSetCombine(gfx_dl_head++, 0x121A04, 0xFFFFFFF8);
     }
-    D_80081CDC = D_80083068;
-    n = D_80081CC4;
+    mapobj_scrolltex_cursor = mapobj_scrolltex_list;
+    n = mapobj_scrolltex_count;
     for (; n != 0; n--) {
-        s = *D_80081CDC++;
+        s = *mapobj_scrolltex_cursor++;
         rot = s->angle;
         k = (s->unk16 & 0xFF) - 0x40;
         idx = s->timer;
         guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, s->scale, s->x, s->y, s->z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gDPLoadTextureTile(gfx_dl_head++, D_8004DDB4[k], G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, D_8004DDC8[k], 0, 0, 31,
-                           D_8004DDC8[k] - 1, 0, G_TX_WRAP, G_TX_WRAP, 5, (D_8004DDC8[k] == 32) ? 5 : 6, G_TX_NOLOD,
+        gDPLoadTextureTile(gfx_dl_head++, mapobj_scrolltex_tex[k], G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, mapobj_scrolltex_height[k], 0, 0, 31,
+                           mapobj_scrolltex_height[k] - 1, 0, G_TX_WRAP, G_TX_WRAP, 5, (mapobj_scrolltex_height[k] == 32) ? 5 : 6, G_TX_NOLOD,
                            G_TX_NOLOD);
-        gDPSetTileSize(gfx_dl_head++, G_TX_RENDERTILE, 0, (t = D_8004DDB0 % 256) << 2, 32 << 2, (D_8004DDC8[k] + t) << 2);
-        gSPDisplayList(gfx_dl_head++, D_8007C294[idx].dl);
+        gDPSetTileSize(gfx_dl_head++, G_TX_RENDERTILE, 0, (t = mapobj_scrolltex_offset % 256) << 2, 32 << 2, (mapobj_scrolltex_height[k] + t) << 2);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[idx].dl);
         D_8007C2A0++;
     }
-    if (D_80081CC0 != 0) {
+    if (mapobj_animtex_count != 0) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetRenderMode(gfx_dl_head++, 0x0C1849D8, 0);
         gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
-        D_80081CD8 = D_80082C60;
-        MapObj_DrawAnimTexBillboards(arg0, D_80081CC0, 0x11, D_80081CD8);
-        MapObj_DrawAnimTexBillboards(arg0, D_80081CC0, 0x12, D_80081CD8);
+        mapobj_animtex_cursor = mapobj_animtex_list;
+        MapObj_DrawAnimTexBillboards(arg0, mapobj_animtex_count, 0x11, mapobj_animtex_cursor);
+        MapObj_DrawAnimTexBillboards(arg0, mapobj_animtex_count, 0x12, mapobj_animtex_cursor);
     }
     D_8004DD70++;
     gDPPipeSync(gfx_dl_head++);
     gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
-    D_8004DDB0 += 2;
+    mapobj_scrolltex_offset += 2;
 }
 
 void MapObj_CollectCell(s32 count, u16 *ids) {
@@ -851,15 +851,15 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
     u16 kind;
 
     for (; count != 0; count--) {
-        s = &D_8007C290[*ids++];
+        s = &map_objs[*ids++];
         if (s->unk16 & 0x1000) {
-            dx = s->x - D_8007AA08.x;
-            dy = s->y - D_8007AA08.y;
-            dz = s->z - D_8007AA08.z;
+            dx = s->x - player_state.x;
+            dy = s->y - player_state.y;
+            dz = s->z - player_state.z;
             d = sqrtf(dx * dx + dy * dy + dz * dz);
-            if (d < D_800842AC) {
-                D_800842AC = d;
-                D_800842B0 = (s->unk16 & 0xF00) >> 8;
+            if (d < mapobj_ambient_dist) {
+                mapobj_ambient_dist = d;
+                mapobj_ambient_type = (s->unk16 & 0xF00) >> 8;
             }
         }
         kind = s->unk16;
@@ -870,32 +870,32 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
         }
         if (!kind || kind == 8) {
             if (s->unk16 & 0x4000) {
-                *D_80081CCC++ = s;
-                D_80081CB4++;
+                *mapobj_noanim_cursor++ = s;
+                mapobj_noanim_count++;
             } else {
-                *D_80081CC8++ = s;
-                D_80081CB0++;
+                *mapobj_opaque_cursor++ = s;
+                mapobj_opaque_count++;
             }
         } else if (kind < 4) {
-            if (D_80081CE0 != 0) {
-                *D_80081FE8 = *s;
+            if (mapobj_wave_capture != 0) {
+                *mapobj_wave_base_cursor = *s;
             }
-            s->x = sins(D_80082048[kind].a + 0xA000) / D_8004DDD4[kind] + D_80081FE8->x;
-            s->z = sins(D_80082048[kind].a + 0x2000) / D_8004DDF4[kind] + D_80081FE8->z;
-            s->y = sins(D_80082048[kind].b) / D_8004DDE4[kind] + D_80081FE8->y;
-            *D_80081CD4++ = s;
-            D_80081CBC++;
-            D_80081FE8++;
+            s->x = sins(mapobj_wave_phase[kind].a + 0xA000) / mapobj_wave_x_div[kind] + mapobj_wave_base_cursor->x;
+            s->z = sins(mapobj_wave_phase[kind].a + 0x2000) / mapobj_wave_z_div[kind] + mapobj_wave_base_cursor->z;
+            s->y = sins(mapobj_wave_phase[kind].b) / mapobj_wave_y_div[kind] + mapobj_wave_base_cursor->y;
+            *mapobj_translucent_cursor++ = s;
+            mapobj_translucent_count++;
+            mapobj_wave_base_cursor++;
         } else if (kind == 0x11 || kind == 0x12) {
-            *D_80081CD8++ = s;
-            D_80081CC0++;
+            *mapobj_animtex_cursor++ = s;
+            mapobj_animtex_count++;
         } else if (kind == 0x10) {
-            *D_80081CD0++ = s;
-            D_80081CB8++;
-            D_8007C2A4++;
+            *mapobj_billboard_cursor++ = s;
+            mapobj_billboard_draw_count++;
+            mapobj_billboard_count++;
         } else if (kind == 0x7F || kind == 0x80) {
-            *D_80081CD4++ = s;
-            D_80081CBC++;
+            *mapobj_translucent_cursor++ = s;
+            mapobj_translucent_count++;
         } else if (kind == 0x81) {
             Effect_QueueMapObjEmitter(s->x, s->y, s->z, s);
         } else if (kind == 0x83) {
@@ -905,8 +905,8 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
         } else if (kind == 0x82) {
             MapObj_QueueSpinner(s->x, s->y, s->z, s->angle, s);
         } else if (kind >= 0x40 && kind < 0x46) {
-            *D_80081CDC++ = s;
-            D_80081CC4++;
+            *mapobj_scrolltex_cursor++ = s;
+            mapobj_scrolltex_count++;
         }
     }
 }
@@ -920,7 +920,7 @@ void Map_DrawBackdrop(MtxBuf *arg0) {
 }
 
 void MapObjAnim_ClearAll(void) {
-    Unk80084238 *p = D_80084238;
+    Unk80084238 *p = mapobj_anim_slots;
     u32 i = 4;
 
     while (i--) {
@@ -934,7 +934,7 @@ s32 MapObjAnim_Find(s32 id) {
     s32 i;
 
     i = 4;
-    p = D_80084238;
+    p = mapobj_anim_slots;
     for (; i != 0; i--, p++) {
         if (p->timer != 0 && id == p->id) {
             i = 5 - i;
@@ -950,9 +950,9 @@ void MapObjAnim_Start(s32 state, s32 frame, s32 type, s32 id) {
     AnimInfo *anim;
 
     i = 3;
-    p = D_80084238;
-    // D_80084238[0].timer, read through the preceding array so IDO does not share its address with p
-    if (*(s32 *)&D_80083638[256] != 0) {
+    p = mapobj_anim_slots;
+    // mapobj_anim_slots[0].timer, read through the preceding array so IDO does not share its address with p
+    if (*(s32 *)&mapobj_billboard_normals[256] != 0) {
         do {
             i--;
             p++;
@@ -993,7 +993,7 @@ void MapObjAnim_UpdateAll(void) {
     AnimInfo *anim;
 
     i = 4;
-    p = D_80084238;
+    p = mapobj_anim_slots;
     do {
         if (p->timer != 0) {
             switch (p->state) {
@@ -1018,9 +1018,9 @@ void MapObjAnim_UpdateAll(void) {
                             anim = &mapobjanim_type4_anim;
                             break;
                     }
-                    Math_EvalTcbSpline(anim, &D_80082020, p->frame++);
-                    p->x = D_80082020.x;
-                    p->z = D_80082020.w;
+                    Math_EvalTcbSpline(anim, &mapobj_spline_out, p->frame++);
+                    p->x = mapobj_spline_out.x;
+                    p->z = mapobj_spline_out.w;
                     break;
             }
         }
@@ -1042,7 +1042,7 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list
     Vec3f *c;
 
     first = 0;
-    e = D_8007C284->unk20;
+    e = map_area_def->unk20;
     dl1 = e[type].a;
     dl2 = e[type].b;
     for (; count != 0; count--) {
@@ -1072,7 +1072,7 @@ void MapObj_DrawBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C **list
                     gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
                     gfx_mtx_index++;
                     gSPDisplayList(gfx_dl_head++, dl2);
-                    c = &D_80083638[(s32)s->angle];
+                    c = &mapobj_billboard_normals[(s32)s->angle];
                     Shadow_Queue(s->x, s->y, s->z, c->x, c->y, c->z, 8.0f);
                     D_8007C2A0++;
                 }
@@ -1088,24 +1088,24 @@ extern u8 mapobj_drop_sprite_tex[];
 extern u8 mapobj_drop_sprite_dl[];
 
 void MapObj_EmitArcSprite(Unk8000FA9C *arg0) {
-    static SpriteObj D_8004DE04 = {
+    static SpriteObj mapobj_arc_sprite_tmpl = {
         0x23, 0, (void *)MapObj_StepArcSprite, 0x07202000, 0, mapobj_arc_sprite_tex, mapobj_arc_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 15.0f, 0.0f, 0,
     };
 
     arg0->timer++;
     if (arg0->timer >= 0) {
-        D_8004DE04.x = arg0->x;
-        D_8004DE04.y = arg0->y;
-        D_8004DE04.z = arg0->z;
-        D_8004DE04.unk28 = D_8004DE04.unk2C = arg0->scale * 10.0;
-        D_80081FF0[0] = arg0->scale * 2.0;
-        D_80081FF0[1] = 0.0f;
-        Math_RotateVec2(arg0->angle, D_80081FF0);
-        D_8004DE04.unk30 = D_80081FF0[0];
-        D_8004DE04.unk38 = D_80081FF0[1];
-        D_8004DE04.unk10 = &mapobj_arc_sprite_tex[arg0->timer << 10];
-        Effect_AllocateSprite(&D_8004DE04);
+        mapobj_arc_sprite_tmpl.x = arg0->x;
+        mapobj_arc_sprite_tmpl.y = arg0->y;
+        mapobj_arc_sprite_tmpl.z = arg0->z;
+        mapobj_arc_sprite_tmpl.unk28 = mapobj_arc_sprite_tmpl.unk2C = arg0->scale * 10.0;
+        mapobj_temp_vec[0] = arg0->scale * 2.0;
+        mapobj_temp_vec[1] = 0.0f;
+        Math_RotateVec2(arg0->angle, mapobj_temp_vec);
+        mapobj_arc_sprite_tmpl.unk30 = mapobj_temp_vec[0];
+        mapobj_arc_sprite_tmpl.unk38 = mapobj_temp_vec[1];
+        mapobj_arc_sprite_tmpl.unk10 = &mapobj_arc_sprite_tex[arg0->timer << 10];
+        Effect_AllocateSprite(&mapobj_arc_sprite_tmpl);
         if (arg0->timer >= 7) {
             arg0->timer = Math_Rand(0x3C) - 0x78;
         }
@@ -1117,30 +1117,30 @@ void MapObj_StepArcSprite(Particle *arg0) {
     arg0->y += arg0->vy;
     arg0->z += arg0->vz;
     arg0->vy -= 0.9;
-    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, (D_800842A8 & 1) ? 0xDC : 0x78);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, (mapobj_arc_flicker_tick & 1) ? 0xDC : 0x78);
 }
 
 void MapObj_EmitDropSprite(Unk8000FA9C *arg0) {
-    static SpriteObj D_8004DE44 = {
+    static SpriteObj mapobj_drop_sprite_tmpl = {
         0xF, 0, (void *)MapObj_StepDropSprite, 0x00081000, 0, mapobj_drop_sprite_tex, mapobj_drop_sprite_dl,
         0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0,
     };
 
     arg0->timer--;
     if (arg0->timer == 0) {
-        D_8004DE44.x = arg0->x;
-        D_8004DE44.y = arg0->y;
-        D_8004DE44.z = arg0->z;
-        D_8004DE44.unk28 = D_8004DE44.unk2C = arg0->scale;
-        Effect_AllocateSprite(&D_8004DE44);
+        mapobj_drop_sprite_tmpl.x = arg0->x;
+        mapobj_drop_sprite_tmpl.y = arg0->y;
+        mapobj_drop_sprite_tmpl.z = arg0->z;
+        mapobj_drop_sprite_tmpl.unk28 = mapobj_drop_sprite_tmpl.unk2C = arg0->scale;
+        Effect_AllocateSprite(&mapobj_drop_sprite_tmpl);
         arg0->timer = Math_Rand(0x96) + 0x96;
     }
 }
 
 /* The rest of this file's .data. */
-u16 D_8004DE84[2] = { 0x10, 0x10 };
-u8 D_8004DE88[4] = { 0x82, 0xDC, 0x78, 0xF0 };
-extern Unk8004DE98 D_8004DE98[];
+u16 mapobj_animtex_width[2] = { 0x10, 0x10 };
+u8 mapobj_animtex_alpha[4] = { 0x82, 0xDC, 0x78, 0xF0 };
+extern Unk8004DE98 map_clock_tlut_schedule[];
 
 void MapObj_StepDropSprite(Particle *arg0) {
     arg0->y = arg0->y + arg0->vy / 2;
@@ -1153,10 +1153,10 @@ void MapObj_ClearSpinners(void) {
     Unk80083470 *q;
     Unk80083470 *p;
 
-    D_8007C6A8 = 0;
+    mapobj_spinner_prev_count = 0;
     i = 8;
-    q = D_80083470;
-    p = D_80083558;
+    q = mapobj_spinner_buf1;
+    p = mapobj_spinner_buf0;
     do {
         p->unk0 = 0;
         q->unk0 = 0;
@@ -1171,11 +1171,11 @@ void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *ar
     Unk80083470 *cur;
     s32 i;
 
-    cur = gfx_frame_index ? D_80083470 : D_80083558;
-    prev = gfx_frame_index ? D_80083558 : D_80083470;
-    if (D_8007C6AC < 8) {
-        cur += D_8007C6AC;
-        i = D_8007C6A8;
+    cur = gfx_frame_index ? mapobj_spinner_buf1 : mapobj_spinner_buf0;
+    prev = gfx_frame_index ? mapobj_spinner_buf0 : mapobj_spinner_buf1;
+    if (mapobj_spinner_count < 8) {
+        cur += mapobj_spinner_count;
+        i = mapobj_spinner_prev_count;
         while (i != 0 && arg4 != prev->unk18) {
             i--;
             prev++;
@@ -1192,7 +1192,7 @@ void MapObj_QueueSpinner(f32 arg0, f32 arg1, f32 arg2, f32 arg3, Unk8000FA9C *ar
         cur->unkC = arg2;
         cur->unk10 = arg3;
         cur->unk18 = arg4;
-        D_8007C6AC++;
+        mapobj_spinner_count++;
     }
 }
 
@@ -1201,9 +1201,9 @@ void MapObj_DrawSpinners(MtxBuf *arg0) {
     u32 i;
     Unk8000FA9C *s;
 
-    D_8007C6A8 = D_8007C6AC;
-    p = gfx_frame_index ? D_80083470 : D_80083558;
-    i = D_8007C6A8;
+    mapobj_spinner_prev_count = mapobj_spinner_count;
+    p = gfx_frame_index ? mapobj_spinner_buf1 : mapobj_spinner_buf0;
+    i = mapobj_spinner_prev_count;
     while (i--) {
         if (p->unk0 != 0) {
             s = p->unk18;
@@ -1211,7 +1211,7 @@ void MapObj_DrawSpinners(MtxBuf *arg0) {
             Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, p->unk10 * 0.017453292519943295, p->unk14, s->scale, s->x, s->y, s->z);
             gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
             gfx_mtx_index++;
-            gSPDisplayList(gfx_dl_head++, D_8007C294[s->timer].dl);
+            gSPDisplayList(gfx_dl_head++, map_obj_models[s->timer].dl);
             D_8007C2A0++;
         }
         p++;
@@ -1238,11 +1238,11 @@ void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C
                 gSPDisplayList(gfx_dl_head++, mapobj_animtex_dls[idx].a);
                 first++;
             }
-            gDPLoadTextureBlock(gfx_dl_head++, tex[(s->timer >> 1) & 7], G_IM_FMT_CI, G_IM_SIZ_8b, D_8004DE84[type - 0x11], 32, 0, 0, 0, 0, 0, 0, 0);
+            gDPLoadTextureBlock(gfx_dl_head++, tex[(s->timer >> 1) & 7], G_IM_FMT_CI, G_IM_SIZ_8b, mapobj_animtex_width[type - 0x11], 32, 0, 0, 0, 0, 0, 0, 0);
             Math_MtxRotScaleTrans(&arg0->mtx[gfx_mtx_index], 0.0f, D_80085E74, 0.0f, s->scale, s->x, s->y, s->z);
             gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
             gfx_mtx_index++;
-            gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, D_8004DE88[s->timer & 3]);
+            gDPSetEnvColor(gfx_dl_head++, 0, 0, 0, mapobj_animtex_alpha[s->timer & 3]);
             gSPDisplayList(gfx_dl_head++, dl);
             s->timer++;
             D_8007C2A0++;
@@ -1251,10 +1251,10 @@ void MapObj_DrawAnimTexBillboards(MtxBuf *arg0, s32 count, s32 type, Unk8000FA9C
 }
 
 void Map_BlendPaletteByClock(void) {
-    static s32 D_8004DE8C = 0;
-    static s32 D_8004DE90 = 1;
-    static s32 D_8004DE94 = 1;
-    static s32 D_80082858;
+    static s32 map_clock_tlut_id = 0;
+    static s32 map_clock_blend_left = 1;
+    static s32 map_clock_tlut_prev_id = 1;
+    static s32 map_clock_blend_len;
     Unk8004DE98 *p;
     s32 inv;
     u16 *src;
@@ -1268,25 +1268,25 @@ void Map_BlendPaletteByClock(void) {
     u16 g2;
     u16 b2;
 
-    p = D_8004DE98;
+    p = map_clock_tlut_schedule;
     while (p->id != 0xFF) {
         if (env_clock >= p->start && env_clock < p[1].start) {
-            D_8004DE8C = p->id;
+            map_clock_tlut_id = p->id;
             break;
         }
         p++;
     }
-    if (D_8004DE8C != D_8004DE94) {
-        D_80083060 = (u16 *)D_800814B0 + D_8004DE94 * 0x100;
-        D_8004DE90 = D_80082858 = p->unk4;
-        D_80083468 = (u16 *)D_800814B0 + D_8004DE8C * 0x100;
-        D_80083550 = D_800810B0;
+    if (map_clock_tlut_id != map_clock_tlut_prev_id) {
+        map_clock_blend_from = (u16 *)map_clock_tlut_srcs + map_clock_tlut_prev_id * 0x100;
+        map_clock_blend_left = map_clock_blend_len = p->unk4;
+        map_clock_blend_to = (u16 *)map_clock_tlut_srcs + map_clock_tlut_id * 0x100;
+        map_clock_blend_out = map_clock_tlut;
     }
-    if (D_8004DE90 != 0) {
-        dst = D_80083550;
-        src = D_80083060;
-        src2 = D_80083468;
-        inv = D_80082858 - D_8004DE90;
+    if (map_clock_blend_left != 0) {
+        dst = map_clock_blend_out;
+        src = map_clock_blend_from;
+        src2 = map_clock_blend_to;
+        inv = map_clock_blend_len - map_clock_blend_left;
         i = 0x100;
         while (i--) {
             r1 = (*src & 0xF800) >> 11;
@@ -1300,15 +1300,15 @@ void Map_BlendPaletteByClock(void) {
             }
             src++;
             src2++;
-            *dst++ = (((r1 * D_8004DE90 + r2 * inv) / D_80082858) << 11) | (((g1 * D_8004DE90 + g2 * inv) / D_80082858) << 6) | (((b1 * D_8004DE90 + b2 * inv) / D_80082858) << 1);
+            *dst++ = (((r1 * map_clock_blend_left + r2 * inv) / map_clock_blend_len) << 11) | (((g1 * map_clock_blend_left + g2 * inv) / map_clock_blend_len) << 6) | (((b1 * map_clock_blend_left + b2 * inv) / map_clock_blend_len) << 1);
         }
-        D_8004DE90--;
+        map_clock_blend_left--;
     }
-    D_8004DE94 = D_8004DE8C;
+    map_clock_tlut_prev_id = map_clock_tlut_id;
 }
 
 /* Map_BlendPaletteByClock's statics come first, then these. */
-Unk8004DE98 D_8004DE98[6] = {
+Unk8004DE98 map_clock_tlut_schedule[6] = {
     { 0, 0x1C, 2 }, { 0x15F9, 0x80, 0 }, { 0x4F1A, 0x1C, 1 },
     { 0x6513, 0x1C, 2 }, { 0x6977, 0x1C, 2 }, { 0x6979, 0xFF, 0xFF },
 };

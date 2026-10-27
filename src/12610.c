@@ -101,9 +101,9 @@ typedef struct {
 } Unk8004DEF4; /* size 0xC */
 
 
-extern u16 D_800806B0[];
-extern u16 D_800808B0[][0x100];
-extern u16 D_800842B8;
+extern u16 map_backdrop_tlut[];
+extern u16 map_backdrop_phase_tluts[][0x100];
+extern u16 map_flags;
 extern u16 battle_flags;
 extern s32 core_flags;
 extern s32 D_8008C168;
@@ -152,7 +152,7 @@ Unk8004DEF4 env_day_phase_last[1] = {
 void Env_InterpolateLighting(s32, Unk80084994 *);
 void Env_StepPaletteFade(s32);
 void Env_StartPaletteFade(s32, u16 *, u16 *);
-extern u16 D_8007C280;
+extern u16 map_env_flags;
 extern s32 gfx_frame_index;
 extern Gfx *gfx_dl_head;
 extern s16 gfx_fog_near;
@@ -228,8 +228,8 @@ void Env_InitForMap(void) {
     } else {
         env_next_phase = i;
     }
-    src = D_800808B0[p->unk4];
-    dst = D_800806B0;
+    src = map_backdrop_phase_tluts[p->unk4];
+    dst = map_backdrop_tlut;
     i = 0x100;
     do {
         *dst++ = *src++;
@@ -239,7 +239,7 @@ void Env_InitForMap(void) {
     if (++env_next_phase >= 4) {
         env_next_phase = 0;
     }
-    if (D_8007C280 & 2) {
+    if (map_env_flags & 2) {
         env_light_time = env_clock;
         env_light_period = env_day_length;
     } else {
@@ -266,13 +266,13 @@ void Env_Update(void) {
     } else {
         p = &env_day_phases[env_next_phase];
         if (env_light_time >= p->unk0 && (env_next_phase != 0 || env_light_time < env_last_phase_start)) {
-            Env_StartPaletteFade(p->unk8, D_800808B0[0] + p->unk4 * 256, D_800806B0);
+            Env_StartPaletteFade(p->unk8, map_backdrop_phase_tluts[0] + p->unk4 * 256, map_backdrop_tlut);
             if (++env_next_phase >= 4) {
                 env_next_phase = 0;
             }
         }
     }
-    if (D_800842B8 & 5) {
+    if (map_flags & 5) {
         if (!(battle_flags & 1) && !(core_flags & 3) && D_8008C168 == 0) {
             if (++env_clock >= env_day_length) {
                 env_clock -= env_day_length;
@@ -282,7 +282,7 @@ void Env_Update(void) {
             }
             env_light_time = env_clock;
         }
-    } else if ((D_8007C280 & 1) && D_8008C168 == 0) {
+    } else if ((map_env_flags & 1) && D_8008C168 == 0) {
         if (++env_light_time >= env_light_period) {
             env_light_time -= env_light_period;
         }
@@ -387,7 +387,7 @@ void Env_ComputeLightDirs(void) {
     f32 z;
     f32 angle;
 
-    if (D_8007C280 & 1) {
+    if (map_env_flags & 1) {
         angle = (f32)env_light_time * 3.141592653589793 * 2 / (f32)env_light_period - 3.141592653589793;
         Math_MtxFRotate(env_light_rot_mtx, 0.0f, 0.0f, angle);
         guMtxXFMF(env_light_rot_mtx, 0.0f, 90.0f, 50.0f, &x, &y, &z);
@@ -641,7 +641,7 @@ void Env_ApplyLightSlot(s32 idx) {
     Env_FillLights3(l, cols, dirs);
     gSPSetLights3(gfx_dl_head++, (*l));
     gDPSetFogColor(gfx_dl_head++, cols[3][0], cols[3][1], cols[3][2], 0xFF);
-    if (D_800842B8 & 0x80) {
+    if (map_flags & 0x80) {
         gfx_clear_r = cols[3][0];
         gfx_clear_g = cols[3][1];
         gfx_clear_b = cols[3][2];

@@ -16,7 +16,7 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 
 Verdict: **equivalent.**
 
-- Read the retail asm against the C: `env_last_phase_start = env_day_phase_last[0].unk0`, the backward walk (`p--`, test `i` before `i--`, stop when `env_clock >= p->unk0`), the `i < 0` fallback to entry 3, the 0x100-halfword copy from `D_800808B0[p->unk4]` to `D_800806B0`, the `++env_next_phase >= 4` wrap, both `D_8007C280 & 2` branches (last keyframe time of `env_area_settings`), `Env_ClearLightSlots()` and `env_play_time_ticks = 0`.
+- Read the retail asm against the C: `env_last_phase_start = env_day_phase_last[0].unk0`, the backward walk (`p--`, test `i` before `i--`, stop when `env_clock >= p->unk0`), the `i < 0` fallback to entry 3, the 0x100-halfword copy from `map_backdrop_phase_tluts[p->unk4]` to `map_backdrop_tlut`, the `++env_next_phase >= 4` wrap, both `map_env_flags & 2` branches (last keyframe time of `env_area_settings`), `Env_ClearLightSlots()` and `env_play_time_ticks = 0`.
 - Changed from the draft: it read `env_day_phases[3].unk0`, out of bounds of the 3-entry array; the C reads `env_day_phase_last[0].unk0`, the object retail's %hi/%lo name. Dropped the permuter leftovers (`(long long)` cast, `if (0) {}`). This cost words (draft: 8; keeping the leftovers with the fixed object gave 91).
 - Open: the walk steps from `env_day_phase_last` back into `env_day_phases`, so it relies on the two tables being adjacent, as they are (defined together in this file's .data, as in retail).
 

@@ -116,13 +116,13 @@ s32 Exit_IsEnabled(Unk24 *);
 void Exit_SetDestination(Unk24 *);
 void Math_RotateVec2(f32, f32 *);
 
-extern Unk8007C288 *D_8007C288;
-extern Unk8007C28C *D_8007C28C;
-extern CollObj *D_8007C290;
-extern CollMesh *D_8007C294;
-extern CollWalls *D_8007C298;
-extern CollWalls *D_8007C29C;
-extern s32 D_800842C0;
+extern Unk8007C288 *map_subarea_def;
+extern Unk8007C28C *map_subarea_grid;
+extern CollObj *map_objs;
+extern CollMesh *map_obj_models;
+extern CollWalls *map_actor_walls;
+extern CollWalls *map_camera_walls;
+extern s32 map_subarea;
 /* This file's .bss, 800842F0..80084300. */
 f32 coll_push_radius;
 extern Vec2f exit_local_offset;
@@ -145,35 +145,35 @@ void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) 
     out->nz = 0.0f;
     out->ny = 1.0f;
     if (flags & 1) {
-        if (D_8007C298 != NULL && Coll_PushFromWalls(x, z, &D_8007C298[D_800842C0], out)) {
+        if (map_actor_walls != NULL && Coll_PushFromWalls(x, z, &map_actor_walls[map_subarea], out)) {
             x = out->x;
             z = out->z;
         }
     } else if (flags & 2) {
-        if (D_8007C29C != NULL && Coll_PushFromWalls(x, z, &D_8007C29C[D_800842C0], out)) {
+        if (map_camera_walls != NULL && Coll_PushFromWalls(x, z, &map_camera_walls[map_subarea], out)) {
             x = out->x;
             z = out->z;
         }
     }
     ix = 0;
     iz = 0;
-    if (D_8007C28C->unk28 == 0) {
-        list = D_8007C28C->unk20;
+    if (map_subarea_grid->unk28 == 0) {
+        list = map_subarea_grid->unk20;
     } else {
-        ix = (x - D_8007C28C->unk8) / D_8007C28C->unk10;
-        iz = (z - D_8007C28C->unkC) / D_8007C28C->unk14;
-        i = D_8007C28C->unk4 * iz + ix;
-        list = &D_8007C28C->unk20[D_8007C28C->unk1C[i]];
+        ix = (x - map_subarea_grid->unk8) / map_subarea_grid->unk10;
+        iz = (z - map_subarea_grid->unkC) / map_subarea_grid->unk14;
+        i = map_subarea_grid->unk4 * iz + ix;
+        list = &map_subarea_grid->unk20[map_subarea_grid->unk1C[i]];
     }
-    if (ix >= 0 && ix < D_8007C28C->unk4 && iz >= 0 && iz < D_8007C28C->unk6) {
+    if (ix >= 0 && ix < map_subarea_grid->unk4 && iz >= 0 && iz < map_subarea_grid->unk6) {
         for (n = *list++; n != 0; n--) {
             if (Coll_TestObjectFloor(x, z, flags, *list++, out)) {
                 return;
             }
         }
     }
-    list = D_8007C28C->unk24;
-    for (n = D_8007C28C->unk2; n != 0; n--) {
+    list = map_subarea_grid->unk24;
+    for (n = map_subarea_grid->unk2; n != 0; n--) {
         if (Coll_TestObjectFloor(x, z, flags, *list++, out)) {
             return;
         }
@@ -188,12 +188,12 @@ s32 Coll_TestObjectFloor(f32 x, f32 z, u16 flags, u16 idx, CollResult *out) {
     f32 ang;
     f32 v[2];
 
-    obj = &D_8007C290[idx];
+    obj = &map_objs[idx];
     x -= obj->x;
     z -= obj->z;
     ang = obj->angle * 0.017453292519943295;
     ret = 0;
-    mesh = &D_8007C294[obj->mesh];
+    mesh = &map_obj_models[obj->mesh];
     if (ang != 0.0f) {
         v[0] = x;
         v[1] = z;
@@ -479,11 +479,11 @@ s32 Exit_CheckEnter(f32 x, f32 z, f32 angle) {
     Unk24 *p;
     f32 dx;
     f32 dz;
-    if (D_8007C288->count == 0 || (battle_flags & 1)) {
+    if (map_subarea_def->count == 0 || (battle_flags & 1)) {
         return 0;
     }
-    n = D_8007C288->count;
-    for (p = D_8007C288->list; n != 0; n--, p++) {
+    n = map_subarea_def->count;
+    for (p = map_subarea_def->list; n != 0; n--, p++) {
         if (Exit_IsEnabled(p)) {
             exit_local_offset.x = x - p->x;
             exit_local_offset.z = z - p->z;

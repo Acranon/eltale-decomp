@@ -78,20 +78,20 @@ extern s32 core_flags;
 extern s32 core_transition_timer;
 extern u16 fade_transition_style;
 extern s16 core_fade_out_time;
-extern f32 D_8007A98C;
-extern f32 D_8007A990;
-extern f32 D_8007A994;
-extern s32 D_8007A998;
-extern Unk8007A9D0 D_8007A9D0;
+extern f32 player_spawn_x;
+extern f32 player_spawn_z;
+extern f32 player_spawn_rot;
+extern s32 player_spawn_type;
+extern Unk8007A9D0 player_stats;
 extern s16 D_8007AA0E;
-extern s32 D_8007ABA4;
-extern u8 D_8007B430[];
-extern u8 D_8007B8E0[];
-extern s32 D_8007B900;
-extern Unk8007C288 *D_8007C288;
-extern s32 D_800842BC;
-extern s32 D_800842C4;
-extern s32 D_800842C8;
+extern s32 npc_count;
+extern u8 text_message_buf[];
+extern u8 text_speaker_name[];
+extern s32 enemy_count;
+extern Unk8007C288 *map_subarea_def;
+extern s32 map_id;
+extern s32 map_next_id;
+extern s32 map_next_subarea;
 extern s32 D_80084308;
 extern Unk80085E48 camera_state;
 extern f32 D_80085E54;
@@ -111,27 +111,27 @@ void Cutscene_StartEntry(s32 arg0) {
     D_8007A8E8 = entry->unk34;
     cutscene_messages_remaining = entry->unk38;
     cutscene_message_wait_frames = 0x3C;
-    D_800842BC = -1;
-    D_800842C4 = entry->unk0;
-    D_800842C8 = entry->unk4;
+    map_id = -1;
+    map_next_id = entry->unk0;
+    map_next_subarea = entry->unk4;
     Text_ResetAllWindows(0, arg0);
     text_active_window_count = 0;
     D_80084308 = -1;
     Map_LoadArea();
-    D_8007A98C = entry->unk20;
-    D_8007A990 = entry->unk24;
-    D_8007A994 = entry->unk28;
-    D_8007A998 = 0x108;
+    player_spawn_x = entry->unk20;
+    player_spawn_z = entry->unk24;
+    player_spawn_rot = entry->unk28;
+    player_spawn_type = 0x108;
     D_8007AA0E = 0;
-    D_8007A9D0.unk4 = D_8007A9D0.unk6;
+    player_stats.unk4 = player_stats.unk6;
     Player_Spawn();
     if (!(entry->unk3C & 1)) {
         core_flags |= 0x10000;
     }
-    D_8007ABA4 = 0;
-    func_80009764(D_8007C288->unk12);
+    npc_count = 0;
+    func_80009764(map_subarea_def->unk12);
     Npc_SpawnForArea(entry->unk2C, entry->unk30);
-    D_8007B900 = 0;
+    enemy_count = 0;
     Camera_InitForMap();
     camera_state.unk0 = 3;
     D_80085E54 = entry->unk8;
@@ -187,11 +187,11 @@ void Cutscene_CopyMessageBuffers(u8 *arg0, u8 *arg1) {
     s32 i;
     u8 *dst;
 
-    dst = D_8007B430;
+    dst = text_message_buf;
     for (i = 0x4B0; i != 0; i--) {
         *dst++ = *arg0++;
     }
-    dst = D_8007B8E0;
+    dst = text_speaker_name;
     for (i = 0x20; i != 0; i--) {
         *dst++ = *arg1++;
     }

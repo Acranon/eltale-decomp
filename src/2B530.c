@@ -329,7 +329,7 @@ typedef struct {
     /* 0x1C */ f32 y;
     /* 0x20 */ f32 z;
 } Unk8007AA08_2B530;
-extern Unk8007AA08_2B530 D_8007AA08;
+extern Unk8007AA08_2B530 player_state;
 extern s8 menu_bgm_volume_option;
 extern s8 D_800616B0;
 extern s8 input_stick_y;
@@ -710,8 +710,8 @@ void Menu_UpdateMapPage(s32 arg0) {
     Menu_DrawSprite(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
     if (menu_map_region < 6) {
         if (menu_map_spot < 0) {
-            cx = (s32) D_8007AA08.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
-            cy = (s32) D_8007AA08.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
+            cx = (s32) player_state.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
+            cy = (s32) player_state.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
         } else {
             cx = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2];
             cy = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2 + 1];
@@ -1273,8 +1273,8 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
 
 typedef struct { s8 a; s8 b; } Unk80060F30;
 extern Unk80060F30 menu_map_location_list[];
-extern s32 D_800842BC;
-extern s32 D_800842C0;
+extern s32 map_id;
+extern s32 map_subarea;
 extern f32 menu_map_cursor_x;
 extern f32 menu_map_cursor_y;
 extern s16 menu_map_world_scale[];
@@ -2105,7 +2105,7 @@ void Menu_FindMapPageLocation(void) {
                 sub = -1;
                 break;
         }
-        if (menu_map_location_list[i].a == D_800842BC && menu_map_location_list[i].b == D_800842C0) {
+        if (menu_map_location_list[i].a == map_id && menu_map_location_list[i].b == map_subarea) {
             break;
         }
     }

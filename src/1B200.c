@@ -932,7 +932,7 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
     /* 0x1C */ f32 unk1C;
 } Unk8007AA08_1B200;
-extern Unk8007AA08_1B200 D_8007AA08;
+extern Unk8007AA08_1B200 player_state;
 void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Coll1B200*);
 s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     s32 i;
@@ -964,7 +964,7 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
         Math_RotateVec2(angle, &effect_rotated_offset_scratch);
         pt->x = effect_rotated_offset_scratch.x + arg1;
         pt->z = effect_rotated_offset_scratch.y + arg3;
-        Coll_ResolveFloorAndWalls(pt->x, D_8007AA08.unk1C, pt->z, 0xA00, &effect_floor_collision_scratch);
+        Coll_ResolveFloorAndWalls(pt->x, player_state.unk1C, pt->z, 0xA00, &effect_floor_collision_scratch);
         if (effect_floor_collision_scratch.flags & 0x8000) {
             pt->y = arg2;
             n->x = 0.0f;
@@ -1332,7 +1332,7 @@ typedef struct {
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
 } Unk8007AB48;
-extern Unk8007AB48 D_8007AB48;
+extern Unk8007AB48 player_shadow_pos;
 extern f32 D_8007AA44;
 extern Gfx D_800EB9C8[];
 extern Gfx D_800EB990[];
@@ -1362,9 +1362,9 @@ void Effect_DrawStatUpMarkers(void* arg0) {
                 } else if (p->unk0 >= 22) {
                     alpha = ((25 - p->unk0) * alpha) >> 2;
                 }
-                x = D_8007AB48.x;
-                y = D_8007AA44 * 70.0 + D_8007AB48.y;
-                z = D_8007AB48.z;
+                x = player_shadow_pos.x;
+                y = D_8007AA44 * 70.0 + player_shadow_pos.y;
+                z = player_shadow_pos.z;
                 Math_MtxFAimAt(&mtx, x, y, z, camera_state.eyeX, camera_state.eyeY, camera_state.eyeZ);
                 Math_MtxFScaleAxes(&mtx, D_8007AA44, D_8007AA44, D_8007AA44);
                 guMtxF2L(mtx.mf, &((Unk2000000_1B200*)arg0)->unkC0[gfx_mtx_index]);

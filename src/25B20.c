@@ -36,8 +36,8 @@ typedef s32 (*ItemFunc)(void*, Struct_803AAAA0*, u8);
 
 extern u8 D_D384B0[];
 extern u8 D_8007AA20[];
-extern Struct_8007C288* D_8007C288;
-extern u16 D_800842B8;
+extern Struct_8007C288* map_subarea_def;
+extern u16 map_flags;
 extern u16 battle_flags;
 extern u8 D_8008CA4E;
 extern u8 D_803AC460[];
@@ -88,10 +88,10 @@ typedef struct {
 extern s32 core_flags;
 extern s32 core_transition_timer;
 extern s16 fade_transition_style;
-extern f32 D_8007A98C;
-extern f32 D_8007A990;
-extern f32 D_8007A994;
-extern s32 D_8007A998;
+extern f32 player_spawn_x;
+extern f32 player_spawn_z;
+extern f32 player_spawn_rot;
+extern s32 player_spawn_type;
 extern s16 D_8007AA0E;
 extern Struct_80084300 exit_destination;
 extern Struct_803AAA40 D_803AAA40[];
@@ -480,7 +480,7 @@ s32 Item_CanUseRestore(Struct_80026054* arg0, Struct_803AAAA0* arg1) {
 s32 Item_CanUseWarp(s32 arg0, Struct_803AAAA0* arg1) {
     s32 ret;
 
-    if ((D_800842B8 & 0xA) || (D_8007C288->unk14 & 4)) {
+    if ((map_flags & 0xA) || (map_subarea_def->unk14 & 4)) {
         ret = 0;
     } else {
         ret = 1;
@@ -538,10 +538,10 @@ void Item_UseWarp(Struct_80026140* arg0, Struct_803AAAA0* arg1) {
     exit_destination.unk0 = D_803AAA40[arg1->unk4].unk0;
     exit_destination.unk4 = D_803AAA40[arg1->unk4].unk2;
     exit_destination.unk8 = -1;
-    D_8007A98C = D_803AAA40[arg1->unk4].unk4;
-    D_8007A990 = D_803AAA40[arg1->unk4].unk8;
-    D_8007A994 = D_803AAA40[arg1->unk4].unkC;
-    D_8007A998 = 0x108;
+    player_spawn_x = D_803AAA40[arg1->unk4].unk4;
+    player_spawn_z = D_803AAA40[arg1->unk4].unk8;
+    player_spawn_rot = D_803AAA40[arg1->unk4].unkC;
+    player_spawn_type = 0x108;
     D_8007AA0E = 0;
     fade_transition_style = 1;
     item_effect_scale.x = D_803AB36C[1].unk8;
