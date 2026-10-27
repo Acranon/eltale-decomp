@@ -76,3 +76,44 @@ D_8020F470_ovl_title	title_screen_fade_combine_dl	Title_StepAndDrawScreenFade su
 D_8020F718_ovl_ending	ending_sprite_default_combine_dl	Ending_UpdateAndDrawSprites selects this combiner display list when no fade flag is active
 D_8020F730_ovl_ending	ending_scroll_backdrop_combine_dl	Ending_UpdateAndDrawScrollingBackdrop submits this combiner display list before scrolling texture strips
 D_8020F748_ovl_ending	ending_sprite_fade_combine_dl	Ending_UpdateAndDrawSprites selects this combiner display list when fade flags are active, then sets env color
+# cue assets with a unique animation-index owner; shared assets remain raw
+D_80218400_ovl_intro	intro_sprite_anim_0_tlut	intro_sprite_cues[0..37] references this tlut only with anim_index 0; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_8024B348_ovl_intro	intro_sprite_anim_4_tex	intro_sprite_cues[89..91] references this tex only with anim_index 4; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_8024BB30_ovl_intro	intro_sprite_anim_4_tlut	intro_sprite_cues[89..91] references this tlut only with anim_index 4; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_8024CE78_ovl_intro	intro_sprite_anim_6_variant0_tex	intro_sprite_cues[92..104] references this tex only with anim_index 6; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_8024E050_ovl_intro	intro_sprite_anim_6_variant0_tlut	intro_sprite_cues[92..104] references this tlut only with anim_index 6; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_8024C4E8_ovl_intro	intro_sprite_anim_6_variant1_tex	intro_sprite_cues[97..107] references this tex only with anim_index 6; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_8024CC70_ovl_intro	intro_sprite_anim_6_variant1_tlut	intro_sprite_cues[97..107] references this tlut only with anim_index 6; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_8024E258_ovl_intro	intro_sprite_anim_8_tex	intro_sprite_cues[121..132] references this tex only with anim_index 8; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_802510B0_ovl_intro	intro_sprite_anim_8_tlut	intro_sprite_cues[121..132] references this tlut only with anim_index 8; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_802512B8_ovl_intro	intro_sprite_anim_12_tex	intro_sprite_cues[158..167] references this tex only with anim_index 12; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_802531B0_ovl_intro	intro_sprite_anim_12_tlut	intro_sprite_cues[158..167] references this tlut only with anim_index 12; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_802533B8_ovl_intro	intro_sprite_anim_17_tex	intro_sprite_cues[206..213] references this tex only with anim_index 17; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80254E90_ovl_intro	intro_sprite_anim_17_tlut	intro_sprite_cues[206..213] references this tlut only with anim_index 17; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80255098_ovl_intro	intro_sprite_anim_22_tex	intro_sprite_cues[252..258] references this tex only with anim_index 22; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_802566F8_ovl_intro	intro_sprite_anim_22_tlut	intro_sprite_cues[252..258] references this tlut only with anim_index 22; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80248C30_ovl_intro	intro_sprite_anim_24_tlut	intro_sprite_cues[310..315] references this tlut only with anim_index 24; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80248E30_ovl_intro	intro_sprite_anim_24_tex	intro_sprite_cues[310..315] references this tex only with anim_index 24; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80256900_ovl_intro	intro_sprite_anim_29_tex	intro_sprite_cues[355..358] references this tex only with anim_index 29; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80257538_ovl_intro	intro_sprite_anim_29_tlut	intro_sprite_cues[355..358] references this tlut only with anim_index 29; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80217100_ovl_intro	intro_sprite_anim_31_tlut	intro_sprite_cues[368..407] references this tlut only with anim_index 31; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80217300_ovl_intro	intro_sprite_anim_31_tex	intro_sprite_cues[368..407] references this tex only with anim_index 31; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80258580_ovl_intro	intro_sprite_anim_32_tex	intro_sprite_cues[363..367] references this tex only with anim_index 32; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80259048_ovl_intro	intro_sprite_anim_32_tlut	intro_sprite_cues[363..367] references this tlut only with anim_index 32; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80257740_ovl_intro	intro_sprite_anim_34_tex	intro_sprite_cues[359..362] references this tex only with anim_index 34; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80258378_ovl_intro	intro_sprite_anim_34_tlut	intro_sprite_cues[359..362] references this tlut only with anim_index 34; Intro_RunSpriteScript selects intro_sprite_anim_table[cue.anim_index]
+D_80221618_ovl_ending	ending_sprite_anim_1_tex	ending_sprite_cues[33..63] references this tex only with anim_index 1; Ending_RunSpriteScript selects ending_sprite_anim_table[cue.anim_index]
+D_8022BAD0_ovl_ending	ending_sprite_anim_1_tlut	ending_sprite_cues[33..63] references this tlut only with anim_index 1; Ending_RunSpriteScript selects ending_sprite_anim_table[cue.anim_index]
+# title render assets with direct code roles; no interpretation of image or message content
+D_802111A8_ovl_title	title_menu_item_cursor_tlut	Title_DrawScreenAndMoveCursor loads this palette immediately before drawing the cursor at title_menu_item_cursor_pos[title_menu_item]
+D_80211148_ovl_title	title_menu_item_cursor_tex	Title_DrawScreenAndMoveCursor draws this texture at title_menu_item_cursor_pos[title_menu_item]
+D_80210D00_ovl_title	title_menu_atlas_tlut	Title_DrawScreenAndMoveCursor loads this palette before the three menu image display lists that use D_80210D20
+D_80210D20_ovl_title	title_menu_atlas_tex	The three menu image display lists D_8020F2A8/F300/F358 load regions of this texture
+D_80226AF8_ovl_title	title_message_box_border_tlut	Title_DrawScreenAndMoveCursor loads this palette before drawing four message-box border strips
+D_80226D00_ovl_title	title_message_box_top_left_border_tex	Title_DrawScreenAndMoveCursor draws top and left strips of the message box from this texture
+D_80226D18_ovl_title	title_message_box_bottom_right_border_tex	Title_DrawScreenAndMoveCursor draws bottom and right strips of the message box from this texture
+D_8020F3B0_ovl_title	title_initial_screen_dl	Title_DrawScreenAndMoveCursor submits this image display list only for its initial states 0 and 1
+D_8020FE10_ovl_title	title_initial_screen_image_tlut	title_initial_screen_dl loads this palette for the image drawn in title states 0 and 1
+D_80210010_ovl_title	title_initial_screen_image_tex	title_initial_screen_dl loads this texture for the image drawn in title states 0 and 1
+D_80105578_ovl_DA4570	pak_menu_state9_confirmation_message	PakMenu_Run displays this only in state 9 before the user confirms another Pak initialization attempt
+D_80105608_ovl_DA4570	pak_menu_state10_confirmation_message	PakMenu_Run displays this only in state 10 before the user confirms another Pak initialization attempt
