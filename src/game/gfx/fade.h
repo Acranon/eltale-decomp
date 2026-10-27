@@ -14,7 +14,7 @@ typedef struct ColorRGBA8 {
 
 /* .bss 8008CA50..8008CE60 */
 extern u16 fade_flags; /* bit 0 quad on, 1 hold at the end, 2 step the ramp backwards, 3 letterbox bars */
-extern u8 fade_grey_ramp_256[0x100][4];
+extern ColorRGBA8 fade_grey_ramp_256[0x100];
 extern s32 fade_frames_left;
 extern ColorRGBA8 *fade_ramp_ptr;
 

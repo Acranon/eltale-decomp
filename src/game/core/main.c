@@ -866,9 +866,7 @@ void Fade_StartTransitionIn(void) {
             Fade_Start(0x20, 4, fade_grey_ramp_slow_end);
             break;
         case 4:
-            /* H2b: fade.h declares fade_grey_ramp_256 as u8[0x100][4]; its last entry read as a
-             * ColorRGBA8 (see D3_HINTS: it is a ColorRGBA8[0x100]) */
-            Fade_Start(0x100, 4, (ColorRGBA8 *)fade_grey_ramp_256[0xFF]);
+            Fade_Start(0x100, 4, &fade_grey_ramp_256[0xFF]);
             break;
     }
 }
@@ -888,7 +886,7 @@ void Fade_StartTransitionOut(void) {
             Fade_Start(0x1F, 2, fade_grey_ramp_slow);
             break;
         case 4:
-            Fade_Start(0xFF, 2, (ColorRGBA8 *)fade_grey_ramp_256); /* H2b: as above */
+            Fade_Start(0xFF, 2, fade_grey_ramp_256);
             break;
     }
 }
