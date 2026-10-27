@@ -1,4 +1,4 @@
-#include "common.h"
+#include "overlays/intro/intro_screens.h"
 
 /*
  * Intro overlay: the three splash screens, the no-controller message and the pak warning screens.
@@ -39,9 +39,6 @@ extern u8 D_8025C1E0_ovl_intro[];
 extern u16 D_8025BFD8_ovl_intro[];
 extern u8 D_80259250_ovl_intro[];
 
-void Intro_DrawSplash1(void);
-void Intro_DrawSplash2(void);
-void Intro_DrawSplash3(void);
 
 void Intro_RunSplash1(void) {
     gSPDisplayList(gfx_dl_head++, intro_render_setup_dl);
