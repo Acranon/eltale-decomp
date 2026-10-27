@@ -137,6 +137,7 @@ extern Gfx mapobj_kind11_setup_dl[13];
 extern Gfx mapobj_kind12_setup_dl[13];
 extern Gfx mapobj_kind11_quad_dl[3];
 extern Gfx mapobj_kind12_quad_dl[3];
+extern u8 **mapobj_animtex_frame_tables[2];
 extern MapDlPair mapobj_animtex_dls[2];
 extern u8 *mapobj_kind11_frames[8];
 extern u8 *mapobj_kind12_frames[8];
