@@ -1102,17 +1102,17 @@ void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
 
     def = arg0->def;
     cfg = arg0->cfg;
-    if (def->unk0 >= 0) {
-        tbl = &D_800C18D8[def->unk0];
-        magic_temp_vec.x = def->unk8;
-        magic_temp_vec.y = def->unkC;
+    if (def->cast_visual_index >= 0) {
+        tbl = &D_800C18D8[def->cast_visual_index];
+        magic_temp_vec.x = def->cast_scale_x;
+        magic_temp_vec.y = def->cast_scale_y;
         magic_temp_vec.z = cfg->hit_range;
         if (arg0->vx != 0.0f || arg0->vz != 0.0f) {
             angle = Math_Atan2(arg0->vx, arg0->vz);
         } else {
             angle = arg1->rot;
         }
-        arg0->unk34 = Magic_CreateVisualEffect(def->unk2, def->unk4, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg1);
+        arg0->unk34 = Magic_CreateVisualEffect(def->cast_color_index, def->cast_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg1);
         arg0->unk34->unk28 = arg0->vx;
         arg0->unk34->unk2C = arg0->vy;
         arg0->unk34->unk30 = arg0->vz;
@@ -1132,8 +1132,8 @@ void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
                 break;
         }
     }
-    if (def->unk40 >= 0) {
-        Sfx_Play(def->unk41, def->unk40, 0xFF);
+    if (def->cast_sound_id >= 0) {
+        Sfx_Play(def->cast_sound_delay, def->cast_sound_id, 0xFF);
     }
 }
 
@@ -1146,21 +1146,21 @@ void Magic_CreateTimedPresentation(MagicEffect* arg0, Actor* arg1) {
 
     def = arg0->def;
     cfg = arg0->cfg;
-    tbl = &D_800C18D8[def->unk10];
-    magic_temp_vec.x = def->unk18;
-    magic_temp_vec.y = def->unk1C;
+    tbl = &D_800C18D8[def->timed_visual_index];
+    magic_temp_vec.x = def->timed_scale_x;
+    magic_temp_vec.y = def->timed_scale_y;
     magic_temp_vec.z = cfg->hit_range;
-    if (def->unk14 & 0x10) {
+    if (def->timed_flags & 0x10) {
         angle = arg0->unk4 * 3.141592653589793 / 10.0;
     } else {
         angle = arg1->rot;
     }
-    ret = Magic_CreateVisualEffect(def->unk12, def->unk14, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->unk24);
+    ret = Magic_CreateVisualEffect(def->timed_color_index, def->timed_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->unk24);
     ret->unk28 = arg0->vx;
     ret->unk2C = arg0->vy;
     ret->unk30 = arg0->vz;
-    if (def->unk46 >= 0) {
-        Sfx_Play(def->unk47, def->unk46, 0xFF);
+    if (def->timed_sound_id >= 0) {
+        Sfx_Play(def->timed_sound_delay, def->timed_sound_id, 0xFF);
     }
 }
 
@@ -1176,12 +1176,12 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
 
     def = (SpellFxDef*)arg0->def;
     cfg = arg0->cfg;
-    if (def->unk30 >= 0) {
-        tbl = &D_800C18D8[def->unk30];
-        magic_temp_vec.x = def->unk38;
-        magic_temp_vec.y = def->unk3C;
+    if (def->hit_visual_index >= 0) {
+        tbl = &D_800C18D8[def->hit_visual_index];
+        magic_temp_vec.x = def->hit_scale_x;
+        magic_temp_vec.y = def->hit_scale_y;
         magic_temp_vec.z = cfg->hit_range;
-        flags = def->unk34;
+        flags = def->hit_flags;
         if (flags & 0x40) {
             arg1 = arg0->unk24;
         }
@@ -1196,7 +1196,7 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
         } else {
             y = arg1->y;
         }
-        arg0->unk38 = Magic_CreateVisualEffect(def->unk32, flags, arg1->x, y, arg1->z, arg1->rot, tbl, &magic_temp_vec, arg1);
+        arg0->unk38 = Magic_CreateVisualEffect(def->hit_color_index, flags, arg1->x, y, arg1->z, arg1->rot, tbl, &magic_temp_vec, arg1);
         arg0->unk38->unk28 = arg0->vx;
         arg0->unk38->unk2C = arg0->vy;
         arg0->unk38->unk30 = arg0->vz;
@@ -1216,8 +1216,8 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
                 break;
         }
     }
-    if (def->unk42 >= 0) {
-        Sfx_Play(def->unk43, def->unk42, 0xFF);
+    if (def->hit_sound_id >= 0) {
+        Sfx_Play(def->hit_sound_delay, def->hit_sound_id, 0xFF);
     } else if (arg0->unk24 != arg0->target) {
         Sfx_Play(0, 0x18, 0xFF);
     }
@@ -1234,12 +1234,12 @@ void Magic_CreateGroundHitPresentation(MagicEffect* arg0, Actor* arg1) {
 
     def = (SpellFxDef*)arg0->def;
     cfg = arg0->cfg;
-    if (def->unk20 >= 0) {
-        tbl = &D_800C18D8[def->unk20];
-        magic_temp_vec.x = def->unk28;
-        magic_temp_vec.y = def->unk2C;
+    if (def->ground_hit_visual_index >= 0) {
+        tbl = &D_800C18D8[def->ground_hit_visual_index];
+        magic_temp_vec.x = def->ground_hit_scale_x;
+        magic_temp_vec.y = def->ground_hit_scale_y;
         magic_temp_vec.z = cfg->hit_range;
-        ret = Magic_CreateVisualEffect(def->unk22, def->unk24, arg0->x, arg0->y, arg0->z, arg1->rot, tbl, &magic_temp_vec, arg0->unk24);
+        ret = Magic_CreateVisualEffect(def->ground_hit_color_index, def->ground_hit_flags, arg0->x, arg0->y, arg0->z, arg1->rot, tbl, &magic_temp_vec, arg0->unk24);
         ret->unk28 = arg0->vx;
         ret->unk2C = arg0->vy;
         ret->unk30 = arg0->vz;
@@ -1257,8 +1257,8 @@ void Magic_CreateGroundHitPresentation(MagicEffect* arg0, Actor* arg1) {
                 break;
         }
     }
-    if (def->unk44 >= 0) {
-        Sfx_Play(def->unk45, def->unk44, 0xFF);
+    if (def->ground_hit_sound_id >= 0) {
+        Sfx_Play(def->ground_hit_sound_delay, def->ground_hit_sound_id, 0xFF);
     }
 }
 

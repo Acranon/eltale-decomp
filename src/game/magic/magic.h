@@ -51,38 +51,38 @@ typedef struct SpellDef {
  * visual-effect stages (cast, timed, ground hit, hit: table index, two args, scale x/y)
  * and four sound pairs. */
 typedef struct SpellFxDef {
-    /* 0x00 */ s16 unk0; /* cast: D_800C18D8 index, -1: none */
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
+    /* 0x00 */ s16 cast_visual_index; /* cast: D_800C18D8 index, -1: none */
+    /* 0x02 */ u16 cast_color_index;
+    /* 0x04 */ u16 cast_flags;
     /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ s16 unk10; /* timed */
-    /* 0x12 */ u16 unk12;
-    /* 0x14 */ u16 unk14;
+    /* 0x08 */ f32 cast_scale_x;
+    /* 0x0C */ f32 cast_scale_y;
+    /* 0x10 */ s16 timed_visual_index; /* timed */
+    /* 0x12 */ u16 timed_color_index;
+    /* 0x14 */ u16 timed_flags;
     /* 0x16 */ u8 pad16[2];
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ s16 unk20; /* ground hit */
-    /* 0x22 */ u16 unk22;
-    /* 0x24 */ u16 unk24;
+    /* 0x18 */ f32 timed_scale_x;
+    /* 0x1C */ f32 timed_scale_y;
+    /* 0x20 */ s16 ground_hit_visual_index; /* ground hit */
+    /* 0x22 */ u16 ground_hit_color_index;
+    /* 0x24 */ u16 ground_hit_flags;
     /* 0x26 */ u8 pad26[2];
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ s16 unk30; /* hit */
-    /* 0x32 */ u16 unk32;
-    /* 0x34 */ u16 unk34;
+    /* 0x28 */ f32 ground_hit_scale_x;
+    /* 0x2C */ f32 ground_hit_scale_y;
+    /* 0x30 */ s16 hit_visual_index; /* hit */
+    /* 0x32 */ u16 hit_color_index;
+    /* 0x34 */ u16 hit_flags;
     /* 0x36 */ u8 pad36[2];
-    /* 0x38 */ f32 unk38;
-    /* 0x3C */ f32 unk3C;
-    /* 0x40 */ s8 unk40; /* cast sound (Sfx_Play arg 2, -1: none) */
-    /* 0x41 */ u8 unk41;
-    /* 0x42 */ s8 unk42; /* hit sound */
-    /* 0x43 */ u8 unk43;
-    /* 0x44 */ s8 unk44; /* ground hit sound */
-    /* 0x45 */ u8 unk45;
-    /* 0x46 */ s8 unk46; /* timed sound */
-    /* 0x47 */ u8 unk47;
+    /* 0x38 */ f32 hit_scale_x;
+    /* 0x3C */ f32 hit_scale_y;
+    /* 0x40 */ s8 cast_sound_id; /* cast sound (Sfx_Play arg 2, -1: none) */
+    /* 0x41 */ u8 cast_sound_delay;
+    /* 0x42 */ s8 hit_sound_id; /* hit sound */
+    /* 0x43 */ u8 hit_sound_delay;
+    /* 0x44 */ s8 ground_hit_sound_id; /* ground hit sound */
+    /* 0x45 */ u8 ground_hit_sound_delay;
+    /* 0x46 */ s8 timed_sound_id; /* timed sound */
+    /* 0x47 */ u8 timed_sound_delay;
 } SpellFxDef; /* 0x48 bytes */
 
 /* A spell's particle record (D_800C363C tables, same index as SpellDef): for three
