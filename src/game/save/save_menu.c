@@ -1,90 +1,18 @@
-#include "common.h"
+#include "game/save/save_menu.h"
+
+/* Local Controller Pak scan view; the input header's prototypes are reconciled in H2. */
+typedef struct {
+    /* 0x00 */ s16 unk0;
+    /* 0x02 */ s8 unk2[16];
+    /* 0x12 */ s8 unk12;
+    /* 0x13 */ u8 unk13;
+} Unk80092E48; /* 0x14 bytes */
 
 /*
  * Controller Pak save/load menu: file discovery, UI states, and game-state
  * capture and restoration.
  * Original file: 30600.c (ROM 0x30600).
  */
-
-typedef struct {
-    u8 b[0x20];
-} Bytes20;
-
-typedef struct {
-    u8 b[0x10];
-} Bytes10;
-
-typedef struct {
-    u8 b[0x97];
-} Bytes97;
-
-typedef struct {
-    u8 b[1];
-} Bytes1;
-
-typedef struct {
-    /* 0x00 */ Bytes20 unk0;
-    /* 0x20 */ Bytes10 unk20;
-    /* 0x30 */ Bytes97 unk30;
-    /* 0xC7 */ Bytes1 unkC7;
-} Unk80090228; /* size = 0xC8 */
-
-#ifdef NON_MATCHING
-/* the fields SaveMenu_UpdateSlotList reads (same size and alignment as the retail-build view) */
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u16 unk8;
-    /* 0x0A */ u16 unkA;
-    /* 0x0C */ s32 unkC[6];
-    /* 0x24 */ u8 unk24;
-    /* 0x25 */ u8 unk25;
-    /* 0x26 */ u8 unk26;
-    /* 0x27 */ u8 unk27;
-    /* 0x28 */ s32 unk28[4];
-} Unk8007A9D0; /* size = 0x38 */
-
-typedef struct {
-    u8 b[14];
-} Bytes14;
-#else
-typedef struct {
-    s32 unk0[14];
-} Unk8007A9D0; /* size = 0x38 */
-#endif
-
-typedef struct {
-    /* 0x00 */ Unk8007A9D0 unk0;
-    /* 0x38 */ u16 unk38;
-    /* 0x3A */ u16 unk3A;
-    /* 0x3C */ s32 unk3C;
-    /* 0x40 */ s32 unk40;
-    /* 0x44 */ s32 unk44;
-    /* 0x48 */ s32 unk48;
-    /* 0x4C */ s32 unk4C;
-    /* 0x50 */ s32 unk50;
-    /* 0x54 */ s32 unk54;
-    /* 0x58 */ s32 unk58;
-    /* 0x5C */ u16 unk5C;
-    /* 0x5E */ u16 unk5E;
-    /* 0x60 */ u16 unk60;
-    /* 0x62 */ s8 unk62;
-    /* 0x63 */ s8 unk63;
-    /* 0x64 */ u16 unk64;
-} Unk8008FBA8; /* size = 0x68 */
-
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s8 unk2[16];
-    /* 0x12 */ s8 unk12;
-    /* 0x13 */ u8 unk13;
-} Unk80092E48; /* size = 0x14 */
-
-typedef struct {
-    s8 unk0;
-    s8 unk1;
-} Unk8008FB80;
 
 /* .bss 8008FB70..80090450 */
 u16 save_menu_flags; /* low three bits select the save-menu state */
@@ -100,10 +28,10 @@ u8 save_menu_stick_repeat_counter; /* SaveMenu_UpdateSlotList reads it with lbu 
 s8 save_menu_stick_repeat_counter;
 #endif
 u8 save_menu_repair_count;
-Unk8008FB80 save_menu_file_entries[17];
-Unk8008FBA8 save_menu_save_headers[16];
-Unk80090228 save_menu_game_state_block;
-Unk8008FBA8 save_menu_header_read_scratch; /* Pak_ReadFile reads 0x80 bytes into it */
+SaveFileEntry save_menu_file_entries[17];
+SaveHeader save_menu_save_headers[16];
+SaveGameStateBlock save_menu_game_state_block;
+SaveHeader save_menu_header_read_scratch; /* Pak_ReadFile reads 0x80 bytes into it */
 u8 D_80090358[0x18];    /* the rest of that 0x80-byte buffer: unreferenced */
 u8 save_menu_state_read_scratch[0xE0];
 
@@ -113,7 +41,7 @@ extern s8 menu_text_delay_option;
 extern u16 player_respawn_map;
 extern u16 player_respawn_subarea;
 extern u16 player_respawn_entry;
-extern Unk8007A9D0 player_stats;
+extern ActorStats player_stats;
 extern u8 boss_defeated_bits[];
 extern s32 map_id;
 extern s32 map_subarea;
@@ -141,21 +69,8 @@ extern u8 D_80090258[];
 extern u8 D_800902EF[];
 extern s8 input_primary_port;
 
-void SaveMenu_DrawOperationPanel(void);
-void SaveMenu_CheckControllerPak(void);
-void SaveMenu_UpdateDialog(void);
-void SaveMenu_UpdateSlotList(s32);
-void SaveMenu_UpdateDelay(void);
-void SaveMenu_DeleteSelectedFile(void);
-void SaveMenu_LoadSelectedFile(void);
-void SaveMenu_SaveSelectedFile(void);
-void SaveMenu_RepairPak(void);
-void SaveMenu_DrawBackground(void);
-void SaveMenu_CaptureGameState(s32);
-void SaveMenu_RestoreGameState(s32);
 void Menu_DrawSprite(s32, s32, s32, s32, s32);
 void Text_DrawEncodedString(s32, s32, u8 *);
-void SaveMenu_SetTextDrawState(void);
 s8 Pak_AllocateGameFile(s32, u8);
 u8 Pak_DeleteGameFile(s32, u8);
 s32 Pak_WriteFile(s32, s32, s32, s32, void *);
@@ -169,7 +84,6 @@ s32 func_8003D0F0(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
 s32 Pak_ScanGameFiles(s32);
-void SaveMenu_RefreshFileList(void);
 extern s16 save_menu_dialog_rects[][4];
 extern u8 *save_menu_dialog_messages_save[];
 extern u8 *save_menu_dialog_messages_load_delete[];
@@ -654,7 +568,7 @@ void SaveMenu_UpdateDialog(void) {
 /* .data 80061650..80061660: SaveMenu_UpdateSlotList's local message (an initialized u8[14]
  * that IDO copies to the stack); becomes its initializer when the function is C. */
 #ifdef NON_MATCHING
-Bytes14 D_80061650 = { {
+SaveBytes14 D_80061650 = { {
 #include "assets/D_80061650.inc.c"
 } };
 #else
@@ -672,8 +586,8 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     s32 n;
     s32 pad_x;
     s32 colors[1];
-    Bytes14 buf;
-    Unk8008FB80 *ptr[1];
+    SaveBytes14 buf;
+    SaveFileEntry *ptr[1];
 
     flag = 0;
     buf = D_80061650;
@@ -703,10 +617,10 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 Menu_DrawSprite(0x44, 0xD9, 0x35, 0x1C, 0xE);
                 colors[0] = 0x48;
             }
-            Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].unk0.unk24, 0xA);
-            Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].unk0.unk25, 0xA);
-            Menu_DrawNumber(2, 0xAF, 0x6C, save_menu_save_headers[idx].unk0.unk26, 0xA);
-            Menu_DrawNumber(2, 0xD4, 0x6C, save_menu_save_headers[idx].unk0.unk27, 0xA);
+            Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].unk0.unk24[0], 0xA);
+            Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].unk0.unk24[1], 0xA);
+            Menu_DrawNumber(2, 0xAF, 0x6C, save_menu_save_headers[idx].unk0.unk24[2], 0xA);
+            Menu_DrawNumber(2, 0xD4, 0x6C, save_menu_save_headers[idx].unk0.unk24[3], 0xA);
             switch (save_menu_save_headers[idx].unk3C) {
                 case 15:
                     if (save_menu_save_headers[idx].unk40 == 5) {
@@ -805,10 +719,10 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     Menu_DrawSprite(0x44, 0xD9, 0x82, 0x1C, 0xE);
                     colors[0] = 0x48;
                 }
-                Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].unk0.unk24, 0xA);
-                Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].unk0.unk25, 0xA);
-                Menu_DrawNumber(2, 0xAF, 0xBA, save_menu_save_headers[idx].unk0.unk26, 0xA);
-                Menu_DrawNumber(2, 0xD4, 0xBA, save_menu_save_headers[idx].unk0.unk27, 0xA);
+                Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].unk0.unk24[0], 0xA);
+                Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].unk0.unk24[1], 0xA);
+                Menu_DrawNumber(2, 0xAF, 0xBA, save_menu_save_headers[idx].unk0.unk24[2], 0xA);
+                Menu_DrawNumber(2, 0xD4, 0xBA, save_menu_save_headers[idx].unk0.unk24[3], 0xA);
                 switch (save_menu_save_headers[idx].unk3C) {
                     case 15:
                         if (save_menu_save_headers[idx].unk40 == 5) {
@@ -1033,7 +947,7 @@ void SaveMenu_DeleteSelectedFile(void) {
 void SaveMenu_LoadSelectedFile(void) {
     s32 err = Pak_ReadFile(input_primary_port, save_menu_file_entries[save_menu_selected_slot].unk0, 0x80, 0xE0, save_menu_state_read_scratch);
 
-    save_menu_game_state_block = *(Unk80090228 *)save_menu_state_read_scratch;
+    save_menu_game_state_block = *(SaveGameStateBlock *)save_menu_state_read_scratch;
     if (err != 0) {
         save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
@@ -1068,7 +982,7 @@ void SaveMenu_SaveSelectedFile(void) {
     s32 id;
     s32 i;
     s32 idx;
-    Unk8008FB80 *p;
+    SaveFileEntry *p;
     s32 k;
     s32 cont;
 
@@ -1198,12 +1112,12 @@ void SaveMenu_RepairPak(void) {
 }
 
 void SaveMenu_RefreshFileList(void) {
-    Unk8008FB80 *p;
+    SaveFileEntry *p;
     s32 cont;
     s32 n;
     s32 err = 0;
     s32 i;
-    Unk8008FBA8 *e;
+    SaveHeader *e;
     s32 ret;
 
     for (i = 0; i < 17; i++) {
@@ -1283,7 +1197,7 @@ void SaveMenu_DrawBackground(void) {
 }
 
 void SaveMenu_CaptureGameState(s32 arg0) {
-    Unk8008FBA8 *e = &save_menu_save_headers[arg0];
+    SaveHeader *e = &save_menu_save_headers[arg0];
     u8 *d;
     u8 *s;
     s32 n;
@@ -1328,7 +1242,7 @@ void SaveMenu_CaptureGameState(s32 arg0) {
 }
 
 void SaveMenu_RestoreGameState(s32 arg0) {
-    Unk8008FBA8 *e = &save_menu_save_headers[arg0];
+    SaveHeader *e = &save_menu_save_headers[arg0];
     u8 *d;
     u8 *s;
     s32 n;
