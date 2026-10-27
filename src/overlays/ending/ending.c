@@ -1,5 +1,4 @@
-#include "common.h"
-#include "overlays/ending/ending_data.h"
+#include "overlays/ending/ending.h"
 
 /*
  * Ending overlay: entry and per-frame update, the same scripted sprite engine as the intro,
@@ -10,57 +9,6 @@
 extern Gfx* gfx_dl_head;
 extern Gfx ending_sprite_setup_dl[];
 
-s32 Ending_RunSpriteScript(void);
-
-typedef struct {
-    s32 unk0;
-    s16 unk4;
-    s16 unk6;
-    s16 unk8;
-    s16 unkA;
-    s16 unkC;
-    s16 unkE;
-    s16 unk10;
-    s16 unk12;
-    s32 unk14;
-    s32 unk18;
-    f32 unk1C;
-    f32 unk20;
-    s16 unk24;
-    s16 unk26;
-    s16 unk28;
-    s16 unk2A;
-    s16 unk2C;
-    s16 unk2E;
-    s16 unk30;
-    u16 unk32;
-    s16 unk34;
-    char unk36[2];
-    s32 unk38;
-    u32 unk3C;
-    f32 unk40;
-    f32 unk44;
-    f32 unk48;
-    u16 unk4C;
-    s16 unk4E;
-} UnkStruct_8022BB38;
-
-typedef struct {
-    s32 unk0;
-    s32 unk4;
-    s32 s;
-    s32 t;
-    s32 unk10;
-    s32 unk14;
-    s32 sw;
-    s32 th;
-    s32 dsdx;
-    s32 dtdy;
-    s32 sfrac;
-    s32 tfrac;
-    s32 env;
-    s32 prim;
-} UnkArg_8020CE70;
 
 typedef struct {
     u32 key;
@@ -82,7 +30,7 @@ s32 ending_scene_initialized;
 u32 ending_cue_entry_index;
 u32 ending_previous_cue_index;
 s32 ending_cue_frame; /* current sprite-script frame */
-UnkStruct_8022BB38 ending_sprite_slots[150];
+EndingSprite ending_sprite_slots[150];
 Gfx ending_display_list_buffers[2][2500];
 Gfx* ending_saved_display_ptr;
 /* 8023865C..80238660: func_8020C254's static */
@@ -127,7 +75,6 @@ extern f64 D_8022BAF8_ovl_ending;
 void Audio_StartSeqFadeOut(s32);
 #endif
 
-void Ending_ClearAllSprites(void);
 
 void Ending_Init(void) {
     Ending_ClearAllSprites();
@@ -165,22 +112,12 @@ s32 Ending_Update(void) {
     return ret;
 }
 
-s32 Ending_FindSpriteScriptEntry(s32 arg0, u32* arg1);
-void Ending_SpawnSprite(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD);
-void Ending_ClearSprite(s32 arg0);
-s32 Ending_CountActiveSprites(void);
-s16 Ending_FindFreeSprite(void);
-void Ending_SetClipAnchor(s32 arg0);
-void Ending_SetMoveTarget(s32 arg0, s32 arg1, s32 arg2);
-void Ending_ResetWait(s32 arg0);
-void Ending_UpdateAndDrawSprites(s32 arg0);
-s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1);
 
 s32 Ending_RunSpriteScript(void) {
     EndingSpriteCue* entries;
     EndingAnimStep* steps;
     u32 listIdx;
-    UnkStruct_8022BB38* obj;
+    EndingSprite* obj;
     s32 slot;
     s32 dx;
     s32 dy;
@@ -323,7 +260,7 @@ s32 Ending_FindSpriteScriptEntry(s32 arg0, u32* arg1) {
 }
 
 void Ending_SpawnSprite(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 arg5, s16 arg6, s16 arg7, s16 arg8, s16 arg9, s32 argA, s32 argB, s32 argC, s32 argD) {
-    UnkStruct_8022BB38* temp_v0;
+    EndingSprite* temp_v0;
 
     temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk0 = arg1;
@@ -358,7 +295,7 @@ void Ending_SpawnSprite(s16 arg0, s32 arg1, s16 arg2, s16 arg3, s16 arg4, s16 ar
 
 void Ending_ClearAllSprites(void) {
     s32 i;
-    UnkStruct_8022BB38* temp_v0 = ending_sprite_slots;
+    EndingSprite* temp_v0 = ending_sprite_slots;
 
     for (i = 0; i < 150; i++, temp_v0++) {
         temp_v0->unk0 = 0;
@@ -393,7 +330,7 @@ void Ending_ClearAllSprites(void) {
 }
 
 void Ending_ClearSprite(s32 arg0) {
-    UnkStruct_8022BB38* temp_v0;
+    EndingSprite* temp_v0;
 
     temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk0 = 0;
@@ -428,7 +365,7 @@ void Ending_ClearSprite(s32 arg0) {
 
 s32 Ending_CountFreeSprites(void) {
     s32 count;
-    UnkStruct_8022BB38* ptr = ending_sprite_slots;
+    EndingSprite* ptr = ending_sprite_slots;
     s32 i = 0;
 
     count = 0;
@@ -444,7 +381,7 @@ s32 Ending_CountFreeSprites(void) {
 
 s32 Ending_CountActiveSprites(void) {
     s32 count;
-    UnkStruct_8022BB38* ptr = ending_sprite_slots;
+    EndingSprite* ptr = ending_sprite_slots;
     s32 i = 0;
 
     count = 0;
@@ -459,7 +396,7 @@ s32 Ending_CountActiveSprites(void) {
 }
 
 s16 Ending_FindFreeSprite(void) {
-    UnkStruct_8022BB38* ptr = ending_sprite_slots;
+    EndingSprite* ptr = ending_sprite_slots;
     s32 i = 0;
 
     while (i < 150) {
@@ -472,8 +409,8 @@ s16 Ending_FindFreeSprite(void) {
     return -1;
 }
 
-s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
-    UnkStruct_8022BB38* temp_v1;
+s32 Ending_StepClipGrow(s32 arg0, s32 arg1, EndingRect* arg2) {
+    EndingSprite* temp_v1;
     s32 v;
     s32 x;
     s32 y;
@@ -521,8 +458,8 @@ s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
     return 0;
 }
 
-s32 Ending_StepClipShrink(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
-    UnkStruct_8022BB38* temp_v1;
+s32 Ending_StepClipShrink(s32 arg0, s32 arg1, EndingRect* arg2) {
+    EndingSprite* temp_v1;
     s32 v;
     s16 x;
     s16 y;
@@ -567,7 +504,7 @@ s32 Ending_StepClipShrink(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2) {
 }
 
 void Ending_SetClipAnchor(s32 arg0) {
-    UnkStruct_8022BB38* temp_v0;
+    EndingSprite* temp_v0;
 
     temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk2E = temp_v0->unk4 + temp_v0->unk8;
@@ -575,7 +512,7 @@ void Ending_SetClipAnchor(s32 arg0) {
 }
 
 s32 Ending_StepAlphaFade(s32 arg0, s32 arg1) {
-    UnkStruct_8022BB38* temp_v0;
+    EndingSprite* temp_v0;
     f32 step;
 
     temp_v0 = &ending_sprite_slots[arg0];
@@ -607,7 +544,7 @@ s32 Ending_StepAlphaFade(s32 arg0, s32 arg1) {
 }
 
 s32 Ending_StepBrightnessFade(s32 arg0, s32 arg1) {
-    UnkStruct_8022BB38* temp_v0;
+    EndingSprite* temp_v0;
     f32 step;
 
     temp_v0 = &ending_sprite_slots[arg0];
@@ -639,7 +576,7 @@ s32 Ending_StepBrightnessFade(s32 arg0, s32 arg1) {
 }
 
 s32 Ending_StepMoveXY(s32 arg0, s32 arg1) {
-    UnkStruct_8022BB38* temp_v1;
+    EndingSprite* temp_v1;
     f32 step;
     s32 dir;
     s32 dx;
@@ -718,7 +655,7 @@ s32 Ending_StepMoveXY(s32 arg0, s32 arg1) {
 }
 
 void Ending_SetMoveTarget(s32 arg0, s32 arg1, s32 arg2) {
-    UnkStruct_8022BB38* temp_v0;
+    EndingSprite* temp_v0;
 
     temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk2A = (s16) arg1;
@@ -728,7 +665,7 @@ void Ending_SetMoveTarget(s32 arg0, s32 arg1, s32 arg2) {
 }
 
 s32 Ending_StepMoveX(s32 arg0, s32 arg1) {
-    UnkStruct_8022BB38* temp_v1;
+    EndingSprite* temp_v1;
     f32 step;
     s32 dir;
     s32 d;
@@ -780,7 +717,7 @@ s32 Ending_StepMoveX(s32 arg0, s32 arg1) {
 }
 
 s32 Ending_StepMoveY(s32 arg0, s32 arg1) {
-    UnkStruct_8022BB38* temp_v1;
+    EndingSprite* temp_v1;
     f32 step;
     s32 dir;
     s32 d;
@@ -832,7 +769,7 @@ s32 Ending_StepMoveY(s32 arg0, s32 arg1) {
 }
 
 s32 Ending_StepWait(s32 arg0) {
-    UnkStruct_8022BB38* temp_v0;
+    EndingSprite* temp_v0;
 
     temp_v0 = &ending_sprite_slots[arg0];
     temp_v0->unk34 += 1;
@@ -846,15 +783,14 @@ void Ending_ResetWait(s32 arg0) {
     ending_sprite_slots[arg0].unk34 = 0;
 }
 
-s32 Ending_StepClipGrow(s32 arg0, s32 arg1, UnkArg_8020CE70* arg2);
 
 #ifdef NON_MATCHING
 /* 25 words: t4/t9 and t3/t5 swapped in the flipped texrect block (allocation only); code is equivalent */
 void Ending_UpdateAndDrawSprites(s32 arg0) {
     s32 i;
-    UnkArg_8020CE70 rect;
+    EndingRect rect;
     UnkSortEntry_8020D98C* entry;
-    UnkStruct_8022BB38* obj;
+    EndingSprite* obj;
     s32 idx;
     s32 flags;
     s32 fade;
