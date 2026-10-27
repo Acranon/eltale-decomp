@@ -14,18 +14,18 @@
 /* An actor's base record: player_stats for the player. Enemy definitions (EnemyDef,
  * game/enemy/enemy.h) share 0x00..0x23 and differ after it. */
 typedef struct ActorStats {
-    /* 0x00 */ u16 unk0; /* 1: Magic_/Enemy_ code use battle->unk94 as the body height; 2: no shadow */
+    /* 0x00 */ u16 unk0; /* 1: Magic_/Enemy_ code use battle->unk94 as an absolute world Y for visual placement; 2: no shadow */
     /* 0x02 */ s16 anim_set_index; /* anim set index, copied to Actor.animSetIndex */
     /* 0x04 */ u16 hp;
     /* 0x06 */ u16 max_hp; /* cap of hp (Player_StateMeleeAttack) */
     /* 0x08 */ u16 mp;
     /* 0x0A */ u16 max_mp; /* cap of mp */
-    /* 0x0C */ u16 agility; /* copied to ActorBattle.unk86 */
-    /* 0x0E */ u16 defense; /* copied to ActorBattle.unk88 */
+    /* 0x0C */ u16 agility; /* copied to ActorBattle.agility */
+    /* 0x0E */ u16 defense; /* copied to ActorBattle.defense */
     /* 0x10 */ u32 exp;
     /* 0x14 */ s32 unk14;
-    /* 0x18 */ f32 unk18; /* multiplied by Actor.scale for the collision radius */
-    /* 0x1C */ f32 unk1C;
+    /* 0x18 */ f32 body_radius; /* multiplied by Actor.scale for the collision radius */
+    /* 0x1C */ f32 body_height; /* vertical body extent used for placement/camera */
     /* 0x20 */ f32 scale; /* copied to Actor.scale */
     /* 0x24 */ u8 element_levels[4];
     /* 0x28 */ u16 hp_xp;
@@ -56,8 +56,8 @@ typedef struct ActorBattle {
     /* 0x8A */ u16 damage_scale_16ths; /* 0x10 normally (damage scale / 16) */
     /* 0x8C */ u16 magic_hit_slot_bits; /* magic_slot_bits of the effects that hit this actor */
     /* 0x8E */ u16 unk8E;
-    /* 0x90 */ f32 unk90;
-    /* 0x94 */ f32 unk94;
+    /* 0x90 */ f32 unk90; /* scales movement and attack reach; status effects change it */
+    /* 0x94 */ f32 unk94; /* absolute world Y used for visual placement for actor kind 1 */
 } ActorBattle; /* 0x98 bytes */
 
 /* A posed, animated actor model. Anim_* (game/actor/anim.c) drive 0x38..0x60; chests

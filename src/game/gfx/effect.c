@@ -373,7 +373,7 @@ void Effect_DrawFloatingNumbers(void) {
         if (d->timer) {
             actor = d->target;
             if (actor->stats->unk0 == 0) {
-                y = actor->y + actor->stats->unk1C * actor->scale;
+                y = actor->y + actor->stats->body_height * actor->scale;
             } else if (actor->stats->unk0 == 1) {
                 y = actor->battle->unk94;
             } else {

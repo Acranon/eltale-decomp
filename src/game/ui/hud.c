@@ -684,7 +684,7 @@ void Hud_DrawMeleeTargetMarker(u16 arg0) {
     } else if (a->stats->unk0 == 2) {
         y = a->y + 350.0 * a->scale;
     } else {
-        y = a->y + a->stats->unk1C * a->scale;
+        y = a->y + a->stats->body_height * a->scale;
     }
     if (Camera_WorldToScreen(a->x, y, a->z, &sx, &sy)) {
         bob = sins(*angle) >> 13;
@@ -703,7 +703,7 @@ void Hud_DrawOutOfRangeIcon(void) {
     f32 y;
     f32 h;
 
-    h = player_state.actor.stats->unk1C * player_state.actor.scale;
+    h = player_state.actor.stats->body_height * player_state.actor.scale;
     y = player_state.actor.y + h;
     if (Camera_WorldToScreen(player_state.actor.x, y, player_state.actor.z, &sx, &sy) != 0) {
         gDPPipeSync(gfx_dl_head++);
@@ -738,10 +738,10 @@ void Hud_StartActorStatusIndicator(Actor* arg0, u16 mask, u16 idx, s16 val) {
                 if (e->unk4 & 0x100) {
                     y = arg0->battle->unk94;
                 } else {
-                    y = arg0->battle->unk94 - arg0->stats->unk18 * arg0->scale;
+                    y = arg0->battle->unk94 - arg0->stats->body_radius * arg0->scale;
                 }
             } else if (e->unk4 & 0x100) {
-                y = arg0->y + arg0->stats->unk1C * 0.5 * arg0->scale;
+                y = arg0->y + arg0->stats->body_height * 0.5 * arg0->scale;
             } else {
                 y = arg0->y;
             }
@@ -783,7 +783,7 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
         if (arg0->stats->unk0 == 1) {
             y = arg0->battle->unk94;
         } else {
-            y = arg0->y + arg0->stats->unk1C * arg0->scale;
+            y = arg0->y + arg0->stats->body_height * arg0->scale;
         }
         pad1 = pad2 = 0;
     vis = Camera_WorldToScreen(arg0->x, y, arg0->z, &sx, &sy);
@@ -822,10 +822,10 @@ void Hud_UpdateAndDrawActorStatusIndicators(Actor* arg0) {
                 if (fx->flags & 0x100) {
                     fx->y = arg0->battle->unk94;
                 } else {
-                    fx->y = arg0->battle->unk94 - arg0->stats->unk18 * arg0->scale;
+                    fx->y = arg0->battle->unk94 - arg0->stats->body_radius * arg0->scale;
                 }
             } else if (fx->flags & 0x100) {
-                fx->y = arg0->y + arg0->stats->unk1C * 0.5 * arg0->scale;
+                fx->y = arg0->y + arg0->stats->body_height * 0.5 * arg0->scale;
             } else {
                 fx->y = arg0->y;
             }
@@ -918,7 +918,7 @@ void Hud_DrawEnemyInfoPanel(void) {
     if (enemy_turn_current->battle.status_bits & 0x80) {
         Hud_DrawNumber(3, 0x10, 0x1C, enemy_turn_current->def->max_hp);
         Hud_DrawNumber(3, 0x10, 0x26, enemy_turn_current->def->defense);
-        Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->def->unk2A);
+        Hud_DrawNumber(3, 0x46, 0x1C, enemy_turn_current->def->attack_power);
         Hud_DrawNumber(3, 0x46, 0x26, enemy_turn_current->def->agility);
         if (enemy_turn_current->def->element_index != 4) {
             Hud_DrawTextureTile(&D_803A86F8, 0x5B, 3, 0xC, 0xC, enemy_turn_current->def->element_index * 0xC + 0x20, 0x10, 0x400, 0x400);
@@ -950,7 +950,7 @@ void Hud_ShowActorPopup(Actor* arg0) {
     p->offset_z = 0.0f;
     p->offset_x = 0.0f;
     if (arg0->stats->unk0 == 0) {
-        p->offset_y = arg0->stats->unk1C * arg0->scale;
+        p->offset_y = arg0->stats->body_height * arg0->scale;
     } else if (arg0->stats->unk0 == 1) {
         p->offset_y = arg0->battle->unk94 - arg0->y;
     } else {

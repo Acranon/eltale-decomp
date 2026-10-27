@@ -126,9 +126,9 @@ extern u16 D_8007A9D4; /* player_stats.hp */
 extern u16 D_8007A9D6; /* player_stats.max_hp */
 extern u16 D_8007A9D8; /* player_stats.mp */
 extern u16 D_8007A9DA; /* player_stats.max_mp */
-extern u16 D_8007A9DC; /* player_stats.unkC */
-extern u16 D_8007A9DE; /* player_stats.unkE */
-extern s32 D_8007A9E0; /* player_stats.unk10 */
+extern u16 D_8007A9DC; /* player_stats.agility */
+extern u16 D_8007A9DE; /* player_stats.defense */
+extern s32 D_8007A9E0; /* player_stats.exp */
 extern u8 D_8007A9F4; /* player_stats.element_levels[0] */
 extern u8 D_8007A9F5; /* player_stats.element_levels[1] */
 extern u8 D_8007A9F6; /* player_stats.element_levels[2] */

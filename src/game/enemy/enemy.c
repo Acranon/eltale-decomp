@@ -126,7 +126,7 @@ void Enemy_DrawAll(struct GfxFrameData *arg0) {
             y = obj->y;
             anims = enemy_anim_tables[obj->animSetIndex];
             if (obj->stats->unk0 == 1) {
-                h = obj->stats->unk1C * obj->scale;
+                h = obj->stats->body_height * obj->scale;
                 if (y < player_state.actor.y) {
                     obj->y = player_state.actor.y;
                 }
@@ -183,7 +183,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
     obj->frame = Math_Rand(16);
     obj->scale = def->scale;
-    obj->collisionRadius = def->unk18;
+    obj->collisionRadius = def->body_radius;
     obj->battle = &e->battle;
     obj->stats = (ActorStats *)def;
     e->def = def;
@@ -191,9 +191,9 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     e->unkC = def->max_hp;
     e->type = 0;
     e->flags = 0;
-    e->unk10 = (f32)def->agility * 0.2857 + 17.0;
-    e->unk20 = e->unk24 = 0;
-    enemy_coll.x = obj->stats->unk18 * obj->stats->scale;
+    e->engagement_radius = (f32)def->agility * 0.2857 + 17.0;
+    e->move_offset_x = e->move_offset_z = 0;
+    enemy_coll.x = obj->stats->body_radius * obj->stats->scale;
     Coll_ResolveFloorAndWalls(x, 0.0f, z, 0xA01, &enemy_coll);
     if (enemy_coll.flags & 0x8000) {
         if (obj->stats->unk0 == 0) {
@@ -217,7 +217,7 @@ void Enemy_Spawn(s32 idx, f32 x, f32 z, f32 angle, Actor *obj, Enemy *e) {
     obj->animFlags = 0;
     e->battle.status_bits = 0;
     e->battle.magic_hit_slot_bits = 0;
-    e->battle.attack_power = e->def->unk2A;
+    e->battle.attack_power = e->def->attack_power;
     e->battle.damage_scale_16ths = 16;
     e->battle.agility = obj->stats->agility;
     e->battle.defense = obj->stats->defense;
@@ -275,7 +275,7 @@ void Enemy_StateIdle(Actor *obj, Enemy *e, AnimSet *arg2) {
                 return;
             }
             e->type = 1;
-            e->unk4 = 4;
+            e->approach_cycles_left = 4;
             if (battle_flags & 0x100) {
                 e->state_timer = arg2[1].length;
                 Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
@@ -285,7 +285,7 @@ void Enemy_StateIdle(Actor *obj, Enemy *e, AnimSet *arg2) {
             }
         } else {
             e->type = 1;
-            e->unk4 = 4;
+            e->approach_cycles_left = 4;
             if (battle_flags & 0x100) {
                 e->state_timer = arg2[1].length;
                 Anim_SetCurrentAndNext(obj, 1, 1, 1, 1, 1);
@@ -314,16 +314,16 @@ void Enemy_StateApproach(Actor *obj, Enemy *e, AnimSet *arg2) {
     Enemy_Move(1, enemy_temp_vec.x, enemy_temp_vec.y, obj, e);
     e->state_timer--;
     if (e->state_timer == 0) {
-        e->unk4--;
+        e->approach_cycles_left--;
         if (e->selected_attack != NULL) {
             dx = player_state.actor.x - obj->x;
             dz = player_state.actor.z - obj->z;
-            d = sqrtf(dx * dx + dz * dz) - player_state.actor.stats->unk18 * player_state.actor.scale;
+            d = sqrtf(dx * dx + dz * dz) - player_state.actor.stats->body_radius * player_state.actor.scale;
             if (d < e->selected_attack->range * obj->scale) {
                 Enemy_StartAttack(e, obj, e->selected_attack);
                 return;
             }
-            if (e->unk4 == 0 || (e->flags & 2)) {
+            if (e->approach_cycles_left == 0 || (e->flags & 2)) {
                 Enemy_StartAttack(e, obj, e->selected_attack);
                 return;
             }
@@ -338,7 +338,7 @@ void Enemy_StateApproach(Actor *obj, Enemy *e, AnimSet *arg2) {
                 Enemy_StartAttack(e, obj, v);
                 return;
             }
-            if (e->unk4 == 0 || (e->flags & 2)) {
+            if (e->approach_cycles_left == 0 || (e->flags & 2)) {
                 e->type = 0;
                 Anim_SetCurrentAndNext(obj, 0, 1, 0, 1, 1);
                 Battle_EndTurn(obj);
@@ -417,7 +417,7 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
             if (!(player_state.actor.animFlags & 2) && !(e->flags & 8)) {
                 dx = player_state.actor.x - obj->x;
                 dz = player_state.actor.z - obj->z;
-                d = sqrtf(dx * dx + dz * dz) - player_state.actor.scale * player_state.stats->unk18;
+                d = sqrtf(dx * dx + dz * dz) - player_state.actor.scale * player_state.stats->body_radius;
                 if (d < e->selected_attack->unk14 * obj->scale) {
                     if (Enemy_RollHitOnPlayer(obj) != 0) {
                         n = Enemy_CalcAttackDamage(e);
@@ -427,9 +427,9 @@ void Enemy_StateMeleeAttack(Actor *obj, Enemy *e, AnimSet *anims) {
                         }
                         n = Player_TakeDamage(n, atk, obj);
                         enemy_temp_vec.x = 0.0f;
-                        enemy_temp_vec.y = 2.0f * (obj->stats->unk18 * obj->scale);
+                        enemy_temp_vec.y = 2.0f * (obj->stats->body_radius * obj->scale);
                         Math_RotateVec2(obj->rot, (Vec2f *)&enemy_temp_vec);
-                        Effect_SpawnStreakBurst(obj->x + enemy_temp_vec.x, obj->y + obj->stats->unk1C * obj->scale * 0.7f, obj->z + enemy_temp_vec.y);
+                        Effect_SpawnStreakBurst(obj->x + enemy_temp_vec.x, obj->y + obj->stats->body_height * obj->scale * 0.7f, obj->z + enemy_temp_vec.y);
                         if (e->battle.status_bits & 2) {
                             n = ((n + 3) >> 2) + 1;
                             e->hp += n;
@@ -510,7 +510,7 @@ void Enemy_StateCastSpell(Actor *obj, Enemy *e, AnimSet *anims) {
             if (e->state_timer == 0) {
                 e->type = 0;
                 obj->animFlags &= 0xFFFE;
-                e->unk20 = e->unk24 = 0.0f;
+                e->move_offset_x = e->move_offset_z = 0.0f;
             }
             break;
         case 2:
@@ -547,7 +547,7 @@ EnemyAttack *Enemy_ChooseAttack(Enemy *e, Actor *obj) {
     EnemyAttack *a;
 
     e->flags &= ~0x10;
-    dist = sqrtf((player_state.actor.x - obj->x) * (player_state.actor.x - obj->x) + (player_state.actor.z - obj->z) * (player_state.actor.z - obj->z)) - D_8007AA84->unk18 * player_state.actor.scale;
+    dist = sqrtf((player_state.actor.x - obj->x) * (player_state.actor.x - obj->x) + (player_state.actor.z - obj->z) * (player_state.actor.z - obj->z)) - D_8007AA84->body_radius * player_state.actor.scale;
     sel = e->def->attacks;
     for (i = 0; i < e->def->attack_count; i++) {
         list[i] = sel++;
@@ -570,7 +570,7 @@ EnemyAttack *Enemy_ChooseAttack(Enemy *e, Actor *obj) {
         sel = list[i];
         if (i < e->def->attack_count - 1) {
             d = sel->range * obj->scale;
-            d2 = e->unk10 * e->battle.unk90 + d;
+            d2 = e->engagement_radius * e->battle.unk90 + d;
             if (dist < d) {
                 swapped = 1;
                 break;
@@ -591,7 +591,7 @@ EnemyAttack *Enemy_ChooseAttack(Enemy *e, Actor *obj) {
             }
         } else {
             d = sel->range * obj->scale;
-            d2 = e->unk10 * e->battle.unk90 + d;
+            d2 = e->engagement_radius * e->battle.unk90 + d;
             if (dist < d2) {
                 if (d < dist) {
                     e->flags |= 0x10;
@@ -604,7 +604,7 @@ EnemyAttack *Enemy_ChooseAttack(Enemy *e, Actor *obj) {
     if (!swapped) {
         sel = NULL;
     }
-    if (e->def->unk24 & 4) {
+    if (e->def->flags & 4) {
         sel = &e->def->attacks[Math_Rand(e->def->attack_count)];
     }
     e->selected_attack = sel;
@@ -667,17 +667,17 @@ void Enemy_Move(s32 clamp, f32 dx, f32 dz, Actor *obj, Enemy *ai) {
     f32 r;
     u16 flags;
 
-    if (e->unk20 != 0.0f || e->unk24 != 0.0f) {
-        dx += e->unk20;
-        dz += e->unk24;
-        e->unk20 *= 0.9f;
-        e->unk24 *= 0.9f;
+    if (e->move_offset_x != 0.0f || e->move_offset_z != 0.0f) {
+        dx += e->move_offset_x;
+        dz += e->move_offset_z;
+        e->move_offset_x *= 0.9f;
+        e->move_offset_z *= 0.9f;
     }
     if (clamp) {
         x = obj->x + obj->vx - battle_turn_origin_x;
         z = obj->z + obj->vz - battle_turn_origin_z;
         d = sqrtf(x * x + z * z);
-        r = e->unk10 * e->battle.unk90;
+        r = e->engagement_radius * e->battle.unk90;
         if (r < d) {
             dx = r * x / d - obj->x + battle_turn_origin_x;
             dz = r * z / d - obj->z + battle_turn_origin_z;
@@ -700,7 +700,7 @@ void Enemy_Move(s32 clamp, f32 dx, f32 dz, Actor *obj, Enemy *ai) {
     if (obj->stats->unk0 == 0 && e->type != 0) {
         flags = 0xA01;
     }
-    enemy_coll.x = obj->stats->unk18 * obj->stats->scale;
+    enemy_coll.x = obj->stats->body_radius * obj->stats->scale;
     Coll_ResolveFloorAndWalls(obj->x, obj->y, obj->z, flags, &enemy_coll);
     obj->x = enemy_coll.x;
     obj->y = enemy_coll.y;
@@ -932,11 +932,11 @@ void Enemy_SpawnDeathEffects(Actor *obj) {
     if (obj->stats->unk0 == 1) {
         y = obj->battle->unk94;
     } else {
-        y = obj->y + obj->stats->unk1C * 0.5 * obj->scale;
+        y = obj->y + obj->stats->body_height * 0.5 * obj->scale;
     }
     Magic_CreateVisualEffect(D_8005685A, D_8005685C, obj->x, y, obj->z, obj->rot, t, &enemy_temp_vec, obj);
-    Effect_StartConvergeEmitter(2, 0x1E, obj->x, obj->stats->unk1C * obj->scale + y, obj->z,
-                  obj->stats->unk18 * obj->scale * 3.6);
+    Effect_StartConvergeEmitter(2, 0x1E, obj->x, obj->stats->body_height * obj->scale + y, obj->z,
+                  obj->stats->body_radius * obj->scale * 3.6);
 }
 
 void Enemy_ClearAttackScript(void) {
@@ -975,8 +975,8 @@ void Enemy_RunAttackScript(void) {
                 enemy_temp_vec.x = e->offset_x;
                 enemy_temp_vec.y = e->offset_z;
                 Math_RotateVec2(obj->rot, (Vec2f *)&enemy_temp_vec);
-                en->unk20 = enemy_temp_vec.x;
-                en->unk24 = enemy_temp_vec.y;
+                en->move_offset_x = enemy_temp_vec.x;
+                en->move_offset_z = enemy_temp_vec.y;
             } else {
                 d = &enemy_effect_defs[e->effect_def_index];
                 t = &D_800C18D8[d->visual_def_index];

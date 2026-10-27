@@ -128,7 +128,7 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     arg4->actor.animSetIndex = s2->anim_set_index;
     Anim_SetCurrentAndNext(s1, 0, 1, 0, 1, 1);
     s1->scale = s2->scale;
-    s1->collisionRadius = s2->unk18;
+    s1->collisionRadius = s2->body_radius;
     s1->stats = (ActorStats *)s2;
     s1->battle = &arg4->battle;
     arg4->def = s2;
@@ -136,9 +136,9 @@ void Boss_Spawn(s32 arg0, f32 arg1, f32 arg2, f32 arg3, Enemy *arg4) {
     arg4->unkC = s2->max_hp;
     arg4->type = 0;
     arg4->flags = 0;
-    arg4->unk10 = sqrtf((u32)s2->agility) * 3.846 + 17.838;
+    arg4->engagement_radius = sqrtf((u32)s2->agility) * 3.846 + 17.838;
     arg4->battle.status_bits = 0;
-    arg4->battle.attack_power = arg4->def->unk2A;
+    arg4->battle.attack_power = arg4->def->attack_power;
     arg4->battle.agility = ((EnemyDef *)s1->stats)->agility;
     arg4->battle.defense = ((EnemyDef *)s1->stats)->defense;
     arg4->battle.unk90 = 1.0f;

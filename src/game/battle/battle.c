@@ -180,10 +180,10 @@ void Battle_UpdateStartCamera(void) {
                 ang -= 6.283185307179586;
             }
             battle_temp_vec.x = 0.0f;
-            if (a->stats->unk1C < a->stats->unk18) {
-                battle_temp_vec.y = a->stats->unk18 * a->scale * 2.0 + 15.0;
+            if (a->stats->body_height < a->stats->body_radius) {
+                battle_temp_vec.y = a->stats->body_radius * a->scale * 2.0 + 15.0;
             } else {
-                battle_temp_vec.y = a->stats->unk1C * a->scale * 2.0 + 15.0;
+                battle_temp_vec.y = a->stats->body_height * a->scale * 2.0 + 15.0;
             }
             camera_state.distance = battle_temp_vec.y * 1.5;
             Math_RotateVec2(ang, (Vec2f*)&battle_temp_vec);
@@ -301,7 +301,7 @@ void Battle_UpdateTurnTransition(void) {
             battle_turn_origin_x = a->x;
             battle_turn_origin_z = a->z;
             if (battle_flags & 2) {
-                f = enemy_slots[enemy_turn_order[battle_turn_order_index]].unk10;
+                f = enemy_slots[enemy_turn_order[battle_turn_order_index]].engagement_radius;
             } else {
                 f = player_state.unkC;
             }
@@ -311,7 +311,7 @@ void Battle_UpdateTurnTransition(void) {
                 a = &player_state.actor;
             }
             f *= a->battle->unk90;
-            f += a->stats->unk18 * a->scale;
+            f += a->stats->body_radius * a->scale;
             battle_turn_ring_slot = Effect_CreateTerrainRing((battle_flags & 2) ? 1 : 2, battle_turn_origin_x, a->y, battle_turn_origin_z, f * 1.04);
         }
     }

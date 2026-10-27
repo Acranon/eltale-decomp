@@ -34,15 +34,15 @@ typedef struct EnemyDef {
     /* 0x0A */ u16 max_mp;
     /* 0x0C */ u16 agility;
     /* 0x0E */ u16 defense;
-    /* 0x10 */ s32 unk10;
+    /* 0x10 */ s32 exp_reward;
     /* 0x14 */ s32 unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
+    /* 0x18 */ f32 body_radius;
+    /* 0x1C */ f32 body_height;
     /* 0x20 */ f32 scale;
-    /* 0x24 */ u16 unk24;
+    /* 0x24 */ u16 flags;
     /* 0x26 */ u16 element_index; /* index into enemy_element_bits */
     /* 0x28 */ s16 hurt_anim_index; /* hurt anim */
-    /* 0x2A */ u16 unk2A; /* copied to ActorBattle.unk84 */
+    /* 0x2A */ u16 attack_power; /* copied to ActorBattle.attack_power */
     /* 0x2C */ u16 attack_count; /* attack count */
     /* 0x2E */ u8 pad2E[2];
     /* 0x30 */ EnemyAttack *attacks; /* attack list */
@@ -63,7 +63,7 @@ typedef struct EnemyAreaSet {
 typedef struct EnemyScriptCmd {
     /* 0x00 */ u16 time;
     /* 0x02 */ u16 effect_def_index;
-    /* 0x04 */ u16 flags; /* 1: last, 2: at the player, 4: camera shake, 8: offset enemy_slots[0].unk20/unk24 */
+    /* 0x04 */ u16 flags; /* 1: last, 2: at the player, 4: camera shake, 8: offset enemy_slots[0].move_offset_x/move_offset_z */
     /* 0x06 */ u8 pad6[2];
     /* 0x08 */ f32 offset_x;
     /* 0x0C */ f32 offset_y;
@@ -75,17 +75,17 @@ typedef struct EnemyScriptCmd {
 typedef struct Enemy {
     /* 0x000 */ u16 type; /* state, index into enemy_state_handlers */
     /* 0x002 */ s16 state_timer; /* state timer */
-    /* 0x004 */ u16 unk4;
+    /* 0x004 */ u16 approach_cycles_left;
     /* 0x006 */ u16 unk6;
     /* 0x008 */ u16 flags;
     /* 0x00A */ u16 hp;
     /* 0x00C */ u16 unkC;
     /* 0x00E */ u8 padE[2];
-    /* 0x010 */ f32 unk10;
+    /* 0x010 */ f32 engagement_radius;
     /* 0x014 */ u8 pad14[8];
     /* 0x01C */ EnemyAttack *selected_attack; /* chosen attack */
-    /* 0x020 */ f32 unk20;
-    /* 0x024 */ f32 unk24;
+    /* 0x020 */ f32 move_offset_x;
+    /* 0x024 */ f32 move_offset_z;
     /* 0x028 */ EnemyDef *def;
     /* 0x02C */ Actor actor;
     /* 0x098 */ ActorBattle battle; /* actor.battle points here */

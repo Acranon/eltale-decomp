@@ -197,7 +197,7 @@ void Magic_PlaceEffectAtActorLowerPoint(MagicEffect* arg0, Actor* arg1) {
     arg0->x = arg1->x;
     arg0->z = arg1->z;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 - arg1->stats->unk18 * arg1->scale;
+        arg0->y = arg1->battle->unk94 - arg1->stats->body_radius * arg1->scale;
     } else {
         arg0->y = arg1->y;
     }
@@ -209,7 +209,7 @@ void Magic_PlaceEffectAtActorMiddlePoint(MagicEffect* arg0, Actor* arg1) {
     if (arg1->stats->unk0 == 1) {
         arg0->y = arg1->battle->unk94;
     } else {
-        arg0->y = arg1->y + arg1->stats->unk1C * 0.5 * arg1->scale;
+        arg0->y = arg1->y + arg1->stats->body_height * 0.5 * arg1->scale;
     }
 }
 
@@ -217,48 +217,48 @@ void Magic_PlaceEffectAtActorUpperPoint(MagicEffect* arg0, Actor* arg1) {
     arg0->x = arg1->x;
     arg0->z = arg1->z;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->battle->unk94 + arg1->stats->body_radius * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->y + 2.0 * arg1->stats->body_height * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
 void Magic_PlaceEffectAheadAtMiddlePoint(MagicEffect* arg0, Actor* arg1) {
     magic_temp_vec.x = 0.0f;
-    magic_temp_vec.y = arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
+    magic_temp_vec.y = arg1->stats->body_radius * arg1->scale + arg0->cfg->effect_extent;
     Math_RotateVec2(arg1->rot, (Vec2f*)&magic_temp_vec);
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
         arg0->y = arg1->battle->unk94;
     } else {
-        arg0->y = arg1->y + arg1->stats->unk1C * 0.5 * arg1->scale;
+        arg0->y = arg1->y + arg1->stats->body_height * 0.5 * arg1->scale;
     }
 }
 
 void Magic_PlaceEffectAheadAtUpperPoint(MagicEffect* arg0, Actor* arg1) {
     magic_temp_vec.x = 0.0f;
-    magic_temp_vec.y = arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
+    magic_temp_vec.y = arg1->stats->body_radius * arg1->scale + arg0->cfg->effect_extent;
     Math_RotateVec2(arg1->rot, (Vec2f*)&magic_temp_vec);
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->battle->unk94 + arg1->stats->body_radius * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->y + 2.0 * arg1->stats->body_height * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
 void Magic_PlaceEffectBehindAtUpperPoint(MagicEffect* arg0, Actor* arg1) {
     magic_temp_vec.x = 0.0f;
-    magic_temp_vec.y = -arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
+    magic_temp_vec.y = -arg1->stats->body_radius * arg1->scale + arg0->cfg->effect_extent;
     Math_RotateVec2(arg1->rot, (Vec2f*)&magic_temp_vec);
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->battle->unk94 + arg1->stats->body_radius * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->y + 2.0 * arg1->stats->body_height * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
@@ -269,7 +269,7 @@ void Magic_PlaceEffectAtSelectedTarget(MagicEffect* arg0, Actor* arg1) {
     arg0->x = arg1->x;
     arg0->z = arg1->z;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 - arg1->stats->unk18 * arg1->scale;
+        arg0->y = arg1->battle->unk94 - arg1->stats->body_radius * arg1->scale;
     } else if (arg1->stats->unk0 == 2) {
         arg0->y = arg1->y + 100.0f * arg1->scale;
     } else {
@@ -284,9 +284,9 @@ void Magic_PlaceEffectAtRandomOffset(MagicEffect* arg0, Actor* arg1) {
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 + arg1->stats->unk18 * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->battle->unk94 + arg1->stats->body_radius * arg1->scale + arg0->cfg->effect_extent;
     } else {
-        arg0->y = arg1->y + 2.0 * arg1->stats->unk1C * arg1->scale + arg0->cfg->effect_extent;
+        arg0->y = arg1->y + 2.0 * arg1->stats->body_height * arg1->scale + arg0->cfg->effect_extent;
     }
 }
 
@@ -299,7 +299,7 @@ void Magic_PlaceEffectAtDiagonalOffset(MagicEffect* arg0, Actor* arg1) {
         dz = arg0->target->z - arg1->z;
         dist = sqrtf(dist * dist + dz * dz);
     } else {
-        dist = arg1->stats->unk18 * 10.0 * arg1->scale;
+        dist = arg1->stats->body_radius * 10.0 * arg1->scale;
     }
     magic_temp_vec.y = dist;
     magic_temp_vec.x = dist * 1.5;
@@ -307,7 +307,7 @@ void Magic_PlaceEffectAtDiagonalOffset(MagicEffect* arg0, Actor* arg1) {
     arg0->x = arg1->x + magic_temp_vec.x;
     arg0->z = arg1->z + magic_temp_vec.y;
     if (arg1->stats->unk0 == 1) {
-        arg0->y = arg1->battle->unk94 - arg1->stats->unk18 * arg1->scale;
+        arg0->y = arg1->battle->unk94 - arg1->stats->body_radius * arg1->scale;
     } else {
         arg0->y = arg1->y;
     }
@@ -474,7 +474,7 @@ void Magic_MoveHomingEffect(MagicEffect* arg0) {
             if (t->stats->unk0 == 1) {
                 dy = t->battle->unk94 - arg0->y;
             } else {
-                dy = t->y + t->stats->unk1C * t->scale * 0.5 - arg0->y;
+                dy = t->y + t->stats->body_height * t->scale * 0.5 - arg0->y;
             }
             dz = t->z - arg0->z;
             d = sqrtf(dx * dx + dy * dy + dz * dz);
@@ -585,9 +585,9 @@ Actor* Magic_FindTargetInRange(MagicEffect* arg0, s32 arg1) {
             } else {
                 dx = ret->x - arg0->x;
                 dz = ret->z - arg0->z;
-                dy = (ret->y + ret->stats->unk1C * ret->scale * 0.5 - arg0->y) * 0.5;
+                dy = (ret->y + ret->stats->body_height * ret->scale * 0.5 - arg0->y) * 0.5;
                 dist = sqrtf(dx * dx + dy * dy + dz * dz);
-                if (arg0->cfg->effect_extent + ret->stats->unk18 * ret->scale < dist) {
+                if (arg0->cfg->effect_extent + ret->stats->body_radius * ret->scale < dist) {
                     ret = NULL;
                 }
             }
@@ -606,14 +606,14 @@ Actor* Magic_FindTargetInRange(MagicEffect* arg0, s32 arg1) {
                                 dy = 0.0f;
                                 break;
                             case 0:
-                                dy = (a->y + a->stats->unk1C * a->scale * 0.5 - arg0->y) * 0.5;
+                                dy = (a->y + a->stats->body_height * a->scale * 0.5 - arg0->y) * 0.5;
                                 break;
                             case 1:
                                 dy = (a->battle->unk94 - arg0->y) * 0.5;
                                 break;
                         }
                         dist = sqrtf(dx * dx + dy * dy + dz * dz);
-                        if (dist < arg0->cfg->effect_extent + a->stats->unk18 * a->scale) {
+                        if (dist < arg0->cfg->effect_extent + a->stats->body_radius * a->scale) {
                             break;
                         }
                     }
@@ -1036,7 +1036,7 @@ u16 Magic_CalculateEffectDamage(SpellDef* arg0, Actor* arg1) {
     s32 i;
 
     if (arg1->typeFlags & 1) {
-        lv = enemy_slots[Enemy_GetSlotIndex(arg1)].def->unk2A;
+        lv = enemy_slots[Enemy_GetSlotIndex(arg1)].def->attack_power;
     } else {
         p = &magic_damage_bonus_stats[arg0->input_sequence[0] * 2];
         lv = player_stats.element_levels[arg0->input_sequence[0]];
@@ -1059,10 +1059,10 @@ EffectModel* Magic_CreateVisualEffect(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f3
 
     switch (arg6->x_scale_source) {
         case 0:
-            sx = arg8->stats->unk18 * arg8->scale * arg7->x;
+            sx = arg8->stats->body_radius * arg8->scale * arg7->x;
             break;
         case 1:
-            sx = arg8->stats->unk1C * arg8->scale * arg7->x;
+            sx = arg8->stats->body_height * arg8->scale * arg7->x;
             break;
         case 3:
             sx = arg7->z * arg7->x;
@@ -1074,10 +1074,10 @@ EffectModel* Magic_CreateVisualEffect(u16 arg0, u16 arg1, f32 arg2, f32 arg3, f3
     }
     switch (arg6->y_scale_source) {
         case 0:
-            sy = arg8->stats->unk18 * arg8->scale * arg7->y;
+            sy = arg8->stats->body_radius * arg8->scale * arg7->y;
             break;
         case 1:
-            sy = arg8->stats->unk1C * arg8->scale * arg7->y;
+            sy = arg8->stats->body_height * arg8->scale * arg7->y;
             break;
         case 3:
             sy = arg7->z * arg7->y;
@@ -1121,8 +1121,8 @@ void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
     }
     fx = &D_800C363C[arg0->spell_group][arg0->spell_index];
     if (fx->cast_kind != 0) {
-        h = 2.0 * arg1->stats->unk18 * arg1->scale;
-        y = arg1->y + arg1->stats->unk1C * arg1->scale;
+        h = 2.0 * arg1->stats->body_radius * arg1->scale;
+        y = arg1->y + arg1->stats->body_height * arg1->scale;
         switch (fx->cast_kind) {
             case 1:
                 Effect_StartConvergeEmitter(fx->cast_effect_arg, 30, arg1->x, y, arg1->z, h * 1.2);
@@ -1192,7 +1192,7 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
                 y = arg1->y;
             }
         } else if (flags & 0x100) {
-            y = arg1->y + arg1->stats->unk1C * 0.5 * arg1->scale;
+            y = arg1->y + arg1->stats->body_height * 0.5 * arg1->scale;
         } else {
             y = arg1->y;
         }
@@ -1205,8 +1205,8 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
     }
     fx = &D_800C363C[arg0->spell_group][arg0->spell_index];
     if (fx->hit_kind != 0) {
-        h = 2.0 * arg1->stats->unk18 * arg1->stats->scale;
-        y = arg1->y + arg1->stats->unk1C * arg1->stats->scale;
+        h = 2.0 * arg1->stats->body_radius * arg1->stats->scale;
+        y = arg1->y + arg1->stats->body_height * arg1->stats->scale;
         switch (fx->hit_kind) {
             case 1:
                 Effect_StartConvergeEmitter(fx->hit_effect_arg, 30, arg1->x, y, arg1->z, h * 1.2);
@@ -1246,8 +1246,8 @@ void Magic_CreateGroundHitPresentation(MagicEffect* arg0, Actor* arg1) {
     }
     fx = &D_800C363C[arg0->spell_group][arg0->spell_index];
     if (fx->ground_hit_kind != 0) {
-        h = 2.0 * arg1->stats->unk18 * arg1->scale;
-        y = arg1->y + arg1->stats->unk1C * arg1->scale;
+        h = 2.0 * arg1->stats->body_radius * arg1->scale;
+        y = arg1->y + arg1->stats->body_height * arg1->scale;
         switch (fx->ground_hit_kind) {
             case 1:
                 Effect_StartConvergeEmitter(fx->ground_hit_effect_arg, 30, arg1->x, y, arg1->z, h * 1.2);

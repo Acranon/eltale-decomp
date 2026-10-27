@@ -11,7 +11,7 @@ struct Enemy;
 
 /* One D_800C18D8 entry: a visual effect for Magic_CreateVisualEffect. */
 typedef struct MagicVisualDef {
-    /* 0x00 */ u16 x_scale_source; /* x scale source: 0 ActorStats.unk18, 1 ActorStats.unk1C, 3 arg7->z (times scale) */
+    /* 0x00 */ u16 x_scale_source; /* x scale source: 0 ActorStats.body_radius, 1 ActorStats.body_height, 3 arg7->z (times scale) */
     /* 0x02 */ u16 y_scale_source; /* y scale source */
     /* 0x04 */ u16 display_list_index;
     /* 0x06 */ u16 texture_index;

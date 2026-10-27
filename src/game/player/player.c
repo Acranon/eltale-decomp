@@ -104,7 +104,7 @@ void Player_Init(void) {
     Dma_ReadRom(D_869620, D_80206000, D_86F6F0 - D_869620);
     player_stats = player_default_stats;
     player_state.actor.scale = player_stats.scale;
-    player_state.actor.collisionRadius = player_stats.unk18;
+    player_state.actor.collisionRadius = player_stats.body_radius;
     player_state.actor.animSetIndex = player_stats.anim_set_index;
     player_state.stats = (ActorStats *)&player_stats;
     player_state.unk6 = 0;
@@ -259,7 +259,7 @@ void Player_Spawn(void) {
 void Player_SetSpawnFromSaveTable(void) {
     s32 i;
 
-    player_state.stats->unk18 = 50.0f;
+    player_state.stats->body_radius = 50.0f;
     map_next_id = map_id;
     map_next_subarea = map_subarea;
     exit_destination.entry = 0;
@@ -762,9 +762,9 @@ void Player_StateMeleeAttack(Actor *a, Player *p, PlayerAnimTable *cd) {
                     Hud_StartActorStatusIndicator(a, 2, 1, 0x1E);
                 }
                 player_temp_vec.x = 0.0f;
-                player_temp_vec.y = 2.0f * (a->stats->unk18 * a->scale);
+                player_temp_vec.y = 2.0f * (a->stats->body_radius * a->scale);
                 Math_RotateVec2(a->rot, (Vec2f *)&player_temp_vec);
-                Effect_SpawnStreakBurst(a->x + player_temp_vec.x, a->y + a->stats->unk1C * a->scale * 0.7f, a->z + player_temp_vec.y);
+                Effect_SpawnStreakBurst(a->x + player_temp_vec.x, a->y + a->stats->body_height * a->scale * 0.7f, a->z + player_temp_vec.y);
             }
             p->stats->hp_xp++;
         } else {
@@ -1216,7 +1216,7 @@ void Player_MoveAndCollide(u16 arg0, Actor *arg1, Player *arg2) {
     player_move_dz = arg1->vz;
     dx = arg1->x + arg1->vx;
     dz = arg1->z + arg1->vz;
-    player_coll.x = arg1->stats->unk18 * arg1->stats->scale;
+    player_coll.x = arg1->stats->body_radius * arg1->stats->scale;
     Coll_ResolveFloorAndWalls(dx, arg1->y, dz, arg0, &player_coll);
     arg1->vx = player_coll.x - arg1->x;
     arg1->vz = player_coll.z - arg1->z;
@@ -1563,7 +1563,7 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
     f32 r;
     f32 dist;
 
-    radius = arg0->stats->unk18 * arg0->scale;
+    radius = arg0->stats->body_radius * arg0->scale;
     ret = 0;
     idx = enemy_turn_order;
     i = 0;
@@ -1574,25 +1574,25 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
             dx = a->x - arg0->x;
             dz = a->z - arg0->z;
             dist = sqrtf(dx * dx + dz * dz);
-            r = a->stats->unk18 * a->scale;
+            r = a->stats->body_radius * a->scale;
             if (dist < radius + r + 10.0) {
                 player_temp_vec.x = dx;
                 player_temp_vec.y = dz;
                 stats = a->stats;
                 if (stats->unk0 == 1) {
                     dx = a->battle->unk94 - arg0->y;
-                    dz = 2.0 * stats->unk18;
+                    dz = 2.0 * stats->body_radius;
                 } else if (stats->unk0 == 2) {
                     dz = 0.0f;
                     dx = 0.0f;
                 } else {
-                    dz = stats->unk1C;
+                    dz = stats->body_height;
                     dx = a->y - arg0->y;
                 }
                 if (dx < 0.0f) {
                     dx = -dx;
                 }
-                dx -= dz * a->scale + arg0->stats->unk1C * arg0->scale;
+                dx -= dz * a->scale + arg0->stats->body_height * arg0->scale;
                 if (dx <= 0.0f) {
                     Math_RotateVec2(arg0->rot, (Vec2f *)&player_temp_vec);
                     r = r * 1.5;

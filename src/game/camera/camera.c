@@ -575,11 +575,11 @@ void Camera_StartBattleFocus(s32 arg0, Actor* arg1) {
     camera_focus_target.stats = arg1->stats;
     camera_focus_target.battle = arg1->battle;
     if (arg1->typeFlags & 4) {
-        h = arg1->stats->unk1C * arg1->scale + 40.0;
-    } else if (arg1->stats->unk1C < arg1->stats->unk18) {
-        h = arg1->stats->unk18 * arg1->scale * 2.0 + 40.0;
+        h = arg1->stats->body_height * arg1->scale + 40.0;
+    } else if (arg1->stats->body_height < arg1->stats->body_radius) {
+        h = arg1->stats->body_radius * arg1->scale * 2.0 + 40.0;
     } else {
-        h = arg1->stats->unk1C * arg1->scale * 2.0 + 40.0;
+        h = arg1->stats->body_height * arg1->scale * 2.0 + 40.0;
     }
     camera_state.mode = 4;
     camera_state.flags |= 0x40;
