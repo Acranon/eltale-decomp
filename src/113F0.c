@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Map collision: floor height and normal from the room's triangle meshes (grid lookup),
+ * pushing positions out of wall segments, and the map exits the player walks into.
+ * Folder: src/game/map/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;

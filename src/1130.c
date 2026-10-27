@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Nintendo's nnSc scheduler sample (retrace/pre-NMI broadcast, audio and graphics task
+ * threads), with an added retrace counter.
+ * Folder: src/game/core/   (proposed for round 4)
+ */
+
 #define NN_SC_SWAPBUFFER 0x0040
 #define NN_SC_RETRACE_MSG 1
 #define NN_SC_PRE_NMI_MSG 3

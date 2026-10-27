@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Chests: per-map placement, opened flags, the open interaction and animation, and the
+ * item message text.
+ * Folder: src/game/map/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;

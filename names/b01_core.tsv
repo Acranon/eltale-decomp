@@ -1,0 +1,90 @@
+# b01_core (round 1): 1050, 1130, 113F0, 12610, 13DE0, 13DF0, 140D0, 14760, 147A0, 14CF0, 15150
+# old	new	evidence
+# --- 1050: boot
+func_80000450	Boot_Main	the entry code (asm/1000.s) jumps here after clearing bss; calls osInitialize (func_80036AC0), creates and starts thread 1 on func_800004B0
+func_800004B0	Boot_IdleThread	thread 1 body: creates the PI manager, creates/starts thread 6 (func_80000C70) and then spins forever (for(;;){}), the SDK idle-thread pattern
+# --- 1130: Nintendo nnSc scheduler sample (names from the sample / Rainchus Quest64-Recomp dump.toml via us_map.tsv, all US twins "same")
+func_80000530	nnScCreateScheduler	US twin nnScCreateScheduler (dump.toml); inits the scheduler struct, its six message queues and the VI/SP/DP/PRENMI events
+func_8000062C	nnScStartScheduler	US twin nnScStartScheduler (dump.toml); creates/starts the event, audio and graphics threads (ids 0x13/0x12/0x11)
+func_800006F8	nnScGetAudioMQ	US twin nnScGetAudioMQ (dump.toml); returns &sc->audioRequestMQ
+func_80000704	nnScGetGfxMQ	US twin nnScGetGfxMQ (dump.toml); returns &sc->graphicsRequestMQ
+func_80000710	nnScEventHandler	US twin nnScEventHandler (dump.toml, kind "changed": Eltale adds the retrace counter D_8007A160++); loops on retraceMQ, broadcasts retrace / pre-NMI
+func_800007F4	nnScAddClient	US twin nnScAddClient (dump.toml); links a client queue at the head of sc->clientList with interrupts off
+func_80000844	nnScRemoveClient	US twin nnScRemoveClient (dump.toml); unlinks a client from sc->clientList with interrupts off
+func_800008D0	nnScEventBroadcast	US twin 800008B0 nnScEventBroadcast (dump.toml); sends the message to every client's queue
+func_80000920	nnScExecuteAudio	US twin nnScExecuteAudio (dump.toml); audio thread: yields the gfx task, runs the audio task on the RSP, resumes gfx
+func_80000AA0	nnScExecuteGraphics	US twin nnScExecuteGraphics (dump.toml); graphics thread: waits for audio, runs the gfx task, waits RSP+RDP, swaps the framebuffer
+func_80000BD4	nnScWaitTaskReady	US twin nnScWaitTaskReady (dump.toml); waits on retraces while the task's framebuffer is still the one on screen
+# --- 113F0: map collision (floor triangles, wall segments)
+func_800107F0	Coll_ResolveFloorAndWalls	(x,y,z,flags,out): if flags&1/&2 pushes x,z out of the current room's wall set (func_8001164C), then finds the floor triangle under x,z via the grid D_8007C28C and writes floor y, normal and tri flags to out (0x8000 = no floor); used by player, enemies, camera, chests to stand on the ground
+func_80010A4C	Coll_TestObjectFloor	moves x,z into a placed collision object's space (offset, rotate by obj->angle), tests its mesh with func_80010BC8, adds obj->y and rotates the normal back
+func_80010BC8	Coll_TestMeshFloor	bounds check against the mesh's scaled min/max X/Z, then for each triangle with (tri->flags & flags): point-in-triangle by edge crossing counts, height from the triangle plane (normal nx,ny,nz) into out->y
+func_80010F34	Coll_RayCrossesEdge	returns 1 when the edge (a,b) spans pz and crosses the horizontal ray from (px,pz) toward -x; the three calls in func_80010BC8 sum to the crossing count (point-in-triangle test)
+func_80011034	Coll_PushFromSegment	if (px,pz) is within radius r of segment a-b (line distance, then endpoint distances), moves *px,*pz out to r+0.1 and returns 1
+func_8001164C	Coll_PushFromWalls	walks every wall polyline of a CollWalls set (vertex list, index ranges) calling func_80011034 with radius D_800842F0; writes the pushed x,z to out, returns whether any wall hit
+# --- 113F0/12610: map exits
+func_80011770	Exit_CheckEnter	(x,z,angle) of the player: for each enabled entry of D_8007C288 (not in battle, D_8008BE52&1) tests the rotated box halfW/halfD and either flag 2 or facing within pi/8 (func_800118E4); on hit stores the destination (func_80011A10), returns 1; the main loop (1870) then sets D_8004DCA0|=0x80 and later loads map D_80084300.unk0 / room .unk4 (into D_800842C4/C8)
+func_800118E4	Exit_IsFacing	wraps an angle difference into -pi..pi and returns |a| < pi/8 (0.3927); only used by func_80011770 for the player-vs-exit facing test
+func_80011978	Exit_IsEnabled	flags&0x10: enabled only if the exit's id is among the 150 (0x96) item ids in D_8008C9B8 (the inventory: 25B20 draws D_803AB288[D_8008C9B8[i]], the item names); flags&0x20: only if absent; otherwise always
+func_80011A10	Exit_SetDestination	copies the touched exit's three destination halfwords and its flags/angle fields into D_80084300; called only from func_80011770; 1870 reads D_80084300.unk0/.unk4 as the next map/room
+# --- 12610: world clock, day-phase palette, lighting and fog
+func_80011A60	Env_InitClock	called once at boot (1870 func_80000C70): clock D_80084980 = 0x1EC3, day length D_80084984 = 0x6978 ticks, day counter D_80084990 = 1, clears the four light colours D_80084B18
+func_80011AE0	Env_InitForMap	called on map load (with the chest/spirit loaders): picks the day phase for the clock from the 4-entry time table D_8004DED0, copies that phase's 256-entry palette into the live palette D_800806B0, chooses the lighting time source (world clock if D_8007C280&2, else the map track's last key time), clears the light slots
+func_80011C60	Env_Update	per frame (1870 loops): interpolates the lighting track (func_80011EF4), steps a running palette fade or starts the next phase's fade at its time, advances the world clock (wrap -> day counter up to 999) on clock maps outside battle, or the map's own cycle; counts D_80084992 every 1501 frames
+func_80011EA0	Env_SetClock	sets the clock D_80084980; past the day length wraps it and increments the day counter (cap 9999); 1870 calls it with clock+0x2328 when D_8004DCA0&0x400
+func_80011EF4	Env_InterpolateLighting	(t, track): finds the two keyframes around t and lerps ambient, the three light colours and fog near/far into D_80084B18 / D_80084B78; a 1-key track is copied as is
+func_800124E8	Env_PrepareFrameLighting	fills this frame's Lights3 (double-buffered by D_8007A17C) from the interpolated colours and func_8001263C's directions, emits gSPFogPosition from the fog range and a black env colour; 1870 draw path
+func_8001263C	Env_ComputeLightDirs	light dir 0: rotates (0,90,50) by an angle from the cycle time D_80084988/D_8008498C when D_8007C280&1, else the map's fixed dir or (-89,89,20); dir 1: (-89,89,20) through the camera view matrix D_80085F10 (func_800277A4)
+func_80012800	Env_StartPaletteFade	(frames, target, live): stores the fade length and both palette pointers, saves a copy of the live 256-entry palette as the fade start (D_80084350)
+func_80012854	Env_StepPaletteFade	(t): blends the saved start and target RGBA5551 palettes by t/frames into the live palette (t counts down, t=0 copies the target); called by func_80011C60 with the decremented timer
+func_80012A60	Env_ClearLightSlots	clears the in-use word of all 8 light slots D_80084998
+func_80012A90	Env_AllocLightSlot	scans the 8 light slots from the top for a free one, marks it used, clears its colour/light/dir animations, returns its index; called when map scenes set up (1870)
+func_80012AE0	Env_FreeLightSlot	clears light slot arg0's in-use word (pair of func_80012A90)
+func_80012B00	Env_SetSlotEnvAnim	(slot, mode, count, rgb list): sets the slot's env-colour animation that func_80012B88 steps (mode 1 play once, 2 hold last, 3 loop)
+func_80012B34	Env_SetSlotLightAnim	(slot, mode, count, list): sets the slot's light-colour scale animation (6 ints per step: ambient scale, light scale) that func_80012B88 steps with the same modes
+func_80012B68	Env_SetSlotLightDirs	sets light slot arg0's own light-direction pair (func_80012B88 falls back to D_80084B48 when NULL)
+func_80012B88	Env_ApplyLightSlot	(slot): steps the slot's animations and emits its env colour, gSPSetLights3 (scaled colours, slot or global dirs, brightened when state 2) and fog colour; used before drawing the player and map objects
+func_800130F8	Env_FillLights3	writes the two direction vectors and the ambient + light colours (col and colc) into a Lights3 (light 0 and 2 share dir/colour)
+# --- 13DE0/13DF0: shadows
+func_800131E0	Shadow_ClearQueue	zeroes the queue count D_80085280 that func_800131F0 fills and func_80013264 draws; called every frame from the 1870 loops
+func_800131F0	Shadow_Queue	(pos, rotation, scale) appended to the 64-entry queue D_80084B80; callers pass an object's floor point and the floor normal from func_800107F0 (player, enemies, chests). "Shadow" is a reading of that use
+func_80013264	Shadow_DrawAll	for each queued entry builds rotate+translate+scale matrix and draws the shared 4-vertex quad (D_1000230) after the setup DL D_1000270
+# --- 140D0/14760: chests (reading: a placed object opened once, with an opened-flag bitset, an open animation and an item it gives)
+func_800134D0	Chest_ClearOpenedFlags	zeroes the 256-bit flag set D_80085988 (boot, 1870 func_80000C70)
+func_80013500	Chest_LoadForMap	for the current map D_800842BC / room D_800842C0 copies the placement list (D_8004DF1C, data in the map overlays) into D_80085290, puts each on the floor (func_800107F0) and starts anim 3 if its flag is set, else 0
+func_800136B8	Chest_UpdateAll	per frame: after the open timer (0x8000|n) runs out switches to anim 3, steps/draws the animation (func_80020428/func_8002099C) and queues a shadow (func_800131F0, scale 6)
+func_80013808	Chest_FindInFront	(player): first unopened entry the player faces within pi/4 of its angle, within sqrt(300) and inside its rotated box; 3F50 player update then opens it on the button
+func_800139EC	Chest_Open	sets the entry's flag (func_80013B60), open timer 0x5B, anim 1 then 2, sound func_8002A7C8(0x1A); player code then gives item ->unk50 (unk11C -> func_80025094)
+func_80013A50	Item_BuildMessage	copies a fixed prefix, item name D_803AB288[arg0] (the item name table, also drawn by 25B20 for D_8008C9B8) and a fixed suffix into the message buffer D_8007B430; called when the player gets an item (3F50, chest item and D_8007A9BC)
+func_80013B20	Chest_IsOpened	returns bit arg0 of D_80085988 (mask table D_8004F770)
+func_80013B60	Chest_SetOpened	sets bit arg0 of D_80085988 (14760; pair of func_80013B20)
+# --- 147A0/14CF0: spirits (reading via Quest 64: the four player values at unk14->unk24 capped at 50 are the element levels; a spirit cannot be taken when all four are 50)
+func_80013BA0	Spirit_ClearCollectedFlags	zeroes the 128-bit flag set D_80085A98 (boot, 1870 func_80000C70)
+func_80013BD0	Spirit_LoadForMap	copies the current map/room's entries from D_8004DFC0 into D_800859B8, marks collected ones (func_800140B0), puts each on the floor (func_800107F0)
+func_80013D08	Spirit_FindInFront	(player): first uncollected entry within 20 units, in front of the player and within 5 to the side; 3F50 then sets its flag unless the four 50-capped values are all 50
+func_80013E4C	Spirit_SpawnSparkles	per frame: for each uncollected entry spawns a particle (func_8001D9A8, template D_8004E658 with the 4 frames D_8004E258) every other frame, circling the point by pi/8
+func_80013FA4	Spirit_MoveSparkle	particle callback of D_8004E658: wobbles the particle with a sine, moves it by its velocity, sets the purple env colour D_8004E698
+func_800140B0	Spirit_IsCollected	returns bit arg0 of D_80085A98
+func_800140F0	Spirit_SetCollected	sets bit arg0 of D_80085A98; called by the player code when it takes the entry from func_80013D08
+# --- 14CF0: text spots (fixed points that show a message from ROM)
+func_80014130	TextSpot_LoadForMap	collects the current map/room's entries of D_8004E6A0 (position, angle, radius, flags, two ROM offsets) into D_80085AC0
+func_80014318	TextSpot_FindInFront	(player): first entry within its radius that the player faces within pi/4 and (unless flag 1) that the player stands in front of within pi/4; 3F50 then calls func_800144B4 on the button
+func_800144B4	TextSpot_LoadMessage	reads the entry's 0x20-byte header and 0x200-byte text from ROM D_D37700 (func_80028120) into D_8007B8E0 / the message buffer D_8007B430, stores the player angle offset in D_8007AB3C
+# --- 15150: camera (D_80085E48; mode handlers in D_8004EC18)
+func_80014550	Camera_InitForMap	map load: ortho matrices, the room's camera presets (D_8007C284->unk24, else D_8004EB70), places the eye behind/at the preset for mode 0/2 or 1, aims at the player, enables sway for the rooms in D_8004EC30
+func_80014994	Camera_Update	per frame: preset follow/cycling (button 0x20 cycles presets), runs the mode handler D_8004EC18[mode], builds perspective + lookAt, applies shake, emits the projection/view/lookAt to the display list
+func_80014E04	Camera_FollowTarget	mode 0/2 handler: springs the eye toward the follow distance, orbits (func_80015C38), keeps the eye on the floor/out of walls (func_800107F0 0x602), springs eye height and look-at
+func_80015494	Camera_UpdateFixedEye	mode 1 handler: eye stays, look-at tracks the target, pitch/yaw clamped to the preset's limits
+func_80015810	Camera_UpdateHeading	mode 3 handler: only recomputes the yaw from eye minus look-at
+func_80015878	Camera_UpdateBattle	mode 4 handler (set only by func_80015F44, battle only): counts down a temporary focus and restores the saved camera, else snaps the angle away from the battle centre D_8008BE5C/60 to pi/8 sectors, button 0x20 rotates by pi/4, then follows
+func_80015AD8	Camera_UpdateDelayedTurn	mode 5 handler (set by func_80016218): waits 15 frames, turns (flag 0x10) for 75, then restores the saved mode/flags and turn rates; follows each frame
+func_80015B94	Camera_UpdateLookAt	look-at x/z = target, look-at y springs to the target's height (model height if model type 1) plus the preset offset
+func_80015C38	Camera_OrbitTarget	rotates the eye around the target; with flags 0x14 turns toward angle unk54 at rate unk78, damped by unk7C
+func_80015D78	Camera_Shake	(type): 15 frames of projection offset from D_8004EC68[type] that func_80014994 applies and decays by -0.8; called when the player or an enemy is hit (3F50 damage, 17360)
+func_80015DB4	Camera_SetPreset	(i): sets mode, distances, height offsets, limits and perspective (fov/near/far) from preset i of the current set
+func_80015F44	Camera_StartBattleFocus	(frames, target): in battle only, saves the camera and switches to mode 4 focused on a copy of the target's position/size for the given frames
+func_80016218	Camera_SetPresetDelayedTurn	(i): func_80015DB4 then mode 5 (wait 15, turn 75, restore); called at the end of a battle (1FA00)
+func_8001628C	Camera_SetTargetView	(def, target): sets mode, distance/height from def, target, eye behind the target (mode 0) or at def's point (mode 1), flag 0x40; called from DAE0 func_8000D40C
+func_800163F4	Camera_TurnForExit	on entering an exit (1870 after func_80011770): eye angle offset = camera yaw vs player clamped to pi/4, turn target = exit angle (D_80084314) + pi, flag 0x10
+func_80016578	Camera_RaiseOverObjects	(cam, y): returns an object's y+30 when one of the objects D_8007ABB0 is within 30 of the eye and not more than 20 above y, else y
+func_8001668C	Camera_UpdateSway	writes sin(phaseA+phaseB) to arg->y and advances both phases; func_80014994 adds it to the eye height only in the map/rooms of D_8004EC30 ("sway" is a reading)

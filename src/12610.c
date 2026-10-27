@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * World clock and environment: day counter, day-phase palette fades, the lighting/fog
+ * keyframe track, and the light slots that emit env colour, Lights3 and fog colour.
+ * Folder: src/game/env/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;

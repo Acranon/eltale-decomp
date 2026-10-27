@@ -1,5 +1,10 @@
 #include "common.h"
 
+/*
+ * Spirits: per-map placement, collected flags, the pick-up test and the sparkle particles.
+ * Folder: src/game/map/   (proposed for round 4)
+ */
+
 typedef struct {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;

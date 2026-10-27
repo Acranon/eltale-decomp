@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Boot: the entry point's first C function and the idle thread, which starts the PI
+ * manager and the main game thread.
+ * Folder: src/game/core/   (proposed for round 4)
+ */
+
 void func_80036AC0(void);
 void osCreatePiManager(s32, OSMesgQueue *, OSMesg *, s32);
 void func_800004B0(void *);
