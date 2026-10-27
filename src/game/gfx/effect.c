@@ -1,4 +1,6 @@
-#include "common.h"
+#include "game/gfx/effect.h"
+#include "game/camera/camera.h"
+#include "game/map/map.h"
 
 /*
  * Sprite particles, model effects, floating numbers, streaks, and terrain rings.
@@ -6,219 +8,46 @@
  */
 
 typedef struct {
+    /* 0x00 */ u16 type;
+    /* 0x02 */ u8 pad2[0x1A];
+    /* 0x1C */ f32 height;
+} Unk1B200DmgModel;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x94];
+    /* 0x94 */ f32 top;
+} Unk1B200DmgModel2;
+
+/* Local view of Actor (game/actor/actor.h, h_actors) until H2. */
+typedef struct Actor {
     /* 0x00 */ f32 x;
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-} Unk1B200Pos;
-
-typedef struct {
-    /* 0x00 */ s32 timer;
-    /* 0x04 */ Unk1B200Pos* pos;
-} Unk80086400; // size = 0x8
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ void* unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ void* unk10;
-    /* 0x14 */ void* unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
-    /* 0x34 */ f32 unk34;
-    /* 0x38 */ f32 unk38;
-    /* 0x3C */ u8 unk3C;
-    /* 0x3D */ u8 pad3D[3];
-} Unk8004EE20;
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-} Unk1B200Vec2;
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[0xE];
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ u8 pad24[4];
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
-    /* 0x34 */ f32 unk34;
-    /* 0x38 */ f32 unk38;
-} Unk1B200Particle;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ f32 x;
-    /* 0x08 */ f32 y;
-    /* 0x0C */ f32 z;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ Unk1B200Pos* unk14;
-} Unk80086440; // size = 0x18
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ u16 unkC;
-    /* 0x0E */ u8 padE[0xE];
-} Unk800865DC; // size = 0x1C
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-} Unk800866D8; // size = 0x18
+    /* 0x0C */ f32 rx;
+    /* 0x10 */ f32 ry;
+    /* 0x14 */ u8 pad14[0x10];
+    /* 0x24 */ f32 scale;
+    /* 0x28 */ u8 pad28[0x3C];
+    /* 0x64 */ Unk1B200DmgModel* model;
+    /* 0x68 */ Unk1B200DmgModel2* model2;
+} Actor;
 
 extern Gfx* gfx_dl_head;
 extern s16 D_800865CC;
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[2];
-    /* 0x04 */ f32 x;
-    /* 0x08 */ f32 y;
-    /* 0x0C */ f32 z;
-    /* 0x10 */ f32 vx;
-    /* 0x14 */ f32 vy;
-    /* 0x18 */ f32 vz;
-    /* 0x1C */ f32 x0;
-    /* 0x20 */ f32 y0;
-    /* 0x24 */ f32 z0;
-} Unk80087298; // size = 0x28
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-} Unk1B200Vec3;
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ Unk1B200Vec3 pts[16];
-    /* 0xD4 */ Unk1B200Vec3 norms[16];
-} Unk800877A8; // size = 0x194
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ s16 unk2;
-} Unk80087798; // size = 0x4
-
-typedef struct {
-    /* 0x00 */ void* target;
-    /* 0x04 */ u8 digits[8];
-    /* 0x0C */ u16 timer;
-    /* 0x0E */ u8 padE[2];
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ s32 numDigits;
-    /* 0x18 */ s32 unk18;
-} Unk800865C0; // size = 0x1C
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u8 pad2[0x16];
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
-    /* 0x34 */ f32 unk34;
-    /* 0x38 */ f32 unk38;
-    /* 0x3C */ u8 unk3C;
-} Unk1B200Spark;
-
 extern u8 D_800EB5E4[][4];
 extern s32 D_80084B6C;
 extern s32 D_80084B70;
 extern s32 D_80084B74;
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ f32 eyeX;
-    /* 0x10 */ f32 eyeY;
-    /* 0x14 */ f32 eyeZ;
-    /* 0x18 */ u8 pad18[0x14];
-    /* 0x2C */ f32 yaw;
-} Unk80085E48;
-
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ void* unk8;
-} Unk800EB2B4; // size = 0xC
-
-typedef struct {
-    /* 0x00 */ u16 flags;
-    /* 0x02 */ u16 mask;
-    /* 0x04 */ u16 shift;
-    /* 0x06 */ u16 tlut;
-    /* 0x08 */ s32 img;
-    /* 0x0C */ s16 s;
-    /* 0x0E */ s16 t;
-    /* 0x10 */ s16 ds;
-    /* 0x12 */ s16 dt;
-} Unk800DA0F0; // size = 0x14
-
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ u16 unk4;
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u16 unk8;
-    /* 0x0A */ u8 padA[2];
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 unk28;
-    /* 0x2C */ f32 unk2C;
-    /* 0x30 */ f32 unk30;
-    /* 0x34 */ s32 unk34;
-    /* 0x38 */ Unk800EB2B4 unk38;
-    /* 0x44 */ Unk800DA0F0 unk44;
-} Unk80086798b; // size = 0x58
-
 /* This file's .bss, 800863F0..80087E30 (in address order; first declaration
  * fixes the order). 800865C0..80087E00 is the 16-byte-aligned run that holds effect_stat_up_marker_slots (Effect_ResetStatUpMarkers shares a lui between its pairs only when it
  * is defined here). Labels splat put inside these arrays (D_800865CC..,
  * D_8008779C.., D_8008793C) are gone; no asm uses them now. */
 
-extern Unk80085E48 camera_state;
 extern s32 gfx_frame_index;
-extern Unk800EB2B4 D_800EB2B4[];
+extern AnimSet D_800EB2B4[];
 extern u8 D_800CADA8[][4];
-extern Unk800DA0F0 D_800DA0F0[];
-typedef struct {
-    f32 mf[4][4];
-} MtxF;
-
+extern EffectTexAnim D_800DA0F0[];
 extern Gfx D_800EB6D0[];
-s32 Effect_DrawModelEffectGeometry(Unk80086798b*, s32);
-s32 Effect_ConfigureModelEffectTexture(Unk80086798b*);
 void Math_MtxFRotate(MtxF*, f32, f32, f32);
 f32 Math_Atan2(f32, f32);
 u32 Math_Rand(u32);
@@ -228,7 +57,8 @@ void Math_MtxFRotScaleTrans(MtxF*, f32, f32, f32, f32, f32, f32, f32);
 void Math_MtxFAlignYToVector(MtxF*, f32, f32, f32);
 void Math_MtxFScaleAxes(MtxF*, f32, f32, f32);
 f32 sqrtf(f32);
-typedef struct {
+/* Local view of GfxFrameData (game/core/main.h, h_core) until H2. */
+typedef struct GfxFrameData {
     /* 0x00 */ Mtx unk0[3];
     /* 0xC0 */ Mtx unkC0[1];
 } Unk2000000_1B200;
@@ -236,69 +66,38 @@ extern Unk2000000_1B200 D_2000000;
 extern Gfx D_800EB880[];
 extern Gfx D_800EB8E8[];
 
-void Effect_UpdateFootParticle(Unk1B200Particle* arg0);
-void Effect_UpdateMapObjParticle(Unk1B200Particle* arg0);
-void Effect_UpdateFlipbookSprite(Unk1B200Particle* arg0);
-void Effect_UpdateConvergeParticle(Unk1B200Spark* arg0);
-void Effect_UpdateBurstParticle(Unk1B200Spark* arg0);
 
-/* This file's .data, 8004EE20..8004F060: effect descriptors (Unk8004EE20,
+/* This file's .data, 8004EE20..8004F060: effect descriptors (EffectSprite,
  * 0x40 bytes each) and their tables, in source order: these first, then
  * Effect_UpdateMapObjEmitters's static descriptor (8004EE9C), effect_mapobj_particle_alpha_anim, Effect_SpawnFlipbookSprite's
  * static descriptor (8004EF0C) and the tables after Effect_SpawnFlipbookSprite. Both
  * descriptors must be function statics: IDO then stores their fields through
  * lui/%lo instead of the descriptor's address register. */
-Unk8004EE20 effect_foot_particle_template = {
-    0x000C, 0, (void*)Effect_UpdateFootParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C3790,
+EffectSprite effect_foot_particle_template = {
+    0x0C, 0, 0, Effect_UpdateFootParticle, 0x02, 0x10, 0x10, 0x00, 0, { 0 }, (u8*)0x800C3650, (Gfx*)0x800C3790,
     0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
 };
 f32 effect_foot_particle_scale_anim[12] = {
     3.25f, 3.24f, 3.23f, 3.22f, 3.21f, 3.2f, 3.0f, 2.8f, 2.6f, 2.4f, 2.2f, 2.0f,
 };
 u8 effect_foot_particle_alpha_anim[12] = { 0x10, 0x20, 0x40, 0x50, 0x60, 0x80, 0x90, 0xA0, 0xB0, 0xA0, 0x80, 0x40 };
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ f32 y;
-    /* 0x08 */ u8 pad8[4];
-    /* 0x0C */ Unk1B200Vec3 normal;
-    /* 0x18 */ u16 flags;
-} Coll1B200;
-
 s32 effect_mapobj_emitter_count;
 u16 effect_model_frame_counter;
 s32 effect_mapobj_emitter_prev_count;
-Unk80086400 effect_foot_emitter_slots[8];
-Unk80086440 effect_mapobj_emitter_buf1[8];
-Unk80086440 effect_mapobj_emitter_buf0[8];
-Unk800865C0 effect_floating_number_slots[10];
-Unk800866D8 effect_converge_emitter_slots[8];
-Unk80086798b effect_model_slots[32];
-Unk80087298 effect_streak_slots[32];
-Unk80087798 effect_stat_up_marker_slots[4];
-Unk800877A8 effect_ring_slots[4];
+EffectFootEmitter effect_foot_emitter_slots[8];
+EffectMapObjEmitter effect_mapobj_emitter_buf1[8];
+EffectMapObjEmitter effect_mapobj_emitter_buf0[8];
+EffectFloatingNumber effect_floating_number_slots[10];
+EffectConvergeEmitter effect_converge_emitter_slots[8];
+EffectModel effect_model_slots[32];
+EffectStreak effect_streak_slots[32];
+EffectStatUpMarker effect_stat_up_marker_slots[4];
+EffectRing effect_ring_slots[4];
 u16 effect_loaded_tlut_index;
-Unk1B200Vec2 effect_temp_vec;
+Vec2f effect_temp_vec;
 u8 D_80087E08[8]; /* unreferenced */
-Coll1B200 effect_ring_coll;
+CollResult effect_ring_coll;
 
-void Effect_ResetFootEmitters(void);
-void Effect_ResetMapObjEmitters(void);
-void Effect_ResetFloatingNumbers(void);
-void Effect_ResetConvergeEmitters(void);
-void Effect_ResetStreaks(void);
-void Effect_ResetRings(void);
-void Effect_ResetModelEffects(void);
-void Effect_ResetStatUpMarkers(void);
-void Effect_UpdateFootEmitters(void);
-void Effect_UpdateMapObjEmitters(void);
-void Effect_DrawFloatingNumbers(void);
-void Effect_UpdateConvergeEmitters(void);
-void Effect_UpdateAndDrawStreaks(void*);
-void Effect_UpdateAndDrawRings(void*);
-void Effect_UpdateAndDrawModelEffects(void*);
-void Effect_DrawStatUpMarkers(void*);
-s32 Effect_AllocateSprite(void*);
-void Math_RotateVec2(f32, Unk1B200Vec2*);
 
 void Effect_ResetAll(void) {
     Effect_ResetFootEmitters();
@@ -311,7 +110,7 @@ void Effect_ResetAll(void) {
     Effect_ResetRings();
 }
 
-void Effect_UpdateAndDrawAll(void* arg0) {
+void Effect_UpdateAndDrawAll(struct GfxFrameData* arg0) {
     Effect_UpdateFootEmitters();
     Effect_UpdateMapObjEmitters();
     Effect_UpdateConvergeEmitters();
@@ -324,7 +123,7 @@ void Effect_UpdateAndDrawAll(void* arg0) {
 
 void Effect_ResetFootEmitters(void) {
     s32 i = 8;
-    Unk80086400* p = effect_foot_emitter_slots;
+    EffectFootEmitter* p = effect_foot_emitter_slots;
 
     do {
         i--;
@@ -333,22 +132,22 @@ void Effect_ResetFootEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_StartFootEmitter(Unk1B200Pos* arg0) {
+void Effect_StartFootEmitter(Actor* arg0) {
     s32 i = 7;
-    Unk80086400* p = effect_foot_emitter_slots;
+    EffectFootEmitter* p = effect_foot_emitter_slots;
 
     while (i != 0 && p->timer != 0) {
         i--;
         p++;
     }
     p->timer = 4;
-    p->pos = arg0;
+    p->actor = arg0;
 }
 
 void Effect_UpdateFootEmitters(void) {
     s32 i;
-    Unk80086400* p;
-    Unk1B200Pos* pos;
+    EffectFootEmitter* p;
+    Actor* pos;
 
     i = 8;
     p = effect_foot_emitter_slots;
@@ -356,13 +155,13 @@ void Effect_UpdateFootEmitters(void) {
         if (p->timer != 0) {
             p->timer--;
             if (p->timer & 1) {
-                pos = p->pos;
-                effect_foot_particle_template.unk18 = pos->x;
-                effect_foot_particle_template.unk1C = pos->y + 1.0f;
-                effect_foot_particle_template.unk20 = pos->z;
+                pos = p->actor;
+                effect_foot_particle_template.x = pos->x;
+                effect_foot_particle_template.y = pos->y + 1.0f;
+                effect_foot_particle_template.z = pos->z;
                 effect_temp_vec.x = 0.0f;
                 effect_temp_vec.y = 0.7f;
-                Math_RotateVec2(pos->unk10, &effect_temp_vec);
+                Math_RotateVec2(pos->ry, &effect_temp_vec);
                 effect_foot_particle_template.unk34 = 0.2f;
                 effect_foot_particle_template.unk30 = effect_temp_vec.x;
                 effect_foot_particle_template.unk38 = effect_temp_vec.y;
@@ -374,21 +173,21 @@ void Effect_UpdateFootEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_UpdateFootParticle(Unk1B200Particle* arg0) {
-    arg0->unk18 += arg0->unk30;
-    arg0->unk1C += arg0->unk34;
-    arg0->unk20 += arg0->unk38;
+void Effect_UpdateFootParticle(EffectSprite* arg0) {
+    arg0->x += arg0->unk30;
+    arg0->y += arg0->unk34;
+    arg0->z += arg0->unk38;
     arg0->unk30 *= 0.8;
     arg0->unk34 *= 0.9;
     arg0->unk38 *= 0.8;
-    arg0->unk28 = arg0->unk2C = effect_foot_particle_scale_anim[arg0->unk0];
-    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, effect_foot_particle_alpha_anim[arg0->unk0]);
+    arg0->scaleX = arg0->scaleY = effect_foot_particle_scale_anim[arg0->life];
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, effect_foot_particle_alpha_anim[arg0->life]);
 }
 
 void Effect_ResetMapObjEmitters(void) {
     s32 i;
-    Unk80086440* a;
-    Unk80086440* b;
+    EffectMapObjEmitter* a;
+    EffectMapObjEmitter* b;
 
     effect_mapobj_emitter_prev_count = 0;
     i = 8;
@@ -403,10 +202,10 @@ void Effect_ResetMapObjEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
+void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, MapObj* arg3) {
     s32 pad[4];
-    Unk80086440* cur;
-    Unk80086440* prev;
+    EffectMapObjEmitter* cur;
+    EffectMapObjEmitter* prev;
     f32 angle;
     s32 n;
 
@@ -433,18 +232,18 @@ void Effect_QueueMapObjEmitter(f32 x, f32 y, f32 z, Unk1B200Pos* arg3) {
         cur->x = x;
         cur->y = y;
         cur->z = z;
-        cur->unk10 = arg3->unk10;
+        cur->unk10 = arg3->scale;
         cur->unk14 = arg3;
         effect_mapobj_emitter_count++;
     }
 }
 
 void Effect_UpdateMapObjEmitters(void) {
-    static Unk8004EE20 effect_mapobj_particle_template = {
-        0x002D, 0, (void*)Effect_UpdateMapObjParticle, 0x02101000, 0, (void*)0x800C3650, (void*)0x800C37E0,
+    static EffectSprite effect_mapobj_particle_template = {
+        0x2D, 0, 0, Effect_UpdateMapObjParticle, 0x02, 0x10, 0x10, 0x00, 0, { 0 }, (u8*)0x800C3650, (Gfx*)0x800C37E0,
         0.0f, 0.0f, 0.0f, 0.0f, 4.0f, 4.0f, 0.1f, 0.25f, 0.05f, 0,
     };
-    Unk80086440* p;
+    EffectMapObjEmitter* p;
     s32 n;
 
     effect_mapobj_emitter_prev_count = effect_mapobj_emitter_count;
@@ -452,10 +251,10 @@ void Effect_UpdateMapObjEmitters(void) {
     n = effect_mapobj_emitter_prev_count;
     while (n != 0) {
         if (p->unk0 != 0 && --p->unk0 == 0) {
-            effect_mapobj_particle_template.unk18 = p->x;
-            effect_mapobj_particle_template.unk1C = p->y;
-            effect_mapobj_particle_template.unk20 = p->z;
-            effect_mapobj_particle_template.unk28 = effect_mapobj_particle_template.unk2C = p->unk10;
+            effect_mapobj_particle_template.x = p->x;
+            effect_mapobj_particle_template.y = p->y;
+            effect_mapobj_particle_template.z = p->z;
+            effect_mapobj_particle_template.scaleX = effect_mapobj_particle_template.scaleY = p->unk10;
             Effect_AllocateSprite(&effect_mapobj_particle_template);
             p->unk0 = 0x19;
         }
@@ -470,16 +269,16 @@ u8 effect_mapobj_particle_alpha_anim[48] = {
     0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xD0, 0xC0, 0xB0, 0xA0, 0x90, 0x80, 0x70, 0x60, 0x50, 0x40, 0x30, 0x20, 0x10, 0x00, 0x00, 0x00,
 };
 
-void Effect_UpdateMapObjParticle(Unk1B200Particle* arg0) {
+void Effect_UpdateMapObjParticle(EffectSprite* arg0) {
     s32 r;
     s32 g;
     s32 b;
 
-    arg0->unk18 += arg0->unk30;
-    arg0->unk1C += arg0->unk34;
-    arg0->unk20 += arg0->unk38;
-    arg0->unk28 += 0.08;
-    arg0->unk2C += 0.08;
+    arg0->x += arg0->unk30;
+    arg0->y += arg0->unk34;
+    arg0->z += arg0->unk38;
+    arg0->scaleX += 0.08;
+    arg0->scaleY += 0.08;
     r = D_80084B6C + 0x40;
     g = D_80084B70 + 0x40;
     b = D_80084B74 + 0x40;
@@ -492,18 +291,18 @@ void Effect_UpdateMapObjParticle(Unk1B200Particle* arg0) {
     if (b >= 0x100) {
         b = 0xFF;
     }
-    gDPSetEnvColor(gfx_dl_head++, r, g, b, effect_mapobj_particle_alpha_anim[arg0->unk0]);
+    gDPSetEnvColor(gfx_dl_head++, r, g, b, effect_mapobj_particle_alpha_anim[arg0->life]);
 }
 
 void Effect_SpawnFlipbookSprite(f32 x, f32 y, f32 z) {
-    static Unk8004EE20 effect_flipbook_sprite_template = {
-        0x000C, 0, (void*)Effect_UpdateFlipbookSprite, 0x04202000, 0, (void*)0x800C3830, (void*)0x800C4070,
+    static EffectSprite effect_flipbook_sprite_template = {
+        0x0C, 0, 0, Effect_UpdateFlipbookSprite, 0x04, 0x20, 0x20, 0x00, 0, { 0 }, (u8*)0x800C3830, (Gfx*)0x800C4070,
         0.0f, 0.0f, 0.0f, 0.0f, 0.4f, 0.4f, 0.0f, 0.0f, 0.0f, 0,
     };
 
-    effect_flipbook_sprite_template.unk18 = x;
-    effect_flipbook_sprite_template.unk1C = y;
-    effect_flipbook_sprite_template.unk20 = z;
+    effect_flipbook_sprite_template.x = x;
+    effect_flipbook_sprite_template.y = y;
+    effect_flipbook_sprite_template.z = z;
     Effect_AllocateSprite(&effect_flipbook_sprite_template);
 }
 
@@ -516,12 +315,12 @@ u8 effect_flipbook_alpha_anim[12] = { 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x80, 
 u8 effect_floating_number_colors[4][4] = {
     { 0xFF, 0xFF, 0xFF, 0xFF }, { 0xC8, 0xFF, 0xC8, 0xFF }, { 0xC8, 0xC8, 0xFF, 0xFF }, { 0xFF, 0x7F, 0x7F, 0xFF },
 };
-Unk8004EE20 effect_converge_particle_template = {
-    0x0014, 0, (void*)Effect_UpdateConvergeParticle, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+EffectSprite effect_converge_particle_template = {
+    0x14, 0, 0, Effect_UpdateConvergeParticle, 0x02, 0x10, 0x10, 0x00, 0, { 0 }, (u8*)0x800C4128, (Gfx*)0x800C4268,
     0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
 };
-Unk8004EE20 effect_burst_particle_template = {
-    0x0014, 0, (void*)Effect_UpdateBurstParticle, 0x02101000, 0, (void*)0x800C4128, (void*)0x800C4268,
+EffectSprite effect_burst_particle_template = {
+    0x14, 0, 0, Effect_UpdateBurstParticle, 0x02, 0x10, 0x10, 0x00, 0, { 0 }, (u8*)0x800C4128, (Gfx*)0x800C4268,
     0.0f, 0.0f, 0.0f, 0.0f, 1.3f, 1.3f, 0.0f, 0.0f, 0.0f, 0,
 };
 u16 effect_ring_grow_frames[4] = { 0x14, 0xC, 0xC, 0 };
@@ -532,19 +331,19 @@ u8 effect_stat_up_marker_colors[5][4] = {
     { 0xFF, 0x00, 0x00, 0x00 }, { 0xFF, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0xFF, 0x00 }, { 0x00, 0xFF, 0x00, 0x00 }, { 0x00, 0x00, 0x00, 0x00 },
 };
 
-void Effect_UpdateFlipbookSprite(Unk1B200Particle* arg0) {
-    u16 v = arg0->unk0;
+void Effect_UpdateFlipbookSprite(EffectSprite* arg0) {
+    u16 v = arg0->life;
 
     if (!(v & 3)) {
-        arg0->unk10 = effect_flipbook_frame_ptrs[v >> 2];
+        arg0->tex = (u8*)effect_flipbook_frame_ptrs[v >> 2];
     }
-    arg0->unk28 = arg0->unk2C = effect_flipbook_scale_anim[v];
-    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, effect_flipbook_alpha_anim[arg0->unk0]);
+    arg0->scaleX = arg0->scaleY = effect_flipbook_scale_anim[v];
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, effect_flipbook_alpha_anim[arg0->life]);
 }
 
 void Effect_ResetFloatingNumbers(void) {
     s32 i = 10;
-    Unk800865C0* p = effect_floating_number_slots;
+    EffectFloatingNumber* p = effect_floating_number_slots;
 
     do {
         i--;
@@ -553,9 +352,9 @@ void Effect_ResetFloatingNumbers(void) {
     } while (i != 0);
 }
 
-void Effect_AddFloatingNumber(void* arg0, s32 arg1, s32 arg2) {
+void Effect_AddFloatingNumber(Actor* arg0, s32 arg1, s32 arg2) {
     s32 pad[2];
-    Unk800865C0* var_t0;
+    EffectFloatingNumber* var_t0;
     s32 var_v1;
     s32 i;
 
@@ -584,27 +383,6 @@ void Effect_AddFloatingNumber(void* arg0, s32 arg1, s32 arg2) {
     var_t0->unk18 = var_v1 - 1;
 }
 
-typedef struct {
-    /* 0x00 */ u16 type;
-    /* 0x02 */ u8 pad2[0x1A];
-    /* 0x1C */ f32 height;
-} Unk1B200DmgModel;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x94];
-    /* 0x94 */ f32 top;
-} Unk1B200DmgModel2;
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ u8 padC[0x18];
-    /* 0x24 */ f32 scale;
-    /* 0x28 */ u8 pad28[0x3C];
-    /* 0x64 */ Unk1B200DmgModel* model;
-    /* 0x68 */ Unk1B200DmgModel2* model2;
-} Unk1B200DmgActor;
 
 extern Gfx D_800C40C0[];
 extern u8 D_8039E290[];
@@ -613,9 +391,9 @@ s16 sins(u16);
 
 void Effect_DrawFloatingNumbers(void) {
     s32 n;
-    Unk800865C0* d;
+    EffectFloatingNumber* d;
     s32 first;
-    Unk1B200DmgActor* actor;
+    Actor* actor;
     s32 sx;
     s32 sy;
     f32 y;
@@ -689,7 +467,7 @@ void Effect_DrawFloatingNumbers(void) {
 
 
 void Effect_ResetConvergeEmitters(void) {
-    Unk800866D8* p = effect_converge_emitter_slots;
+    EffectConvergeEmitter* p = effect_converge_emitter_slots;
     s32 i = 8;
 
     do {
@@ -700,7 +478,7 @@ void Effect_ResetConvergeEmitters(void) {
 }
 
 void Effect_StartConvergeEmitter(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
-    Unk800866D8* p = effect_converge_emitter_slots;
+    EffectConvergeEmitter* p = effect_converge_emitter_slots;
     s32 i = 7;
 
     while (i != 0 && p->unk0 != 0) {
@@ -716,7 +494,7 @@ void Effect_StartConvergeEmitter(s32 arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg
 }
 
 void Effect_UpdateConvergeEmitters(void) {
-    Unk800866D8* p;
+    EffectConvergeEmitter* p;
     f32 x;
     f32 y;
     f32 z;
@@ -724,7 +502,7 @@ void Effect_UpdateConvergeEmitters(void) {
     f32 a;
     MtxF mtx;
     f32 b;
-    Unk8004EE20 spawn;
+    EffectSprite spawn;
 
     spawn = effect_converge_particle_template;
     p = effect_converge_emitter_slots;
@@ -736,9 +514,9 @@ void Effect_UpdateConvergeEmitters(void) {
                 b = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
                 Math_MtxFRotate(&mtx, a, b, 0.0f);
                 guMtxXFMF(mtx.mf, 0.0f, 0.0f, p->unk14, &x, &y, &z);
-                spawn.unk18 = p->unk8 + x;
-                spawn.unk1C = p->unkC + y;
-                spawn.unk20 = p->unk10 + z;
+                spawn.x = p->unk8 + x;
+                spawn.y = p->unkC + y;
+                spawn.z = p->unk10 + z;
                 spawn.unk30 = x * -0.03;
                 spawn.unk34 = y * -0.03;
                 spawn.unk38 = z * -0.03;
@@ -752,21 +530,21 @@ void Effect_UpdateConvergeEmitters(void) {
     } while (i != 0);
 }
 
-void Effect_UpdateConvergeParticle(Unk1B200Spark* arg0) {
+void Effect_UpdateConvergeParticle(EffectSprite* arg0) {
     u8* c;
 
-    arg0->unk18 += arg0->unk30;
-    arg0->unk1C += arg0->unk34;
-    arg0->unk20 += arg0->unk38;
+    arg0->x += arg0->unk30;
+    arg0->y += arg0->unk34;
+    arg0->z += arg0->unk38;
     arg0->unk30 *= 0.9;
     arg0->unk34 *= 0.9;
     arg0->unk38 *= 0.9;
-    arg0->unk24 += 0.39269908169872414;
-    if (arg0->unk0 < 10) {
-        arg0->unk28 = arg0->unk2C = 1.0f;
+    arg0->roll += 0.39269908169872414;
+    if (arg0->life < 10) {
+        arg0->scaleX = arg0->scaleY = 1.0f;
     }
     c = D_800EB5E4[arg0->unk3C];
-    if (arg0->unk0 & 1) {
+    if (arg0->life & 1) {
         gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0xDC);
     } else {
         gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0x20);
@@ -779,7 +557,7 @@ void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     f32 b;
     f32 c;
     MtxF mtx;
-    Unk8004EE20 spawn;
+    EffectSprite spawn;
     spawn = effect_burst_particle_template;
     i = 15;
     do {
@@ -787,9 +565,9 @@ void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
         b = (f32)Math_Rand(32) * 3.141592653589793 / 16.0f;
         Math_MtxFRotate(&mtx, a, b, 0.0f);
         guMtxXFMF(mtx.mf, 0.0f, 0.0f, arg4, &a, &b, &c);
-        spawn.unk18 = arg1;
-        spawn.unk1C = arg2;
-        spawn.unk20 = arg3;
+        spawn.x = arg1;
+        spawn.y = arg2;
+        spawn.z = arg3;
         spawn.unk30 = a;
         spawn.unk34 = b;
         spawn.unk38 = c;
@@ -799,21 +577,21 @@ void Effect_SpawnBurst(s32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     } while (i != 0);
 }
 
-void Effect_UpdateBurstParticle(Unk1B200Spark* arg0) {
+void Effect_UpdateBurstParticle(EffectSprite* arg0) {
     u8* c;
 
-    arg0->unk18 += arg0->unk30;
-    arg0->unk1C += arg0->unk34;
-    arg0->unk20 += arg0->unk38;
+    arg0->x += arg0->unk30;
+    arg0->y += arg0->unk34;
+    arg0->z += arg0->unk38;
     arg0->unk30 *= 0.8;
     arg0->unk34 *= 0.8;
     arg0->unk38 *= 0.8;
-    arg0->unk24 += 0.39269908169872414;
-    if (arg0->unk0 < 10) {
-        arg0->unk28 = arg0->unk2C = 1.0f;
+    arg0->roll += 0.39269908169872414;
+    if (arg0->life < 10) {
+        arg0->scaleX = arg0->scaleY = 1.0f;
     }
     c = D_800EB5E4[arg0->unk3C];
-    if (arg0->unk0 & 1) {
+    if (arg0->life & 1) {
         gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0xDC);
     } else {
         gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], 0x20);
@@ -828,9 +606,9 @@ void Effect_ResetStreaks(void) {
     }
 }
 
-void Effect_UpdateAndDrawStreaks(void* arg0) {
+void Effect_UpdateAndDrawStreaks(struct GfxFrameData* arg0) {
     s32 n;
-    Unk80087298* p;
+    EffectStreak* p;
     s32 first;
     u32 alpha;
     f32 dx;
@@ -886,7 +664,7 @@ void Effect_UpdateAndDrawStreaks(void* arg0) {
 
 void Effect_SpawnStreakBurst(f32 x, f32 y, f32 z) {
     s32 n;
-    Unk80087298* p;
+    EffectStreak* p;
     s32 count;
     f32 a;
     f32 b;
@@ -919,7 +697,7 @@ void Effect_SpawnStreakBurst(f32 x, f32 y, f32 z) {
 
 void Effect_ResetRings(void) {
     s32 i = 4;
-    Unk800877A8* p = effect_ring_slots;
+    EffectRing* p = effect_ring_slots;
 
     do {
         i--;
@@ -933,12 +711,11 @@ typedef struct {
     /* 0x1C */ f32 unk1C;
 } Unk8007AA08_1B200;
 extern Unk8007AA08_1B200 player_state;
-void Coll_ResolveFloorAndWalls(f32, f32, f32, s32, Coll1B200*);
 s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
     s32 i;
-    Unk800877A8* p;
-    Unk1B200Vec3* pt;
-    Unk1B200Vec3* n;
+    EffectRing* p;
+    Vec3f* pt;
+    Vec3f* n;
     s32 j;
     f32 angle;
     f32 dy;
@@ -979,9 +756,9 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
                 n->z = 0.0f;
             } else {
                 pt->y = effect_ring_coll.y;
-                n->x = effect_ring_coll.normal.x;
-                n->y = effect_ring_coll.normal.y;
-                n->z = effect_ring_coll.normal.z;
+                n->x = effect_ring_coll.nx;
+                n->y = effect_ring_coll.ny;
+                n->z = effect_ring_coll.nz;
             }
         }
         angle += 0.39269908169872414;
@@ -992,7 +769,7 @@ s32 Effect_CreateTerrainRing(u16 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4) {
 }
 
 void Effect_FadeRing(s32 arg0, f32 arg1, f32 arg2, f32 arg3) {
-    Unk800877A8* p = &effect_ring_slots[arg0];
+    EffectRing* p = &effect_ring_slots[arg0];
 
     p->unk0 = 3;
     p->unk2 = 0;
@@ -1006,13 +783,13 @@ extern Gfx D_800C4780[];
 extern u8 D_800C47C0[];
 extern Gfx D_800C4840[];
 
-void Effect_UpdateAndDrawRings(void* arg0) {
+void Effect_UpdateAndDrawRings(struct GfxFrameData* arg0) {
     s32 cnt;
-    Unk800877A8* p;
+    EffectRing* p;
     s32 first;
     u8 alpha;
     s32 j;
-    Unk1B200Vec3* pt;
+    Vec3f* pt;
     f32 x0;
     f32 y0;
     f32 z0;
@@ -1102,7 +879,7 @@ void Effect_UpdateAndDrawRings(void* arg0) {
 
 void Effect_ResetModelEffects(void) {
     s32 i = 32;
-    Unk80086798b* p = effect_model_slots;
+    EffectModel* p = effect_model_slots;
 
     do {
         i--;
@@ -1111,9 +888,9 @@ void Effect_ResetModelEffects(void) {
     } while (i != 0);
 }
 
-Unk80086798b* Effect_CreateModelEffect(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 arg10, f32 arg11) {
+EffectModel* Effect_CreateModelEffect(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8, f32 arg9, f32 arg10, f32 arg11) {
     s32 i;
-    Unk80086798b* p;
+    EffectModel* p;
 
     i = 31;
     p = effect_model_slots;
@@ -1131,19 +908,19 @@ Unk80086798b* Effect_CreateModelEffect(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s
     p->unk28 = 0.0f;
     p->unk2C = 0.0f;
     p->unk30 = 1.0f;
-    p->unk38 = D_800EB2B4[arg0];
+    p->anim = D_800EB2B4[arg0];
     p->unk4 = 0;
     p->unk6 = arg3;
-    p->unk38.unk8 = D_800CADA8[arg1];
-    p->unk0 = p->unk2 = p->unk38.unk2;
+    p->anim.dls = (Gfx**)D_800CADA8[arg1];
+    p->unk0 = p->unk2 = p->anim.length;
     p->unk8 = arg4;
     p->unk34 = 0;
-    p->unk44 = D_800DA0F0[arg2];
+    p->tex = D_800DA0F0[arg2];
     return p;
 }
 
-void Effect_UpdateAndDrawModelEffects(void* arg0) {
-    Unk80086798b* p;
+void Effect_UpdateAndDrawModelEffects(struct GfxFrameData* arg0) {
+    EffectModel* p;
     s32 i;
     u32 alpha;
     u8* col;
@@ -1196,26 +973,13 @@ void Effect_UpdateAndDrawModelEffects(void* arg0) {
 }
 
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f_1B200;
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s8 unk14;
-    /* 0x15 */ u8 pad15[0xB];
-} Anim1B200; // size = 0x20
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x04 */ Anim1B200* unk4;
-} AnimSet1B200;
 extern s32 anim_node_position_count;
-void Anim_DrawNode(MtxF*, Vec3f_1B200, s32, s32, s32, s32, AnimSet1B200*, Anim1B200*, s32);
-s32 Effect_DrawModelEffectGeometry(Unk80086798b* arg0, s32 arg1) {
+s32 Effect_DrawModelEffectGeometry(EffectModel* arg0, s32 arg1) {
     u32 i;
-    Anim1B200* anims;
+    AnimNode* anims;
     s32 frame;
     MtxF mtx;
-    Vec3f_1B200 scale;
+    Vec3f scale;
 
     anim_node_position_count = 0;
     if (arg0->unk8 & 4) {
@@ -1231,27 +995,27 @@ s32 Effect_DrawModelEffectGeometry(Unk80086798b* arg0, s32 arg1) {
     scale.x = arg0->unk1C * 0.01;
     scale.y = arg0->unk20 * 0.01;
     scale.z = arg0->unk24 * 0.01;
-    anims = ((AnimSet1B200*)&arg0->unk38)->unk4;
+    anims = arg0->anim.nodes;
     frame = arg0->unk34;
     if (gfx_mtx_index < 0x1E6) {
-        for (i = 0; i < ((AnimSet1B200*)&arg0->unk38)->unk0; i++) {
-            if (anims[i].unk14 == 0) {
-                Anim_DrawNode(&mtx, scale, 0, i, frame, 0, (AnimSet1B200*)&arg0->unk38, anims, arg1);
+        for (i = 0; i < arg0->anim.nodeCount; i++) {
+            if (anims[i].parent == 0) {
+                Anim_DrawNode(&mtx, scale, 0, i, frame, 0, &arg0->anim, anims, arg1);
             }
         }
     }
 }
 
-s32 Effect_ConfigureModelEffectTexture(Unk80086798b* arg0) {
-    Unk800DA0F0* t;
+s32 Effect_ConfigureModelEffectTexture(EffectModel* arg0) {
+    EffectTexAnim* t;
     u32 mask;
     u32 size;
     s32 geom = 0;
     s32 img;
     s32 clamp;
 
-    if (arg0->unk44.img != 0) {
-        t = &arg0->unk44;
+    if (arg0->tex.img != 0) {
+        t = &arg0->tex;
         if (arg0->unk8 & 0x20) {
             geom = G_LIGHTING;
         }
@@ -1337,10 +1101,10 @@ extern f32 D_8007AA44;
 extern Gfx D_800EB9C8[];
 extern Gfx D_800EB990[];
 void Math_MtxFAimAt(MtxF*, f32, f32, f32, f32, f32, f32);
-void Effect_DrawStatUpMarkers(void* arg0) {
+void Effect_DrawStatUpMarkers(struct GfxFrameData* arg0) {
     s32 first;
     s32 i;
-    Unk80087798* p;
+    EffectStatUpMarker* p;
     u32 alpha;
     f32 x;
     f32 y;

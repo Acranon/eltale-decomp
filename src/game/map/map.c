@@ -414,7 +414,7 @@ void MapObj_UpdateAndDrawNearby(MtxBuf *arg0) {
     *pB0 = -1;
     px = camera_state.eyeX;
     pz = camera_state.eyeZ;
-    switch (map_subarea_grid->alwaysCount8) {
+    switch (map_subarea_grid->unk28) {
         case 1:
             off = mapobj_cell_disc_r7;
             n = 0x9D;
