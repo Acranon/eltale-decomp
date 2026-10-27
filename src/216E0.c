@@ -232,21 +232,21 @@ extern Gfx D_803A8788[];
 
 struct Struct_80021030;
 void Hud_DrawPlayerMeters(struct Struct_80021030* arg0);
-void Hud_DrawPlayerStatus(Unk2000000* arg0, s32 arg1);
+void Hud_DrawElementLevels(Unk2000000* arg0, s32 arg1);
 void Hud_DrawCompass(Unk2000000* buf);
 struct Struct_80021C04;
 void Hud_DrawSpellInput(Unk2000000* arg0, struct Struct_80021C04* arg1);
 void Hud_DrawSpellName(void* arg0);
 struct Struct_80022970;
-void Hud_UpdateDirectionalAllocation(Unk2000000* arg0, struct Struct_80022970* arg1);
-void Hud_DrawWorldObjectMarker(void);
-void func_800231C4(void);
-void func_800232A8(void);
-void func_8002338C(void);
-void Hud_DrawEnemyMarker(u16 arg0);
-void Hud_DrawPlayerOverheadIcon(void);
-void Hud_DrawActorStatusIndicators(Struct_8002373C* arg0);
-void Hud_DrawInfoPanel(void);
+void Hud_UpdateElementAllocation(Unk2000000* arg0, struct Struct_80022970* arg1);
+void Hud_DrawNpcTalkMarker(void);
+void Hud_DrawSpiritMarker(void);
+void Hud_DrawChestMarker(void);
+void Hud_DrawTextSpotMarker(void);
+void Hud_DrawMeleeTargetMarker(u16 arg0);
+void Hud_DrawOutOfRangeIcon(void);
+void Hud_UpdateAndDrawActorStatusIndicators(Struct_8002373C* arg0);
+void Hud_DrawEnemyInfoPanel(void);
 void Hud_DrawPopups(void);
 
 void Hud_Draw(Unk2000000* buf) {
@@ -266,7 +266,7 @@ void Hud_Draw(Unk2000000* buf) {
     }
     if (!(D_8004DCA0 & 0xC00)) {
         Hud_DrawPlayerMeters((struct Struct_80021030*)D_8007AA20);
-        Hud_DrawPlayerStatus(buf, D_8007AA1C);
+        Hud_DrawElementLevels(buf, D_8007AA1C);
         if (D_8008C154 == 1) {
             if (++D_8008C152 >= 13) {
                 D_8008C152 = 12;
@@ -281,43 +281,43 @@ void Hud_Draw(Unk2000000* buf) {
         Hud_DrawCompass(buf);
     }
     if ((D_8008BE52 & 1) && D_8008C162) {
-        Hud_DrawInfoPanel();
+        Hud_DrawEnemyInfoPanel();
         D_8008C162--;
     }
     D_8008C174 = D_8008C178 = 0;
     if (D_8008BE52 & 1) {
         Hud_DrawPopups();
         if (!(D_8008BE52 & 2) && D_8007AA0A && !(D_8007AA80 & 1) && !(D_80085F90 & 1)) {
-            Hud_DrawEnemyMarker(D_8007AA0A - 1);
+            Hud_DrawMeleeTargetMarker(D_8007AA0A - 1);
         }
         if ((D_8007AA10 & 0x20) && !(D_8004DCA0 & 0x800)) {
-            Hud_DrawPlayerOverheadIcon();
+            Hud_DrawOutOfRangeIcon();
         }
-        Hud_DrawActorStatusIndicators((Struct_8002373C*)D_8007AA20);
+        Hud_UpdateAndDrawActorStatusIndicators((Struct_8002373C*)D_8007AA20);
         n = D_8007B900;
         e = D_8007B908;
         while (n != 0) {
             if (e->unk7C != -1) {
-                Hud_DrawActorStatusIndicators((Struct_8002373C*)e->unk2C);
+                Hud_UpdateAndDrawActorStatusIndicators((Struct_8002373C*)e->unk2C);
                 n--;
             }
             e++;
         }
     } else if (!(D_8004DCA0 & 0x87) && !(D_8007AA80 & 1)) {
         if (D_8007A9C0) {
-            Hud_DrawWorldObjectMarker();
+            Hud_DrawNpcTalkMarker();
         } else if (D_8007A9C4 && !(D_8004DCA0 & 8)) {
-            func_800231C4();
+            Hud_DrawSpiritMarker();
         } else if (D_8007A9C8) {
-            func_800232A8();
+            Hud_DrawChestMarker();
         } else if (D_8007A9CC) {
-            func_8002338C();
+            Hud_DrawTextSpotMarker();
         }
     }
     if (D_8004DCA0 & 4) {
         Hud_DrawSpellInput(buf, (struct Struct_80021C04*)&D_8007AA08);
     } else if (D_8004DCA0 & 8) {
-        Hud_UpdateDirectionalAllocation(buf, (struct Struct_80022970*)&D_8007AA08);
+        Hud_UpdateElementAllocation(buf, (struct Struct_80022970*)&D_8007AA08);
     }
     if (D_8008C15E) {
         Hud_DrawSpellName(&D_8007AA08);
@@ -389,7 +389,7 @@ extern Gfx D_803AA3C8[];
 extern u8 D_8004F2CC[][4];
 extern Gfx D_803AA2F8[];
 
-void Hud_DrawPlayerStatus(Unk2000000* buf, s32 arg1) {
+void Hud_DrawElementLevels(Unk2000000* buf, s32 arg1) {
     s32 x;
     f32 fx;
     f32 fy;
@@ -695,7 +695,7 @@ extern u8 D_8039ADB0[];
 extern Gfx D_803AA2F8[];
 void Sfx_Play(s32, s32, s32);
 
-void Hud_UpdateDirectionalAllocation(Unk2000000* buf, Struct_80022970* pl) {
+void Hud_UpdateElementAllocation(Unk2000000* buf, Struct_80022970* pl) {
     u16 alpha;
     s32 yoff;
     s32 t;
@@ -786,7 +786,7 @@ typedef struct {
 extern s32 D_8007A9C0;
 extern Struct_8007ABF0 D_8007ABF0[];
 
-void Hud_DrawWorldObjectMarker(void) {
+void Hud_DrawNpcTalkMarker(void) {
     s32 sx;
     s32 bob;
     Vec3f_216E0* p;
@@ -806,7 +806,7 @@ void Hud_DrawWorldObjectMarker(void) {
     }
 }
 
-void func_800231C4(void) {
+void Hud_DrawSpiritMarker(void) {
     s32 sx;
     s32 sy;
     s32 bob;
@@ -823,7 +823,7 @@ void func_800231C4(void) {
     }
 }
 
-void func_800232A8(void) {
+void Hud_DrawChestMarker(void) {
     s32 sx;
     s32 sy;
     s32 bob;
@@ -840,7 +840,7 @@ void func_800232A8(void) {
     }
 }
 
-void func_8002338C(void) {
+void Hud_DrawTextSpotMarker(void) {
     s32 sx;
     s32 sy;
     s32 bob;
@@ -860,7 +860,7 @@ void func_8002338C(void) {
 
 extern Gfx D_803AA5B0[];
 
-void Hud_DrawEnemyMarker(u16 arg0) {
+void Hud_DrawMeleeTargetMarker(u16 arg0) {
     s32 sx;
     s32 sy;
     s32 bob;
@@ -887,7 +887,7 @@ void Hud_DrawEnemyMarker(u16 arg0) {
     }
 }
 
-void Hud_DrawPlayerOverheadIcon(void) {
+void Hud_DrawOutOfRangeIcon(void) {
     s32 sx;
     s32 sy;
     f32 y;
@@ -959,7 +959,7 @@ typedef struct {
 
 extern Struct_803AA628 D_803AA628[];
 
-void Hud_DrawActorStatusIndicators(Struct_8002373C* arg0) {
+void Hud_UpdateAndDrawActorStatusIndicators(Struct_8002373C* arg0) {
     Struct_8002373C_68* s = arg0->unk68;
     f32 y;
     s32 vis;
@@ -1110,7 +1110,7 @@ extern Struct_80024A54 D_803A86F8;
 extern Struct_80024A54 D_803A8718;
 void Hud_DrawNumber(u16 arg0, s32 arg1, s32 arg2, s32 arg3);
 
-void Hud_DrawInfoPanel(void) {
+void Hud_DrawEnemyInfoPanel(void) {
     s32 d;
 
     D_8008C174 = 0xB5;

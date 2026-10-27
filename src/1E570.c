@@ -102,7 +102,7 @@ Struct_80087E38* Effect_AllocateSprite(Struct_80087E38* arg0) {
     return ret;
 }
 
-void Effect_DrawSprites(Struct_8001DA3C* arg0) {
+void Effect_UpdateAndDrawSprites(Struct_8001DA3C* arg0) {
     s32 i;
     u8* tex;
     Struct_80087E38* dust;

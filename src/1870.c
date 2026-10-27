@@ -370,14 +370,14 @@ void Chest_UpdateAll(void *arg0);
 void Spirit_SpawnSparkles(void);
 void Camera_Update(void *arg0);
 void Effect_UpdateAndDrawAll(void *arg0);
-void Effect_DrawSprites(void *arg0);
+void Effect_UpdateAndDrawSprites(void *arg0);
 void Hud_Draw(void *arg0);
 void Item_UpdateInventoryMenu(void);
 void Fade_UpdateAndDraw(void *arg0);
 void Menu_Update(void *arg0);
 void SaveMenu_Init(s32 arg0);
 void Text_UpdateAndDrawWindows(void);
-void Cutscene_DrawImageCues(void);
+void Cutscene_UpdateAndDrawImageCues(void);
 s32 func_8020C11C(void);
 s32 func_8020C15C(void);
 s32 func_8020C16C(void);
@@ -433,7 +433,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
         Spirit_SpawnSparkles();
         Env_ApplyLightSlot(D_8007AB60);
         Shadow_DrawAll(sub);
-        Effect_DrawSprites(sub);
+        Effect_UpdateAndDrawSprites(sub);
         Effect_UpdateAndDrawAll(sub);
         Fade_UpdateAndDraw(sub);
         if (D_8004DCA0 & 2) {
@@ -446,7 +446,7 @@ void Gfx_BuildFrameDisplayList(GfxFrame *arg0) {
             Item_UpdateInventoryMenu();
         }
         if (D_8007A170 == 7) {
-            Cutscene_DrawImageCues();
+            Cutscene_UpdateAndDrawImageCues();
         }
     } else if (D_8007A170 == 2) {
         Menu_Update(sub);
@@ -624,7 +624,7 @@ void Effect_ResetAll(void);
 void Effect_ResetSpritePool(void);
 void Battle_ResetState(s32 *arg0);
 void Battle_TryStartRandomEncounter(void);
-void Battle_UpdateTurnCamera(void);
+void Battle_UpdateStartCamera(void);
 void Battle_UpdateTurnTransition(void);
 void Anim_SetCurrentAndNext(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 void Hud_ResetState(void);
@@ -699,7 +699,7 @@ void Core_RunGameplayLoop(void) {
         }
         if (D_8008BE52 & 1) {
             if (D_8008BE52 & 0x200) {
-                Battle_UpdateTurnCamera();
+                Battle_UpdateStartCamera();
             } else {
                 Battle_UpdateTurnTransition();
                 Enemy_UpdateAll();

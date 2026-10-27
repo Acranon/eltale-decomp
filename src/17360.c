@@ -1587,7 +1587,7 @@ typedef struct {
     /* 0x08 */ u8 pad8[4];
 } Unk800C363C; // size = 0xC
 extern Unk800C363C* D_800C363C[];
-void Effect_StartBurstEmitter(s32, s32, f32, f32, f32, f32);
+void Effect_StartConvergeEmitter(s32, s32, f32, f32, f32, f32);
 void Effect_SpawnBurst(s32, f32, f32, f32, f32);
 typedef struct {
     /* 0x00 */ s16 unk0;
@@ -1658,7 +1658,7 @@ void Magic_CreateCastPresentation(Unk800199C0* arg0, Actor17360* arg1) {
         y = arg1->y + arg1->unk64->unk1C * arg1->scale;
         switch (fx->unk0) {
             case 1:
-                Effect_StartBurstEmitter(fx->unk2, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartConvergeEmitter(fx->unk2, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
                 Effect_SpawnBurst(fx->unk2, arg1->x, y, arg1->z, h * 0.2);
@@ -1759,7 +1759,7 @@ void Magic_CreateHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
         y = arg1->y + arg1->unk64->unk1C * arg1->unk64->unk20;
         switch (fx->unk8) {
             case 1:
-                Effect_StartBurstEmitter(fx->unkA, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartConvergeEmitter(fx->unkA, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
                 Effect_SpawnBurst(fx->unkA, arg1->x, y, arg1->z, h * 0.2);
@@ -1800,7 +1800,7 @@ void Magic_CreateGroundHitPresentation(Unk80019BFC* arg0, Actor17360* arg1) {
         y = arg1->y + arg1->unk64->unk1C * arg1->scale;
         switch (fx->unk4) {
             case 1:
-                Effect_StartBurstEmitter(fx->unk6, 30, arg1->x, y, arg1->z, h * 1.2);
+                Effect_StartConvergeEmitter(fx->unk6, 30, arg1->x, y, arg1->z, h * 1.2);
                 break;
             case 2:
                 Effect_SpawnBurst(fx->unk6, arg1->x, y, arg1->z, h * 0.2);

@@ -320,7 +320,7 @@ typedef struct Actor {
 
 extern Actor D_8007AA20;
 
-void Battle_UpdateTurnCamera(void) {
+void Battle_UpdateStartCamera(void) {
     f32 dx;
     f32 dz;
     f32 ang;

@@ -359,7 +359,7 @@ typedef struct {
     /* 0x20 */ f32 z;
 } Unk8007AA08;
 extern Unk8007AA08 D_8007AA08;
-void Effect_QueueVisibleMarker(f32, f32, f32, Unk8000FA9C *);
+void Effect_QueueMapObjEmitter(f32, f32, f32, Unk8000FA9C *);
 void MapObj_EmitArcSprite(Unk8000FA9C *);
 void MapObj_EmitDropSprite(Unk8000FA9C *);
 void MapObj_QueueSpinner(f32, f32, f32, f32, Unk8000FA9C *);
@@ -897,7 +897,7 @@ void MapObj_CollectCell(s32 count, u16 *ids) {
             *D_80081CD4++ = s;
             D_80081CBC++;
         } else if (kind == 0x81) {
-            Effect_QueueVisibleMarker(s->x, s->y, s->z, s);
+            Effect_QueueMapObjEmitter(s->x, s->y, s->z, s);
         } else if (kind == 0x83) {
             MapObj_EmitArcSprite(s);
         } else if (kind == 0x84) {
