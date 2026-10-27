@@ -201,9 +201,9 @@ void Spirit_MoveSparkle(EffectSprite* arg0) {
     s = sinf((f32)arg0->unk3C * 0.09817477042468103) * 0.1;
     arg0->unk3C += 4;
     c = (u8*)&spirit_sparkle_colors[arg0->life & 1];
-    arg0->x += arg0->unk30 + s;
-    arg0->y += arg0->unk34;
-    arg0->z += arg0->unk38 + s;
+    arg0->x += arg0->vecX + s;
+    arg0->y += arg0->vecY;
+    arg0->z += arg0->vecZ + s;
     gDPSetEnvColor(gfx_dl_head++, c[0], c[1], c[2], c[3]);
 }
 

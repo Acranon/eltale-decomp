@@ -55,7 +55,7 @@ void Cutscene_StartEntry(s32 arg0) {
         core_flags |= 0x10000;
     }
     npc_count = 0;
-    func_80009764(map_subarea_def->unk12);
+    func_80009764(map_subarea_def->areaSetIndex);
     Npc_SpawnForArea(entry->unk2C, entry->unk30);
     enemy_count = 0;
     Camera_InitForMap();

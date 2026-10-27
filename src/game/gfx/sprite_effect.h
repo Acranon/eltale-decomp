@@ -29,9 +29,9 @@ typedef struct EffectSprite {
     /* 0x24 */ f32 roll; /* rotation about the view axis */
     /* 0x28 */ f32 scaleX;
     /* 0x2C */ f32 scaleY;
-    /* 0x30 */ f32 unk30; /* the alignment vector (flags bit 0); the update callbacks use 0x30..0x38 as a velocity */
-    /* 0x34 */ f32 unk34;
-    /* 0x38 */ f32 unk38;
+    /* 0x30 */ f32 vecX; /* alignment vector (flags bit 0), also used as velocity by update callbacks */
+    /* 0x34 */ f32 vecY;
+    /* 0x38 */ f32 vecZ;
     /* 0x3C */ u8 unk3C; /* per-sprite counter of the update callbacks */
     /* 0x3D */ u8 pad3D[3];
 } EffectSprite; /* 0x40 bytes */

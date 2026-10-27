@@ -90,17 +90,17 @@ void Env_InitForMap(void) {
     EnvKeyframe *e;
 
     /* env_day_phases[0..2] and env_day_phase_last form one 4-entry table; the walk goes back from its last entry */
-    env_last_phase_start = env_day_phase_last[0].unk0;
+    env_last_phase_start = env_day_phase_last[0].startTime;
     p = env_day_phase_last;
     i = 3;
-    if (env_clock < env_day_phase_last[0].unk0) {
+    if (env_clock < env_day_phase_last[0].startTime) {
         do {
             p--;
             n = i--;
             if (n == 0) {
                 break;
             }
-        } while (env_clock < p->unk0);
+        } while (env_clock < p->startTime);
     }
     if (i < 0) {
         p = env_day_phase_last;
@@ -109,7 +109,7 @@ void Env_InitForMap(void) {
         env_next_phase = i;
     }
     /* map.h declares the four phase palettes as u8[0x800]; they are u16[4][0x100] (D3_HINTS). */
-    src = map_backdrop_phase_tluts[p->unk4];
+    src = map_backdrop_phase_tluts[p->paletteIndex];
     dst = map_backdrop_tlut;
     i = 0x100;
     do {
@@ -146,9 +146,9 @@ void Env_Update(void) {
         Env_StepPaletteFade(env_palette_fade_timer);
     } else {
         p = &env_day_phases[env_next_phase];
-        if (env_light_time >= p->unk0 && (env_next_phase != 0 || env_light_time < env_last_phase_start)) {
-            /* row p->unk4 written as an offset: map_backdrop_phase_tluts[p->unk4] DIFFs (55 words) */
-            Env_StartPaletteFade(p->unk8, map_backdrop_phase_tluts[0] + p->unk4 * 256, map_backdrop_tlut);
+        if (env_light_time >= p->startTime && (env_next_phase != 0 || env_light_time < env_last_phase_start)) {
+            /* row p->paletteIndex written as an offset: map_backdrop_phase_tluts[p->paletteIndex] DIFFs (55 words) */
+            Env_StartPaletteFade(p->fadeFrames, map_backdrop_phase_tluts[0] + p->paletteIndex * 256, map_backdrop_tlut);
             if (++env_next_phase >= 4) {
                 env_next_phase = 0;
             }
@@ -275,10 +275,10 @@ void Env_ComputeLightDirs(void) {
         env_light_dirs[0][0] = x;
         env_light_dirs[0][1] = y;
         env_light_dirs[0][2] = z;
-    } else if (env_area_settings->unk8 != 0) {
-        env_light_dirs[0][0] = env_area_settings->unkC;
-        env_light_dirs[0][1] = env_area_settings->unk10;
-        env_light_dirs[0][2] = env_area_settings->unk14;
+    } else if (env_area_settings->hasLightDirection != 0) {
+        env_light_dirs[0][0] = env_area_settings->lightDirX;
+        env_light_dirs[0][1] = env_area_settings->lightDirY;
+        env_light_dirs[0][2] = env_area_settings->lightDirZ;
     } else {
         env_light_dirs[0][0] = -89;
         env_light_dirs[0][1] = 89;
@@ -350,7 +350,7 @@ void Env_ClearLightSlots(void) {
     s32 i = 8;
 
     do {
-        p->unk0 = 0;
+        p->state = 0;
         p++;
         i--;
     } while (i != 0);
@@ -360,42 +360,42 @@ s32 Env_AllocateLightSlot(void) {
     EnvLightSlot *p = &env_light_slots[7];
     s32 i = 7;
 
-    while (p->unk0 != 0) {
+    while (p->state != 0) {
         i--;
         p--;
         if (i == 0) {
             break;
         }
     }
-    p->unk0 = 1;
-    p->unk4 = 0;
-    p->unk18 = 0;
-    p->unk2C = 0;
+    p->state = 1;
+    p->envAnimMode = 0;
+    p->lightAnimMode = 0;
+    p->lightDirs = 0;
     return i;
 }
 
 void Env_FreeLightSlot(s32 arg0) {
-    env_light_slots[arg0].unk0 = 0;
+    env_light_slots[arg0].state = 0;
 }
 
 void Env_SetSlotEnvAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
     EnvLightSlot *p = &env_light_slots[arg0];
 
-    p->unk4 = arg1;
-    p->unk8 = p->unkC = arg2;
-    p->unk10 = p->unk14 = arg3;
+    p->envAnimMode = arg1;
+    p->envFramesLeft = p->envFrameCount = arg2;
+    p->envFrame = p->envFramesStart = arg3;
 }
 
 void Env_SetSlotLightAnim(s32 arg0, s32 arg1, s32 arg2, s32 *arg3) {
     EnvLightSlot *p = &env_light_slots[arg0];
 
-    p->unk18 = arg1;
-    p->unk20 = p->unk1C = arg2;
-    p->unk24 = p->unk28 = arg3;
+    p->lightAnimMode = arg1;
+    p->lightFramesLeft = p->lightFrameCount = arg2;
+    p->lightFrame = p->lightFramesStart = arg3;
 }
 
 void Env_SetSlotLightDirs(s32 arg0, s32 *arg1) {
-    env_light_slots[arg0].unk2C = arg1;
+    env_light_slots[arg0].lightDirs = arg1;
 }
 
 void Env_ApplyLightSlot(s32 idx) {
@@ -418,31 +418,31 @@ void Env_ApplyLightSlot(s32 idx) {
     } else {
         l = &env_slot_lights_frame0[idx];
     }
-    if (p->unk4 != 0) {
-        cols = (s32 (*)[3])p->unk10;
+    if (p->envAnimMode != 0) {
+        cols = (s32 (*)[3])p->envFrame;
         r = (*cols)[0];
         g = (*cols)[1];
         b = (*cols)[2];
-        switch (p->unk4) {
+        switch (p->envAnimMode) {
             case 1:
-                p->unk10 += 3;
-                if (--p->unk8 == 0) {
-                    p->unk4 = 0;
+                p->envFrame += 3;
+                if (--p->envFramesLeft == 0) {
+                    p->envAnimMode = 0;
                 }
                 break;
             case 2:
-                if (p->unk8 != 0) {
-                    if (--p->unk8 != 0) {
-                        p->unk10 += 3;
+                if (p->envFramesLeft != 0) {
+                    if (--p->envFramesLeft != 0) {
+                        p->envFrame += 3;
                     }
                 }
                 break;
             case 3:
-                if (--p->unk8 == 0) {
-                    p->unk8 = p->unkC;
-                    p->unk10 = p->unk14;
+                if (--p->envFramesLeft == 0) {
+                    p->envFramesLeft = p->envFrameCount;
+                    p->envFrame = p->envFramesStart;
                 } else {
-                    p->unk10 += 3;
+                    p->envFrame += 3;
                 }
                 break;
         }
@@ -450,8 +450,8 @@ void Env_ApplyLightSlot(s32 idx) {
         r = g = b = 0;
     }
     gDPSetEnvColor(gfx_dl_head++, r, g, b, 0xB4);
-    if (p->unk18 != 0) {
-        f = p->unk24;
+    if (p->lightAnimMode != 0) {
+        f = p->lightFrame;
         tmp[0][0] = (f[0] * env_light_colors[0][0]) >> 8;
         tmp[0][1] = (f[1] * env_light_colors[0][1]) >> 8;
         tmp[0][2] = (f[2] * env_light_colors[0][2]) >> 8;
@@ -471,26 +471,26 @@ void Env_ApplyLightSlot(s32 idx) {
         D_80084B64 = f[1];
         D_80084B68 = f[2];
         cols = tmp;
-        switch (p->unk18) {
+        switch (p->lightAnimMode) {
             case 1:
-                p->unk24 += 6;
-                if (--p->unk20 == 0) {
-                    p->unk18 = 0;
+                p->lightFrame += 6;
+                if (--p->lightFramesLeft == 0) {
+                    p->lightAnimMode = 0;
                 }
                 break;
             case 2:
-                if (p->unk20 != 0) {
-                    if (--p->unk20 != 0) {
-                        p->unk24 += 6;
+                if (p->lightFramesLeft != 0) {
+                    if (--p->lightFramesLeft != 0) {
+                        p->lightFrame += 6;
                     }
                 }
                 break;
             case 3:
-                if (--p->unk20 == 0) {
-                    p->unk20 = p->unk1C;
-                    p->unk24 = p->unk28;
+                if (--p->lightFramesLeft == 0) {
+                    p->lightFramesLeft = p->lightFrameCount;
+                    p->lightFrame = p->lightFramesStart;
                 } else {
-                    p->unk24 += 6;
+                    p->lightFrame += 6;
                 }
                 break;
         }
@@ -498,11 +498,11 @@ void Env_ApplyLightSlot(s32 idx) {
         D_80084B60 = D_80084B64 = D_80084B68 = 0xFF;
         cols = env_light_colors;
     }
-    dirs = (s32 (*)[3])p->unk2C;
+    dirs = (s32 (*)[3])p->lightDirs;
     if (dirs == NULL) {
         dirs = env_light_dirs;
     }
-    if (p->unk0 == 2) {
+    if (p->state == 2) {
         src = cols;
         cols = tmp;
         i = 3;

@@ -53,7 +53,7 @@ void Bgm_Init(void) {
     i = 16;
     p = sfx_delayed;
     do {
-        p->unk0 = 0;
+        p->frames_left = 0;
         p++;
     } while (--i);
 }
@@ -92,9 +92,9 @@ void Bgm_Update(void) {
     var_s0 = &sfx_delayed[0];
 
     for (i; i > 0; i--) {
-        if (var_s0->unk0) {
-            if (!--var_s0->unk0) {
-                Sfx_Enqueue(var_s0->unk1, var_s0->unk2, 64);
+        if (var_s0->frames_left) {
+            if (!--var_s0->frames_left) {
+                Sfx_Enqueue(var_s0->sound_id, var_s0->volume, 64);
             }
         }
         var_s0++;
@@ -122,12 +122,12 @@ void Bgm_PlayForMap(s32 arg0, s32 arg1, u16 delay) {
     s8 bgm;
 
     for (i = 0x48; i != 0; i--, entry++) {
-        if (arg0 == entry->unk0 && (arg1 == entry->unk2 || entry->unk2 == -1)) {
+        if (arg0 == entry->map_id && (arg1 == entry->subarea_id || entry->subarea_id == -1)) {
             break;
         }
     }
     if (i != 0) {
-        bgm = entry->unk4;
+        bgm = entry->sequence_id;
         if (bgm != bgm_current) {
             bgm_next = bgm;
             bgm_flags |= 1;
@@ -148,14 +148,14 @@ void Sfx_Play(u8 arg0, s8 arg1, u8 arg2) {
         var_v0 = 0xF;
         var_v1 = sfx_delayed;
 
-        while (var_v0 != 0 && var_v1->unk0 != 0) {
+        while (var_v0 != 0 && var_v1->frames_left != 0) {
             var_v0--;
             var_v1++;
         }
 
-        var_v1->unk0 = arg0;
-        var_v1->unk1 = arg1;
-        var_v1->unk2 = temp_t2;
+        var_v1->frames_left = arg0;
+        var_v1->sound_id = arg1;
+        var_v1->volume = temp_t2;
     }
 }
 

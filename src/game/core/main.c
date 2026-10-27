@@ -218,7 +218,7 @@ void Core_ResetGameState(void) {
     map_flag4_return_map = -1;
     map_flag8_return_map = -1;
     map_backdrop_id = 0xFFFF;
-    camera_state.unk84 = 0.0f;
+    camera_state.spawnHeadingOffset = 0.0f;
     env_play_time = 0;
     map_next_id = 0xD;
     map_next_subarea = 0x11;
@@ -449,7 +449,7 @@ void Core_RunGameplayLoop(void) {
         gfx_scene_light_slot = Env_AllocateLightSlot();
         D_8007A1C4 = Env_AllocateLightSlot();
         player_light_slot = Env_AllocateLightSlot();
-        env_light_slots[player_light_slot].unk0 = 2;
+        env_light_slots[player_light_slot].state = 2;
         Battle_ResetState();
         Magic_ResetEffectSystem();
         Effect_ResetAll();
@@ -592,7 +592,7 @@ void Core_RunMessageCutsceneLoop(void) {
             gfx_scene_light_slot = Env_AllocateLightSlot();
             D_8007A1C4 = Env_AllocateLightSlot();
             player_light_slot = Env_AllocateLightSlot();
-            env_light_slots[player_light_slot].unk0 = 2;
+            env_light_slots[player_light_slot].state = 2;
             Fade_Init();
             fade_flags |= 8;
             if (core_flags & 0x20) {
@@ -672,7 +672,7 @@ void Core_RunCameraCutsceneLoop(void) {
             gfx_scene_light_slot = Env_AllocateLightSlot();
             D_8007A1C4 = Env_AllocateLightSlot();
             player_light_slot = Env_AllocateLightSlot();
-            env_light_slots[player_light_slot].unk0 = 2;
+            env_light_slots[player_light_slot].state = 2;
             Fade_Init();
             fade_flags |= 8;
             if (core_flags & 0x20) {

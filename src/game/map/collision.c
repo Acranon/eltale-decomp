@@ -42,7 +42,7 @@ void Coll_ResolveFloorAndWalls(f32 x, f32 y, f32 z, u16 flags, CollResult *out) 
     }
     ix = 0;
     iz = 0;
-    if (map_subarea_grid->unk28 == 0) {
+    if (map_subarea_grid->searchPattern == 0) {
         list = map_subarea_grid->lists;
     } else {
         ix = (x - map_subarea_grid->originX) / map_subarea_grid->cellW;

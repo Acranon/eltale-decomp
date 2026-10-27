@@ -79,7 +79,7 @@ void Effect_UpdateAndDrawSprites(GfxFrameData* arg0) {
                 gSPDisplayList(gfx_dl_head++, effect_sprite_setup_dl);
             }
             if (dust->flags & 1) {
-                Math_MtxFAlignYToVector(&spB4, dust->unk30, dust->unk34, dust->unk38);
+                Math_MtxFAlignYToVector(&spB4, dust->vecX, dust->vecY, dust->vecZ);
                 spB4.mf[3][0] = dust->x;
                 spB4.mf[3][1] = dust->y;
                 spB4.mf[3][2] = dust->z;

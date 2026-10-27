@@ -54,14 +54,14 @@ typedef struct MapGrid {
     /* 0x1C */ u16 *cells; /* per cell: offset into lists */
     /* 0x20 */ u16 *lists; /* per cell: count, then object indices */
     /* 0x24 */ u16 *alwaysList;
-    /* 0x28 */ u16 unk28; /* 0: one list for the whole grid */
+    /* 0x28 */ u16 searchPattern; /* 0: one list for the whole grid */
     /* 0x2A */ u8 pad2A[2];
 } MapGrid; /* 0x2C bytes */
 
 /*
  * A map exit: a box the player walks into (Exit_CheckEnter). Exit_SetDestination (env.c)
- * copies dest[0..2] to exit_destination.unk0..unk8 (next map, next subarea, ...), flags to
- * exit_destination.unkC, unk1A to unk10 and angle to unk14. env.h/env.c (h_core) and
+ * copies dest[0..2] to exit_destination.map/subarea/entry (next map, next subarea, ...), flags to
+ * exit_destination.flags, mapObj to exit_destination.mapObj and angle to exit_destination.angle. env.h/env.c (h_core) and
  * collision.c use this one type (env.h used to forward-declare it as struct ExitDef).
  */
 typedef struct MapExit {
@@ -85,7 +85,7 @@ typedef struct MapEntryPoint {
     /* 0x04 */ f32 y;
     /* 0x08 */ f32 z;
     /* 0x0C */ u8 padC[2];
-    /* 0x0E */ u16 unkE;
+    /* 0x0E */ u16 spawnObj;
     /* 0x10 */ u8 pad10[4];
 } MapEntryPoint; /* 0x14 bytes */
 
@@ -97,7 +97,7 @@ typedef struct MapSubareaDef {
     /* 0x08 */ s32 exitCount;
     /* 0x0C */ MapEntryPoint *entries;
     /* 0x10 */ u8 pad10[2];
-    /* 0x12 */ u16 unk12;
+    /* 0x12 */ u16 areaSetIndex;
     /* 0x14 */ u16 flags; /* copied to map_subarea_flags; bit 1: camera preset follows the player */
     /* 0x16 */ u8 pad16[2];
 } MapSubareaDef; /* 0x18 bytes */
@@ -123,10 +123,10 @@ typedef struct MapAreaDef {
     /* 0x24 */ struct CameraPresetSet *cameraPresets; /* per sub-area, or NULL */
     /* 0x28 */ CollWalls *cameraWalls; /* per sub-area */
     /* 0x2C */ CollWalls *actorWalls; /* per sub-area */
-    /* 0x30 */ struct EncounterRegionList *unk30; /* per sub-area, or NULL (Battle_ResetState) */
-    /* 0x34 */ struct EncounterGroupTable *unk34; /* per sub-area (Battle_ResetState) */
-    /* 0x38 */ struct NpcList *unk38; /* the area's NPC list, or NULL (Npc_InitArea) */
-    /* 0x3C */ s32 unk3C; /* index into map_extra_rom_ranges */
+    /* 0x30 */ struct EncounterRegionList *encounterRegions; /* per sub-area, or NULL (Battle_ResetState) */
+    /* 0x34 */ struct EncounterGroupTable *encounterGroups; /* per sub-area (Battle_ResetState) */
+    /* 0x38 */ struct NpcList *npcList; /* the area's NPC list, or NULL (Npc_InitArea) */
+    /* 0x3C */ s32 extraRomRangeIndex; /* index into map_extra_rom_ranges */
     /* 0x40 */ u8 pad40[4];
 } MapAreaDef; /* 0x44 bytes */
 
@@ -163,7 +163,7 @@ typedef struct MapObjWavePhase {
 /* map_clock_tlut_schedule entry. */
 typedef struct MapClockTlutStep {
     /* 0x00 */ s32 start;
-    /* 0x04 */ u16 unk4;
+    /* 0x04 */ u16 blendFrames;
     /* 0x06 */ u16 id;
 } MapClockTlutStep; /* 0x8 bytes */
 
@@ -239,12 +239,12 @@ extern u16 mapobj_noanim_list[0x200];
  * .bss by declaration number mod 256). */
 /* A spinning object queued by MapObj_QueueSpinner (mapobj_spinner_buf0/1). */
 typedef struct MapObjSpinner {
-    /* 0x00 */ s32 unk0;
+    /* 0x00 */ s32 active;
     /* 0x04 */ f32 unk4;
     /* 0x08 */ f32 unk8;
     /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
+    /* 0x10 */ f32 yawDegrees;
+    /* 0x14 */ f32 spinAngle;
     /* 0x18 */ MapObj *obj;
 } MapObjSpinner; /* 0x1C bytes */
 

@@ -102,7 +102,7 @@ void Chest_LoadForMap(void) {
             p->unk4C = def->boxZ;
             p->scale = 0.07f;
             p->floorFlags = def->flagId;
-            p->animSetIndex = def->unk21;
+            p->animSetIndex = def->animSetIndex;
             p->animFlags = 0;
             if (Chest_IsOpened(p->floorFlags)) {
                 mode = 3;

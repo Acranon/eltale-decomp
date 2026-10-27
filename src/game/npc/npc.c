@@ -61,8 +61,8 @@ void Npc_InitArea(void) {
 
     npc_count = 0;
     if (!(map_subarea_flags & 1)) {
-        func_80009764(map_subarea_def->unk12);
-        list = map_area_def->unk38;
+        func_80009764(map_subarea_def->areaSetIndex);
+        list = map_area_def->npcList;
         if (list != NULL) {
             Npc_SpawnForArea(list->defs, list->count);
         }
