@@ -66,32 +66,32 @@ void Text_ResetWindow(s32 arg0, u8 arg1) {
     s32 j;
 
     if (arg1 == 0) {
-        text_window_slots[arg0].unk6 = 0;
-        text_window_slots[arg0].unkA = 0;
-        text_window_slots[arg0].unk0 = 0;
-        text_window_slots[arg0].unk4 = text_window_slots[arg0].unk6;
-        text_window_slots[arg0].unk8 = text_window_slots[arg0].unkA;
+        text_window_slots[arg0].y = 0;
+        text_window_slots[arg0].height = 0;
+        text_window_slots[arg0].flags = 0;
+        text_window_slots[arg0].x = text_window_slots[arg0].y;
+        text_window_slots[arg0].width = text_window_slots[arg0].height;
     }
-    text_window_slots[arg0].unkC = 1;
-    text_window_slots[arg0].unkE = 0;
-    text_window_slots[arg0].unkF = 0;
-    text_window_slots[arg0].unk10 = 0;
-    text_window_slots[arg0].unk12 = 0;
-    text_window_slots[arg0].unk14 = 0xFF;
-    text_window_slots[arg0].unk15 = 0;
-    text_window_slots[arg0].unk16 = 0;
+    text_window_slots[arg0].anim_frame = 1;
+    text_window_slots[arg0].window_type = 0;
+    text_window_slots[arg0].reveal_delay = 0;
+    text_window_slots[arg0].reveal_timer = 0;
+    text_window_slots[arg0].reveal_index = 0;
+    text_window_slots[arg0].pending_byte = 0xFF;
+    text_window_slots[arg0].choice_cursor = 0;
+    text_window_slots[arg0].choice_input_latch = 0;
     for (i = 0; i < 32; i++) {
-        text_window_slots[arg0].unk17[i] = 0xFF;
+        text_window_slots[arg0].speaker_name[i] = 0xFF;
     }
     for (i = 0; i < 0x4B0; i++) {
-        text_window_slots[arg0].unk9C[i] = 0xFF;
-        text_window_slots[arg0].unk54C[i] = 0xFF;
+        text_window_slots[arg0].message_bytes[i] = 0xFF;
+        text_window_slots[arg0].visible_bytes[i] = 0xFF;
     }
-    text_window_slots[arg0].unk38 = 0;
+    text_window_slots[arg0].choice_count = 0;
     text_window_slots[arg0].unk3A = 0;
     for (i = 0; i < 24; i++) {
         for (j = 0; j < 4; j++) {
-            text_window_slots[arg0].unk3C[j][i] = 0xFF;
+            text_window_slots[arg0].choice_rows[j][i] = 0xFF;
         }
     }
 }
@@ -105,63 +105,63 @@ s32 Text_OpenWindow(s32 arg0) {
     s32 c;
 
     for (i = 0; i < 4; i++) {
-        if (text_window_slots[i].unk0 & 0x20000000) {
-            j = (text_window_slots[i].unk0 & 7) - 1;
+        if (text_window_slots[i].flags & 0x20000000) {
+            j = (text_window_slots[i].flags & 7) - 1;
             if (j > 0) {
-                text_window_slots[i].unk0 &= ~7;
-                text_window_slots[i].unk0 |= j;
-                text_window_slots[i].unk0 &= 0x7FFFFFFF;
+                text_window_slots[i].flags &= ~7;
+                text_window_slots[i].flags |= j;
+                text_window_slots[i].flags &= 0x7FFFFFFF;
             }
-            text_window_slots[i].unk0 |= 0x400000;
+            text_window_slots[i].flags |= 0x400000;
         } else if (ret < 0) {
-            text_window_slots[i].unk0 |= 0x10000000;
+            text_window_slots[i].flags |= 0x10000000;
             if (arg0 < 0) {
-                text_window_slots[i].unk0 |= 0x40000000;
+                text_window_slots[i].flags |= 0x40000000;
                 if (arg0 == -2) {
-                    text_window_slots[i].unk0 |= 0x80000;
-                    text_window_slots[i].unk0 &= ~0x40000000;
+                    text_window_slots[i].flags |= 0x80000;
+                    text_window_slots[i].flags &= ~0x40000000;
                 }
                 if (arg0 == -3) {
-                    text_window_slots[i].unk0 |= 0x80000;
+                    text_window_slots[i].flags |= 0x80000;
                 }
             }
-            text_window_slots[i].unk0 &= ~7;
-            text_window_slots[i].unk0 |= 4;
-            if (!(text_window_slots[i].unk0 & 0x80000)) {
+            text_window_slots[i].flags &= ~7;
+            text_window_slots[i].flags |= 4;
+            if (!(text_window_slots[i].flags & 0x80000)) {
                 for (j = 0; j < 32; j++) {
-                    text_window_slots[i].unk17[j] = text_speaker_name[j];
+                    text_window_slots[i].speaker_name[j] = text_speaker_name[j];
                 }
                 for (j = 0; j < 0x4B0; j++) {
                     c = text_reveal_delay_steps[0] + menu_text_delay_option;
-                    text_window_slots[i].unk9C[j] = text_message_buf[j];
+                    text_window_slots[i].message_bytes[j] = text_message_buf[j];
                 }
                 for (k = 0; k < text_pending_choice_rows.n; k++) {
                     s = text_pending_choice_rows.rows[k];
                     for (j = 0; j < 24; j++) {
-                        text_window_slots[i].unk3C[k][j] = s[j];
+                        text_window_slots[i].choice_rows[k][j] = s[j];
                     }
                 }
-                text_window_slots[i].unk38 = text_pending_choice_rows.n;
+                text_window_slots[i].choice_count = text_pending_choice_rows.n;
                 text_window_slots[i].unk3A = text_pending_choice_rows.m;
                 if (arg0 >= 0) {
-                    text_window_slots[i].unkE = arg0;
-                    text_window_slots[i].unk4 = text_window_default_rects[arg0].unk0;
-                    text_window_slots[i].unk6 = text_window_default_rects[arg0].unk2;
-                    text_window_slots[i].unk8 = text_window_default_rects[arg0].unk4;
-                    text_window_slots[i].unkA = text_window_default_rects[arg0].unk6;
+                    text_window_slots[i].window_type = arg0;
+                    text_window_slots[i].x = text_window_default_rects[arg0].x;
+                    text_window_slots[i].y = text_window_default_rects[arg0].y;
+                    text_window_slots[i].width = text_window_default_rects[arg0].width;
+                    text_window_slots[i].height = text_window_default_rects[arg0].height;
                 } else {
-                    text_window_slots[i].unk4 = text_choice_window_rect.unk0;
-                    text_window_slots[i].unk6 = text_choice_window_rect.unk2;
-                    text_window_slots[i].unk8 = text_choice_window_rect.unk4;
-                    text_window_slots[i].unkA = text_choice_window_rect.unk6;
-                    text_window_slots[i].unkE = 0x80;
+                    text_window_slots[i].x = text_choice_window_rect.x;
+                    text_window_slots[i].y = text_choice_window_rect.y;
+                    text_window_slots[i].width = text_choice_window_rect.width;
+                    text_window_slots[i].height = text_choice_window_rect.height;
+                    text_window_slots[i].window_type = 0x80;
                 }
-                text_window_slots[i].unkF = text_reveal_delay_steps[0] + menu_text_delay_option;
-                text_window_slots[i].unk10 = c;
+                text_window_slots[i].reveal_delay = text_reveal_delay_steps[0] + menu_text_delay_option;
+                text_window_slots[i].reveal_timer = c;
             }
-            text_window_slots[i].unk12 = 1;
-            text_window_slots[i].unk14 = text_window_slots[i].unk9C[1];
-            text_window_slots[i].unk9C[1] = 0xFF;
+            text_window_slots[i].reveal_index = 1;
+            text_window_slots[i].pending_byte = text_window_slots[i].message_bytes[1];
+            text_window_slots[i].message_bytes[1] = 0xFF;
             ret = i;
             text_active_window_count++;
         }
@@ -196,7 +196,7 @@ void Text_UpdateAndDrawWindows(void) {
     gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
     gDPSetBlendColor(gfx_dl_head++, 0, 0, 0, 1);
     for (j = 0; j < 4; j++) {
-        c = text_window_slots[j].unk0 & 7;
+        c = text_window_slots[j].flags & 7;
         switch (c) {
             case 1: order.s.a = j; break;
             case 2: order.s.b = j; break;
@@ -214,26 +214,26 @@ void Text_UpdateAndDrawWindows(void) {
         gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
         idx = order.v[w];
         if (idx >= 0) {
-            if (text_window_slots[idx].unk0 & 0x10000000) {
+            if (text_window_slots[idx].flags & 0x10000000) {
                 if (Text_AnimateWindowSize(idx) < 0) {
-                    text_window_slots[idx].unk0 &= ~0x10000000;
-                    text_window_slots[idx].unk0 |= 0xA8000000;
+                    text_window_slots[idx].flags &= ~0x10000000;
+                    text_window_slots[idx].flags |= 0xA8000000;
                 }
-            } else if (text_window_slots[idx].unk0 & 0x01000000) {
+            } else if (text_window_slots[idx].flags & 0x01000000) {
                 if (Text_AnimateWindowSize(idx) < 0) {
-                    text_window_slots[idx].unk0 = 0;
+                    text_window_slots[idx].flags = 0;
                     for (j = 0; j < 4; j++) {
-                        if ((c = text_window_slots[j].unk0 & 7) != 0) {
+                        if ((c = text_window_slots[j].flags & 7) != 0) {
                             c = c + 1;
-                            text_window_slots[j].unk0 &= ~7;
-                            text_window_slots[j].unk0 |= c;
+                            text_window_slots[j].flags &= ~7;
+                            text_window_slots[j].flags |= c;
                             if (c >= 4) {
-                                text_window_slots[j].unk0 &= ~0x400000;
-                                text_window_slots[j].unk0 |= 0x80000000;
-                                if (text_window_slots[idx].unk0 & 0x80000) {
+                                text_window_slots[j].flags &= ~0x400000;
+                                text_window_slots[j].flags |= 0x80000000;
+                                if (text_window_slots[idx].flags & 0x80000) {
                                     Text_ResetWindow(j, 1);
-                                    text_window_slots[j].unk0 |= 0x01000000;
-                                    text_window_slots[j].unk0 &= ~0x80000000;
+                                    text_window_slots[j].flags |= 0x01000000;
+                                    text_window_slots[j].flags &= ~0x80000000;
                                 }
                             }
                         }
@@ -245,128 +245,128 @@ void Text_UpdateAndDrawWindows(void) {
                     }
                 }
             } else {
-                if (text_window_slots[idx].unk0 & 0x20000000) {
+                if (text_window_slots[idx].flags & 0x20000000) {
                     Text_DrawWindowFrame(idx);
-                    if (text_window_slots[idx].unk0 & 0x40000000) {
+                    if (text_window_slots[idx].flags & 0x40000000) {
                         gDPPipeSync(gfx_dl_head++);
                         gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
-                        x = text_window_slots[idx].unk4 + 12;
-                        y = text_window_slots[idx].unk6 + 6;
-                        for (i = 0; i < text_window_slots[idx].unk38; i++) {
-                            Text_DrawEncodedString(x, y, text_window_slots[idx].unk3C[i]);
+                        x = text_window_slots[idx].x + 12;
+                        y = text_window_slots[idx].y + 6;
+                        for (i = 0; i < text_window_slots[idx].choice_count; i++) {
+                            Text_DrawEncodedString(x, y, text_window_slots[idx].choice_rows[i]);
                             y += 13;
                         }
-                        if (text_window_slots[idx].unk0 & 0x80000000) {
+                        if (text_window_slots[idx].flags & 0x80000000) {
                             if (input_pressed_buttons & 0xA000) {
                                 Sfx_Play(0, 1, 0xFF);
-                                if (text_window_slots[idx].unk0 & 0x80000) {
-                                    save_menu_choice_cursor = text_window_slots[idx].unk15;
+                                if (text_window_slots[idx].flags & 0x80000) {
+                                    save_menu_choice_cursor = text_window_slots[idx].choice_cursor;
                                 } else {
-                                    text_last_choice_index = text_window_slots[idx].unk15;
+                                    text_last_choice_index = text_window_slots[idx].choice_cursor;
                                 }
                                 Text_ResetWindow(idx, 1);
-                                text_window_slots[idx].unk0 |= 0x01000000;
+                                text_window_slots[idx].flags |= 0x01000000;
                             } else {
                                 if (input_stick_y > 20) {
-                                    if (text_window_slots[idx].unk16 == 0) {
-                                        text_window_slots[idx].unk15--;
-                                        text_window_slots[idx].unk16 = 1;
+                                    if (text_window_slots[idx].choice_input_latch == 0) {
+                                        text_window_slots[idx].choice_cursor--;
+                                        text_window_slots[idx].choice_input_latch = 1;
                                         Sfx_Play(0, 0, 0xFF);
                                     }
                                 } else if (input_stick_y < -20) {
-                                    if (text_window_slots[idx].unk16 == 0) {
-                                        text_window_slots[idx].unk15++;
-                                        text_window_slots[idx].unk16 = 1;
+                                    if (text_window_slots[idx].choice_input_latch == 0) {
+                                        text_window_slots[idx].choice_cursor++;
+                                        text_window_slots[idx].choice_input_latch = 1;
                                         Sfx_Play(0, 0, 0xFF);
                                     }
                                 } else {
-                                    text_window_slots[idx].unk16 = 0;
+                                    text_window_slots[idx].choice_input_latch = 0;
                                 }
-                                if (text_window_slots[idx].unk15 >= text_window_slots[idx].unk38) {
-                                    text_window_slots[idx].unk15 = 0;
-                                } else if (text_window_slots[idx].unk15 < 0) {
-                                    text_window_slots[idx].unk15 = text_window_slots[idx].unk38 - 1;
+                                if (text_window_slots[idx].choice_cursor >= text_window_slots[idx].choice_count) {
+                                    text_window_slots[idx].choice_cursor = 0;
+                                } else if (text_window_slots[idx].choice_cursor < 0) {
+                                    text_window_slots[idx].choice_cursor = text_window_slots[idx].choice_count - 1;
                                 }
                             }
-                            if (!(text_window_slots[idx].unk0 & 0x01000000)) {
+                            if (!(text_window_slots[idx].flags & 0x01000000)) {
                                 gDPPipeSync(gfx_dl_head++);
                                 gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
-                                x = text_window_slots[idx].unk4 - 2;
-                                y = text_window_slots[idx].unk6 + text_window_slots[idx].unk15 * 13 + 2;
+                                x = text_window_slots[idx].x - 2;
+                                y = text_window_slots[idx].y + text_window_slots[idx].choice_cursor * 13 + 2;
                                 gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
                                 gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
                                 Text_DrawTexturedRect(4, x, y, 12, 12);
                             }
                         }
-                    } else if (text_window_slots[idx].unk0 & 0x80000000) {
-                        if (text_window_slots[idx].unk0 & 0x08000000) {
-                            if (text_window_slots[idx].unk0 & 0x04000000) {
+                    } else if (text_window_slots[idx].flags & 0x80000000) {
+                        if (text_window_slots[idx].flags & 0x08000000) {
+                            if (text_window_slots[idx].flags & 0x04000000) {
                                 flagD8 = 1;
                                 m = -1;
                                 if (input_pressed_buttons & 0xA000) {
-                                    j = text_window_slots[idx].unk12;
+                                    j = text_window_slots[idx].reveal_index;
                                     tab = 0;
-                                    text_window_slots[idx].unk9C[j] = text_window_slots[idx].unk14;
+                                    text_window_slots[idx].message_bytes[j] = text_window_slots[idx].pending_byte;
                                     max = j;
                                     do {
-                                        c = text_window_slots[idx].unk9C[max];
+                                        c = text_window_slots[idx].message_bytes[max];
                                         max--;
                                         if (c >= 0xC0 && c < 0xE0 && !(tab & 1)) {
-                                            text_window_slots[idx].unk9C[++m] = c;
+                                            text_window_slots[idx].message_bytes[++m] = c;
                                             tab |= 1;
                                         }
                                         if (c >= 0x80 && c < 0xA0 && !(tab & 2)) {
-                                            text_window_slots[idx].unk9C[++m] = c;
+                                            text_window_slots[idx].message_bytes[++m] = c;
                                             tab |= 2;
                                         }
                                         if (c >= 0xA0 && c < 0xB0 && !(tab & 4)) {
-                                            text_window_slots[idx].unk9C[++m] = c;
+                                            text_window_slots[idx].message_bytes[++m] = c;
                                             tab |= 4;
                                         }
                                     } while (max >= 0);
                                     do {
-                                        text_window_slots[idx].unk9C[++m] = text_window_slots[idx].unk9C[j++];
-                                    } while (text_window_slots[idx].unk9C[m] != 0xFF);
-                                    text_window_slots[idx].unk12 = 1;
-                                    text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[1];
-                                    text_window_slots[idx].unk9C[1] = 0xFF;
-                                    text_window_slots[idx].unk0 &= ~0x04000000;
+                                        text_window_slots[idx].message_bytes[++m] = text_window_slots[idx].message_bytes[j++];
+                                    } while (text_window_slots[idx].message_bytes[m] != 0xFF);
+                                    text_window_slots[idx].reveal_index = 1;
+                                    text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[1];
+                                    text_window_slots[idx].message_bytes[1] = 0xFF;
+                                    text_window_slots[idx].flags &= ~0x04000000;
                                     for (j = 0; j < 0x4B0; j++) {
-                                        text_window_slots[idx].unk54C[j] = 0xFF;
+                                        text_window_slots[idx].visible_bytes[j] = 0xFF;
                                     }
                                 }
                             } else {
                                 if (menu_text_delay_option != 0) {
-                                    if (!(text_window_slots[idx].unk0 & 0x100000) && (input_pressed_buttons & 0xA000)) {
-                                        text_window_slots[idx].unk0 |= 0x100000;
+                                    if (!(text_window_slots[idx].flags & 0x100000) && (input_pressed_buttons & 0xA000)) {
+                                        text_window_slots[idx].flags |= 0x100000;
                                     }
                                 } else {
-                                    text_window_slots[idx].unk0 |= 0x100000;
+                                    text_window_slots[idx].flags |= 0x100000;
                                 }
-                                if (!(text_window_slots[idx].unk0 & 0x100000)) {
-                                    text_window_slots[idx].unk10--;
-                                    if (text_window_slots[idx].unk10 <= 0) {
-                                        text_window_slots[idx].unk10 = text_window_slots[idx].unkF;
-                                        col = text_window_slots[idx].unk12++;
-                                        text_window_slots[idx].unk9C[col++] = text_window_slots[idx].unk14;
-                                        c = text_window_slots[idx].unk14;
-                                        text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[col];
-                                        *(text_window_slots[idx].unk9C + col) = 0xFF;
+                                if (!(text_window_slots[idx].flags & 0x100000)) {
+                                    text_window_slots[idx].reveal_timer--;
+                                    if (text_window_slots[idx].reveal_timer <= 0) {
+                                        text_window_slots[idx].reveal_timer = text_window_slots[idx].reveal_delay;
+                                        col = text_window_slots[idx].reveal_index++;
+                                        text_window_slots[idx].message_bytes[col++] = text_window_slots[idx].pending_byte;
+                                        c = text_window_slots[idx].pending_byte;
+                                        text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[col];
+                                        *(text_window_slots[idx].message_bytes + col) = 0xFF;
                                         switch (c) {
                                             case 0xF2:
-                                                text_window_slots[idx].unk0 |= 0x400000;
+                                                text_window_slots[idx].flags |= 0x400000;
                                                 flagD4 = 1;
                                                 Text_MeasureChoiceWindow(idx);
-                                                text_window_slots[idx].unk0 |= 0x40000;
+                                                text_window_slots[idx].flags |= 0x40000;
                                                 break;
                                             case 0xF0:
                                                 if (cnt != 0) {
-                                                    text_window_slots[idx].unk0 |= 0x04000000;
+                                                    text_window_slots[idx].flags |= 0x04000000;
                                                 }
                                                 break;
                                             case 0xFF:
-                                                text_window_slots[idx].unk0 |= 0x02000000;
-                                                text_window_slots[idx].unk0 &= ~0x08000000;
+                                                text_window_slots[idx].flags |= 0x02000000;
+                                                text_window_slots[idx].flags &= ~0x08000000;
                                                 Text_ResetStickAdvanceTimer();
                                                 break;
                                             case 0xE1:
@@ -378,30 +378,30 @@ void Text_UpdateAndDrawWindows(void) {
                                             case 0xE7:
                                             case 0xE8:
                                                 col = text_reveal_delay_steps[c & 7] * menu_text_delay_option;
-                                                text_window_slots[idx].unk10 = text_window_slots[idx].unkF = col;
+                                                text_window_slots[idx].reveal_timer = text_window_slots[idx].reveal_delay = col;
                                             default:
                                                 cnt++;
                                                 Sfx_Play(0, 3, 0xFF);
                                                 while (c >= 0x80) {
-                                                    j = text_window_slots[idx].unk12++;
-                                                    text_window_slots[idx].unk9C[j++] = text_window_slots[idx].unk14;
-                                                    c = text_window_slots[idx].unk14;
-                                                    text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[j];
-                                                    *(text_window_slots[idx].unk9C + j) = 0xFF;
+                                                    j = text_window_slots[idx].reveal_index++;
+                                                    text_window_slots[idx].message_bytes[j++] = text_window_slots[idx].pending_byte;
+                                                    c = text_window_slots[idx].pending_byte;
+                                                    text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[j];
+                                                    *(text_window_slots[idx].message_bytes + j) = 0xFF;
                                                 }
                                                 break;
                                         }
                                     }
                                 } else {
-                                    j = text_window_slots[idx].unk12;
-                                    text_window_slots[idx].unk9C[j] = text_window_slots[idx].unk14;
+                                    j = text_window_slots[idx].reveal_index;
+                                    text_window_slots[idx].message_bytes[j] = text_window_slots[idx].pending_byte;
                                     tab = 0;
                                     col = 0;
-                                    max = ((text_window_slots[idx].unk8 - 20) / 10) * 4;
+                                    max = ((text_window_slots[idx].width - 20) / 10) * 4;
                                     while (TRUE) {
-                                        if (text_window_slots[idx].unk9C[j] & 0x80) {
-                                            if (text_window_slots[idx].unk9C[j] == 0xE0) {
-                                                tab += (text_window_slots[idx].unk8 - 20) / 10;
+                                        if (text_window_slots[idx].message_bytes[j] & 0x80) {
+                                            if (text_window_slots[idx].message_bytes[j] == 0xE0) {
+                                                tab += (text_window_slots[idx].width - 20) / 10;
                                                 if (tab < col) {
                                                     col -= tab;
                                                     col += tab;
@@ -409,79 +409,79 @@ void Text_UpdateAndDrawWindows(void) {
                                                     col = tab;
                                                 }
                                                 if (col >= max) {
-                                                    text_window_slots[idx].unk0 |= 0x04000000;
-                                                    text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[++j];
-                                                    text_window_slots[idx].unk9C[j] = 0xFF;
-                                                    text_window_slots[idx].unk12++;
+                                                    text_window_slots[idx].flags |= 0x04000000;
+                                                    text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[++j];
+                                                    text_window_slots[idx].message_bytes[j] = 0xFF;
+                                                    text_window_slots[idx].reveal_index++;
                                                     break;
                                                 }
                                             }
                                         } else {
                                             col++;
                                             if (col >= max) {
-                                                text_window_slots[idx].unk0 |= 0x04000000;
-                                                text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[++j];
-                                                text_window_slots[idx].unk9C[j] = 0xFF;
-                                                text_window_slots[idx].unk12++;
+                                                text_window_slots[idx].flags |= 0x04000000;
+                                                text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[++j];
+                                                text_window_slots[idx].message_bytes[j] = 0xFF;
+                                                text_window_slots[idx].reveal_index++;
                                                 break;
                                             } else if (max < col) {
-                                                text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[++j];
-                                                text_window_slots[idx].unk9C[j] = 0xFF;
-                                                text_window_slots[idx].unk12++;
-                                                text_window_slots[idx].unk0 |= 0x04000000;
+                                                text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[++j];
+                                                text_window_slots[idx].message_bytes[j] = 0xFF;
+                                                text_window_slots[idx].reveal_index++;
+                                                text_window_slots[idx].flags |= 0x04000000;
                                                 break;
                                             }
                                         }
-                                        if (text_window_slots[idx].unk9C[j] == 0xF2) {
-                                            text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[++j];
-                                            text_window_slots[idx].unk9C[j] = 0xFF;
-                                            text_window_slots[idx].unk12++;
+                                        if (text_window_slots[idx].message_bytes[j] == 0xF2) {
+                                            text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[++j];
+                                            text_window_slots[idx].message_bytes[j] = 0xFF;
+                                            text_window_slots[idx].reveal_index++;
                                             break;
-                                        } else if (text_window_slots[idx].unk9C[j] == 0xF0) {
-                                            text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[++j];
-                                            text_window_slots[idx].unk9C[j] = 0xFF;
-                                            text_window_slots[idx].unk12++;
-                                            text_window_slots[idx].unk0 |= 0x04000000;
+                                        } else if (text_window_slots[idx].message_bytes[j] == 0xF0) {
+                                            text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[++j];
+                                            text_window_slots[idx].message_bytes[j] = 0xFF;
+                                            text_window_slots[idx].reveal_index++;
+                                            text_window_slots[idx].flags |= 0x04000000;
                                             break;
-                                        } else if (text_window_slots[idx].unk9C[j] == 0xFF) {
-                                            text_window_slots[idx].unk14 = text_window_slots[idx].unk9C[++j];
-                                            text_window_slots[idx].unk9C[j] = 0xFF;
-                                            text_window_slots[idx].unk9C[j + 1] = 0xFF;
+                                        } else if (text_window_slots[idx].message_bytes[j] == 0xFF) {
+                                            text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[++j];
+                                            text_window_slots[idx].message_bytes[j] = 0xFF;
+                                            text_window_slots[idx].message_bytes[j + 1] = 0xFF;
                                             break;
                                         }
                                         j++;
-                                        text_window_slots[idx].unk12++;
+                                        text_window_slots[idx].reveal_index++;
                                     }
-                                    switch (text_window_slots[idx].unk9C[j - 1]) {
+                                    switch (text_window_slots[idx].message_bytes[j - 1]) {
                                         case 0xF2:
-                                            text_window_slots[idx].unk0 |= 0x400000;
+                                            text_window_slots[idx].flags |= 0x400000;
                                             Text_MeasureChoiceWindow(idx);
                                             flagD4 = 1;
-                                            text_window_slots[idx].unk0 |= 0x40000;
+                                            text_window_slots[idx].flags |= 0x40000;
                                             break;
                                         case 0xF0:
-                                            text_window_slots[idx].unk0 |= 0x04000000;
+                                            text_window_slots[idx].flags |= 0x04000000;
                                             break;
                                         case 0xFF:
-                                            text_window_slots[idx].unk0 |= 0x02000000;
-                                            text_window_slots[idx].unk0 &= ~0x08000000;
+                                            text_window_slots[idx].flags |= 0x02000000;
+                                            text_window_slots[idx].flags &= ~0x08000000;
                                             Text_ResetStickAdvanceTimer();
                                             break;
                                     }
-                                    text_window_slots[idx].unk0 &= ~0x100000;
+                                    text_window_slots[idx].flags &= ~0x100000;
                                 }
                             }
                             Text_BuildVisiblePage(idx);
                             Text_DrawWindowContents(idx);
-                        } else if (text_window_slots[idx].unk0 & 0x02000000) {
+                        } else if (text_window_slots[idx].flags & 0x02000000) {
                             if ((input_pressed_buttons & 0xA000) || Text_IsStickAdvanceHeld() != 0) {
                                 Text_ResetWindow(idx, 1);
-                                text_window_slots[idx].unk0 |= 0x01000000;
+                                text_window_slots[idx].flags |= 0x01000000;
                             } else {
-                                if (text_window_slots[idx].unk0 & 0x40000) {
-                                    text_window_slots[idx].unk0 &= ~0x40000;
+                                if (text_window_slots[idx].flags & 0x40000) {
+                                    text_window_slots[idx].flags &= ~0x40000;
                                     Text_ResetWindow(idx, 1);
-                                    text_window_slots[idx].unk0 |= 0x01000000;
+                                    text_window_slots[idx].flags |= 0x01000000;
                                 }
                                 Text_DrawWindowContents(idx);
                             }
@@ -497,7 +497,7 @@ void Text_UpdateAndDrawWindows(void) {
         }
     }
     if (flagD4) {
-        if (text_window_slots[idx].unk0 & 0x80000) {
+        if (text_window_slots[idx].flags & 0x80000) {
             Text_OpenWindow(-3);
         } else {
             Text_OpenWindow(-1);
@@ -524,20 +524,20 @@ s32 Text_AnimateWindowSize(s32 idx) {
     u32 steps;
 
     ret = 0;
-    cx = p->unk4 + (p->unk8 >> 1);
-    cy = p->unk6 + (p->unkA >> 1);
-    if (p->unk0 & 0x10000000) {
+    cx = p->x + (p->width >> 1);
+    cy = p->y + (p->height >> 1);
+    if (p->flags & 0x10000000) {
         steps = 10;
-        ww = p->unk8 / steps;
-        ww = p->unkC * ww;
-        hh = p->unkA / steps;
-        hh = p->unkC * hh;
+        ww = p->width / steps;
+        ww = p->anim_frame * ww;
+        hh = p->height / steps;
+        hh = p->anim_frame * hh;
     } else {
         steps = 8;
-        ww = p->unk8 / steps;
-        ww = (9 - p->unkC) * ww;
-        hh = p->unkA / steps;
-        hh = (9 - p->unkC) * hh;
+        ww = p->width / steps;
+        ww = (9 - p->anim_frame) * ww;
+        hh = p->height / steps;
+        hh = (9 - p->anim_frame) * hh;
     }
     x = cx - (ww >> 1);
     y = cy - (hh >> 1);
@@ -548,8 +548,8 @@ s32 Text_AnimateWindowSize(s32 idx) {
     Text_DrawTexturedRect(3, x, y + hh - 1, ww, 1);
     Text_DrawTexturedRect(3, x, y, 1, hh);
     Text_DrawTexturedRect(3, x + ww - 1, y, 1, hh);
-    p->unkC++;
-    if (p->unkC > steps) {
+    p->anim_frame++;
+    if (p->anim_frame > steps) {
         ret = -1;
     }
     return ret;
@@ -561,22 +561,22 @@ void Text_DrawWindowContents(s32 arg0) {
 
     gDPPipeSync(gfx_dl_head++);
     gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
-    if (text_window_slots[arg0].unk17[0] != 0xFF) {
-        x = text_window_slots[arg0].unk4;
-        y = text_window_slots[arg0].unk6;
+    if (text_window_slots[arg0].speaker_name[0] != 0xFF) {
+        x = text_window_slots[arg0].x;
+        y = text_window_slots[arg0].y;
         Text_DrawTexturedRect(1, x + 27, y + 4, 40, 13);
-        x = text_window_slots[arg0].unk4;
-        y = text_window_slots[arg0].unk6;
-        Text_DrawEncodedString(x + 73, y + 4, text_window_slots[arg0].unk17);
-        x = text_window_slots[arg0].unk4;
-        y = text_window_slots[arg0].unk6;
-        Text_DrawEncodedString(x + 10, y + 20, text_window_slots[arg0].unk54C);
+        x = text_window_slots[arg0].x;
+        y = text_window_slots[arg0].y;
+        Text_DrawEncodedString(x + 73, y + 4, text_window_slots[arg0].speaker_name);
+        x = text_window_slots[arg0].x;
+        y = text_window_slots[arg0].y;
+        Text_DrawEncodedString(x + 10, y + 20, text_window_slots[arg0].visible_bytes);
     } else {
-        x = text_window_slots[arg0].unk4;
+        x = text_window_slots[arg0].x;
         x = x + 10;
-        y = text_window_slots[arg0].unk6;
+        y = text_window_slots[arg0].y;
         y = y + 12;
-        Text_DrawEncodedString(x, y, text_window_slots[arg0].unk54C);
+        Text_DrawEncodedString(x, y, text_window_slots[arg0].visible_bytes);
     }
 }
 
@@ -588,25 +588,25 @@ void Text_DrawWindowFrame(s32 idx) {
     gDPPipeSync(gfx_dl_head++);
     gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
     p = &text_window_slots[idx];
-    Text_DrawTexturedRect(0, p->unk4, p->unk6, p->unk8, p->unkA);
-    Text_DrawTexturedRect(3, p->unk8 + p->unk4, p->unk6 + 2, 2, p->unkA);
-    Text_DrawTexturedRect(3, p->unk4 + 2, p->unkA + p->unk6, p->unk8, 2);
+    Text_DrawTexturedRect(0, p->x, p->y, p->width, p->height);
+    Text_DrawTexturedRect(3, p->width + p->x, p->y + 2, 2, p->height);
+    Text_DrawTexturedRect(3, p->x + 2, p->height + p->y, p->width, 2);
     gDPPipeSync(gfx_dl_head++);
     gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
-    x = p->unk4;
-    y = p->unk6;
-    Text_DrawTexturedRect(3, x, y, p->unk8, 1);
-    Text_DrawTexturedRect(3, x, p->unkA + y - 1, p->unk8, 1);
-    Text_DrawTexturedRect(3, x, y, 1, p->unkA);
-    Text_DrawTexturedRect(3, p->unk8 + x - 1, y, 1, p->unkA);
+    x = p->x;
+    y = p->y;
+    Text_DrawTexturedRect(3, x, y, p->width, 1);
+    Text_DrawTexturedRect(3, x, p->height + y - 1, p->width, 1);
+    Text_DrawTexturedRect(3, x, y, 1, p->height);
+    Text_DrawTexturedRect(3, p->width + x - 1, y, 1, p->height);
 }
 
 #ifdef NON_MATCHING
 /* frame 0x40 vs 0x48, one more saved register, row loop tested as row != rows + 1; code is equivalent */
 void Text_BuildVisiblePage(s32 idx) {
     TextWindow *p = &text_window_slots[idx];
-    s32 cols = (p->unk8 - 20) / 10 + 1;
-    s32 rows = (p->unkA - 20) / 13;
+    s32 cols = (p->width - 20) / 10 + 1;
+    s32 rows = (p->height - 20) / 13;
     s32 k = 0;
     s32 dst = -1;
     s32 src = -1;
@@ -618,8 +618,8 @@ void Text_BuildVisiblePage(s32 idx) {
 
     for (row = 1; row <= rows; row++) {
         for (col = 0; col < cols;) {
-            text_window_slots[idx].unk54C[++dst] = text_window_slots[idx].unk9C[++src];
-            c = text_window_slots[idx].unk54C[dst];
+            text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+            c = text_window_slots[idx].visible_bytes[dst];
             if (c & 0x80) {
                 if (c == 0xE0 || c == 0xFF || (c == 0xF0 && k != 0)) {
                     break;
@@ -629,43 +629,43 @@ void Text_BuildVisiblePage(s32 idx) {
                 k++;
             }
         }
-        c = text_window_slots[idx].unk54C[dst];
+        c = text_window_slots[idx].visible_bytes[dst];
         if (c == 0xFF) {
             break;
         }
         if (c == 0xF0) {
-            p->unk0 |= 0x4000000;
+            p->flags |= 0x4000000;
             break;
         }
         if (c != 0xE0 && c != 0xE0) {
             n = -1;
-            for (j = src + 1; text_window_slots[idx].unk9C[j] >= 0x80; j++) {
-                if (text_window_slots[idx].unk9C[j] == 0xE0) {
+            for (j = src + 1; text_window_slots[idx].message_bytes[j] >= 0x80; j++) {
+                if (text_window_slots[idx].message_bytes[j] == 0xE0) {
                     for (n = j - src; n > 0; n--) {
-                        text_window_slots[idx].unk54C[++dst] = text_window_slots[idx].unk9C[++src];
+                        text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
                     }
-                    text_window_slots[idx].unk54C[++dst] = text_window_slots[idx].unk9C[++src];
+                    text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
                     n = 0;
                     break;
                 }
             }
             if (n != 0) {
-                text_window_slots[idx].unk54C[++dst] = 0xE0;
+                text_window_slots[idx].visible_bytes[++dst] = 0xE0;
             }
         }
     }
-    c = text_window_slots[idx].unk54C[dst];
+    c = text_window_slots[idx].visible_bytes[dst];
     if (c != 0xFF && c != 0xF0) {
-        p->unk0 |= 0x4000000;
-        p->unk54C[dst + 1] = 0xFF;
-        if (p->unk14 != 0xFF) {
-            p->unk9C[(u16)p->unk12] = p->unk14;
-            p->unk12 = src + 1;
-            p->unk14 = p->unk9C[src + 1];
-            p->unk9C[src + 1] = 0xFF;
+        p->flags |= 0x4000000;
+        p->visible_bytes[dst + 1] = 0xFF;
+        if (p->pending_byte != 0xFF) {
+            p->message_bytes[(u16)p->reveal_index] = p->pending_byte;
+            p->reveal_index = src + 1;
+            p->pending_byte = p->message_bytes[src + 1];
+            p->message_bytes[src + 1] = 0xFF;
         } else {
-            p->unk0 |= 0x2000000;
-            p->unk0 &= ~0x8000000;
+            p->flags |= 0x2000000;
+            p->flags &= ~0x8000000;
             Text_ResetStickAdvanceTimer();
         }
     }
@@ -688,14 +688,14 @@ void Text_DrawAdvanceIndicator(s32 idx) {
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
     gDPPipeSync(gfx_dl_head++);
     gDPLoadTLUT_pal256(gfx_dl_head++, text_window_tlut);
-    text_window_slots[idx].unkC++;
-    i = (text_window_slots[idx].unkC >> 1) & 7;
-    x = text_window_slots[idx].unk4 + text_window_slots[idx].unk8 - 11;
-    y = text_window_slots[idx].unk6 + text_window_slots[idx].unkA - 3;
+    text_window_slots[idx].anim_frame++;
+    i = (text_window_slots[idx].anim_frame >> 1) & 7;
+    x = text_window_slots[idx].x + text_window_slots[idx].width - 11;
+    y = text_window_slots[idx].y + text_window_slots[idx].height - 3;
     x -= c.v[i];
     Text_DrawTexturedRect(3, x, y, b.v[i], 1);
-    x = text_window_slots[idx].unk4 + text_window_slots[idx].unk8 - 12;
-    y = text_window_slots[idx].unk6 + text_window_slots[idx].unkA - 15;
+    x = text_window_slots[idx].x + text_window_slots[idx].width - 12;
+    y = text_window_slots[idx].y + text_window_slots[idx].height - 15;
     x = a.v[i] + x;
     y -= a.v[i];
     Text_DrawTexturedRect(2, x, y, 12, 12);
@@ -703,17 +703,17 @@ void Text_DrawAdvanceIndicator(s32 idx) {
 
 void Text_MeasureChoiceWindow(s32 arg0) {
     s32 max = 0;
-    s32 n = text_window_slots[arg0].unk38;
+    s32 n = text_window_slots[arg0].choice_count;
     s32 i;
     s32 j;
     s32 cnt;
 
-    text_choice_window_rect.unk6 = n * 13 + 12;
+    text_choice_window_rect.height = n * 13 + 12;
     for (i = 0; i < n; i++) {
         j = 0;
         cnt = 0;
-        while (text_window_slots[arg0].unk3C[i][j] != 0xFF) {
-            if (text_window_slots[arg0].unk3C[i][j] < 0x80) {
+        while (text_window_slots[arg0].choice_rows[i][j] != 0xFF) {
+            if (text_window_slots[arg0].choice_rows[i][j] < 0x80) {
                 cnt++;
             }
             j++;
@@ -722,7 +722,7 @@ void Text_MeasureChoiceWindow(s32 arg0) {
             max = cnt;
         }
     }
-    text_choice_window_rect.unk4 = max * 10 + 24;
+    text_choice_window_rect.width = max * 10 + 24;
 }
 
 s32 Text_FindWindow(s32 arg0, s32 arg1) {
@@ -731,14 +731,14 @@ s32 Text_FindWindow(s32 arg0, s32 arg1) {
 
     if (arg0 >= 0) {
         for (i = 0; i < 4; i++) {
-            if (arg0 == text_window_slots[i].unkE) {
+            if (arg0 == text_window_slots[i].window_type) {
                 ret = i;
                 break;
             }
         }
     } else {
         for (i = 0; i < 4; i++) {
-            if (arg1 == (text_window_slots[i].unk0 & 7)) {
+            if (arg1 == (text_window_slots[i].flags & 7)) {
                 ret = i;
                 break;
             }

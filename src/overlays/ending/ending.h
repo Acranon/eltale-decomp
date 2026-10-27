@@ -5,45 +5,45 @@
 #include "overlays/ending/ending_data.h"
 
 typedef struct EndingSprite {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ s16 unk8;
-    /* 0x0A */ s16 unkA;
-    /* 0x0C */ s16 unkC;
-    /* 0x0E */ s16 unkE;
-    /* 0x10 */ s16 unk10;
+    /* 0x00 */ s32 flags;
+    /* 0x04 */ s16 x;
+    /* 0x06 */ s16 y;
+    /* 0x08 */ s16 width;
+    /* 0x0A */ s16 height;
+    /* 0x0C */ s16 texture_s;
+    /* 0x0E */ s16 texture_t;
+    /* 0x10 */ s16 texture_width;
     /* 0x12 */ s16 unk12;
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ s16 unk24;
-    /* 0x26 */ s16 unk26;
-    /* 0x28 */ s16 unk28;
-    /* 0x2A */ s16 unk2A;
-    /* 0x2C */ s16 unk2C;
-    /* 0x2E */ s16 unk2E;
-    /* 0x30 */ s16 unk30;
-    /* 0x32 */ u16 unk32;
-    /* 0x34 */ s16 unk34;
+    /* 0x14 */ s32 palette_addr;
+    /* 0x18 */ s32 texture_addr;
+    /* 0x1C */ f32 move_frac_x;
+    /* 0x20 */ f32 move_frac_y;
+    /* 0x24 */ s16 move_frame;
+    /* 0x26 */ s16 move_start_x;
+    /* 0x28 */ s16 move_start_y;
+    /* 0x2A */ s16 move_target_x;
+    /* 0x2C */ s16 move_target_y;
+    /* 0x2E */ s16 clip_anchor_x;
+    /* 0x30 */ s16 clip_anchor_y;
+    /* 0x32 */ u16 fade_frame;
+    /* 0x34 */ s16 wait_frame;
     /* 0x36 */ char unk36[2];
-    /* 0x38 */ s32 unk38;
-    /* 0x3C */ u32 unk3C;
-    /* 0x40 */ f32 unk40;
-    /* 0x44 */ f32 unk44;
-    /* 0x48 */ f32 unk48;
-    /* 0x4C */ u16 unk4C;
-    /* 0x4E */ s16 unk4E;
+    /* 0x38 */ s32 step_duration;
+    /* 0x3C */ u32 draw_order;
+    /* 0x40 */ f32 clip_frac_x;
+    /* 0x44 */ f32 clip_frac_y;
+    /* 0x48 */ f32 fade_progress;
+    /* 0x4C */ u16 clip_frame;
+    /* 0x4E */ s16 fade_value;
 } EndingSprite; /* 0x50 bytes */
 
 typedef struct EndingRect {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
+    /* 0x00 */ s32 x;
+    /* 0x04 */ s32 y;
     /* 0x08 */ s32 s;
     /* 0x0C */ s32 t;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ s32 unk14;
+    /* 0x10 */ s32 width;
+    /* 0x14 */ s32 height;
     /* 0x18 */ s32 sw;
     /* 0x1C */ s32 th;
     /* 0x20 */ s32 dsdx;

@@ -10,17 +10,17 @@ typedef struct SceneMessage {
 } SceneMessage; /* 0xC bytes */
 
 typedef struct SceneEntry {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
+    /* 0x00 */ s32 map_id;
+    /* 0x04 */ s32 subarea;
+    /* 0x08 */ f32 camera_eye_x;
+    /* 0x0C */ f32 camera_eye_y;
+    /* 0x10 */ f32 camera_eye_z;
     /* 0x14 */ f32 unk14;
     /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ f32 unk24;
-    /* 0x28 */ f32 unk28;
+    /* 0x1C */ f32 camera_fovy;
+    /* 0x20 */ f32 spawn_x;
+    /* 0x24 */ f32 spawn_z;
+    /* 0x28 */ f32 spawn_rot;
     /* 0x2C */ s32 unk2C;
     /* 0x30 */ s32 unk30;
     /* 0x34 */ SceneMessage *messages;

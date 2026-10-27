@@ -18,10 +18,10 @@ typedef struct {
 } UnkPos_8020F4DC;
 
 typedef struct {
-    s16 unk0;
-    s16 unk2;
-    f32 unk4;
-    f32 unk8;
+    s16 active;
+    s16 remaining_frames;
+    f32 alpha_step;
+    f32 alpha;
 } UnkFade_8020F4F8;
 
 
@@ -385,25 +385,25 @@ void Title_UpdateScreenFade(void) {
     static UnkFade_8020F4F8 fade = { 0 };
 
     if (title_screen_fade_state == 0) {
-        if (fade.unk0 != 0) {
-            fade.unk0 = 0;
+        if (fade.active != 0) {
+            fade.active = 0;
         }
     } else {
-        if (fade.unk0 == 0) {
-            fade.unk0 = -1;
-            fade.unk4 = 255.0f / title_screen_fade_frames;
-            fade.unk2 = title_screen_fade_frames;
+        if (fade.active == 0) {
+            fade.active = -1;
+            fade.alpha_step = 255.0f / title_screen_fade_frames;
+            fade.remaining_frames = title_screen_fade_frames;
             switch (title_screen_fade_state) {
                 case 1:
                 case 3:
-                    fade.unk8 = 0.0f;
+                    fade.alpha = 0.0f;
                     break;
                 case 2:
                 case 4:
-                    fade.unk8 = 255;
+                    fade.alpha = 255;
                     break;
                 default:
-                    fade.unk8 = 128.0f;
+                    fade.alpha = 128.0f;
                     break;
             }
         }
@@ -415,11 +415,11 @@ void Title_StepAndDrawScreenFade(TitleFade* arg0) {
     s32 rgbColorValue;
     s32 alpha;
 
-    arg0->unk2 -= 1;
+    arg0->remaining_frames -= 1;
     if (title_screen_fade_state & 1) {
-        arg0->unk8 += arg0->unk4;
+        arg0->alpha += arg0->alpha_step;
     } else {
-        arg0->unk8 -= arg0->unk4;
+        arg0->alpha -= arg0->alpha_step;
     }
     switch (title_screen_fade_state) {
     case 3:
@@ -435,28 +435,28 @@ void Title_StepAndDrawScreenFade(TitleFade* arg0) {
         break;
     }
 
-    if (arg0->unk8 <= 0.0f) {
+    if (arg0->alpha <= 0.0f) {
         title_screen_fade_state = 0;
-        arg0->unk8 = 0.0f;
-        arg0->unk0 = 0;
-    } else if (arg0->unk8 > 255.0f) {
+        arg0->alpha = 0.0f;
+        arg0->active = 0;
+    } else if (arg0->alpha > 255.0f) {
         title_screen_fade_state = 0;
-        arg0->unk8 = 255.0f;
-        arg0->unk0 = 0;
+        arg0->alpha = 255.0f;
+        arg0->active = 0;
     }
-    if (arg0->unk2 == 0) {
+    if (arg0->remaining_frames == 0) {
         if ((title_screen_fade_state == 3) || (title_screen_fade_state == 1)) {
             title_screen_fade_state = 0;
-            arg0->unk8 = 255.0f;
-            arg0->unk0 = 0;
+            arg0->alpha = 255.0f;
+            arg0->active = 0;
         } else if ((title_screen_fade_state == 4) || (title_screen_fade_state == 2)) {
             title_screen_fade_state = 0;
-            arg0->unk8 = 0.0f;
-            arg0->unk0 = 0;
+            arg0->alpha = 0.0f;
+            arg0->active = 0;
         }
     }
 
-    alpha = arg0->unk8;
+    alpha = arg0->alpha;
     gDPPipeSync(gfx_dl_head++);
     gDPSetPrimColor(gfx_dl_head++, 0, 0, rgbColorValue, rgbColorValue, rgbColorValue, alpha);
     gDPSetRenderMode(gfx_dl_head++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);

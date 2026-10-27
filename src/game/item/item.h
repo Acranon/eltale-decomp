@@ -6,8 +6,8 @@
 #include "game/math/math.h"
 
 typedef struct ItemDef {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
+    /* 0x00 */ u16 use_flags;
+    /* 0x02 */ u16 handler_index;
     /* 0x04 */ s16 unk4;
     /* 0x06 */ s16 unk6;
     /* 0x08 */ char unk8[4];

@@ -9,16 +9,16 @@
 struct GfxFrameData;
 
 typedef struct HudPopup {
-    /* 0x00 */ u16 unk0;
+    /* 0x00 */ u16 remaining_frames;
     /* 0x02 */ u8 pad2[2];
-    /* 0x04 */ Actor *unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ u16 unk14;
-    /* 0x16 */ u16 unk16;
-    /* 0x18 */ u16 unk18;
-    /* 0x1A */ u16 unk1A;
+    /* 0x04 */ Actor *actor;
+    /* 0x08 */ f32 offset_x;
+    /* 0x0C */ f32 offset_y;
+    /* 0x10 */ f32 offset_z;
+    /* 0x14 */ u16 texture_s;
+    /* 0x16 */ u16 texture_t;
+    /* 0x18 */ u16 width;
+    /* 0x1A */ u16 height;
 } HudPopup; /* 0x1C bytes */
 
 typedef struct HudTextureDesc {

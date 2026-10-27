@@ -4,39 +4,39 @@
 #include "common.h"
 
 typedef struct IntroSpriteCue {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s16 unk8;
-    /* 0x0A */ s16 unkA;
-    /* 0x0C */ s16 unkC;
-    /* 0x0E */ s16 unkE;
-    /* 0x10 */ s16 unk10;
-    /* 0x12 */ s16 unk12;
-    /* 0x14 */ s16 unk14;
+    /* 0x00 */ u16 anim_index;
+    /* 0x02 */ s16 start_frame;
+    /* 0x04 */ s32 flags;
+    /* 0x08 */ s16 x;
+    /* 0x0A */ s16 y;
+    /* 0x0C */ s16 width;
+    /* 0x0E */ s16 height;
+    /* 0x10 */ s16 texture_s;
+    /* 0x12 */ s16 texture_t;
+    /* 0x14 */ s16 texture_width;
     /* 0x16 */ s16 unk16;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s16 unk20;
-    /* 0x22 */ s16 unk22;
-    /* 0x24 */ u16 unk24;
+    /* 0x18 */ s32 texture_addr;
+    /* 0x1C */ s32 palette_addr;
+    /* 0x20 */ s16 anim_step_index;
+    /* 0x22 */ s16 sprite_slot;
+    /* 0x24 */ u16 previous_cue_index;
 } IntroSpriteCue; /* size = 0x28 */
 
 typedef struct IntroAnimStep {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ s32 unk8;
+    /* 0x00 */ s32 flags;
+    /* 0x04 */ s16 x;
+    /* 0x06 */ s16 y;
+    /* 0x08 */ s32 duration;
 } IntroAnimStep; /* size = 0xC */
 
 typedef struct IntroAnim {
-    /* 0x00 */ IntroAnimStep *unk0;
-    /* 0x04 */ u32 unk4;
+    /* 0x00 */ IntroAnimStep *steps;
+    /* 0x04 */ u32 count;
 } IntroAnim; /* 0x8 bytes */
 
 typedef struct IntroCueGroup {
-    /* 0x00 */ IntroSpriteCue *unk0;
-    /* 0x04 */ u32 unk4;
+    /* 0x00 */ IntroSpriteCue *cues;
+    /* 0x04 */ u32 count;
 } IntroCueGroup; /* 0x8 bytes */
 
 extern Gfx intro_render_setup_dl[11];

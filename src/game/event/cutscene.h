@@ -16,12 +16,12 @@ typedef struct CutsceneImageCue {
 } CutsceneImageCue; /* 0x14 bytes */
 
 typedef struct CutsceneSequenceEntry {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ f32 unkC;
-    /* 0x10 */ f32 unk10;
-    /* 0x14 */ f32 unk14;
+    /* 0x00 */ s32 map_id;
+    /* 0x04 */ s32 subarea;
+    /* 0x08 */ s32 flags;
+    /* 0x0C */ f32 spawn_x;
+    /* 0x10 */ f32 spawn_z;
+    /* 0x14 */ f32 spawn_rot;
     /* 0x18 */ KfAnim *camera_track;
     /* 0x1C */ CutsceneImageCue *image_cues;
 } CutsceneSequenceEntry; /* 0x20 bytes */

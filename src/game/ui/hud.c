@@ -931,7 +931,7 @@ void Hud_ResetPopups(void) {
     s32 i = 8;
 
     while (i > 0) {
-        p->unk0 = 0;
+        p->remaining_frames = 0;
         p++;
         i--;
     }
@@ -941,25 +941,25 @@ void Hud_ShowActorPopup(Actor* arg0) {
     HudPopup* p = hud_popup_slots;
     s32 i = 7;
 
-    while (i != 0 && p->unk0 != 0) {
+    while (i != 0 && p->remaining_frames != 0) {
         i--;
         p++;
     }
-    p->unk0 = 0x2D;
-    p->unk4 = arg0;
-    p->unk10 = 0.0f;
-    p->unk8 = 0.0f;
+    p->remaining_frames = 0x2D;
+    p->actor = arg0;
+    p->offset_z = 0.0f;
+    p->offset_x = 0.0f;
     if (arg0->unk64->unk0 == 0) {
-        p->unkC = arg0->unk64->unk1C * arg0->scale;
+        p->offset_y = arg0->unk64->unk1C * arg0->scale;
     } else if (arg0->unk64->unk0 == 1) {
-        p->unkC = arg0->unk68->unk94 - arg0->y;
+        p->offset_y = arg0->unk68->unk94 - arg0->y;
     } else {
-        p->unkC = arg0->scale * 600.0;
+        p->offset_y = arg0->scale * 600.0;
     }
-    p->unk14 = 0x23;
-    p->unk16 = 0x31;
-    p->unk18 = 0x29;
-    p->unk1A = 0xE;
+    p->texture_s = 0x23;
+    p->texture_t = 0x31;
+    p->width = 0x29;
+    p->height = 0xE;
 }
 
 void Hud_DrawPopups(void) {
@@ -976,18 +976,18 @@ void Hud_DrawPopups(void) {
     p = hud_popup_slots;
     i = 8;
     do {
-        if (p->unk0 != 0) {
-            x = p->unk8;
-            y = p->unkC;
-            z = p->unk10;
-            if (p->unk4 != NULL) {
-                x += ((Vec3f*) p->unk4)->x;
-                y += ((Vec3f*) p->unk4)->y;
-                z += ((Vec3f*) p->unk4)->z;
+        if (p->remaining_frames != 0) {
+            x = p->offset_x;
+            y = p->offset_y;
+            z = p->offset_z;
+            if (p->actor != NULL) {
+                x += ((Vec3f*) p->actor)->x;
+                y += ((Vec3f*) p->actor)->y;
+                z += ((Vec3f*) p->actor)->z;
             }
             Camera_WorldToScreen(x, y, z, &sx, &sy);
-            Hud_DrawTextureTile(D_803A8728, sx - (p->unk18 >> 1), sy - p->unk1A, p->unk18, p->unk1A, p->unk14, p->unk16, 0x400, 0x400);
-            p->unk0--;
+            Hud_DrawTextureTile(D_803A8728, sx - (p->width >> 1), sy - p->height, p->width, p->height, p->texture_s, p->texture_t, 0x400, 0x400);
+            p->remaining_frames--;
         }
         i--;
         p++;

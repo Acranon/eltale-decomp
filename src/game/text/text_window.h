@@ -4,41 +4,41 @@
 #include "common.h"
 
 typedef struct TextWindow {
-    /* 0x000 */ s32 unk0;
-    /* 0x004 */ s16 unk4;
-    /* 0x006 */ s16 unk6;
-    /* 0x008 */ s16 unk8;
-    /* 0x00A */ s16 unkA;
-    /* 0x00C */ s16 unkC;
-    /* 0x00E */ u8 unkE;
-    /* 0x00F */ u8 unkF;
+    /* 0x000 */ s32 flags;
+    /* 0x004 */ s16 x;
+    /* 0x006 */ s16 y;
+    /* 0x008 */ s16 width;
+    /* 0x00A */ s16 height;
+    /* 0x00C */ s16 anim_frame;
+    /* 0x00E */ u8 window_type;
+    /* 0x00F */ u8 reveal_delay;
 #ifdef NON_MATCHING
     /* Text_UpdateAndDrawWindows reads these with lb/lhu/lb (the matched functions only store
        them or compile the same with these widths) */
-    /* 0x010 */ s8 unk10;
-    /* 0x012 */ u16 unk12;
-    /* 0x014 */ u8 unk14;
-    /* 0x015 */ s8 unk15;
+    /* 0x010 */ s8 reveal_timer;
+    /* 0x012 */ u16 reveal_index;
+    /* 0x014 */ u8 pending_byte;
+    /* 0x015 */ s8 choice_cursor;
 #else
-    /* 0x010 */ u8 unk10;
-    /* 0x012 */ s16 unk12;
-    /* 0x014 */ u8 unk14;
-    /* 0x015 */ u8 unk15;
+    /* 0x010 */ u8 reveal_timer;
+    /* 0x012 */ s16 reveal_index;
+    /* 0x014 */ u8 pending_byte;
+    /* 0x015 */ u8 choice_cursor;
 #endif
-    /* 0x016 */ u8 unk16;
-    /* 0x017 */ u8 unk17[32];
-    /* 0x038 */ s16 unk38;
+    /* 0x016 */ u8 choice_input_latch;
+    /* 0x017 */ u8 speaker_name[32];
+    /* 0x038 */ s16 choice_count;
     /* 0x03A */ s16 unk3A;
-    /* 0x03C */ u8 unk3C[4][24];
-    /* 0x09C */ u8 unk9C[0x4B0];
-    /* 0x54C */ u8 unk54C[0x4B0];
+    /* 0x03C */ u8 choice_rows[4][24];
+    /* 0x09C */ u8 message_bytes[0x4B0];
+    /* 0x54C */ u8 visible_bytes[0x4B0];
 } TextWindow; /* size = 0x9FC */
 
 typedef struct TextWindowRect {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
+    /* 0x00 */ s16 x;
+    /* 0x02 */ s16 y;
+    /* 0x04 */ s16 width;
+    /* 0x06 */ s16 height;
 } TextWindowRect; /* 0x8 bytes */
 
 typedef struct TextChoiceRows {

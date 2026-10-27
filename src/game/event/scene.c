@@ -38,15 +38,15 @@ void Cutscene_StartEntry(s32 arg0) {
     cutscene_messages_remaining = entry->message_count;
     cutscene_message_wait_frames = 0x3C;
     map_id = -1;
-    map_next_id = entry->unk0;
-    map_next_subarea = entry->unk4;
+    map_next_id = entry->map_id;
+    map_next_subarea = entry->subarea;
     Text_ResetAllWindows(0);
     text_active_window_count = 0;
     exit_destination.entry = -1;
     Map_LoadArea();
-    player_spawn_x = entry->unk20;
-    player_spawn_z = entry->unk24;
-    player_spawn_rot = entry->unk28;
+    player_spawn_x = entry->spawn_x;
+    player_spawn_z = entry->spawn_z;
+    player_spawn_rot = entry->spawn_rot;
     player_spawn_type = 0x108;
     player_state.unk6 = 0;
     player_stats.unk4 = player_stats.unk6;
@@ -60,15 +60,15 @@ void Cutscene_StartEntry(s32 arg0) {
     enemy_count = 0;
     Camera_InitForMap();
     camera_state.mode = 3;
-    camera_state.eyeX = entry->unk8;
-    camera_state.eyeY = entry->unkC;
-    camera_state.eyeZ = entry->unk10;
+    camera_state.eyeX = entry->camera_eye_x;
+    camera_state.eyeY = entry->camera_eye_y;
+    camera_state.eyeZ = entry->camera_eye_z;
     Math_MtxFRotate(mtx, -entry->unk14 * 0.017453292519943295, -entry->unk18 * 0.017453292519943295, 0.0f);
     Math_MtxFMulVecNegZ(mtx, 0.0f, 0.0f, -100.0f, &camera_state.atX, &camera_state.atY, &camera_state.atZ);
     camera_state.atX = camera_state.atX + camera_state.eyeX;
     camera_state.atY = camera_state.atY + camera_state.eyeY;
     camera_state.atZ = camera_state.eyeZ - camera_state.atZ;
-    camera_fovy = entry->unk1C;
+    camera_fovy = entry->camera_fovy;
     Bgm_Play(((s8 *)&entry->unk3E)[1]);
 }
 

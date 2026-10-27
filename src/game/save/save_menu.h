@@ -13,29 +13,29 @@ typedef struct SaveBytes14 { /* 0x00 */ u8 b[14]; } SaveBytes14; /* 0xE bytes */
 #endif
 
 typedef struct SaveGameStateBlock {
-    /* 0x00 */ SaveBytes20 unk0;
-    /* 0x20 */ SaveBytes10 unk20;
-    /* 0x30 */ SaveBytes97 unk30;
-    /* 0xC7 */ SaveBytes1 unkC7;
+    /* 0x00 */ SaveBytes20 opened_chests;
+    /* 0x20 */ SaveBytes10 collected_spirits;
+    /* 0x30 */ SaveBytes97 inventory;
+    /* 0xC7 */ SaveBytes1 defeated_bosses;
 } SaveGameStateBlock; /* 0xC8 bytes */
 
 typedef struct SaveHeader {
-    /* 0x00 */ ActorStats unk0;
-    /* 0x38 */ u16 unk38;
-    /* 0x3A */ u16 unk3A;
-    /* 0x3C */ s32 unk3C;
-    /* 0x40 */ s32 unk40;
-    /* 0x44 */ s32 unk44;
-    /* 0x48 */ s32 unk48;
-    /* 0x4C */ s32 unk4C;
-    /* 0x50 */ s32 unk50;
-    /* 0x54 */ s32 unk54;
-    /* 0x58 */ s32 unk58;
-    /* 0x5C */ u16 unk5C;
-    /* 0x5E */ u16 unk5E;
-    /* 0x60 */ u16 unk60;
-    /* 0x62 */ s8 unk62;
-    /* 0x63 */ s8 unk63;
+    /* 0x00 */ ActorStats player_stats;
+    /* 0x38 */ u16 play_time;
+    /* 0x3A */ u16 day_count;
+    /* 0x3C */ s32 map_id;
+    /* 0x40 */ s32 subarea;
+    /* 0x44 */ s32 flag4_return_map;
+    /* 0x48 */ s32 flag4_return_subarea;
+    /* 0x4C */ s32 flag4_return_entry;
+    /* 0x50 */ s32 flag8_return_map;
+    /* 0x54 */ s32 flag8_return_subarea;
+    /* 0x58 */ s32 flag8_return_entry;
+    /* 0x5C */ u16 respawn_map;
+    /* 0x5E */ u16 respawn_subarea;
+    /* 0x60 */ u16 respawn_entry;
+    /* 0x62 */ s8 text_delay_option;
+    /* 0x63 */ s8 bgm_volume_option;
     /* 0x64 */ u16 unk64;
 } SaveHeader; /* 0x68 bytes */
 

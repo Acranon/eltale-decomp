@@ -593,16 +593,16 @@ void Cutscene_StartNextScene(void) {
     cutscene_camera_frame = 0;
     cutscene_camera_end_frame = cutscene_camera_track->last;
     map_id = -1;
-    map_next_id = e->unk0;
-    map_next_subarea = e->unk4;
+    map_next_id = e->map_id;
+    map_next_subarea = e->subarea;
     Text_ResetAllWindows(0);
     text_active_window_count = 0;
     exit_destination.entry = -1;
     Map_LoadArea();
-    if (e->unk8 & 1) {
-        player_spawn_x = e->unkC;
-        player_spawn_z = e->unk10;
-        player_spawn_rot = e->unk14;
+    if (e->flags & 1) {
+        player_spawn_x = e->spawn_x;
+        player_spawn_z = e->spawn_z;
+        player_spawn_rot = e->spawn_rot;
         player_spawn_type = 0x108;
         player_stats.unk4 = player_stats.unk6;
         player_state.unk6 = 0;

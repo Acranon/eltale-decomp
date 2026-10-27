@@ -256,44 +256,44 @@ s32 Intro_RunSpriteScript(void) {
     intro_elapsed_frames++;
     D_80276F44_ovl_intro++;
     intro_cue_frame++;
-    if ((intro_cue_frame >= intro_cue_groups[intro_cue_group_index].unk0[intro_cue_entry_index].unk2) &&
-        (intro_cue_groups[intro_cue_group_index].unk0[intro_cue_entry_index].unk22 == -1) && (intro_wait_for_sprites == 0)) {
+    if ((intro_cue_frame >= intro_cue_groups[intro_cue_group_index].cues[intro_cue_entry_index].start_frame) &&
+        (intro_cue_groups[intro_cue_group_index].cues[intro_cue_entry_index].sprite_slot == -1) && (intro_wait_for_sprites == 0)) {
         do {
             slot = Intro_FindFreeSprite();
             if (slot != -1) {
-            entries = intro_cue_groups[intro_cue_group_index].unk0;
-            entries[intro_cue_entry_index].unk20 = 0;
-            entries[intro_cue_entry_index].unk22 = slot;
-            steps = intro_sprite_anim_table[entries[intro_cue_entry_index].unk0].unk0;
-            Intro_SpawnSprite(slot, 0x80000000 | entries[intro_cue_entry_index].unk4 | steps[entries[intro_cue_entry_index].unk20].unk0,
-                                     entries[intro_cue_entry_index].unk8, entries[intro_cue_entry_index].unkA, entries[intro_cue_entry_index].unk10,
-                                     entries[intro_cue_entry_index].unk12, entries[intro_cue_entry_index].unkC, entries[intro_cue_entry_index].unkE,
-                                     entries[intro_cue_entry_index].unk14, entries[intro_cue_entry_index].unk16, entries[intro_cue_entry_index].unk18,
-                                     entries[intro_cue_entry_index].unk1C, steps[entries[intro_cue_entry_index].unk20].unk8, intro_sprite_spawn_count);
+            entries = intro_cue_groups[intro_cue_group_index].cues;
+            entries[intro_cue_entry_index].anim_step_index = 0;
+            entries[intro_cue_entry_index].sprite_slot = slot;
+            steps = intro_sprite_anim_table[entries[intro_cue_entry_index].anim_index].steps;
+            Intro_SpawnSprite(slot, 0x80000000 | entries[intro_cue_entry_index].flags | steps[entries[intro_cue_entry_index].anim_step_index].flags,
+                                     entries[intro_cue_entry_index].x, entries[intro_cue_entry_index].y, entries[intro_cue_entry_index].texture_s,
+                                     entries[intro_cue_entry_index].texture_t, entries[intro_cue_entry_index].width, entries[intro_cue_entry_index].height,
+                                     entries[intro_cue_entry_index].texture_width, entries[intro_cue_entry_index].unk16, entries[intro_cue_entry_index].texture_addr,
+                                     entries[intro_cue_entry_index].palette_addr, steps[entries[intro_cue_entry_index].anim_step_index].duration, intro_sprite_spawn_count);
             intro_sprite_spawn_count++;
-            if (entries[intro_cue_entry_index].unk2 == 0) {
-                entries[intro_cue_entry_index].unk24 = intro_previous_cue_index;
+            if (entries[intro_cue_entry_index].start_frame == 0) {
+                entries[intro_cue_entry_index].previous_cue_index = intro_previous_cue_index;
             } else {
                 intro_previous_cue_index = intro_cue_entry_index;
             }
-            if (steps[entries[intro_cue_entry_index].unk20].unk0 & 0xC800) {
-                if (entries[intro_cue_entry_index].unk2 == 0) {
-                    dx = entries[intro_cue_entry_index].unk8 - entries[intro_previous_cue_index].unk8;
-                    dy = entries[intro_cue_entry_index].unkA - entries[intro_previous_cue_index].unkA;
+            if (steps[entries[intro_cue_entry_index].anim_step_index].flags & 0xC800) {
+                if (entries[intro_cue_entry_index].start_frame == 0) {
+                    dx = entries[intro_cue_entry_index].x - entries[intro_previous_cue_index].x;
+                    dy = entries[intro_cue_entry_index].y - entries[intro_previous_cue_index].y;
                 } else {
                     dx = 0;
                     dy = 0;
                 }
-                Intro_SetMoveTarget(slot, steps[entries[intro_cue_entry_index].unk20].unk4 + dx, steps[entries[intro_cue_entry_index].unk20].unk6 + dy);
+                Intro_SetMoveTarget(slot, steps[entries[intro_cue_entry_index].anim_step_index].x + dx, steps[entries[intro_cue_entry_index].anim_step_index].y + dy);
             }
-            if (steps[entries[intro_cue_entry_index].unk20].unk0 & 0x1000) {
+            if (steps[entries[intro_cue_entry_index].anim_step_index].flags & 0x1000) {
                 Intro_ResetWait(slot);
             }
-            if (steps[entries[intro_cue_entry_index].unk20].unk0 & 0x60000000) {
+            if (steps[entries[intro_cue_entry_index].anim_step_index].flags & 0x60000000) {
                 Intro_SetClipAnchor(slot);
             }
             intro_cue_entry_index++;
-            if (intro_cue_entry_index >= intro_cue_groups[intro_cue_group_index].unk4) {
+            if (intro_cue_entry_index >= intro_cue_groups[intro_cue_group_index].count) {
                 intro_cue_entry_index = 0;
                 intro_wait_for_sprites = 1;
                 intro_cue_frame = 0;
@@ -303,7 +303,7 @@ s32 Intro_RunSpriteScript(void) {
             } else {
                 break;
             }
-        } while (entries[intro_cue_entry_index].unk2 == 0);
+        } while (entries[intro_cue_entry_index].start_frame == 0);
     }
     if (intro_elapsed_frames == 0x1E00) {
         Audio_StartSeqFadeOut(0x5A);
@@ -313,41 +313,41 @@ s32 Intro_RunSpriteScript(void) {
     for (i = 0, obj = intro_sprite_slots; i < 150; i++, obj++) {
         if (i) {
         }
-        if (obj->unk0.w & 0x80000000) {
+        if (obj->flags.w & 0x80000000) {
             j = Intro_FindSpriteScriptEntry(i, &listIdx);
             if (j != -1) {
-                flags = obj->unk0.w;
-                entries = intro_cue_groups[listIdx].unk0;
-                steps = intro_sprite_anim_table[entries[j].unk0].unk0;
+                flags = obj->flags.w;
+                entries = intro_cue_groups[listIdx].cues;
+                steps = intro_sprite_anim_table[entries[j].anim_index].steps;
                 if (flags & 0x800000) {
                     flags &= ~0x800000;
                 }
-                if (!(steps[entries[j].unk20].unk0 & flags)) {
+                if (!(steps[entries[j].anim_step_index].flags & flags)) {
                     if (intro_cue_group_index) {
                     }
                     new_var = entries;
-                    entries[j].unk20++;
-                    if (new_var[j].unk20 >= intro_sprite_anim_table[new_var[j].unk0].unk4) {
+                    entries[j].anim_step_index++;
+                    if (new_var[j].anim_step_index >= intro_sprite_anim_table[new_var[j].anim_index].count) {
                         Intro_ClearSprite(i);
-                        entries[j].unk22 = -1;
+                        entries[j].sprite_slot = -1;
                     } else {
-                        obj->unk0.w &= ~0x800000;
-                        obj->unk0.w |= steps[new_var[j].unk20].unk0;
-                        obj->unk38 = steps[new_var[j].unk20].unk8;
-                        if (steps[new_var[j].unk20].unk0 & 0xC800) {
-                            if (new_var[j].unk2 == 0) {
-                                dx = new_var[j].unk8 - new_var[new_var[j].unk24].unk8;
-                                dy = new_var[j].unkA - new_var[new_var[j].unk24].unkA;
+                        obj->flags.w &= ~0x800000;
+                        obj->flags.w |= steps[new_var[j].anim_step_index].flags;
+                        obj->step_duration = steps[new_var[j].anim_step_index].duration;
+                        if (steps[new_var[j].anim_step_index].flags & 0xC800) {
+                            if (new_var[j].start_frame == 0) {
+                                dx = new_var[j].x - new_var[new_var[j].start_frame4].unk8;
+                                dy = new_var[j].y - new_var[new_var[j].start_frame4].unkA;
                             } else {
                                 dx = 0;
                                 dy = 0;
                             }
-                            Intro_SetMoveTarget(i, steps[new_var[j].unk20].unk4 + dx, steps[new_var[j].unk20].unk6 + dy);
+                            Intro_SetMoveTarget(i, steps[new_var[j].anim_step_index].x + dx, steps[new_var[j].anim_step_index].y + dy);
                         }
-                        if (steps[new_var[j].unk20].unk0 & 0x1000) {
+                        if (steps[new_var[j].anim_step_index].flags & 0x1000) {
                             Intro_ResetWait(i);
                         }
-                        if (steps[new_var[j].unk20].unk0 & 0x60000000) {
+                        if (steps[new_var[j].anim_step_index].flags & 0x60000000) {
                             Intro_SetClipAnchor(i);
                         }
                     }
@@ -397,8 +397,8 @@ s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx) {
     u32 j;
 
     for (i = 0; i < intro_cue_group_count; i++) {
-        for (j = 0; j < intro_cue_groups[i].unk4; j++) {
-            if (id == intro_cue_groups[i].unk0[j].unk22) {
+        for (j = 0; j < intro_cue_groups[i].count; j++) {
+            if (id == intro_cue_groups[i].cues[j].sprite_slot) {
                 *outIdx = i;
                 return j;
             }
@@ -411,34 +411,34 @@ void Intro_SpawnSprite(s16 idx, s32 flags, s16 x, s16 y, s16 arg4, s16 arg5, s16
                              s16 arg9, s32 arg10, s32 arg11, s32 arg12, s32 arg13) {
     IntroSprite *p = &intro_sprite_slots[idx];
 
-    p->unk0.w = flags;
-    p->unk4 = x;
-    p->unk6 = y;
-    p->unkC = arg4;
-    p->unkE = arg5;
-    p->unk8 = arg6;
-    p->unkA = arg7;
+    p->flags.w = flags;
+    p->x = x;
+    p->y = y;
+    p->texture_s = arg4;
+    p->texture_t = arg5;
+    p->width = arg6;
+    p->height = arg7;
     if ((flags & 0x4000000) == 0x4000000) {
-        p->unk10 = (arg8 + 15) & 0xFFF0;
+        p->texture_width = (arg8 + 15) & 0xFFF0;
     } else {
-        p->unk10 = arg8;
+        p->texture_width = arg8;
     }
     p->unk12 = arg9;
-    p->unk14 = arg11;
-    p->unk18 = arg10;
-    p->unk4C = 0;
-    p->unk4E = 0xFF;
-    p->unk32 = 0;
-    p->unk24 = 0;
-    p->unk34 = 0;
-    p->unk40 = 0.0f;
-    p->unk44 = 0.0f;
-    p->unk48 = 0.0f;
-    p->unk1C = 0.0f;
-    p->unk20 = 0.0f;
-    p->unk38 = arg12;
-    p->unk3C = arg13;
-    p->unk2E = p->unk30 = 0;
+    p->palette_addr = arg11;
+    p->texture_addr = arg10;
+    p->clip_frame = 0;
+    p->fade_value = 0xFF;
+    p->fade_frame = 0;
+    p->move_frame = 0;
+    p->wait_frame = 0;
+    p->clip_frac_x = 0.0f;
+    p->clip_frac_y = 0.0f;
+    p->fade_progress = 0.0f;
+    p->move_frac_x = 0.0f;
+    p->move_frac_y = 0.0f;
+    p->step_duration = arg12;
+    p->draw_order = arg13;
+    p->clip_anchor_x = p->clip_anchor_y = 0;
 }
 
 void Intro_ClearAllSprites(void) {
@@ -446,68 +446,68 @@ void Intro_ClearAllSprites(void) {
     IntroSprite *p = intro_sprite_slots;
 
     for (i = 0; i < 150; i++, p++) {
-        p->unk0.w = 0;
-        p->unk4 = 0;
-        p->unk6 = 0;
-        p->unkC = 0;
-        p->unkE = 0;
-        p->unk8 = 0;
-        p->unkA = 0;
-        p->unk10 = 0;
+        p->flags.w = 0;
+        p->x = 0;
+        p->y = 0;
+        p->texture_s = 0;
+        p->texture_t = 0;
+        p->width = 0;
+        p->height = 0;
+        p->texture_width = 0;
         p->unk12 = 0;
-        p->unk14 = 0;
-        p->unk18 = 0;
-        p->unk48 = 0.0f;
-        p->unk4E = 0xFF;
-        p->unk32 = 0;
-        p->unk1C = 0.0f;
-        p->unk20 = 0.0f;
-        p->unk24 = 0;
-        p->unk2A = 0;
-        p->unk2C = 0;
-        p->unk26 = 0;
-        p->unk28 = 0;
-        p->unk2E = p->unk30 = 0;
-        p->unk34 = 0;
-        p->unk40 = 0.0f;
-        p->unk44 = 1.0f;
-        p->unk4C = 0;
-        p->unk38 = 0;
-        p->unk3C = 0;
+        p->palette_addr = 0;
+        p->texture_addr = 0;
+        p->fade_progress = 0.0f;
+        p->fade_value = 0xFF;
+        p->fade_frame = 0;
+        p->move_frac_x = 0.0f;
+        p->move_frac_y = 0.0f;
+        p->move_frame = 0;
+        p->move_target_x = 0;
+        p->move_target_y = 0;
+        p->move_start_x = 0;
+        p->move_start_y = 0;
+        p->clip_anchor_x = p->clip_anchor_y = 0;
+        p->wait_frame = 0;
+        p->clip_frac_x = 0.0f;
+        p->clip_frac_y = 1.0f;
+        p->clip_frame = 0;
+        p->step_duration = 0;
+        p->draw_order = 0;
     }
 }
 
 void Intro_ClearSprite(s32 idx) {
     IntroSprite *p = &intro_sprite_slots[idx];
 
-    p->unk0.w = 0;
-    p->unk4 = 0;
-    p->unk6 = 0;
-    p->unkC = 0;
-    p->unkE = 0;
-    p->unk8 = 0;
-    p->unkA = 0;
-    p->unk10 = 0;
+    p->flags.w = 0;
+    p->x = 0;
+    p->y = 0;
+    p->texture_s = 0;
+    p->texture_t = 0;
+    p->width = 0;
+    p->height = 0;
+    p->texture_width = 0;
     p->unk12 = 0;
-    p->unk14 = 0;
-    p->unk18 = 0;
-    p->unk48 = 0.0f;
-    p->unk4E = 0xFF;
-    p->unk32 = 0;
-    p->unk1C = 0.0f;
-    p->unk20 = 0.0f;
-    p->unk24 = 0;
-    p->unk2A = 0;
-    p->unk2C = 0;
-    p->unk26 = 0;
-    p->unk28 = 0;
-    p->unk34 = 0;
-    p->unk40 = 0.0f;
-    p->unk44 = 1.0f;
-    p->unk4C = 0;
-    p->unk38 = 0;
-    p->unk3C = 0;
-    p->unk2E = p->unk30 = 0;
+    p->palette_addr = 0;
+    p->texture_addr = 0;
+    p->fade_progress = 0.0f;
+    p->fade_value = 0xFF;
+    p->fade_frame = 0;
+    p->move_frac_x = 0.0f;
+    p->move_frac_y = 0.0f;
+    p->move_frame = 0;
+    p->move_target_x = 0;
+    p->move_target_y = 0;
+    p->move_start_x = 0;
+    p->move_start_y = 0;
+    p->wait_frame = 0;
+    p->clip_frac_x = 0.0f;
+    p->clip_frac_y = 1.0f;
+    p->clip_frame = 0;
+    p->step_duration = 0;
+    p->draw_order = 0;
+    p->clip_anchor_x = p->clip_anchor_y = 0;
 }
 
 s32 Intro_CountFreeSprites(s32 n) {
@@ -516,7 +516,7 @@ s32 Intro_CountFreeSprites(s32 n) {
 
     n = 0;
     for (i = 0; i < 150; i++, p++) {
-        if (!(p->unk0.w & 0x80000000)) {
+        if (!(p->flags.w & 0x80000000)) {
             n++;
         }
     }
@@ -529,7 +529,7 @@ s32 Intro_CountActiveSprites(s32 n) {
 
     n = 0;
     for (i = 0; i < 150; i++, p++) {
-        if (p->unk0.w & 0x80000000) {
+        if (p->flags.w & 0x80000000) {
             n++;
         }
     }
@@ -541,7 +541,7 @@ s16 Intro_FindFreeSprite(void) {
     IntroSprite *p = intro_sprite_slots;
 
     for (i = 0; i < 150; i++, p++) {
-        if (!(p->unk0.w & 0x80000000)) {
+        if (!(p->flags.w & 0x80000000)) {
             return i;
         }
     }
@@ -556,39 +556,39 @@ s32 Intro_StepClipGrow(s32 arg0, s32 arg1, IntroRect* arg2) {
     s32 flag;
 
     temp_v1 = &intro_sprite_slots[arg0];
-    if (!(temp_v1->unk0.w & 0x80000000)) {
+    if (!(temp_v1->flags.w & 0x80000000)) {
         return 0xFF;
     }
-    x = temp_v1->unk8;
-    y = temp_v1->unkA;
+    x = temp_v1->width;
+    y = temp_v1->height;
     flag = arg1 & 0x100;
-    temp_v1->unk4C++;
+    temp_v1->clip_frame++;
     if (flag) {
-        arg1 = temp_v1->unk38;
-        temp_v1->unk40 += (f32) x / (f32) arg1;
-        v = temp_v1->unk40;
-        if ((v >= x) || (temp_v1->unk4C >= arg1)) {
+        arg1 = temp_v1->step_duration;
+        temp_v1->clip_frac_x += (f32) x / (f32) arg1;
+        v = temp_v1->clip_frac_x;
+        if ((v >= x) || (temp_v1->clip_frame >= arg1)) {
             v = x;
         }
-        arg2->unk0 = temp_v1->unk2E - v;
-        arg2->unk10 = v;
+        arg2->x = temp_v1->clip_anchor_x - v;
+        arg2->width = v;
     }
     if (!flag) {
-        arg1 = temp_v1->unk38;
-        temp_v1->unk44 += (f32) y / (f32) arg1;
-        v = temp_v1->unk44;
-        if ((v >= y) || (temp_v1->unk4C >= arg1)) {
+        arg1 = temp_v1->step_duration;
+        temp_v1->clip_frac_y += (f32) y / (f32) arg1;
+        v = temp_v1->clip_frac_y;
+        if ((v >= y) || (temp_v1->clip_frame >= arg1)) {
             v = y;
         }
-        arg2->unk4 = temp_v1->unk30 - v;
-        arg2->unk14 = v;
+        arg2->y = temp_v1->clip_anchor_y - v;
+        arg2->height = v;
     }
-    if (temp_v1->unk4C >= temp_v1->unk38) {
-        temp_v1->unk4C = 0;
-        temp_v1->unk2E = 0;
-        temp_v1->unk30 = 0;
-        temp_v1->unk40 = 0.0f;
-        temp_v1->unk44 = 0.0f;
+    if (temp_v1->clip_frame >= temp_v1->step_duration) {
+        temp_v1->clip_frame = 0;
+        temp_v1->clip_anchor_x = 0;
+        temp_v1->clip_anchor_y = 0;
+        temp_v1->clip_frac_x = 0.0f;
+        temp_v1->clip_frac_y = 0.0f;
         return 0xFF;
     }
     return 0;
@@ -599,38 +599,38 @@ s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r) {
     IntroSprite *p;
     s32 v;
 
-    if (!(s->unk0.w & 0x80000000)) {
+    if (!(s->flags.w & 0x80000000)) {
         return 0xFF;
     }
     p = s;
     idx = flags & 0x400;
-    p->unk4C++;
+    p->clip_frame++;
     if (idx) {
-        flags = p->unk8;
-        p->unk40 += (f32) flags / p->unk38;
-        v = flags - (s32) p->unk40;
-        if (v <= 0 || p->unk4C >= p->unk38) {
+        flags = p->width;
+        p->clip_frac_x += (f32) flags / p->step_duration;
+        v = flags - (s32) p->clip_frac_x;
+        if (v <= 0 || p->clip_frame >= p->step_duration) {
             v = 0;
         }
-        r->unk0 = p->unk2E - v;
-        r->unk10 = v;
+        r->x = p->clip_anchor_x - v;
+        r->width = v;
     }
     if (!idx) {
-        idx = p->unkA;
-        p->unk44 += (f32) idx / p->unk38;
-        v = idx - (s32) p->unk44;
-        if (v <= 0 || p->unk4C >= p->unk38) {
+        idx = p->height;
+        p->clip_frac_y += (f32) idx / p->step_duration;
+        v = idx - (s32) p->clip_frac_y;
+        if (v <= 0 || p->clip_frame >= p->step_duration) {
             v = 0;
         }
-        r->unk4 = p->unk30 - v;
-        r->unk14 = v;
+        r->y = p->clip_anchor_y - v;
+        r->height = v;
     }
-    if (p->unk4C >= p->unk38) {
-        p->unk4C = 0;
-        p->unk2E = 0;
-        p->unk30 = 0;
-        p->unk40 = 0.0f;
-        p->unk44 = 0.0f;
+    if (p->clip_frame >= p->step_duration) {
+        p->clip_frame = 0;
+        p->clip_anchor_x = 0;
+        p->clip_anchor_y = 0;
+        p->clip_frac_x = 0.0f;
+        p->clip_frac_y = 0.0f;
         return 0xFF;
     }
     return 0;
@@ -639,35 +639,35 @@ s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r) {
 void Intro_SetClipAnchor(s32 idx) {
     IntroSprite *p = &intro_sprite_slots[idx];
 
-    p->unk2E = p->unk4 + p->unk8;
-    p->unk30 = p->unk6 + p->unkA;
+    p->clip_anchor_x = p->x + p->width;
+    p->clip_anchor_y = p->y + p->height;
 }
 
 s32 Intro_StepAlphaFade(s32 idx, s32 arg1) {
     IntroSprite *p = &intro_sprite_slots[idx];
     f32 step;
 
-    if (!(p->unk0.w & 0x80000000)) {
+    if (!(p->flags.w & 0x80000000)) {
         return 0;
     }
-    p->unk32++;
-    step = 255.0f / p->unk38;
-    p->unk48 += step;
-    if (p->unk48 >= 255.0f || p->unk32 >= p->unk38) {
-        p->unk48 = 255.0f;
+    p->fade_frame++;
+    step = 255.0f / p->step_duration;
+    p->fade_progress += step;
+    if (p->fade_progress >= 255.0f || p->fade_frame >= p->step_duration) {
+        p->fade_progress = 255.0f;
     }
     if (arg1 == 0) {
-        p->unk4E = p->unk48;
+        p->fade_value = p->fade_progress;
     } else {
-        p->unk4E = 255.0f - p->unk48;
+        p->fade_value = 255.0f - p->fade_progress;
     }
-    if (p->unk32 >= p->unk38) {
-        p->unk32 = 0;
-        p->unk48 = 0.0f;
+    if (p->fade_frame >= p->step_duration) {
+        p->fade_frame = 0;
+        p->fade_progress = 0.0f;
         if (arg1 == 0) {
-            p->unk4E = 0xFF;
+            p->fade_value = 0xFF;
         } else {
-            p->unk4E = 0;
+            p->fade_value = 0;
         }
         return 0xFF;
     }
@@ -678,27 +678,27 @@ s32 Intro_StepBrightnessFade(s32 idx, s32 arg1) {
     IntroSprite *p = &intro_sprite_slots[idx];
     f32 step;
 
-    if (!(p->unk0.w & 0x80000000)) {
+    if (!(p->flags.w & 0x80000000)) {
         return 0;
     }
-    p->unk32++;
-    step = 255.0f / p->unk38;
-    p->unk48 += step;
-    if (p->unk48 >= 255.0f || p->unk32 >= p->unk38) {
-        p->unk48 = 255.0f;
+    p->fade_frame++;
+    step = 255.0f / p->step_duration;
+    p->fade_progress += step;
+    if (p->fade_progress >= 255.0f || p->fade_frame >= p->step_duration) {
+        p->fade_progress = 255.0f;
     }
     if (arg1 == 0) {
-        p->unk4E = p->unk48;
+        p->fade_value = p->fade_progress;
     } else {
-        p->unk4E = 255.0f - p->unk48;
+        p->fade_value = 255.0f - p->fade_progress;
     }
-    if (p->unk32 >= p->unk38) {
-        p->unk32 = 0;
-        p->unk48 = 0.0f;
+    if (p->fade_frame >= p->step_duration) {
+        p->fade_frame = 0;
+        p->fade_progress = 0.0f;
         if (arg1 == 0) {
-            p->unk4E = 0xFF;
+            p->fade_value = 0xFF;
         } else {
-            p->unk4E = 0;
+            p->fade_value = 0;
         }
         return 0xFF;
     }
@@ -717,67 +717,67 @@ s32 Intro_StepMoveXY(s32 idx, s32 flags) {
     if (!(flags & 0x80000000)) {
         return 0;
     }
-    p->unk24++;
-    step = ((f32) p->unk2A - (f32) p->unk26) / p->unk38;
+    p->move_frame++;
+    step = ((f32) p->move_target_x - (f32) p->move_start_x) / p->step_duration;
     if (step < 0) {
         step = -step;
     }
-    p->unk1C += step;
+    p->move_frac_x += step;
     dir = 2;
-    tx = p->unk1C;
-    step = ((f32) p->unk2C - (f32) p->unk28) / p->unk38;
+    tx = p->move_frac_x;
+    step = ((f32) p->move_target_y - (f32) p->move_start_y) / p->step_duration;
     dx = tx;
     if (step < 0) {
         step = -step;
     }
-    p->unk20 += step;
-    ty = p->unk20;
+    p->move_frac_y += step;
+    ty = p->move_frac_y;
     dy = ty;
-    if (p->unk4 < p->unk2A) {
+    if (p->x < p->move_target_x) {
         dir = 1;
     } else {
         dx = -tx;
     }
-    if (p->unk6 < p->unk2C) {
+    if (p->y < p->move_target_y) {
         dir |= 4;
     } else {
         dy = -ty;
         dir |= 8;
     }
-    p->unk4 += dx;
-    p->unk6 += dy;
-    if (p->unk1C >= 1.0f) {
-        p->unk1C -= tx;
+    p->x += dx;
+    p->y += dy;
+    if (p->move_frac_x >= 1.0f) {
+        p->move_frac_x -= tx;
     }
-    if (p->unk20 >= 1.0f) {
-        p->unk20 -= ty;
+    if (p->move_frac_y >= 1.0f) {
+        p->move_frac_y -= ty;
     }
-    if (p->unk24 >= p->unk38) {
-        p->unk4 = p->unk2A;
-        p->unk6 = p->unk2C;
+    if (p->move_frame >= p->step_duration) {
+        p->x = p->move_target_x;
+        p->y = p->move_target_y;
     }
     if (dir & 1) {
-        if (p->unk4 >= p->unk2A) {
-            p->unk4 = p->unk2A;
+        if (p->x >= p->move_target_x) {
+            p->x = p->move_target_x;
         }
     } else if (dir & 2) {
-        if (p->unk4 <= p->unk2A) {
-            p->unk4 = p->unk2A;
+        if (p->x <= p->move_target_x) {
+            p->x = p->move_target_x;
         }
     }
     if (dir & 4) {
-        if (p->unk6 >= p->unk2C) {
-            p->unk6 = p->unk2C;
+        if (p->y >= p->move_target_y) {
+            p->y = p->move_target_y;
         }
     } else if (dir & 8) {
-        if (p->unk6 <= p->unk2C) {
-            p->unk6 = p->unk2C;
+        if (p->y <= p->move_target_y) {
+            p->y = p->move_target_y;
         }
     }
-    if (p->unk24 >= p->unk38) {
-        p->unk24 = 0;
-        p->unk1C = 0.0f;
-        p->unk20 = 0.0f;
+    if (p->move_frame >= p->step_duration) {
+        p->move_frame = 0;
+        p->move_frac_x = 0.0f;
+        p->move_frac_y = 0.0f;
         return 0xFF;
     }
     return 0;
@@ -786,10 +786,10 @@ s32 Intro_StepMoveXY(s32 idx, s32 flags) {
 void Intro_SetMoveTarget(s32 idx, s32 arg1, s32 arg2) {
     IntroSprite *p = &intro_sprite_slots[idx];
 
-    p->unk2A = arg1;
-    p->unk2C = arg2;
-    p->unk26 = p->unk4;
-    p->unk28 = p->unk6;
+    p->move_target_x = arg1;
+    p->move_target_y = arg2;
+    p->move_start_x = p->x;
+    p->move_start_y = p->y;
 }
 
 s32 Intro_StepMoveX(s32 idx, s32 flags) {
@@ -802,41 +802,41 @@ s32 Intro_StepMoveX(s32 idx, s32 flags) {
     if (!(flags & 0x80000000)) {
         return 0xFF;
     }
-    p->unk24++;
-    step = ((f32) p->unk2A - (f32) p->unk26) / p->unk38;
+    p->move_frame++;
+    step = ((f32) p->move_target_x - (f32) p->move_start_x) / p->step_duration;
     if (step < 0) {
         step = -step;
     }
-    p->unk1C += step;
+    p->move_frac_x += step;
     dir = 2;
-    t = p->unk1C;
+    t = p->move_frac_x;
     d = t;
-    if (p->unk4 < p->unk2A) {
+    if (p->x < p->move_target_x) {
         dir = 1;
     } else {
         dir = 2;
         d = -t;
     }
-    p->unk4 += d;
-    if (p->unk1C >= 1.0f) {
-        p->unk1C -= t;
+    p->x += d;
+    if (p->move_frac_x >= 1.0f) {
+        p->move_frac_x -= t;
     }
-    if (p->unk24 >= p->unk38) {
-        p->unk4 = p->unk2A;
+    if (p->move_frame >= p->step_duration) {
+        p->x = p->move_target_x;
     }
     if (dir & 1) {
-        if (p->unk4 >= p->unk2A) {
-            p->unk4 = p->unk2A;
+        if (p->x >= p->move_target_x) {
+            p->x = p->move_target_x;
         }
     } else if (dir & 2) {
-        if (p->unk4 <= p->unk2A) {
-            p->unk4 = p->unk2A;
+        if (p->x <= p->move_target_x) {
+            p->x = p->move_target_x;
         }
     }
-    if (p->unk24 >= p->unk38) {
-        p->unk24 = 0;
-        p->unk1C = 0.0f;
-        p->unk20 = 0.0f;
+    if (p->move_frame >= p->step_duration) {
+        p->move_frame = 0;
+        p->move_frac_x = 0.0f;
+        p->move_frac_y = 0.0f;
         return 0xFF;
     }
     return 0;
@@ -852,41 +852,41 @@ s32 Intro_StepMoveY(s32 idx, s32 flags) {
     if (!(flags & 0x80000000)) {
         return 0xFF;
     }
-    p->unk24++;
-    step = ((f32) p->unk2C - (f32) p->unk28) / p->unk38;
+    p->move_frame++;
+    step = ((f32) p->move_target_y - (f32) p->move_start_y) / p->step_duration;
     if (step < 0) {
         step = -step;
     }
-    p->unk20 += step;
+    p->move_frac_y += step;
     dir = 8;
-    t = p->unk20;
+    t = p->move_frac_y;
     d = t;
-    if (p->unk6 < p->unk2C) {
+    if (p->y < p->move_target_y) {
         dir = 4;
     } else {
         dir = 8;
         d = -t;
     }
-    p->unk6 += d;
-    if (p->unk20 >= 1.0f) {
-        p->unk20 -= t;
+    p->y += d;
+    if (p->move_frac_y >= 1.0f) {
+        p->move_frac_y -= t;
     }
-    if (p->unk24 >= p->unk38) {
-        p->unk6 = p->unk2C;
+    if (p->move_frame >= p->step_duration) {
+        p->y = p->move_target_y;
     }
     if (dir & 4) {
-        if (p->unk6 >= p->unk2C) {
-            p->unk6 = p->unk2C;
+        if (p->y >= p->move_target_y) {
+            p->y = p->move_target_y;
         }
     } else if (dir & 8) {
-        if (p->unk6 <= p->unk2C) {
-            p->unk6 = p->unk2C;
+        if (p->y <= p->move_target_y) {
+            p->y = p->move_target_y;
         }
     }
-    if (p->unk24 >= p->unk38) {
-        p->unk24 = 0;
-        p->unk1C = 0.0f;
-        p->unk20 = 0.0f;
+    if (p->move_frame >= p->step_duration) {
+        p->move_frame = 0;
+        p->move_frac_x = 0.0f;
+        p->move_frac_y = 0.0f;
         return 0xFF;
     }
     return 0;
@@ -895,15 +895,15 @@ s32 Intro_StepMoveY(s32 idx, s32 flags) {
 s32 Intro_StepWait(s32 idx) {
     IntroSprite *p = &intro_sprite_slots[idx];
 
-    p->unk34++;
-    if (p->unk34 >= p->unk38) {
+    p->wait_frame++;
+    if (p->wait_frame >= p->step_duration) {
         return 0xFF;
     }
     return 0;
 }
 
 void Intro_ResetWait(s32 idx) {
-    intro_sprite_slots[idx].unk34 = 0;
+    intro_sprite_slots[idx].wait_frame = 0;
 }
 
 #ifdef NON_MATCHING
@@ -925,7 +925,7 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
 
     for (i = 0, p = intro_sprite_slots; i < 150; i++, p++) {
         ents[i].idx = i;
-        ents[i].key = p->unk3C;
+        ents[i].key = p->draw_order;
     }
     for (i = 0; i < 149; i++) {
         for (j = 0; j < 149 - i; j++) {
@@ -944,15 +944,15 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
         p = &intro_sprite_slots[idx];
         changed = 0;
         fade = 0;
-        if (p->unk0.w & 0x80000000) {
+        if (p->flags.w & 0x80000000) {
         if (arg0 == 1) {
-            if (!(p->unk0.w & 0x800000)) {
+            if (!(p->flags.w & 0x800000)) {
                 continue;
             }
-        } else if (arg0 == 0 && (p->unk0.w & 0x800000)) {
+        } else if (arg0 == 0 && (p->flags.w & 0x800000)) {
             continue;
         }
-        flags = p->unk0.w;
+        flags = p->flags.w;
         if ((flags & 0x800) && Intro_StepMoveXY(idx, flags)) {
             flags &= ~0x800;
         }
@@ -962,18 +962,18 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
         if ((flags & 0x8000) && Intro_StepMoveY(idx, flags)) {
             flags &= ~0x8000;
         }
-        r.unk0 = p->unk4;
-        r.unk4 = p->unk6;
-        r.unk8 = p->unkC;
-        r.unkC = p->unkE;
-        r.unk10 = p->unk8;
-        r.unk14 = p->unkA;
-        r.unk18 = p->unk8;
-        r.unk1C = p->unkA;
-        r.unk20 = 0x400;
-        r.unk24 = 0x400;
-        r.unk28 = r.unk8 << 5;
-        r.unk2C = r.unkC << 5;
+        r.x = p->x;
+        r.y = p->y;
+        r.s = p->texture_s;
+        r.t = p->texture_t;
+        r.width = p->width;
+        r.height = p->height;
+        r.texture_width = p->width;
+        r.texture_height = p->height;
+        r.dsdx = 0x400;
+        r.dtdy = 0x400;
+        r.sfrac = r.s << 5;
+        r.tfrac = r.t << 5;
         if ((flags & 0x20000000) && Intro_StepClipGrow(idx, flags, &r)) {
             flags &= ~0x20000100;
         }
@@ -1015,97 +1015,97 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
             if (Intro_StepWait(idx)) {
                 flags &= ~0x10000000;
             }
-            p->unk0.w = flags;
+            p->flags.w = flags;
             continue;
         }
-        if (r.unk0 < intro_clip_left && r.unk4 < intro_clip_top && intro_clip_left + intro_clip_width < r.unk0 + r.unk10 &&
-            intro_clip_top + intro_clip_height < r.unk4 + r.unk14) {
-            p->unk0.w = flags;
+        if (r.x < intro_clip_left && r.y < intro_clip_top && intro_clip_left + intro_clip_width < r.x + r.width &&
+            intro_clip_top + intro_clip_height < r.y + r.height) {
+            p->flags.w = flags;
             continue;
         }
-        if (r.unk0 + r.unk10 < intro_clip_left || r.unk4 + r.unk14 < intro_clip_top) {
-            p->unk0.w = flags;
+        if (r.x + r.width < intro_clip_left || r.y + r.height < intro_clip_top) {
+            p->flags.w = flags;
             continue;
         }
-        if (intro_clip_left + intro_clip_width < r.unk0 || intro_clip_top + intro_clip_height < r.unk4) {
-            p->unk0.w = flags;
+        if (intro_clip_left + intro_clip_width < r.x || intro_clip_top + intro_clip_height < r.y) {
+            p->flags.w = flags;
             continue;
         }
         {
-            if (intro_clip_left + intro_clip_width < r.unk0 + r.unk10) {
-                r.unk10 = intro_clip_left + intro_clip_width - r.unk0;
+            if (intro_clip_left + intro_clip_width < r.x + r.width) {
+                r.width = intro_clip_left + intro_clip_width - r.x;
             }
-            if (intro_clip_top + intro_clip_height < r.unk4 + r.unk14) {
-                r.unk14 = intro_clip_top + intro_clip_height - r.unk4;
+            if (intro_clip_top + intro_clip_height < r.y + r.height) {
+                r.height = intro_clip_top + intro_clip_height - r.y;
             }
-            if (r.unk0 < intro_clip_left) {
-                r.unk10 = r.unk10 + r.unk0 - intro_clip_left;
-                r.unk8 = p->unkC;
-                r.unk28 = ((intro_clip_left - r.unk0) << 5) + r.unk28;
-                r.unk0 = intro_clip_left;
+            if (r.x < intro_clip_left) {
+                r.width = r.width + r.x - intro_clip_left;
+                r.s = p->texture_s;
+                r.sfrac = ((intro_clip_left - r.x) << 5) + r.sfrac;
+                r.x = intro_clip_left;
             }
-            if (p->unk6 < intro_clip_top) {
-                r.unk14 = r.unk14 + r.unk4 - intro_clip_top;
-                r.unkC = p->unkE;
-                r.unk2C = ((intro_clip_top - r.unk4) << 5) + r.unk2C;
-                r.unk4 = intro_clip_top;
+            if (p->y < intro_clip_top) {
+                r.height = r.height + r.y - intro_clip_top;
+                r.t = p->texture_t;
+                r.tfrac = ((intro_clip_top - r.y) << 5) + r.tfrac;
+                r.y = intro_clip_top;
             }
             if (fade == 0) {
-                r.unk34 = 0xFF;
-                r.unk30 = 0xFF;
+                r.prim = 0xFF;
+                r.env = 0xFF;
             } else if (fade & 0x30) {
-                r.unk34 = 0xFF;
-                r.unk30 = p->unk4E;
+                r.prim = 0xFF;
+                r.env = p->fade_value;
             } else if (fade & 0xC0) {
-                r.unk34 = p->unk4E;
-                r.unk30 = 0xFF;
+                r.prim = p->fade_value;
+                r.env = 0xFF;
             }
             gDPPipeSync(gfx_dl_head++);
             if ((flags & 0xF0) || changed) {
                 gSPDisplayList(gfx_dl_head++, D_802122E0_ovl_intro);
-                gDPSetEnvColor(gfx_dl_head++, r.unk34, r.unk34, r.unk34, r.unk30);
+                gDPSetEnvColor(gfx_dl_head++, r.prim, r.prim, r.prim, r.env);
             } else {
                 gSPDisplayList(gfx_dl_head++, D_802122C8_ovl_intro);
             }
             gDPPipeSync(gfx_dl_head++);
-            if (p->unk0.w & 0x0C000000) {
+            if (p->flags.w & 0x0C000000) {
                 gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
-                if (p->unk0.w & 0x08000000) {
-                    gDPLoadTLUT_pal256(gfx_dl_head++, p->unk14);
-                    gDPLoadTextureTile(gfx_dl_head++, p->unk18, G_IM_FMT_CI, G_IM_SIZ_8b, p->unk10, 0, r.unk8, r.unkC,
-                                       r.unk8 + r.unk18 - 1, r.unkC + r.unk1C - 1, 0, 0, 0, 0, 0, 0, 0);
-                } else if (p->unk0.w & 0x04000000) {
-                    gDPLoadTLUT_pal16(gfx_dl_head++, 0, p->unk14);
-                    gDPLoadTextureTile_4b(gfx_dl_head++, p->unk18, G_IM_FMT_CI, p->unk10, 0, r.unk8, r.unkC,
-                                          r.unk8 + r.unk18 - 1, r.unkC + r.unk1C - 1, 0, 0, 0, 0, 0, 0, 0);
+                if (p->flags.w & 0x08000000) {
+                    gDPLoadTLUT_pal256(gfx_dl_head++, p->palette_addr);
+                    gDPLoadTextureTile(gfx_dl_head++, p->texture_addr, G_IM_FMT_CI, G_IM_SIZ_8b, p->texture_width, 0, r.s, r.t,
+                                       r.s + r.texture_width - 1, r.t + r.texture_height - 1, 0, 0, 0, 0, 0, 0, 0);
+                } else if (p->flags.w & 0x04000000) {
+                    gDPLoadTLUT_pal16(gfx_dl_head++, 0, p->palette_addr);
+                    gDPLoadTextureTile_4b(gfx_dl_head++, p->texture_addr, G_IM_FMT_CI, p->texture_width, 0, r.s, r.t,
+                                          r.s + r.texture_width - 1, r.t + r.texture_height - 1, 0, 0, 0, 0, 0, 0, 0);
                 }
             } else {
                 gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
-                gDPLoadTextureTile(gfx_dl_head++, p->unk18, G_IM_FMT_RGBA, G_IM_SIZ_16b, p->unk10, 0, r.unk8, r.unkC,
-                                   r.unk8 + r.unk18 - 1, r.unkC + r.unk1C - 1, 0, 0, 0, 0, 0, 0, 0);
+                gDPLoadTextureTile(gfx_dl_head++, p->texture_addr, G_IM_FMT_RGBA, G_IM_SIZ_16b, p->texture_width, 0, r.s, r.t,
+                                   r.s + r.texture_width - 1, r.t + r.texture_height - 1, 0, 0, 0, 0, 0, 0, 0);
             }
-            if (p->unk0.w & 0x60000) {
-                if (p->unk0.w & 0x20000) {
-                    r.unk20 = -0x400;
-                    GFX_TEXRECT_STEPS(gfx_dl_head++, r.unk0 << 2, r.unk4 << 2, (r.unk0 + r.unk10) << 2,
-                                        (r.unk4 + r.unk14) << 2, G_TX_RENDERTILE, (r.unk8 + r.unk18 - 1) << 5, r.unk2C,
-                                        r.unk20, r.unk24);
+            if (p->flags.w & 0x60000) {
+                if (p->flags.w & 0x20000) {
+                    r.dsdx = -0x400;
+                    GFX_TEXRECT_STEPS(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
+                                        (r.y + r.height) << 2, G_TX_RENDERTILE, (r.s + r.texture_width - 1) << 5, r.tfrac,
+                                        r.dsdx, r.dtdy);
                 }
-                if (p->unk0.w & 0x40000) {
-                    r.unk24 = -0x400;
-                    GFX_TEXRECT_STEPS(gfx_dl_head++, r.unk0 << 2, r.unk4 << 2, (r.unk0 + r.unk10) << 2,
-                                        (r.unk4 + r.unk14) << 2, G_TX_RENDERTILE, r.unk28, (r.unkC + r.unk1C - 1) << 5,
-                                        r.unk20, r.unk24);
+                if (p->flags.w & 0x40000) {
+                    r.dtdy = -0x400;
+                    GFX_TEXRECT_STEPS(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
+                                        (r.y + r.height) << 2, G_TX_RENDERTILE, r.sfrac, (r.t + r.texture_height - 1) << 5,
+                                        r.dsdx, r.dtdy);
                 }
             } else {
-                gSPTextureRectangle(gfx_dl_head++, r.unk0 << 2, r.unk4 << 2, (r.unk0 + r.unk10) << 2,
-                                    (r.unk4 + r.unk14) << 2, G_TX_RENDERTILE, r.unk28, r.unk2C, r.unk20, r.unk24);
+                gSPTextureRectangle(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
+                                    (r.y + r.height) << 2, G_TX_RENDERTILE, r.sfrac, r.tfrac, r.dsdx, r.dtdy);
             }
             if (changed) {
-                p->unk4E = 0xFF;
+                p->fade_value = 0xFF;
             }
         }
-        p->unk0.w = flags;
+        p->flags.w = flags;
         }
     }
 }

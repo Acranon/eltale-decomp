@@ -898,7 +898,7 @@ void Player_StateOpenChest(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
 void Player_StateUseItem(Actor *arg0, Player *arg1, PlayerAnimTable *arg2) {
     if (--arg1->unk4 == 0) {
         Item_ApplyEffect(arg1->unk11C, arg0);
-        if (D_803AAAA0[arg1->unk11C].unk2 == 2) {
+        if (D_803AAAA0[arg1->unk11C].handler_index == 2) {
             Player_AddTurnMoveAgilityXP(arg1);
             arg1->unk2 = 0;
             Battle_EndTurn(arg0);

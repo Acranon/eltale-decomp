@@ -151,13 +151,13 @@ s32 Item_TryUse(u8 arg0) {
     s32 ret = 0;
     ItemDef* item = &D_803AAAA0[arg0];
 
-    if ((battle_flags & 1) && (item->unk0 & 2)) {
+    if ((battle_flags & 1) && (item->use_flags & 2)) {
         ret = 1;
-    } else if (!(battle_flags & 1) && (item->unk0 & 1)) {
+    } else if (!(battle_flags & 1) && (item->use_flags & 1)) {
         ret = 1;
     }
     if (ret) {
-        ret = item_can_use_handlers[item->unk2](&player_state.actor, item, arg0);
+        ret = item_can_use_handlers[item->handler_index](&player_state.actor, item, arg0);
     }
     if (ret) {
         Player_StartUseItem(arg0);
@@ -166,7 +166,7 @@ s32 Item_TryUse(u8 arg0) {
 }
 
 void Item_ApplyEffect(u8 arg0, void* arg1) {
-    item_use_handlers[D_803AAAA0[arg0].unk2](arg1, &D_803AAAA0[arg0], arg0);
+    item_use_handlers[D_803AAAA0[arg0].handler_index](arg1, &D_803AAAA0[arg0], arg0);
 }
 
 s32 func_80025228(u16 arg0) {
@@ -177,7 +177,7 @@ s32 func_80025228(u16 arg0) {
 
     while (!found && *p != 0xFF) {
         e = &D_803AAAA0[*p++];
-        if (e->unk2 == 0xF) {
+        if (e->handler_index == 0xF) {
             found = (arg0 == e->unk4);
         }
         i--;
@@ -420,7 +420,7 @@ s32 Item_CanUseWarp(s32 arg0, ItemDef* arg1) {
 s32 Item_CanUseSpell(s32 arg0, ItemDef* arg1) {
     s32 ret = 1;
 
-    if ((battle_flags & 0x100) && (arg1->unk0 & 8)) {
+    if ((battle_flags & 0x100) && (arg1->use_flags & 8)) {
         ret = 0;
     }
     return ret;

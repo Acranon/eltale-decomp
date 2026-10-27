@@ -567,20 +567,20 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 Menu_DrawSprite(0x44, 0xD9, 0x35, 0x1C, 0xE);
                 colors[0] = 0x48;
             }
-            Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].unk0.unk24[0], 0xA);
-            Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].unk0.unk24[1], 0xA);
-            Menu_DrawNumber(2, 0xAF, 0x6C, save_menu_save_headers[idx].unk0.unk24[2], 0xA);
-            Menu_DrawNumber(2, 0xD4, 0x6C, save_menu_save_headers[idx].unk0.unk24[3], 0xA);
-            switch (save_menu_save_headers[idx].unk3C) {
+            Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].player_stats.unk24[0], 0xA);
+            Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].player_stats.unk24[1], 0xA);
+            Menu_DrawNumber(2, 0xAF, 0x6C, save_menu_save_headers[idx].player_stats.unk24[2], 0xA);
+            Menu_DrawNumber(2, 0xD4, 0x6C, save_menu_save_headers[idx].player_stats.unk24[3], 0xA);
+            switch (save_menu_save_headers[idx].map_id) {
                 case 15:
-                    if (save_menu_save_headers[idx].unk40 == 5) {
+                    if (save_menu_save_headers[idx].subarea == 5) {
                         n = 0;
                     } else {
                         n = 0x10;
                     }
                     break;
                 case 16:
-                    if (save_menu_save_headers[idx].unk40 == 7) {
+                    if (save_menu_save_headers[idx].subarea == 7) {
                         n = 1;
                     } else {
                         n = 2;
@@ -590,7 +590,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     n = 4;
                     break;
                 case 18:
-                    if (save_menu_save_headers[idx].unk40 == 6) {
+                    if (save_menu_save_headers[idx].subarea == 6) {
                         n = 3;
                     } else {
                         n = 5;
@@ -600,14 +600,14 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     n = 6;
                     break;
                 case 22:
-                    if (save_menu_save_headers[idx].unk40 == 0x16) {
+                    if (save_menu_save_headers[idx].subarea == 0x16) {
                         n = 7;
                     } else {
                         n = 8;
                     }
                     break;
                 case 23:
-                    switch (save_menu_save_headers[idx].unk40) {
+                    switch (save_menu_save_headers[idx].subarea) {
                         case 0:
                             n = 9;
                             break;
@@ -635,16 +635,16 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
             Text_DrawEncodedString(0x51, 0x48, save_menu_slot_map_labels[n]);
             SaveMenu_SetTextDrawState();
             n = 0;
-            secs = save_menu_save_headers[idx].unk38;
+            secs = save_menu_save_headers[idx].play_time;
             while (secs >= 60) {
                 secs -= 60;
                 n++;
             }
             Menu_DrawNumber(3, 0x7E, 0x36, n, colors[0]);
             Menu_DrawNumberZeroPad(2, 0x9A, 0x36, secs, colors[0]);
-            Menu_DrawNumber(3, 0xC0, 0x36, save_menu_save_headers[idx].unk3A, colors[0]);
-            Menu_PrintNumber(3, 0x70, 0x58, save_menu_save_headers[idx].unk0.unk4);
-            Menu_PrintNumber(3, 0xC0, 0x58, save_menu_save_headers[idx].unk0.unk8);
+            Menu_DrawNumber(3, 0xC0, 0x36, save_menu_save_headers[idx].day_count, colors[0]);
+            Menu_PrintNumber(3, 0x70, 0x58, save_menu_save_headers[idx].player_stats.unk4);
+            Menu_PrintNumber(3, 0xC0, 0x58, save_menu_save_headers[idx].player_stats.unk8);
         }
     } else {
         flag = 1;
@@ -669,20 +669,20 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     Menu_DrawSprite(0x44, 0xD9, 0x82, 0x1C, 0xE);
                     colors[0] = 0x48;
                 }
-                Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].unk0.unk24[0], 0xA);
-                Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].unk0.unk24[1], 0xA);
-                Menu_DrawNumber(2, 0xAF, 0xBA, save_menu_save_headers[idx].unk0.unk24[2], 0xA);
-                Menu_DrawNumber(2, 0xD4, 0xBA, save_menu_save_headers[idx].unk0.unk24[3], 0xA);
-                switch (save_menu_save_headers[idx].unk3C) {
+                Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].player_stats.unk24[0], 0xA);
+                Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].player_stats.unk24[1], 0xA);
+                Menu_DrawNumber(2, 0xAF, 0xBA, save_menu_save_headers[idx].player_stats.unk24[2], 0xA);
+                Menu_DrawNumber(2, 0xD4, 0xBA, save_menu_save_headers[idx].player_stats.unk24[3], 0xA);
+                switch (save_menu_save_headers[idx].map_id) {
                     case 15:
-                        if (save_menu_save_headers[idx].unk40 == 5) {
+                        if (save_menu_save_headers[idx].subarea == 5) {
                             n = 0;
                         } else {
                             n = 0x10;
                         }
                         break;
                     case 16:
-                        if (save_menu_save_headers[idx].unk40 == 7) {
+                        if (save_menu_save_headers[idx].subarea == 7) {
                             n = 1;
                         } else {
                             n = 2;
@@ -692,7 +692,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                         n = 4;
                         break;
                     case 18:
-                        if (save_menu_save_headers[idx].unk40 == 6) {
+                        if (save_menu_save_headers[idx].subarea == 6) {
                             n = 3;
                         } else {
                             n = 5;
@@ -702,14 +702,14 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                         n = 6;
                         break;
                     case 22:
-                        if (save_menu_save_headers[idx].unk40 == 0x16) {
+                        if (save_menu_save_headers[idx].subarea == 0x16) {
                             n = 7;
                         } else {
                             n = 8;
                         }
                         break;
                     case 23:
-                        switch (save_menu_save_headers[idx].unk40) {
+                        switch (save_menu_save_headers[idx].subarea) {
                             case 0:
                                 n = 9;
                                 break;
@@ -737,16 +737,16 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 Text_DrawEncodedString(0x51, 0x96, save_menu_slot_map_labels[n]);
                 SaveMenu_SetTextDrawState();
                 n = 0;
-                secs = save_menu_save_headers[idx].unk38;
+                secs = save_menu_save_headers[idx].play_time;
                 while (secs >= 60) {
                     secs -= 60;
                     n++;
                 }
                 Menu_DrawNumber(3, 0x7E, 0x83, n, colors[0]);
                 Menu_DrawNumberZeroPad(2, 0x9A, 0x83, secs, colors[0]);
-                Menu_DrawNumber(3, 0xC0, 0x83, save_menu_save_headers[idx].unk3A, colors[0]);
-                Menu_PrintNumber(3, 0x70, 0xA6, save_menu_save_headers[idx].unk0.unk4);
-                Menu_PrintNumber(3, 0xC0, 0xA6, save_menu_save_headers[idx].unk0.unk8);
+                Menu_DrawNumber(3, 0xC0, 0x83, save_menu_save_headers[idx].day_count, colors[0]);
+                Menu_PrintNumber(3, 0x70, 0xA6, save_menu_save_headers[idx].player_stats.unk4);
+                Menu_PrintNumber(3, 0xC0, 0xA6, save_menu_save_headers[idx].player_stats.unk8);
             }
         } else {
             Text_DrawEncodedString(0x82, 0x7F, buf.b);
@@ -1152,41 +1152,41 @@ void SaveMenu_CaptureGameState(s32 arg0) {
     u8 *s;
     s32 n;
 
-    e->unk0 = player_stats;
-    e->unk38 = env_play_time;
-    e->unk3A = env_day_count;
-    e->unk3C = map_id;
-    e->unk40 = map_subarea;
-    e->unk44 = map_flag4_return_map;
-    e->unk48 = map_flag4_return_subarea;
-    e->unk4C = map_flag4_return_entry;
-    e->unk50 = map_flag8_return_map;
-    e->unk54 = map_flag8_return_subarea;
-    e->unk58 = map_flag8_return_entry;
-    e->unk5C = player_respawn_map;
-    e->unk5E = player_respawn_subarea;
-    e->unk60 = player_respawn_entry;
-    e->unk62 = menu_text_delay_option;
-    e->unk63 = menu_bgm_volume_option;
+    e->player_stats = player_stats;
+    e->play_time = env_play_time;
+    e->day_count = env_day_count;
+    e->map_id = map_id;
+    e->subarea = map_subarea;
+    e->flag4_return_map = map_flag4_return_map;
+    e->flag4_return_subarea = map_flag4_return_subarea;
+    e->flag4_return_entry = map_flag4_return_entry;
+    e->flag8_return_map = map_flag8_return_map;
+    e->flag8_return_subarea = map_flag8_return_subarea;
+    e->flag8_return_entry = map_flag8_return_entry;
+    e->respawn_map = player_respawn_map;
+    e->respawn_subarea = player_respawn_subarea;
+    e->respawn_entry = player_respawn_entry;
+    e->text_delay_option = menu_text_delay_option;
+    e->bgm_volume_option = menu_bgm_volume_option;
     if (core_flags & 0x20000) {
         e->unk64 = 1;
     } else {
         e->unk64 = 0;
     }
-    d = save_menu_game_state_block.unk0.b;
-    for (s = chest_opened_flags, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
+    d = save_menu_game_state_block.opened_chests.b;
+    for (s = chest_opened_flags, n = sizeof(save_menu_game_state_block.opened_chests); n != 0; n--) {
         *d++ = *s++;
     }
-    d = save_menu_game_state_block.unk20.b;
-    for (s = spirit_collected_flags, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
+    d = save_menu_game_state_block.collected_spirits.b;
+    for (s = spirit_collected_flags, n = sizeof(save_menu_game_state_block.collected_spirits); n != 0; n--) {
         *d++ = *s++;
     }
-    d = save_menu_game_state_block.unk30.b;
-    for (s = item_inventory, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
+    d = save_menu_game_state_block.inventory.b;
+    for (s = item_inventory, n = sizeof(save_menu_game_state_block.inventory); n != 0; n--) {
         *d++ = *s++;
     }
-    d = save_menu_game_state_block.unkC7.b;
-    for (s = boss_defeated_bits, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
+    d = save_menu_game_state_block.defeated_bosses.b;
+    for (s = boss_defeated_bits, n = sizeof(save_menu_game_state_block.defeated_bosses); n != 0; n--) {
         *d++ = *s++;
     }
 }
@@ -1197,38 +1197,38 @@ void SaveMenu_RestoreGameState(s32 arg0) {
     u8 *s;
     s32 n;
 
-    player_stats = e->unk0;
-    env_play_time = e->unk38;
-    env_day_count = e->unk3A;
-    map_id = e->unk3C;
-    map_subarea = e->unk40;
-    map_flag4_return_map = e->unk44;
-    map_flag4_return_subarea = e->unk48;
-    map_flag4_return_entry = e->unk4C;
-    map_flag8_return_map = e->unk50;
-    map_flag8_return_subarea = e->unk54;
-    map_flag8_return_entry = e->unk58;
-    player_respawn_map = e->unk5C;
-    player_respawn_subarea = e->unk5E;
-    player_respawn_entry = e->unk60;
-    menu_text_delay_option = e->unk62;
-    menu_bgm_volume_option = e->unk63;
+    player_stats = e->player_stats;
+    env_play_time = e->play_time;
+    env_day_count = e->day_count;
+    map_id = e->map_id;
+    map_subarea = e->subarea;
+    map_flag4_return_map = e->flag4_return_map;
+    map_flag4_return_subarea = e->flag4_return_subarea;
+    map_flag4_return_entry = e->flag4_return_entry;
+    map_flag8_return_map = e->flag8_return_map;
+    map_flag8_return_subarea = e->flag8_return_subarea;
+    map_flag8_return_entry = e->flag8_return_entry;
+    player_respawn_map = e->respawn_map;
+    player_respawn_subarea = e->respawn_subarea;
+    player_respawn_entry = e->respawn_entry;
+    menu_text_delay_option = e->text_delay_option;
+    menu_bgm_volume_option = e->bgm_volume_option;
     if (e->unk64 != 0) {
         core_flags |= 0x20000;
     }
-    for (s = save_menu_game_state_block.unk0.b, d = chest_opened_flags, n = sizeof(save_menu_game_state_block.unk0); n != 0; n--) {
+    for (s = save_menu_game_state_block.opened_chests.b, d = chest_opened_flags, n = sizeof(save_menu_game_state_block.opened_chests); n != 0; n--) {
         *d++ = *s++;
     }
-    s = save_menu_game_state_block.unk20.b;
-    for (d = spirit_collected_flags, n = sizeof(save_menu_game_state_block.unk20); n != 0; n--) {
+    s = save_menu_game_state_block.collected_spirits.b;
+    for (d = spirit_collected_flags, n = sizeof(save_menu_game_state_block.collected_spirits); n != 0; n--) {
         *d++ = *s++;
     }
-    s = save_menu_game_state_block.unk30.b;
-    for (d = item_inventory, n = sizeof(save_menu_game_state_block.unk30); n != 0; n--) {
+    s = save_menu_game_state_block.inventory.b;
+    for (d = item_inventory, n = sizeof(save_menu_game_state_block.inventory); n != 0; n--) {
         *d++ = *s++;
     }
-    s = save_menu_game_state_block.unkC7.b;
-    for (d = boss_defeated_bits, n = sizeof(save_menu_game_state_block.unkC7); n != 0; n--) {
+    s = save_menu_game_state_block.defeated_bosses.b;
+    for (d = boss_defeated_bits, n = sizeof(save_menu_game_state_block.defeated_bosses); n != 0; n--) {
         *d++ = *s++;
     }
 }

@@ -4,10 +4,10 @@
 #include "common.h"
 
 typedef struct TitleFade {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 unk2;
-    /* 0x04 */ f32 unk4;
-    /* 0x08 */ f32 unk8;
+    /* 0x00 */ u16 active;
+    /* 0x02 */ u16 remaining_frames;
+    /* 0x04 */ f32 alpha_step;
+    /* 0x08 */ f32 alpha;
 } TitleFade; /* 0xC bytes */
 
 extern s32 D_8020F200_ovl_title;
