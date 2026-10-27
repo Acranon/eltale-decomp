@@ -7,12 +7,12 @@
 typedef struct IntroSpriteFlags {
     /* 0x00 */ s32 active : 1;
     /* 0x00 */ u32 flags : 31;
-} IntroSpriteFlags;
+} IntroSpriteFlags; /* 0x4 bytes */
 
 typedef union IntroSpriteFlagWord {
-    IntroSpriteFlags b;
-    s32 w;
-} IntroSpriteFlagWord;
+    /* 0x00 */ IntroSpriteFlags b;
+    /* 0x00 */ s32 w;
+} IntroSpriteFlagWord; /* 0x4 bytes */
 
 typedef struct IntroSprite {
     /* 0x00 */ IntroSpriteFlagWord unk0;
