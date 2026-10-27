@@ -324,7 +324,7 @@ f32 D_8007A988;
 f32 D_8007A98C;
 f32 D_8007A990;
 f32 D_8007A994;
-s32 D_8007A998;
+s32 D_8007A998; /* bit 3: start in state 3; bits 8-10: entry kind (Player_Spawn) */
 s32 D_8007A99C;
 f32 D_8007A9A0;
 f32 D_8007A9A4;

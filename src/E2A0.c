@@ -86,7 +86,7 @@ s32 D_800842D8;
 s32 D_800842DC;
 s32 D_800842E0;
 s32 D_800842E4;
-u16 D_800842E8;
+u16 D_800842E8; /* bit 0: enemy area (enemy set, random encounters, no NPCs) */
 
 typedef struct {
     /* 0x00 */ u16 alpha;
@@ -264,7 +264,7 @@ typedef struct {
  * D_80081CE4, D_80081FEC, D_80081FF8 and D_8008201C are
  * unreferenced. Splat's labels inside D_80081AB0 (D_80081B78..D_80081C42) and
  * D_80081CE8 (D_80081D00..D_80081D30) are aliases in undefined_syms.txt. */
-u16 D_8007C280;
+u16 D_8007C280; /* bit 0: own light cycle, bit 1: world clock time (Env_*) */
 u16 D_8007C282;
 Unk8007C284 *D_8007C284;
 Unk8007C288 *D_8007C288;

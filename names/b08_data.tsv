@@ -1,0 +1,118 @@
+# D3 round 3: data names for b08 (AEA0, DAE0, E2A0). old<TAB>new<TAB>evidence. Rules: ~/eltale-notes/D3_NAMING.md
+# Left D_ (AEA0): D_8007B904, D_8007C09C, D_8007C0A0 (unreferenced).
+# Left D_ (DAE0): D_8007C0C8, D_8007C144, D_8007C274, D_8007C278 (unreferenced).
+# Left D_ (E2A0): D_8004DD70 and D_8007C2A0 (counters only incremented/reset, never read), D_800842CC (written by
+#   Map_LoadArea with the old map id, never read), D_8004DD84, D_80081CE4, D_80081FEC, D_80081FF8, D_8008201C,
+#   D_80082030 (unreferenced), D_80081AB0 and D_8004DEC8 (a u16[256] table loaded from ROM D_D86770 that Map_LoadArea
+#   mirrors and the unnamed func_80010768 rotates each frame while D_8004DEC8 >= 0; no reader of the table is visible,
+#   no display list loads it), rodata D_8006F030..D_8006F040 (literals).
+# --- AEA0: battle enemies
+D_8004DD20	enemy_state_handlers	6 function pointers {Enemy_StateIdle, Approach, Hurt, FacePlayer, MeleeAttack, CastSpell}; Enemy_UpdateAll calls D_8004DD20[e->type](obj, e, anims)
+D_8004DD38	enemy_element_bits	{1,2,4,8,0x10}: Enemy_TakeDamage ORs D_8004DD38[def +0x26] with D_8004DD38[elem] (the attack's element) and halves the damage on a single bit (same element), adds 1/4 on 5 or 10; def +0x26 is the element whose icon Hud_DrawEnemyInfoPanel draws
+D_8007B900	enemy_count	number of live enemies in enemy_slots: zeroed by Enemy_InitForArea/RemoveAll, raised by Battle_SpawnEncounterGroup, decremented on each death (Enemy_StateHurt, magic removal); loop count of Enemy_UpdateAll/DrawAll, Magic target searches, Hud_Draw
+D_8007B908	enemy_slots	the 6 Enemy records (0x130 bytes: state, HP at +0xA, def at +0x28, object at +0x2C); Enemy_Spawn fills one, Enemy_UpdateAll/DrawAll run them, Battle_* and Magic_* index them by slot
+D_8007C028	enemy_turn_current	Enemy_StateIdle stores the enemy whose turn just started (flags & 1 from Enemy_StartTurn); Hud_DrawEnemyInfoPanel shows its name (enemy_names[def +2]) and def numbers
+D_8007C02C	enemy_drawn_count	Enemy_DrawAll: number of enemies drawn this frame; count of enemy_drawn_list for Enemy_ResolveCollisions and Player_PushOutOfObjects
+D_8007C030	enemy_drawn_list	6 object pointers filled by Enemy_DrawAll with the enemies it drew; Enemy_ResolveCollisions and Player_PushOutOfObjects push against them
+D_8007C048	enemy_anim_tables	per model id the animation table (anims = D_8007C048[obj->unk50]) for Enemy_UpdateAll/DrawAll/GetAnimStep/TakeDamage; set from the area set (+8) by Enemy_LoadAreaSet, swapped to the boss table D_803ABA58 by Battle_StartBossEncounter and back afterwards
+D_8007C04C	enemy_names	table of glyph strings: Hud_DrawEnemyInfoPanel draws D_8007C04C[def +2] with Hud_DrawGlyphString; set from the area set (+0x10) by Enemy_LoadAreaSet, swapped to D_803AC3F8 for a boss battle
+D_8007C050	enemy_turn_order	6 slot indices: Enemy_SortTurnOrder sorts them by def +0xC, descending; the battle turn index D_8008BE58 selects enemy_slots[D_8007C050[i]] (Enemy_StartTurn, Battle_EndTurn, Battle_UpdateTurnTransition)
+D_8007C05C	enemy_area_set	Enemy_LoadAreaSet: &D_800561A0[area def +0x12]; its ROM range is DMA'd to D_8020E6F0, its +8/+0x10 give enemy_anim_tables/enemy_names, Enemy_Spawn takes the def from its +0xC list
+D_8007C060	enemy_script_time	attack-script frame counter: zeroed by Enemy_StartAttackScript; Enemy_RunAttackScript pre-increments it and runs the current command once it passes the command's time (+0)
+D_8007C064	enemy_script_cmd	current attack-script command (0x18-byte records): set to D_800566C8[id] by Enemy_StartAttackScript, advanced by Enemy_RunAttackScript, NULL at a command with flag 1 or by Enemy_ClearAttackScript
+D_8007C068	enemy_script_enemy	the attacking Enemy passed to Enemy_StartAttackScript (from Enemy_StartAttack); Enemy_RunAttackScript reads its attack (+0x1C) flags to pick the effect size
+D_8007C06C	enemy_script_obj	object the attack script works from: set to &enemy_slots[0].obj by Enemy_StartAttackScript; Enemy_RunAttackScript places and turns the effects by its position and angle
+D_8007C070	enemy_tmp_vec	scratch Vec3f: Enemy_GetAnimStep output passed straight to Enemy_Move, Math_RotateVec2 offsets in Enemy_StateApproach/MeleeAttack/RunAttackScript, the size argument of Magic_CreateVisualEffect
+D_8007C080	enemy_coll	out record of Enemy_Spawn's and Enemy_Move's Coll_ResolveFloorAndWalls calls (x/y/z, floor normal, flags 0x8000 = no floor), copied into the enemy object
+# --- DAE0: bosses
+D_8004DD50	boss_reward_max_hp	Boss_HandleDefeat (bosses 0-6): player_stats +6 (max HP) += D_8004DD50[boss], capped at 500, and HP refilled
+D_8004DD60	boss_reward_max_mp	Boss_HandleDefeat: player_stats +0xA (max MP) += D_8004DD60[boss], capped at 500, and MP refilled
+D_8007C0B0	boss_spawn_coll	out record of Boss_Spawn's Coll_ResolveFloorAndWalls (0xA00): position and floor normal copied into the boss object
+D_8007C0D0	boss_camera_target	Boss_BeginEncounter copies the field boss's object (boss_field_record +0x2C) here (fixed position for boss 7) and passes it to Camera_SetTargetView
+D_8007C13C	boss_defeated_bits	defeated-boss bitfield: Boss_IsDefeated tests bit D_8004F770[i & 7] of byte i >> 3, Boss_SetDefeated sets it, Boss_ClearDefeated clears it; saved/restored by SaveMenu_Capture/RestoreGameState
+D_8007C140	boss_field_index	boss index + 1 of the undefeated boss standing in the current area (0 = none): set by Boss_LoadForArea; Boss_Draw and Boss_CheckPlayerNear test it, Battle_StartBossEncounter spawns that boss and clears it
+D_8007C148	boss_field_record	the Enemy-style record (object at +0x2C) of the field boss: Boss_LoadForArea fills it with Boss_Spawn, Boss_Draw draws it, Boss_CheckPlayerNear measures the player's distance to it
+# --- E2A0: field map
+D_8004DD74	mapobj_wave_phase_step	read as 4 u16 pairs: MapObj_UpdateAndDrawNearby adds them each frame to mapobj_wave_phase
+D_8004DD88	mapobj_ambient_sfx	per ambient type (object flags bits 8-11) the sound id: MapObj_UpdateAndDrawNearby plays Sfx_PlayIfAudible(D_8004DD88[mapobj_ambient_type], volume by distance)
+D_8004DD98	mapobj_wave_base_init	zero record: Map_LoadArea copies it into all 32 mapobj_wave_base slots
+D_8004DDB0	mapobj_scrolltex_offset	MapObj_DrawTranslucent: texture t offset (% 256) of the tile set for kind 0x40-0x45 objects; += 2 each frame
+D_8004DDB4	mapobj_scrolltex_tex	5 texture addresses: MapObj_DrawTranslucent loads D_8004DDB4[kind - 0x40] (RGBA16, 32 wide) for the scrolling-texture objects
+D_8004DDC8	mapobj_scrolltex_height	heights (0x40/0x20) of the mapobj_scrolltex_tex textures, used for the tile load and the scrolled tile size
+D_8004DDD4	mapobj_wave_x_div	per wave kind (1-3) divisor: MapObj_CollectCell sets x = base x + sins(phase a + 0xA000) / D_8004DDD4[kind]
+D_8004DDE4	mapobj_wave_y_div	y counterpart: y = base y + sins(phase b) / D_8004DDE4[kind]
+D_8004DDF4	mapobj_wave_z_div	z counterpart: z = base z + sins(phase a + 0x2000) / D_8004DDF4[kind]
+D_8004DE04	mapobj_arc_sprite_tmpl	function-static SpriteObj of MapObj_EmitArcSprite (step callback MapObj_StepArcSprite): filled with the object's position, size and rotated velocity, then Effect_AllocateSprite(&it)
+D_8004DE44	mapobj_drop_sprite_tmpl	function-static SpriteObj of MapObj_EmitDropSprite (step callback MapObj_StepDropSprite): position and size from the object, then Effect_AllocateSprite(&it)
+D_8004DE84	mapobj_animtex_width	{0x10, 0x10}: texture width per anim-texture type (0x11/0x12) in MapObj_DrawAnimTexBillboards' gDPLoadTextureBlock
+D_8004DE88	mapobj_animtex_alpha	4 env alphas: MapObj_DrawAnimTexBillboards sets env alpha D_8004DE88[timer & 3]
+D_8004DE8C	map_clock_tlut_id	function-static of Map_BlendPaletteByClock: id of the map_clock_tlut_srcs palette for the current clock D_80084980, from map_clock_tlut_schedule
+D_8004DE90	map_clock_blend_left	function-static of Map_BlendPaletteByClock: blend steps left (set to the schedule entry's +4 on a palette change, decremented per frame while non-zero)
+D_8004DE94	map_clock_tlut_prev_id	function-static of Map_BlendPaletteByClock: last frame's map_clock_tlut_id; a change starts a blend from it to the new id
+D_8004DE98	map_clock_tlut_schedule	{start time, blend frames, palette id} records ending at id 0xFF: Map_BlendPaletteByClock picks the one whose [start, next start) holds D_80084980
+D_8007C280	map_env_flags	Map_LoadArea: the area's env record (D_80084994) +0x18; bit 0 tested by Env_Update/Env_ComputeLightDirs (own cycle time), bit 1 by Env_InitForMap (world clock), bit 2 by Gfx_BuildFrameDisplayList
+D_8007C282	map_backdrop_id	index into D_80060C48 of the loaded backdrop: Map_LoadArea DMAs that entry's ROM data (0x800 to map_backdrop_phase_tluts, 0x4000 to map_backdrop_tex) only when env record +0x1C differs; Map_DrawBackdrop draws D_80060C48[same id].dl; reset to 0xFFFF by Core_ResetGameState
+D_8007C284	map_def	&D_80056BB0[map_next_id] (Map_LoadArea): the map record (flags, ROM block, models, area list, walls, camera presets, NPC list, encounter tables) used by Map_LoadArea, Camera_InitForMap, Npc_InitArea, Battle_ResetState, MapObj_DrawBillboards
+D_8007C288	map_area_def	Map_LoadArea: &map_def->areas(+0x18)[map_area]; its +0 grid index, +2 env record, +0xC entries, +0x12 enemy/NPC set index, +0x14 map_area_flags, exit list for Exit_CheckEnter
+D_8007C28C	map_area_grid	Map_LoadArea: the area's grid record (map_def +0x14 [area +0]): cell size/origin and per-cell lists of floor triangles (Coll_ResolveFloorAndWalls) and map objects (MapObj_UpdateAndDrawNearby)
+D_8007C290	map_objs	the area's map-object array (map_area_grid +0x18): Map_LoadArea initialises it, MapObj_CollectCell sorts its entries into the draw lists, Player_Spawn/StartAreaExit and Coll_TestObjectFloor index it
+D_8007C294	map_obj_models	map_def +0x10: model records (0x20 bytes, display list at +0x10) indexed by a map object's model field; gSPDisplayList'd by the MapObj_Draw* functions, mesh for Coll_TestObjectFloor
+D_8007C298	map_actor_walls	map_def +0x2C: per-area wall sets that Coll_ResolveFloorAndWalls pushes out of with flags bit 0 (0xA01: player, NPC and enemy moves)
+D_8007C29C	map_camera_walls	map_def +0x28: per-area wall sets used with flags bit 1 (0x602: the camera eye, Camera_Update)
+D_8007C2A4	mapobj_billboard_count	number of kind-0x10 objects collected this frame (MapObj_CollectCell; zeroed per frame and by Map_LoadArea): count of mapobj_billboard_list for Player/Npc_PushOutOfObjects and Enemy_ResolveCollisions
+D_8007C2A8	mapobj_billboard_list	pointers to this frame's kind-0x10 objects (filled through mapobj_billboard_cursor), drawn by MapObj_DrawBillboards and pushed against by the actors (radius from +0x10)
+D_8007C6A8	mapobj_spinner_prev_count	number of spinner records in the last-drawn buffer: MapObj_DrawSpinners sets it from mapobj_spinner_count; MapObj_QueueSpinner searches that many records of the other buffer to keep an object's spin angle
+D_8007C6AC	mapobj_spinner_count	spinners queued this frame (max 8): zeroed by Map_StartFrame, incremented by MapObj_QueueSpinner (kind 0x82 objects)
+D_8007C6B0	map_backdrop_tex	0x4000 bytes DMA'd from the backdrop's ROM data (+0x800) by Map_LoadArea; the backdrop display lists (D_80060C48[].dl) load their texture from 0x8007C6B0 (G_SETTIMG in ROM at 0x73034, 0x74004, 0x750F4)
+D_800806B0	map_backdrop_tlut	live 256-entry palette: Env_InitForMap copies a day phase of map_backdrop_phase_tluts into it, Env_StartPaletteFade fades it; the backdrop display lists load their TLUT from 0x800806B0 (ROM 0x72C84, 0x73D94, 0x74FB4)
+D_800808B0	map_backdrop_phase_tluts	4 x 256 u16 palettes DMA'd from the backdrop's ROM data (first 0x800 bytes) by Map_LoadArea; Env_InitForMap/Env_Update take the day phase's one (phase record +4) for map_backdrop_tlut
+D_800810B0	map_clock_tlut	output of Map_BlendPaletteByClock (map_clock_blend_out points here): 256 colours blended between two map_clock_tlut_srcs palettes; map model display lists in ROM load their TLUT from 0x800810B0 (G_SETTIMG at 0xEFAAC, 0xF0494, ...)
+D_800814B0	map_clock_tlut_srcs	3 x 256 u16 palettes DMA'd from ROM D_D86170 (0x600) on the first map load; Map_BlendPaletteByClock blends from/to entries of it by palette id
+D_80081CB0	mapobj_opaque_count	MapObj_CollectCell: count of kind 0/8 objects without flag 0x4000 (mapobj_opaque_list); MapObj_UpdateAndDrawNearby draws that many (with the spline/MapObjAnim offsets)
+D_80081CB4	mapobj_noanim_count	count of kind 0/8 objects with flag 0x4000 (mapobj_noanim_list), drawn at their own position and angle with no animation offset
+D_80081CB8	mapobj_billboard_draw_count	count of kind-0x10 objects this frame passed to MapObj_DrawBillboards (zeroed with the other draw counts each frame)
+D_80081CBC	mapobj_translucent_count	count of mapobj_translucent_list (wave kinds 1-3 and kinds 0x7F/0x80), drawn by MapObj_DrawTranslucent with the translucent render mode
+D_80081CC0	mapobj_animtex_count	count of mapobj_animtex_list (kinds 0x11/0x12) for MapObj_DrawAnimTexBillboards
+D_80081CC4	mapobj_scrolltex_count	count of mapobj_scrolltex_list (kinds 0x40-0x45), drawn by MapObj_DrawTranslucent with the scrolled texture
+D_80081CC8	mapobj_opaque_cursor	write cursor of mapobj_opaque_list in MapObj_CollectCell (reset each frame), then the read cursor MapObj_UpdateAndDrawNearby walks both opaque lists with
+D_80081CCC	mapobj_noanim_cursor	write cursor of mapobj_noanim_list in MapObj_CollectCell
+D_80081CD0	mapobj_billboard_cursor	write cursor of mapobj_billboard_list in MapObj_CollectCell
+D_80081CD4	mapobj_translucent_cursor	write cursor of mapobj_translucent_list (MapObj_CollectCell), read cursor in MapObj_DrawTranslucent
+D_80081CD8	mapobj_animtex_cursor	write cursor of mapobj_animtex_list (MapObj_CollectCell); MapObj_DrawTranslucent passes the list start through it
+D_80081CDC	mapobj_scrolltex_cursor	write cursor of mapobj_scrolltex_list (MapObj_CollectCell), read cursor in MapObj_DrawTranslucent
+D_80081CE0	mapobj_wave_capture	set to 1 by Map_LoadArea, cleared after the first MapObj_UpdateAndDrawNearby; while set MapObj_CollectCell copies each wave object (kinds 1-3) into its mapobj_wave_base slot
+D_80081CE8	mapobj_wave_base	32 saved copies of the wave objects (kinds 1-3), taken on the first frame of an area: MapObj_CollectCell moves each object to its base position plus the sine offsets
+D_80081FE8	mapobj_wave_base_cursor	MapObj_CollectCell's cursor into mapobj_wave_base (reset to the start each frame), advanced per wave object
+D_80081FF0	mapobj_tmp_vec	scratch vec2 rotated with Math_RotateVec2 and read back at once (MapObjAnim offset in MapObj_UpdateAndDrawNearby, sprite velocity in MapObj_EmitArcSprite)
+D_80082000	map_load_coll	out record of Map_LoadArea's Coll_ResolveFloorAndWalls: floor y for flagged (0x8000) objects and the normal stored in mapobj_billboard_normals
+D_80082020	mapobj_spline_out	Math_EvalTcbSpline output: the spline offset of flag-0x2000 objects in MapObj_UpdateAndDrawNearby, the slot's x/angle in MapObjAnim_UpdateAll
+D_80082048	mapobj_wave_phase	4 u16 phase pairs {a, b}, zeroed by Map_LoadArea, advanced by mapobj_wave_phase_step each frame; MapObj_CollectCell uses [kind] as the sins angles of the wave objects
+D_80082058	mapobj_opaque_list	pointers to this frame's kind 0/8 objects without flag 0x4000 (MapObj_CollectCell), drawn by MapObj_UpdateAndDrawNearby with the spline (0x2000) or MapObjAnim (0x100) offsets
+D_80082458	mapobj_noanim_list	pointers to this frame's kind 0/8 objects with flag 0x4000, drawn by MapObj_UpdateAndDrawNearby from their fields only
+D_80082858	map_clock_blend_len	function-static of Map_BlendPaletteByClock: total blend steps (the schedule entry's +4), the divisor of the colour mix
+D_80082860	mapobj_translucent_list	pointers to this frame's wave objects and kind 0x7F/0x80 objects, drawn by MapObj_DrawTranslucent
+D_80082C60	mapobj_animtex_list	pointers to this frame's kind 0x11/0x12 objects for MapObj_DrawAnimTexBillboards
+D_80083060	map_clock_blend_from	Map_BlendPaletteByClock: the map_clock_tlut_srcs palette of the previous id, blend source weighted by map_clock_blend_left
+D_80083068	mapobj_scrolltex_list	pointers to this frame's kind 0x40-0x45 objects, drawn by MapObj_DrawTranslucent with mapobj_scrolltex_tex
+D_80083468	map_clock_blend_to	Map_BlendPaletteByClock: the map_clock_tlut_srcs palette of the new id, the blend target
+D_80083470	mapobj_spinner_buf1	8 spinner records (on flag, position, angle, spin, object) used as the current buffer when the frame index D_8007A17C is non-zero (MapObj_QueueSpinner/DrawSpinners)
+D_80083550	map_clock_blend_out	Map_BlendPaletteByClock's output pointer, always set to map_clock_tlut
+D_80083558	mapobj_spinner_buf0	the other spinner buffer, current when D_8007A17C is 0
+D_80083638	mapobj_billboard_normals	floor normal per kind-0x10 object (its angle field holds the index), stored by Map_LoadArea and passed to Shadow_Queue by MapObj_DrawBillboards
+D_80084238	mapobj_anim_slots	4 MapObjAnim slots (timer, state, frame, type, id, x, z): MapObjAnim_ClearAll/Find/Start/UpdateAll; MapObj_UpdateAndDrawNearby offsets a flag-0x100 object by its slot
+D_800842A8	mapobj_arc_flicker_tick	counter advanced by Map_StartFrame on map 0x1D only; MapObj_StepArcSprite picks env alpha 0xDC/0x78 by its bit 0
+D_800842AC	mapobj_ambient_dist	distance from the player to the nearest ambient-sound object (flag 0x1000) this frame, start 600 (MapObj_CollectCell); MapObj_UpdateAndDrawNearby turns it into the volume
+D_800842B0	mapobj_ambient_type	ambient type (flags bits 8-11) of that nearest object, -1 = none; index into mapobj_ambient_sfx
+D_800842B4	mapobj_ambient_prev_type	last frame's mapobj_ambient_type: when the type becomes -1 and this was not, Sfx_StopChannel4; set to -1 by Map_LoadArea
+D_800842B8	map_flags	map_def +0 flags of the current map, set by Map_LoadArea on a map change (bits 0-2 load extra ROM data); tested by Env_Update, Env_ApplyLightSlot, Hud_Draw, Item_CanUseWarp, the return spells
+D_800842BC	map_id	current map id: Map_LoadArea sets it from map_next_id (-1 = none loaded yet, forces the shared ROM loads); compared with map/area tables by every *_LoadForMap, saved by SaveMenu
+D_800842C0	map_area	current area within the map: Map_LoadArea sets it from map_next_area and picks map_area_def by it; Npc_SpawnForArea, Chest/Spirit/TextSpot/Boss loaders and the wall sets match on it; saved
+D_800842C4	map_next_id	map to load: Map_LoadArea takes map_def = &D_80056BB0[it]; set from the exit destination (D_80084300 +0) by Core_RunGameplayLoop, by the cutscene starters and Player_SetSpawnFromSaveTable
+D_800842C8	map_next_area	area to load (Map_LoadArea copies it to map_area); set from D_80084300 +4 and by the same writers as map_next_id
+D_800842D0	map_flag4_return_map	map recorded by Map_LoadArea on entering map 6, map 11 (area 2 -> 0) or a flags-4 map from a flags-1 map; func_800189F0 (magic effect) sends the player there (D_80084300) when map_flags == 4; saved
+D_800842D4	map_flag4_return_area	area of that record (D_80084300 +4)
+D_800842D8	map_flag4_return_entry	entry of that record (from D_80084308; D_80084300 +8)
+D_800842DC	map_flag8_return_map	map recorded by Map_LoadArea on entering a different map with flags & 8; func_80018B40 (magic effect) sends the player there when map_flags & 8 (not maps 0x1E/0x22); saved
+D_800842E0	map_flag8_return_area	area of that record (D_80084300 +4)
+D_800842E4	map_flag8_return_entry	entry of that record (D_80084300 +8)
+D_800842E8	map_area_flags	map_area_def +0x14: bit 0 = enemy area (Enemy_InitForArea loads the set, Core_RunGameplayLoop runs Battle_TryStartRandomEncounter, Npc_InitArea skips the NPCs); also selects the agility distance in Player_UpdateStatGrowth

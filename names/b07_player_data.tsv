@@ -1,0 +1,53 @@
+# D3 round 3: data names for b07_player (3F50, 9D50). old<TAB>new<TAB>evidence. Rules: ~/eltale-notes/D3_NAMING.md
+# Left D_ (3F50): D_8007A8F4/D_8007A8F8 (only zeroed by Player_Init, never read), D_8007A90E, D_8007A914, D_8007A924,
+#   D_8007A9B2, D_8007AB54..5C (unreferenced), D_8007A9B8 (summed from defeated enemies' def +0x14 and added to stats +0x14
+#   on battle won, but nothing reads stats +0x14, so what it counts is not shown), rodata D_8006EEE8..D_8006EF08 (literals).
+# Left D_ (9D50): D_8007AB70 (scratch pointer to the D_80056880 ROM range that the unnamed func_80009764 DMAs; what it
+#   loads is not shown), D_8007AB80, D_8007ABA0, D_8007ABAC (unreferenced).
+# --- 3F50: player
+D_8004DCB0	player_state_handlers	18 function pointers (Player_State*), Player_Update calls D_8004DCB0[player.unk0](actor, player, chardata) every frame; player.unk0 is the state index
+D_8004DCF8	player_loaded_anim	function-static of Player_LoadAnim (init -1): index of the D_80055F98 ROM range last DMA'd to 0x80200000; the DMA runs only when the actor's anim id +0x52 differs
+D_8004DCFC	player_melee_damage_scale	{0x40,0x40,0x39,0x3C}: Player_CalcMeleeDamage multiplies the damage by D_8004DCFC[n] >> 6, n = number of the 4 element levels above a quarter of their sum
+D_8007A8F0	player_mp_regen_dist	Player_Update adds the frame's move distance (player_move_dist) outside battle while stats +8 < +0xA; each 60 units it subtracts 60 and does stats +8++ (MP: Player_StartCastSpell subtracts the spell cost from +8); zeroed by Player_Spawn
+D_8007A8FC	player_agility_dist_enemy_area	Player_UpdateStatGrowth adds player_move_dist outside battle in areas with map_area_flags bit 0 (the enemy areas: Enemy_InitForArea, random encounters); each 800 units agility XP (stats +0x2C, see Player_AddTurnMoveAgilityXP) +1
+D_8007A900	player_agility_dist_npc_area	same as player_agility_dist_enemy_area for areas without map_area_flags bit 0 (where Npc_InitArea spawns NPCs); each 1500 units agility XP +1
+D_8007A904	player_near_boss	Player_Update stores Boss_CheckPlayerNear() (boss index + 1, 0 = none) and calls Boss_BeginEncounter(D_8007A904 - 1) when non-zero
+D_8007A908	player_boss_text_delay	set to 30 when Player_Update starts a boss encounter (player flag 1); Player_StateMove counts it down and opens the text window (Text_OpenWindow(0)) when it reaches 0, then waits for the window before Battle_StartBossEncounter
+D_8007A90C	player_run_sfx_timer	Player_StateMove adds the anim speed (actor +0x58) each frame in the run state (unk0 == 2); at >= 0x97 it resets and plays Sfx_Play(0, 0x21); zeroed by Player_Spawn/MoveIdle/MoveWalk
+D_8007A910	player_idle_anim	Player_Update sets it each frame: anim 0x19 when HP (stats +4) * 3 < max (+6), else 0x11 in battle, 0 outside; every Anim_SetCurrentAndNext of the player uses it as the anim to return to (and Player_MoveIdle plays it)
+D_8007A918	player_tmp_vec	scratch {x, z, w} vector: each user fills x/z, rotates it with Math_RotateVec2 and reads it back the same moment (Player_Spawn, Player_StateMove, Player_MoveWalk/Run, Player_FindNpcToTalk, Player_FindMeleeTarget, ...)
+D_8007A928	player_coll	out record of the player's Coll_ResolveFloorAndWalls calls (Player_Spawn, Player_MoveAndCollide, Player_Draw): floor x/y/z, normal, tri flags (0x8000 = no floor) copied into the actor
+D_8007A988	player_battle_move_dist	Player_AddTurnMoveAgilityXP (battle only) adds the distance from the turn's start point D_8008BE64/68; each 35 units agility XP (stats +0x2C) +1; zeroed by Player_Init
+D_8007A98C	player_spawn_x	Player_Spawn puts the player at x = D_8007A98C; written by Map_LoadArea from the area entry (x), Player_SetSpawnFromSaveTable, Item_UseWarp, the cutscene starters, Core_ResetGameState
+D_8007A990	player_spawn_z	Player_Spawn's z (actor.z = D_8007A990); same writers as player_spawn_x (the entry's second float)
+D_8007A994	player_spawn_rot	Player_Spawn's facing (actor.rot = D_8007A994, radians); same writers; Camera_InitForMap also rotates by it
+D_8007A998	player_spawn_type	Player_Spawn: bit 3 -> state 3, else bits 8-10 pick the entry: 1/4 walk in (state 8), 2 door-object entry at player_spawn_obj (bit 0 picks one of two offset/anim/sound sets) with MapObjAnim_Start(.., D_8007A998, obj), 3 walk in plus MapObjAnim; set from the exit (D_80084300 +0xC) by Player_StartAreaExit, default 0x108
+D_8007A99C	player_spawn_obj	index into map_objs: Player_Spawn's door-type entry (type 2) takes position and angle (degrees) from map_objs[D_8007A99C]; set by Map_LoadArea from the area entry (+0xE)
+D_8007A9A0	player_move_dx	the actor's x velocity as moved this frame: zeroed in Player_Update, set by Player_MoveAndCollide; used for player_move_dist
+D_8007A9A4	player_move_dz	z counterpart of player_move_dx
+D_8007A9A8	player_move_dist	Player_Update: sqrtf(dx*dx + dz*dz) of player_move_dx/dz each frame; feeds player_mp_regen_dist, the agility distances and Battle_TryStartRandomEncounter's encounter distance D_8008BFAC
+D_8007A9AC	player_respawn_map	copied to the destination map (D_80084300 +0) when the player dies (Player_StateHurt, HP 0 -> dying state 6); set to the current map (map_id) by the rest path (Player_StateTalk with a kind-6 NPC; Core_RunGameplayLoop's 0x400 branch restores HP/MP); saved by SaveMenu_CaptureGameState; default 0xD
+D_8007A9AE	player_respawn_area	area counterpart of player_respawn_map (D_80084300 +4 on death, set from map_area); default 0x11
+D_8007A9B0	player_respawn_entry	entry counterpart (D_80084300 +8 on death, set from the destination entry D_80084308 by the rest path); default 0
+D_8007A9B4	player_battle_exp	zeroed by Player_InitBattle; Enemy_StateHurt adds each defeated enemy's def +0x10; on battle won (D_8008BE52 & 8) Player_Update adds it to stats +0x10, the experience that Player_UpdateStatGrowth compares with the level table D_80055D7C
+D_8007A9BC	player_battle_drop_item	item id (0xFF = none) set by Battle_UpdateTurnTransition from func_800200F8 (a random enemy's def +0x34, by chance); cleared on battle won if 3 are held or the inventory is full; Player_UpdateStatGrowth then shows Item_BuildMessage and Item_AddToInventory(it)
+D_8007A9C0	player_talk_npc	Player_Update: Player_FindNpcToTalk result (NPC index + 1, 0 = none); on the talk button it is decremented to the index and passed to Npc_StartTalk, Player_StateTalk ends the talk with Npc_EndTalk(it) and clears it; Hud_Draw shows the talk marker while non-zero
+D_8007A9C4	player_front_spirit	Player_Update: Spirit_FindInFront(player) result; on the button Spirit_SetCollected(it->unk14) and it->unk10 |= 1; Hud_Draw shows the spirit marker while set
+D_8007A9C8	player_front_chest	Player_Update: Chest_FindInFront(player) result; on the button Chest_Open(it) and the player is placed in front of it (Player_StartOpenChest); Hud_Draw shows the chest marker while set
+D_8007A9CC	player_front_text_spot	Player_Update: TextSpot_FindInFront(player) result; on the button TextSpot_LoadMessage(it) and the examine state 0x11; Hud_Draw shows the text-spot marker while set
+D_8007A9D0	player_stats	the player's ActorStats (actor.unk64 = &D_8007A9D0, copied from D_80055D44 by Player_Init): +4/+6 HP/max, +8/+0xA MP/max, +0x10 exp, +0x24 element levels; shown by Menu_UpdateStatsPage, saved by SaveMenu_CaptureGameState
+D_8007AA08	player_state	the PlayerState record: +0 state index into player_state_handlers, +4 state timer, +8 flags, +0x18 the player Actor (D_8007AA20); every Player_* function works on it (p = &D_8007AA08)
+D_8007AB48	player_shadow_pos	Player_Draw: x/z of D_8008BFC0 with the floor y under them (player_coll), passed to Shadow_Queue; Effect_DrawStatUpMarkers draws above this point
+D_8007AB60	player_light_slot	Env_AllocateLightSlot() result taken on every map/cutscene start (Core_Run*Loop, which set its slot record +0 to 2); Player_Draw and Gfx_BuildFrameDisplayList apply it with Env_ApplyLightSlot
+# --- 9D50: NPCs
+D_8004DD10	npc_rest_menu_row0	asset (8 bytes): Npc_StartTalk for a kind-6 NPC sets D_80090458 = {n 2, rows D_8004DD10, D_8004DD18}, which Text_OpenWindow copies in as the window's choice rows; answer 0 (D_80090454) leads to the rest path (Player_StateTalk: respawn point, HP/MP refill)
+D_8004DD18	npc_rest_menu_row1	asset (8 bytes): the second row of that two-row choice (see npc_rest_menu_row0)
+D_8007AB74	npc_walking_count	Npc_UpdateAll: an NPC may start walking (state 1) only while this is < 3; incremented on start, decremented when the walk ends; zeroed by Npc_InitArea
+D_8007AB78	npc_walk_step	Npc_UpdateAll state 1: {0, 0.4} rotated by the NPC's angle (Math_RotateVec2) and passed to Npc_Move as the frame's step
+D_8007AB88	npc_move_coll	out record of Npc_Move's Coll_ResolveFloorAndWalls (0xA01); x/y/z and the floor normal are copied into the NPC
+D_8007ABA4	npc_count	number of spawned NPCs in npc_slots: zeroed by Npc_InitArea (and the cutscene starters), incremented by Npc_SpawnForArea; Npc_UpdateAll/Npc_DrawAll loop over it
+D_8007ABA8	npc_drawn_count	Npc_DrawAll: number of NPCs drawn this frame (within sqrt(90000) of the player); count of npc_drawn_list for Player_FindNpcToTalk, Player/Npc_PushOutOfObjects, Camera_RaiseOverNpcs
+D_8007ABB0	npc_drawn_list	16 NPC object pointers filled by Npc_DrawAll with the NPCs it drew; read by Player_FindNpcToTalk, Player_PushOutOfObjects, Npc_PushOutOfObjects, Camera_RaiseOverNpcs
+D_8007ABF0	npc_slots	the 16 NPC records (0x84 bytes: state, timer, home pos, object at +0x14, def at +0x80) spawned by Npc_SpawnForArea and run by Npc_UpdateAll/DrawAll/StartTalk/EndTalk
+D_8007B430	text_message_buf	0x4B0-byte message buffer: filled by Npc_LoadMessage (DMA from D_D2E2F0), Npc_SetMessage, TextSpot_LoadMessage, Item_BuildMessage, Boss_BeginEncounter, Cutscene_CopyMessageBuffers; Text_OpenWindow copies it into the window
+D_8007B8E0	text_speaker_name	0x20-byte name buffer next to text_message_buf: the NPC def's name (0xFF first byte = none) by Npc_LoadMessage/SetMessage, the boss name by Boss_*, cleared by Item_BuildMessage; Text_OpenWindow copies it into the window's name field
