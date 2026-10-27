@@ -99,24 +99,24 @@ typedef struct SpellParticleDef {
 
 /* One magic_effects slot: a live spell effect. */
 typedef struct MagicEffect {
-    /* 0x00 */ u16 unk0; /* spell group */
-    /* 0x02 */ u16 unk2; /* spell index */
-    /* 0x04 */ u16 unk4; /* frames left, 0: slot free */
-    /* 0x06 */ u16 unk6;
-    /* 0x08 */ u16 unk8; /* start delay */
-    /* 0x0A */ u16 unkA; /* flags */
+    /* 0x00 */ u16 spell_group; /* spell group */
+    /* 0x02 */ u16 spell_index; /* spell index */
+    /* 0x04 */ u16 frames_left; /* frames left, 0: slot free */
+    /* 0x06 */ u16 timed_visual_timer;
+    /* 0x08 */ u16 start_delay; /* start delay */
+    /* 0x0A */ u16 flags; /* flags */
     /* 0x0C */ f32 x;
     /* 0x10 */ f32 y;
     /* 0x14 */ f32 z;
     /* 0x18 */ f32 vx;
     /* 0x1C */ f32 vy;
     /* 0x20 */ f32 vz;
-    /* 0x24 */ Actor *unk24; /* caster */
+    /* 0x24 */ Actor *caster; /* caster */
     /* 0x28 */ Actor *target;
     /* 0x2C */ SpellDef *cfg;
     /* 0x30 */ SpellFxDef *def;
-    /* 0x34 */ struct EffectModel *unk34; /* cast visual (Magic_CreateCastPresentation) */
-    /* 0x38 */ struct EffectModel *unk38; /* hit visual (Magic_CreateHitPresentation) */
+    /* 0x34 */ struct EffectModel *cast_visual; /* cast visual (Magic_CreateCastPresentation) */
+    /* 0x38 */ struct EffectModel *hit_visual; /* hit visual (Magic_CreateHitPresentation) */
 } MagicEffect; /* 0x3C bytes */
 
 /* One magic_cast_repeats slot: the remaining casts of a multi-cast spell. */

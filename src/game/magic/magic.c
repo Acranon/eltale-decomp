@@ -43,7 +43,7 @@ void Magic_ResetEffectSystem(void) {
     s32 i;
 
     for (i = 0; i < 16; i++) {
-        magic_effects[i].unk4 = 0;
+        magic_effects[i].frames_left = 0;
     }
     for (i = 0; i < 4; i++) {
         magic_cast_repeats[i].casts_left = 0;
@@ -143,20 +143,20 @@ void Magic_CreateCastEffect(Actor* arg0, u32 arg1, s32 arg2, u16 arg3) {
     }
     p = (MagicEffect*)magic_effects;
     i = 15;
-    while (i != 0 && p->unk4 != 0) {
+    while (i != 0 && p->frames_left != 0) {
         i--;
         p++;
     }
-    p->unk0 = (arg1 >> 8) & 0xF;
-    p->unk2 = arg1 & 0xFF;
-    p->unk24 = arg0;
+    p->spell_group = (arg1 >> 8) & 0xF;
+    p->spell_index = arg1 & 0xFF;
+    p->caster = arg0;
     p->target = NULL;
     p->cfg = (SpellDef*)def;
     p->def = def2;
-    p->unk4 = def->effect_lifetime;
-    p->unk8 = def->start_delay;
-    p->unk6 = 100;
-    p->unkA = arg3;
+    p->frames_left = def->effect_lifetime;
+    p->start_delay = def->start_delay;
+    p->timed_visual_timer = 100;
+    p->flags = arg3;
     Magic_ClearSlotHitTracking(15 - i);
     switch (def->move_handler_index) {
         case 0:
@@ -172,7 +172,7 @@ void Magic_CreateCastEffect(Actor* arg0, u32 arg1, s32 arg2, u16 arg3) {
                 p->vy = D_800C1878[(def->launch_direction_index + arg2) & 7].y * sizes.v[def->launch_speed_index];
             }
             if (boost) {
-                p->unk4 += p->unk4 >> 1;
+                p->frames_left += p->frames_left >> 1;
             }
             break;
         case 1:
@@ -187,9 +187,9 @@ void Magic_CreateCastEffect(Actor* arg0, u32 arg1, s32 arg2, u16 arg3) {
             Coll_ResolveFloorAndWalls(p->x, p->y, p->z, 0xA00, &magic_coll);
             p->y = magic_coll.y;
         }
-        Magic_CreateCastPresentation(p, p->unk24);
+        Magic_CreateCastPresentation(p, p->caster);
     } else {
-        p->unk4 = 0;
+        p->frames_left = 0;
     }
 }
 
@@ -346,22 +346,22 @@ void Magic_UpdateEffects(void) {
     p = (MagicEffect*)magic_effects;
     active = 0;
     for (i = 0; i != 16; i++, p++) {
-        if (p->unk4 == 0) {
+        if (p->frames_left == 0) {
             continue;
         }
         active++;
-        if (p->unk8 != 0) {
-            p->unk8--;
+        if (p->start_delay != 0) {
+            p->start_delay--;
         } else {
-            p->unk4--;
+            p->frames_left--;
             magic_move_handlers[p->cfg->move_handler_index](p);
             a = magic_find_target_handlers[p->cfg->find_target_handler_index](p, i);
             if (a != NULL) {
                 Magic_MarkActorHitBySlot(i, a);
                 if (!(a->battle->status_bits & 0x100) || p->cfg->target_select_handler_index == 2) {
                     if (Magic_GetHitOutcome(p, a)) {
-                        if (a == p->unk24) {
-                            Hud_ShowActorPopup(p->unk24);
+                        if (a == p->caster) {
+                            Hud_ShowActorPopup(p->caster);
                         } else if (a->typeFlags & 1) {
                             Enemy_PlayMissEffect(a);
                         } else {
@@ -373,7 +373,7 @@ void Magic_UpdateEffects(void) {
                         for (tries = 0, k = 0; k != 12; k++) {
                             if (p->cfg->status_args[k] != 0) {
                                 tries++;
-                                if (Magic_ShouldApplyStatus(p, p->unk24, k)) {
+                                if (Magic_ShouldApplyStatus(p, p->caster, k)) {
                                     Magic_StartStatusTimer(p, a, k);
                                     magic_status_handlers[k](p->cfg->status_args[k], a);
                                     hits++;
@@ -387,35 +387,35 @@ void Magic_UpdateEffects(void) {
                 }
                 Magic_CreateHitPresentation(p, a);
                 if (!(p->cfg->flags & 4)) {
-                    p->unk4 = 0;
-                    if (p->unk34 != NULL && (p->unk34->flags & 1)) {
-                        p->unk34->framesLeft = 7;
-                        p->unk34->flags &= ~1;
+                    p->frames_left = 0;
+                    if (p->cast_visual != NULL && (p->cast_visual->flags & 1)) {
+                        p->cast_visual->framesLeft = 7;
+                        p->cast_visual->flags &= ~1;
                     }
                 } else {
-                    p->unkA |= 2;
+                    p->flags |= 2;
                 }
             }
         }
-        if (p->unk34 != NULL) {
-            p->unk34->x = p->x;
-            p->unk34->y = p->y;
-            p->unk34->z = p->z;
-            p->unk34->upX = p->vx;
-            p->unk34->upY = p->vy;
-            p->unk34->upZ = p->vz;
-            if (p->unk4 == 0 && (p->unk34->flags & 1)) {
-                p->unk34->framesLeft = 7;
-                p->unk34->flags &= ~1;
+        if (p->cast_visual != NULL) {
+            p->cast_visual->x = p->x;
+            p->cast_visual->y = p->y;
+            p->cast_visual->z = p->z;
+            p->cast_visual->upX = p->vx;
+            p->cast_visual->upY = p->vy;
+            p->cast_visual->upZ = p->vz;
+            if (p->frames_left == 0 && (p->cast_visual->flags & 1)) {
+                p->cast_visual->framesLeft = 7;
+                p->cast_visual->flags &= ~1;
             }
         }
         if (((s16 *)p->def)[8] >= 0) {
             k = (u16)((s16 *)p->def)[9];
-            if (p->unk6 >= (u32)(k >> 8)) {
+            if (p->timed_visual_timer >= (u32)(k >> 8)) {
                 Magic_CreateTimedPresentation(p, p->target);
-                p->unk6 = 0;
+                p->timed_visual_timer = 0;
             } else {
-                p->unk6++;
+                p->timed_visual_timer++;
             }
         }
     }
@@ -436,7 +436,7 @@ s32 Magic_IsAnyEffectActive(void) {
 
     i = 16;
     p = magic_effects;
-    while (i != 0 && p->unk4 == 0) {
+    while (i != 0 && p->frames_left == 0) {
         i--;
         p++;
     }
@@ -459,7 +459,7 @@ void Magic_MoveHomingEffect(MagicEffect* arg0) {
 
     speeds = magic_homing_strengths;
     turns = magic_homing_accels;
-    flags = arg0->unkA;
+    flags = arg0->flags;
     t = arg0->target;
     if (flags & 1) {
         return;
@@ -513,14 +513,14 @@ void Magic_MoveHomingEffect(MagicEffect* arg0) {
         switch (arg0->cfg->floor_collision_mode) {
             case 1:
                 if (arg0->y < magic_coll.y) {
-                    arg0->unkA |= 1;
-                    arg0->unk4 = 8;
+                    arg0->flags |= 1;
+                    arg0->frames_left = 8;
                     arg0->vz = 0.0f;
                     arg0->vy = 0.0f;
                     arg0->vx = 0.0f;
-                    if (arg0->unk34 != NULL) {
-                        arg0->unk34->framesLeft = 15;
-                        arg0->unk34->flags &= ~1;
+                    if (arg0->cast_visual != NULL) {
+                        arg0->cast_visual->framesLeft = 15;
+                        arg0->cast_visual->flags &= ~1;
                     }
                     Camera_Shake(1);
                     if (((s16 *)arg0->def)[0x10] >= 0) {
@@ -536,7 +536,7 @@ void Magic_MoveHomingEffect(MagicEffect* arg0) {
 }
 
 void Magic_MoveVerticalEffect(MagicEffect* arg0) {
-    if (!(arg0->unkA & 1)) {
+    if (!(arg0->flags & 1)) {
         if (arg0->cfg->launch_flags & 1) {
             arg0->vy -= 0.3;
         }
@@ -545,14 +545,14 @@ void Magic_MoveVerticalEffect(MagicEffect* arg0) {
             Coll_ResolveFloorAndWalls(arg0->x, arg0->y, arg0->z, 0xA00, &magic_coll);
             if (arg0->y < magic_coll.y) {
                 arg0->y = magic_coll.y;
-                arg0->unkA |= 1;
-                arg0->unk4 = 8;
+                arg0->flags |= 1;
+                arg0->frames_left = 8;
                 arg0->vz = 0.0f;
                 arg0->vy = 0.0f;
                 arg0->vx = 0.0f;
-                if (arg0->unk34 != NULL) {
-                    arg0->unk34->framesLeft = 15;
-                    arg0->unk34->flags &= ~1;
+                if (arg0->cast_visual != NULL) {
+                    arg0->cast_visual->framesLeft = 15;
+                    arg0->cast_visual->flags &= ~1;
                 }
                 Camera_Shake(1);
                 Magic_CreateGroundHitPresentation(arg0, arg0->target);
@@ -664,7 +664,7 @@ Actor* Magic_FindEligibleTarget(MagicEffect* arg0, s32 arg1) {
 Actor* Magic_FindTargetInRangeIfLanded(MagicEffect* arg0, s32 arg1) {
     Actor* ret = NULL;
 
-    if (arg0->unkA & 1) {
+    if (arg0->flags & 1) {
         ret = Magic_FindTargetInRange(arg0, arg1);
     }
     return ret;
@@ -675,8 +675,8 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
     u16 flag;
 
     flag = 0;
-    dmg = Magic_CalculateEffectDamage(arg0->cfg, arg0->unk24);
-    if (arg0->unk24->battle->status_bits & 1) {
+    dmg = Magic_CalculateEffectDamage(arg0->cfg, arg0->caster);
+    if (arg0->caster->battle->status_bits & 1) {
         dmg >>= 1;
     }
     if (arg1->typeFlags & 1) {
@@ -687,7 +687,7 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
                 flag = 0x4000;
             }
         }
-        if (Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), dmg, arg0->cfg->input_sequence[0], arg0->cfg->flags | flag, arg0->unk24) != 0) {
+        if (Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), dmg, arg0->cfg->input_sequence[0], arg0->cfg->flags | flag, arg0->caster) != 0) {
             player_state.stats->unk2A++;
         }
     } else {
@@ -696,7 +696,7 @@ void Magic_ApplyEffectDamage(MagicEffect* arg0, Actor* arg1) {
             Fade_Start(4, 0, fade_damage_flash);
             flag = 0x4000;
         }
-        Player_TakeDamage(dmg, arg0->cfg->flags | flag, arg0->unk24);
+        Player_TakeDamage(dmg, arg0->cfg->flags | flag, arg0->caster);
     }
 }
 
@@ -747,8 +747,8 @@ void Magic_TransferTargetResource(MagicEffect* arg0, Actor* arg1) {
         arg1->stats->unk8 -= amt;
         magic_target_enemy_rec = (struct Enemy*)&enemy_slots[Enemy_GetSlotIndex(arg1)];
         magic_target_enemy_rec->unkC += amt;
-        if (magic_target_enemy_rec->unkC > arg0->unk24->stats->unkA) {
-            magic_target_enemy_rec->unkC = arg0->unk24->stats->unkA;
+        if (magic_target_enemy_rec->unkC > arg0->caster->stats->unkA) {
+            magic_target_enemy_rec->unkC = arg0->caster->stats->unkA;
         }
     }
     Effect_AddFloatingNumber(arg1, 1, amt);
@@ -782,10 +782,10 @@ void func_800189F0(s32 arg0, Actor* arg1) {
 void Magic_ApplyZeroDamageHit(MagicEffect* arg0, Actor* arg1) {
     if (arg0->cfg->target_select_handler_index != 2) {
         if (arg1->typeFlags & 1) {
-            Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), 0, 0, 4, arg0->unk24);
+            Enemy_TakeDamage(Enemy_GetSlotIndex(arg1), 0, 0, 4, arg0->caster);
             player_state.stats->unk2A++;
         } else {
-            Player_TakeDamage(0, 4, arg0->unk24);
+            Player_TakeDamage(0, 4, arg0->caster);
         }
     }
 }
@@ -816,7 +816,7 @@ void Magic_RemoveEnemyOrDamagePlayer(MagicEffect* arg0, Actor* arg1) {
             Hud_ShowActorPopup(arg1);
         }
     } else {
-        Player_TakeDamage(arg1->stats->unk4 * 4, 4, arg0->unk24);
+        Player_TakeDamage(arg1->stats->unk4 * 4, 4, arg0->caster);
     }
 }
 
@@ -849,7 +849,7 @@ void Magic_SelectClosestAimTarget(MagicEffect* arg0) {
     Enemy* p;
     Actor* caster;
 
-    caster = arg0->unk24;
+    caster = arg0->caster;
     if (caster->typeFlags & 1) {
         arg0->target = &player_state.actor;
         return;
@@ -859,7 +859,7 @@ void Magic_SelectClosestAimTarget(MagicEffect* arg0) {
     } else {
         angle = caster->rot;
     }
-    caster = arg0->unk24;
+    caster = arg0->caster;
     best = 9.424778f;
     n = enemy_count;
     p = enemy_slots;
@@ -891,7 +891,7 @@ void Magic_SelectFirstActiveTarget(MagicEffect* arg0) {
     s32 i;
     Enemy* p;
 
-    if (arg0->unk24->typeFlags & 1) {
+    if (arg0->caster->typeFlags & 1) {
         arg0->target = &player_state.actor;
         return;
     }
@@ -909,7 +909,7 @@ void Magic_SelectFirstActiveTarget(MagicEffect* arg0) {
 }
 
 void Magic_TargetCaster(MagicEffect* arg0) {
-    arg0->target = arg0->unk24;
+    arg0->target = arg0->caster;
 }
 
 void Magic_ApplyShrinkStatus(s32 arg0, Actor* arg1) {
@@ -1112,14 +1112,14 @@ void Magic_CreateCastPresentation(MagicEffect* arg0, Actor* arg1) {
         } else {
             angle = arg1->rot;
         }
-        arg0->unk34 = Magic_CreateVisualEffect(def->cast_color_index, def->cast_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg1);
-        arg0->unk34->upX = arg0->vx;
-        arg0->unk34->upY = arg0->vy;
-        arg0->unk34->upZ = arg0->vz;
+        arg0->cast_visual = Magic_CreateVisualEffect(def->cast_color_index, def->cast_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg1);
+        arg0->cast_visual->upX = arg0->vx;
+        arg0->cast_visual->upY = arg0->vy;
+        arg0->cast_visual->upZ = arg0->vz;
     } else {
-        arg0->unk34 = NULL;
+        arg0->cast_visual = NULL;
     }
-    fx = &D_800C363C[arg0->unk0][arg0->unk2];
+    fx = &D_800C363C[arg0->spell_group][arg0->spell_index];
     if (fx->cast_kind != 0) {
         h = 2.0 * arg1->stats->unk18 * arg1->scale;
         y = arg1->y + arg1->stats->unk1C * arg1->scale;
@@ -1151,11 +1151,11 @@ void Magic_CreateTimedPresentation(MagicEffect* arg0, Actor* arg1) {
     magic_temp_vec.y = def->timed_scale_y;
     magic_temp_vec.z = cfg->hit_range;
     if (def->timed_flags & 0x10) {
-        angle = arg0->unk4 * 3.141592653589793 / 10.0;
+        angle = arg0->frames_left * 3.141592653589793 / 10.0;
     } else {
         angle = arg1->rot;
     }
-    ret = Magic_CreateVisualEffect(def->timed_color_index, def->timed_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->unk24);
+    ret = Magic_CreateVisualEffect(def->timed_color_index, def->timed_flags, arg0->x, arg0->y, arg0->z, angle, tbl, &magic_temp_vec, arg0->caster);
     ret->upX = arg0->vx;
     ret->upY = arg0->vy;
     ret->upZ = arg0->vz;
@@ -1183,7 +1183,7 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
         magic_temp_vec.z = cfg->hit_range;
         flags = def->hit_flags;
         if (flags & 0x40) {
-            arg1 = arg0->unk24;
+            arg1 = arg0->caster;
         }
         if (arg1->stats->unk0 == 1) {
             if (flags & 0x100) {
@@ -1196,14 +1196,14 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
         } else {
             y = arg1->y;
         }
-        arg0->unk38 = Magic_CreateVisualEffect(def->hit_color_index, flags, arg1->x, y, arg1->z, arg1->rot, tbl, &magic_temp_vec, arg1);
-        arg0->unk38->upX = arg0->vx;
-        arg0->unk38->upY = arg0->vy;
-        arg0->unk38->upZ = arg0->vz;
+        arg0->hit_visual = Magic_CreateVisualEffect(def->hit_color_index, flags, arg1->x, y, arg1->z, arg1->rot, tbl, &magic_temp_vec, arg1);
+        arg0->hit_visual->upX = arg0->vx;
+        arg0->hit_visual->upY = arg0->vy;
+        arg0->hit_visual->upZ = arg0->vz;
     } else {
-        arg0->unk38 = NULL;
+        arg0->hit_visual = NULL;
     }
-    fx = &D_800C363C[arg0->unk0][arg0->unk2];
+    fx = &D_800C363C[arg0->spell_group][arg0->spell_index];
     if (fx->hit_kind != 0) {
         h = 2.0 * arg1->stats->unk18 * arg1->stats->scale;
         y = arg1->y + arg1->stats->unk1C * arg1->stats->scale;
@@ -1218,7 +1218,7 @@ void Magic_CreateHitPresentation(MagicEffect* arg0, Actor* arg1) {
     }
     if (def->hit_sound_id >= 0) {
         Sfx_Play(def->hit_sound_delay, def->hit_sound_id, 0xFF);
-    } else if (arg0->unk24 != arg0->target) {
+    } else if (arg0->caster != arg0->target) {
         Sfx_Play(0, 0x18, 0xFF);
     }
 }
@@ -1239,12 +1239,12 @@ void Magic_CreateGroundHitPresentation(MagicEffect* arg0, Actor* arg1) {
         magic_temp_vec.x = def->ground_hit_scale_x;
         magic_temp_vec.y = def->ground_hit_scale_y;
         magic_temp_vec.z = cfg->hit_range;
-        ret = Magic_CreateVisualEffect(def->ground_hit_color_index, def->ground_hit_flags, arg0->x, arg0->y, arg0->z, arg1->rot, tbl, &magic_temp_vec, arg0->unk24);
+        ret = Magic_CreateVisualEffect(def->ground_hit_color_index, def->ground_hit_flags, arg0->x, arg0->y, arg0->z, arg1->rot, tbl, &magic_temp_vec, arg0->caster);
         ret->upX = arg0->vx;
         ret->upY = arg0->vy;
         ret->upZ = arg0->vz;
     }
-    fx = &D_800C363C[arg0->unk0][arg0->unk2];
+    fx = &D_800C363C[arg0->spell_group][arg0->spell_index];
     if (fx->ground_hit_kind != 0) {
         h = 2.0 * arg1->stats->unk18 * arg1->scale;
         y = arg1->y + arg1->stats->unk1C * arg1->scale;
@@ -1319,16 +1319,16 @@ void Magic_ClearSlotHitTracking(s32 arg0) {
 s32 Magic_GetHitOutcome(MagicEffect* arg0, Actor* arg1) {
     s32 ret;
 
-    if (arg0->unkA & 4) {
+    if (arg0->flags & 4) {
         ret = 2;
     } else {
         ret = Math_Rand(100) < arg0->cfg->hit_chance;
         if (ret != 0) {
-            if (arg1 != arg0->unk24) {
+            if (arg1 != arg0->caster) {
                 if (arg1->typeFlags & 1) {
-                    ret = Player_RollHitOnEnemy(Enemy_GetSlotIndex(arg1), arg0->unk24);
+                    ret = Player_RollHitOnEnemy(Enemy_GetSlotIndex(arg1), arg0->caster);
                 } else {
-                    ret = Enemy_RollHitOnPlayer(arg0->unk24);
+                    ret = Enemy_RollHitOnPlayer(arg0->caster);
                 }
             }
             ret++;
@@ -1342,7 +1342,7 @@ s32 Magic_ShouldApplyStatus(MagicEffect* arg0, Actor* arg1, s32 arg2) {
     s32 n;
     SpellDef* cfg;
 
-    if (arg0->unkA & 4) {
+    if (arg0->flags & 4) {
         ret = 1;
     } else if (cfg = arg0->cfg, cfg->target_select_handler_index == 2) {
         ret = 1;
@@ -1356,7 +1356,7 @@ s32 Magic_ShouldApplyStatus(MagicEffect* arg0, Actor* arg1, s32 arg2) {
 }
 
 void Magic_StartStatusTimer(MagicEffect* arg0, Actor* arg1, s32 arg2) {
-    if (arg1 != arg0->unk24) {
+    if (arg1 != arg0->caster) {
         arg1->battle->timers[arg2] = Math_Rand(magic_status_time_range_other[arg2]) + 2;
     } else {
         arg1->battle->timers[arg2] = Math_Rand(magic_status_time_range_self[arg2]) + 3;
