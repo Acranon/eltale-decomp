@@ -1,0 +1,47 @@
+# b02: src/17360.c spell/effect system
+# old<TAB>new<TAB>evidence
+func_80016760	Magic_ResetEffectSystem	Clears the 16 effect-slot active fields, four repeat-slot counters, and the effect-system state flag.
+func_800167B0	Magic_LookupSpellSequence	Copies and normalizes an input byte sequence, then searches the selected spell-definition group for matching bytes.
+func_800168F0	Magic_GetSpellRestrictionFlags	Builds three restriction bits from the spell record's threshold, mode mask, and cost check.
+func_800169B8	Magic_CreateCastEffect	Allocates an effect slot from a spell definition, schedules repeats, initializes velocity, and invokes its target and visual callbacks.
+func_80016DE0	Magic_PlaceEffectAtActorLowerPoint	Copies actor X/Z and chooses actor Y or ground-height minus model radius for the effect position.
+func_80016E34	Magic_PlaceEffectAtActorMiddlePoint	Copies actor X/Z and chooses ground height or actor Y plus half model height for the effect position.
+func_80016EA8	Magic_PlaceEffectAtActorUpperPoint	Copies actor X/Z and sets Y from upper model extent plus configured offset.
+func_80016F3C	Magic_PlaceEffectAheadAtMiddlePoint	Rotates a positive local Z offset by actor yaw and places the effect at the actor's middle height.
+func_80017028	Magic_PlaceEffectAheadAtUpperPoint	Rotates a positive local Z offset by actor yaw and places the effect at its upper height.
+func_80017134	Magic_PlaceEffectBehindAtUpperPoint	Rotates a negative local Z offset by actor yaw and places the effect at its upper height.
+func_80017244	Magic_PlaceEffectAtSelectedTarget	Uses the effect's target when present and copies its X/Z and model-dependent lower Y.
+func_800172D0	Magic_PlaceEffectAtRandomOffset	Chooses random radius and yaw, rotates the offset, and places it around the actor.
+func_8001744C	Magic_PlaceEffectAtDiagonalOffset	Derives distance from target separation or model radius, rotates a 1.5:1 X/Z offset, then places the effect.
+func_80017590	Magic_PlaceEffectAtFixedForwardOffset	Rotates a 380-unit local Z offset and adds scaled X/Y/Z offsets to actor position.
+func_80017630	Magic_UpdateEffects	Advances repeat schedules and all 16 active effects, resolves target hits, updates linked visuals, and handles effect-system end state.
+func_80017AEC	Magic_MoveHomingEffect	Steers velocity toward a target, applies optional gravity, integrates position, and handles ground contact.
+func_80017F48	Magic_MoveVerticalEffect	Integrates vertical velocity with optional gravity, handles ground contact, and follows target X/Z when configured.
+func_8001809C	Magic_FindTargetInRange	Tests eligible player or enemy actors against the effect's position and configured radius, returning one in range.
+func_80018348	Magic_FindEligibleTarget	Returns player or an active enemy after checking the slot-specific hit mask, without a distance test.
+func_80018444	Magic_FindTargetWhenEnabled	Invokes the target search only when bit one of the effect flags is set.
+func_80018480	Magic_ApplyEffectDamage	Calculates damage from definition and caster, adjusts it for target state and random bonus, then calls player or enemy damage.
+func_8001860C	Magic_HealTarget	Adds a bounded amount to the target's current resource using its configured maximum, then reports the amount.
+func_800187C4	Magic_TransferTargetResource	Subtracts a fraction of one actor resource and adds it to the opposing actor's bounded resource.
+func_80018AAC	Magic_ApplyZeroDamageHit	Calls the player or enemy damage routine with amount zero and hit flag four.
+func_80018C14	Magic_RemoveEnemyOrDamagePlayer	For enemy targets disables/removes the actor; for the player applies damage equal to four times a model stat.
+func_80018CD8	Magic_ClearActorStatuses	Clears the actor status bits and restores affected scale and three model-derived values.
+func_80018D88	Magic_DamageAndClearStatuses	Calls the module's effect-damage handler, then clears the target's statuses.
+func_80018DC0	Magic_SelectClosestAimTarget	Chooses the active enemy with the smallest absolute yaw difference from the caster aiming direction.
+func_80018FB0	Magic_SelectFirstActiveTarget	Targets the player for an enemy caster, otherwise chooses the first active enemy among six slots.
+func_80019024	Magic_TargetCaster	Copies the effect's caster pointer into its target pointer.
+func_80019034	Magic_ApplyShrinkStatus	Sets status bit one, halves actor scale, and starts the corresponding timed status effect.
+func_800195FC	Magic_CalculateEffectDamage	Computes the amount used by the effect-damage handler from base value and caster or target level.
+func_80019820	Magic_CreateVisualEffect	Scales visual dimensions from model size and calls the effect-object constructor.
+func_800199C0	Magic_CreateCastPresentation	Creates the cast visual, optional particle effect, and optional sound from the cast definition.
+func_80019BFC	Magic_CreateTimedPresentation	Creates a visual and optional sound for a timed effect step.
+func_80019D2C	Magic_CreateHitPresentation	Creates a visual, optional particle effect, and optional sound at the hit actor.
+func_80019FC8	Magic_CreateGroundHitPresentation	Creates an effect visual, optional particle effect, and optional sound for the ground-contact callback.
+func_8001A1A4	Magic_TickActorStatuses	Decrements all active status timers and restores changed actor values when each timer expires.
+func_8001A2A0	Magic_WasActorHitBySlot	Tests the bit for an effect slot against the actor's recorded hit mask.
+func_8001A2C4	Magic_MarkActorHitBySlot	Sets the bit for an effect slot in the actor's recorded hit mask.
+func_8001A2EC	Magic_ResetHitTracking	Clears the player hit mask and the six enemy hit masks.
+func_8001A340	Magic_ClearSlotHitTracking	Clears one effect-slot bit from the player and six enemy hit masks.
+func_8001A3EC	Magic_GetHitOutcome	Combines the effect flag, random threshold, and target relationship into a value from the outcome table.
+func_8001A4AC	Magic_ShouldApplyStatus	Checks effect flags and target type, then compares a random value with the status-specific chance table.
+func_8001A56C	Magic_StartStatusTimer	Assigns a random duration to the selected target status, with different ranges for self and other targets.

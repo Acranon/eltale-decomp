@@ -1,5 +1,11 @@
 #include "common.h"
 
+/*
+ * Spell effect system: spell lookup, effect instances, target selection,
+ * hit/status callbacks, and visual presentation.
+ * Folder: src/game/magic/
+ */
+
 typedef struct {
     /* 0x00 */ u8 pad0[0x5E];
     /* 0x5E */ u16 unk5E;
