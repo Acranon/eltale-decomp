@@ -1,0 +1,13 @@
+# D3 cleanup: names supported after canonical actor-field analysis (2026-10-27)
+func_80009764	Npc_LoadAreaAssets	Npc_InitArea and Cutscene_StartEntry pass MapSubareaDef.areaSetIndex; loads common NPC overlay and two ROM asset blocks, then DMA-reads the selected npc_area_set_rom_ranges entry.
+func_800200F8	Battle_RollDropItem	Battle_EndTurn stores result in player_battle_drop_item; chooses an enemy definition item_id on the battle flag/random roll, otherwise returns 0xFF.
+func_800190BC	Magic_ApplyHealOnHitStatus	Sets status bit 2; Player and Enemy melee-hit paths test it and heal attacker HP by part of damage dealt, with a status indicator.
+func_80019104	Magic_ApplyAttackScaleStatus	Sets status bit 4 and changes ActorBattle.damage_scale_16ths to 0x18 or 0x20; Player/Enemy damage calculations multiply by this live scale.
+func_80019184	Magic_ApplyActionBlockStatus	Sets status bit 8 outside boss battle; Player_Update suppresses movement and Enemy_StateIdle ends the turn when this bit is set.
+func_8001920C	Magic_ApplyRangeScaleStatus	Sets status bit 0x10 and ActorBattle.unk90 to 0.5 or 2; this factor scales player battle-movement limit and enemy engagement/attack reach.
+func_800192C8	Magic_ApplyAgilityScaleStatus	Sets status bit 0x20 and writes ActorBattle.agility as 2x, 4x or half the base ActorStats.agility; hit/turn calculations use the live value.
+func_800193A4	Magic_ApplySpellBlockStatus	Sets status bit 0x40; Player_Update blocks spell input and Enemy_StartAttack ends spell attacks when the bit is set.
+func_80019408	Magic_ApplyEnemyStatRevealStatus	Sets status bit 0x80; Hud_DrawEnemyInfo tests that bit to draw max HP, defense, attack power, agility and element details.
+func_80019450	Magic_ApplyMagicHitBlockStatus	Sets status bit 0x100; Magic_UpdateEffects skips the hit handler for targets with this bit except target-select handler 2.
+func_80019498	Magic_ApplyResourceGainOnDamageStatus	Sets status bit 0x200; Player_TakeDamage and Enemy_TakeDamage add damage amount to MP/secondary resource while still reducing HP.
+func_800194E0	Magic_ApplyDefenseScaleStatus	Sets status bit 0x400 and writes ActorBattle.defense as half, three-quarters, one-and-a-half or twice base defense; damage formula reads live defense.
