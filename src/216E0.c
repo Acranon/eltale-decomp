@@ -47,7 +47,7 @@ typedef struct {
  * the order). D_8008C164 is used only by 12610. */
 u16 D_8008C040;
 u16 D_8008C042;
-s32 D_8008C044;
+s32 D_8008C044; /* HUD clip bound, screen pixels */
 s32 D_8008C048;
 s32 D_8008C04C;
 u16 D_8008C050;
@@ -65,7 +65,7 @@ u16 D_8008C158;
 u16 D_8008C15A;
 u16 D_8008C15C;
 u16 D_8008C15E;
-u16 D_8008C160;
+u16 D_8008C160; /* eight-frame element input/fade timer */
 u16 D_8008C162;
 s32 D_8008C164;
 s32 D_8008C168;

@@ -61,7 +61,7 @@ Struct_8001FF10_Pos D_8008BE40;
 u16 D_8008BE4C;
 u16 D_8008BE4E;
 u16 D_8008BE50;
-u16 D_8008BE52;
+u16 D_8008BE52; /* bit 0x1: in battle; 0x2: enemy turn; 0x100: boss encounter */
 u16 D_8008BE54;
 s16 D_8008BE56;
 u16 D_8008BE58;
