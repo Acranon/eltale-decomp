@@ -25,7 +25,7 @@ func_8020DDA0_ovl_intro	Intro_StepMoveX	flag 0x4000: the x-only version of Intro
 func_8020DF20_ovl_intro	Intro_StepMoveY	flag 0x8000: the y-only version of Intro_StepMoveXY
 func_8020E0A0_ovl_intro	Intro_StepWait	flags 0x1000/0x10000000: counts unk34 up and returns 0xFF when it reaches the step's frames
 func_8020E0EC_ovl_intro	Intro_ResetWait	zeroes the wait counter unk34; called when a step with 0x1000 starts
-func_8020E108_ovl_intro	Intro_UpdateAndDrawSprites	bubble-sorts the slots by key unk3C, then for the active sprites of the pass (arg 1: flag 0x800000 set, 0: clear) steps their move/clip/fade/wait effects and clears each finished effect's flag (which Intro_RunSpriteScript waits for), clips the rect to the view rect and emits the texture load and texrect (flipped when 0x20000/0x40000) (r2: was Intro_DrawSprites; it also steps the effects)
+func_8020E108_ovl_intro	Intro_UpdateAndDrawSprites	bubble-sorts the slots by key unk3C, then for the active sprites of the pass (arg 1: flag 0x800000 set, 0: clear) steps their move/clip/fade/wait effects and clears each finished effect's flag (which Intro_RunSpriteScript waits for), clips the rect to the view rect and emits the texture load and texrect (flipped when 0x20000/0x40000) (r2: was Intro_UpdateAndDrawSprites; it also steps the effects)
 func_8020F170_ovl_intro	Intro_RunSplash1	first splash screen (Intro_Update step 0): Intro_DrawSplash1 under env alpha D_80212250 that rises by 16, holds 90 frames, falls by 16
 func_8020F2DC_ovl_intro	Intro_RunSplash2	second splash (step 1, START skips): Intro_DrawSplash2, alpha steps of 8, holds 100 frames
 func_8020F448_ovl_intro	Intro_RunSplash3	third splash (step 2, START skips): Intro_DrawSplash3, alpha steps of 8, holds 120 frames

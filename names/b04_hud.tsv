@@ -20,7 +20,7 @@ func_80023930	Hud_UpdateAndDrawActorStatusIndicators	Draws the actor's active st
 func_80023D28	Hud_ClearActorStatusIndicators	Clears all status-icon slots and ends any attached visual effects.
 func_80023E14	Hud_DrawEnemyInfoPanel	Draws for 60 frames the enemy whose turn just started (Enemy_StateIdle sets D_8007C028 = that enemy and D_8008C162 = 60): its name from D_8007C04C (the enemy name table Battle_StartBossEncounter swaps for bosses) and, for enemies flagged 0x80, four stat values.
 func_8002430C	Hud_ResetPopups	Clears every entry in the eight-slot popup pool.
-func_8002433C	Hud_ShowActorPopup	Allocates a 45-frame popup attached to an actor (fixed sprite region 41x14) at its top; called by Player_StartDodge and Enemy_PlayMissEffect.
+func_8002433C	Hud_ShowActorPopup	Allocates a 45-frame popup attached to an actor (fixed sprite region 41x14) at its top; called by Player_StartMissReaction and Enemy_PlayMissEffect.
 func_8002440C	Hud_DrawPopups	Projects each timed popup's world position and draws its sprite, counting the timer down.
 func_800245D0	Hud_DrawSpellLabel	Looks up the spell for an element sequence, gets its restriction flags, and draws its name (or a placeholder when flag 4) with a palette by flags.
 func_80024694	Hud_DrawGlyphString	Draws 0xFF-terminated glyph bytes from the HUD font texture, with control bytes 0x80/0x81 (marks) and 0x82 (space).
