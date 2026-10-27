@@ -1,4 +1,5 @@
 #include "common.h"
+#include "overlays/ending/ending_data.h"
 
 /*
  * Ending overlay: entry and per-frame update, the same scripted sprite engine as the intro,
@@ -66,42 +67,9 @@ typedef struct {
     u16 idx;
 } UnkSortEntry_8020D98C;
 
-typedef struct {
-    u16 unk0;
-    s16 unk2;
-    s32 unk4;
-    s16 unk8;
-    s16 unkA;
-    s16 unkC;
-    s16 unkE;
-    s16 unk10;
-    s16 unk12;
-    s16 unk14;
-    s16 unk16;
-    s32 unk18;
-    s32 unk1C;
-    s16 unk20;
-    s16 unk22;
-    u16 unk24;
-    char unk26[2];
-} UnkStruct_802107F0_inner;
 
-typedef struct {
-    u32 flags;
-    s16 x;
-    s16 y;
-    s32 duration;
-} UnkStep_8020F880;
 
-typedef struct {
-    UnkStep_8020F880* steps;
-    u32 count;
-} UnkAnim_8020F880;
 
-typedef struct {
-    UnkStruct_802107F0_inner* unk0;
-    u32 unk4;
-} UnkStruct_802107F0;
 
 /* ovl_ending .bss 8022BB10..80238660: all of it is this file's (source order). */
 s32 ending_clip_left; /* sprite clip left, screen pixels */
@@ -124,9 +92,9 @@ u32 ending_cue_group_index = 0;
 s32 ending_wait_for_sprites = 0;
 s32 ending_display_buffer_index = 0;
 
-extern UnkStruct_802107F0 ending_cue_groups[];
+extern EndingCueGroup ending_cue_groups[];
 extern u32 ending_cue_group_count;
-extern UnkAnim_8020F880 ending_sprite_anim_table[];
+extern EndingAnim ending_sprite_anim_table[];
 extern Gfx D_8020F718_ovl_ending[];
 extern Gfx D_8020F748_ovl_ending[];
 
@@ -154,7 +122,6 @@ typedef struct {
 } UnkPic_80210800;
 
 extern Gfx D_8020F730_ovl_ending[];
-extern UnkPic_80210800 ending_picture_defs[];
 extern f32 D_8022BAF0_ovl_ending;
 extern f64 D_8022BAF8_ovl_ending;
 void Audio_StartSeqFadeOut(s32);
@@ -210,8 +177,8 @@ void Ending_UpdateAndDrawSprites(s32 arg0);
 s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1);
 
 s32 Ending_RunSpriteScript(void) {
-    UnkStruct_802107F0_inner* entries;
-    UnkStep_8020F880* steps;
+    EndingSpriteCue* entries;
+    EndingAnimStep* steps;
     u32 listIdx;
     UnkStruct_8022BB38* obj;
     s32 slot;
@@ -1160,7 +1127,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     if (ending_backdrop_frame < 0x2814) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
-        pic = &ending_picture_defs[arg0];
+        pic = &((UnkPic_80210800 *)ending_picture_defs)[arg0];
         width = pic->width;
         img = pic->img;
         gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);
@@ -1208,7 +1175,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     if (ending_backdrop_frame >= 0x26AC) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
-        pic = &ending_picture_defs[arg0 + 1];
+        pic = &((UnkPic_80210800 *)ending_picture_defs)[arg0 + 1];
         width = pic->width;
         img = pic->img;
         gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);

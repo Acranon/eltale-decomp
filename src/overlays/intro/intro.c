@@ -1,4 +1,5 @@
 #include "common.h"
+#include "overlays/intro/intro_data.h"
 
 /*
  * Intro overlay: entry and per-frame update (boot pak check, splashes), and the
@@ -48,41 +49,9 @@ typedef struct {
     /* 0x4E */ s16 unk4E;
 } IntroSprite; /* size = 0x50 */
 
-typedef struct {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s16 unk8;
-    /* 0x0A */ s16 unkA;
-    /* 0x0C */ s16 unkC;
-    /* 0x0E */ s16 unkE;
-    /* 0x10 */ s16 unk10;
-    /* 0x12 */ s16 unk12;
-    /* 0x14 */ s16 unk14;
-    /* 0x16 */ s16 unk16;
-    /* 0x18 */ s32 unk18;
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s16 unk20;
-    /* 0x22 */ s16 unk22;
-    /* 0x24 */ u16 unk24;
-} Unk28; /* size = 0x28 */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ s32 unk8;
-} AnimFrame; /* size = 0xC */
 
-typedef struct {
-    /* 0x00 */ AnimFrame *unk0;
-    /* 0x04 */ u32 unk4;
-} AnimTbl;
 
-typedef struct {
-    /* 0x00 */ Unk28 *unk0;
-    /* 0x04 */ u32 unk4;
-} Unk802170E8;
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -156,9 +125,9 @@ u8 intro_skip_requested;
 
 extern s32 intro_splash_fade_alpha;
 extern s32 intro_splash_phase;
-extern Unk802170E8 intro_cue_groups[];
+extern IntroCueGroup intro_cue_groups[];
 extern u32 intro_cue_group_count;
-extern AnimTbl intro_sprite_anim_table[];
+extern IntroAnim intro_sprite_anim_table[];
 extern Gfx D_802122E0_ovl_intro[];
 extern u16 D_80217A80_ovl_intro[];
 extern u8 D_80217C80_ovl_intro[];
@@ -371,14 +340,14 @@ s32 Intro_Update(void) {
 #ifdef NON_MATCHING
 /* D_80276F44 is the module's global (the original's function static), so its address is kept in a register; v1 spill at sp+0x74 vs 0x70; code is equivalent */
 s32 Intro_RunSpriteScript(void) {
-    Unk28* entries;
-    AnimFrame* steps;
+    IntroSpriteCue* entries;
+    IntroAnimStep* steps;
     u32 listIdx;
     IntroSprite* obj;
     s32 slot;
     s32 dx;
     s32 dy;
-    Unk28 *new_var;
+    IntroSpriteCue *new_var;
     s32 i;
     s32 j;
     s32 flags;
