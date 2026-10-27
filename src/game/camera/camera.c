@@ -1,24 +1,20 @@
 #include "game/camera/camera.h"
 #include "game/actor/actor.h"
+#include "game/battle/battle.h"
+#include "game/core/main.h"
+#include "game/env/env.h"
+#include "game/input/input.h"
+#include "game/map/map.h"
+#include "game/math/math.h"
+#include "game/npc/npc.h"
+#include "game/player/player.h"
+#include "game/ui/hud.h"
 
 /*
  * Camera: per-map presets, the mode handlers (follow, fixed eye, battle, delayed turn),
  * shake, the eye-height oscillation, and the projection/view matrices for each frame.
  * Original file: 15150.c (ROM 0x15150).
  */
-
-
-
-
-
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-} Unk8007ABB0;
-
-
 
 /* 15150 .bss, 80085B80..80085F90, in address order (first declaration fixes the order). */
 Camera camera_saved_state;
@@ -45,59 +41,10 @@ CameraDelayedTurn camera_delayed_turn;
 f32 camera_battle_angle_offset;
 u16 camera_persp_norm;
 
-extern s32 npc_drawn_count;
-extern Unk8007ABB0* npc_drawn_list[];
-
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ CameraPresetSet* unk24;
-} Unk8007C284;
-
-extern Mtx D_80301098;
-extern Mtx D_8030EB68;
-extern s32 D_80084308;
-extern u16 D_8007AA82;
-extern Unk8007C284* map_area_def;
-extern s32 map_id;
-extern s32 map_subarea;
-extern Vec3f D_8007AA20;
-extern f32 player_spawn_rot;
-void guOrtho(Mtx*, f32, f32, f32, f32, f32, f32, f32);
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ u16 unk14;
-} Unk8007C288;
-
-/* Local view of GfxFrameData (game/core/main.h, h_core) until H2. */
-typedef struct GfxFrameData {
-    /* 0x0000 */ Mtx proj;
-    /* 0x0040 */ Mtx unk40;
-    /* 0x0080 */ Mtx view;
-    /* 0x00C0 */ Mtx unkC0[0x226];
-    /* 0x8A40 */ LookAt lookAt;
-} Unk15150Dyn;
-
-extern Unk8007C288* map_subarea_def;
-extern u16 battle_flags;
-extern s32 core_flags;
-extern s32 D_8008C168;
-extern u16 input_pressed_buttons;
-extern s32 gfx_mtx_index;
-extern Gfx* gfx_dl_head;
-extern Unk15150Dyn D_2000000;
-void Camera_UpdateHeightOscillation(Vec3f*);
-
-f32 sinf(f32);
-f32 cosf(f32);
-f32 sqrtf(f32);
-void Camera_FollowTarget(Camera*);
-void Camera_SetPreset(s32);
-void Camera_UpdateFixedEye(Camera*);
-void Camera_UpdateHeading(Camera*);
-void Camera_UpdateBattle(Camera*);
-void Camera_UpdateDelayedTurn(Camera*);
+/* Not defined by a module: the two graphics frames at a fixed address (main.c uses them
+ * too) and segment 2. */
+extern GfxFrame D_80301000[2];
+extern GfxFrameData D_2000000;
 
 CameraPreset camera_default_presets[3] = {
     { 0, 0.0f, 0.0f, 0.0f, 11.0f, 15.0f, 65.0f, 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 15.0f, 2.5e+03f },
@@ -117,19 +64,19 @@ f32 camera_height_osc_phase_b = 0.0f;
 void Camera_InitForMap(void) {
     s32 pad[2];
     Camera* cam = &camera_state;
-    Vec3f* pos = &D_8007AA20;
+    Actor* pos = &player_state.actor;
     CameraPreset* p;
     s32 i;
 
-    guOrtho(&D_80301098, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
-    guOrtho(&D_8030EB68, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
-    if (D_80084308 < 0) {
+    guOrtho(&D_80301000[0].data.ortho, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
+    guOrtho(&D_80301000[1].data.ortho, -159.0f, 159.0f, 119.0f, -119.0f, 10.0f, 200.0f, 1.0f);
+    if (exit_destination.entry < 0) {
         cam->unk84 = 3.1415927f;
     }
-    camera_preset_index = (D_8007AA82 >> 1) & 7;
-    if (map_area_def->unk24 != NULL) {
-        camera_presets = map_area_def->unk24[map_subarea].presets;
-        camera_preset_count[0] = map_area_def->unk24[map_subarea].count;
+    camera_preset_index = (player_state.actor.unk62 >> 1) & 7;
+    if (map_area_def->cameraPresets != NULL) {
+        camera_presets = map_area_def->cameraPresets[map_subarea].presets;
+        camera_preset_count[0] = map_area_def->cameraPresets[map_subarea].count;
     } else {
         camera_presets = camera_default_presets;
         camera_preset_count[0] = 1;
@@ -138,7 +85,7 @@ void Camera_InitForMap(void) {
     cam->mode = p->mode;
     cam->flags = 1;
     cam->unk4 = 0;
-    cam->target = (Actor*)pos;
+    cam->target = pos;
     cam->pitchMin = p->pitchMin;
     cam->pitchMax = p->pitchMax;
     cam->yawMin = p->yawMin;
@@ -197,20 +144,20 @@ void Camera_InitForMap(void) {
     }
 }
 
-void Camera_Update(Unk15150Dyn* arg0) {
+void Camera_Update(GfxFrameData* arg0) {
     Camera* cam = &camera_state;
     f32 a;
     s32 idx;
     s32 pad;
 
-    if ((map_subarea_def->unk14 & 2) && !(battle_flags & 1) && cam->mode != 3) {
-        idx = (D_8007AA82 >> 1) & 7;
+    if ((map_subarea_def->flags & 2) && !(battle_flags & 1) && cam->mode != 3) {
+        idx = (player_state.actor.unk62 >> 1) & 7;
         if (idx != camera_preset_index) {
             Camera_SetPreset(idx);
         }
     }
     camera_mode_handlers[cam->mode](cam);
-    if (!(core_flags & 0x82) && D_8008C168 == 0 && !(battle_flags & 1) && !(map_subarea_def->unk14 & 2) &&
+    if (!(core_flags & 0x82) && D_8008C168 == 0 && !(battle_flags & 1) && !(map_subarea_def->flags & 2) &&
         (input_pressed_buttons & 0x20) && camera_preset_count[0] >= 2) {
         camera_preset_index++;
         if (camera_preset_index >= camera_preset_count[0]) {
@@ -220,6 +167,7 @@ void Camera_Update(Unk15150Dyn* arg0) {
     }
     camera_temp_vec.y = 0.0f;
     if (camera_height_osc_enabled[0] != 0) {
+        /* Reinterpretation: the callee writes only .y, here camera_temp_vec's second float. */
         Camera_UpdateHeightOscillation((Vec3f*)&camera_temp_vec);
     }
     guPerspectiveF(camera_proj_mtx.mf, &camera_persp_norm, camera_fovy, 1.3333334f, camera_near, camera_far, 1.0f);
@@ -228,11 +176,11 @@ void Camera_Update(Unk15150Dyn* arg0) {
     guMtxF2L(camera_proj_mtx.mf, &arg0->proj);
     guMtxF2L(camera_view_mtx.mf, &arg0->view);
     if (camera_shake_timer != 0) {
-        guTranslate(&arg0->unkC0[gfx_mtx_index], camera_shake_x, camera_shake_y, 0.0f);
+        guTranslate(&arg0->mtx[gfx_mtx_index], camera_shake_x, camera_shake_y, 0.0f);
         camera_shake_x *= -0.8;
         camera_shake_y *= -0.8;
         camera_shake_timer--;
-        gSPMatrix(gfx_dl_head++, &D_2000000.unkC0[gfx_mtx_index], G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
+        gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_PROJECTION | G_MTX_LOAD | G_MTX_NOPUSH);
         gfx_mtx_index++;
         gSPMatrix(gfx_dl_head++, &D_2000000.proj, G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
     } else {
@@ -245,14 +193,6 @@ void Camera_Update(Unk15150Dyn* arg0) {
     camera_tan_half_fovy = sinf(a) / cosf(a);
 }
 
-extern s32 core_flags;
-extern u16 input_held_buttons;
-extern u16 battle_flags;
-extern f32 D_8007AA24;
-void func_80015B88(Camera *arg0);
-void Camera_UpdateLookAt(Camera *arg0, Actor *arg1);
-void Camera_OrbitTarget(Camera *arg0, Actor *arg1);
-f32 Camera_RaiseOverNpcs(Camera *arg0, f32 arg1);
 void Camera_FollowTarget(Camera *arg0)
 {
   u8 locked;
@@ -366,9 +306,9 @@ void Camera_FollowTarget(Camera *arg0)
     y = dz;
   }
   y = Camera_RaiseOverNpcs(arg0, y);
-  if ((battle_flags & 1) && (y < D_8007AA24))
+  if ((battle_flags & 1) && (y < player_state.actor.y))
   {
-    y = D_8007AA24;
+    y = player_state.actor.y;
   }
   ny = y - arg0->eyeY;
   ny *= arg0->unk70 * ((ny < 0.0f) ? (0.2) : (0.8));
@@ -399,10 +339,6 @@ void Camera_FollowTarget(Camera *arg0)
   }
 }
 
-
-
-void func_80015B88(Camera* arg0);
-void Camera_UpdateLookAt(Camera* arg0, Actor* arg1);
 void Camera_UpdateFixedEye(Camera* arg0) {
     f32 dx;
     f32 dy;
@@ -481,9 +417,6 @@ void Camera_UpdateHeading(Camera* arg0) {
     }
 }
 
-extern f32 battle_center_x;
-extern f32 battle_center_z;
-extern u16 input_pressed_buttons;
 void Camera_UpdateBattle(Camera* arg0) {
     f32 a;
 
@@ -625,8 +558,6 @@ void Camera_SetPreset(s32 arg0) {
     cam->orbitSpeed = 0.0f;
 }
 
-extern f32 D_8007AA24;
-extern u16 battle_flags;
 void Camera_StartBattleFocus(s32 arg0, Actor* arg1) {
     f32 h;
 
@@ -639,7 +570,7 @@ void Camera_StartBattleFocus(s32 arg0, Actor* arg1) {
     camera_focus_target.x = arg1->x;
     camera_focus_target.z = arg1->z;
     if (arg1->unk5E & 4) {
-        camera_focus_target.y = D_8007AA24;
+        camera_focus_target.y = player_state.actor.y;
     } else if (arg1->unk64->unk0 == 1) {
         camera_focus_target.y = arg1->unk68->unk94;
     } else {
@@ -671,8 +602,8 @@ void Camera_StartBattleFocus(s32 arg0, Actor* arg1) {
     camera_state.eyeX = arg1->x + camera_temp_vec.x;
     camera_state.eyeY = camera_focus_target.y + camera_state.eyeHeight * 1.1;
     camera_state.eyeZ = arg1->z + camera_temp_vec.y;
-    if (camera_state.eyeY < D_8007AA24) {
-        camera_state.eyeY = D_8007AA24;
+    if (camera_state.eyeY < player_state.actor.y) {
+        camera_state.eyeY = player_state.actor.y;
     }
 }
 
@@ -721,12 +652,10 @@ void Camera_SetTargetView(CameraPreset* arg0, Actor* arg1) {
     camera_state.eyeVelX = camera_state.eyeVelY;
 }
 
-extern f32 D_8007AA30;
-extern f32 D_80084314;
 void Camera_TurnForExit(void) {
     f32 a;
 
-    a = camera_state.unk28 - D_8007AA30;
+    a = camera_state.unk28 - player_state.actor.rot;
     if (a < -3.141592653589793) {
         a += 6.283185307179586;
     } else if (a > 3.141592653589793) {
@@ -745,7 +674,7 @@ void Camera_TurnForExit(void) {
         a -= 6.283185307179586;
     }
     camera_state.unk84 = a;
-    camera_state.orbitAngle = D_80084314 + 3.141592653589793;
+    camera_state.orbitAngle = exit_destination.angle + 3.141592653589793;
     if (camera_state.orbitAngle > 3.141592653589793) {
         camera_state.orbitAngle -= 6.283185307179586;
     } else if (camera_state.orbitAngle < -3.141592653589793) {
@@ -756,8 +685,8 @@ void Camera_TurnForExit(void) {
 
 f32 Camera_RaiseOverNpcs(Camera* arg0, f32 arg1) {
     s32 n = npc_drawn_count;
-    Unk8007ABB0** p;
-    Unk8007ABB0* obj;
+    Actor** p;
+    Actor* obj;
     f32 dx;
     f32 dz;
 
