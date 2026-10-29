@@ -22,15 +22,16 @@ extern ColorRGBA8 *fade_ramp_ptr;
 extern Vtx fade_quad_vtx[4];
 extern Gfx fade_quad_dl[8];
 extern Gfx fade_letterbox_dl[10];
-extern ColorRGBA8 fade_black_ramp[5];
-extern ColorRGBA8 fade_black_ramp_dim[10];
-extern ColorRGBA8 fade_black_ramp_end[1];
-extern ColorRGBA8 fade_grey_ramp[15];
-extern ColorRGBA8 fade_grey_ramp_end[1];
-extern ColorRGBA8 fade_black_ramp_slow[31];
-extern ColorRGBA8 fade_black_ramp_slow_end[9];
-extern ColorRGBA8 fade_grey_ramp_slow[31];
-extern ColorRGBA8 fade_grey_ramp_slow_end[9];
+extern ColorRGBA8 fade_black_ramp[16];
+extern ColorRGBA8 fade_grey_ramp[16];
+extern ColorRGBA8 fade_black_ramp_slow[40];
+extern ColorRGBA8 fade_grey_ramp_slow[40];
+/* Entries of the ramps that the code names: aliases (undefined_syms.txt). */
+extern ColorRGBA8 fade_black_ramp_dim[];  /* &fade_black_ramp[5] */
+extern ColorRGBA8 fade_black_ramp_end[];  /* &fade_black_ramp[15] */
+extern ColorRGBA8 fade_grey_ramp_end[];  /* &fade_grey_ramp[15] */
+extern ColorRGBA8 fade_black_ramp_slow_end[];  /* &fade_black_ramp_slow[31] */
+extern ColorRGBA8 fade_grey_ramp_slow_end[];  /* &fade_grey_ramp_slow[31] */
 extern ColorRGBA8 fade_damage_flash[4];
 
 void Fade_Init(void);
