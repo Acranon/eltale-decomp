@@ -929,7 +929,7 @@ void Effect_UpdateAndDrawModelEffects(struct GfxFrameData* arg0) {
 }
 
 
-s32 Effect_DrawModelEffectGeometry(EffectModel* arg0, struct GfxFrameData* arg1) {
+void Effect_DrawModelEffectGeometry(EffectModel* arg0, struct GfxFrameData* arg1) {
     u32 i;
     AnimNode* anims;
     s32 frame;
@@ -961,7 +961,7 @@ s32 Effect_DrawModelEffectGeometry(EffectModel* arg0, struct GfxFrameData* arg1)
     }
 }
 
-s32 Effect_ConfigureModelEffectTexture(EffectModel* arg0) {
+void Effect_ConfigureModelEffectTexture(EffectModel* arg0) {
     EffectTexAnim* t;
     u32 mask;
     u32 size;

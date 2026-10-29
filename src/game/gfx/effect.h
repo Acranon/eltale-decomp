@@ -184,8 +184,8 @@ void Effect_ResetModelEffects(void);
 EffectModel *Effect_CreateModelEffect(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8,
                                       f32 arg9, f32 arg10, f32 arg11);
 void Effect_UpdateAndDrawModelEffects(struct GfxFrameData *arg0);
-s32 Effect_DrawModelEffectGeometry(EffectModel *arg0, struct GfxFrameData *arg1);
-s32 Effect_ConfigureModelEffectTexture(EffectModel *arg0);
+void Effect_DrawModelEffectGeometry(EffectModel *arg0, struct GfxFrameData *arg1);
+void Effect_ConfigureModelEffectTexture(EffectModel *arg0);
 void Effect_ResetStatUpMarkers(void);
 void Effect_DrawStatUpMarkers(struct GfxFrameData *arg0);
 void Effect_StartStatUpMarker(s32 arg0);

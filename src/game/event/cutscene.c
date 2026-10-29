@@ -466,16 +466,8 @@ u8 *save_menu_operation_panel_messages[5] = {
 s16 save_menu_operation_panel_rects[5][4] = {
     { 44, 107, 232, 25 }, { 79, 107, 162, 25 }, { 84, 107, 152, 25 }, { 84, 107, 152, 25 }, { 54, 107, 212, 25 },
 };
-u8 *save_menu_dialog_messages_save[1] = {
-    D_8006C16C,
-};
-u8 *D_8006C938[1] = {
-    D_8006C174,
-};
-u8 *D_8006C93C[1] = {
-    D_8006C180,
-};
-u8 *D_8006C940[22] = {
+u8 *save_menu_dialog_messages_save[25] = {
+    D_8006C16C, D_8006C174, D_8006C180,
     D_8006C188, D_8006C190, D_8006C1BC, D_8006C1E0, D_8006C858, D_8006C280,
     D_8006C2CC, D_8006C2CC, D_8006C370, D_8006C390, D_8006C3B8, D_8006C408,
     D_8006C458, D_8006C4C4, D_8006C4C8, D_8006C50C, D_8006C560, D_8006C564,
