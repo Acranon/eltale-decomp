@@ -224,3 +224,4 @@ D_80092264 = text_window_slots + 0x1DF4;
 D_80084308 = exit_destination + 0x8;
 D_8008430C = exit_destination + 0xC;
 D_80084314 = exit_destination + 0x14;
+env_day_phase_last = env_day_phases + 0x24; /* env_day_phases[3], named by Env_InitForMap's asm */

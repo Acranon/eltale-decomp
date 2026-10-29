@@ -44,14 +44,12 @@ s32 env_light_colors[4][3];
 s32 env_light_dirs[4][3];
 s32 env_fog_range[2];
 
-/* This file's .data, 8004DED0..8004DF00: the day-phase table (env_day_phase_last is
- * its last entry, named separately by the asm). */
-EnvDayPhase env_day_phases[3] = {
+/* This file's .data, 8004DED0..8004DF00: the day-phase table. The asm names its last entry
+ * env_day_phase_last (an alias, symbol_addrs.txt). */
+EnvDayPhase env_day_phases[4] = {
     { 0x15F9, 0, 0x80 },
     { 0x2328, 1, 0x80 },
     { 0x4AB5, 2, 0x80 },
-};
-EnvDayPhase env_day_phase_last[1] = {
     { 0x537F, 3, 0x80 },
 };
 
@@ -80,7 +78,7 @@ void Env_InitClock(void) {
 }
 
 #ifdef NON_MATCHING
-/* &env_day_phase_last held in a register instead of separate %hi/%lo loads, temporaries rotated (register allocation); code is equivalent */
+/* &env_day_phases[3] held in a register instead of separate %hi/%lo loads, temporaries rotated (register allocation); code is equivalent */
 void Env_InitForMap(void) {
     EnvDayPhase *p;
     s32 i;
@@ -89,11 +87,11 @@ void Env_InitForMap(void) {
     u16 *dst;
     EnvKeyframe *e;
 
-    /* env_day_phases[0..2] and env_day_phase_last form one 4-entry table; the walk goes back from its last entry */
-    env_last_phase_start = env_day_phase_last[0].startTime;
-    p = env_day_phase_last;
+    /* the walk goes back from the table's last entry */
+    env_last_phase_start = env_day_phases[3].startTime;
+    p = &env_day_phases[3];
     i = 3;
-    if (env_clock < env_day_phase_last[0].startTime) {
+    if (env_clock < env_day_phases[3].startTime) {
         do {
             p--;
             n = i--;
@@ -103,7 +101,7 @@ void Env_InitForMap(void) {
         } while (env_clock < p->startTime);
     }
     if (i < 0) {
-        p = env_day_phase_last;
+        p = &env_day_phases[3];
         env_next_phase = 3;
     } else {
         env_next_phase = i;

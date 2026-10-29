@@ -120,8 +120,7 @@ extern s32 D_80084B74;
 extern s32 env_fog_range[2];
 
 /* .data */
-extern EnvDayPhase env_day_phases[3];
-extern EnvDayPhase env_day_phase_last[1];
+extern EnvDayPhase env_day_phases[4];
 
 void Exit_SetDestination(struct MapExit *arg0);
 void Env_InitClock(void);
