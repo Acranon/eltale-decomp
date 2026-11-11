@@ -207,9 +207,6 @@ s32 Coll_RayCrossesEdge(f32 px, f32 pz, f32 ax, f32 az, f32 bx, f32 bz) {
     return 0;
 }
 
-#ifdef NON_MATCHING
-/* FP register allocation and stack homes differ, two extra instructions; code is equivalent.
- * Both endpoint cases push away from (ax, az), as retail does. */
 s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz) {
     s32 ret;
     f32 a;
@@ -225,8 +222,6 @@ s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz
     f32 iz;
     f32 dx;
     f32 dz;
-    f32 cx;
-    f32 cz;
 
     ret = 0;
     a = (ax <= bx) ? ax : bx;
@@ -258,36 +253,29 @@ s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz
         if (a == 0.0f) {
             a2 = 1.0f;
             b2 = 0.0f;
-            cx = *px;
-            cz = *pz;
-            c2 = -cx;
+            c2 = -*px;
         } else if (b == 0.0f) {
             a2 = 0.0f;
             b2 = 1.0f;
-            cz = *pz;
-            cx = *px;
-            c2 = -cz;
+            c2 = -*pz;
         } else {
             a2 = -1.0f / a;
-            cx = *px;
-            cz = *pz;
             b2 = 1.0f;
-            c2 = -a2 * cx - cz;
+            c2 = -a2 * *px - *pz;
         }
         ix = (c2 * b - c * b2) / (a * b2 - a2 * b);
         iz = (a2 * c - a * c2) / (a * b2 - a2 * b);
         a = (ax <= bx) ? ax : bx;
         b = (bx < ax) ? ax : bx;
-        dz = az;
-        c = (dz <= bz) ? dz : bz;
-        d = (bz < dz) ? dz : bz;
+        c = (az <= bz) ? az : bz;
+        d = (bz < az) ? az : bz;
         if (ix < a || b < ix || iz < c || d < iz) {
-            a = ax - cx;
-            b = dz - cz;
+            a = ax - *px;
+            b = az - *pz;
             c = sqrtf(a * a + b * b);
             if (c < r) {
                 dx = ax - *px;
-                dz = dz - *pz;
+                dz = az - *pz;
                 k = ((r + 0.1) - c) / sqrtf(dx * dx + dz * dz);
                 *px -= dx * k;
                 *pz -= dz * k;
@@ -299,7 +287,7 @@ s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz
             if (c < r) {
                 /* retail: (ax, az) here too, not (bx, bz) */
                 dx = ax - *px;
-                dz = dz - *pz;
+                dz = az - *pz;
                 k = ((r + 0.1) - c) / sqrtf(dx * dx + dz * dz);
                 *px -= dx * k;
                 *pz -= dz * k;
@@ -307,11 +295,10 @@ s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz
             }
             return 0;
         }
-        dx = ix - cx;
-        dz = iz - cz;
+        dx = ix - *px;
+        dz = iz - *pz;
         if (dist != 0.0f) {
-            ix = dx * dx + dz * dz;
-            k = ((r + 0.1) - dist) / sqrtf(ix);
+            k = ((r + 0.1) - dist) / sqrtf(dx * dx + dz * dz);
             *px -= dx * k;
             *pz -= dz * k;
         }
@@ -319,9 +306,6 @@ s32 Coll_PushFromSegment(f32 *px, f32 *pz, f32 r, f32 ax, f32 az, f32 bx, f32 bz
     }
     return ret;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/map/collision/Coll_PushFromSegment.s")
-#endif
 
 s32 Coll_PushFromWalls(f32 x, f32 z, CollWalls *walls, CollResult *out) {
     s32 n;
