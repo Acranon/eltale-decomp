@@ -594,65 +594,69 @@ void Text_DrawWindowFrame(s32 idx) {
     Text_DrawTexturedRect(3, p->width + x - 1, y, 1, p->height);
 }
 
-#ifdef NON_MATCHING
-/* frame 0x40 vs 0x48, one more saved register, row loop tested as row != rows + 1; code is equivalent */
 void Text_BuildVisiblePage(s32 idx) {
     TextWindow *p = &text_window_slots[idx];
     s32 cols = (p->width - 20) / 10 + 1;
-    s32 rows = (p->height - 20) / 13;
+    s32 row;
+    s32 i;
+    s32 n;
+    s32 j;
     s32 k = 0;
+    s32 rows = (p->height - 20) / 13;
     s32 dst = -1;
     s32 src = -1;
-    s32 row;
-    s32 col;
-    s32 j;
-    s32 n;
-    u8 c;
 
-    for (row = 1; row <= rows; row++) {
-        for (col = 0; col < cols;) {
-            text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
-            c = text_window_slots[idx].visible_bytes[dst];
-            if (c & 0x80) {
-                if (c == 0xE0 || c == 0xFF || (c == 0xF0 && k != 0)) {
-                    break;
-                }
-            } else {
-                col++;
-                k++;
-            }
-        }
-        c = text_window_slots[idx].visible_bytes[dst];
-        if (c == 0xFF) {
-            break;
-        }
-        if (c == 0xF0) {
-            p->flags |= 0x4000000;
-            break;
-        }
-        if (c != 0xE0 && c != 0xE0) {
-            n = -1;
-            for (j = src + 1; text_window_slots[idx].message_bytes[j] >= 0x80; j++) {
-                if (text_window_slots[idx].message_bytes[j] == 0xE0) {
-                    for (n = j - src; n > 0; n--) {
-                        text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+    row = 1;
+    if (rows > 0) {
+        do {
+            for (i = 0; i < cols;) {
+                text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+                if (text_window_slots[idx].visible_bytes[dst] & 0x80) {
+                    if (text_window_slots[idx].visible_bytes[dst] == 0xE0) {
+                        break;
                     }
-                    text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
-                    n = 0;
-                    break;
+                    if (text_window_slots[idx].visible_bytes[dst] == 0xFF) {
+                        break;
+                    }
+                    if (text_window_slots[idx].visible_bytes[dst] == 0xF0 && k != 0) {
+                        break;
+                    }
+                } else {
+                    i++;
+                    k++;
                 }
             }
-            if (n != 0) {
-                text_window_slots[idx].visible_bytes[++dst] = 0xE0;
+            if (text_window_slots[idx].visible_bytes[dst] == 0xFF) {
+                break;
             }
-        }
+            if (text_window_slots[idx].visible_bytes[dst] == 0xF0) {
+                p->flags |= 0x4000000;
+                break;
+            }
+            if (text_window_slots[idx].visible_bytes[dst] != 0xE0 && text_window_slots[idx].visible_bytes[dst] != 0xE0) {
+                n = -1;
+                for (i = src; text_window_slots[idx].message_bytes[++i] >= 0x80;) {
+                    if (text_window_slots[idx].message_bytes[i] == 0xE0) {
+                        for (n = i - src; n > 0; n--) {
+                            text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+                        }
+                        text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+                        n = 0;
+                        break;
+                    }
+                }
+                if (n != 0) {
+                    text_window_slots[idx].visible_bytes[++dst] = 0xE0;
+                }
+            }
+        } while (row++ < rows);
     }
-    c = text_window_slots[idx].visible_bytes[dst];
-    if (c != 0xFF && c != 0xF0) {
+    if (text_window_slots[idx].visible_bytes[dst] != 0xFF && text_window_slots[idx].visible_bytes[dst] != 0xF0) {
         p->flags |= 0x4000000;
         p->visible_bytes[dst + 1] = 0xFF;
         if (p->pending_byte != 0xFF) {
-            p->message_bytes[(u16)p->reveal_index] = p->pending_byte;
+            dst = p->reveal_index;
+            p->message_bytes[dst] = p->pending_byte;
             p->reveal_index = src + 1;
             p->pending_byte = p->message_bytes[src + 1];
             p->message_bytes[src + 1] = 0xFF;
@@ -663,9 +667,6 @@ void Text_BuildVisiblePage(s32 idx) {
         }
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/text/text_window/Text_BuildVisiblePage.s")
-#endif
 
 void Text_DrawAdvanceIndicator(s32 idx) {
     s32 x;
@@ -740,38 +741,24 @@ s32 Text_FindWindow(s32 arg0, s32 arg1) {
     return ret;
 }
 
-#ifdef NON_MATCHING
-/* frame 0xE0 vs 0xD8, type == 0 tested as &tex.p[type] == &tex.p[0], one dead _g home store missing; code is equivalent */
-void Text_DrawTexturedRect(s32 type, s32 x, s32 y, s32 w, s32 h)
-{
-  u32 new_var;
-  Gfx *new_var2;
-  TextTextureTile *t;
-  TextTexturePointers tex = text_rect_texture_ptrs;
-  TextTextureTiles prm = text_rect_texture_params;
+void Text_DrawTexturedRect(s32 type, s32 x, s32 y, s32 w, s32 h) {
+    s32 i = type;
+    TextTexturePointers tex = text_rect_texture_ptrs;
+    TextTextureTiles prm = text_rect_texture_params;
 
-  { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
-  ;
-  t = &prm.e[type];
-  {
-    { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = ((((unsigned int) ((((unsigned int) 0xfd) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) (t->w - 1)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (unsigned int) tex.p[type]; }
-    ;
-    { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((((unsigned int) ((((unsigned int) 0xf5) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) ((((((t->w - 1) - 0) + 1) * 1) + 7) >> 3)) & ((0x01 << 9) - 1)) << 9))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 9) - 1)) << 0)); _g->words.w1 = ((((((((unsigned int) ((((unsigned int) 7) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 20))) | ((unsigned int) ((((unsigned int) t->cmt) & ((0x01 << 2) - 1)) << 18))) | ((unsigned int) ((((unsigned int) t->maskt) & ((0x01 << 4) - 1)) << 14))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 10))) | ((unsigned int) ((((unsigned int) t->cms) & ((0x01 << 2) - 1)) << 8))) | ((unsigned int) ((((unsigned int) prm.e[type].masks) & ((0x01 << 4) - 1)) << 4))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 0)); }
-    ;
-    { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe6) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
-    ;
-    { Gfx *_g = (Gfx *) (gfx_dl_head++); new_var2 = _g; new_var2->words.w0 = (((unsigned int) ((((unsigned int) 0xf4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 0)); new_var2->words.w1 = (((unsigned int) ((((unsigned int) 7) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((t->w - 1) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((prm.e[type].h - 1) << 2)) & ((0x01 << 12) - 1)) << 0)); }
-    ;
- { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((((unsigned int) ((((unsigned int) 0xf5) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 2) & ((0x01 << 3) - 1)) << 21))) | ((unsigned int) ((((unsigned int) 1) & ((0x01 << 2) - 1)) << 19))) | ((unsigned int) ((((unsigned int) ((((((t->w - 1) - 0) + 1) * 1) + 7) >> 3)) & ((0x01 << 9) - 1)) << 9))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 9) - 1)) << 0)); _g->words.w1 = ((((((((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 20))) | ((unsigned int) ((((unsigned int) t->cmt) & ((0x01 << 2) - 1)) << 18))) | ((unsigned int) ((((unsigned int) t->maskt) & ((0x01 << 4) - 1)) << 14))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 10))) | ((unsigned int) ((((unsigned int) t->cms) & ((0x01 << 2) - 1)) << 8))) | ((unsigned int) ((((unsigned int) prm.e[type].masks) & ((0x01 << 4) - 1)) << 4))) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 4) - 1)) << 0)); } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((unsigned int) ((((unsigned int) 0xf2) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (0 << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((t->w - 1) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((prm.e[type].h - 1) << 2)) & ((0x01 << 12) - 1)) << 0)); } } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; } ; if (type == 0) { { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((unsigned int) (new_var = (((unsigned int) 0xe4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((x + w) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((y + h) << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (x << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (y << 2)) & ((0x01 << 12) - 1)) << 0)); { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 11)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) ((x & 0xF) << 5)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) ((y & 0xF) << 5)) & ((0x01 << 16) - 1)) << 0))); } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 12)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 0))); } ; } ; } else { { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (((unsigned int) ((((unsigned int) 0xe4) & ((0x01 << 8) - 1)) << 24)) | ((unsigned int) ((((unsigned int) ((x + w) << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) ((y + h) << 2)) & ((0x01 << 12) - 1)) << 0)); _g->words.w1 = (((unsigned int) ((((unsigned int) 0) & ((0x01 << 3) - 1)) << 24)) | ((unsigned int) ((((unsigned int) (x << 2)) & ((0x01 << 12) - 1)) << 12))) | ((unsigned int) ((((unsigned int) (y << 2)) & ((0x01 << 12) - 1)) << 0)); { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 11)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) 0) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) 0) & ((0x01 << 16) - 1)) << 0))); } ; { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) ((-65) - 12)) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = (unsigned int) (((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 16)) | ((unsigned int) ((((unsigned int) (1 << 10)) & ((0x01 << 16) - 1)) << 0))); } ; }
-    ;
-  }
-  { Gfx *_g = (Gfx *) (gfx_dl_head++); _g->words.w0 = (unsigned int) ((((unsigned int) 0xe7) & ((0x01 << 8) - 1)) << 24); _g->words.w1 = 0; }
-  ;
-
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTextureTile(gfx_dl_head++, tex.p[i], G_IM_FMT_CI, G_IM_SIZ_8b, prm.e[i].w, prm.e[i].h, 0, 0, prm.e[i].w - 1, prm.e[i].h - 1, 0, prm.e[i].cms, prm.e[i].cmt, prm.e[i].masks, prm.e[i].maskt, 0, 0);
+    gDPPipeSync(gfx_dl_head++);
+    if (i == 0) {
+        gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, (x & 0xF) << 5, (y & 0xF) << 5, 1 << 10, 1 << 10);
+    } else {
+        gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+    }
+    gDPPipeSync(gfx_dl_head++);
+    /* an empty check: retail still evaluates &tex.p[i] for it (a debug message was probably compiled out) */
+    if (tex.p[i] == NULL) {
+    }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/text/text_window/Text_DrawTexturedRect.s")
-#endif
 
 void Text_DrawFramedRect(s32 x, s32 y, s32 w, s32 h) {
     gDPPipeSync(gfx_dl_head++);

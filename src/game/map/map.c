@@ -383,8 +383,8 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
             cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         default:
-            off = mapobj_cell_single;
             cx = 0;
+            off = mapobj_cell_single;
             cz = 0;
             n = 1;
             break;
@@ -396,13 +396,14 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
         if (gx >= 0 && gz >= 0 && gx < map_subarea_grid->w && gz < map_subarea_grid->h) {
             idx = map_subarea_grid->w * gz + gx;
             list = &map_subarea_grid->lists[map_subarea_grid->cells[idx]];
-            t = *list;
-            MapObj_CollectCell(t, list + 1);
+            t = *list++;
+            MapObj_CollectCell(t, list);
         }
     }
     if (map_subarea_grid->alwaysCount != 0) {
         t = map_subarea_grid->alwaysCount;
-        MapObj_CollectCell(t, map_subarea_grid->alwaysList);
+        list = map_subarea_grid->alwaysList;
+        MapObj_CollectCell(t, list);
     }
     gSPDisplayList(gfx_dl_head++, D_10000E8);
     gSPFogPosition(gfx_dl_head++, gfx_fog_near, gfx_fog_far);

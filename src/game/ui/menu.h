@@ -53,22 +53,6 @@ typedef struct MenuExpGaugeTextures { /* 0x00 */ u8 *v[4][2]; } MenuExpGaugeText
 typedef struct MenuFourWords { /* 0x00 */ s32 v[4]; } MenuFourWords; /* 0x10 bytes */
 typedef struct MenuFourPointers { /* 0x00 */ u8 *v[4]; } MenuFourPointers; /* 0x10 bytes */
 
-extern s32 menu_slide_right_x;
-extern s32 menu_slide_left_x;
-extern s32 menu_slide_timer;
-extern u16 menu_map_cursor_active;
-extern u16 menu_flags;
-extern s8 menu_save_loaded;
-extern s32 menu_frame_counter;
-extern f32 menu_map_marker_x;
-extern f32 menu_map_marker_z;
-extern s32 menu_map_region;
-extern s32 menu_map_spot;
-#ifndef NON_MATCHING
-extern s32 menu_options_marker_x;
-#endif
-extern f32 menu_map_cursor_saved_x;
-extern f32 menu_map_cursor_saved_y;
 extern void *player_char_data[1];
 extern ActorStats player_default_stats;
 extern u32 player_level_exp_table[100];
@@ -156,6 +140,19 @@ extern Vtx mapobj_drop_sprite_vtx[4];
 extern Gfx mapobj_drop_sprite_dl[10];
 extern MapBackdropDef map_backdrop_defs[8];
 extern u8 mapobj_translucent_alpha[40];
+/* .bss. IDO lays .bss out by declaration number modulo 256, so these come after the shared
+ * tables above: Menu_UpdateOptionsPage's static (8008FB58) then lands right after menu_map_spot. */
+extern s32 menu_slide_right_x;
+extern s32 menu_slide_left_x;
+extern s32 menu_slide_timer;
+extern u16 menu_map_cursor_active;
+extern u16 menu_flags;
+extern s8 menu_save_loaded;
+extern s32 menu_frame_counter;
+extern f32 menu_map_marker_x;
+extern f32 menu_map_marker_z;
+extern s32 menu_map_region;
+extern s32 menu_map_spot;
 extern s8 menu_bgm_volume_option;
 extern u8 menu_sprite_sizes[88][2];
 extern s8 menu_wobble_offsets[16];
@@ -175,7 +172,6 @@ extern void *menu_map_small_tluts[4];
 extern void *menu_map_small_tex[8];
 extern u8 menu_map_small_sizes[4][3];
 extern s16 menu_map_small_pos[8];
-extern u8 menu_options_marker_sprites[4];
 extern s16 menu_options_top_row_pos[8][2];
 extern s16 menu_options_bgm_row_pos[5][2];
 extern s32 menu_map_loaded_region;

@@ -1660,21 +1660,24 @@ u16 Player_CalcMeleeDamage(Player *arg0) {
     return val;
 }
 
-#ifdef NON_MATCHING
+/* Retail takes the actor's address into a register of its own for the facing read after
+ * Math_Atan2 and re-reads animFlags after storing it: those accesses are not folded into
+ * the D_8007AA20 ones. An address that went through an integer (a pointer kept in an s32,
+ * as elsewhere in this code) gives exactly that. */
+#define PLAYER_ACTOR_VIA_INT ((Actor *) (s32) &D_8007AA20)
 
-/* frame 0x50 vs 0x48: damage kept in an extra saved register, arg2 kept live (register allocation); code is equivalent */
 u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
     Player *p = &player_state;
-    PlayerAnimTable *cd;
     f32 angle;
-    s32 d;
-    s32 flags;
+    s32 back;
+    PlayerAnimTable *cd;
 
     if (p->state != 6) {
         cd = player_char_data[p->actor.animSetIndex];
-        if (dmg != 0) {
-            if (arg1 & 0x8000) {
-                angle = Math_Atan2(arg2->x - player_state.actor.x, arg2->z - player_state.actor.z) - player_state.actor.rot;
+        back = arg1 & 0x8000;
+        if (dmg) {
+            if (back) {
+                angle = Math_Atan2(arg2->x - D_8007AA20.x, arg2->z - D_8007AA20.z) - PLAYER_ACTOR_VIA_INT->rot;
                 if (angle > 3.141592653589793) {
                     angle -= 6.283185307179586;
                 } else if (angle < -3.141592653589793) {
@@ -1687,52 +1690,47 @@ u16 Player_TakeDamage(u16 dmg, u16 arg1, Actor *arg2) {
                     dmg += dmg >> 1;
                 }
             }
-            dmg = dmg * ((f32) arg2->battle->attack_power / (f32) (arg2->battle->attack_power + p->battle.defense));
+            angle = arg2->battle->attack_power;
+            angle = angle / (arg2->battle->attack_power + p->battle.defense);
+            dmg = dmg * angle;
             dmg += Math_Rand((u32) (sqrtf(dmg) * 0.75 + 1.0));
-            if (dmg == 0) {
+            if (!dmg) {
                 dmg++;
             }
-            d = dmg;
-            if (p->actor.stats->hp < dmg) {
-                p->actor.stats->hp = 0;
+            if (D_8007AA20.stats->hp < dmg) {
+                D_8007AA20.stats->hp = 0;
             } else {
-                p->actor.stats->hp -= d;
+                D_8007AA20.stats->hp -= dmg;
             }
             if (p->battle.status_bits & 0x200) {
-                p->actor.stats->mp += d;
-                if (p->actor.stats->max_mp < p->actor.stats->mp) {
-                    p->actor.stats->mp = p->actor.stats->max_mp;
+                D_8007AA20.stats->mp += dmg;
+                if (D_8007AA20.stats->max_mp < D_8007AA20.stats->mp) {
+                    D_8007AA20.stats->mp = D_8007AA20.stats->max_mp;
                 }
-                Hud_StartActorStatusIndicator(&player_state.actor, 0x200, 2, 0x1E);
+                Hud_StartActorStatusIndicator(&D_8007AA20, 0x200, 2, 0x1E);
             }
-            flags = 0;
             p->stats->hp_xp++;
             p->stats->defense_xp++;
-            if (arg1 & 0x4000) {
-                flags = 0x8003;
-            }
-            Effect_AddFloatingNumber(&player_state.actor, flags, d);
+            Effect_AddFloatingNumber(&D_8007AA20, (arg1 & 0x4000) ? 0x8003 : 0, dmg);
         }
         p->state = 5;
-        p->state_timer = *(s16 *) ((u8 *) cd + 0x62); /* PlayerAnimTable field 0x62 (lh) */
-        player_state.actor.animFlags |= 1;
-        d = arg1 & 0x8000;
+        p->state_timer = cd->unk62;
+        PLAYER_ACTOR_VIA_INT->animFlags |= 1;
         if (arg1 & 4) {
-            player_state.actor.animFlags |= 2;
+            PLAYER_ACTOR_VIA_INT->animFlags |= 2;
         }
-        Anim_SetCurrentAndNext(&player_state.actor, 8, 1, player_idle_anim, 1, 1);
-        if (dmg != 0) {
+        Anim_SetCurrentAndNext(PLAYER_ACTOR_VIA_INT, 8, 1, player_idle_anim, 1, 1);
+        if (dmg) {
             Camera_Shake(2);
         }
-        if (d != 0) {
+        if (back) {
             Sfx_Play(0, 0x18, 0xFF);
         }
     }
     return dmg;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/player/player/Player_TakeDamage.s")
-#endif
+
+#undef PLAYER_ACTOR_VIA_INT
 
 
 void Player_StartMissReaction(void) {
