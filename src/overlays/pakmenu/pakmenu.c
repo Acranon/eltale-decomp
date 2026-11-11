@@ -623,12 +623,13 @@ s16 pak_menu_text_x;
 s16 pak_menu_text_y;
 
 
-#ifdef NON_MATCHING
 s32 func_8003D0F0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D554(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003D6B0(OSMesgQueue*, OSPfs*, s32);
 s32 func_8003EDC0(OSPfs*, s32*, s32*);
-#endif
+
+/* Stick directions as the four C-button bits (up 8, down 4, left 2, right 1). */
+#define PAD_STICK_BITS(pad) (((u16) ((pad).stick_y > 32) << 3) | ((u16) ((pad).stick_y < -32) << 2) | ((u16) ((pad).stick_x < -32) << 1) | (u16) ((pad).stick_x > 32))
 
 void PakMenu_FormatNumber(u16 arg0, u8* arg1) {
     s32 var_v0 = arg0;
@@ -808,12 +809,7 @@ void PakMenu_DrawCursor(void) {
     PakMenu_BlitImage(pak_menu_cursor_x, pak_menu_cursor_y, 16, 14, pak_menu_cursor_tex, pak_menu_cursor_tlut, 2);
 }
 
-#ifdef NON_MATCHING
-/* the message pointer it passes on to func_80101C80's u8* str (same code as s32) */
 void PakMenu_DrawMessageBox(u8* arg0) {
-#else
-void PakMenu_DrawMessageBox(s32 arg0) {
-#endif
     PakMenu_DrawScreen();
     PakMenu_DrawSprites(pak_menu_message_window_sprites, 75);
     PakMenu_DrawSprites(pak_menu_message_lower_window_sprites, 22);
@@ -837,13 +833,11 @@ void PakMenu_DrawScreen(void) {
     pak_menu_redraw_pending = 1;
 }
 
-#ifdef NON_MATCHING
-/* 37 words: pad pointer, stick_x and the pad-bit temps in other registers (allocation only); code is equivalent */
 s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
     OSContPad pads[4];
     u32* p;
     u16 btn;
-    s16 dir;
+    u16 dir;
     s16 unused3;
     u16 repeat;
     u16 blink;
@@ -1382,12 +1376,10 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         osContStartReadData(mq);
         PakMenu_WaitFrame();
         osRecvMesg(mq, &pak_menu_mesg, 1);
-        unused3 = pads[input_primary_port].stick_y;
-        dir = (((unused3 < 33) ^ 1) << 3) | ((pads[input_primary_port].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[input_primary_port].stick_x < -32) << 1);
+        dir = PAD_STICK_BITS(pads[input_primary_port]);
         btn = pads[input_primary_port].button | dir;
         osContGetReadData(pads);
-        unused3 = pads[input_primary_port].stick_y;
-        dir = (((unused3 < 33) ^ 1) << 3) | ((pads[input_primary_port].stick_x < 33) ^ 1); dir |= ((unused3 < -32) << 2); dir |= ((pads[input_primary_port].stick_x < -32) << 1);
+        dir = PAD_STICK_BITS(pads[input_primary_port]);
         cur = pads[input_primary_port].button | dir;
         held = cur & btn;
         if (held) {
@@ -1405,9 +1397,6 @@ s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1) {
         }
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/overlays/pakmenu/pakmenu/PakMenu_Run.s")
-#endif
 
 void PakMenu_DrawText(s32 x, s32 y, u8* str) {
     s32 rowOff = 0;
