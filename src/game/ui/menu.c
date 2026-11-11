@@ -25,7 +25,8 @@
  * buffer addresses are written as numbers.
  * IDO emits .data in source order, function-local initializers included, so the
  * tables up to 800615A8 (Menu_UpdateOptionsPage's ids[]) are defined here, before
- * the functions, and the rest after Menu_DrawNumberZeroPad.
+ * the functions, the two options tables between that function and Menu_UpdateMapPage
+ * (whose static follows them), and the rest after Menu_DrawNumberZeroPad.
  */
 void *player_char_data[1] = {
     (void*)0x80206064,
@@ -572,7 +573,7 @@ MenuMapLocation menu_map_location_list[298] = {
     { 14, 13 }, { 34, 0 }, { 34, 1 }, { 34, 2 }, { 34, 3 }, { 34, 4 }, { 34, 5 }, { 34, 6 }, { 34, 7 }, { 34, 8 },
     { 34, 9 }, { 34, 10 }, { 15, 13 }, { 25, 6 }, { 25, 7 }, { 25, 24 }, { 25, 25 }, { -8, -1 },
 };
-s16 menu_map_spot_coords[108] = {
+s16 menu_map_spot_coords[6][9][2] = {
     150, 10, 90, 115, 143, 128, 131, 70, 98, 167, -1, -1,
     -1, -1, -1, -1, -1, -1, 150, 162, 132, 152, 70, 80,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -586,7 +587,7 @@ s16 menu_map_spot_coords[108] = {
 void *menu_map_tluts[6] = {
     (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000,
 };
-void *menu_map_strips[144] = {
+void *menu_map_strips[6][24] = {
     (void*)0x801C0200, (void*)0x801C09A0, (void*)0x801C1140, (void*)0x801C18E0, (void*)0x801C2080, (void*)0x801C2820,
     (void*)0x801C2FC0, (void*)0x801C3760, (void*)0x801C3F00, (void*)0x801C46A0, (void*)0x801C4E40, (void*)0x801C55E0,
     (void*)0x801C5D80, (void*)0x801C6520, (void*)0x801C6CC0, (void*)0x801C7460, (void*)0x801C7C00, (void*)0x801C83A0,
@@ -628,14 +629,14 @@ MenuPictureDma menu_map_picture_dma[10] = {
 void *menu_map_small_tluts[4] = {
     (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000, (void*)0x801C0000,
 };
-void *menu_map_small_tex[8] = {
+void *menu_map_small_tex[4][2] = {
     (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200,
     (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200, (void*)0x801C0200,
 };
 u8 menu_map_small_sizes[4][3] = {
     { 0x41, 0x12, 0 }, { 0x41, 0x13, 0 }, { 0x60, 0x11, 0 }, { 0x63, 0x12, 0 },
 };
-s16 menu_map_small_pos[8] = {
+s16 menu_map_small_pos[4][2] = {
     127, 112, 127, 112, 112, 112, 110, 112,
 };
 /* .bss 8008FB30..8008FB70 */
@@ -1129,25 +1130,24 @@ void Menu_UpdateOptionsPage(s32 x) {
 f32 menu_map_cursor_saved_x;
 f32 menu_map_cursor_saved_y;
 
-#ifdef NON_MATCHING
-/* frame, stack homes and register allocation differ; code is equivalent */
+/* .data 800615AC, 800615CC (after Menu_UpdateOptionsPage's ids[] initializer at 800615A8) */
+s16 menu_options_top_row_pos[8][2] = {
+    { 138, 0 }, { 159, 0 }, { 179, 1 }, { 199, 2 }, { 219, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
+};
+s16 menu_options_bgm_row_pos[5][2] = {
+    { 138, 0 }, { 159, 0 }, { 179, 1 }, { 199, 2 }, { 219, 2 },
+};
+
 void Menu_UpdateMapPage(s32 arg0) {
-    static s32 menu_map_loaded_region = -1; /* the retail build keeps it as the file-scope menu_map_loaded_region */
-    s32 cx;
-    s32 cy;
+    static s32 menu_map_loaded_region = -1; /* .data 800615E0 */
+    s32 w; /* also the cursor position (x, then y in h) */
+    s32 h;
     s32 x;
-    f32 f;
+    s32 y;
     s32 s;
     s32 n;
-    s32 sx;
-    s32 sy;
-    s32 px;
-    s32 py;
+    f32 f;
     s32 ox;
-    s32 w;
-    s32 h;
-    s32 y;
-    s32 i;
 
     s = 0;
     if (menu_map_region < 6) {
@@ -1165,9 +1165,9 @@ void Menu_UpdateMapPage(s32 arg0) {
                 h = 0;
             } else {
                 s = -x;
+                x = 0;
                 w -= s;
                 s <<= 5;
-                x = 0;
             }
         }
         if (x > 320) {
@@ -1179,11 +1179,11 @@ void Menu_UpdateMapPage(s32 arg0) {
         if (h != 0) {
             gDPPipeSync(gfx_dl_head++);
             gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_tluts[menu_map_region]);
-            for (i = 0; i < 24; i++) {
-                if (i == 23) {
+            for (n = 0; n < 24; n++) {
+                if (n == 23) {
                     h = 1;
                 }
-                gDPLoadTextureTile(gfx_dl_head++, menu_map_strips[menu_map_region * 24 + i], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
+                gDPLoadTextureTile(gfx_dl_head++, menu_map_strips[menu_map_region][n], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
                                    243, h - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                    G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
                 gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
@@ -1213,16 +1213,16 @@ void Menu_UpdateMapPage(s32 arg0) {
         n = menu_map_region - 6;
         w = menu_map_small_sizes[n][0];
         h = menu_map_small_sizes[n][1];
-        x = menu_map_small_pos[n * 2] + arg0;
-        y = menu_map_small_pos[n * 2 + 1];
+        x = menu_map_small_pos[n][0] + arg0;
+        y = menu_map_small_pos[n][1];
         if (x < 0) {
             if (x + w < 0) {
                 h = 0;
             } else {
                 s = -x;
+                x = 0;
                 w -= s;
                 s <<= 5;
-                x = 0;
             }
         }
         if (x > 320) {
@@ -1234,14 +1234,14 @@ void Menu_UpdateMapPage(s32 arg0) {
         if (h != 0) {
             gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_small_tluts[n]);
             menu_flags &= ~0x10;
-            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][1], 0, 0,
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n][0], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][1], 0, 0,
                                menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][1] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
             gDPPipeSync(gfx_dl_head++);
             gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
                                 1 << 10, 1 << 10);
             gDPPipeSync(gfx_dl_head++);
-            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2 + 1], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][2], 0, 0,
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n][1], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][2], 0, 0,
                                menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][2] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
             gDPPipeSync(gfx_dl_head++);
@@ -1259,23 +1259,23 @@ void Menu_UpdateMapPage(s32 arg0) {
     Menu_DrawSprite(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
     if (menu_map_region < 6) {
         if (menu_map_spot < 0) {
-            cx = (s32) player_state.actor.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
-            cy = (s32) player_state.actor.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
+            w = player_state.actor.x;
+            w /= menu_map_world_scale[menu_map_region];
+            w += menu_map_origin[menu_map_region];
+            h = player_state.actor.z;
+            h /= menu_map_world_scale[menu_map_region + 6];
+            h += menu_map_origin[menu_map_region + 6];
         } else {
-            cx = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2];
-            cy = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2 + 1];
+            w = menu_map_spot_coords[menu_map_region][menu_map_spot][0];
+            h = menu_map_spot_coords[menu_map_region][menu_map_spot][1];
         }
         if (menu_frame_counter & 0x20) {
-            Menu_DrawSprite(0x2C, arg0 + cx + 0x23, cy + 0xD, 0xC, 0x10);
+            Menu_DrawSprite(0x2C, arg0 + w + 0x23, h + 0xD, 0xC, 0x10);
         }
         if (menu_map_spot < 0) {
-            sx = menu_map_world_scale[menu_map_region];
-            sy = menu_map_world_scale[menu_map_region + 6];
-            px = menu_map_origin[menu_map_region];
-            py = menu_map_origin[menu_map_region + 6];
             if (menu_map_cursor_x == -1.0f) {
-                menu_map_cursor_x = cx;
-                menu_map_cursor_y = cy;
+                menu_map_cursor_x = w;
+                menu_map_cursor_y = h;
             }
             if (menu_map_cursor_active != 0) {
                 f = input_stick_x;
@@ -1315,14 +1315,21 @@ void Menu_UpdateMapPage(s32 arg0) {
                     menu_map_cursor_y = 178.0f;
                 }
             }
-            menu_map_marker_x = sx * ((s32) menu_map_cursor_x - px);
-            menu_map_marker_z = sy * ((s32) menu_map_cursor_y - py);
+            w = menu_map_cursor_x;
+            h = menu_map_cursor_y;
+            w -= menu_map_origin[menu_map_region];
+            h -= menu_map_origin[menu_map_region + 6];
+            menu_map_marker_x = menu_map_world_scale[menu_map_region] * w;
+            menu_map_marker_z = menu_map_world_scale[menu_map_region + 6] * h;
             y = 0;
             h = 5;
             ox = -2;
             if (menu_map_cursor_active != 0) {
                 y = -2;
                 h = 6;
+            } else {
+                y = 0;
+                h = 5;
             }
             Menu_DrawSprite(0x55, arg0 + menu_map_cursor_x + 39.0f + ox, menu_map_cursor_y + 29.0f - 1.0f, h, 1);
             Menu_DrawSprite(4, arg0 + menu_map_cursor_x + 39.0f - 2.0f, menu_map_cursor_y + 29.0f - 12.0f + y, 0xC, 0xC);
@@ -1357,9 +1364,6 @@ void Menu_UpdateMapPage(s32 arg0) {
         }
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_UpdateMapPage.s")
-#endif
 
 void Menu_UpdateElementsPage(s32 x) {
     s32 p;
@@ -1771,16 +1775,7 @@ void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
 
 
 
-/* .data, continued (800615A8 is Menu_UpdateOptionsPage's ids[] initializer) */
-s16 menu_options_top_row_pos[8][2] = {
-    { 138, 0 }, { 159, 0 }, { 179, 1 }, { 199, 2 }, { 219, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
-};
-s16 menu_options_bgm_row_pos[5][2] = {
-    { 138, 0 }, { 159, 0 }, { 179, 1 }, { 199, 2 }, { 219, 2 },
-};
-#ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
-s32 menu_map_loaded_region = -1;
-#endif
+/* .data, continued (800615E0 is Menu_UpdateMapPage's static menu_map_loaded_region) */
 MenuExpGaugePalettes menu_exp_gauge_tluts = { { menu_exp_gauge_layer_0_tlut, menu_exp_gauge_layer_1_tlut, menu_exp_gauge_layer_2_tlut, menu_exp_gauge_layer_3_tlut } };
 MenuExpGaugeTextures menu_exp_gauge_tex = { { { menu_exp_gauge_layer_0_0_tex, menu_exp_gauge_layer_0_1_tex }, { menu_exp_gauge_layer_1_0_tex, menu_exp_gauge_layer_1_1_tex }, { menu_exp_gauge_layer_2_0_tex, menu_exp_gauge_layer_2_1_tex }, { menu_exp_gauge_layer_3_0_tex, menu_exp_gauge_layer_3_1_tex } } };
 MenuFourWords menu_bg_strip_tex_heights = { { 32, 32, 32, 24 } };

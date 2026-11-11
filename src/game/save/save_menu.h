@@ -8,7 +8,6 @@ typedef struct SaveBytes20 { /* 0x00 */ u8 b[0x20]; } SaveBytes20; /* 0x20 bytes
 typedef struct SaveBytes10 { /* 0x00 */ u8 b[0x10]; } SaveBytes10; /* 0x10 bytes */
 typedef struct SaveBytes97 { /* 0x00 */ u8 b[0x97]; } SaveBytes97; /* 0x97 bytes */
 typedef struct SaveBytes1 { /* 0x00 */ u8 b[1]; } SaveBytes1; /* 0x1 byte */
-typedef struct SaveBytes14 { /* 0x00 */ u8 b[14]; } SaveBytes14; /* 0xE bytes */
 
 typedef struct SaveGameStateBlock {
     /* 0x00 */ SaveBytes20 opened_chests;
@@ -58,7 +57,6 @@ extern SaveHeader save_menu_header_read_scratch;
 extern u8 D_80090358[0x18];
 extern u8 save_menu_state_read_scratch[0xE0];
 
-extern SaveBytes14 D_80061650;
 
 void SaveMenu_Init(s32 arg0);
 void SaveMenu_Update(void);
@@ -74,7 +72,7 @@ void SaveMenu_RepairPak(void);
 void SaveMenu_RefreshFileList(void);
 void SaveMenu_SetTextDrawState(void);
 void SaveMenu_DrawBackground(void);
-void SaveMenu_CaptureGameState(s32 arg0);
+void SaveMenu_CaptureGameState(u32 arg0);
 void SaveMenu_RestoreGameState(s32 arg0);
 
 #endif

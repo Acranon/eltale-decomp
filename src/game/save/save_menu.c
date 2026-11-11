@@ -508,22 +508,16 @@ void SaveMenu_UpdateDialog(void) {
     }
 }
 
-/* .data 80061650..80061660: SaveMenu_UpdateSlotList's local message (an initialized u8[14]
- * that IDO copies to the stack); becomes its initializer when the function is C. */
-SaveBytes14 D_80061650 = { {
-#include "assets/D_80061650.inc.c"
-} };
-
 void SaveMenu_UpdateSlotList(s32 arg0) {
     s32 idx;
-    s32 flag;
+    s32 flag = 0;
     s32 secs;
     s32 n;
     s32 color[2];
-    SaveBytes14 buf;
+    u8 buf[14] = { /* .data 80061650: copied to the stack on entry */
+#include "assets/D_80061650.inc.c"
+    };
 
-    flag = 0;
-    buf = D_80061650;
     if (save_menu_flags & 0x20) {
         if (save_menu_selected_slot == 0) {
             idx = save_menu_selected_slot;
@@ -630,7 +624,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         }
     } else {
         flag = 1;
-        Text_DrawEncodedString(0x82, 0x33, buf.b);
+        Text_DrawEncodedString(0x82, 0x33, buf);
     }
     SaveMenu_SetTextDrawState();
     idx++;
@@ -730,7 +724,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 Menu_PrintNumber(3, 0xC0, 0xA6, save_menu_save_headers[idx].player_stats.mp);
             }
         } else {
-            Text_DrawEncodedString(0x82, 0x7F, buf.b);
+            Text_DrawEncodedString(0x82, 0x7F, buf);
         }
     }
     SaveMenu_SetTextDrawState();
@@ -910,7 +904,7 @@ void SaveMenu_SaveSelectedFile(void) {
     s32 n;
     s32 id;
     s32 i;
-    s32 idx;
+    s8 idx;
     SaveFileEntry *p;
     s32 k;
     s32 cont;
@@ -948,9 +942,9 @@ void SaveMenu_SaveSelectedFile(void) {
         } else {
             idx = save_menu_selected_slot;
         }
-        SaveMenu_CaptureGameState(idx * 1);
+        SaveMenu_CaptureGameState(idx);
     } else {
-        SaveMenu_CaptureGameState(idx * 1);
+        SaveMenu_CaptureGameState(idx);
     }
     idx = save_menu_selected_slot;
     err = Pak_WriteFile(input_primary_port, save_menu_file_entries[idx].file_no, 0, 0x80, &save_menu_save_headers[idx]);
@@ -1122,7 +1116,7 @@ void SaveMenu_DrawBackground(void) {
     Menu_DrawSprite(0x47, 0xA2, 0xA6, 0x18, 0xE);
 }
 
-void SaveMenu_CaptureGameState(s32 arg0) {
+void SaveMenu_CaptureGameState(u32 arg0) {
     SaveHeader *e = &save_menu_save_headers[arg0];
     u8 *d;
     u8 *s;
