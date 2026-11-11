@@ -42,16 +42,13 @@ s32 ending_wait_for_sprites = 0;
 s32 ending_display_buffer_index = 0;
 
 
-#ifdef NON_MATCHING
-/* func_8020E9C8's picture table (E25C80.c's D_80210800, 16-byte entries) */
+/* Ending_UpdateAndDrawScrollingBackdrop's picture table (ending_picture_defs, 16-byte entries) */
 typedef struct {
     void* img;
     void* tlut;
     u32 width;
     s32 unkC;
 } UnkPic_80210800;
-
-#endif
 
 
 void Ending_Init(void) {
@@ -966,33 +963,17 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
     }
 }
 
-#ifndef NON_MATCHING
-/* func_8020E9C8's function statics; globals here while it is asm. */
-f32 ending_scroll_offset = 32767.0f;
-s32 ending_backdrop_frame = 0;
-f32 ending_first_fade_alpha = 0.0f;
-f32 ending_second_fade_alpha = 0.0f;
-u8 ending_first_backdrop_fade_mode = 1;
-u8 ending_second_backdrop_fade_mode = 0;
-u8 ending_backdrop_completion_state = 0;
-#endif
-
-#ifdef NON_MATCHING
-/* One instruction differs: retail has `move s0,a2` where this has `sw a2,0x1A0(sp)` (the dead copy of
-   (s32) scroll before the second loop). Everything else is byte-identical; see
-   src/nonmatching/Ending_UpdateAndDrawScrollingBackdrop.md */
 s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
-    u32 sx; /* dead: (s32) ending_scroll_offset before the first loop */
-    u32 sy; /* dead: (s32) ending_scroll_offset before the second loop; retail keeps this one in s0 */
-    s32 unused3;
     f32 delta;
     s32 i;
     s32 x;
-    s32 height; /* the picture's 4th field: read, never used */
-    s32 unused4;
-    u32 width; /* 9th local: its home is sp+0x184 in retail */
+    s32 sx = 0; /* the scroll position as an integer, taken before the first picture's strips */
+    s32 sy = 0; /* the same before the second picture's strips */
+    s32 unused; /* the only reader of sx and sy (see the end of the function) */
     void* tlut;
     void* img;
+    u32 width;
+    s32 height; /* the picture's 4th field: read, never used */
     static f32 ending_scroll_offset = 32767.0f;
     static s32 ending_backdrop_frame = 0;
     static f32 ending_first_fade_alpha = 0.0f;
@@ -1101,9 +1082,9 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
             gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, (i * 6) << 2, 304 << 2, ((i * 6) + 6) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 0x400, 0x400);
         }
     }
-    unused3 = sx;
-    if (sy) {
-    }
+    /* Nothing uses this. The two copies above still shape the code: each makes (s32) ending_scroll_offset a value of
+       its own (a2), and the second picture's copy of it for the unsigned `%` is the `move s0,a2` before its loop. */
+    unused = sx + sy;
     ending_backdrop_frame++;
     if ((ending_backdrop_frame >= 240.0) && (ending_backdrop_frame < 0x26E8)) {
         ending_scroll_offset -= (f32) width / (f32) arg1;
@@ -1112,6 +1093,3 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     }
     return 0;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/overlays/ending/ending/Ending_UpdateAndDrawScrollingBackdrop.s")
-#endif

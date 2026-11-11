@@ -229,5 +229,3 @@ Gfx D_8022BAC8_ovl_ending[1] = {
 u16 ending_sprite_anim_1_tlut[0x10] = {
 #include "assets/ending_sprite_anim_1_tlut.inc.c"
 };
-f32 D_8022BAF0_ovl_ending = 32767.0f;
-f64 D_8022BAF8_ovl_ending = 10530.0;

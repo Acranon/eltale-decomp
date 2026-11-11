@@ -474,8 +474,8 @@ segments:
       - [0xE22690, c, overlays/ending/ending]
       - [0xE25C50, c, overlays/ending/ending_data]
       - [0xE25C50, .data, overlays/ending/ending]     # 8020F690..8020F6C0
-      - [0xE25C80, .data, overlays/ending/ending_data]     # 8020F6C0..8022BB00
-      - [0xE420C0, .rodata, overlays/ending/ending]
+      - [0xE25C80, .data, overlays/ending/ending_data]     # 8020F6C0..8022BAF0
+      - [0xE420B0, .rodata, overlays/ending/ending]
       - { start: 0xE420D0, type: .bss, vram: 0x8022BB10, name: overlays/ending/ending }
 
   - [0xE420D0, databin, data_E420D0]

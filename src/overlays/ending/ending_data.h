@@ -66,7 +66,5 @@ extern Gfx D_80221610_ovl_ending[1];
 extern u8 ending_sprite_anim_1_tex[0xA4B0];
 extern Gfx D_8022BAC8_ovl_ending[1];
 extern u16 ending_sprite_anim_1_tlut[0x10];
-extern f32 D_8022BAF0_ovl_ending;
-extern f64 D_8022BAF8_ovl_ending;
 
 #endif

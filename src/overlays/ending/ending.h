@@ -70,13 +70,6 @@ extern Gfx *ending_saved_display_ptr;
 extern u32 ending_cue_group_index;
 extern s32 ending_wait_for_sprites;
 extern s32 ending_display_buffer_index;
-extern f32 ending_scroll_offset;
-extern s32 ending_backdrop_frame;
-extern f32 ending_first_fade_alpha;
-extern f32 ending_second_fade_alpha;
-extern u8 ending_first_backdrop_fade_mode;
-extern u8 ending_second_backdrop_fade_mode;
-extern u8 ending_backdrop_completion_state;
 
 void Ending_Init(void);
 s32 Ending_Update(void);
