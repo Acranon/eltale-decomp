@@ -7,7 +7,7 @@ Current snapshot: 2026-10-26, main `f529079`. Historical measurements below may 
 - Retail code size: `0x180` bytes
 - Current gap: 67 object words, length exact (0x17C). One real difference: the last phase's start time sits in v0 (a uopt register) where retail has it in the ugen temporary t6; the other 66 words are the t-register numbering shifted by that one temporary.
 - Specific blocker: retail is `lw t6,last.startTime; sw t6,env_last_phase_start` with the first loop test reading t6 again and no address register for env_last_phase_start. uopt gives any value or address used twice in the first block a register, so that shape needs the reload of env_last_phase_start to be folded by ugen (it does that for a direct-symbol store followed by a direct-symbol load, see Map_LoadArea's `k = map_subarea = map_next_subarea`), which only happens when `&env_last_phase_start` is NOT given a register.
-- Next discriminating test: find what keeps uopt from colouring the address of env_last_phase_start (two uses in block 0 give save 1 > cost 0). `n = env_last_phase_start = env_day_phases[3].startTime; ... if (env_clock < n)` already gives retail's registers everywhere (t6, t7, t8, hidden t9, t1..) and differs only by `lui a2/addiu a2` + `sw t6,0(a2)` instead of `lui at/sw t6,%lo(at)` (one instruction longer).
+- Next discriminating test: retail needs `&env_last_phase_start` to have ONE register-candidate use in the entry block while ugen still sees a direct-symbol store followed by a direct-symbol load. In uopt that only happens when one of the two accesses comes from a pointer variable assigned in an earlier basic block, or from a function-scope static (see the Fable w1 entry below). Find what in the original puts a uopt block boundary before the store without a label that as1 sees, or what makes the address range lose (total uses minus reloads <= 0) in the entry block. Closest natural form: `n = env_last_phase_start = env_day_phases[3].startTime; i = 3; if (env_clock < n) { do {...} while (env_clock < p->startTime); }` (69 words, one instruction too long: `lui a2/addiu a2` + `sw t6,0(a2)`).
 - C: in [`src/game/env/env.c`](../game/env/env.c) under `#ifdef NON_MATCHING` (draft removed).
 - Original whole-source snapshot: `/home/sean/eltale-notes/codex/gfx-resume/func_80011AE0_8words.c` (SHA-256 `999660e1350c9eb9681e4fdfae30c28c933515033d6a7b5cb0d0bade94859641`)
 - Detailed research reports: [ REPORT.txt ](reports/codex__gfx-resume__REPORT.txt)
@@ -35,4 +35,27 @@ This is the original worker history. Treat old D1/D2 labels and old best scores 
   - Claude D2: Not D2. With env_day_phases/DEF4 and env_clock.. defined in game/env/env.c, Sol's 8-word draft is still exactly 8 words (the env_day_phases[3].unk0 value in a2 instead of t6).
   - Claude retry: no change (Sol's 8 words). Natural `p = env_day_phase_last; env_last_phase_start = p->unk0; i = 3; while (env_clock < p->unk0) { p--; n = i--; if (n == 0) break; }` (rotated loop = retail shape) gives 83 words: the value is CSE'd through &env_day_phase_last into v0. Assignment in the condition (`(env_last_phase_start = env_day_phase_last[0].unk0) > env_clock`) gets the value in t6 as retail but the store goes to the branch delay slot through a materialized &env_last_phase_start (33 words). 15 min permuter on Sol's draft: nothing below its base. Draft unchanged: C:\Users\Sean\AppData\Local\Temp\claude\c--code\e28e4613-47ce-4c8d-9eb8-47918177bdc8\scratchpad\rpb\best_80011AE0_8w.c
   - Fable w2 (2026-11-10): 83 -> 67 words, and the 67 are one cause. Solved: the hidden extra temporary before `lw t1,4(a1)` is the palette row written as an offset, `map_backdrop_phase_tluts[0] + p->paletteIndex * 256` (as in Env_Update): ugen scales the index in two steps and as1 merges the shifts, which consumes one t-register. Read from ugen's temp FIFO (t6,t7,t8,t9,t1..t5 here): retail takes exactly one temp in block 0 (t6 = the loaded start time, used by the store and by the first test) and one hidden temp after `li t8,3`. Not solved: every form where uopt sees the start time twice (two loads, a local, `p->startTime`, typed loads, struct copy) puts it in v0; every form that reloads env_last_phase_start (direct, through `n`, chained assignment) gets retail's t6 and all later registers but colours `&env_last_phase_start` (2 uses in block 0, save 1), one instruction too many. Tried to make that address uncoloured: unused label / empty-if block boundaries (the reload then stays a real `lw`), later dead uses after the call (still coloured), file-static (same lda form), pointer locals (propagated). The natural `while` form is now the NON_MATCHING body.
-
+  - Fable w1 (2026-11-10): still 67 words, body unchanged. What the compiler sources and traces say (uopt source in
+    ~/eltale-notes/codex/d1-root/ido-uopt-source, cost traces with scratchpad w1/try.py --trace):
+    - Every direct access to a global is turned into `lda` + `ilod/istr` by uopt (uoptinput.c, Ulod/Ustr cases, "kpicopt")
+      unless the symbol is a function-scope static (FSYM). File-scope statics, externs, arrays and block-scope externs all
+      get the address form. An address with two uses in one block always gets a register in the ENTRY block (save 1,
+      cost 0). Map_LoadArea's `k = map_subarea = map_next_subarea` stays uncoloured only because that range comes in
+      across calls: its piece carries reload-only blocks (-1 each) and the total goes negative. Nothing precedes the
+      entry block, so that cannot happen here.
+    - ugen reuses the stored register for a later load only when both are direct-symbol accesses (listing: `lw $14,X;
+      sw $14,G; ... bge $3,$14`). Through an address register the reload is a real `lw` that as1 forwards (one hidden
+      temporary, and the `la`).
+    - Forms that DO give retail's `lw t6; lui at; sw t6,%lo(G)(at); slt at,v1,t6` and every later register: the store
+      through a pointer variable that was assigned in an earlier basic block (uopt then emits the address inline, no
+      candidate) and the test reading the global directly: `s32 *q = &env_last_phase_start; top:; *q = ...;
+      if (env_clock < env_last_phase_start)`. But every block boundary uopt accepts (unused label, `do {} while (0)`,
+      `for (;;) { ... break; }`) is also a label for as1, which then keeps `lui a3/addiu a3` out of the prologue
+      (38 words, length exact). A nested declaration block is not a uopt boundary. So retail has no boundary there.
+    - Tried and ruled out (all colour the address or put the value in v0): pointer local in the same block (substituted
+      at input), store through pointer + direct reload and the reverse, typed reads (`*(u32 *)&...`: two loads, the
+      table base gets v0), array-element read for the store with `p->` for the test (uopt normalises both to the same
+      load), function-static stand-ins for the global (promoted to v0; file-static and static array: address form),
+      address through an integer on either side (the `lda` under the casts still counts), assignment in the condition
+      with u32/s16/s64 targets (cfe always reloads the target), a function-static last table entry (`last.startTime`
+      direct + `p->startTime` via a3: two real loads).
