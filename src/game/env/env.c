@@ -77,11 +77,6 @@ void Env_InitClock(void) {
     }
 }
 
-#ifdef NON_MATCHING
-/* One value's register left: the last phase's start time is kept in v0 (a uopt CSE of the
- * load, shared by the store and the first loop test) where retail has it in the temporary t6,
- * which shifts every later t-register by one. Everything else is retail's. Code is equivalent.
- * See src/nonmatching/Env_InitForMap.md. */
 void Env_InitForMap(void) {
     EnvDayPhase *p;
     s32 i;
@@ -90,16 +85,19 @@ void Env_InitForMap(void) {
     u16 *dst;
     EnvKeyframe *e;
 
-    /* the walk goes back from the table's last entry */
+    /* The walk goes back from the table's last entry. The guard is the first pass of
+     * `i >= 0 && env_clock < p->startTime`; its `i >= 0` half folds away. */
     p = &env_day_phases[3];
     env_last_phase_start = p->startTime;
     i = 3;
-    while (env_clock < p->startTime) {
-        p--;
-        n = i--;
-        if (n == 0) {
-            break;
-        }
+    if (i >= 0 && env_clock < p->startTime) {
+        do {
+            p--;
+            n = i--;
+            if (n == 0) {
+                break;
+            }
+        } while (env_clock < p->startTime);
     }
     if (i < 0) {
         p = &env_day_phases[3];
@@ -130,9 +128,6 @@ void Env_InitForMap(void) {
     Env_ClearLightSlots();
     env_play_time_ticks = 0;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/env/env/Env_InitForMap.s")
-#endif
 
 void Env_Update(void) {
     EnvDayPhase *p;
