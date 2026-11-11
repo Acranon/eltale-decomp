@@ -12,19 +12,10 @@ typedef struct TextWindow {
     /* 0x00C */ s16 anim_frame;
     /* 0x00E */ u8 window_type;
     /* 0x00F */ u8 reveal_delay;
-#ifdef NON_MATCHING
-    /* Text_UpdateAndDrawWindows reads these with lb/lhu/lb (the matched functions only store
-       them or compile the same with these widths) */
     /* 0x010 */ s8 reveal_timer;
     /* 0x012 */ u16 reveal_index;
     /* 0x014 */ u8 pending_byte;
     /* 0x015 */ s8 choice_cursor;
-#else
-    /* 0x010 */ u8 reveal_timer;
-    /* 0x012 */ s16 reveal_index;
-    /* 0x014 */ u8 pending_byte;
-    /* 0x015 */ u8 choice_cursor;
-#endif
     /* 0x016 */ u8 choice_input_latch;
     /* 0x017 */ u8 speaker_name[32];
     /* 0x038 */ s16 choice_count;
