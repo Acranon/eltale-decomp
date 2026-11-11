@@ -966,6 +966,7 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
     }
 }
 
+#ifndef NON_MATCHING
 /* func_8020E9C8's function statics; globals here while it is asm. */
 f32 ending_scroll_offset = 32767.0f;
 s32 ending_backdrop_frame = 0;
@@ -974,22 +975,33 @@ f32 ending_second_fade_alpha = 0.0f;
 u8 ending_first_backdrop_fade_mode = 1;
 u8 ending_second_backdrop_fade_mode = 0;
 u8 ending_backdrop_completion_state = 0;
+#endif
 
 #ifdef NON_MATCHING
-/* code 0xC70 vs 0xCBC, frame 0x198 vs 0x1A8: arg0/width homes, the B3/B4 hoists and allocation differ; the statics are the module's globals; code is equivalent */
+/* code 0xCB8 vs 0xCBC, frame and spill slots exact: the statement and block structure is retail's; what is left is
+   the colouring of a few low-priority candidates (see src/nonmatching/Ending_UpdateAndDrawScrollingBackdrop.md) */
 s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
-    u32 width;
-    f32 alpha;
+    s32 unused1;
+    s32 unused2;
+    s32 unused3;
     f32 delta;
+    s32 i;
     s32 x;
-    s32 y;
-    UnkPic_80210800* pic;
+    s32 height; /* the picture's 4th field: read, never used */
+    s32 unused4;
+    u32 width; /* 9th local: its home is sp+0x184 in retail */
+    void* tlut;
     void* img;
-    f32 scroll;
-    s32 frame;
+    static f32 ending_scroll_offset = 32767.0f;
+    static s32 ending_backdrop_frame = 0;
+    static f32 ending_first_fade_alpha = 0.0f;
+    static f32 ending_second_fade_alpha = 0.0f;
+    static u8 ending_first_backdrop_fade_mode = 1;
+    static u8 ending_second_backdrop_fade_mode = 0;
+    static u8 ending_backdrop_completion_state = 0;
 
     if (arg0 == 0) {
-        ending_scroll_offset = D_8022BAF0_ovl_ending;
+        ending_scroll_offset = 32767.0f;
         ending_backdrop_completion_state = 0;
         return 0;
     }
@@ -1003,11 +1015,10 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
     if (ending_backdrop_frame == 0x26AC) {
         ending_first_backdrop_fade_mode = 2;
         ending_second_backdrop_fade_mode = 1;
-    } else if (ending_backdrop_frame == D_8022BAF8_ovl_ending) {
+    } else if (ending_backdrop_frame == 10530.0) {
         ending_second_backdrop_fade_mode = 2;
         Audio_StartSeqFadeOut(0x1E0);
     }
-
     switch (ending_first_backdrop_fade_mode) {
         case 0:
             delta = 0.0f;
@@ -1022,37 +1033,31 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
             delta = 0.0f;
             break;
     }
-    alpha = ending_first_fade_alpha + delta;
-    if (alpha > 255.0f) {
-        alpha = 255.0f;
+    ending_first_fade_alpha += delta;
+    if (ending_first_fade_alpha > 255.0f) {
+        ending_first_fade_alpha = 255.0f;
         ending_first_backdrop_fade_mode = 0;
-    } else if (alpha <= 0.0f) {
-        alpha = 0.0f;
+    } else if (ending_first_fade_alpha <= 0.0f) {
+        ending_first_fade_alpha = 0.0f;
         ending_first_backdrop_fade_mode = 0;
     }
-    ending_first_fade_alpha = alpha;
     if (ending_backdrop_frame < 0x2814) {
         gDPPipeSync(gfx_dl_head++);
-        gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
-        pic = &((UnkPic_80210800 *)ending_picture_defs)[arg0];
-        width = pic->width;
-        img = pic->img;
-        gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);
-        ending_first_fade_alpha = alpha;
-        x = (s32) ending_scroll_offset % width;
-        for (y = 0; y < 222; y += 6) {
-            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
-                               0, 0);
-            gSPTextureRectangle(gfx_dl_head++, 0, y << 2, (304 - x) << 2, (y + 6) << 2, G_TX_RENDERTILE, x << 5, y << 5,
-                                0x400, 0x400);
-            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, y, x - 1, y + 5, 0, 0, 0, 0, 0,
-                               0, 0);
-            gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, y << 2, 304 << 2, (y + 6) << 2, G_TX_RENDERTILE, 0, y << 5,
-                                0x400, 0x400);
+        gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, (s32) ending_first_fade_alpha);
+        width = ((UnkPic_80210800*) ending_picture_defs)[arg0].width;
+        tlut = ((UnkPic_80210800*) ending_picture_defs)[arg0].tlut;
+        img = ((UnkPic_80210800*) ending_picture_defs)[arg0].img;
+        height = ((UnkPic_80210800*) ending_picture_defs)[arg0].unkC;
+        gDPLoadTLUT_pal256(gfx_dl_head++, tlut);
+        
+        for (i = 0; i < 37; i++) {
+            x = (s32) ending_scroll_offset % width;
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, (i * 6), 303, (i * 6) + 5, 0, 0, 0, 0, 0, 0, 0);
+            gSPTextureRectangle(gfx_dl_head++, 0, (i * 6) << 2, (304 - x) << 2, ((i * 6) + 6) << 2, G_TX_RENDERTILE, x << 5, (i * 6) << 5, 0x400, 0x400);
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, (i * 6), x - 1, (i * 6) + 5, 0, 0, 0, 0, 0, 0, 0);
+            gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, (i * 6) << 2, 304 << 2, ((i * 6) + 6) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 0x400, 0x400);
         }
     }
-
-    scroll = ending_scroll_offset;
     switch (ending_second_backdrop_fade_mode) {
         case 0:
             delta = 0.0f;
@@ -1067,42 +1072,37 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
             delta = 0.0f;
             break;
     }
-    alpha = ending_second_fade_alpha + delta;
-    if (alpha > 255.0f) {
-        alpha = 255.0f;
+    ending_second_fade_alpha += delta;
+    if (ending_second_fade_alpha > 255.0f) {
+        ending_second_fade_alpha = 255.0f;
         ending_second_backdrop_fade_mode = 0;
-    } else if (alpha <= 0.0f) {
-        alpha = 0.0f;
+    } else if (ending_second_fade_alpha <= 0.0f) {
+        ending_second_fade_alpha = 0.0f;
         ending_second_backdrop_fade_mode = 0;
         if (ending_backdrop_completion_state == 1) {
             ending_backdrop_completion_state = 2;
         }
     }
-    ending_second_fade_alpha = alpha;
     if (ending_backdrop_frame >= 0x26AC) {
         gDPPipeSync(gfx_dl_head++);
-        gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, (s32) alpha);
-        pic = &((UnkPic_80210800 *)ending_picture_defs)[arg0 + 1];
-        width = pic->width;
-        img = pic->img;
-        gDPLoadTLUT_pal256(gfx_dl_head++, pic->tlut);
-        ending_second_fade_alpha = alpha;
-        x = (s32) scroll % width;
-        for (y = 0; y < 222; y += 6) {
-            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, y, 303, y + 5, 0, 0, 0, 0, 0,
-                               0, 0);
-            gSPTextureRectangle(gfx_dl_head++, 0, y << 2, (304 - x) << 2, (y + 6) << 2, G_TX_RENDERTILE, x << 5, y << 5,
-                                0x400, 0x400);
-            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, y, x - 1, y + 5, 0, 0, 0, 0, 0,
-                               0, 0);
-            gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, y << 2, 304 << 2, (y + 6) << 2, G_TX_RENDERTILE, 0, y << 5,
-                                0x400, 0x400);
+        gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, (s32) ending_second_fade_alpha);
+        width = ((UnkPic_80210800*) ending_picture_defs)[arg0 + 1].width;
+        tlut = ((UnkPic_80210800*) ending_picture_defs)[arg0 + 1].tlut;
+        img = ((UnkPic_80210800*) ending_picture_defs)[arg0 + 1].img;
+        height = ((UnkPic_80210800*) ending_picture_defs)[arg0 + 1].unkC;
+        gDPLoadTLUT_pal256(gfx_dl_head++, tlut);
+        
+        for (i = 0; i < 37; i++) {
+            x = (s32) ending_scroll_offset % width;
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, (i * 6), 303, (i * 6) + 5, 0, 0, 0, 0, 0, 0, 0);
+            gSPTextureRectangle(gfx_dl_head++, 0, (i * 6) << 2, (304 - x) << 2, ((i * 6) + 6) << 2, G_TX_RENDERTILE, x << 5, (i * 6) << 5, 0x400, 0x400);
+            gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, 0, (i * 6), x - 1, (i * 6) + 5, 0, 0, 0, 0, 0, 0, 0);
+            gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, (i * 6) << 2, 304 << 2, ((i * 6) + 6) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 0x400, 0x400);
         }
     }
-    frame = ending_backdrop_frame + 1;
-    ending_backdrop_frame = frame;
-    if ((frame >= 240.0) && (frame < 0x26E8)) {
-        ending_scroll_offset = scroll - (f32) width / (f32) arg1;
+    ending_backdrop_frame++;
+    if ((ending_backdrop_frame >= 240.0) && (ending_backdrop_frame < 0x26E8)) {
+        ending_scroll_offset -= (f32) width / (f32) arg1;
         return 0;
     }
     if (ending_backdrop_frame == 0x26E8) {
