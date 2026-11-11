@@ -44,14 +44,12 @@ u8 text_stick_advance_enabled;
 u16 text_stick_advance_frames;
 
 
-#ifdef NON_MATCHING
 typedef union {
     /* 0x0 */ s8 v[4];
     struct { s8 a, b, c, d; } s;
     s32 w;
 } Bytes4;
 
-#endif
 
 void Text_ResetAllWindows(s32 arg0) {
     s32 i;
@@ -171,8 +169,6 @@ s32 Text_OpenWindow(s32 arg0) {
     return ret;
 }
 
-#ifdef NON_MATCHING
-/* 18 words: menu_text_delay_option, the text cursor index and 0xE7000000 sit in other registers (allocation only); code is equivalent */
 void Text_UpdateAndDrawWindows(void) {
     Gfx *gfx;
     s32 w;
@@ -249,7 +245,7 @@ void Text_UpdateAndDrawWindows(void) {
                     Text_DrawWindowFrame(idx);
                     if (text_window_slots[idx].flags & 0x40000000) {
                         gDPPipeSync(gfx_dl_head++);
-                        gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xCC);
+                        gfx = gfx_dl_head++; gfx->words.w0 = _SHIFTL(G_SETENVCOLOR, 24, 8); gfx->words.w1 = 0xFFFFFFCC;
                         x = text_window_slots[idx].x + 12;
                         y = text_window_slots[idx].y + 6;
                         for (i = 0; i < text_window_slots[idx].choice_count; i++) {
@@ -384,9 +380,9 @@ void Text_UpdateAndDrawWindows(void) {
                                                 Sfx_Play(0, 3, 0xFF);
                                                 while (c >= 0x80) {
                                                     j = text_window_slots[idx].reveal_index++;
-                                                    text_window_slots[idx].message_bytes[j++] = text_window_slots[idx].pending_byte;
+                                                    text_window_slots[idx].message_bytes[j] = text_window_slots[idx].pending_byte;
                                                     c = text_window_slots[idx].pending_byte;
-                                                    text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[j];
+                                                    text_window_slots[idx].pending_byte = text_window_slots[idx].message_bytes[++j];
                                                     *(text_window_slots[idx].message_bytes + j) = 0xFF;
                                                 }
                                                 break;
@@ -395,8 +391,8 @@ void Text_UpdateAndDrawWindows(void) {
                                 } else {
                                     j = text_window_slots[idx].reveal_index;
                                     text_window_slots[idx].message_bytes[j] = text_window_slots[idx].pending_byte;
-                                    tab = 0;
                                     col = 0;
+                                    tab = 0;
                                     max = ((text_window_slots[idx].width - 20) / 10) * 4;
                                     while (TRUE) {
                                         if (text_window_slots[idx].message_bytes[j] & 0x80) {
@@ -505,12 +501,9 @@ void Text_UpdateAndDrawWindows(void) {
     }
     gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
     gDPPipeSync(gfx_dl_head++);
-    gfx = gfx_dl_head++; gfx->words.w0 = 0xF9000000; gfx->words.w1 = 1;
-    gfx = gfx_dl_head++; gfx->words.w0 = 0xE7000000; gfx->words.w1 = 0;
+    gfx = gfx_dl_head++; gfx->words.w0 = _SHIFTL(G_SETBLENDCOLOR, 24, 8); gfx->words.w1 = 1;
+    gDPPipeSync(gfx_dl_head++);
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/text/text_window/Text_UpdateAndDrawWindows.s")
-#endif
 
 s32 Text_AnimateWindowSize(s32 idx) {
     TextWindow *p = &text_window_slots[idx];

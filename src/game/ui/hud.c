@@ -451,11 +451,9 @@ void Hud_DrawSpellInput(GfxFrameData* buf, Player* arg1) {
 extern u8 D_8039EC90[];
 extern HudTextureDesc D_803A8718;
 
-#ifdef NON_MATCHING
-/* register-only: (u8)w lands in a2 instead of t9 and w >> 8 misses ra; code is equivalent */
 void Hud_DrawSpellName(void* arg0) {
     s32 tmp;
-    volatile s32 id;
+    s32 id;
     s32 t;
     s32 w;
     s32 yoff;
@@ -463,16 +461,15 @@ void Hud_DrawSpellName(void* arg0) {
 
     hud_draw_origin_x = 0x69;
     hud_draw_origin_y = 0x32;
-    w = ((Player *)arg0)->spell_id;
-    id = (u8)w;
-    str = D_800C03D8[(u8)(w >> 8) & 0xF][(u8)w];
+    tmp = (((Player *)arg0)->spell_id >> 8) & 0xF;
+    id = ((Player *)arg0)->spell_id & 0xFF;
+    str = D_800C03D8[tmp][id];
     gDPPipeSync(gfx_dl_head++);
     gDPSetTextureFilter(gfx_dl_head++, G_TF_POINT);
     gDPLoadTLUT_pal256(gfx_dl_head++, D_8039EC90);
     yoff = 0;
     if (hud_spell_input_anim_timer && (hud_spell_input_anim_flags & 2)) {
-        w = hud_spell_input_anim_timer;
-        t = w * w;
+        t = hud_spell_input_anim_timer * hud_spell_input_anim_timer;
         yoff = t * 40 / 64;
         gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
         gDPSetCombine(gfx_dl_head++, 0xFF9BFF, 0xFF34FE7F);
@@ -480,14 +477,12 @@ void Hud_DrawSpellName(void* arg0) {
         hud_spell_input_anim_timer--;
     }
     Hud_DrawTextureTile(&D_803A8718, 0, yoff, 0x6E, 0xE, 0x64, 0xE, 0x400, 0x400);
-    Hud_DrawGlyphString(0x37 - Hud_MeasureGlyphString(str) / 2, yoff + 3, 0, str);
+    w = Hud_MeasureGlyphString(str);
+    Hud_DrawGlyphString(0x37 - w / 2, yoff + 3, 0, str);
     gDPPipeSync(gfx_dl_head++);
     gDPSetRenderMode(gfx_dl_head++, 0x0F0A4000, 0);
     gDPSetCombine(gfx_dl_head++, 0xFFFFFF, 0xFFFCF279);
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/ui/hud/Hud_DrawSpellName.s")
-#endif
 
 
 

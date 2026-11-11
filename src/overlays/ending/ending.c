@@ -43,20 +43,6 @@ s32 ending_display_buffer_index = 0;
 
 
 #ifdef NON_MATCHING
-/* gSPTextureRectangle with the RDPHALF_2 step word built as ((dsdx & 0xFFFF) << 13) << 3
-   (func_8020D98C's flipped texrects) */
-#define GFX_TEXRECT_STEPS(pkt, xl, yl, xh, yh, tile, s, t, dsdx, dtdy)                                       \
-    {                                                                                                     \
-        Gfx *_g = (Gfx *) (pkt);                                                                          \
-                                                                                                          \
-        _g->words.w0 = (_SHIFTL(G_TEXRECT, 24, 8) | _SHIFTL(xh, 12, 12) | _SHIFTL(yh, 0, 12));            \
-        _g->words.w1 = (_SHIFTL(tile, 24, 3) | _SHIFTL(xl, 12, 12) | _SHIFTL(yl, 0, 12));                 \
-        gImmp1(pkt, G_RDPHALF_1, (_SHIFTL(s, 16, 16) | _SHIFTL(t, 0, 16)));                               \
-        gImmp1(pkt, G_RDPHALF_2,                                                                          \
-               (((unsigned int) ((((unsigned int) (dsdx)) & ((0x01 << 16) - 1)) << 13) << 3) |             \
-                _SHIFTL(dtdy, 0, 16)));                                                                   \
-    }
-
 /* func_8020E9C8's picture table (E25C80.c's D_80210800, 16-byte entries) */
 typedef struct {
     void* img;
@@ -776,12 +762,10 @@ void Ending_ResetWait(s32 arg0) {
 }
 
 
-#ifdef NON_MATCHING
-/* 25 words: t4/t9 and t3/t5 swapped in the flipped texrect block (allocation only); code is equivalent */
 void Ending_UpdateAndDrawSprites(s32 arg0) {
     s32 i;
     EndingRect rect;
-    UnkSortEntry_8020D98C* entry;
+    s32 k;
     EndingSprite* obj;
     s32 idx;
     s32 flags;
@@ -792,8 +776,6 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
     s32 unused2;
     UnkSortEntry_8020D98C list[150];
     UnkSortEntry_8020D98C tmp;
-    s32 unused3;
-    s32 unused4;
 
     for (i = 0; i < 150; i++) {
         list[i].idx = i;
@@ -811,8 +793,8 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
     gDPSetRenderMode(gfx_dl_head++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
     gDPSetTextureFilter(gfx_dl_head++, G_TF_POINT);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
-    for (entry = list; entry != &list[150]; entry++) {
-        idx = entry->idx;
+    for (k = 0; k < 150; k++) {
+        idx = list[k].idx;
         obj = &ending_sprite_slots[idx];
         fadeDone = 0;
         fade = 0;
@@ -962,14 +944,14 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
             if (obj->flags & 0x60000) {
                 if (obj->flags & 0x20000) {
                     rect.dsdx = -0x400;
-                    GFX_TEXRECT_STEPS(gfx_dl_head++, rect.x << 2, rect.y << 2, (rect.x + rect.width) << 2,
+                    gSPTextureRectangle(gfx_dl_head++, rect.x << 2, rect.y << 2, (rect.x + rect.width) << 2,
                                         (rect.y + rect.height) << 2, G_TX_RENDERTILE, (rect.s + rect.sw - 1) << 5,
-                                        rect.tfrac, rect.dsdx, rect.dtdy);
+                                        rect.tfrac, rect.dsdx & 0xFFFF, rect.dtdy);
                 } else {
                     rect.dtdy = -0x400;
-                    GFX_TEXRECT_STEPS(gfx_dl_head++, rect.x << 2, rect.y << 2, (rect.x + rect.width) << 2,
+                    gSPTextureRectangle(gfx_dl_head++, rect.x << 2, rect.y << 2, (rect.x + rect.width) << 2,
                                         (rect.y + rect.height) << 2, G_TX_RENDERTILE, rect.sfrac,
-                                        (rect.t + rect.th - 1) << 5, rect.dsdx, rect.dtdy);
+                                        (rect.t + rect.th - 1) << 5, rect.dsdx, rect.dtdy & 0xFFFF);
                 }
             } else {
                 gSPTextureRectangle(gfx_dl_head++, rect.x << 2, rect.y << 2, (rect.x + rect.width) << 2,
@@ -983,9 +965,6 @@ void Ending_UpdateAndDrawSprites(s32 arg0) {
         obj->flags = flags;
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/overlays/ending/ending/Ending_UpdateAndDrawSprites.s")
-#endif
 
 /* func_8020E9C8's function statics; globals here while it is asm. */
 f32 ending_scroll_offset = 32767.0f;

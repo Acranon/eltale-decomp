@@ -924,8 +924,6 @@ void SaveMenu_LoadSelectedFile(void) {
     }
 }
 
-#ifdef NON_MATCHING
-/* register-only: index/pointer a3/t0 colouring differs; code is equivalent */
 void SaveMenu_SaveSelectedFile(void) {
     s32 err;
     s32 n;
@@ -969,12 +967,12 @@ void SaveMenu_SaveSelectedFile(void) {
         } else {
             idx = save_menu_selected_slot;
         }
-        SaveMenu_CaptureGameState(idx);
+        SaveMenu_CaptureGameState(idx * 1);
     } else {
-        SaveMenu_CaptureGameState(idx);
+        SaveMenu_CaptureGameState(idx * 1);
     }
-    id = save_menu_selected_slot;
-    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[id].file_no, 0, 0x80, &save_menu_save_headers[id]);
+    idx = save_menu_selected_slot;
+    err = Pak_WriteFile(input_primary_port, save_menu_file_entries[idx].file_no, 0, 0x80, &save_menu_save_headers[idx]);
     if (err != 0) {
         save_menu_pak_error = err;
         switch (-Pak_ClassifyError(err)) {
@@ -1024,9 +1022,6 @@ void SaveMenu_SaveSelectedFile(void) {
     save_menu_dialog_index = 23;
     save_menu_delay_frames = 10;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/save/save_menu/SaveMenu_SaveSelectedFile.s")
-#endif
 
 void SaveMenu_RepairPak(void) {
     s32 err;

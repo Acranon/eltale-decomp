@@ -129,10 +129,6 @@ void PakMenu_DrawScreen(void);
 s32 PakMenu_Run(OSMesgQueue* mq, OSMesgQueue* arg1);
 void PakMenu_DrawText(s32 x, s32 y, u8* str);
 
-#ifdef NON_MATCHING
-void PakMenu_DrawMessageBox(u8 *arg0);
-#else
-void PakMenu_DrawMessageBox(s32 arg0);
-#endif
+void PakMenu_DrawMessageBox(u8* arg0);
 
 #endif

@@ -30,9 +30,9 @@
 /* This file's .bss, 8007B900..8007C0B0, in address order. D_8007B904 and
  * D_8007C09C/D_8007C0A0 are unreferenced gaps. Splat's labels inside the enemy
  * table (D_8007B918..D_8007BB5C, fields of enemy_slots[0] and [1]) and D_8007C074
- * (enemy_temp_vec.y) are aliases in undefined_syms.txt. Enemy_StartAttackScript treats
- * enemy_script_time..enemy_script_obj as one Unk8007C060; they are kept as the scalars the
- * other functions use. */
+ * (enemy_temp_vec.y) are aliases in undefined_syms.txt. Enemy_StartAttackScript and
+ * Enemy_RunAttackScript treat enemy_script_time..enemy_script_obj as one Unk8007C060;
+ * they are kept as the scalars Enemy_ClearAttackScript and the asm labels name. */
 s32 enemy_count;
 s32 D_8007B904;
 Enemy enemy_slots[6];
@@ -52,7 +52,7 @@ CollResult enemy_coll;
 s32 D_8007C09C;
 s32 D_8007C0A0[4];
 
-/* enemy_script_time..enemy_script_obj as Enemy_StartAttackScript writes them */
+/* enemy_script_time..enemy_script_obj as Enemy_StartAttackScript and Enemy_RunAttackScript see them */
 typedef struct {
     /* 0x00 */ u16 time;
     /* 0x02 */ u8 pad2[2];
@@ -950,27 +950,25 @@ void Enemy_StartAttackScript(s32 arg0, s32 arg1) {
     ((Unk8007C060 *)&enemy_script_time)->actor = &enemy_slots[0].actor;
 }
 
-#ifdef NON_MATCHING
-/* &enemy_script_time kept in a register for the ++ shifts the temporaries by one (register allocation); code is equivalent */
 void Enemy_RunAttackScript(void) {
+    Unk8007C060 *p = (Unk8007C060 *) &enemy_script_time;
+    Enemy *en = enemy_slots;
     EnemyScriptCmd *e;
     f32 x;
     f32 y;
     f32 z;
     f32 s;
-    u16 m;
-    s32 pad2;
     Actor *obj;
-    s32 pad3;
-    s32 pad4;
+    s32 hi;
+    s32 lo;
     EnemyEffectDef *d;
     MagicVisualDef *t;
-    Enemy *en = enemy_slots;
+    SpellDef *row;
 
-    if (enemy_script_cmd != NULL) {
-        e = enemy_script_cmd;
-        if (e->time < ++enemy_script_time) {
-            obj = enemy_script_obj;
+    if (p->cmd != NULL) {
+        e = p->cmd;
+        if (p->cmd->time < ++p->time) {
+            obj = p->actor;
             if (e->flags & 8) {
                 enemy_temp_vec.x = e->offset_x;
                 enemy_temp_vec.y = e->offset_z;
@@ -984,9 +982,9 @@ void Enemy_RunAttackScript(void) {
                 enemy_temp_vec.y = e->offset_z;
                 Math_RotateVec2(obj->rot + e->yaw_offset, (Vec2f *)&enemy_temp_vec);
                 if (e->flags & 2) {
-                    x = player_state.actor.x;
-                    y = player_state.actor.y;
-                    z = player_state.actor.z;
+                    x = D_8007AA20.x;
+                    y = D_8007AA24;
+                    z = D_8007AA28;
                 } else {
                     x = obj->x;
                     y = obj->y;
@@ -998,9 +996,11 @@ void Enemy_RunAttackScript(void) {
                 z += enemy_temp_vec.y * s;
                 enemy_temp_vec.x = d->scale_x;
                 enemy_temp_vec.y = d->scale_y;
-                m = enemy_script_enemy->selected_attack->attack_code;
-                if (m & 0x8000) {
-                    enemy_temp_vec.z = D_800C185C[(m >> 8) & 0xF][m & 0xFF].effect_extent;
+                if (((Enemy *) p->enemy_ptr)->selected_attack->attack_code & 0x8000) {
+                    hi = ((Enemy *) p->enemy_ptr)->selected_attack->attack_code >> 8;
+                    lo = ((Enemy *) p->enemy_ptr)->selected_attack->attack_code & 0xFF;
+                    row = &D_800C185C[hi & 0xF][lo];
+                    enemy_temp_vec.z = row->effect_extent;
                 } else {
                     enemy_temp_vec.z = obj->collisionRadius;
                 }
@@ -1010,16 +1010,13 @@ void Enemy_RunAttackScript(void) {
                 Camera_Shake(1);
             }
             if (e->flags & 1) {
-                enemy_script_cmd = NULL;
+                p->cmd = NULL;
             } else {
-                enemy_script_cmd++;
+                p->cmd++;
             }
         }
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/enemy/enemy/Enemy_RunAttackScript.s")
-#endif
 
 /* .data 8004DD20..8004DD50 */
 EnemyStateFunc enemy_state_handlers[6] = {
