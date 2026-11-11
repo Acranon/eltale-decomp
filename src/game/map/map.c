@@ -18,12 +18,13 @@
 /* map.h comes after the headers above on purpose (.bss order). Its .bss externs fix this file's
  * .bss order (first declaration; IDO sorts by declaration number mod 256, later blocks first on
  * a tie), and Map_BlendPaletteByClock's static map_clock_blend_len only lands at 80082858 (after
- * mapobj_noanim_list) if the number of declarations (typedefs, tags, used externs) between
- * map.h's externs and the static stays as it is now: measured margin 2 more or 2 fewer (a
- * tagged struct typedef counts 2). That is why menu.h (which includes map.h), camera.h and
- * dma.h come right after map.h: H2c dropped menu.h's MapObjAnimDef (2 fewer) and moved dma.h
- * here from the top (2 more) to keep the margin centred. Above map.h about 96 more
- * declarations still work. */
+ * mapobj_noanim_list) if the number of declarations between map.h's first .bss run and the
+ * static stays close to what it is now: margin 13 more (measured) or about 8 fewer (typedef
+ * names, struct tags and data externs count 1 each, used or not; prototypes and unused
+ * locals don't). That is why menu.h (which includes map.h), camera.h and
+ * dma.h come right after map.h, and why map.h declares its .data externs between its two
+ * .bss runs (that widened the gap when MapObj_UpdateAndDrawNearby became C, which moved the
+ * static's number down by about 8). Above map.h about 96 more declarations still work. */
 #include "game/map/map.h"
 #include "game/ui/menu.h"
 #include "game/camera/camera.h"
@@ -305,12 +306,10 @@ void Map_StartFrame(void) {
     }
 }
 
-#ifdef NON_MATCHING
 extern Gfx D_10000E8[]; /* segment 1 (no module defines it) */
 
-/* &mapobj_opaque_list kept in a saved register instead of rematerialized, 8 bytes short, register allocation; code is equivalent */
 void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
-    CellOffset *off;
+    MapObj *s; /* first the cursor into the cell-offset table, then the current object: one variable */
     s32 n;
     s32 cx;
     s32 cz;
@@ -327,10 +326,7 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     f32 rot;
     AnimNode *anim;
     s32 i;
-    MapObjWavePhase *a;
-    MapObjWavePhase *b;
     f64 d;
-    s32 k;
 
     mapobj_noanim_count = 0;
     mapobj_opaque_count = 0;
@@ -352,40 +348,40 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     pz = camera_state.eyeZ;
     switch (map_subarea_grid->searchPattern) {
         case 1:
-            off = mapobj_cell_disc_r7;
+            s = (MapObj *) mapobj_cell_disc_r7;
             n = 0x9D;
             cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
             cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         case 2:
-            off = mapobj_cell_disc_r5;
+            s = (MapObj *) mapobj_cell_disc_r5;
             n = 0x59;
             cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
             cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         case 3:
-            off = mapobj_cell_square_3x3;
+            s = (MapObj *) mapobj_cell_square_3x3;
             n = 9;
             cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
             cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         case 4:
-            off = mapobj_cell_disc_r2;
+            s = (MapObj *) mapobj_cell_disc_r2;
             n = 0x15;
             cx = (px - map_subarea_grid->originX) / map_subarea_grid->cellW;
             cz = (pz - map_subarea_grid->originZ) / map_subarea_grid->cellD;
             break;
         default:
             cx = 0;
-            off = mapobj_cell_single;
+            s = (MapObj *) mapobj_cell_single;
             cz = 0;
             n = 1;
             break;
     }
     for (; n != 0; n--) {
-        gx = off->dx + cx;
-        gz = off->dz + cz;
-        off++;
+        gx = ((CellOffset *) s)->dx + cx;
+        gz = ((CellOffset *) s)->dz + cz;
+        s = (MapObj *) ((CellOffset *) s + 1);
         if (gx >= 0 && gz >= 0 && gx < map_subarea_grid->w && gz < map_subarea_grid->h) {
             idx = map_subarea_grid->w * gz + gx;
             list = &map_subarea_grid->lists[map_subarea_grid->cells[idx]];
@@ -403,47 +399,47 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     D_8007C2A0 = 0;
     mapobj_opaque_cursor = (MapObj **) mapobj_opaque_list;
     for (n = mapobj_opaque_count; n != 0; n--) {
-        off = (CellOffset *) *mapobj_opaque_cursor++;
-        x = ((MapObj *) off)->x;
-        y = ((MapObj *) off)->y;
-        z = ((MapObj *) off)->z;
-        rot = ((MapObj *) off)->angle;
-        if (((MapObj *) off)->kind & 0x2000) {
-            i = (((MapObj *) off)->kind & 0xF00) >> 8;
-            t = ((MapObj *) off)->kind & 0xFF;
+        s = *mapobj_opaque_cursor++;
+        x = s->x;
+        y = s->y;
+        z = s->z;
+        rot = s->angle;
+        if (s->kind & 0x2000) {
+            i = (s->kind & 0xF00) >> 8;
+            t = s->kind & 0xFF;
             anim = &mapobj_loop_anims[i];
             Math_EvalTcbSpline(&anim->track, (f32 *)&mapobj_spline_out, t++);
-            x += mapobj_spline_out.x * ((MapObj *) off)->scale;
-            y += mapobj_spline_out.y * ((MapObj *) off)->scale;
-            z += mapobj_spline_out.z * ((MapObj *) off)->scale;
+            x += mapobj_spline_out.x * s->scale;
+            y += mapobj_spline_out.y * s->scale;
+            z += mapobj_spline_out.z * s->scale;
             if (t >= anim->track.last) {
                 t = 0;
             }
-            ((MapObj *) off)->kind = (((MapObj *) off)->kind & 0xFF00) | t;
-        } else if (((MapObj *) off)->kind & 0x100) {
-            i = MapObjAnim_Find((MapObj *) off);
+            s->kind = (s->kind & 0xFF00) | t;
+        } else if (s->kind & 0x100) {
+            i = MapObjAnim_Find(s);
             if (i != 0) {
                 mapobj_temp_vec[1] = 0.0f;
                 mapobj_temp_vec[0] = mapobj_anim_slots[i - 1].x;
-                Math_RotateVec2(((MapObj *) off)->angle * 0.017453292519943295, (Vec2f *)mapobj_temp_vec);
+                Math_RotateVec2(s->angle * 0.017453292519943295, (Vec2f *)mapobj_temp_vec);
                 x -= mapobj_temp_vec[0];
                 z -= mapobj_temp_vec[1];
                 rot += mapobj_anim_slots[i - 1].z;
             }
         }
-        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, ((MapObj *) off)->scale, x, y, z);
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, s->scale, x, y, z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gSPDisplayList(gfx_dl_head++, map_obj_models[((MapObj *) off)->model].dl);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[s->model].dl);
         D_8007C2A0++;
     }
     mapobj_opaque_cursor = (MapObj **) mapobj_noanim_list;
     for (n = mapobj_noanim_count; n != 0; n--) {
-        off = (CellOffset *) *mapobj_opaque_cursor++;
-        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, ((MapObj *) off)->angle, 0.0f, ((MapObj *) off)->scale, ((MapObj *) off)->x, ((MapObj *) off)->y, ((MapObj *) off)->z);
+        s = *mapobj_opaque_cursor++;
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gSPDisplayList(gfx_dl_head++, map_obj_models[((MapObj *) off)->model].dl);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[s->model].dl);
         D_8007C2A0++;
     }
     MapObj_DrawSpinners(arg0);
@@ -458,6 +454,7 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     }
     gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
+    /* the end test is on the step table's address (an index test would get the loop unrolled) */
     for (i = 0; &mapobj_wave_phase_step[i] < &mapobj_wave_phase_step[4]; i++) {
         mapobj_wave_phase[i].a += mapobj_wave_phase_step[i].a;
         mapobj_wave_phase[i].b += mapobj_wave_phase_step[i].b;
@@ -486,9 +483,6 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     }
     mapobj_ambient_prev_type = mapobj_ambient_type;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/map/map/MapObj_UpdateAndDrawNearby.s")
-#endif
 
 void MapObj_DrawTranslucent(GfxFrameData *arg0) {
     MapObj *s;

@@ -167,23 +167,6 @@ typedef struct MapClockTlutStep {
     /* 0x06 */ u16 id;
 } MapClockTlutStep; /* 0x8 bytes */
 
-/* .data 8004DD70..8004DED0 */
-extern u16 D_8004DD70;
-extern MapObjWavePhase mapobj_wave_phase_step[4];
-extern s32 D_8004DD84;
-extern s32 mapobj_ambient_sfx[4];
-extern MapObjWaveBase mapobj_wave_base_init;
-extern u16 mapobj_scrolltex_offset;
-extern u8 *mapobj_scrolltex_tex[5];
-extern u16 mapobj_scrolltex_height[6];
-extern f32 mapobj_wave_x_div[4];
-extern f32 mapobj_wave_y_div[4];
-extern f32 mapobj_wave_z_div[4];
-extern u16 mapobj_animtex_width[2];
-extern u8 mapobj_animtex_alpha[4];
-extern MapClockTlutStep map_clock_tlut_schedule[6];
-extern s32 map_halfword_rotation_counter;
-
 /* .bss 8007C280..80082030 */
 extern u16 map_env_flags; /* bit 0: own light cycle, bit 1: world clock time (Env_*) */
 extern u16 map_backdrop_id;
@@ -234,9 +217,27 @@ extern MapObjWavePhase mapobj_wave_phase[4];
 extern u16 mapobj_opaque_list[0x200];
 extern u16 mapobj_noanim_list[0x200];
 
-/* The types of the last .bss run are declared here, between the runs: the gap in declaration
- * numbers is where map.c's function static map_clock_blend_len (80082858) sorts (IDO orders
- * .bss by declaration number mod 256). */
+/* .data 8004DD70..8004DED0. These externs sit between the two .bss runs on purpose: they widen the
+ * gap in declaration numbers in which map.c's function static sorts (see below). */
+extern u16 D_8004DD70;
+extern MapObjWavePhase mapobj_wave_phase_step[4];
+extern s32 D_8004DD84;
+extern s32 mapobj_ambient_sfx[4];
+extern MapObjWaveBase mapobj_wave_base_init;
+extern u16 mapobj_scrolltex_offset;
+extern u8 *mapobj_scrolltex_tex[5];
+extern u16 mapobj_scrolltex_height[6];
+extern f32 mapobj_wave_x_div[4];
+extern f32 mapobj_wave_y_div[4];
+extern f32 mapobj_wave_z_div[4];
+extern u16 mapobj_animtex_width[2];
+extern u8 mapobj_animtex_alpha[4];
+extern MapClockTlutStep map_clock_tlut_schedule[6];
+extern s32 map_halfword_rotation_counter;
+
+/* The .data externs above and the types of the last .bss run are declared here, between the
+ * runs: the gap in declaration numbers is where map.c's function static map_clock_blend_len
+ * (80082858) sorts (IDO orders .bss by declaration number mod 256). */
 /* A spinning object queued by MapObj_QueueSpinner (mapobj_spinner_buf0/1). */
 typedef struct MapObjSpinner {
     /* 0x00 */ s32 active;
