@@ -33,3 +33,38 @@ This is the original worker history. Treat old D1/D2 labels and old best scores 
   - w6 s6: 30600. The old draft needs hook h5c.py (Bytes14 etc.) and is around 690 words off. Retail homes are idx 92, flag 88, 84, n 80, X 76, color 72, buf 56, Y 52, p 48, spill 44. There is no home for the e pointer, so retail has no e local; removing it is right. Even with padX/padY and no e, mine puts the spill at 48 with an empty slot at 52, which makes the frame 104 instead of 96.
   - Codex D1 implementation: D1 pass: valid storage-layout lead reduces697 to315 raw instruction words. Code remains3508 vs3532 bytes (24 short); do not include migrated rodata in code-size comparisons. Persistent pointer and color as one-element local arrays, removing e, and idx-before-pointer increment improve prefix. Draft codex-ui/round2/30D5C.best.c and full replay; still GLOBAL_ASM.
   - Claude retry: not attempted (315+ words).
+
+## 2026-11-10 (Fable w4): what the frame says, and a tested natural form (not landed)
+
+Source body unchanged (309 words, 0xDB4 vs 0xDCC). Findings, all checked against the retail asm and the
+ido-debug cost trace:
+
+- **`ptr` is not a local.** Retail's slot at sp+0x30 is uopt's own induction pointer for
+  `&save_menu_file_entries[idx]` (a spill temp, like the header pointer at sp+0x2C): it is updated next to
+  `idx` (`addiu t7,t8,2; sw t7,0x30(sp); sw t6,0x5C(sp)`), and the slot between `buf` and it (sp+0x34) is cfe's
+  switch temp. With `save_menu_file_entries[idx].x` everywhere, `idx < 16 && save_menu_file_entries[idx + 1].file_no != -1`
+  for the down arrow (uopt turns it into the `sltu` pointer test itself) and a plain `s32 color`, the code is
+  identical to retail from the start to +0x4E0 (homes 0x30/0x2C, store order, no `[1]` arrays). Transform:
+  scratchpad `w4/u1.py` (`nat()`).
+- That form is **not landed** because it regresses elsewhere: in the second slot block uopt moves both
+  `color = 0xA` / `color = 0x48` stores to the top of their branches (retail and the pointer draft keep them after
+  the four draw calls), 2 instructions out, which shifts everything after (551 raw words, 0xDB8). The first
+  slot block is unaffected, so it is a dataflow effect of the extra `idx` reads (uopt ends a basic block after 20
+  variable reads; see FABLE_FINDINGS.md), not of the statement itself.
+- **`n` in s1 with `sw s1,0x50(sp)` after every case and `lw s1,0x50(sp)` at the joins** is a split live range of
+  one variable (the draft already reproduces it). The ternary-looking `li s1,0x10; bne; li s1,0` is as1 filling
+  delay slots.
+- **The `-8` in s1 is a coloring decision, not source**: `save_menu_flags &= ~7` gives `andi 0xFFF8` when uopt
+  leaves the constant uncoloured (ugen narrows it against the `lhu`), and `and t,t,s1` when the constant gets
+  a register. Retail loads it at the end of each of the three stick branches = the start of that piece of the
+  constant's live range, right where `n` (also s1) dies. So the draft's `0xFFF8` in the stick part vs `~7` in the
+  button part is probably `~7` everywhere, and the real question is why the constant is coloured.
+- **The wobble value** (`flag` reused, home sp+0x58) is coloured v1 in pieces in retail (`sw v1,0x58(sp)` before
+  each call and at each block exit, `lw` after); in the draft the whole range stays in memory ("split out", never
+  assigned in the trace). Same kind of decision as the `-8`: total savings of the piece against the call cost.
+
+Next test: with the natural form, print the pieces of `flag` (bit 0) and of the constant -8 with the ido-debug
+uopt (`ELTALE_UOPT_COSTS=1`, w5's `~/w5tmp/uoptw5` adds temp slots and live-through blocks) and find which
+block boundary (20-read splits move with every `idx` read) makes the retail pieces profitable; then look at the
+block-2 `color` store the same way (which block it is "anticipated" in). The remaining unknown locals are the
+referenced ones at sp+0x54 and sp+0x4C (one is `secs`).
