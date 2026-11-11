@@ -1548,15 +1548,12 @@ void Player_LoadAnim(Actor *arg0) {
 }
 
 
-#ifdef NON_MATCHING
-/* -1 and 0x130 swapped between s5/s7, one addu operand order (register allocation tie); code is equivalent */
 s32 Player_FindMeleeTarget(Actor *arg0) {
-    Enemy *m;
+    Actor *a;
     s32 ret;
     u16 *idx;
     u32 i;
     f32 radius;
-    Actor *a;
     ActorStats *stats;
     f32 dx;
     f32 dz;
@@ -1568,9 +1565,8 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
     idx = enemy_turn_order;
     i = 0;
     for (; i < battle_enemy_count; i++, idx++) {
-        m = enemy_slots + *idx;
-        a = &m->actor;
-        if (m->actor.animSetIndex != -1) {
+        if (enemy_slots[*idx].actor.animSetIndex != -1) {
+            a = &enemy_slots[*idx].actor;
             dx = a->x - arg0->x;
             dz = a->z - arg0->z;
             dist = sqrtf(dx * dx + dz * dz);
@@ -1606,9 +1602,6 @@ s32 Player_FindMeleeTarget(Actor *arg0) {
     }
     return ret;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/player/player/Player_FindMeleeTarget.s")
-#endif
 
 void Player_StartMeleeAttack(Player *arg0, Actor *arg1, PlayerAnimTable *arg2) {
     Enemy *mon;
