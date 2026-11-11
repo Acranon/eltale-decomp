@@ -321,8 +321,6 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     u16 t;
     f32 px;
     f32 pz;
-    MapObj *s;
-    u16 flags;
     f32 x;
     f32 y;
     f32 z;
@@ -333,28 +331,23 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     MapObjWavePhase *b;
     f64 d;
     s32 k;
-    s32 *pCB4 = &mapobj_noanim_count;
-    s32 *pCB8 = &mapobj_billboard_draw_count;
-    MapObj ***pCD0 = &mapobj_billboard_cursor;
-    f32 *pAC = &mapobj_ambient_dist;
-    s32 *pB0 = &mapobj_ambient_type;
 
-    *pCB4 = 0;
+    mapobj_noanim_count = 0;
     mapobj_opaque_count = 0;
-    *pCB8 = 0;
+    mapobj_billboard_draw_count = 0;
     mapobj_translucent_count = 0;
     mapobj_animtex_count = 0;
     mapobj_scrolltex_count = 0;
     mapobj_billboard_count = 0;
     mapobj_opaque_cursor = (MapObj **) mapobj_opaque_list;
     mapobj_noanim_cursor = (MapObj **) mapobj_noanim_list;
-    *pCD0 = (MapObj **) mapobj_billboard_list;
+    mapobj_billboard_cursor = (MapObj **) mapobj_billboard_list;
     mapobj_translucent_cursor = mapobj_translucent_list;
     mapobj_animtex_cursor = mapobj_animtex_list;
     mapobj_scrolltex_cursor = mapobj_scrolltex_list;
     mapobj_wave_base_cursor = (MapObj *) mapobj_wave_base;
-    *pAC = 600.0f;
-    *pB0 = -1;
+    mapobj_ambient_dist = 600.0f;
+    mapobj_ambient_type = -1;
     px = camera_state.eyeX;
     pz = camera_state.eyeZ;
     switch (map_subarea_grid->searchPattern) {
@@ -410,60 +403,58 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     D_8007C2A0 = 0;
     mapobj_opaque_cursor = (MapObj **) mapobj_opaque_list;
     for (n = mapobj_opaque_count; n != 0; n--) {
-        s = *mapobj_opaque_cursor++;
-        flags = s->kind;
-        x = s->x;
-        y = s->y;
-        z = s->z;
-        rot = s->angle;
-        if (flags & 0x2000) {
-            anim = &mapobj_loop_anims[(flags & 0xF00) >> 8];
-            t = flags;
-            t = (t & 0xFF) + 1;
-            Math_EvalTcbSpline(&anim->track, (f32 *)&mapobj_spline_out, flags & 0xFF);
-            x += mapobj_spline_out.x * s->scale;
-            y += mapobj_spline_out.y * s->scale;
-            z += mapobj_spline_out.z * s->scale;
-            flags = t;
+        off = (CellOffset *) *mapobj_opaque_cursor++;
+        x = ((MapObj *) off)->x;
+        y = ((MapObj *) off)->y;
+        z = ((MapObj *) off)->z;
+        rot = ((MapObj *) off)->angle;
+        if (((MapObj *) off)->kind & 0x2000) {
+            i = (((MapObj *) off)->kind & 0xF00) >> 8;
+            t = ((MapObj *) off)->kind & 0xFF;
+            anim = &mapobj_loop_anims[i];
+            Math_EvalTcbSpline(&anim->track, (f32 *)&mapobj_spline_out, t++);
+            x += mapobj_spline_out.x * ((MapObj *) off)->scale;
+            y += mapobj_spline_out.y * ((MapObj *) off)->scale;
+            z += mapobj_spline_out.z * ((MapObj *) off)->scale;
             if (t >= anim->track.last) {
-                flags = 0;
+                t = 0;
             }
-            s->kind = (s->kind & 0xFF00) | flags;
-        } else if (flags & 0x100) {
-            i = MapObjAnim_Find(s);
+            ((MapObj *) off)->kind = (((MapObj *) off)->kind & 0xFF00) | t;
+        } else if (((MapObj *) off)->kind & 0x100) {
+            i = MapObjAnim_Find((MapObj *) off);
             if (i != 0) {
                 mapobj_temp_vec[1] = 0.0f;
                 mapobj_temp_vec[0] = mapobj_anim_slots[i - 1].x;
-                Math_RotateVec2(s->angle * 0.017453292519943295, (Vec2f *)mapobj_temp_vec);
+                Math_RotateVec2(((MapObj *) off)->angle * 0.017453292519943295, (Vec2f *)mapobj_temp_vec);
                 x -= mapobj_temp_vec[0];
                 z -= mapobj_temp_vec[1];
                 rot += mapobj_anim_slots[i - 1].z;
             }
         }
-        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, s->scale, x, y, z);
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, rot, 0.0f, ((MapObj *) off)->scale, x, y, z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gSPDisplayList(gfx_dl_head++, map_obj_models[s->model].dl);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[((MapObj *) off)->model].dl);
         D_8007C2A0++;
     }
     mapobj_opaque_cursor = (MapObj **) mapobj_noanim_list;
-    for (n = *pCB4; n != 0; n--) {
-        s = *mapobj_opaque_cursor++;
-        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, s->angle, 0.0f, s->scale, s->x, s->y, s->z);
+    for (n = mapobj_noanim_count; n != 0; n--) {
+        off = (CellOffset *) *mapobj_opaque_cursor++;
+        guPosition(&arg0->mtx[gfx_mtx_index], 0.0f, ((MapObj *) off)->angle, 0.0f, ((MapObj *) off)->scale, ((MapObj *) off)->x, ((MapObj *) off)->y, ((MapObj *) off)->z);
         gSPMatrix(gfx_dl_head++, &D_2000000.mtx[gfx_mtx_index], G_MTX_LOAD);
         gfx_mtx_index++;
-        gSPDisplayList(gfx_dl_head++, map_obj_models[s->model].dl);
+        gSPDisplayList(gfx_dl_head++, map_obj_models[((MapObj *) off)->model].dl);
         D_8007C2A0++;
     }
     MapObj_DrawSpinners(arg0);
-    if (*pCB8 != 0) {
+    if (mapobj_billboard_draw_count != 0) {
         gDPPipeSync(gfx_dl_head++);
         gDPSetRenderMode(gfx_dl_head++, 0xC8113078, 0);
-        *pCD0 = (MapObj **) mapobj_billboard_list;
-        MapObj_DrawBillboards(arg0, *pCB8, 0, *pCD0);
-        MapObj_DrawBillboards(arg0, *pCB8, 1, *pCD0);
-        MapObj_DrawBillboards(arg0, *pCB8, 2, *pCD0);
-        MapObj_DrawBillboards(arg0, *pCB8, 3, *pCD0);
+        mapobj_billboard_cursor = (MapObj **) mapobj_billboard_list;
+        MapObj_DrawBillboards(arg0, mapobj_billboard_draw_count, 0, mapobj_billboard_cursor);
+        MapObj_DrawBillboards(arg0, mapobj_billboard_draw_count, 1, mapobj_billboard_cursor);
+        MapObj_DrawBillboards(arg0, mapobj_billboard_draw_count, 2, mapobj_billboard_cursor);
+        MapObj_DrawBillboards(arg0, mapobj_billboard_draw_count, 3, mapobj_billboard_cursor);
     }
     gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
