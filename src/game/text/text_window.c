@@ -594,65 +594,69 @@ void Text_DrawWindowFrame(s32 idx) {
     Text_DrawTexturedRect(3, p->width + x - 1, y, 1, p->height);
 }
 
-#ifdef NON_MATCHING
-/* frame 0x40 vs 0x48, one more saved register, row loop tested as row != rows + 1; code is equivalent */
 void Text_BuildVisiblePage(s32 idx) {
     TextWindow *p = &text_window_slots[idx];
     s32 cols = (p->width - 20) / 10 + 1;
-    s32 rows = (p->height - 20) / 13;
+    s32 row;
+    s32 i;
+    s32 n;
+    s32 j;
     s32 k = 0;
+    s32 rows = (p->height - 20) / 13;
     s32 dst = -1;
     s32 src = -1;
-    s32 row;
-    s32 col;
-    s32 j;
-    s32 n;
-    u8 c;
 
-    for (row = 1; row <= rows; row++) {
-        for (col = 0; col < cols;) {
-            text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
-            c = text_window_slots[idx].visible_bytes[dst];
-            if (c & 0x80) {
-                if (c == 0xE0 || c == 0xFF || (c == 0xF0 && k != 0)) {
-                    break;
-                }
-            } else {
-                col++;
-                k++;
-            }
-        }
-        c = text_window_slots[idx].visible_bytes[dst];
-        if (c == 0xFF) {
-            break;
-        }
-        if (c == 0xF0) {
-            p->flags |= 0x4000000;
-            break;
-        }
-        if (c != 0xE0 && c != 0xE0) {
-            n = -1;
-            for (j = src + 1; text_window_slots[idx].message_bytes[j] >= 0x80; j++) {
-                if (text_window_slots[idx].message_bytes[j] == 0xE0) {
-                    for (n = j - src; n > 0; n--) {
-                        text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+    row = 1;
+    if (rows > 0) {
+        do {
+            for (i = 0; i < cols;) {
+                text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+                if (text_window_slots[idx].visible_bytes[dst] & 0x80) {
+                    if (text_window_slots[idx].visible_bytes[dst] == 0xE0) {
+                        break;
                     }
-                    text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
-                    n = 0;
-                    break;
+                    if (text_window_slots[idx].visible_bytes[dst] == 0xFF) {
+                        break;
+                    }
+                    if (text_window_slots[idx].visible_bytes[dst] == 0xF0 && k != 0) {
+                        break;
+                    }
+                } else {
+                    i++;
+                    k++;
                 }
             }
-            if (n != 0) {
-                text_window_slots[idx].visible_bytes[++dst] = 0xE0;
+            if (text_window_slots[idx].visible_bytes[dst] == 0xFF) {
+                break;
             }
-        }
+            if (text_window_slots[idx].visible_bytes[dst] == 0xF0) {
+                p->flags |= 0x4000000;
+                break;
+            }
+            if (text_window_slots[idx].visible_bytes[dst] != 0xE0 && text_window_slots[idx].visible_bytes[dst] != 0xE0) {
+                n = -1;
+                for (i = src; text_window_slots[idx].message_bytes[++i] >= 0x80;) {
+                    if (text_window_slots[idx].message_bytes[i] == 0xE0) {
+                        for (n = i - src; n > 0; n--) {
+                            text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+                        }
+                        text_window_slots[idx].visible_bytes[++dst] = text_window_slots[idx].message_bytes[++src];
+                        n = 0;
+                        break;
+                    }
+                }
+                if (n != 0) {
+                    text_window_slots[idx].visible_bytes[++dst] = 0xE0;
+                }
+            }
+        } while (row++ < rows);
     }
-    c = text_window_slots[idx].visible_bytes[dst];
-    if (c != 0xFF && c != 0xF0) {
+    if (text_window_slots[idx].visible_bytes[dst] != 0xFF && text_window_slots[idx].visible_bytes[dst] != 0xF0) {
         p->flags |= 0x4000000;
         p->visible_bytes[dst + 1] = 0xFF;
         if (p->pending_byte != 0xFF) {
-            p->message_bytes[(u16)p->reveal_index] = p->pending_byte;
+            dst = p->reveal_index;
+            p->message_bytes[dst] = p->pending_byte;
             p->reveal_index = src + 1;
             p->pending_byte = p->message_bytes[src + 1];
             p->message_bytes[src + 1] = 0xFF;
@@ -663,9 +667,6 @@ void Text_BuildVisiblePage(s32 idx) {
         }
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/text/text_window/Text_BuildVisiblePage.s")
-#endif
 
 void Text_DrawAdvanceIndicator(s32 idx) {
     s32 x;
