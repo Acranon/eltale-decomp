@@ -65,7 +65,6 @@ ItemHandler item_use_handlers[] = {
     (ItemHandler) Item_UseWarp,
     (ItemHandler) Item_UseSpell,
 };
-u16 item_menu_bob_phase = 0; /* only Item_UpdateInventoryMenu uses it */
 
 void Item_InitInventory(void) {
     s32 i;
@@ -188,8 +187,6 @@ s32 Item_RemoveMatchingInventoryEntry(u16 arg0) {
     return found;
 }
 
-#ifdef NON_MATCHING
-/* stack homes, saved registers and frame differ; code is equivalent */
 extern Gfx D_1000388[];
 extern u8 D_8039AFB0[];
 extern Gfx D_803AA7C0[];
@@ -201,10 +198,9 @@ extern u8 D_803AC660[];
 extern void* D_803AB288[];
 extern void* D_803AB2F0[];
 
-
 void Item_UpdateInventoryMenu(void) {
-    volatile s32 n;
-    u8* list;
+    s32 n;
+    s32 bob;
     s32 count;
     s32 changed;
     u8* slot;
@@ -215,8 +211,7 @@ void Item_UpdateInventoryMenu(void) {
     u8* tex;
     u8* fp;
     u8 freeSlots[8];
-    s32 y;
-    s32 b;
+    static u16 item_menu_bob_phase = 0;
 
     gSPDisplayList(gfx_dl_head++, D_803AA7C0);
     Item_DrawMenuFrame(0x46, 0x7F, 0xB2, 0x16);
@@ -231,8 +226,7 @@ void Item_UpdateInventoryMenu(void) {
     } else {
         x = 0;
     }
-    list = &item_inventory[item_menu_scroll];
-    p = list;
+    p = &item_inventory[item_menu_scroll];
     n = 8;
     while (n != 0 && *p != 0xFF) {
         n--;
@@ -275,16 +269,13 @@ void Item_UpdateInventoryMenu(void) {
                     Sfx_Play(0, 3, 0xFF);
                 }
             }
-            list = &item_inventory[item_menu_scroll];
-            p = list;
         } else {
             item_menu_stick_accum = 0;
-            p = list;
         }
         fp = freeSlots;
         slot = item_icon_cache_ids;
-        n = 8;
-        do {
+        for (n = 8; n != 0; n--) {
+            p = &item_inventory[item_menu_scroll];
             k = count;
             while (k != 0 && *slot != *p) {
                 k--;
@@ -293,15 +284,13 @@ void Item_UpdateInventoryMenu(void) {
             slot++;
             if (k == 0) {
                 *fp++ = 8 - n;
-                list = &item_inventory[item_menu_scroll];
             }
-            n--;
-            p = list;
-        } while (n != 0);
+        }
+        p = &item_inventory[item_menu_scroll];
         x = 0x1AC;
+        n = count;
         gSPDisplayList(gfx_dl_head++, D_803AA9F0);
         hl = 0;
-        n = count;
         while (n != 0 && *p != 0xFF) {
             k = 8;
             slot = item_icon_cache_ids;
@@ -312,14 +301,13 @@ void Item_UpdateInventoryMenu(void) {
             if (k == 0) {
                 k = *--fp;
                 item_icon_cache_ids[k] = *p;
-                tex = ((u8 (*)[0x100])item_icon_cache_tex)[k];
-                Dma_ReadRom(&D_D384B0[(*p << 8) + 0x400], tex, 0x100);
+                Dma_ReadRom(&D_D384B0[(*p << 8) + 0x400], &item_icon_cache_tex[k * 0x100], 0x100);
             } else {
-                tex = ((u8 (*)[0x100])item_icon_cache_tex)[8 - k];
+                k = 8 - k;
             }
+            tex = &item_icon_cache_tex[k * 0x100];
             gDPLoadTextureBlock(gfx_dl_head++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, 16, 16, 0, G_TX_NOMIRROR | G_TX_WRAP,
                                 G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-            p++;
             if (item_menu_cursor == count - n) {
                 gDPSetEnvColor(gfx_dl_head++, 0xFF, 0xFF, 0xFF, 0xFF);
                 gDPLoadTLUT_pal256(gfx_dl_head++, D_803AC460);
@@ -331,25 +319,26 @@ void Item_UpdateInventoryMenu(void) {
             }
             gSPTextureRectangle(gfx_dl_head++, x, 0x20C, x + 0x40, 0x24C, G_TX_RENDERTILE, 0, 0, 0x400, 0x400);
             x += 0x44;
+            p++;
             n--;
         }
         x = item_menu_cursor * 0x44 + 0x1D4;
-        y = 0x1F0 - (u16)((sins(item_menu_bob_phase & 0x7FFF) >> 13) << 2);
+        bob = 0x1F0 - ((sins(item_menu_bob_phase & 0x7FFF) >> 11) & 0xFFFC);
         gSPDisplayList(gfx_dl_head++, D_803AA828);
-        gSPTextureRectangle(gfx_dl_head++, x, y, x + 0x30, y + 0x30, G_TX_RENDERTILE, 0x9C0, 0, 0x400, 0x400);
+        gSPTextureRectangle(gfx_dl_head++, x, bob, x + 0x30, bob + 0x30, G_TX_RENDERTILE, 0x9C0, 0, 0x400, 0x400);
         if (count == 8) {
-            b = sins((item_menu_bob_phase * 2) & 0x7FFF);
+            bob = sins((item_menu_bob_phase * 2) & 0x7FFF) >> 13;
             gDPLoadTextureTile(gfx_dl_head++, D_8039AFB0, G_IM_FMT_CI, G_IM_SIZ_8b, 176, 0, 90, 0, 146, 13, 0,
                                G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK,
                                G_TX_NOLOD, G_TX_NOLOD);
             if (item_menu_scroll != 0) {
                 gSPTextureRectangle(gfx_dl_head++, 0x218, 0x250, 0x234, 0x26C, G_TX_RENDERTILE, 0xE00, 0, 0x400, 0x400);
-                gSPTextureRectangle(gfx_dl_head++, (0x77 - (b >> 13)) * 4, 0x248, (0x85 - (b >> 13)) * 4, 0x274,
+                gSPTextureRectangle(gfx_dl_head++, (0x77 - bob) << 2, 0x248, (0x85 - bob) << 2, 0x274,
                                     G_TX_RENDERTILE, 0xEE0, 0, 0x400, 0x400);
             }
             if (item_inventory[item_menu_scroll + 8] != 0xFF) {
                 gSPTextureRectangle(gfx_dl_head++, 0x348, 0x250, 0x364, 0x26C, G_TX_RENDERTILE, 0xE00, 0, 0x400, 0x400);
-                gSPTextureRectangle(gfx_dl_head++, ((b >> 13) + 0xDA) * 4, 0x248, ((b >> 13) + 0xE8) * 4, 0x274,
+                gSPTextureRectangle(gfx_dl_head++, (bob + 0xDA) << 2, 0x248, (bob + 0xE8) << 2, 0x274,
                                     G_TX_RENDERTILE, 0x10A0, 0, 0x400, 0x400);
             }
         }
@@ -358,30 +347,28 @@ void Item_UpdateInventoryMenu(void) {
         Text_DrawEncodedString(0x4E, 0x5A, D_803AB2F0[item_inventory[item_menu_scroll + item_menu_cursor]]);
         if ((input_pressed_buttons & 0xA000) && Item_TryUse(item_inventory[item_menu_scroll + item_menu_cursor])) {
             p = &item_inventory[item_menu_scroll + item_menu_cursor];
-            for (n = 0x95 - item_menu_scroll - item_menu_cursor; n != 0; n--) {
+            n = 0x95 - item_menu_scroll - item_menu_cursor;
+            while (n != 0) {
                 *p = p[1];
                 p++;
+                n--;
             }
             *p = 0xFF;
             core_flags &= ~1;
             Fade_Start(6, 4, fade_black_ramp_dim);
-            list = &item_inventory[item_menu_scroll];
-            if (list[item_menu_cursor] == 0xFF) {
+            if (item_inventory[item_menu_scroll + item_menu_cursor] == 0xFF) {
                 if (item_menu_scroll > 0) {
                     item_menu_scroll--;
                 } else if (item_menu_cursor > 0) {
                     item_menu_cursor--;
                 }
-            } else if (list[7] == 0xFF && item_menu_scroll > 0) {
+            } else if (item_inventory[item_menu_scroll + 7] == 0xFF && item_menu_scroll > 0) {
                 item_menu_scroll--;
             }
         }
         item_menu_bob_phase += 0x300;
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/item/item/Item_UpdateInventoryMenu.s")
-#endif
 
 s32 Item_CanUseNever(s32 arg0, ItemDef* arg1) {
     return 0;

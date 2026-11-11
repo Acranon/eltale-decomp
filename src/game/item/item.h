@@ -26,7 +26,6 @@ extern u8 item_icon_cache_tex[0x800];
 extern u8 item_inventory[0x97];
 extern ItemHandler item_can_use_handlers[];
 extern ItemHandler item_use_handlers[];
-extern u16 item_menu_bob_phase;
 
 void Item_InitInventory(void);
 s32 Item_HasInventoryRoom(void);
