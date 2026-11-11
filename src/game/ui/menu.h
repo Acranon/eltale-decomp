@@ -162,18 +162,22 @@ extern Gfx menu_sprite_alpha_dl[7];
 extern f32 menu_map_cursor_x;
 extern f32 menu_map_cursor_y;
 extern MenuMapLocation menu_map_location_list[298];
-extern s16 menu_map_spot_coords[108];
+extern s16 menu_map_spot_coords[6][9][2];
 extern void *menu_map_tluts[6];
-extern void *menu_map_strips[144];
+extern void *menu_map_strips[6][24];
 extern s16 menu_map_world_scale[12];
 extern s16 menu_map_origin[12];
 extern MenuPictureDma menu_map_picture_dma[10];
 extern void *menu_map_small_tluts[4];
-extern void *menu_map_small_tex[8];
+extern void *menu_map_small_tex[4][2];
 extern u8 menu_map_small_sizes[4][3];
-extern s16 menu_map_small_pos[8];
+extern s16 menu_map_small_pos[4][2];
 extern s16 menu_options_top_row_pos[8][2];
 extern s16 menu_options_bgm_row_pos[5][2];
+/* Menu_UpdateMapPage's function static (.data 800615E0), which hides this declaration; nothing
+ * else may use it. The line stays because map.c's .bss order depends on the number of
+ * declarations in this header (see the note at the top of map.c): removing it moves
+ * map_clock_blend_len in front of mapobj_noanim_list. */
 extern s32 menu_map_loaded_region;
 extern MenuExpGaugePalettes menu_exp_gauge_tluts;
 extern MenuExpGaugeTextures menu_exp_gauge_tex;
