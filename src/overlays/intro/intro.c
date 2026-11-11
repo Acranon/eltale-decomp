@@ -25,22 +25,6 @@ typedef struct {
         _g->words.w1 = (b);                \
     }
 
-#ifdef NON_MATCHING
-/* gSPTextureRectangle with the RDPHALF_2 step word built as ((dsdx & 0xFFFF) << 13) << 3
-   (func_8020E108's flipped texrects) */
-#define GFX_TEXRECT_STEPS(pkt, xl, yl, xh, yh, tile, s, t, dsdx, dtdy)                                       \
-    {                                                                                                     \
-        Gfx *_g = (Gfx *) (pkt);                                                                          \
-                                                                                                          \
-        _g->words.w0 = (_SHIFTL(G_TEXRECT, 24, 8) | _SHIFTL(xh, 12, 12) | _SHIFTL(yh, 0, 12));            \
-        _g->words.w1 = (_SHIFTL(tile, 24, 3) | _SHIFTL(xl, 12, 12) | _SHIFTL(yl, 0, 12));                 \
-        gImmp1(pkt, G_RDPHALF_1, (_SHIFTL(s, 16, 16) | _SHIFTL(t, 0, 16)));                               \
-        gImmp1(pkt, G_RDPHALF_2,                                                                          \
-               (((unsigned int) ((((unsigned int) (dsdx)) & ((0x01 << 16) - 1)) << 13) << 3) |             \
-                _SHIFTL(dtdy, 0, 16)));                                                                   \
-    }
-#endif
-
 /* ovl_intro .data 80212230..80212250 (80212250.. is DC9350.c's): 230, then
    func_8020C16C's statics 234..240. */
 s32 intro_phase_timer = 0;
@@ -906,8 +890,6 @@ void Intro_ResetWait(s32 idx) {
     intro_sprite_slots[idx].wait_frame = 0;
 }
 
-#ifdef NON_MATCHING
-/* 23 words: t3/t4 swapped in the flipped texrect block (allocation only); code is equivalent */
 void Intro_UpdateAndDrawSprites(s32 arg0) {
     s32 i;
     IntroRect r;
@@ -1087,15 +1069,15 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
             if (p->flags.w & 0x60000) {
                 if (p->flags.w & 0x20000) {
                     r.dsdx = -0x400;
-                    GFX_TEXRECT_STEPS(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
+                    gSPTextureRectangle(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
                                         (r.y + r.height) << 2, G_TX_RENDERTILE, (r.s + r.texture_width - 1) << 5, r.tfrac,
-                                        r.dsdx, r.dtdy);
+                                        r.dsdx & 0xFFFF, r.dtdy);
                 }
                 if (p->flags.w & 0x40000) {
                     r.dtdy = -0x400;
-                    GFX_TEXRECT_STEPS(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
+                    gSPTextureRectangle(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
                                         (r.y + r.height) << 2, G_TX_RENDERTILE, r.sfrac, (r.t + r.texture_height - 1) << 5,
-                                        r.dsdx, r.dtdy);
+                                        r.dsdx, r.dtdy & 0xFFFF);
                 }
             } else {
                 gSPTextureRectangle(gfx_dl_head++, r.x << 2, r.y << 2, (r.x + r.width) << 2,
@@ -1109,7 +1091,4 @@ void Intro_UpdateAndDrawSprites(s32 arg0) {
         }
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/overlays/intro/intro/Intro_UpdateAndDrawSprites.s")
-#endif
 
