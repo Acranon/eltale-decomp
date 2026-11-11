@@ -83,10 +83,6 @@ extern s32 intro_wait_for_sprites;
 extern IntroSprite intro_sprite_slots[150];
 extern Gfx intro_display_list_buffers[2][0xBB8];
 extern Gfx *intro_saved_display_ptr;
-extern s32 D_80276F44_ovl_intro;
-extern u8 D_80276F48_ovl_intro[0x12C];
-extern s32 intro_fade_alpha;
-extern u8 intro_skip_requested;
 
 void Intro_Init(void);
 s32 Intro_Update(void);
@@ -96,7 +92,7 @@ void Intro_ClearAllSprites(void);
 void Intro_ClearSprite(s32 idx);
 s32 Intro_CountFreeSprites(s32 n);
 /* n is the counter: it only gets the parameter's register (a0); the callee zeroes it first. */
-s32 Intro_CountActiveSprites(s32 n);
+s32 Intro_CountActiveSprites(); /* defined with a parameter it uses as a local; called without arguments */
 s16 Intro_FindFreeSprite(void);
 s32 Intro_StepClipGrow(s32 arg0, s32 arg1, IntroRect* arg2);
 s32 Intro_StepClipShrink(s32 idx, s32 flags, IntroRect *r);

@@ -45,10 +45,7 @@ s32 intro_wait_for_sprites;
 IntroSprite intro_sprite_slots[150];
 Gfx intro_display_list_buffers[2][0xBB8];
 Gfx *intro_saved_display_ptr;
-s32 D_80276F44_ovl_intro;
-u8 D_80276F48_ovl_intro[0x12C]; /* not referenced */
-s32 intro_fade_alpha;
-u8 intro_skip_requested;
+/* 80276F44..80277080: Intro_RunSpriteScript's statics */
 
 
 
@@ -213,32 +210,30 @@ s32 Intro_Update(void) {
     return ret;
 }
 
-#ifdef NON_MATCHING
-/* D_80276F44 is the module's global (the original's function static), so its address is kept in a register; v1 spill at sp+0x74 vs 0x70; code is equivalent */
 s32 Intro_RunSpriteScript(void) {
     IntroSpriteCue* entries;
     IntroAnimStep* steps;
     u32 listIdx;
-    IntroSprite* obj;
     s32 slot;
     s32 dx;
     s32 dy;
-    IntroSpriteCue *new_var;
     s32 i;
     s32 j;
     s32 flags;
-    Gfx *g;
-    if (intro_fade_alpha) {}
+    static s32 script_frames;      /* 80276F44: counted, never read */
+    static u8 unused_80276F48[0x12C]; /* not referenced */
+    static s32 intro_fade_alpha;   /* 80277074 */
+    static u8 intro_skip_requested; /* 80277078 */
 
     if (intro_scene_initialized == 0) {
-        D_80276F44_ovl_intro = 0;
+        script_frames = 0;
         intro_elapsed_frames = 0;
         intro_skip_requested = 0;
         intro_fade_alpha = 0;
         intro_scene_initialized = 1;
     }
     intro_elapsed_frames++;
-    D_80276F44_ovl_intro++;
+    script_frames++;
     intro_cue_frame++;
     if ((intro_cue_frame >= intro_cue_groups[intro_cue_group_index].cues[intro_cue_entry_index].start_frame) &&
         (intro_cue_groups[intro_cue_group_index].cues[intro_cue_entry_index].sprite_slot == -1) && (intro_wait_for_sprites == 0)) {
@@ -294,47 +289,48 @@ s32 Intro_RunSpriteScript(void) {
     }
     Intro_UpdateAndDrawSprites(1);
     Intro_UpdateAndDrawSprites(0);
-    for (i = 0, obj = intro_sprite_slots; i < 150; i++, obj++) {
+    for (i = 0; i < 150; i++) {
+        // Fakes, as in Ending_RunSpriteScript: the empty uses of i (here) and of intro_cue_group_index
+        // (end of the loop body) give IDO the retail live ranges; they emit no code.
         if (i) {
         }
-        if (obj->flags.w & 0x80000000) {
+        if (intro_sprite_slots[i].flags.w & 0x80000000) {
             j = Intro_FindSpriteScriptEntry(i, &listIdx);
             if (j != -1) {
-                flags = obj->flags.w;
+                flags = intro_sprite_slots[i].flags.w;
                 entries = intro_cue_groups[listIdx].cues;
                 steps = intro_sprite_anim_table[entries[j].anim_index].steps;
                 if (flags & 0x800000) {
                     flags &= ~0x800000;
                 }
                 if (!(steps[entries[j].anim_step_index].flags & flags)) {
-                    if (intro_cue_group_index) {
-                    }
-                    new_var = entries;
                     entries[j].anim_step_index++;
-                    if (new_var[j].anim_step_index >= intro_sprite_anim_table[new_var[j].anim_index].count) {
+                    if (entries[j].anim_step_index >= intro_sprite_anim_table[entries[j].anim_index].count) {
                         Intro_ClearSprite(i);
                         entries[j].sprite_slot = -1;
                     } else {
-                        obj->flags.w &= ~0x800000;
-                        obj->flags.w |= steps[new_var[j].anim_step_index].flags;
-                        obj->step_duration = steps[new_var[j].anim_step_index].duration;
-                        if (steps[new_var[j].anim_step_index].flags & 0xC800) {
-                            if (new_var[j].start_frame == 0) {
-                                dx = new_var[j].x - new_var[new_var[j].previous_cue_index].x;
-                                dy = new_var[j].y - new_var[new_var[j].previous_cue_index].y;
+                        intro_sprite_slots[i].flags.w &= ~0x800000;
+                        intro_sprite_slots[i].flags.w |= steps[entries[j].anim_step_index].flags;
+                        intro_sprite_slots[i].step_duration = steps[entries[j].anim_step_index].duration;
+                        if (steps[entries[j].anim_step_index].flags & 0xC800) {
+                            if (entries[j].start_frame == 0) {
+                                dx = entries[j].x - entries[entries[j].previous_cue_index].x;
+                                dy = entries[j].y - entries[entries[j].previous_cue_index].y;
                             } else {
                                 dx = 0;
                                 dy = 0;
                             }
-                            Intro_SetMoveTarget(i, steps[new_var[j].anim_step_index].x + dx, steps[new_var[j].anim_step_index].y + dy);
+                            Intro_SetMoveTarget(i, steps[entries[j].anim_step_index].x + dx, steps[entries[j].anim_step_index].y + dy);
                         }
-                        if (steps[new_var[j].anim_step_index].flags & 0x1000) {
+                        if (steps[entries[j].anim_step_index].flags & 0x1000) {
                             Intro_ResetWait(i);
                         }
-                        if (steps[new_var[j].anim_step_index].flags & 0x60000000) {
+                        if (steps[entries[j].anim_step_index].flags & 0x60000000) {
                             Intro_SetClipAnchor(i);
                         }
                     }
+                }
+                if (intro_cue_group_index) {
                 }
             }
         }
@@ -347,9 +343,9 @@ s32 Intro_RunSpriteScript(void) {
         if (intro_fade_alpha >= 0x100) {
             intro_fade_alpha = 0xFF;
         }
-        g = gfx_dl_head++; g->words.w0 = _SHIFTL(G_RDPPIPESYNC, 24, 8); g->words.w1 = 0;
-        g = gfx_dl_head++; g->words.w0 = (_SHIFTL(G_DL, 24, 8) | _SHIFTL(G_DL_PUSH, 16, 8)); g->words.w1 = (u32)D_802122E0_ovl_intro;
-        g = gfx_dl_head++; g->words.w0 = (_SHIFTL(G_SETOTHERMODE_H,24,8) | _SHIFTL(G_MDSFT_TEXTLUT,8,8) | _SHIFTL(2,0,8)); g->words.w1 = G_TT_RGBA16;
+        gDPPipeSync(gfx_dl_head++);
+        gSPDisplayList(gfx_dl_head++, D_802122E0_ovl_intro);
+        gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
         gDPSetRenderMode(gfx_dl_head++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
         gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, intro_fade_alpha);
         gDPLoadTLUT_pal256(gfx_dl_head++, D_80217A80_ovl_intro);
@@ -361,8 +357,7 @@ s32 Intro_RunSpriteScript(void) {
             return 1;
         }
     }
-    /* Retail sets up no a0 for this call (nop in the delay slot); the callee zeroes n first. */
-    if ((Intro_CountActiveSprites(0) == 0) && (intro_wait_for_sprites != 0)) {
+    if ((Intro_CountActiveSprites() == 0) && (intro_wait_for_sprites != 0)) {
         intro_wait_for_sprites = 0;
         intro_cue_group_index++;
         if (intro_cue_group_index >= intro_cue_group_count) {
@@ -372,9 +367,6 @@ s32 Intro_RunSpriteScript(void) {
     }
     return 2;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/overlays/intro/intro/Intro_RunSpriteScript.s")
-#endif
 
 s32 Intro_FindSpriteScriptEntry(s32 id, u32 *outIdx) {
     u32 i;
