@@ -978,11 +978,12 @@ u8 ending_backdrop_completion_state = 0;
 #endif
 
 #ifdef NON_MATCHING
-/* code 0xCB8 vs 0xCBC, frame and spill slots exact: the statement and block structure is retail's; what is left is
-   the colouring of a few low-priority candidates (see src/nonmatching/Ending_UpdateAndDrawScrollingBackdrop.md) */
+/* One instruction differs: retail has `move s0,a2` where this has `sw a2,0x1A0(sp)` (the dead copy of
+   (s32) scroll before the second loop). Everything else is byte-identical; see
+   src/nonmatching/Ending_UpdateAndDrawScrollingBackdrop.md */
 s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
-    s32 unused1;
-    s32 unused2;
+    u32 sx; /* dead: (s32) ending_scroll_offset before the first loop */
+    u32 sy; /* dead: (s32) ending_scroll_offset before the second loop; retail keeps this one in s0 */
     s32 unused3;
     f32 delta;
     s32 i;
@@ -1049,7 +1050,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
         img = ((UnkPic_80210800*) ending_picture_defs)[arg0].img;
         height = ((UnkPic_80210800*) ending_picture_defs)[arg0].unkC;
         gDPLoadTLUT_pal256(gfx_dl_head++, tlut);
-        
+        sx = (s32) ending_scroll_offset;
         for (i = 0; i < 37; i++) {
             x = (s32) ending_scroll_offset % width;
             gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, (i * 6), 303, (i * 6) + 5, 0, 0, 0, 0, 0, 0, 0);
@@ -1091,7 +1092,7 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
         img = ((UnkPic_80210800*) ending_picture_defs)[arg0 + 1].img;
         height = ((UnkPic_80210800*) ending_picture_defs)[arg0 + 1].unkC;
         gDPLoadTLUT_pal256(gfx_dl_head++, tlut);
-        
+        sy = (s32) ending_scroll_offset;
         for (i = 0; i < 37; i++) {
             x = (s32) ending_scroll_offset % width;
             gDPLoadTextureTile(gfx_dl_head++, img, G_IM_FMT_CI, G_IM_SIZ_8b, width, 0, x, (i * 6), 303, (i * 6) + 5, 0, 0, 0, 0, 0, 0, 0);
@@ -1100,12 +1101,13 @@ s32 Ending_UpdateAndDrawScrollingBackdrop(s32 arg0, s32 arg1) {
             gSPTextureRectangle(gfx_dl_head++, (304 - x) << 2, (i * 6) << 2, 304 << 2, ((i * 6) + 6) << 2, G_TX_RENDERTILE, 0, (i * 6) << 5, 0x400, 0x400);
         }
     }
+    unused3 = sx;
+    if (sy) {
+    }
     ending_backdrop_frame++;
     if ((ending_backdrop_frame >= 240.0) && (ending_backdrop_frame < 0x26E8)) {
         ending_scroll_offset -= (f32) width / (f32) arg1;
-        return 0;
-    }
-    if (ending_backdrop_frame == 0x26E8) {
+    } else if (ending_backdrop_frame == 0x26E8) {
         ending_backdrop_completion_state = 1;
     }
     return 0;
