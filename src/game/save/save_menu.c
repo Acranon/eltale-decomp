@@ -29,11 +29,7 @@ s32 save_menu_pak_error;
 u8 save_menu_choice_cursor;
 s8 save_menu_delay_frames; /* save-menu delay, in frames */
 s8 save_menu_selected_slot;
-#ifdef NON_MATCHING
-u8 save_menu_stick_repeat_counter; /* SaveMenu_UpdateSlotList reads it with lbu */
-#else
-s8 save_menu_stick_repeat_counter;
-#endif
+u8 save_menu_stick_repeat_counter;
 u8 save_menu_repair_count;
 SaveFileEntry save_menu_file_entries[17];
 SaveHeader save_menu_save_headers[16];
@@ -47,9 +43,6 @@ void func_8003D8EC(const char *, ...);
 s32 func_8003D0F0(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D554(OSMesgQueue *, OSPfs *, s32);
 s32 func_8003D6B0(OSMesgQueue *, OSPfs *, s32);
-
-#ifdef NON_MATCHING
-#endif
 
 void SaveMenu_Init(s32 arg0) {
     core_game_mode = 2;
@@ -517,27 +510,17 @@ void SaveMenu_UpdateDialog(void) {
 
 /* .data 80061650..80061660: SaveMenu_UpdateSlotList's local message (an initialized u8[14]
  * that IDO copies to the stack); becomes its initializer when the function is C. */
-#ifdef NON_MATCHING
 SaveBytes14 D_80061650 = { {
 #include "assets/D_80061650.inc.c"
 } };
-#else
-u8 D_80061650[0xE] = {
-#include "assets/D_80061650.inc.c"
-};
-#endif
 
-#ifdef NON_MATCHING
-/* stack homes and flag/cursor lifetimes differ (code 0x18 bytes short); code is equivalent */
 void SaveMenu_UpdateSlotList(s32 arg0) {
     s32 idx;
     s32 flag;
     s32 secs;
     s32 n;
-    s32 pad_x;
-    s32 colors[1];
+    s32 color[2];
     SaveBytes14 buf;
-    SaveFileEntry *ptr[1];
 
     flag = 0;
     buf = D_80061650;
@@ -551,21 +534,20 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     } else {
         idx = save_menu_selected_slot;
     }
-    ptr[0] = &save_menu_file_entries[idx];
-    if (ptr[0]->file_no != -2) {
-        if (ptr[0]->extension_id != -1) {
+    if (save_menu_file_entries[idx].file_no != -2) {
+        if (save_menu_file_entries[idx].extension_id != -1) {
             if (idx == save_menu_selected_slot) {
                 Menu_DrawNumber(2, 0x6F, 0x36, idx, 0xA);
                 Menu_DrawSprite(0x36, 0x53, 0x35, 0x1C, 0xD);
                 Menu_DrawSprite(0x19, 0x92, 0x36, 8, 0xA);
                 Menu_DrawSprite(0x43, 0xD9, 0x35, 0x1C, 0xE);
-                colors[0] = 0xA;
+                color[0] = 0xA;
             } else {
                 Menu_DrawNumber(2, 0x6F, 0x36, idx, 0x48);
                 Menu_DrawSprite(0x45, 0x53, 0x35, 0x1C, 0xD);
                 Menu_DrawSprite(0x52, 0x92, 0x36, 8, 0xA);
                 Menu_DrawSprite(0x44, 0xD9, 0x35, 0x1C, 0xE);
-                colors[0] = 0x48;
+                color[0] = 0x48;
             }
             Menu_DrawNumber(2, 0x65, 0x6C, save_menu_save_headers[idx].player_stats.element_levels[0], 0xA);
             Menu_DrawNumber(2, 0x8A, 0x6C, save_menu_save_headers[idx].player_stats.element_levels[1], 0xA);
@@ -640,9 +622,9 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 secs -= 60;
                 n++;
             }
-            Menu_DrawNumber(3, 0x7E, 0x36, n, colors[0]);
-            Menu_DrawNumberZeroPad(2, 0x9A, 0x36, secs, colors[0]);
-            Menu_DrawNumber(3, 0xC0, 0x36, save_menu_save_headers[idx].day_count, colors[0]);
+            Menu_DrawNumber(3, 0x7E, 0x36, n, color[0]);
+            Menu_DrawNumberZeroPad(2, 0x9A, 0x36, secs, color[0]);
+            Menu_DrawNumber(3, 0xC0, 0x36, save_menu_save_headers[idx].day_count, color[0]);
             Menu_PrintNumber(3, 0x70, 0x58, save_menu_save_headers[idx].player_stats.hp);
             Menu_PrintNumber(3, 0xC0, 0x58, save_menu_save_headers[idx].player_stats.mp);
         }
@@ -652,22 +634,21 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
     }
     SaveMenu_SetTextDrawState();
     idx++;
-    ptr[0]++;
-    if (ptr[0]->file_no != -1 && flag == 0) {
-        if (ptr[0]->file_no != -2) {
-            if (ptr[0]->extension_id != -1) {
-                    if (idx == save_menu_selected_slot) {
+    if (save_menu_file_entries[idx].file_no != -1 && flag == 0) {
+        if (save_menu_file_entries[idx].file_no != -2) {
+            if (save_menu_file_entries[idx].extension_id != -1) {
+                if (idx == save_menu_selected_slot) {
                     Menu_DrawNumber(2, 0x6F, 0x83, idx, 0xA);
                     Menu_DrawSprite(0x36, 0x53, 0x82, 0x1C, 0xD);
                     Menu_DrawSprite(0x19, 0x92, 0x83, 8, 0xA);
                     Menu_DrawSprite(0x43, 0xD9, 0x82, 0x1C, 0xE);
-                    colors[0] = 0xA;
+                    color[0] = 0xA;
                 } else {
                     Menu_DrawNumber(2, 0x6F, 0x83, idx, 0x48);
                     Menu_DrawSprite(0x45, 0x53, 0x82, 0x1C, 0xD);
                     Menu_DrawSprite(0x52, 0x92, 0x83, 8, 0xA);
                     Menu_DrawSprite(0x44, 0xD9, 0x82, 0x1C, 0xE);
-                    colors[0] = 0x48;
+                    color[0] = 0x48;
                 }
                 Menu_DrawNumber(2, 0x65, 0xBA, save_menu_save_headers[idx].player_stats.element_levels[0], 0xA);
                 Menu_DrawNumber(2, 0x8A, 0xBA, save_menu_save_headers[idx].player_stats.element_levels[1], 0xA);
@@ -742,9 +723,9 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                     secs -= 60;
                     n++;
                 }
-                Menu_DrawNumber(3, 0x7E, 0x83, n, colors[0]);
-                Menu_DrawNumberZeroPad(2, 0x9A, 0x83, secs, colors[0]);
-                Menu_DrawNumber(3, 0xC0, 0x83, save_menu_save_headers[idx].day_count, colors[0]);
+                Menu_DrawNumber(3, 0x7E, 0x83, n, color[0]);
+                Menu_DrawNumberZeroPad(2, 0x9A, 0x83, secs, color[0]);
+                Menu_DrawNumber(3, 0xC0, 0x83, save_menu_save_headers[idx].day_count, color[0]);
                 Menu_PrintNumber(3, 0x70, 0xA6, save_menu_save_headers[idx].player_stats.hp);
                 Menu_PrintNumber(3, 0xC0, 0xA6, save_menu_save_headers[idx].player_stats.mp);
             }
@@ -753,7 +734,10 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         }
     }
     SaveMenu_SetTextDrawState();
-    flag = menu_wobble_offsets[(menu_frame_counter >> 2) & 0xF];
+    flag = menu_frame_counter;
+    flag >>= 2;
+    flag &= 0xF;
+    flag = menu_wobble_offsets[flag];
     if (save_menu_selected_slot >= 2) {
         Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
         Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
@@ -761,7 +745,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         Menu_DrawSprite(5, 0x38, 0x4D, 7, 7);
         Menu_DrawSprite(0x53, 0x36, flag + 0x3F, 0xC, 0x10);
     }
-    if (ptr[0] < &save_menu_file_entries[16] && ptr[0][1].file_no != -1) {
+    if (idx < 16 && save_menu_file_entries[idx + 1].file_no != -1) {
         Menu_DrawSprite(5, 0x38, 0xA4, 7, 7);
         Menu_DrawSprite(0x54, 0x36, 0xAC - flag, 0xE, 0xB);
     }
@@ -783,7 +767,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 if (!(save_menu_flags & 0x20) && n == 0) {
                     save_menu_flags |= 0x20;
                 } else if (n == 0) {
-                    save_menu_flags &= 0xFFF8;
+                    save_menu_flags &= ~7;
                     save_menu_flags |= 6;
                     save_menu_delay_frames = 4;
                 }
@@ -801,7 +785,7 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
                 if (save_menu_flags & 0x20) {
                     save_menu_flags &= 0xFFDF;
                 } else if (n == 0) {
-                    save_menu_flags &= 0xFFF8;
+                    save_menu_flags &= ~7;
                     save_menu_flags |= 6;
                     save_menu_delay_frames = 4;
                 }
@@ -850,9 +834,6 @@ void SaveMenu_UpdateSlotList(s32 arg0) {
         }
     }
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/save/save_menu/SaveMenu_UpdateSlotList.s")
-#endif
 
 void SaveMenu_UpdateDelay(void) {
     save_menu_delay_frames--;
