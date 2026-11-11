@@ -78,7 +78,10 @@ void Env_InitClock(void) {
 }
 
 #ifdef NON_MATCHING
-/* &env_day_phases[3] held in a register instead of separate %hi/%lo loads, temporaries rotated (register allocation); code is equivalent */
+/* One value's register left: the last phase's start time is kept in v0 (a uopt CSE of the
+ * load, shared by the store and the first loop test) where retail has it in the temporary t6,
+ * which shifts every later t-register by one. Everything else is retail's. Code is equivalent.
+ * See src/nonmatching/Env_InitForMap.md. */
 void Env_InitForMap(void) {
     EnvDayPhase *p;
     s32 i;
@@ -88,17 +91,15 @@ void Env_InitForMap(void) {
     EnvKeyframe *e;
 
     /* the walk goes back from the table's last entry */
-    env_last_phase_start = env_day_phases[3].startTime;
     p = &env_day_phases[3];
+    env_last_phase_start = p->startTime;
     i = 3;
-    if (env_clock < env_day_phases[3].startTime) {
-        do {
-            p--;
-            n = i--;
-            if (n == 0) {
-                break;
-            }
-        } while (env_clock < p->startTime);
+    while (env_clock < p->startTime) {
+        p--;
+        n = i--;
+        if (n == 0) {
+            break;
+        }
     }
     if (i < 0) {
         p = &env_day_phases[3];
@@ -106,8 +107,8 @@ void Env_InitForMap(void) {
     } else {
         env_next_phase = i;
     }
-    /* map.h declares the four phase palettes as u8[0x800]; they are u16[4][0x100] (D3_HINTS). */
-    src = map_backdrop_phase_tluts[p->paletteIndex];
+    /* the row is written as an offset, as in Env_Update (retail scales the index in two steps) */
+    src = map_backdrop_phase_tluts[0] + p->paletteIndex * 256;
     dst = map_backdrop_tlut;
     i = 0x100;
     do {
@@ -186,28 +187,30 @@ void Env_SetClock(s32 arg0) {
     env_light_time = env_clock;
 }
 
-#ifdef NON_MATCHING
-/* 8-byte frame with one saved register where retail is a no-frame leaf, light pointers rematerialized differently (register allocation); code is equivalent */
+/* Lighting and fog for time t on an area's keyframe track: the single keyframe as is, or
+ * the two keys around t blended. The four colours (ambient, three lights) are one run in
+ * both the keyframe and env_light_colors. */
 void Env_InterpolateLighting(s32 t, EnvAreaSettings *arg1) {
     EnvKeyframe *k;
     EnvKeyframe *prev;
     s32 span;
     s32 off;
     s32 rem;
-    EnvColor *ambient = (EnvColor *) env_light_colors[0];
-    EnvColor *light;
-    EnvFogRange *fog = (EnvFogRange *) env_fog_range;
+    EnvColor *dst;
     EnvColor *before;
     EnvColor *after;
+    s32 i;
+    s32 count;
 
+    count = arg1->count;
     k = arg1->frames;
-    if (arg1->count == 1) {
-        *ambient = k->amb;
-        light = (EnvColor *) env_light_colors[1]; /* D_80084B24 */
-        *light++ = k->lights[0];
-        *light++ = k->lights[1];
-        *light++ = k->lights[2];
-        *fog = k->fog;
+    dst = (EnvColor *) env_light_colors;
+    if (count == 1) {
+        before = &k->amb;
+        for (i = 0; i < 4; i++) {
+            *dst++ = *before++;
+        }
+        *(EnvFogRange *) env_fog_range = k->fog;
         return;
     }
     while (t >= k->time) {
@@ -217,35 +220,19 @@ void Env_InterpolateLighting(s32 t, EnvAreaSettings *arg1) {
     span = k->time - prev->time;
     off = t - prev->time;
     rem = span - off;
-    light = (EnvColor *) env_light_colors[1]; /* D_80084B24 */
     before = &prev->amb;
     after = &k->amb;
-    ambient->r = (before->r * rem + after->r * off) / span;
-    ambient->g = (before->g * rem + after->g * off) / span;
-    ambient->b = (before->b * rem + after->b * off) / span;
-    before++;
-    after++;
-    light->r = (before->r * rem + after->r * off) / span;
-    light->g = (before->g * rem + after->g * off) / span;
-    light->b = (before->b * rem + after->b * off) / span;
-    light++;
-    before++;
-    after++;
-    light->r = (before->r * rem + after->r * off) / span;
-    light->g = (before->g * rem + after->g * off) / span;
-    light->b = (before->b * rem + after->b * off) / span;
-    light++;
-    before++;
-    after++;
-    light->r = (before->r * rem + after->r * off) / span;
-    light->g = (before->g * rem + after->g * off) / span;
-    light->b = (before->b * rem + after->b * off) / span;
-    fog->near = (prev->fog.near * rem + k->fog.near * off) / span;
-    fog->far = (prev->fog.far * rem + k->fog.far * off) / span;
+    for (i = 0; i < 4; i++) {
+        dst->r = (before->r * rem + after->r * off) / span;
+        dst->g = (before->g * rem + after->g * off) / span;
+        dst->b = (before->b * rem + after->b * off) / span;
+        dst++;
+        before++;
+        after++;
+    }
+    env_fog_range[0] = (prev->fog.near * rem + k->fog.near * off) / span;
+    env_fog_range[1] = (prev->fog.far * rem + k->fog.far * off) / span;
 }
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/env/env/Env_InterpolateLighting.s")
-#endif
 
 void Env_PrepareFrameLighting(void) {
     Lights3 *l;
