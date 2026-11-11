@@ -169,7 +169,7 @@ typedef struct MapClockTlutStep {
 
 /* .data 8004DD70..8004DED0 */
 extern u16 D_8004DD70;
-extern s32 mapobj_wave_phase_step[4];
+extern MapObjWavePhase mapobj_wave_phase_step[4];
 extern s32 D_8004DD84;
 extern s32 mapobj_ambient_sfx[4];
 extern MapObjWaveBase mapobj_wave_base_init;

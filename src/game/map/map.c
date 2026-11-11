@@ -143,7 +143,7 @@ u16 map_subarea_flags; /* bit 0: enemy area (enemy set, random encounters, no NP
  * 16-byte line), which both functions need. D_8004DD8B (MapObj_UpdateAndDrawNearby's asm
  * name for mapobj_ambient_sfx + 3) is an alias in undefined_syms.txt. */
 u16 D_8004DD70 = 0;
-s32 mapobj_wave_phase_step[4] = { 0x00000000, 0x01600160, 0x01600160, 0x01600100 };
+MapObjWavePhase mapobj_wave_phase_step[4] = { { 0, 0 }, { 0x160, 0x160 }, { 0x160, 0x160 }, { 0x160, 0x100 } };
 s32 D_8004DD84 = 0x00500050;
 s32 mapobj_ambient_sfx[4] = { 0x19, 0x1B, 0x1E, 0x20 };
 MapObjWaveBase mapobj_wave_base_init = { { 0 } };
@@ -458,20 +458,9 @@ void MapObj_UpdateAndDrawNearby(GfxFrameData *arg0) {
     }
     gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
     gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
-    /* mapobj_wave_phase_step is read as four u16 pairs */
-    a = mapobj_wave_phase;
-    b = (MapObjWavePhase *) mapobj_wave_phase_step;
-    for (;;) {
-        u16 ta = a->a + b->a;
-        u16 tb = a->b + b->b;
-        b++;
-        k = b < ((MapObjWavePhase *) mapobj_wave_phase_step) + 4;
-        a++;
-        a[-1].a = ta;
-        a[-1].b = tb;
-        if (!k) {
-            break;
-        }
+    for (i = 0; &mapobj_wave_phase_step[i] < &mapobj_wave_phase_step[4]; i++) {
+        mapobj_wave_phase[i].a += mapobj_wave_phase_step[i].a;
+        mapobj_wave_phase[i].b += mapobj_wave_phase_step[i].b;
     }
     mapobj_wave_capture = 0;
     Map_BlendPaletteByClock();
