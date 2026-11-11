@@ -17,1171 +17,16 @@
  * Original file: 2B530.c (ROM 0x2B530).
  */
 
-/* .bss 8008FB30..8008FB70 */
-s32 menu_slide_right_x;
-s32 menu_slide_left_x;
-s32 menu_slide_timer;
-u16 menu_map_cursor_active;
-u16 menu_flags; /* bits 0-1 page, 0x10 TLUT loaded, 0x20 page edit mode, 0x1000 slide direction, 0x2000 slide, 0x4000 save menu, 0x8000 open */
-s8 menu_save_loaded;
-s32 menu_frame_counter;
-f32 menu_map_marker_x;
-f32 menu_map_marker_z;
-s32 menu_map_region;
-s32 menu_map_spot;
-#ifndef NON_MATCHING /* a function static in the NON_MATCHING C */
-s32 menu_options_marker_x; /* only Menu_UpdateOptionsPage (asm) uses it */
-#endif
-f32 menu_map_cursor_saved_x; /* only Menu_UpdateMapPage (asm) uses these two */
-f32 menu_map_cursor_saved_y;
-
-
-void Menu_Init(void) {
-    menu_flags = 0x8000;
-    save_menu_flags = 0;
-    menu_map_cursor_active = 0;
-}
-
-void Menu_ResetKeepPage(void) {
-    menu_flags = (menu_flags & 3) | 0x8000;
-    save_menu_flags = 0;
-    menu_map_cursor_active = 0;
-}
-
-
-
-void Menu_Update(struct GfxFrameData *arg0) {
-    gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
-    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
-    Menu_DrawBackground();
-    menu_frame_counter++;
-    if (menu_flags & 0x4000) {
-        SaveMenu_Update();
-    } else if (menu_flags & 0x2000) {
-        Menu_UpdatePageSlide();
-    } else {
-        switch ((u16)(menu_flags & 3)) {
-            case 0:
-                Menu_UpdateStatsPage(0);
-                break;
-            case 1:
-                Menu_UpdateMapPage(0);
-                break;
-            case 2:
-                Menu_UpdateElementsPage(0);
-                break;
-            case 3:
-                Menu_UpdateOptionsPage(0);
-                break;
-        }
-    }
-    menu_flags &= ~0x10;
-    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
-    gDPSetBlendColor(gfx_dl_head++, 0, 0, 0, 1);
-    if ((input_pressed_buttons & 0x5000) && !(menu_flags & 0x6020)) {
-        menu_flags &= 0x7FFF;
-        Sfx_Play(0, 1, 0xFF);
-    }
-    if (!(menu_flags & 0x8000)) {
-        if (menu_flags & 0x4000) {
-            switch ((u16)(menu_flags & 0xC)) {
-                case 0:
-                    if (save_menu_flags & 0x80) {
-                        core_game_mode = 1;
-                        menu_save_loaded = 1;
-                    } else {
-                        core_game_mode = 3;
-                        menu_save_loaded = 0;
-                    }
-                    break;
-                case 8:
-                    core_game_mode = 3;
-                    break;
-                case 4:
-                    core_game_mode = 1;
-                    break;
-            }
-        } else {
-            core_game_mode = 1;
-        }
-        Menu_ResetKeepPage();
-    }
-}
-
-
-void Menu_UpdatePageSlide(void) {
-    s32 mode;
-    s32 dir = 0;
-    s32 d;
-    s32 a;
-    s32 b;
-
-    d = menu_slide_timer * menu_slide_timer * 0.3125;
-    if (menu_flags & 0x1000) {
-        menu_slide_right_x = 0x140 - d;
-        menu_slide_left_x = -d;
-        a = menu_slide_right_x;
-        b = menu_slide_left_x;
-        if (menu_slide_timer == 0) {
-            dir = -1;
-        }
-    } else {
-        menu_slide_right_x = d;
-        menu_slide_left_x = d - 0x140;
-        a = menu_slide_left_x;
-        b = menu_slide_right_x;
-        if (menu_slide_timer == 0) {
-            dir = 1;
-        }
-    }
-    menu_slide_timer--;
-    mode = menu_flags & 3;
-    switch (mode) {
-        case 0:
-            Menu_UpdateStatsPage(a);
-            if (menu_flags & 0x1000) {
-                Menu_UpdateOptionsPage(b);
-            } else {
-                Menu_UpdateMapPage(b);
-            }
-            break;
-        case 1:
-            Menu_UpdateMapPage(a);
-            if (menu_flags & 0x1000) {
-                Menu_UpdateStatsPage(b);
-            } else {
-                Menu_UpdateElementsPage(b);
-            }
-            break;
-        case 2:
-            Menu_UpdateElementsPage(a);
-            if (menu_flags & 0x1000) {
-                Menu_UpdateMapPage(b);
-            } else {
-                Menu_UpdateOptionsPage(b);
-            }
-            break;
-        case 3:
-            Menu_UpdateOptionsPage(a);
-            if (menu_flags & 0x1000) {
-                Menu_UpdateElementsPage(b);
-            } else {
-                Menu_UpdateStatsPage(b);
-            }
-            break;
-    }
-    if (dir != 0) {
-        menu_flags &= ~0x2000;
-        menu_flags &= ~0x1000;
-        mode += dir;
-        menu_flags &= ~3;
-        menu_flags |= mode & 3;
-    }
-}
-
-void Menu_UpdateStatsPage(s32 x) {
-    s32 px;
-    s32 i;
-    f32 f;
-    s32 pad[2]; // unused locals in the original (frame size)
-
-    gDPPipeSync(gfx_dl_head++);
-    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 255);
-    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x98);
-    Menu_DrawSprite(0x37, x + 0x2B, 0xB7, 0xF0, 3);
-    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x96);
-    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
-    Menu_DrawSprite(0x37, x + 0x27, 0xB6, 0xF2, 1);
-    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 1, 0x9A);
-    Menu_DrawSprite(0x37, x + 0x118, 0x1D, 1, 0x9A);
-    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
-    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 1, 0x95);
-    Menu_DrawSprite(0x39, x + 0x29, 0xB4, 0xEE, 1);
-    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x96);
-    Menu_DrawSprite(0x3C, x + 0x3A, 0x1E, 0x15, 0x98);
-    px = 0x4B;
-    for (i = 0; i < 3; i++, px += 0x21) {
-        Menu_DrawSprite(0x3D, x + 0x5D, px, 0xA7, 2);
-    }
-    px = 0x40;
-    for (i = 0; i < 4; i++, px += 0x21) {
-        Menu_DrawSprite(0x32, x + 0x63, px, 0x3C, 7);
-    }
-    px = 0x3C;
-    for (i = 0; i < 4; i++, px += 0x21) {
-        Menu_DrawSprite(0x20, x + 0xC3, px, 0x13, 11);
-    }
-    Menu_DrawSprite(0x1B, x + 0x38, 0x34, 0x18, 0xE);
-    Menu_DrawSprite(0x1C, x + 0x37, 0x54, 0x1C, 0xD);
-    Menu_DrawSprite(0x1D, x + 0x35, 0x78, 0x24, 0xF);
-    Menu_DrawSprite(0x1E, x + 0x35, 0x99, 0x1C, 0xE);
-    Menu_DrawSprite(5, x + 0x45, 0x1C, 8, 8);
-    Menu_DrawSprite(5, x + 0xF3, 0x1C, 8, 8);
-    i = menu_frame_counter;
-    i = (i >> 2) & 0xF;
-    i = menu_wobble_offsets[i];
-    Menu_DrawSprite(6, x + i + 0x36, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(7, x - i + 0xFB, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(0x14, x + 0x79, 0x35, 8, 0xA);
-    Menu_DrawSprite(0x14, x + 0x79, 0x56, 8, 0xA);
-    i = D_8007A9D6;
-    Menu_DrawNumber(3, x + 0x80, 0x35, i, 0xA);
-    i = D_8007A9DA;
-    Menu_DrawNumber(3, x + 0x80, 0x56, i, 0xA);
-    i = D_8007A9D4;
-    Menu_DrawNumber(3, x + 0x64, 0x35, i, 0xA);
-    i = D_8007A9D8;
-    Menu_DrawNumber(3, x + 0x64, 0x56, i, 0xA);
-    i = D_8007A9DE;
-    Menu_DrawNumber(3, x + 0x80, 0x77, i, 0xA);
-    i = D_8007A9DC;
-    Menu_DrawNumber(3, x + 0x80, 0x98, i, 0xA);
-    i = player_stat_xp_costs[D_8007AA00];
-    Menu_DrawNumber(3, x + 0xDA, 0x3B, D_8007A9F8 * 100 / i, 0xA);
-    i = player_stat_xp_costs[D_8007AA01];
-    if (D_8007AA10 & 0x4000) {
-        i = i * 3;
-    } else {
-        i = i * 4;
-    }
-    Menu_DrawNumber(3, x + 0xDA, 0x5C, D_8007A9FA * 100 / i, 0xA);
-    i = player_stat_xp_costs[D_8007AA03];
-    if (D_8007AA10 & 0x2000) {
-        i = (f32) i * 0.8;
-    }
-    Menu_DrawNumber(3, x + 0xDA, 0x7D, D_8007A9FE * 100 / i, 0xA);
-    i = player_stat_xp_costs[D_8007AA02];
-    if (D_8007AA10 & 0x8000) {
-        i = (f32) i * 0.8;
-    }
-    Menu_DrawNumber(3, x + 0xDA, 0x9E, D_8007A9FC * 100 / i, 0xA);
-    f = (u32)D_8007A9D4;
-    f /= (u32)D_8007A9D6;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0x64, 0x41, f, 3);
-    f = (u32)D_8007A9D8;
-    f /= (u32)D_8007A9DA;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0x64, 0x62, f, 3);
-    f = (u32)D_8007A9DE;
-    f /= 255.0f;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0x64, 0x83, f, 3);
-    f = (u32)D_8007A9DC;
-    f /= 255.0f;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0x64, 0xA4, f, 3);
-    Menu_DrawSprite(0x15, x + 0xF6, 0x3B, 8, 0xA);
-    Menu_DrawSprite(0x15, x + 0xF6, 0x5C, 8, 0xA);
-    Menu_DrawSprite(0x15, x + 0xF6, 0x7D, 8, 0xA);
-    Menu_DrawSprite(0x15, x + 0xF6, 0x9E, 8, 0xA);
-    Menu_DrawSprite(0x1A, x + 0x77, 0x19, 0x52, 0xD);
-    if (!(menu_flags & 0x2000)) {
-        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
-            menu_flags |= 0x2000;
-            menu_slide_timer = 31;
-            Sfx_Play(0, 0, 0xFF);
-        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
-            menu_flags |= 0x3000;
-            menu_slide_timer = 31;
-            Sfx_Play(0, 0, 0xFF);
-        }
-    }
-}
-
-#ifdef NON_MATCHING
-/* context for the NON_MATCHING Menu_UpdateOptionsPage and Menu_UpdateMapPage (their data is defined below) */
-#endif
-
-#ifdef NON_MATCHING
-/* stack homes and register allocation differ; code is equivalent */
-void Menu_UpdateOptionsPage(s32 x) {
-    s32 wob;
-    s32 sel;
-    s32 y;
-    u8 ids[3] = { 0x28, 0x27, 0x26 }; /* the retail build keeps these bytes as the file-scope menu_options_marker_sprites */
-    static s32 menu_options_marker_x; /* the retail build keeps it as the file-scope menu_options_marker_x */
-
-    menu_text_delay_option = 4 - menu_text_delay_option;
-    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x6C);
-    Menu_DrawSprite(0x37, x + 0x2B, 0x8B, 0xF0, 3);
-    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x68);
-    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
-    Menu_DrawSprite(0x37, x + 0x27, 0x8A, 0xF2, 1);
-    Menu_DrawSprite(0x37, x + 0x27, 0x1E, 1, 0x6D);
-    Menu_DrawSprite(0x37, x + 0x118, 0x1E, 1, 0x6D);
-    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
-    Menu_DrawSprite(0x38, x + 0x29, 0x20, 1, 0x68);
-    Menu_DrawSprite(0x39, x + 0x29, 0x88, 0xEE, 1);
-    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x69);
-    Menu_DrawSprite(0x3C, x + 0x3A, 0x1E, 0x15, 0x6C);
-    Menu_DrawSprite(0x3D, x + 0x5D, 0x56, 0xA7, 2);
-    Menu_DrawSprite(0x24, x + 0x8D, 0x3E, 0x54, 7);
-    Menu_DrawSprite(0x24, x + 0x8D, 0x6C, 0x54, 7);
-    Menu_DrawSprite(0x57, x + 0xE9, 0x3C, 0x1A, 9);
-    Menu_DrawSprite(0x56, x + 0x6C, 0x3C, 0x1A, 9);
-    Menu_DrawSprite(0x29, x + 0xE9, 0x6B, 0x1A, 9);
-    Menu_DrawSprite(0x2A, x + 0x6C, 0x6B, 0x1A, 9);
-    Menu_DrawSprite(0x22, x + 0x31, 0x3B, 0x36, 0xC);
-    Menu_DrawSprite(0x23, x + 0x35, 0x68, 0x2A, 0xC);
-    Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
-    Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
-    wob = menu_frame_counter;
-    wob = (wob >> 2) & 0xF;
-    wob = menu_wobble_offsets[wob];
-    Menu_DrawSprite(6, x + wob + 0x36, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(7, x - wob + 0xFB, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(0x21, x + 0x75, 0x18, 0x56, 0xE);
-    Menu_DrawSprite(0x25, x + 0x8E, 0x3F, 0x50, 3);
-    Menu_DrawSprite(0x25, x + 0x8E, 0x6D, 0x50, 3);
-    Menu_DrawSprite(0x27, x + 0xB3, 0x39, 8, 0xB);
-    Menu_DrawSprite(0x27, x + 0xB3, 0x67, 8, 0xB);
-    if (menu_flags & 0x200) {
-        switch (menu_flags & 0x100) {
-            case 0:
-                Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
-                break;
-            case 0x100:
-                Menu_DrawSprite(ids[menu_options_top_row_pos[menu_text_delay_option][1]], menu_options_top_row_pos[menu_text_delay_option][0] + x, 0x39, 8, 0xB);
-                break;
-        }
-    } else {
-        Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
-        Menu_DrawSprite(ids[menu_options_top_row_pos[menu_text_delay_option][1]], menu_options_top_row_pos[menu_text_delay_option][0] + x, 0x39, 8, 0xB);
-    }
-    if (menu_flags & 0x2000) {
-        menu_text_delay_option = 4 - menu_text_delay_option;
-        return;
-    }
-    if (!(menu_flags & 0x800)) {
-        if (input_stick_x > 0x14 || (input_held_buttons & 0x10)) {
-            menu_flags |= 0x2000;
-            menu_slide_timer = 0x1F;
-            Sfx_Play(0, 0, 0xFF);
-        } else if (input_stick_x < -0x14 || (input_held_buttons & 0x2000)) {
-            menu_flags |= 0x3000;
-            menu_slide_timer = 0x1F;
-            Sfx_Play(0, 0, 0xFF);
-        }
-        if (input_pressed_buttons & 0x8000) {
-            menu_flags |= 0x820;
-            Sfx_Play(0, 1, 0xFF);
-        }
-    } else {
-        if ((input_pressed_buttons & 0x8000) && !(menu_flags & 0x200)) {
-            menu_flags &= ~0x920;
-            Sfx_Play(0, 2, 0xFF);
-            menu_text_delay_option = 4 - menu_text_delay_option;
-            return;
-        }
-        wob = menu_frame_counter;
-        wob = (wob >> 1) & 0xF;
-        wob = menu_wobble_offsets[wob];
-        sel = menu_flags & 0x100;
-        if (menu_flags & 0x200) {
-            switch (sel) {
-                case 0:
-                    if (menu_options_marker_x < menu_options_top_row_pos[menu_text_delay_option][0]) {
-                    } else if (menu_options_top_row_pos[menu_text_delay_option][0] < menu_options_marker_x) {
-                    } else {
-                        menu_flags &= ~0x200;
-                        menu_flags &= ~0x400;
-                        sel = ids[menu_options_top_row_pos[menu_text_delay_option][1]];
-                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
-                            Menu_DrawSprite(sel, menu_options_marker_x + x, 0x39, 8, 0xB);
-                        }
-                        y = 0x3A;
-                        sel = 0;
-                    }
-                    break;
-                case 0x100:
-                    if (menu_options_marker_x < menu_options_bgm_row_pos[menu_bgm_volume_option][0]) {
-                    } else if (menu_options_bgm_row_pos[menu_bgm_volume_option][0] < menu_options_marker_x) {
-                    } else {
-                        menu_flags &= ~0x200;
-                        menu_flags &= ~0x400;
-                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]];
-                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
-                            Menu_DrawSprite(sel, menu_options_marker_x + x, 0x67, 8, 0xB);
-                        }
-                        y = 0x65;
-                        sel = 0x100;
-                    }
-                    break;
-            }
-        }
-        if (!(menu_flags & 0x200)) {
-            switch (sel) {
-                case 0:
-                    y = 0x3A;
-                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
-                        if (!(menu_flags & 0x400)) {
-                            menu_flags &= ~0x100;
-                            menu_flags |= 0x100;
-                            menu_flags |= 0x400;
-                            Sfx_Play(0, 0, 0xFF);
-                        }
-                    } else if (input_stick_x < -0x14) {
-                        if (!(menu_flags & 0x400)) {
-                            menu_options_marker_x = menu_options_top_row_pos[menu_text_delay_option--][0];
-                            if (menu_text_delay_option < 0) {
-                                menu_text_delay_option = 0;
-                            }
-                            menu_flags |= 0x600;
-                        }
-                    } else if (input_stick_x > 0x14) {
-                        if (!(menu_flags & 0x400)) {
-                            menu_options_marker_x = menu_options_top_row_pos[menu_text_delay_option++][0];
-                            if (menu_text_delay_option > 4) {
-                                menu_text_delay_option = 4;
-                            }
-                            menu_flags |= 0x600;
-                        }
-                    } else {
-                        menu_flags &= ~0x400;
-                    }
-                    break;
-                case 0x100:
-                    y = 0x65;
-                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
-                        if (!(menu_flags & 0x400)) {
-                            menu_flags &= ~0x100;
-                            menu_flags |= 0;
-                            menu_flags |= 0x400;
-                            Sfx_Play(0, 0, 0xFF);
-                        }
-                    } else if (input_stick_x < -0x14) {
-                        if (!(menu_flags & 0x400)) {
-                            menu_options_marker_x = menu_options_bgm_row_pos[menu_bgm_volume_option--][0];
-                            if (menu_bgm_volume_option < 0) {
-                                menu_bgm_volume_option = 0;
-                            }
-                            menu_flags |= 0x400;
-                            menu_flags |= 0x200;
-                        }
-                    } else if (input_stick_x > 0x14) {
-                        if (!(menu_flags & 0x400)) {
-                            menu_options_marker_x = menu_options_bgm_row_pos[menu_bgm_volume_option++][0];
-                            if (menu_bgm_volume_option > 4) {
-                                menu_bgm_volume_option = 4;
-                            }
-                            menu_flags |= 0x400;
-                            menu_flags |= 0x200;
-                        }
-                    } else {
-                        menu_flags &= ~0x400;
-                    }
-                    break;
-            }
-        }
-        if (menu_flags & 0x200) {
-            s32 pos;
-
-            switch (sel) {
-                case 0:
-                    y = 0x3A;
-                    pos = menu_options_marker_x + x;
-                    if (menu_options_marker_x < menu_options_top_row_pos[menu_text_delay_option][0]) {
-                        menu_options_marker_x++;
-                        pos++;
-                        sel = ids[menu_options_top_row_pos[menu_text_delay_option - 1][1]];
-                    } else if (menu_options_top_row_pos[menu_text_delay_option][0] < menu_options_marker_x) {
-                        menu_options_marker_x--;
-                        pos--;
-                        sel = ids[menu_options_top_row_pos[menu_text_delay_option + 1][1]];
-                    } else {
-                        menu_flags &= ~0x400;
-                        sel = ids[menu_options_top_row_pos[menu_text_delay_option][1]];
-                    }
-                    Menu_DrawSprite(sel, pos, 0x39, 8, 0xB);
-                    break;
-                case 0x100:
-                    y = 0x65;
-                    pos = menu_options_marker_x + x;
-                    if (menu_options_marker_x < menu_options_bgm_row_pos[menu_bgm_volume_option][0]) {
-                        menu_options_marker_x++;
-                        pos++;
-                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option - 1][1]];
-                    } else if (menu_options_bgm_row_pos[menu_bgm_volume_option][0] < menu_options_marker_x) {
-                        menu_options_marker_x--;
-                        pos--;
-                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option + 1][1]];
-                    } else {
-                        menu_flags &= ~0x400;
-                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]];
-                    }
-                    Menu_DrawSprite(sel, pos, 0x67, 8, 0xB);
-                    break;
-            }
-        }
-        Menu_DrawSprite(1, x - wob + 0x1E, y, 0x10, 0xD);
-    }
-    menu_text_delay_option = 4 - menu_text_delay_option;
-}
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_UpdateOptionsPage.s")
-#endif
-
-#ifdef NON_MATCHING
-/* frame, stack homes and register allocation differ; code is equivalent */
-void Menu_UpdateMapPage(s32 arg0) {
-    static s32 menu_map_loaded_region = -1; /* the retail build keeps it as the file-scope menu_map_loaded_region */
-    s32 cx;
-    s32 cy;
-    s32 x;
-    f32 f;
-    s32 s;
-    s32 n;
-    s32 sx;
-    s32 sy;
-    s32 px;
-    s32 py;
-    s32 ox;
-    s32 w;
-    s32 h;
-    s32 y;
-    s32 i;
-
-    s = 0;
-    if (menu_map_region < 6) {
-        if (menu_map_region != menu_map_loaded_region) {
-            Dma_ReadRom(menu_map_picture_dma[menu_map_region].start, menu_map_picture_dma[menu_map_region].dst,
-                          menu_map_picture_dma[menu_map_region].end - menu_map_picture_dma[menu_map_region].start);
-            menu_map_loaded_region = menu_map_region;
-        }
-        w = 0xF4;
-        h = 8;
-        x = arg0 + 0x27;
-        y = 0x1D;
-        if (x < 0) {
-            if (x + w < 0) {
-                h = 0;
-            } else {
-                s = -x;
-                w -= s;
-                s <<= 5;
-                x = 0;
-            }
-        }
-        if (x > 320) {
-            h = 0;
-        } else if (x + w > 320) {
-            w = w - (x + w) + 320;
-            s = 0;
-        }
-        if (h != 0) {
-            gDPPipeSync(gfx_dl_head++);
-            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_tluts[menu_map_region]);
-            for (i = 0; i < 24; i++) {
-                if (i == 23) {
-                    h = 1;
-                }
-                gDPLoadTextureTile(gfx_dl_head++, menu_map_strips[menu_map_region * 24 + i], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
-                                   243, h - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
-                                   G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
-                                    1 << 10, 1 << 10);
-                gDPPipeSync(gfx_dl_head++);
-                y += h;
-            }
-            SaveMenu_SetTextDrawState();
-        }
-    } else {
-        Menu_DrawSprite(0, arg0 + 0x28, 0x1E, 0xF0, 0xB4);
-        Menu_DrawSprite(0x38, arg0 + 0x29, 0x1F, 0xED, 1);
-        Menu_DrawSprite(0x38, arg0 + 0x29, 0x20, 1, 0xB1);
-        Menu_DrawSprite(0x39, arg0 + 0x29, 0xD0, 0xEE, 1);
-        Menu_DrawSprite(0x39, arg0 + 0x117, 0x1F, 1, 0xB2);
-        Menu_DrawSprite(0x37, arg0 + 0x2C, 0xD4, 0xF0, 3);
-        Menu_DrawSprite(0x37, arg0 + 0x11A, 0x25, 2, 0xB2);
-        Menu_DrawSprite(0x37, arg0 + 0x27, 0x1D, 0xF2, 1);
-        Menu_DrawSprite(0x37, arg0 + 0x27, 0xD3, 0xF2, 1);
-        Menu_DrawSprite(0x37, arg0 + 0x27, 0x1E, 1, 0xB3);
-        Menu_DrawSprite(0x37, arg0 + 0x119, 0x1E, 1, 0xB3);
-        if (menu_map_region != menu_map_loaded_region) {
-            Dma_ReadRom(menu_map_picture_dma[menu_map_region].start, menu_map_picture_dma[menu_map_region].dst,
-                          menu_map_picture_dma[menu_map_region].end - menu_map_picture_dma[menu_map_region].start);
-            menu_map_loaded_region = menu_map_region;
-        }
-        n = menu_map_region - 6;
-        w = menu_map_small_sizes[n][0];
-        h = menu_map_small_sizes[n][1];
-        x = menu_map_small_pos[n * 2] + arg0;
-        y = menu_map_small_pos[n * 2 + 1];
-        if (x < 0) {
-            if (x + w < 0) {
-                h = 0;
-            } else {
-                s = -x;
-                w -= s;
-                s <<= 5;
-                x = 0;
-            }
-        }
-        if (x > 320) {
-            h = 0;
-        } else if (x + w > 320) {
-            w = w - (x + w) + 320;
-            s = 0;
-        }
-        if (h != 0) {
-            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_small_tluts[n]);
-            menu_flags &= ~0x10;
-            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][1], 0, 0,
-                               menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][1] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
-                               G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-            gDPPipeSync(gfx_dl_head++);
-            gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
-                                1 << 10, 1 << 10);
-            gDPPipeSync(gfx_dl_head++);
-            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2 + 1], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][2], 0, 0,
-                               menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][2] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
-                               G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-            gDPPipeSync(gfx_dl_head++);
-            gSPTextureRectangle(gfx_dl_head++, x << 2, (y + menu_map_small_sizes[n][1]) << 2, (x + w) << 2, (y + h + menu_map_small_sizes[n][2]) << 2,
-                                G_TX_RENDERTILE, s, 0, 1 << 10, 1 << 10);
-            SaveMenu_SetTextDrawState();
-        }
-    }
-    Menu_DrawSprite(5, arg0 + 0x45, 0x1C, 7, 7);
-    Menu_DrawSprite(5, arg0 + 0xF3, 0x1C, 7, 7);
-    n = (menu_frame_counter >> 2) & 0xF;
-    n = menu_wobble_offsets[n];
-    Menu_DrawSprite(6, arg0 + n + 0x36, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(7, arg0 - n + 0xFB, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
-    if (menu_map_region < 6) {
-        if (menu_map_spot < 0) {
-            cx = (s32) player_state.actor.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
-            cy = (s32) player_state.actor.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
-        } else {
-            cx = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2];
-            cy = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2 + 1];
-        }
-        if (menu_frame_counter & 0x20) {
-            Menu_DrawSprite(0x2C, arg0 + cx + 0x23, cy + 0xD, 0xC, 0x10);
-        }
-        if (menu_map_spot < 0) {
-            sx = menu_map_world_scale[menu_map_region];
-            sy = menu_map_world_scale[menu_map_region + 6];
-            px = menu_map_origin[menu_map_region];
-            py = menu_map_origin[menu_map_region + 6];
-            if (menu_map_cursor_x == -1.0f) {
-                menu_map_cursor_x = cx;
-                menu_map_cursor_y = cy;
-            }
-            if (menu_map_cursor_active != 0) {
-                f = input_stick_x;
-                if (f > 0.0f) {
-                    f -= 5.0f;
-                    if (f < 0.0f) {
-                        f = 0.0f;
-                    }
-                } else {
-                    f += 5.0f;
-                    if (f > 0.0f) {
-                        f = 0.0f;
-                    }
-                }
-                menu_map_cursor_x += f * 0.08;
-                f = input_stick_y;
-                if (f > 0.0f) {
-                    f -= 5.0f;
-                    if (f < 0.0f) {
-                        f = 0.0f;
-                    }
-                } else {
-                    f += 5.0f;
-                    if (f > 0.0f) {
-                        f = 0.0f;
-                    }
-                }
-                menu_map_cursor_y -= f * 0.08;
-                if (menu_map_cursor_x < 6.0f) {
-                    menu_map_cursor_x = 6.0f;
-                } else if (menu_map_cursor_x > 236.0f) {
-                    menu_map_cursor_x = 236.0f;
-                }
-                if (menu_map_cursor_y < 6.0f) {
-                    menu_map_cursor_y = 6.0f;
-                } else if (menu_map_cursor_y > 178.0f) {
-                    menu_map_cursor_y = 178.0f;
-                }
-            }
-            menu_map_marker_x = sx * ((s32) menu_map_cursor_x - px);
-            menu_map_marker_z = sy * ((s32) menu_map_cursor_y - py);
-            y = 0;
-            h = 5;
-            ox = -2;
-            if (menu_map_cursor_active != 0) {
-                y = -2;
-                h = 6;
-            }
-            Menu_DrawSprite(0x55, arg0 + menu_map_cursor_x + 39.0f + ox, menu_map_cursor_y + 29.0f - 1.0f, h, 1);
-            Menu_DrawSprite(4, arg0 + menu_map_cursor_x + 39.0f - 2.0f, menu_map_cursor_y + 29.0f - 12.0f + y, 0xC, 0xC);
-        }
-    }
-    if (!(menu_flags & 0x2000)) {
-        if (menu_map_cursor_active == 0) {
-            if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
-                menu_flags |= 0x2000;
-                menu_slide_timer = 31;
-                Sfx_Play(0, 0, 0xFF);
-            } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
-                menu_flags |= 0x3000;
-                menu_slide_timer = 31;
-                Sfx_Play(0, 0, 0xFF);
-            }
-        }
-        if (menu_map_region < 6 && menu_map_spot < 0) {
-            if (menu_map_cursor_active == 0) {
-                menu_map_cursor_saved_x = menu_map_cursor_x;
-                menu_map_cursor_saved_y = menu_map_cursor_y;
-            }
-            if (input_pressed_buttons & 0x8000) {
-                menu_map_cursor_active ^= 1;
-                menu_flags ^= 0x20;
-                Sfx_Play(0, 0x17, 0xFF);
-            } else if ((input_pressed_buttons & 0x4000) && menu_map_cursor_active != 0) {
-                menu_map_cursor_x = menu_map_cursor_saved_x;
-                menu_map_cursor_y = menu_map_cursor_saved_y;
-                Sfx_Play(0, 0x13, 0xFF);
-            }
-        }
-    }
-}
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_UpdateMapPage.s")
-#endif
-
-void Menu_UpdateElementsPage(s32 x) {
-    s32 p;
-    s32 v;
-    f32 f;
-
-    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x9F);
-    Menu_DrawSprite(0x37, x + 0x2B, 0xBE, 0xF0, 3);
-    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x9A);
-    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
-    Menu_DrawSprite(0x37, x + 0x27, 0xBD, 0xF2, 1);
-    Menu_DrawSprite(0x37, x + 0x27, 0x1E, 1, 0x9F);
-    Menu_DrawSprite(0x37, x + 0x118, 0x1E, 1, 0x9F);
-    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
-    Menu_DrawSprite(0x38, x + 0x29, 0x20, 1, 0x9B);
-    Menu_DrawSprite(0x39, x + 0x29, 0xBB, 0xEE, 1);
-    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x9C);
-    Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
-    Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
-    p = menu_frame_counter;
-    p = (p >> 2) & 0xF;
-    p = menu_wobble_offsets[p];
-    Menu_DrawSprite(6, x + p + 0x36, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(7, x - p + 0xFB, 0x1A, 0xE, 0xB);
-    Menu_DrawSprite(0x2D, x + 0x75, 0x19, 0x56, 0xD);
-    Menu_DrawSprite(0x32, x + 0xA5, 0x35, 0x35, 6);
-    Menu_DrawSprite(0x32, x + 0x31, 0x78, 0x35, 6);
-    Menu_DrawSprite(0x32, x + 0xD9, 0x78, 0x35, 6);
-    Menu_DrawSprite(0x32, x + 0xA5, 0xAE, 0x35, 6);
-    Menu_DrawSprite(0x14, x + 0x86, 0x34, 8, 0xA);
-    Menu_DrawSprite(0x14, x + 0x47, 0x6B, 8, 0xA);
-    Menu_DrawSprite(0x14, x + 0xF0, 0x6B, 8, 0xA);
-    Menu_DrawSprite(0x14, x + 0x86, 0xAD, 8, 0xA);
-    Menu_DrawSprite(0x2E, x + 0x9A, 0x3D, 0xC, 0xC);
-    Menu_DrawSprite(0x2F, x + 0x67, 0x6F, 0xC, 0xC);
-    Menu_DrawSprite(0x30, x + 0xCC, 0x6F, 0xC, 0xC);
-    Menu_DrawSprite(0x31, x + 0x9A, 0xA1, 0xC, 0xC);
-    Menu_DrawSprite(0x15, x + 0xA7, 0x92, 8, 0xA);
-    Menu_DrawNumber(2, x + 0x8D, 0x34, 50, 0xA);
-    Menu_DrawNumber(2, x + 0x4E, 0x6B, 50, 0xA);
-    Menu_DrawNumber(2, x + 0xF7, 0x6B, 50, 0xA);
-    Menu_DrawNumber(2, x + 0x8D, 0xAD, 50, 0xA);
-    p = D_8007A9F4;
-    Menu_DrawNumber(2, x + 0x78, 0x34, p, 0xA);
-    p = D_8007A9F5;
-    Menu_DrawNumber(2, x + 0x39, 0x6B, p, 0xA);
-    p = D_8007A9F7;
-    Menu_DrawNumber(2, x + 0xE2, 0x6B, p, 0xA);
-    p = D_8007A9F6;
-    Menu_DrawNumber(2, x + 0x78, 0xAD, p, 0xA);
-    f = (u32)D_8007A9F4;
-    f /= 50.0f;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0xA6, 0x36, f, 3);
-    f = (u32)D_8007A9F5;
-    f /= 50.0f;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0x32, 0x79, f, 3);
-    f = (u32)D_8007A9F7;
-    f /= 50.0f;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0xDA, 0x79, f, 3);
-    f = (u32)D_8007A9F6;
-    f /= 50.0f;
-    f *= 50.0f;
-    Menu_DrawSprite(0x33, x + 0xA6, 0xAF, f, 3);
-    v = D_8007A9E0 * 100 / player_level_exp_table[D_8007AA04];
-    if (v > 100) {
-        v = 100;
-    }
-    Menu_DrawNumber(3, x + 0x91, 0x92, v, 0xA);
-    Menu_DrawExpGauge(v, x);
-    if (!(menu_flags & 0x2000)) {
-        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
-            menu_flags |= 0x2000;
-            menu_slide_timer = 31;
-            Sfx_Play(0, 0, 0xFF);
-        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
-            menu_flags |= 0x3000;
-            menu_slide_timer = 31;
-            Sfx_Play(0, 0, 0xFF);
-        }
-    }
-}
-
-#ifdef NON_MATCHING
-/* w, s, lrs and lrt are kept in registers where retail reloads them from the stack; code is equivalent */
-
-void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
-    s32 ret;
-    s32 alpha;
-    s32 xr;
-    s32 masks;
-    s32 maskt;
-    s32 ult;
-    s32 uls;
-    s32 s;
-    s32 t;
-    s32 dsdx;
-    s32 dtdy;
-    s32 texH;
-    s32 d;
-    s32 lrs;
-    s32 lrt;
-    u8* tex;
-    s32 texW;
-    s32 pad[2];
-
-    tex = menu_sprite_tex[id];
-    texW = menu_sprite_sizes[id][0];
-    texH = menu_sprite_sizes[id][1];
-    lrs = texW - 1;
-    lrt = texH - 1;
-    alpha = 0;
-    ret = 0;
-    maskt = 0;
-    masks = 0;
-    s = 0;
-    t = 0;
-    uls = 0;
-    ult = 0;
-    dtdy = 0x400;
-    dsdx = 0x400;
-
-    switch (id) {
-        case 0:
-            maskt = 4;
-            masks = 4;
-            s = (x & 0xF) << 5;
-            t = (y & 0xF) << 5;
-            break;
-        case 0x3C:
-            alpha = -0x80;
-            dtdy = 0;
-            dsdx = 0;
-            break;
-        case 0x3E:
-            alpha = 0x50;
-            break;
-        case 0x37:
-        case 0x38:
-        case 0x39:
-            dtdy = 0;
-            dsdx = 0;
-            break;
-        case 0x3D:
-            dsdx = 0;
-            break;
-    }
-    if (x < 0) {
-        if (x + w < 0) {
-            ret = -1;
-        } else {
-            d = -x;
-            s += d << 5;
-            x = 0;
-            w -= d;
-        }
-    }
-    if (x > 320) {
-        ret = -1;
-    } else if ((xr = x + w) > 320) {
-        w = w - xr + 320;
-    }
-    if (w <= 0 || h <= 0) {
-        ret = -1;
-    }
-    if (ret >= 0) {
-        gDPPipeSync(gfx_dl_head++);
-        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
-        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
-        gDPPipeSync(gfx_dl_head++);
-        if (alpha == 0) {
-            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
-        } else {
-            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
-            gDPPipeSync(gfx_dl_head++);
-            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, alpha);
-        }
-        if (!(menu_flags & 0x10)) {
-            gDPPipeSync(gfx_dl_head++);
-            gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
-            menu_flags |= 0x10;
-        }
-        gDPLoadTextureTile(gfx_dl_head++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
-                           G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, masks, maskt, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, t, dsdx,
-                            dtdy);
-        gDPPipeSync(gfx_dl_head++);
-    }
-}
-#else
-#pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_DrawSprite.s")
-#endif
-
-
-void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
-    s32 k;
-    s32 j;
-    s32 d;
-    MenuExpGaugePalettes pals = menu_exp_gauge_tluts;
-    MenuExpGaugeTextures tex = menu_exp_gauge_tex;
-    s32 xr;
-    s32 x;
-    s32 y;
-    s32 w;
-    s32 h = 0;
-    s32 texW;
-    s32 texH;
-    s32 ult;
-    s32 s[1];
-    s32 t;
-    s32 ret;
-
-    for (k = 0; k < 4; k++) {
-        gDPPipeSync(gfx_dl_head++);
-        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
-        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
-        gDPPipeSync(gfx_dl_head++);
-        if (k != 1) {
-            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
-        } else {
-            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
-            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 0x80);
-        }
-        gDPPipeSync(gfx_dl_head++);
-        gDPLoadTLUT_pal256(gfx_dl_head++, pals.v[k]);
-        for (j = 0; j < 2; j++) {
-            s[0] = 0;
-            switch (k) {
-                case 2:
-                    x = arg1 + 0x87;
-                    ult = 0x32 - arg0 / 2;
-                    y = ult + 0x52;
-                    w = 0x19;
-                    h = 0x32;
-                    texW = 0x19;
-                    texH = 0x32;
-                    t = ult << 5;
-                    break;
-                case 3:
-                    ult = 0;
-                    t = 0;
-                    x = arg1 + 0x84;
-                    y = 0x4F;
-                    w = 0x1C;
-                    h = 0x38;
-                    texW = 0x1C;
-                    texH = 0x38;
-                    break;
-                default:
-                    ult = 0;
-                    t = 0;
-                    x = arg1 + 0x87;
-                    y = 0x52;
-                    w = 0x19;
-                    h = 0x32;
-                    texW = 0x19;
-                    texH = 0x32;
-                    break;
-            }
-            x += w * j;
-            if (x < 0 && x + w >= 0) {
-                d = -x;
-                x = 0;
-                w -= d;
-                s[0] = d << 5;
-            }
-            if (x > 320) {
-                ret = -1;
-            } else {
-                ret = 0;
-                xr = x + w;
-                if (xr > 320) {
-                    w = w - xr + 320;
-                }
-            }
-            if (w <= 0) {
-                ret = -1;
-            }
-            if (ret >= 0) {
-                gDPLoadTextureTile(gfx_dl_head++, tex.v[k][j], G_IM_FMT_CI, G_IM_SIZ_8b, texW, texH, 0, ult, texW - 1,
-                                   texH - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
-                                   G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h - ult) << 2, G_TX_RENDERTILE, s[0],
-                                    t, 1 << 10, 1 << 10);
-                gDPPipeSync(gfx_dl_head++);
-            }
-        }
-    }
-    menu_flags &= ~0x10;
-}
-
-
-void Menu_DrawBackground(void) {
-    s32 i;
-    s32 y;
-    MenuFourWords texH = menu_bg_strip_tex_heights;
-    MenuFourWords stripH = menu_bg_strip_heights;
-    MenuFourPointers tex = menu_bg_strip_tex;
-
-    gDPPipeSync(gfx_dl_head++);
-    gDPLoadTLUT_pal256(gfx_dl_head++, menu_bg_tlut);
-    menu_flags &= ~0x10;
-    for (i = 0, y = 22; i < 4; i++) {
-        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
-                           G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0, 0,
-                            0x4A8, 0x4E6);
-        gDPPipeSync(gfx_dl_head++);
-        y += stripH.v[i];
-    }
-    for (i = 3, y = 120; i >= 0; i--) {
-        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
-                           G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0,
-                            (texH.v[i] - 1) << 5, 0x4A8, -0x4E6);
-        gDPPipeSync(gfx_dl_head++);
-        y += stripH.v[i];
-    }
-}
-
-
-void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
-    s32 i;
-    u64 div;
-    s64 v;
-    s8 digits[10];
-    s32 xoff;
-    s32 j;
-    s32 n;
-
-    div = 1000000000;
-    v = value;
-    xoff = 0;
-    j = 9;
-    if (ndigits >= 10) {
-        ndigits = 9;
-    }
-    for (i = 0; i < 9; i++) {
-        n = 0;
-        while (TRUE) {
-            v -= div;
-            if (v < 0) {
-                v += div;
-                break;
-            }
-            n++;
-        }
-        digits[j--] = n;
-        div /= 10;
-    }
-    digits[0] = v;
-    i = 0;
-    if (!(menu_flags & 0x10)) {
-        gDPPipeSync(gfx_dl_head++);
-        gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
-        menu_flags |= 0x10;
-    }
-    for (n = ndigits - 1; n >= 0; n--) {
-        i += digits[n];
-        if (i != 0 || n == 0) {
-            gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
-                               0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
-            gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
-                                G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-            gDPPipeSync(gfx_dl_head++);
-        }
-        xoff += 7;
-    }
-}
-
-void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
-    s32 i;
-    s32 n;
-    u64 div;
-    s64 v;
-    s8 digits[10];
-    s32 xoff;
-    s32 j;
-
-    div = 1000000000;
-    v = value;
-    xoff = 0;
-    j = 9;
-    if (ndigits >= 10) {
-        ndigits = 9;
-    }
-    for (i = 0; i < 9; i++) {
-        n = 0;
-        while (TRUE) {
-            v -= div;
-            if (v < 0) {
-                v += div;
-                break;
-            }
-            n++;
-        }
-        digits[j--] = n;
-        div /= 10;
-    }
-    digits[0] = v;
-    if (!(menu_flags & 0x10)) {
-        gDPPipeSync(gfx_dl_head++);
-        gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
-        menu_flags |= 0x10;
-    }
-    for (n = ndigits - 1; n >= 0; n--) {
-        gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
-                           0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
-        gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
-                            G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
-        gDPPipeSync(gfx_dl_head++);
-        xoff += 7;
-    }
-}
-
-
-
-
 /* ---------------------------------------------------------------------------
  * .data 80055D40..80061650 (after 2B0F0, before 30600). Besides this file's own
  * tables it holds tables that 3F50, 9D50, AEA0 and E2A0 use: by link order they
  * belong here (or to a data-only file we can't tell apart). Pixels, palettes,
  * message text and animation keyframes are assets; ROM offsets and overlay or
  * buffer addresses are written as numbers.
+ * IDO emits .data in source order, function-local initializers included, so the
+ * tables up to 800615A8 (Menu_UpdateOptionsPage's ids[]) are defined here, before
+ * the functions, and the rest after Menu_DrawNumberZeroPad.
  */
-#ifndef NON_MATCHING /* the NON_MATCHING build declares it earlier, for Menu_UpdateMapPage */
-#endif
 void *player_char_data[1] = {
     (void*)0x80206064,
 };
@@ -1793,11 +638,1140 @@ u8 menu_map_small_sizes[4][3] = {
 s16 menu_map_small_pos[8] = {
     127, 112, 127, 112, 112, 112, 110, 112,
 };
-#ifndef NON_MATCHING /* Menu_UpdateOptionsPage's local ids[] initializer in the NON_MATCHING C */
-u8 menu_options_marker_sprites[4] = {
-    0x28, 0x27, 0x26, 0,
-};
+/* .bss 8008FB30..8008FB70 */
+s32 menu_slide_right_x;
+s32 menu_slide_left_x;
+s32 menu_slide_timer;
+u16 menu_map_cursor_active;
+u16 menu_flags; /* bits 0-1 page, 0x10 TLUT loaded, 0x20 page edit mode, 0x1000 slide direction, 0x2000 slide, 0x4000 save menu, 0x8000 open */
+s8 menu_save_loaded;
+s32 menu_frame_counter;
+f32 menu_map_marker_x;
+f32 menu_map_marker_z;
+s32 menu_map_region;
+s32 menu_map_spot;
+/* 8008FB58 is Menu_UpdateOptionsPage's static menu_options_marker_x; 8008FB5C and 8008FB60
+ * (menu_map_cursor_saved_x/y) are defined after that function. The order of these in .bss
+ * depends on where menu.h first declares them (see the note there). */
+
+
+void Menu_Init(void) {
+    menu_flags = 0x8000;
+    save_menu_flags = 0;
+    menu_map_cursor_active = 0;
+}
+
+void Menu_ResetKeepPage(void) {
+    menu_flags = (menu_flags & 3) | 0x8000;
+    save_menu_flags = 0;
+    menu_map_cursor_active = 0;
+}
+
+
+
+void Menu_Update(struct GfxFrameData *arg0) {
+    gSPDisplayList(gfx_dl_head++, text_glyph_setup_dl);
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_RGBA16);
+    Menu_DrawBackground();
+    menu_frame_counter++;
+    if (menu_flags & 0x4000) {
+        SaveMenu_Update();
+    } else if (menu_flags & 0x2000) {
+        Menu_UpdatePageSlide();
+    } else {
+        switch ((u16)(menu_flags & 3)) {
+            case 0:
+                Menu_UpdateStatsPage(0);
+                break;
+            case 1:
+                Menu_UpdateMapPage(0);
+                break;
+            case 2:
+                Menu_UpdateElementsPage(0);
+                break;
+            case 3:
+                Menu_UpdateOptionsPage(0);
+                break;
+        }
+    }
+    menu_flags &= ~0x10;
+    gDPSetTextureLUT(gfx_dl_head++, G_TT_NONE);
+    gDPSetBlendColor(gfx_dl_head++, 0, 0, 0, 1);
+    if ((input_pressed_buttons & 0x5000) && !(menu_flags & 0x6020)) {
+        menu_flags &= 0x7FFF;
+        Sfx_Play(0, 1, 0xFF);
+    }
+    if (!(menu_flags & 0x8000)) {
+        if (menu_flags & 0x4000) {
+            switch ((u16)(menu_flags & 0xC)) {
+                case 0:
+                    if (save_menu_flags & 0x80) {
+                        core_game_mode = 1;
+                        menu_save_loaded = 1;
+                    } else {
+                        core_game_mode = 3;
+                        menu_save_loaded = 0;
+                    }
+                    break;
+                case 8:
+                    core_game_mode = 3;
+                    break;
+                case 4:
+                    core_game_mode = 1;
+                    break;
+            }
+        } else {
+            core_game_mode = 1;
+        }
+        Menu_ResetKeepPage();
+    }
+}
+
+
+void Menu_UpdatePageSlide(void) {
+    s32 mode;
+    s32 dir = 0;
+    s32 d;
+    s32 a;
+    s32 b;
+
+    d = menu_slide_timer * menu_slide_timer * 0.3125;
+    if (menu_flags & 0x1000) {
+        menu_slide_right_x = 0x140 - d;
+        menu_slide_left_x = -d;
+        a = menu_slide_right_x;
+        b = menu_slide_left_x;
+        if (menu_slide_timer == 0) {
+            dir = -1;
+        }
+    } else {
+        menu_slide_right_x = d;
+        menu_slide_left_x = d - 0x140;
+        a = menu_slide_left_x;
+        b = menu_slide_right_x;
+        if (menu_slide_timer == 0) {
+            dir = 1;
+        }
+    }
+    menu_slide_timer--;
+    mode = menu_flags & 3;
+    switch (mode) {
+        case 0:
+            Menu_UpdateStatsPage(a);
+            if (menu_flags & 0x1000) {
+                Menu_UpdateOptionsPage(b);
+            } else {
+                Menu_UpdateMapPage(b);
+            }
+            break;
+        case 1:
+            Menu_UpdateMapPage(a);
+            if (menu_flags & 0x1000) {
+                Menu_UpdateStatsPage(b);
+            } else {
+                Menu_UpdateElementsPage(b);
+            }
+            break;
+        case 2:
+            Menu_UpdateElementsPage(a);
+            if (menu_flags & 0x1000) {
+                Menu_UpdateMapPage(b);
+            } else {
+                Menu_UpdateOptionsPage(b);
+            }
+            break;
+        case 3:
+            Menu_UpdateOptionsPage(a);
+            if (menu_flags & 0x1000) {
+                Menu_UpdateElementsPage(b);
+            } else {
+                Menu_UpdateStatsPage(b);
+            }
+            break;
+    }
+    if (dir != 0) {
+        menu_flags &= ~0x2000;
+        menu_flags &= ~0x1000;
+        mode += dir;
+        menu_flags &= ~3;
+        menu_flags |= mode & 3;
+    }
+}
+
+void Menu_UpdateStatsPage(s32 x) {
+    s32 px;
+    s32 i;
+    f32 f;
+    s32 pad[2]; // unused locals in the original (frame size)
+
+    gDPPipeSync(gfx_dl_head++);
+    gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 255);
+    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x98);
+    Menu_DrawSprite(0x37, x + 0x2B, 0xB7, 0xF0, 3);
+    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x96);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0xB6, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 1, 0x9A);
+    Menu_DrawSprite(0x37, x + 0x118, 0x1D, 1, 0x9A);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 1, 0x95);
+    Menu_DrawSprite(0x39, x + 0x29, 0xB4, 0xEE, 1);
+    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x96);
+    Menu_DrawSprite(0x3C, x + 0x3A, 0x1E, 0x15, 0x98);
+    px = 0x4B;
+    for (i = 0; i < 3; i++, px += 0x21) {
+        Menu_DrawSprite(0x3D, x + 0x5D, px, 0xA7, 2);
+    }
+    px = 0x40;
+    for (i = 0; i < 4; i++, px += 0x21) {
+        Menu_DrawSprite(0x32, x + 0x63, px, 0x3C, 7);
+    }
+    px = 0x3C;
+    for (i = 0; i < 4; i++, px += 0x21) {
+        Menu_DrawSprite(0x20, x + 0xC3, px, 0x13, 11);
+    }
+    Menu_DrawSprite(0x1B, x + 0x38, 0x34, 0x18, 0xE);
+    Menu_DrawSprite(0x1C, x + 0x37, 0x54, 0x1C, 0xD);
+    Menu_DrawSprite(0x1D, x + 0x35, 0x78, 0x24, 0xF);
+    Menu_DrawSprite(0x1E, x + 0x35, 0x99, 0x1C, 0xE);
+    Menu_DrawSprite(5, x + 0x45, 0x1C, 8, 8);
+    Menu_DrawSprite(5, x + 0xF3, 0x1C, 8, 8);
+    i = menu_frame_counter;
+    i = (i >> 2) & 0xF;
+    i = menu_wobble_offsets[i];
+    Menu_DrawSprite(6, x + i + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, x - i + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x14, x + 0x79, 0x35, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0x79, 0x56, 8, 0xA);
+    i = D_8007A9D6;
+    Menu_DrawNumber(3, x + 0x80, 0x35, i, 0xA);
+    i = D_8007A9DA;
+    Menu_DrawNumber(3, x + 0x80, 0x56, i, 0xA);
+    i = D_8007A9D4;
+    Menu_DrawNumber(3, x + 0x64, 0x35, i, 0xA);
+    i = D_8007A9D8;
+    Menu_DrawNumber(3, x + 0x64, 0x56, i, 0xA);
+    i = D_8007A9DE;
+    Menu_DrawNumber(3, x + 0x80, 0x77, i, 0xA);
+    i = D_8007A9DC;
+    Menu_DrawNumber(3, x + 0x80, 0x98, i, 0xA);
+    i = player_stat_xp_costs[D_8007AA00];
+    Menu_DrawNumber(3, x + 0xDA, 0x3B, D_8007A9F8 * 100 / i, 0xA);
+    i = player_stat_xp_costs[D_8007AA01];
+    if (D_8007AA10 & 0x4000) {
+        i = i * 3;
+    } else {
+        i = i * 4;
+    }
+    Menu_DrawNumber(3, x + 0xDA, 0x5C, D_8007A9FA * 100 / i, 0xA);
+    i = player_stat_xp_costs[D_8007AA03];
+    if (D_8007AA10 & 0x2000) {
+        i = (f32) i * 0.8;
+    }
+    Menu_DrawNumber(3, x + 0xDA, 0x7D, D_8007A9FE * 100 / i, 0xA);
+    i = player_stat_xp_costs[D_8007AA02];
+    if (D_8007AA10 & 0x8000) {
+        i = (f32) i * 0.8;
+    }
+    Menu_DrawNumber(3, x + 0xDA, 0x9E, D_8007A9FC * 100 / i, 0xA);
+    f = (u32)D_8007A9D4;
+    f /= (u32)D_8007A9D6;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0x64, 0x41, f, 3);
+    f = (u32)D_8007A9D8;
+    f /= (u32)D_8007A9DA;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0x64, 0x62, f, 3);
+    f = (u32)D_8007A9DE;
+    f /= 255.0f;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0x64, 0x83, f, 3);
+    f = (u32)D_8007A9DC;
+    f /= 255.0f;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0x64, 0xA4, f, 3);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x3B, 8, 0xA);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x5C, 8, 0xA);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x7D, 8, 0xA);
+    Menu_DrawSprite(0x15, x + 0xF6, 0x9E, 8, 0xA);
+    Menu_DrawSprite(0x1A, x + 0x77, 0x19, 0x52, 0xD);
+    if (!(menu_flags & 0x2000)) {
+        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
+            menu_flags |= 0x2000;
+            menu_slide_timer = 31;
+            Sfx_Play(0, 0, 0xFF);
+        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
+            menu_flags |= 0x3000;
+            menu_slide_timer = 31;
+            Sfx_Play(0, 0, 0xFF);
+        }
+    }
+}
+
+void Menu_UpdateOptionsPage(s32 x) {
+    s32 wob;
+    s32 sel;
+    s32 y;
+    u8 ids[3] = { 0x28, 0x27, 0x26 }; /* marker sprites; the initializer is the .data object at 800615A8 */
+    static s32 menu_options_marker_x; /* .bss 8008FB58 */
+
+    menu_text_delay_option = 4 - menu_text_delay_option;
+    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x6C);
+    Menu_DrawSprite(0x37, x + 0x2B, 0x8B, 0xF0, 3);
+    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x68);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x8A, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1E, 1, 0x6D);
+    Menu_DrawSprite(0x37, x + 0x118, 0x1E, 1, 0x6D);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
+    Menu_DrawSprite(0x38, x + 0x29, 0x20, 1, 0x68);
+    Menu_DrawSprite(0x39, x + 0x29, 0x88, 0xEE, 1);
+    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x69);
+    Menu_DrawSprite(0x3C, x + 0x3A, 0x1E, 0x15, 0x6C);
+    Menu_DrawSprite(0x3D, x + 0x5D, 0x56, 0xA7, 2);
+    Menu_DrawSprite(0x24, x + 0x8D, 0x3E, 0x54, 7);
+    Menu_DrawSprite(0x24, x + 0x8D, 0x6C, 0x54, 7);
+    Menu_DrawSprite(0x57, x + 0xE9, 0x3C, 0x1A, 9);
+    Menu_DrawSprite(0x56, x + 0x6C, 0x3C, 0x1A, 9);
+    Menu_DrawSprite(0x29, x + 0xE9, 0x6B, 0x1A, 9);
+    Menu_DrawSprite(0x2A, x + 0x6C, 0x6B, 0x1A, 9);
+    Menu_DrawSprite(0x22, x + 0x31, 0x3B, 0x36, 0xC);
+    Menu_DrawSprite(0x23, x + 0x35, 0x68, 0x2A, 0xC);
+    Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
+    Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
+    wob = menu_frame_counter;
+    wob = (wob >> 2) & 0xF;
+    wob = menu_wobble_offsets[wob];
+    Menu_DrawSprite(6, x + wob + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, x - wob + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x21, x + 0x75, 0x18, 0x56, 0xE);
+    Menu_DrawSprite(0x25, x + 0x8E, 0x3F, 0x50, 3);
+    Menu_DrawSprite(0x25, x + 0x8E, 0x6D, 0x50, 3);
+    Menu_DrawSprite(0x27, x + 0xB3, 0x39, 8, 0xB);
+    Menu_DrawSprite(0x27, x + 0xB3, 0x67, 8, 0xB);
+    if (menu_flags & 0x200) {
+        switch (menu_flags & 0x100) {
+            case 0:
+                Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
+                break;
+            case 0x100:
+                Menu_DrawSprite(ids[menu_options_top_row_pos[menu_text_delay_option][1]], menu_options_top_row_pos[menu_text_delay_option][0] + x, 0x39, 8, 0xB);
+                break;
+        }
+    } else {
+        Menu_DrawSprite(ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]], menu_options_bgm_row_pos[menu_bgm_volume_option][0] + x, 0x67, 8, 0xB);
+        Menu_DrawSprite(ids[menu_options_top_row_pos[menu_text_delay_option][1]], menu_options_top_row_pos[menu_text_delay_option][0] + x, 0x39, 8, 0xB);
+    }
+    if (menu_flags & 0x2000) {
+        menu_text_delay_option = 4 - menu_text_delay_option;
+        return;
+    }
+    if (!(menu_flags & 0x800)) {
+        if (input_stick_x > 0x14 || (input_held_buttons & 0x10)) {
+            menu_flags |= 0x2000;
+            menu_slide_timer = 0x1F;
+            Sfx_Play(0, 0, 0xFF);
+        } else if (input_stick_x < -0x14 || (input_held_buttons & 0x2000)) {
+            menu_flags |= 0x3000;
+            menu_slide_timer = 0x1F;
+            Sfx_Play(0, 0, 0xFF);
+        }
+        if (input_pressed_buttons & 0x8000) {
+            menu_flags |= 0x820;
+            Sfx_Play(0, 1, 0xFF);
+        }
+    } else {
+        if ((input_pressed_buttons & 0x8000) && !(menu_flags & 0x200)) {
+            menu_flags &= ~0x920;
+            Sfx_Play(0, 2, 0xFF);
+            menu_text_delay_option = 4 - menu_text_delay_option;
+            return;
+        }
+        sel = menu_flags & 0x100;
+        wob = menu_frame_counter;
+        wob >>= 1;
+        wob &= 0xF;
+        wob = menu_wobble_offsets[wob];
+        if (menu_flags & 0x200) {
+            switch (sel) {
+                case 0:
+                    if (menu_options_marker_x < menu_options_top_row_pos[menu_text_delay_option][0]) {
+                    } else if (menu_options_top_row_pos[menu_text_delay_option][0] < menu_options_marker_x) {
+                    } else {
+                        menu_flags &= ~0x200;
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option][1]];
+                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
+                            Menu_DrawSprite(sel, menu_options_marker_x + x, 0x39, 8, 0xB);
+                        }
+                        y = 0x3A;
+                        sel = 0;
+                    }
+                    break;
+                case 0x100:
+                    if (menu_options_marker_x < menu_options_bgm_row_pos[menu_bgm_volume_option][0]) {
+                    } else if (menu_options_bgm_row_pos[menu_bgm_volume_option][0] < menu_options_marker_x) {
+                    } else {
+                        menu_flags &= ~0x200;
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]];
+                        if (input_stick_x < 0x14 && input_stick_x > -0x14) {
+                            Menu_DrawSprite(sel, menu_options_marker_x + x, 0x67, 8, 0xB);
+                        }
+                        y = 0x65;
+                        sel = 0x100;
+                    }
+                    break;
+            }
+        }
+        if (!(menu_flags & 0x200)) {
+            switch (sel) {
+                case 0:
+                    y = 0x3A;
+                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_flags &= ~0x100;
+                            menu_flags |= 0x100;
+                            menu_flags |= 0x400;
+                            Sfx_Play(0, 0, 0xFF);
+                        }
+                    } else if (input_stick_x < -0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_top_row_pos[menu_text_delay_option--][0];
+                            if (menu_text_delay_option < 0) {
+                                menu_text_delay_option = 0;
+                            }
+                            menu_flags |= 0x600;
+                        }
+                    } else if (input_stick_x > 0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_top_row_pos[menu_text_delay_option++][0];
+                            if (menu_text_delay_option > 4) {
+                                menu_text_delay_option = 4;
+                            }
+                            menu_flags |= 0x600;
+                        }
+                    } else {
+                        menu_flags &= ~0x400;
+                    }
+                    break;
+                case 0x100:
+                    y = 0x65;
+                    if (input_stick_y < -0x1E || input_stick_y > 0x1E) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_flags &= ~0x100;
+                            menu_flags |= 0;
+                            menu_flags |= 0x400;
+                            Sfx_Play(0, 0, 0xFF);
+                        }
+                    } else if (input_stick_x < -0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_bgm_row_pos[menu_bgm_volume_option--][0];
+                            if (menu_bgm_volume_option < 0) {
+                                menu_bgm_volume_option = 0;
+                            }
+                            menu_flags |= 0x400;
+                            menu_flags |= 0x200;
+                        }
+                    } else if (input_stick_x > 0x14) {
+                        if (!(menu_flags & 0x400)) {
+                            menu_options_marker_x = menu_options_bgm_row_pos[menu_bgm_volume_option++][0];
+                            if (menu_bgm_volume_option > 4) {
+                                menu_bgm_volume_option = 4;
+                            }
+                            menu_flags |= 0x400;
+                            menu_flags |= 0x200;
+                        }
+                    } else {
+                        menu_flags &= ~0x400;
+                    }
+                    break;
+            }
+        }
+        if (menu_flags & 0x200) {
+            switch (sel) {
+                case 0:
+                    if (menu_options_marker_x < menu_options_top_row_pos[menu_text_delay_option][0]) {
+                        menu_options_marker_x++;
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option - 1][1]];
+                    } else if (menu_options_top_row_pos[menu_text_delay_option][0] < menu_options_marker_x) {
+                        menu_options_marker_x--;
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option + 1][1]];
+                    } else {
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_top_row_pos[menu_text_delay_option][1]];
+                    }
+                    y = 0x3A;
+                    Menu_DrawSprite(sel, menu_options_marker_x + x, 0x39, 8, 0xB);
+                    break;
+                case 0x100:
+                    if (menu_options_marker_x < menu_options_bgm_row_pos[menu_bgm_volume_option][0]) {
+                        menu_options_marker_x++;
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option - 1][1]];
+                    } else if (menu_options_bgm_row_pos[menu_bgm_volume_option][0] < menu_options_marker_x) {
+                        menu_options_marker_x--;
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option + 1][1]];
+                    } else {
+                        menu_flags &= ~0x400;
+                        sel = ids[menu_options_bgm_row_pos[menu_bgm_volume_option][1]];
+                    }
+                    y = 0x65;
+                    Menu_DrawSprite(sel, menu_options_marker_x + x, 0x67, 8, 0xB);
+                    break;
+            }
+        }
+        Menu_DrawSprite(1, x - wob + 0x1E, y, 0x10, 0xD);
+    }
+    menu_text_delay_option = 4 - menu_text_delay_option;
+}
+
+/* .bss 8008FB5C, 8008FB60: only Menu_UpdateMapPage uses these two */
+f32 menu_map_cursor_saved_x;
+f32 menu_map_cursor_saved_y;
+
+#ifdef NON_MATCHING
+/* frame, stack homes and register allocation differ; code is equivalent */
+void Menu_UpdateMapPage(s32 arg0) {
+    static s32 menu_map_loaded_region = -1; /* the retail build keeps it as the file-scope menu_map_loaded_region */
+    s32 cx;
+    s32 cy;
+    s32 x;
+    f32 f;
+    s32 s;
+    s32 n;
+    s32 sx;
+    s32 sy;
+    s32 px;
+    s32 py;
+    s32 ox;
+    s32 w;
+    s32 h;
+    s32 y;
+    s32 i;
+
+    s = 0;
+    if (menu_map_region < 6) {
+        if (menu_map_region != menu_map_loaded_region) {
+            Dma_ReadRom(menu_map_picture_dma[menu_map_region].start, menu_map_picture_dma[menu_map_region].dst,
+                          menu_map_picture_dma[menu_map_region].end - menu_map_picture_dma[menu_map_region].start);
+            menu_map_loaded_region = menu_map_region;
+        }
+        w = 0xF4;
+        h = 8;
+        x = arg0 + 0x27;
+        y = 0x1D;
+        if (x < 0) {
+            if (x + w < 0) {
+                h = 0;
+            } else {
+                s = -x;
+                w -= s;
+                s <<= 5;
+                x = 0;
+            }
+        }
+        if (x > 320) {
+            h = 0;
+        } else if (x + w > 320) {
+            w = w - (x + w) + 320;
+            s = 0;
+        }
+        if (h != 0) {
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_tluts[menu_map_region]);
+            for (i = 0; i < 24; i++) {
+                if (i == 23) {
+                    h = 1;
+                }
+                gDPLoadTextureTile(gfx_dl_head++, menu_map_strips[menu_map_region * 24 + i], G_IM_FMT_CI, G_IM_SIZ_8b, 244, h, 0, 0,
+                                   243, h - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
+                                   G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
+                                    1 << 10, 1 << 10);
+                gDPPipeSync(gfx_dl_head++);
+                y += h;
+            }
+            SaveMenu_SetTextDrawState();
+        }
+    } else {
+        Menu_DrawSprite(0, arg0 + 0x28, 0x1E, 0xF0, 0xB4);
+        Menu_DrawSprite(0x38, arg0 + 0x29, 0x1F, 0xED, 1);
+        Menu_DrawSprite(0x38, arg0 + 0x29, 0x20, 1, 0xB1);
+        Menu_DrawSprite(0x39, arg0 + 0x29, 0xD0, 0xEE, 1);
+        Menu_DrawSprite(0x39, arg0 + 0x117, 0x1F, 1, 0xB2);
+        Menu_DrawSprite(0x37, arg0 + 0x2C, 0xD4, 0xF0, 3);
+        Menu_DrawSprite(0x37, arg0 + 0x11A, 0x25, 2, 0xB2);
+        Menu_DrawSprite(0x37, arg0 + 0x27, 0x1D, 0xF2, 1);
+        Menu_DrawSprite(0x37, arg0 + 0x27, 0xD3, 0xF2, 1);
+        Menu_DrawSprite(0x37, arg0 + 0x27, 0x1E, 1, 0xB3);
+        Menu_DrawSprite(0x37, arg0 + 0x119, 0x1E, 1, 0xB3);
+        if (menu_map_region != menu_map_loaded_region) {
+            Dma_ReadRom(menu_map_picture_dma[menu_map_region].start, menu_map_picture_dma[menu_map_region].dst,
+                          menu_map_picture_dma[menu_map_region].end - menu_map_picture_dma[menu_map_region].start);
+            menu_map_loaded_region = menu_map_region;
+        }
+        n = menu_map_region - 6;
+        w = menu_map_small_sizes[n][0];
+        h = menu_map_small_sizes[n][1];
+        x = menu_map_small_pos[n * 2] + arg0;
+        y = menu_map_small_pos[n * 2 + 1];
+        if (x < 0) {
+            if (x + w < 0) {
+                h = 0;
+            } else {
+                s = -x;
+                w -= s;
+                s <<= 5;
+                x = 0;
+            }
+        }
+        if (x > 320) {
+            h = 0;
+        } else if (x + w > 320) {
+            w = w - (x + w) + 320;
+            s = 0;
+        }
+        if (h != 0) {
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_map_small_tluts[n]);
+            menu_flags &= ~0x10;
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][1], 0, 0,
+                               menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][1] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
+                               G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+            gDPPipeSync(gfx_dl_head++);
+            gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, 0,
+                                1 << 10, 1 << 10);
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTextureTile(gfx_dl_head++, menu_map_small_tex[n * 2 + 1], G_IM_FMT_CI, G_IM_SIZ_8b, menu_map_small_sizes[n][0], menu_map_small_sizes[n][2], 0, 0,
+                               menu_map_small_sizes[n][0] - 1, menu_map_small_sizes[n][2] - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
+                               G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+            gDPPipeSync(gfx_dl_head++);
+            gSPTextureRectangle(gfx_dl_head++, x << 2, (y + menu_map_small_sizes[n][1]) << 2, (x + w) << 2, (y + h + menu_map_small_sizes[n][2]) << 2,
+                                G_TX_RENDERTILE, s, 0, 1 << 10, 1 << 10);
+            SaveMenu_SetTextDrawState();
+        }
+    }
+    Menu_DrawSprite(5, arg0 + 0x45, 0x1C, 7, 7);
+    Menu_DrawSprite(5, arg0 + 0xF3, 0x1C, 7, 7);
+    n = (menu_frame_counter >> 2) & 0xF;
+    n = menu_wobble_offsets[n];
+    Menu_DrawSprite(6, arg0 + n + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, arg0 - n + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x2B, arg0 + 0x83, 0x18, 0x3A, 0x10);
+    if (menu_map_region < 6) {
+        if (menu_map_spot < 0) {
+            cx = (s32) player_state.actor.x / menu_map_world_scale[menu_map_region] + menu_map_origin[menu_map_region];
+            cy = (s32) player_state.actor.z / menu_map_world_scale[menu_map_region + 6] + menu_map_origin[menu_map_region + 6];
+        } else {
+            cx = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2];
+            cy = menu_map_spot_coords[menu_map_region * 18 + menu_map_spot * 2 + 1];
+        }
+        if (menu_frame_counter & 0x20) {
+            Menu_DrawSprite(0x2C, arg0 + cx + 0x23, cy + 0xD, 0xC, 0x10);
+        }
+        if (menu_map_spot < 0) {
+            sx = menu_map_world_scale[menu_map_region];
+            sy = menu_map_world_scale[menu_map_region + 6];
+            px = menu_map_origin[menu_map_region];
+            py = menu_map_origin[menu_map_region + 6];
+            if (menu_map_cursor_x == -1.0f) {
+                menu_map_cursor_x = cx;
+                menu_map_cursor_y = cy;
+            }
+            if (menu_map_cursor_active != 0) {
+                f = input_stick_x;
+                if (f > 0.0f) {
+                    f -= 5.0f;
+                    if (f < 0.0f) {
+                        f = 0.0f;
+                    }
+                } else {
+                    f += 5.0f;
+                    if (f > 0.0f) {
+                        f = 0.0f;
+                    }
+                }
+                menu_map_cursor_x += f * 0.08;
+                f = input_stick_y;
+                if (f > 0.0f) {
+                    f -= 5.0f;
+                    if (f < 0.0f) {
+                        f = 0.0f;
+                    }
+                } else {
+                    f += 5.0f;
+                    if (f > 0.0f) {
+                        f = 0.0f;
+                    }
+                }
+                menu_map_cursor_y -= f * 0.08;
+                if (menu_map_cursor_x < 6.0f) {
+                    menu_map_cursor_x = 6.0f;
+                } else if (menu_map_cursor_x > 236.0f) {
+                    menu_map_cursor_x = 236.0f;
+                }
+                if (menu_map_cursor_y < 6.0f) {
+                    menu_map_cursor_y = 6.0f;
+                } else if (menu_map_cursor_y > 178.0f) {
+                    menu_map_cursor_y = 178.0f;
+                }
+            }
+            menu_map_marker_x = sx * ((s32) menu_map_cursor_x - px);
+            menu_map_marker_z = sy * ((s32) menu_map_cursor_y - py);
+            y = 0;
+            h = 5;
+            ox = -2;
+            if (menu_map_cursor_active != 0) {
+                y = -2;
+                h = 6;
+            }
+            Menu_DrawSprite(0x55, arg0 + menu_map_cursor_x + 39.0f + ox, menu_map_cursor_y + 29.0f - 1.0f, h, 1);
+            Menu_DrawSprite(4, arg0 + menu_map_cursor_x + 39.0f - 2.0f, menu_map_cursor_y + 29.0f - 12.0f + y, 0xC, 0xC);
+        }
+    }
+    if (!(menu_flags & 0x2000)) {
+        if (menu_map_cursor_active == 0) {
+            if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
+                menu_flags |= 0x2000;
+                menu_slide_timer = 31;
+                Sfx_Play(0, 0, 0xFF);
+            } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
+                menu_flags |= 0x3000;
+                menu_slide_timer = 31;
+                Sfx_Play(0, 0, 0xFF);
+            }
+        }
+        if (menu_map_region < 6 && menu_map_spot < 0) {
+            if (menu_map_cursor_active == 0) {
+                menu_map_cursor_saved_x = menu_map_cursor_x;
+                menu_map_cursor_saved_y = menu_map_cursor_y;
+            }
+            if (input_pressed_buttons & 0x8000) {
+                menu_map_cursor_active ^= 1;
+                menu_flags ^= 0x20;
+                Sfx_Play(0, 0x17, 0xFF);
+            } else if ((input_pressed_buttons & 0x4000) && menu_map_cursor_active != 0) {
+                menu_map_cursor_x = menu_map_cursor_saved_x;
+                menu_map_cursor_y = menu_map_cursor_saved_y;
+                Sfx_Play(0, 0x13, 0xFF);
+            }
+        }
+    }
+}
+#else
+#pragma GLOBAL_ASM("asm/nonmatchings/game/ui/menu/Menu_UpdateMapPage.s")
 #endif
+
+void Menu_UpdateElementsPage(s32 x) {
+    s32 p;
+    s32 v;
+    f32 f;
+
+    Menu_DrawSprite(0, x + 0x28, 0x1E, 0xF0, 0x9F);
+    Menu_DrawSprite(0x37, x + 0x2B, 0xBE, 0xF0, 3);
+    Menu_DrawSprite(0x37, x + 0x119, 0x24, 2, 0x9A);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1D, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0xBD, 0xF2, 1);
+    Menu_DrawSprite(0x37, x + 0x27, 0x1E, 1, 0x9F);
+    Menu_DrawSprite(0x37, x + 0x118, 0x1E, 1, 0x9F);
+    Menu_DrawSprite(0x38, x + 0x29, 0x1F, 0xED, 1);
+    Menu_DrawSprite(0x38, x + 0x29, 0x20, 1, 0x9B);
+    Menu_DrawSprite(0x39, x + 0x29, 0xBB, 0xEE, 1);
+    Menu_DrawSprite(0x39, x + 0x116, 0x1F, 1, 0x9C);
+    Menu_DrawSprite(5, x + 0x45, 0x1C, 7, 7);
+    Menu_DrawSprite(5, x + 0xF3, 0x1C, 7, 7);
+    p = menu_frame_counter;
+    p = (p >> 2) & 0xF;
+    p = menu_wobble_offsets[p];
+    Menu_DrawSprite(6, x + p + 0x36, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(7, x - p + 0xFB, 0x1A, 0xE, 0xB);
+    Menu_DrawSprite(0x2D, x + 0x75, 0x19, 0x56, 0xD);
+    Menu_DrawSprite(0x32, x + 0xA5, 0x35, 0x35, 6);
+    Menu_DrawSprite(0x32, x + 0x31, 0x78, 0x35, 6);
+    Menu_DrawSprite(0x32, x + 0xD9, 0x78, 0x35, 6);
+    Menu_DrawSprite(0x32, x + 0xA5, 0xAE, 0x35, 6);
+    Menu_DrawSprite(0x14, x + 0x86, 0x34, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0x47, 0x6B, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0xF0, 0x6B, 8, 0xA);
+    Menu_DrawSprite(0x14, x + 0x86, 0xAD, 8, 0xA);
+    Menu_DrawSprite(0x2E, x + 0x9A, 0x3D, 0xC, 0xC);
+    Menu_DrawSprite(0x2F, x + 0x67, 0x6F, 0xC, 0xC);
+    Menu_DrawSprite(0x30, x + 0xCC, 0x6F, 0xC, 0xC);
+    Menu_DrawSprite(0x31, x + 0x9A, 0xA1, 0xC, 0xC);
+    Menu_DrawSprite(0x15, x + 0xA7, 0x92, 8, 0xA);
+    Menu_DrawNumber(2, x + 0x8D, 0x34, 50, 0xA);
+    Menu_DrawNumber(2, x + 0x4E, 0x6B, 50, 0xA);
+    Menu_DrawNumber(2, x + 0xF7, 0x6B, 50, 0xA);
+    Menu_DrawNumber(2, x + 0x8D, 0xAD, 50, 0xA);
+    p = D_8007A9F4;
+    Menu_DrawNumber(2, x + 0x78, 0x34, p, 0xA);
+    p = D_8007A9F5;
+    Menu_DrawNumber(2, x + 0x39, 0x6B, p, 0xA);
+    p = D_8007A9F7;
+    Menu_DrawNumber(2, x + 0xE2, 0x6B, p, 0xA);
+    p = D_8007A9F6;
+    Menu_DrawNumber(2, x + 0x78, 0xAD, p, 0xA);
+    f = (u32)D_8007A9F4;
+    f /= 50.0f;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0xA6, 0x36, f, 3);
+    f = (u32)D_8007A9F5;
+    f /= 50.0f;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0x32, 0x79, f, 3);
+    f = (u32)D_8007A9F7;
+    f /= 50.0f;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0xDA, 0x79, f, 3);
+    f = (u32)D_8007A9F6;
+    f /= 50.0f;
+    f *= 50.0f;
+    Menu_DrawSprite(0x33, x + 0xA6, 0xAF, f, 3);
+    v = D_8007A9E0 * 100 / player_level_exp_table[D_8007AA04];
+    if (v > 100) {
+        v = 100;
+    }
+    Menu_DrawNumber(3, x + 0x91, 0x92, v, 0xA);
+    Menu_DrawExpGauge(v, x);
+    if (!(menu_flags & 0x2000)) {
+        if (input_stick_x > 20 || (input_held_buttons & 0x10)) {
+            menu_flags |= 0x2000;
+            menu_slide_timer = 31;
+            Sfx_Play(0, 0, 0xFF);
+        } else if (input_stick_x < -20 || (input_held_buttons & 0x2000)) {
+            menu_flags |= 0x3000;
+            menu_slide_timer = 31;
+            Sfx_Play(0, 0, 0xFF);
+        }
+    }
+}
+
+void Menu_DrawSprite(s32 id, s32 x, s32 y, s32 w, s32 h) {
+    s32 ret;
+    s32 cms;
+    s32 cmt;
+    s32 masks;
+    s32 maskt;
+    s32 shifts;
+    s32 shiftt;
+    s32 s;
+    s32 t;
+    s32 dsdx;
+    s32 dtdy;
+    s32 uls;
+    s32 ult;
+    s32 lrs;
+    s32 lrt;
+    u8 *tex;
+    s32 texW;
+    s32 alpha;
+    s32 xr;
+
+    ret = alpha = 0;
+    tex = menu_sprite_tex[id];
+    texW = menu_sprite_sizes[id][0];
+    lrs = menu_sprite_sizes[id][0] - 1;
+    lrt = menu_sprite_sizes[id][1] - 1;
+    cms = cmt = 0;
+    masks = maskt = 0;
+    shifts = shiftt = 0;
+    s = t = 0;
+    dsdx = dtdy = 0x400;
+    uls = ult = 0;
+
+    switch (id) {
+        case 0:
+            maskt = 4;
+            masks = 4;
+            s = (x & 0xF) << 5;
+            t = (y & 0xF) << 5;
+            break;
+        case 0x3C:
+            alpha = -0x80;
+            dtdy = 0;
+            dsdx = 0;
+            break;
+        case 0x3E:
+            alpha = 0x50;
+            break;
+        case 0x37:
+        case 0x38:
+        case 0x39:
+            dtdy = 0;
+            dsdx = 0;
+            break;
+        case 0x3D:
+            dsdx = 0;
+            break;
+    }
+    if (x < 0) {
+        if (x + w < 0) {
+            ret = -1;
+        } else {
+            xr = -x;
+            x = 0;
+            w -= xr;
+            s += xr << 5;
+        }
+    }
+    if (x > 320) {
+        ret = -1;
+    } else if ((xr = x + w) > 320) {
+        w = w - xr + 320;
+    }
+    if (w <= 0 || h <= 0) {
+        ret = -1;
+    }
+    if (ret >= 0) {
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
+        if (alpha == 0) {
+            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
+        } else {
+            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
+            gDPPipeSync(gfx_dl_head++);
+            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, alpha);
+        }
+        if (!(menu_flags & 0x10)) {
+            gDPPipeSync(gfx_dl_head++);
+            gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
+            menu_flags |= 0x10;
+        }
+        gDPLoadTextureTile(gfx_dl_head++, tex, G_IM_FMT_CI, G_IM_SIZ_8b, texW, 0, uls, ult, lrs, lrt, 0,
+                           cms, cmt, masks, maskt, shifts, shiftt);
+        gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h) << 2, G_TX_RENDERTILE, s, t, dsdx,
+                            dtdy);
+        gDPPipeSync(gfx_dl_head++);
+    }
+}
+
+
+void Menu_DrawExpGauge(s32 arg0, s32 arg1) {
+    s32 k;
+    s32 j;
+    s32 d;
+    MenuExpGaugePalettes pals = menu_exp_gauge_tluts;
+    MenuExpGaugeTextures tex = menu_exp_gauge_tex;
+    s32 xr;
+    s32 x;
+    s32 y;
+    s32 w;
+    s32 h = 0;
+    s32 texW;
+    s32 texH;
+    s32 ult;
+    s32 s[1];
+    s32 t;
+    s32 ret;
+
+    for (k = 0; k < 4; k++) {
+        gDPPipeSync(gfx_dl_head++);
+        gDPSetRenderMode(gfx_dl_head++, 0x504240, 0);
+        gDPSetTextureFilter(gfx_dl_head++, G_TF_BILERP);
+        gDPPipeSync(gfx_dl_head++);
+        if (k != 1) {
+            gSPDisplayList(gfx_dl_head++, menu_sprite_opaque_dl);
+        } else {
+            gSPDisplayList(gfx_dl_head++, menu_sprite_alpha_dl);
+            gDPSetEnvColor(gfx_dl_head++, 255, 255, 255, 0x80);
+        }
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, pals.v[k]);
+        for (j = 0; j < 2; j++) {
+            s[0] = 0;
+            switch (k) {
+                case 2:
+                    x = arg1 + 0x87;
+                    ult = 0x32 - arg0 / 2;
+                    y = ult + 0x52;
+                    w = 0x19;
+                    h = 0x32;
+                    texW = 0x19;
+                    texH = 0x32;
+                    t = ult << 5;
+                    break;
+                case 3:
+                    ult = 0;
+                    t = 0;
+                    x = arg1 + 0x84;
+                    y = 0x4F;
+                    w = 0x1C;
+                    h = 0x38;
+                    texW = 0x1C;
+                    texH = 0x38;
+                    break;
+                default:
+                    ult = 0;
+                    t = 0;
+                    x = arg1 + 0x87;
+                    y = 0x52;
+                    w = 0x19;
+                    h = 0x32;
+                    texW = 0x19;
+                    texH = 0x32;
+                    break;
+            }
+            x += w * j;
+            if (x < 0 && x + w >= 0) {
+                d = -x;
+                x = 0;
+                w -= d;
+                s[0] = d << 5;
+            }
+            if (x > 320) {
+                ret = -1;
+            } else {
+                ret = 0;
+                xr = x + w;
+                if (xr > 320) {
+                    w = w - xr + 320;
+                }
+            }
+            if (w <= 0) {
+                ret = -1;
+            }
+            if (ret >= 0) {
+                gDPLoadTextureTile(gfx_dl_head++, tex.v[k][j], G_IM_FMT_CI, G_IM_SIZ_8b, texW, texH, 0, ult, texW - 1,
+                                   texH - 1, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
+                                   G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+                gSPTextureRectangle(gfx_dl_head++, x << 2, y << 2, (x + w) << 2, (y + h - ult) << 2, G_TX_RENDERTILE, s[0],
+                                    t, 1 << 10, 1 << 10);
+                gDPPipeSync(gfx_dl_head++);
+            }
+        }
+    }
+    menu_flags &= ~0x10;
+}
+
+
+void Menu_DrawBackground(void) {
+    s32 i;
+    s32 y;
+    MenuFourWords texH = menu_bg_strip_tex_heights;
+    MenuFourWords stripH = menu_bg_strip_heights;
+    MenuFourPointers tex = menu_bg_strip_tex;
+
+    gDPPipeSync(gfx_dl_head++);
+    gDPLoadTLUT_pal256(gfx_dl_head++, menu_bg_tlut);
+    menu_flags &= ~0x10;
+    for (i = 0, y = 22; i < 4; i++) {
+        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+                           G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
+        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0, 0,
+                            0x4A8, 0x4E6);
+        gDPPipeSync(gfx_dl_head++);
+        y += stripH.v[i];
+    }
+    for (i = 3, y = 120; i >= 0; i--) {
+        gDPLoadTextureTile(gfx_dl_head++, tex.v[i], G_IM_FMT_CI, G_IM_SIZ_8b, 64, texH.v[i], 0, 0, 63, texH.v[i] - 1, 0,
+                           G_TX_MIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 6, 5, G_TX_NOLOD, G_TX_NOLOD);
+        gSPTextureRectangle(gfx_dl_head++, 23 << 2, y << 2, 297 << 2, (y + stripH.v[i]) << 2, G_TX_RENDERTILE, 0,
+                            (texH.v[i] - 1) << 5, 0x4A8, -0x4E6);
+        gDPPipeSync(gfx_dl_head++);
+        y += stripH.v[i];
+    }
+}
+
+
+void Menu_DrawNumber(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
+    s32 i;
+    u64 div;
+    s64 v;
+    s8 digits[10];
+    s32 xoff;
+    s32 j;
+    s32 n;
+
+    div = 1000000000;
+    v = value;
+    xoff = 0;
+    j = 9;
+    if (ndigits >= 10) {
+        ndigits = 9;
+    }
+    for (i = 0; i < 9; i++) {
+        n = 0;
+        while (TRUE) {
+            v -= div;
+            if (v < 0) {
+                v += div;
+                break;
+            }
+            n++;
+        }
+        digits[j--] = n;
+        div /= 10;
+    }
+    digits[0] = v;
+    i = 0;
+    if (!(menu_flags & 0x10)) {
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
+        menu_flags |= 0x10;
+    }
+    for (n = ndigits - 1; n >= 0; n--) {
+        i += digits[n];
+        if (i != 0 || n == 0) {
+            gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
+                               0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
+            gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
+                                G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+            gDPPipeSync(gfx_dl_head++);
+        }
+        xoff += 7;
+    }
+}
+
+void Menu_DrawNumberZeroPad(s32 ndigits, s32 x, s32 y, u32 value, s32 pal) {
+    s32 i;
+    s32 n;
+    u64 div;
+    s64 v;
+    s8 digits[10];
+    s32 xoff;
+    s32 j;
+
+    div = 1000000000;
+    v = value;
+    xoff = 0;
+    j = 9;
+    if (ndigits >= 10) {
+        ndigits = 9;
+    }
+    for (i = 0; i < 9; i++) {
+        n = 0;
+        while (TRUE) {
+            v -= div;
+            if (v < 0) {
+                v += div;
+                break;
+            }
+            n++;
+        }
+        digits[j--] = n;
+        div /= 10;
+    }
+    digits[0] = v;
+    if (!(menu_flags & 0x10)) {
+        gDPPipeSync(gfx_dl_head++);
+        gDPLoadTLUT_pal256(gfx_dl_head++, menu_sprite_tlut);
+        menu_flags |= 0x10;
+    }
+    for (n = ndigits - 1; n >= 0; n--) {
+        gDPLoadTextureTile(gfx_dl_head++, menu_sprite_tex[pal + digits[n]], G_IM_FMT_CI, G_IM_SIZ_8b, 8, 10, 0, 0, 7, 9,
+                           0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 3, 4, G_TX_NOLOD, G_TX_NOLOD);
+        gSPTextureRectangle(gfx_dl_head++, (x + xoff) << 2, y << 2, (x + xoff + 8) << 2, (y + 10) << 2,
+                            G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+        gDPPipeSync(gfx_dl_head++);
+        xoff += 7;
+    }
+}
+
+
+
+
+/* .data, continued (800615A8 is Menu_UpdateOptionsPage's ids[] initializer) */
 s16 menu_options_top_row_pos[8][2] = {
     { 138, 0 }, { 159, 0 }, { 179, 1 }, { 199, 2 }, { 219, 2 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
 };
