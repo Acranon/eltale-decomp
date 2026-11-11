@@ -174,11 +174,6 @@ extern u8 menu_map_small_sizes[4][3];
 extern s16 menu_map_small_pos[4][2];
 extern s16 menu_options_top_row_pos[8][2];
 extern s16 menu_options_bgm_row_pos[5][2];
-/* Menu_UpdateMapPage's function static (.data 800615E0), which hides this declaration; nothing
- * else may use it. The line stays because map.c's .bss order depends on the number of
- * declarations in this header (see the note at the top of map.c): removing it moves
- * map_clock_blend_len in front of mapobj_noanim_list. */
-extern s32 menu_map_loaded_region;
 extern MenuExpGaugePalettes menu_exp_gauge_tluts;
 extern MenuExpGaugeTextures menu_exp_gauge_tex;
 extern MenuFourWords menu_bg_strip_tex_heights;

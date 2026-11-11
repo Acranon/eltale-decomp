@@ -19,7 +19,7 @@
  * .bss order (first declaration; IDO sorts by declaration number mod 256, later blocks first on
  * a tie), and Map_BlendPaletteByClock's static map_clock_blend_len only lands at 80082858 (after
  * mapobj_noanim_list) if the number of declarations between map.h's first .bss run and the
- * static stays close to what it is now: margin 13 more (measured) or about 8 fewer (typedef
+ * static stays close to what it is now: margin 14 more (measured) or about 7 fewer (typedef
  * names, struct tags and data externs count 1 each, used or not; prototypes and unused
  * locals don't). That is why menu.h (which includes map.h), camera.h and
  * dma.h come right after map.h, and why map.h declares its .data externs between its two
